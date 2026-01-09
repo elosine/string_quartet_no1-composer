@@ -1,0 +1,38 @@
+MIDI Control Change (
+CC) messages are a standard part of the MIDI protocol, used to control various parameters of a musical device. There are 128 possible CC numbers (0-127), each assigned a specific or general purpose, allowing for expressive manipulation of sound and performance. 
+Below is a list of common and standard MIDI CC messages and their typical uses:
+Commonly Used Continuous Controllers 
+These controllers generally use a range of values (0-127) to represent gradual changes. 
+
+    CC 0: Bank Select (MSB) Used in conjunction with CC 32 (LSB) and Program Change messages to access large banks of sounds or patches beyond the standard 128 program changes.
+    CC 1: Modulation Wheel Typically controls vibrato (pitch, loudness, or brightness).
+    CC 2: Breath Controller Originally for use with a breath controller device to vary sound based on breath pressure, but often used for general modulation.
+    CC 4: Foot Controller A general purpose control often assigned to aftertouch or other continuous parameters via a foot pedal.
+    CC 5: Portamento Time Controls the speed at which the pitch slides from one note to the next when portamento is active.
+    CC 7: Main Volume Controls the main volume level of the channel.
+    CC 10: Pan Position Controls the stereo left/right position of the sound (0 = hard left, 64 = center, 127 = hard right).
+    CC 11: Expression Controls the volume as a percentage of the main volume (CC 7). It is often used for dynamic changes (crescendo/diminuendo) within a musical phrase. 
+
+Commonly Used On/Off Switches 
+These controllers typically use values 0-63 for "Off" and 64-127 for "On". 
+
+    CC 64: Damper Pedal (Sustain) The most common pedal message; it sustains notes after the key is released.
+    CC 65: Portamento On/Off Turns the portamento effect (note sliding) on or off.
+    CC 66: Sostenuto Similar to sustain, but only sustains notes that were already held down when the pedal was pressed.
+    CC 67: Soft Pedal Lowers the volume of notes played (una corda effect). 
+
+Sound Controllers (General MIDI Level 2 Defaults)
+These are used for general sound shaping. 
+
+    CC 71: Resonance (Timbre) Controls the filter resonance (Q).
+    CC 72: Release Time Controls the release time of the sound's envelope.
+    CC 73: Attack Time Controls the attack time of the sound's envelope.
+    CC 74: Brightness (Filter Cutoff) Controls the filter cutoff frequency. 
+
+Channel Mode Messages
+Controllers 120-127 are reserved for channel mode messages, which affect the channel's operating mode rather than sound parameters. 
+
+    CC 120: All Sound Off Immediately mutes all sounding notes regardless of release time.
+    CC 121: Reset All Controllers Resets all controllers to their default states.
+    CC 122: Local Control On/Off Determines if the local keyboard is connected to its internal sound generator.
+    CC 123: All Notes Off Mutes all sounding notes while still respecting their release times and the sustain pedal. 

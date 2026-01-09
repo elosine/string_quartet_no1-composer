@@ -193,15 +193,15 @@
             text-align: center;
         }
         
-        /* Cursor Control Menu (Right Side) */
+        /* Playback-MIDI Menu (Right Side) */
         #cursorMenu {
             position: fixed;
             right: 0;
             top: 0;
             height: 100vh;
-            width: 250px;
+            width: 280px;
             background: rgba(30, 30, 40, 0.95);
-            transform: translateX(225px);
+            transform: translateX(255px);
             transition: transform 0.3s ease;
             z-index: 1000;
             display: flex;
@@ -219,7 +219,7 @@
             justify-content: center;
             writing-mode: vertical-rl;
             text-orientation: mixed;
-            font-size: 12px;
+            font-size: 11px;
             color: white;
             user-select: none;
         }
@@ -230,6 +230,150 @@
             flex: 1;
             padding: 15px;
             overflow-y: auto;
+        }
+        
+        /* Track Radio Buttons (T1-T4) */
+        .track-radio-group {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 4px;
+        }
+        .track-radio-group input[type="radio"] {
+            display: none;
+        }
+        .track-radio-group label {
+            flex: 1;
+            text-align: center;
+            padding: 6px 4px;
+            background: rgba(40, 40, 50, 0.6);
+            border: 1px solid #555;
+            border-radius: 3px;
+            color: #aaa;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .track-radio-group label:hover {
+            background: rgba(60, 60, 80, 0.6);
+            border-color: #777;
+        }
+        .track-radio-group input[type="radio"]:checked + label {
+            background: var(--clr-brightBlue);
+            border-color: var(--clr-brightBlue);
+            color: #fff;
+        }
+        
+        /* MIDI Select Dropdowns */
+        .midi-select {
+            flex: 1;
+            background: #2a2a3a;
+            border: 1px solid var(--clr-blueGrey);
+            color: white;
+            padding: 4px 6px;
+            font-size: 11px;
+            border-radius: 3px;
+            max-width: 140px;
+        }
+        .midi-select:focus {
+            outline: none;
+            border-color: var(--clr-brightBlue);
+        }
+        
+        /* MIDI Filename Display */
+        .midi-filename {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--clr-blueGrey);
+            color: var(--clr-lightGrey);
+            padding: 4px 8px;
+            font-size: 10px;
+            border-radius: 3px;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Small Timecode Display */
+        .timecode-display-small {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--clr-blueGrey);
+            color: var(--clr-brightGreen);
+            padding: 4px 8px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 3px;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        /* Track Enable Toggles */
+        .track-enable-group {
+            margin-top: 10px;
+        }
+        .track-enable-label {
+            font-size: 11px;
+            color: var(--clr-lightGrey);
+            display: block;
+            margin-bottom: 6px;
+        }
+        .track-toggles {
+            display: flex;
+            gap: 4px;
+        }
+        .track-toggles input[type="checkbox"] {
+            display: none;
+        }
+        .track-toggles label {
+            flex: 1;
+            text-align: center;
+            padding: 6px 4px;
+            background: rgba(40, 40, 50, 0.6);
+            border: 1px solid #555;
+            border-radius: 3px;
+            color: #666;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .track-toggles label:hover {
+            background: rgba(60, 60, 80, 0.6);
+            border-color: #777;
+        }
+        .track-toggles input[type="checkbox"]:checked + label {
+            background: var(--clr-brightGreen);
+            border-color: var(--clr-brightGreen);
+            color: #000;
+        }
+        
+        /* Display Toggles */
+        .display-toggles {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .display-toggles input[type="checkbox"] {
+            display: none;
+        }
+        .display-toggles label {
+            display: block;
+            padding: 6px 10px;
+            background: rgba(40, 40, 50, 0.6);
+            border: 1px solid #555;
+            border-radius: 3px;
+            color: #666;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .display-toggles label:hover {
+            background: rgba(60, 60, 80, 0.6);
+            border-color: #777;
+        }
+        .display-toggles input[type="checkbox"]:checked + label {
+            background: var(--clr-brightBlue);
+            border-color: var(--clr-brightBlue);
+            color: #fff;
         }
         .control-btn {
             width: 100%;
@@ -249,123 +393,16 @@
             background: var(--clr-brightRed);
         }
         
-        /* MIDI Control Panel (Bottom) */
-        #midiPanel {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 180px;
-            background: rgba(30, 30, 40, 0.95);
-            transform: translateY(155px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
-        #midiPanel.open {
-            transform: translateY(0);
-        }
-        #midiPanelToggle {
-            height: 25px;
-            background: var(--clr-navyBlue);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: white;
-            user-select: none;
-        }
-        #midiPanelToggle:hover {
-            background: var(--clr-brightBlue);
-        }
-        #midiPanelContent {
-            flex: 1;
-            padding: 10px 20px;
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
-            overflow-x: auto;
-        }
-        .midi-section {
-            display: flex;
-            flex-direction: column;
-            min-width: 180px;
-        }
-        .midi-section h4 {
-            color: var(--clr-brightBlue);
-            font-size: 12px;
-            margin-bottom: 8px;
-            border-bottom: 1px solid var(--clr-blueGrey);
-            padding-bottom: 4px;
-        }
-        .midi-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 6px;
-            gap: 8px;
-        }
-        .midi-row label {
-            font-size: 11px;
-            color: var(--clr-lightGrey);
-            min-width: 50px;
-        }
-        .midi-row select {
-            flex: 1;
-            background: #2a2a3a;
-            border: 1px solid var(--clr-blueGrey);
-            color: white;
-            padding: 4px 6px;
-            font-size: 11px;
-            border-radius: 3px;
-            max-width: 150px;
-        }
-        .midi-row select:focus {
-            outline: none;
-            border-color: var(--clr-brightBlue);
-        }
-        .midi-row select option {
-            background: #2a2a3a;
-            color: white;
-            padding: 4px;
-        }
-        .midi-btn {
-            padding: 6px 12px;
-            background: var(--clr-navyBlue);
-            border: 1px solid var(--clr-blueGrey);
-            color: white;
-            font-size: 11px;
-            border-radius: 3px;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-        .midi-btn:hover {
-            background: var(--clr-brightBlue);
-        }
-        .midi-btn.active {
-            background: var(--clr-brightRed);
-        }
-        .midi-btn.record {
-            background: var(--clr-darkRed);
-        }
-        .midi-btn.record.active {
-            background: var(--clr-brightRed);
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
+        /* Transport Controls */
         .transport-controls {
             display: flex;
             align-items: center;
             gap: 6px;
         }
         .transport-btn {
-            width: 32px;
+            width: 32px !important;
             height: 32px;
-            padding: 0;
+            padding: 0 !important;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -385,16 +422,317 @@
         .file-input-hidden {
             display: none;
         }
+        
+        /* Composition Panel (Left Side) */
+        #compositionPanel {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: rgba(30, 30, 40, 0.95);
+            transform: translateX(-255px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: row;
+        }
+        #compositionPanel.open {
+            transform: translateX(0);
+        }
+        #compositionPanelToggle {
+            width: 25px;
+            background: var(--clr-plum);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-size: 12px;
+            color: white;
+            user-select: none;
+        }
+        #compositionPanelToggle:hover {
+            background: var(--clr-lavander);
+        }
+        #compositionPanelContent {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .edit-cursor-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--clr-yellow);
+            color: var(--clr-yellow);
+            padding: 8px 12px;
+            font-size: 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .edit-cursor-input:focus {
+            outline: none;
+            border-color: var(--clr-limeGreen);
+        }
+        
+        /* G Track Radio Buttons */
+        .gtrack-radio-group {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 4px;
+            margin-top: 10px;
+        }
+        .gtrack-radio-group input[type="radio"] {
+            display: none;
+        }
+        .gtrack-radio-group label {
+            flex: 1;
+            text-align: center;
+            padding: 6px 4px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #aaa;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .gtrack-radio-group label:hover {
+            background: rgba(60, 60, 80, 0.6);
+            border-color: #777;
+        }
+        .gtrack-radio-group input[type="radio"]:checked + label {
+            background: var(--clr-yellow);
+            border-color: var(--clr-yellow);
+            color: #000;
+        }
+        
+        /* Curve Maker Styles */
+        .curve-input-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center;
+        }
+        .curve-input-row label {
+            font-size: 10px;
+            color: #aaa;
+            min-width: 35px;
+        }
+        .curve-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #555;
+            color: #fff;
+            padding: 4px 6px;
+            font-size: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-radius: 3px;
+            text-align: center;
+            width: 60px;
+        }
+        .curve-input:focus {
+            outline: none;
+            border-color: var(--clr-yellow);
+        }
+        .curve-draw-btn {
+            background: var(--clr-plum);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 8px;
+            width: 100%;
+        }
+        .curve-draw-btn:hover {
+            background: var(--clr-lavander);
+        }
+        .curve-fill-toggle {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .curve-fill-toggle input[type="radio"] {
+            display: none;
+        }
+        .curve-fill-toggle label {
+            flex: 1;
+            text-align: center;
+            padding: 4px 2px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #555;
+            border-radius: 3px;
+            color: #aaa;
+            font-size: 9px;
+            cursor: pointer;
+        }
+        .curve-fill-toggle input[type="radio"]:checked + label {
+            background: var(--clr-lavander);
+            border-color: var(--clr-lavander);
+            color: #000;
+        }
+        .color-swatches {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+        .color-swatch:hover {
+            border-color: #fff;
+        }
+        .color-swatch.selected {
+            border-color: #fff;
+            box-shadow: 0 0 4px rgba(255,255,255,0.5);
+        }
+        .section-divider {
+            border-top: 1px solid #444;
+            margin: 12px 0 8px 0;
+            padding-top: 8px;
+        }
+        .section-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        
+        /* Curve Selection Bounding Box */
+        .curve-bounding-box {
+            fill-opacity: 0.1;
+            stroke-width: 2;
+            stroke-dasharray: 6,3;
+            cursor: pointer;
+        }
+        
+        /* Edit Cursor Styles */
+        .edit-cursor-line {
+            stroke: rgba(254, 254, 0, 0.8);
+            stroke-width: 5;
+            cursor: ew-resize;
+        }
+        .edit-cursor-handle {
+            fill: rgba(254, 254, 0, 0.8);
+            cursor: ew-resize;
+        }
     </style>
 </head>
 <body>
-    <!-- Cursor Control Menu (Right) -->
+    <!-- Composition Panel (Left) -->
+    <div id="compositionPanel">
+        <div id="compositionPanelContent">
+            <div class="menu-section">
+                <div class="control-row">
+                    <input type="text" id="editCursorSecondsInput" class="edit-cursor-input" value="0.000">
+                </div>
+                <div class="gtrack-radio-group">
+                    <input type="radio" id="gtrackG1" name="gtrack" value="1">
+                    <label for="gtrackG1">G1</label>
+                    <input type="radio" id="gtrackG2" name="gtrack" value="2">
+                    <label for="gtrackG2">G2</label>
+                    <input type="radio" id="gtrackG3" name="gtrack" value="3">
+                    <label for="gtrackG3">G3</label>
+                    <input type="radio" id="gtrackG4" name="gtrack" value="4">
+                    <label for="gtrackG4">G4</label>
+                    <input type="radio" id="gtrackGA" name="gtrack" value="A" checked>
+                    <label for="gtrackGA">GA</label>
+                </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label">Curve Maker</div>
+                
+                <div class="curve-input-row">
+                    <label>Name</label>
+                    <input type="text" id="curveNameDisplay" class="curve-input" value="" readonly style="background: rgba(40,40,50,0.8); color: #aaa;">
+                </div>
+                <div class="curve-input-row">
+                    <label>Start</label>
+                    <input type="text" id="curveStartInput" class="curve-input" value="0.000">
+                </div>
+                <div class="curve-input-row">
+                    <label>End</label>
+                    <input type="text" id="curveEndInput" class="curve-input" value="1.000">
+                </div>
+                <div class="curve-input-row">
+                    <label>Y1</label>
+                    <input type="text" id="curveY1Input" class="curve-input" value="0.0">
+                </div>
+                <div class="curve-input-row">
+                    <label>Y2</label>
+                    <input type="text" id="curveY2Input" class="curve-input" value="10.0">
+                </div>
+                
+                <button id="curveDrawBtn" class="curve-draw-btn">Draw</button>
+                
+                <div class="curve-fill-toggle">
+                    <input type="radio" id="curveFillLine" name="curveFill" value="line" checked>
+                    <label for="curveFillLine">Line</label>
+                    <input type="radio" id="curveFillBottom" name="curveFill" value="bottom">
+                    <label for="curveFillBottom">Fill ↓</label>
+                    <input type="radio" id="curveFillTop" name="curveFill" value="top">
+                    <label for="curveFillTop">Fill ↑</label>
+                </div>
+                
+                <div class="section-label" style="margin-top: 10px;">Color</div>
+                <div class="color-swatches" id="colorSwatches">
+                    <div class="color-swatch selected" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
+                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
+                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
+                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
+                    <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
+                    <div class="color-swatch" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
+                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
+                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
+                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
+                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
+                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
+                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                </div>
+            </div>
+        </div>
+        <div id="compositionPanelToggle">◀ Composition</div>
+    </div>
+    
+    <!-- Playback-MIDI Menu (Right) -->
     <div id="cursorMenu">
-        <div id="cursorMenuToggle">Cursor ▶</div>
+        <div id="cursorMenuToggle">Playback-MIDI ▶</div>
         <div id="cursorMenuContent">
             <div class="menu-section">
                 <h3>Playback</h3>
                 <div class="control-row">
+                    <span id="midiTimecode" class="timecode-display">00:00:00.000</span>
+                </div>
+                <div class="track-enable-group">
+                    <label class="track-enable-label">Enable Tracks:</label>
+                    <div class="track-toggles">
+                        <input type="checkbox" id="midiEnableT1" checked>
+                        <label for="midiEnableT1">T1</label>
+                        <input type="checkbox" id="midiEnableT2" checked>
+                        <label for="midiEnableT2">T2</label>
+                        <input type="checkbox" id="midiEnableT3" checked>
+                        <label for="midiEnableT3">T3</label>
+                        <input type="checkbox" id="midiEnableT4" checked>
+                        <label for="midiEnableT4">T4</label>
+                    </div>
+                </div>
+                <div class="control-row">
+                    <span id="midiEventCount" style="font-size: 11px; color: var(--clr-lightGrey);">Events: 0</span>
+                </div>
+                <div class="control-row" style="margin-top: 10px;">
                     <button id="goStopBtn" class="control-btn">Go</button>
                 </div>
             </div>
@@ -403,10 +741,6 @@
                 <div class="control-row">
                     <label>Second</label>
                     <input type="number" id="gotoSecondInput" step="0.01" value="0">
-                </div>
-                <div class="control-row">
-                    <label>Beat</label>
-                    <input type="number" id="gotoBeatInput" step="0.25" value="0">
                 </div>
                 <div class="control-row">
                     <button id="gotoBtn" class="control-btn">Go</button>
@@ -419,6 +753,66 @@
                     <input type="number" id="leadInSecondsInput" min="0" step="0.5" value="2">
                 </div>
             </div>
+            
+            <div class="menu-section">
+                <h3>MIDI Devices</h3>
+                <div class="control-row">
+                    <label>Input</label>
+                    <select id="midiInputSelect" class="midi-select">
+                        <option value="">-- Select Input --</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <label>Output</label>
+                    <select id="midiOutputSelect" class="midi-select">
+                        <option value="">-- Select Output --</option>
+                    </select>
+                </div>
+                <div class="control-row">
+                    <button id="midiRefreshBtn" class="control-btn">Refresh Devices</button>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <h3>MIDI File</h3>
+                <div class="track-radio-group">
+                    <input type="radio" id="midiTrackT1" name="midiTrack" value="1" checked>
+                    <label for="midiTrackT1">T1</label>
+                    <input type="radio" id="midiTrackT2" name="midiTrack" value="2">
+                    <label for="midiTrackT2">T2</label>
+                    <input type="radio" id="midiTrackT3" name="midiTrack" value="3">
+                    <label for="midiTrackT3">T3</label>
+                    <input type="radio" id="midiTrackT4" name="midiTrack" value="4">
+                    <label for="midiTrackT4">T4</label>
+                </div>
+                <div class="control-row" style="margin-top: 10px;">
+                    <button id="midiLoadBtn" class="control-btn">Load MIDI</button>
+                    <input type="file" id="midiFileInput" class="file-input-hidden" accept=".mid,.midi">
+                </div>
+                <div class="control-row">
+                    <span id="midiFileName" class="midi-filename">No file loaded</span>
+                </div>
+                <div class="control-row" style="margin-top: 10px;">
+                    <button id="midiInsertBtn" class="control-btn">Insert</button>
+                    <span id="midiInsertTime" class="timecode-display-small">0.000</span>
+                </div>
+                <div class="control-row" style="margin-top: 10px;">
+                    <button id="midiDownloadBtn" class="control-btn">Download MIDI</button>
+                </div>
+                <div class="control-row">
+                    <button id="midiExportCsvBtn" class="control-btn">Export CSV</button>
+                </div>
+            </div>
+            
+            <div class="menu-section">
+                <h3>Display</h3>
+                <div class="display-toggles">
+                    <input type="checkbox" id="showGraphicItems" checked>
+                    <label for="showGraphicItems">Graphic Items</label>
+                    <input type="checkbox" id="showMidiDisplay" checked>
+                    <label for="showMidiDisplay">MIDI Display</label>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -427,73 +821,6 @@
         <svg id="ScoreBottom"></svg>
     </div>
     
-    <!-- MIDI Control Panel (Bottom) -->
-    <div id="midiPanel">
-        <div id="midiPanelToggle">▲ MIDI</div>
-        <div id="midiPanelContent">
-            <!-- Device Selection -->
-            <div class="midi-section">
-                <h4>Devices</h4>
-                <div class="midi-row">
-                    <label>Input</label>
-                    <select id="midiInputSelect">
-                        <option value="">-- Select Input --</option>
-                    </select>
-                </div>
-                <div class="midi-row">
-                    <label>Output</label>
-                    <select id="midiOutputSelect">
-                        <option value="">-- Select Output --</option>
-                    </select>
-                </div>
-                <div class="midi-row">
-                    <button id="midiRefreshBtn" class="midi-btn">Refresh</button>
-                </div>
-            </div>
-            
-            <!-- File Operations -->
-            <div class="midi-section">
-                <h4>File</h4>
-                <div class="midi-row">
-                    <button id="midiLoadBtn" class="midi-btn">Load MIDI</button>
-                    <input type="file" id="midiFileInput" class="file-input-hidden" accept=".mid,.midi">
-                </div>
-                <div class="midi-row">
-                    <button id="midiDownloadBtn" class="midi-btn">Download MIDI</button>
-                </div>
-                <div class="midi-row">
-                    <button id="midiExportCsvBtn" class="midi-btn">Export CSV</button>
-                </div>
-            </div>
-            
-            <!-- Transport -->
-            <div class="midi-section">
-                <h4>Transport</h4>
-                <div class="midi-row">
-                    <div class="transport-controls">
-                        <button id="midiBeginningBtn" class="midi-btn transport-btn" title="Go to Beginning">⏮</button>
-                        <button id="midiPrevEventBtn" class="midi-btn transport-btn" title="Previous Event">⏪</button>
-                        <button id="midiPlayPauseBtn" class="midi-btn transport-btn" title="Play/Pause">▶</button>
-                        <button id="midiNextEventBtn" class="midi-btn transport-btn" title="Next Event">⏩</button>
-                    </div>
-                </div>
-                <div class="midi-row">
-                    <span id="midiTimecode" class="timecode-display">00:00:00.000</span>
-                </div>
-            </div>
-            
-            <!-- Recording -->
-            <div class="midi-section">
-                <h4>Record</h4>
-                <div class="midi-row">
-                    <button id="midiRecordBtn" class="midi-btn record" title="Record">⏺ Record</button>
-                </div>
-                <div class="midi-row">
-                    <span id="midiEventCount" style="font-size: 11px; color: var(--clr-lightGrey);">Events: 0</span>
-                </div>
-            </div>
-        </div>
-    </div>
     
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -724,7 +1051,6 @@
             toggleEl: null,
             goStopBtn: null,
             gotoSecondInput: null,
-            gotoBeatInput: null,
             gotoBtn: null,
             leadInSecondsInput: null,
             isOpen: false,
@@ -734,7 +1060,6 @@
                 this.toggleEl = document.getElementById('cursorMenuToggle');
                 this.goStopBtn = document.getElementById('goStopBtn');
                 this.gotoSecondInput = document.getElementById('gotoSecondInput');
-                this.gotoBeatInput = document.getElementById('gotoBeatInput');
                 this.gotoBtn = document.getElementById('gotoBtn');
                 this.leadInSecondsInput = document.getElementById('leadInSecondsInput');
                 
@@ -746,9 +1071,8 @@
                     leadInSeconds = parseFloat(e.target.value) || 0;
                     // Update min values for jump inputs to allow negative lead-in time
                     this.updateJumpInputLimits();
-                    // Re-render timelines with new lead-in
-                    if (window.Timeline) Timeline.renderTicks();
-                    if (window.BeatTimeline) BeatTimeline.renderTicks();
+                    // Re-render graphic timeline with new lead-in
+                    if (window.GraphicTimeline) GraphicTimeline.renderTicks();
                 });
                 
                 // Set initial min values based on default lead-in
@@ -760,24 +1084,8 @@
                 // Go to button - stops, jumps, stays stopped
                 this.gotoBtn.addEventListener('click', () => this.gotoPosition());
                 
-                // Link second and beat inputs - when one changes, update the other
-                this.gotoSecondInput.addEventListener('input', (e) => {
-                    const seconds = parseFloat(e.target.value) || 0;
-                    const beats = this.secondsToBeats(seconds);
-                    this.gotoBeatInput.value = beats.toFixed(2);
-                });
-                
-                this.gotoBeatInput.addEventListener('input', (e) => {
-                    const beats = parseFloat(e.target.value) || 0;
-                    const seconds = this.beatsToSeconds(beats);
-                    this.gotoSecondInput.value = seconds.toFixed(2);
-                });
-                
-                // Enter key on either input triggers goto
+                // Enter key on second input triggers goto
                 this.gotoSecondInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.gotoPosition();
-                });
-                this.gotoBeatInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.gotoPosition();
                 });
                 
@@ -805,18 +1113,16 @@
                 return beats * (60 / beatsPerMinute);
             },
             
-            // Update min values for jump inputs based on lead-in time
+            // Update min value for jump input based on lead-in time
             updateJumpInputLimits() {
                 const minSeconds = -leadInSeconds;
-                const minBeats = this.secondsToBeats(minSeconds);
                 this.gotoSecondInput.setAttribute('min', minSeconds);
-                this.gotoBeatInput.setAttribute('min', minBeats);
             },
             
             toggle() {
                 this.isOpen = !this.isOpen;
                 this.menuEl.classList.toggle('open', this.isOpen);
-                this.toggleEl.textContent = this.isOpen ? 'Cursor ▶' : 'Cursor ▶';
+                this.toggleEl.textContent = this.isOpen ? '◀ Playback-MIDI' : 'Playback-MIDI ▶';
             },
             
             toggleGoStop() {
@@ -858,21 +1164,20 @@
                 serverTempoHistory = data.tempoHistory;
                 this.goStopBtn.textContent = 'Go';
                 this.goStopBtn.classList.remove('active');
-                // Update both inputs to reflect the new position (convert from actual to display time)
+                // Update input to reflect the new position (convert from actual to display time)
                 const displaySeconds = data.targetSeconds - leadInSeconds;
                 this.gotoSecondInput.value = displaySeconds.toFixed(2);
-                this.gotoBeatInput.value = this.secondsToBeats(displaySeconds).toFixed(2);
-                // Update timeline for new position
-                if (window.Timeline) {
-                    Timeline.onGoto(data.targetSeconds);
-                }
-                // Update beat timeline for new position
-                if (window.BeatTimeline) {
-                    BeatTimeline.onGoto(data.targetSeconds);
+                // Update graphic timeline for new position
+                if (window.GraphicTimeline) {
+                    GraphicTimeline.onGoto(data.targetSeconds);
                 }
                 // Update track system for new position
                 if (window.TrackSystem) {
                     TrackSystem.onGoto(data.targetSeconds);
+                }
+                // Reset MIDI playback indices to match new position
+                if (window.MidiController) {
+                    MidiController.resetPlaybackToTime(displaySeconds * 1000);
                 }
                 console.log(`Score GOTO ${data.targetSeconds}s (display: ${displaySeconds}s) - frozen at ${data.currentScoreTimeMs}ms`);
             }
@@ -886,6 +1191,7 @@
         // Uses server-synced animation timeline for exact pixel sync across all clients
         const StaffCursors = {
             cursors: [],           // Array of cursor objects for each staff
+            staffDividers: [],     // Array of horizontal staff divider line objects
             scoreTopEl: null,
             scoreBottomEl: null,
             initialized: false,
@@ -901,6 +1207,9 @@
             init() {
                 this.scoreTopEl = document.getElementById('ScoreTop');
                 this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                // Create horizontal staff dividers (3 lines dividing into 4 sections)
+                this.createStaffDividers();
                 
                 // Create cursors for each of the 4 staves
                 for (let i = 0; i < 4; i++) {
@@ -940,6 +1249,11 @@
                     const latestTempo = serverTempoHistory[serverTempoHistory.length - 1];
                     beatsPerMinute = latestTempo.bpm;
                     beatsPerPage = latestTempo.beatsPerPage;
+                }
+                
+                // Redraw graphic timeline when tempo/beatsPerPage changes
+                if (window.GraphicTimeline) {
+                    GraphicTimeline.renderTicks();
                 }
                 
                 // Update UI button state
@@ -1004,14 +1318,70 @@
             },
             
             // Timeline height in pixels - staves start below this
-            timelineHeight: 24,
+            timelineHeight: 8,
+            
+            // Create 3 horizontal staff dividers to divide page into 4 vertical sections
+            createStaffDividers() {
+                const scoreHeight = this.scoreTopEl.clientHeight;
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const sectionHeight = availableHeight / 4;
+                
+                // Create 3 staff dividers (at bottom of sections 1, 2, and 3)
+                for (let i = 1; i <= 3; i++) {
+                    const yPosition = this.timelineHeight + (i * sectionHeight);
+                    
+                    // Create line for ScoreTop
+                    const lineTop = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    lineTop.setAttribute('x1', '0');
+                    lineTop.setAttribute('y1', yPosition);
+                    lineTop.setAttribute('x2', '100%');
+                    lineTop.setAttribute('y2', yPosition);
+                    lineTop.setAttribute('stroke', '#999');
+                    lineTop.setAttribute('stroke-width', '1');
+                    
+                    // Create line for ScoreBottom
+                    const lineBottom = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    lineBottom.setAttribute('x1', '0');
+                    lineBottom.setAttribute('y1', yPosition);
+                    lineBottom.setAttribute('x2', '100%');
+                    lineBottom.setAttribute('y2', yPosition);
+                    lineBottom.setAttribute('stroke', '#999');
+                    lineBottom.setAttribute('stroke-width', '1');
+                    
+                    // Add to SVG elements
+                    this.scoreTopEl.appendChild(lineTop);
+                    this.scoreBottomEl.appendChild(lineBottom);
+                    
+                    this.staffDividers.push({
+                        sectionIndex: i,
+                        topEl: lineTop,
+                        bottomEl: lineBottom
+                    });
+                }
+            },
+            
+            // Update staff divider positions on resize
+            updateStaffDividers() {
+                const scoreHeight = this.scoreTopEl.clientHeight;
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const sectionHeight = availableHeight / 4;
+                
+                this.staffDividers.forEach((line) => {
+                    const yPosition = this.timelineHeight + (line.sectionIndex * sectionHeight);
+                    [line.topEl, line.bottomEl].forEach(el => {
+                        el.setAttribute('y1', yPosition);
+                        el.setAttribute('y2', yPosition);
+                    });
+                });
+            },
             
             createCursor(staffIndex) {
                 // Create SVG rect elements for both ScoreTop and ScoreBottom
                 const cursorTop = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 const cursorBottom = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 
-                // Get the score height to calculate staff dimensions
+                // Get the score height to calculate cursor dimensions
+                // Each cursor is on its own horizontal stripe (1/4 of available height)
                 const scoreHeight = this.scoreTopEl.clientHeight;
                 const availableHeight = scoreHeight - this.timelineHeight;
                 const staffHeight = availableHeight / 4;
@@ -1026,16 +1396,37 @@
                     cursor.setAttribute('x', '0');
                 });
                 
+                // Create curve-following rectangles (8px wide, left of cursor, 65% opaque)
+                const curveFollowerTop = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                const curveFollowerBottom = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                
+                [curveFollowerTop, curveFollowerBottom].forEach(follower => {
+                    follower.setAttribute('width', '8');
+                    follower.setAttribute('y', yPosition);
+                    follower.setAttribute('height', staffHeight);
+                    follower.setAttribute('fill', 'none');
+                    follower.setAttribute('stroke', this.colors[staffIndex]);
+                    follower.setAttribute('stroke-width', '1');
+                    follower.setAttribute('opacity', '0.65');
+                    follower.setAttribute('x', '-11'); // 8px width + 3px gap left of cursor
+                    follower.style.display = 'none';
+                });
+                
                 // Add to SVG elements
                 this.scoreTopEl.appendChild(cursorTop);
                 this.scoreBottomEl.appendChild(cursorBottom);
+                this.scoreTopEl.appendChild(curveFollowerTop);
+                this.scoreBottomEl.appendChild(curveFollowerBottom);
                 
                 return {
                     staffIndex: staffIndex,
                     topEl: cursorTop,
                     bottomEl: cursorBottom,
+                    curveFollowerTop: curveFollowerTop,
+                    curveFollowerBottom: curveFollowerBottom,
                     currentSection: 'top',  // 'top' or 'bottom'
-                    xPosition: 0            // Current x position in pixels
+                    xPosition: 0,           // Current x position in pixels
+                    currentCurveValue: null // Current normalized Y value from curve
                 };
             },
             
@@ -1051,7 +1442,15 @@
                         el.setAttribute('y', yPosition);
                         el.setAttribute('height', staffHeight);
                     });
+                    // Update curve followers too
+                    [cursor.curveFollowerTop, cursor.curveFollowerBottom].forEach(el => {
+                        el.setAttribute('y', yPosition);
+                        el.setAttribute('height', staffHeight);
+                    });
                 });
+                
+                // Also update staff dividers on resize
+                this.updateStaffDividers();
             },
             
             update() {
@@ -1081,8 +1480,17 @@
                     inBottom = true;
                 }
                 
+                // Get score width for pixel calculations
+                const scoreWidth = this.scoreTopEl.clientWidth;
+                const xPixel = (xPercent / 100) * scoreWidth;
+                const currentSection = inTop ? 'top' : 'bottom';
+                // Convert score time to display time (subtract lead-in)
+                // ScoreTime starts at 0 when playback begins (during lead-in)
+                // Display time 0 = first beat (after lead-in)
+                const currentDisplayTimeSec = (currentScoreTimeMs / 1000) - leadInSeconds;
+                
                 // Update each cursor using percentage positioning
-                this.cursors.forEach(cursor => {
+                this.cursors.forEach((cursor, staffIndex) => {
                     // Set x position as percentage
                     cursor.topEl.setAttribute('x', `${xPercent}%`);
                     cursor.bottomEl.setAttribute('x', `${xPercent}%`);
@@ -1090,7 +1498,85 @@
                     // Show/hide based on which section is active
                     cursor.topEl.style.display = inTop ? 'block' : 'none';
                     cursor.bottomEl.style.display = inBottom ? 'block' : 'none';
+                    
+                    // Update curve follower for this track
+                    this.updateCurveFollower(cursor, staffIndex, xPixel, xPercent, currentSection, currentDisplayTimeSec);
                 });
+            },
+            
+            // Update curve follower rectangle based on curve intersection
+            // TIMECODE-BASED SYSTEM: O(1) lookup using time-indexed samples
+            updateCurveFollower(cursor, staffIndex, xPixel, xPercent, section, currentTimeSec) {
+                const follower = section === 'top' ? cursor.curveFollowerTop : cursor.curveFollowerBottom;
+                const otherFollower = section === 'top' ? cursor.curveFollowerBottom : cursor.curveFollowerTop;
+                
+                // Hide the follower on the inactive section
+                otherFollower.style.display = 'none';
+                
+                // Check if there's a curve at this position for this track
+                const gTrack = window.GTrackSystem ? GTrackSystem.getGTrack(staffIndex) : null;
+                if (!gTrack) {
+                    follower.style.display = 'none';
+                    cursor.currentCurveValue = null;
+                    return;
+                }
+                
+                // Find curve that contains current time and get O(1) sample lookup
+                let foundCurve = null;
+                let normalizedY = null;
+                
+                for (const item of gTrack.graphicItems) {
+                    if (item.type !== 'curve' || !item.curveData) continue;
+                    
+                    const { startTime, endTime, sampleInterval, samples } = item.curveData;
+                    
+                    // Check if current time is within curve's time range
+                    if (currentTimeSec >= startTime && currentTimeSec <= endTime) {
+                        // O(1) lookup: calculate array index from time
+                        const timeOffset = currentTimeSec - startTime;
+                        const sampleIndex = Math.floor(timeOffset / sampleInterval);
+                        
+                        if (sampleIndex >= 0 && sampleIndex < samples.length) {
+                            foundCurve = item;
+                            normalizedY = samples[sampleIndex];
+                            break;
+                        }
+                    }
+                }
+                
+                if (!foundCurve || normalizedY === null) {
+                    follower.style.display = 'none';
+                    cursor.currentCurveValue = null;
+                    return;
+                }
+                
+                // Show and position the curve follower
+                follower.style.display = 'block';
+                
+                // Position follower to the left of the cursor
+                follower.setAttribute('x', `calc(${xPercent}% - 11px)`);
+                
+                // Get track dimensions for fill calculation
+                const scoreHeight = this.scoreTopEl.clientHeight;
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const staffHeight = availableHeight / 4;
+                const yPosition = this.timelineHeight + (staffIndex * staffHeight);
+                
+                // Calculate fill height based on normalized Y value
+                // normalizedY: 0 = bottom, 1 = top
+                const fillHeight = normalizedY * staffHeight;
+                const fillY = yPosition + staffHeight - fillHeight;
+                
+                // Update follower to show fill from bottom up to curve value
+                // Use the curve's color, not the cursor color
+                const curveColor = foundCurve.color ? (ColorMap[foundCurve.color] || foundCurve.color) : this.colors[staffIndex];
+                follower.setAttribute('y', fillY);
+                follower.setAttribute('height', fillHeight);
+                follower.setAttribute('fill', curveColor);
+                follower.setAttribute('stroke', curveColor);
+                
+                // Store current curve value for external use
+                cursor.currentCurveValue = normalizedY;
             },
             
             // Get current position info for a specific staff (returns percentage)
@@ -1472,27 +1958,34 @@
         TrackSystem.init();
         window.TrackSystem = TrackSystem;
         
-        // Timeline System - Visual ticks at the top of ScoreTop and ScoreBottom
-        // Continuous second numbering: ScoreTop shows page 0, 2, 4... ScoreBottom shows page 1, 3, 5...
-        const Timeline = {
+        // Graphic Timeline System - Visual timeline at the top of ScoreTop and ScoreBottom
+        // Dots at y=0 for each second, 3px lines for every 5th second, Lato 7pt labels for 5th seconds
+        // Uses percentage-based positioning so all clients see identical graphics regardless of window size
+        const GraphicTimeline = {
             scoreTopEl: null,
             scoreBottomEl: null,
-            topTicksGroup: null,
-            bottomTicksGroup: null,
-            currentTopPage: 0,      // Which "page" of ticks is showing on ScoreTop (even pages: 0, 2, 4...)
-            currentBottomPage: 1,   // Which "page" of ticks is showing on ScoreBottom (odd pages: 1, 3, 5...)
+            topGroup: null,
+            bottomGroup: null,
+            currentTopPage: 0,
+            currentBottomPage: 1,
             lastCursorSection: 'top',
             
             init() {
                 this.scoreTopEl = document.getElementById('ScoreTop');
                 this.scoreBottomEl = document.getElementById('ScoreBottom');
                 
-                // Create groups for ticks
-                this.topTicksGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                this.bottomTicksGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                // Create groups for timeline graphics
+                this.topGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.bottomGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.topGroup.setAttribute('class', 'graphic-timeline');
+                this.bottomGroup.setAttribute('class', 'graphic-timeline');
                 
-                this.scoreTopEl.appendChild(this.topTicksGroup);
-                this.scoreBottomEl.appendChild(this.bottomTicksGroup);
+                this.scoreTopEl.appendChild(this.topGroup);
+                this.scoreBottomEl.appendChild(this.bottomGroup);
+                
+                // Create clickable areas for timeline (invisible rectangles)
+                this.createClickableArea('top');
+                this.createClickableArea('bottom');
                 
                 // Initial render
                 this.renderTicks();
@@ -1504,16 +1997,58 @@
                     this.checkPageChange();
                 };
                 
-                // Refresh ticks on window resize
+                // Refresh on window resize
                 window.addEventListener('resize', () => {
                     this.renderTicks();
+                    this.updateClickableAreas();
                 });
             },
             
+            createClickableArea(section) {
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const clickArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                clickArea.setAttribute('x', '0');
+                clickArea.setAttribute('y', '0');
+                clickArea.setAttribute('width', '100%');
+                clickArea.setAttribute('height', '20');
+                clickArea.setAttribute('fill', 'transparent');
+                clickArea.setAttribute('cursor', 'pointer');
+                
+                clickArea.addEventListener('click', (e) => this.onTimelineClick(e, section));
+                
+                scoreEl.appendChild(clickArea);
+                
+                if (section === 'top') {
+                    this.topClickArea = clickArea;
+                } else {
+                    this.bottomClickArea = clickArea;
+                }
+            },
+            
+            updateClickableAreas() {
+                // Click areas use 100% width so no update needed for width
+            },
+            
+            onTimelineClick(e, section) {
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const rect = scoreEl.getBoundingClientRect();
+                const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+                
+                // Get the page number for this section
+                const pageNumber = section === 'top' ? this.currentTopPage : this.currentBottomPage;
+                const secondsPerPage = this.getSecondsPerPage();
+                
+                // Calculate the seconds position
+                const seconds = (pageNumber + xPercent / 100) * secondsPerPage - leadInSeconds;
+                
+                // Jump edit cursor to this position
+                if (window.EditCursor) {
+                    EditCursor.setPositionSeconds(seconds);
+                }
+            },
+            
             // Calculate seconds per page based on tempo
-            // One page = beatsPerPage beats at current BPM
             getSecondsPerPage() {
-                // beatsPerPage beats / (beatsPerMinute beats/minute) * 60 seconds/minute
                 return (beatsPerPage / beatsPerMinute) * 60;
             },
             
@@ -1528,85 +2063,82 @@
             },
             
             renderTicksForSection(section) {
-                const group = section === 'top' ? this.topTicksGroup : this.bottomTicksGroup;
+                const group = section === 'top' ? this.topGroup : this.bottomGroup;
                 const pageNumber = section === 'top' ? this.currentTopPage : this.currentBottomPage;
                 
-                // Clear existing ticks
+                // Clear existing graphics
                 while (group.firstChild) {
                     group.removeChild(group.firstChild);
                 }
                 
                 const secondsPerPage = this.getSecondsPerPage();
-                // Adjust start second to account for lead-in (negative time)
                 const rawStartSecond = this.getPageStartSecond(pageNumber);
                 const startSecond = rawStartSecond - leadInSeconds;
-                
-                // Render ticks for each second in this page using percentage positioning
                 const endSecond = startSecond + secondsPerPage;
                 
-                // Start from the floor to catch all seconds including negative
+                // Render graphics for each second
                 for (let sec = Math.floor(startSecond); sec <= Math.ceil(endSecond); sec++) {
-                    // Calculate x position as percentage of page width
-                    // Account for lead-in offset in position calculation
                     const adjustedSec = sec + leadInSeconds;
                     const xPercent = ((adjustedSec - rawStartSecond) / secondsPerPage) * 100;
                     
                     if (xPercent < 0 || xPercent > 100) continue;
                     
-                    const isFifthSecond = Math.abs(sec) % 5 === 0;
-                    const tickHeight = isFifthSecond ? 3 : 2;  // Halved from 6:4
-                    
-                    // Determine if this is lead-in time (negative or before zero)
+                    const isFifthSecond = sec % 5 === 0;
                     const isLeadIn = sec < 0;
-                    const tickColor = isLeadIn ? '#cc3333' : '#333';
+                    const color = isLeadIn ? '#cc3333' : '#333';
                     
-                    // Create tick line using percentage positioning
-                    const tick = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    tick.setAttribute('x', `${xPercent}%`);
-                    tick.setAttribute('y', '0');
-                    tick.setAttribute('width', '1');
-                    tick.setAttribute('height', tickHeight);
-                    tick.setAttribute('fill', tickColor);
-                    group.appendChild(tick);
-                    
-                    // Add number label for every 5th second or at zero
-                    if ((isFifthSecond && sec !== 0) || sec === 0) {
+                    if (isFifthSecond) {
+                        // 5th second: 3px vertical line, 1px width
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', `${xPercent}%`);
+                        line.setAttribute('y1', '0');
+                        line.setAttribute('x2', `${xPercent}%`);
+                        line.setAttribute('y2', '3');
+                        line.setAttribute('stroke', color);
+                        line.setAttribute('stroke-width', '1');
+                        group.appendChild(line);
+                        
+                        // Label for 5th second - Lato font, 7pt
                         const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                         label.setAttribute('x', `${xPercent}%`);
-                        label.setAttribute('y', tickHeight + 7);
-                        label.setAttribute('font-size', '7');  // 90% of original 8px
-                        label.setAttribute('fill', tickColor);
+                        label.setAttribute('y', '10');
+                        label.setAttribute('font-family', 'Lato, sans-serif');
+                        label.setAttribute('font-size', '7');
+                        label.setAttribute('fill', color);
                         
-                        // Adjust text-anchor based on position to keep label fully visible
+                        // Adjust text-anchor based on position
                         let textAnchor = 'middle';
-                        if (xPercent < 5) {
+                        if (xPercent < 3) {
                             textAnchor = 'start';
-                        } else if (xPercent > 95) {
+                        } else if (xPercent > 97) {
                             textAnchor = 'end';
                         }
                         label.setAttribute('text-anchor', textAnchor);
                         label.textContent = sec.toString();
                         group.appendChild(label);
+                    } else {
+                        // Non-5th second: small dot at y=0
+                        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        dot.setAttribute('cx', `${xPercent}%`);
+                        dot.setAttribute('cy', '1');
+                        dot.setAttribute('r', '1');
+                        dot.setAttribute('fill', color);
+                        group.appendChild(dot);
                     }
                 }
             },
             
             checkPageChange() {
-                // Get cursor position info (now returns percentage)
                 const position = StaffCursors.getPosition(0);
                 if (!position) return;
                 
                 const cursorSection = position.section;
                 
-                // Check if cursor has moved to a new section
-                // When cursor leaves a section, that section refreshes to show the next page
                 if (cursorSection !== this.lastCursorSection) {
                     if (cursorSection === 'bottom' && this.lastCursorSection === 'top') {
-                        // Cursor moved from top to bottom - ScoreTop refreshes to next even page
                         this.currentTopPage = this.currentTopPage + 2;
                         this.renderTicksForSection('top');
                     } else if (cursorSection === 'top' && this.lastCursorSection === 'bottom') {
-                        // Cursor moved from bottom to top - ScoreBottom refreshes to next odd page
                         this.currentBottomPage = this.currentBottomPage + 2;
                         this.renderTicksForSection('bottom');
                     }
@@ -1614,7 +2146,6 @@
                 }
             },
             
-            // Reset timeline to beginning
             reset() {
                 this.currentTopPage = 0;
                 this.currentBottomPage = 1;
@@ -1622,23 +2153,16 @@
                 this.renderTicks();
             },
             
-            // Called when goto is triggered - jump to specific second
             onGoto(targetSeconds) {
                 const secondsPerPage = this.getSecondsPerPage();
                 const targetPage = Math.floor(targetSeconds / secondsPerPage);
                 
-                // Determine which section the cursor will be in
-                // Even pages (0, 2, 4...) are on ScoreTop, odd pages (1, 3, 5...) are on ScoreBottom
                 if (targetPage % 2 === 0) {
-                    // Cursor will be on ScoreTop
                     this.currentTopPage = targetPage;
-                    // ScoreBottom shows the previous odd page (or page 1 if at start)
                     this.currentBottomPage = targetPage > 0 ? targetPage - 1 : 1;
                     this.lastCursorSection = 'top';
                 } else {
-                    // Cursor will be on ScoreBottom
                     this.currentBottomPage = targetPage;
-                    // ScoreTop shows the previous even page
                     this.currentTopPage = targetPage - 1;
                     this.lastCursorSection = 'bottom';
                 }
@@ -1646,191 +2170,12 @@
             }
         };
         
-        // Initialize timeline after DOM is ready
-        Timeline.init();
-        window.Timeline = Timeline;
+        // Initialize graphic timeline
+        GraphicTimeline.init();
+        window.GraphicTimeline = GraphicTimeline;
         
-        // Beat Timeline System - Visual ticks for beats and quarter beats below the second timeline
-        // Beat ticks are 6px, quarter beat ticks are 4px
-        const BeatTimeline = {
-            scoreTopEl: null,
-            scoreBottomEl: null,
-            topTicksGroup: null,
-            bottomTicksGroup: null,
-            currentTopPage: 0,      // Which "page" of ticks is showing on ScoreTop (even pages: 0, 2, 4...)
-            currentBottomPage: 1,   // Which "page" of ticks is showing on ScoreBottom (odd pages: 1, 3, 5...)
-            lastCursorSection: 'top',
-            tickYOffset: 12,        // Y offset to position below second timeline
-            
-            init() {
-                this.scoreTopEl = document.getElementById('ScoreTop');
-                this.scoreBottomEl = document.getElementById('ScoreBottom');
-                
-                // Create groups for beat ticks
-                this.topTicksGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                this.bottomTicksGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                
-                this.scoreTopEl.appendChild(this.topTicksGroup);
-                this.scoreBottomEl.appendChild(this.bottomTicksGroup);
-                
-                // Initial render
-                this.renderTicks();
-                
-                // Hook into animation to check for page changes
-                const originalOnDraw = AnimationEngine.onDraw;
-                AnimationEngine.onDraw = (frameNumber, elapsedMs) => {
-                    if (originalOnDraw) originalOnDraw(frameNumber, elapsedMs);
-                    this.checkPageChange();
-                };
-                
-                // Refresh ticks on window resize
-                window.addEventListener('resize', () => {
-                    this.renderTicks();
-                });
-            },
-            
-            // Get the starting beat for a given page
-            getPageStartBeat(pageNumber) {
-                return pageNumber * beatsPerPage;
-            },
-            
-            renderTicks() {
-                this.renderTicksForSection('top');
-                this.renderTicksForSection('bottom');
-            },
-            
-            renderTicksForSection(section) {
-                const group = section === 'top' ? this.topTicksGroup : this.bottomTicksGroup;
-                const pageNumber = section === 'top' ? this.currentTopPage : this.currentBottomPage;
-                
-                // Clear existing ticks
-                while (group.firstChild) {
-                    group.removeChild(group.firstChild);
-                }
-                
-                // Calculate lead-in in beats
-                const leadInBeats = leadInSeconds * (beatsPerMinute / 60);
-                
-                const rawStartBeat = this.getPageStartBeat(pageNumber);
-                const startBeat = rawStartBeat - leadInBeats;
-                const endBeat = startBeat + beatsPerPage;
-                
-                // Render ticks for each quarter beat in this page
-                for (let quarterBeat = Math.floor(startBeat * 4); quarterBeat <= Math.ceil(endBeat * 4); quarterBeat++) {
-                    const beat = quarterBeat / 4;
-                    
-                    // Calculate x position as percentage of page width
-                    // Account for lead-in offset in position calculation
-                    const adjustedBeat = beat + leadInBeats;
-                    const xPercent = ((adjustedBeat - rawStartBeat) / beatsPerPage) * 100;
-                    
-                    if (xPercent < 0 || xPercent > 100) continue;
-                    
-                    const isFullBeat = quarterBeat % 4 === 0;
-                    const tickHeight = isFullBeat ? 3 : 2;  // Halved from 6:4
-                    
-                    // Determine if this is lead-in time (negative beat)
-                    const isLeadIn = beat < 0;
-                    const tickColor = isLeadIn ? '#cc3333' : '#333';
-                    
-                    // Create tick line using percentage positioning
-                    const tick = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    tick.setAttribute('x', `${xPercent}%`);
-                    tick.setAttribute('y', this.tickYOffset);
-                    tick.setAttribute('width', '1');
-                    tick.setAttribute('height', tickHeight);
-                    tick.setAttribute('fill', tickColor);
-                    group.appendChild(tick);
-                    
-                    // Add number label for every full beat or at zero
-                    if (isFullBeat && (beat !== 0 || beat === 0)) {
-                        const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                        label.setAttribute('x', `${xPercent}%`);
-                        label.setAttribute('y', this.tickYOffset + tickHeight + 7);
-                        label.setAttribute('font-size', '7');  // 90% of original 8px
-                        label.setAttribute('fill', tickColor);
-                        
-                        // Adjust text-anchor based on position to keep label fully visible
-                        let textAnchor = 'middle';
-                        if (xPercent < 5) {
-                            textAnchor = 'start';
-                        } else if (xPercent > 95) {
-                            textAnchor = 'end';
-                        }
-                        label.setAttribute('text-anchor', textAnchor);
-                        label.textContent = beat.toString();
-                        group.appendChild(label);
-                    }
-                }
-            },
-            
-            checkPageChange() {
-                // Get cursor position info (now returns percentage)
-                const position = StaffCursors.getPosition(0);
-                if (!position) return;
-                
-                const cursorSection = position.section;
-                
-                // Check if cursor has moved to a new section
-                // When cursor leaves a section, that section refreshes to show the next page
-                if (cursorSection !== this.lastCursorSection) {
-                    if (cursorSection === 'bottom' && this.lastCursorSection === 'top') {
-                        // Cursor moved from top to bottom - ScoreTop refreshes to next even page
-                        this.currentTopPage = this.currentTopPage + 2;
-                        this.renderTicksForSection('top');
-                    } else if (cursorSection === 'top' && this.lastCursorSection === 'bottom') {
-                        // Cursor moved from bottom to top - ScoreBottom refreshes to next odd page
-                        this.currentBottomPage = this.currentBottomPage + 2;
-                        this.renderTicksForSection('bottom');
-                    }
-                    this.lastCursorSection = cursorSection;
-                }
-            },
-            
-            // Reset timeline to beginning
-            reset() {
-                this.currentTopPage = 0;
-                this.currentBottomPage = 1;
-                this.lastCursorSection = 'top';
-                this.renderTicks();
-            },
-            
-            // Called when goto is triggered - jump to specific second
-            onGoto(targetSeconds) {
-                // Convert seconds to beats to determine page
-                const targetBeat = targetSeconds * (beatsPerMinute / 60);
-                const targetPage = Math.floor(targetBeat / beatsPerPage);
-                
-                // Determine which section the cursor will be in
-                // Even pages (0, 2, 4...) are on ScoreTop, odd pages (1, 3, 5...) are on ScoreBottom
-                if (targetPage % 2 === 0) {
-                    // Cursor will be on ScoreTop
-                    this.currentTopPage = targetPage;
-                    // ScoreBottom shows the previous odd page (or page 1 if at start)
-                    this.currentBottomPage = targetPage > 0 ? targetPage - 1 : 1;
-                    this.lastCursorSection = 'top';
-                } else {
-                    // Cursor will be on ScoreBottom
-                    this.currentBottomPage = targetPage;
-                    // ScoreTop shows the previous even page
-                    this.currentTopPage = targetPage - 1;
-                    this.lastCursorSection = 'bottom';
-                }
-                this.renderTicks();
-            }
-        };
-        
-        // Initialize beat timeline after DOM is ready
-        BeatTimeline.init();
-        window.BeatTimeline = BeatTimeline;
-        
-        // MIDI Controller System - Independent MIDI recording and playback
+        // MIDI Controller System - Multi-track MIDI file management and cursor-synced playback
         const MidiController = {
-            // Panel elements
-            panelEl: null,
-            toggleEl: null,
-            isOpen: false,
-            
             // Device elements
             inputSelect: null,
             outputSelect: null,
@@ -1841,39 +2186,54 @@
             fileInput: null,
             downloadBtn: null,
             exportCsvBtn: null,
+            insertBtn: null,
+            insertTimeDisplay: null,
+            fileNameDisplay: null,
             
-            // Transport elements
-            beginningBtn: null,
-            prevEventBtn: null,
-            playPauseBtn: null,
-            nextEventBtn: null,
+            // Display elements
             timecodeDisplay: null,
-            
-            // Record elements
-            recordBtn: null,
             eventCountDisplay: null,
+            showGraphicItemsToggle: null,
+            showMidiDisplayToggle: null,
+            
+            // Track enable checkboxes
+            trackEnables: [null, null, null, null],
             
             // MIDI state
             midiAccess: null,
             selectedInput: null,
             selectedOutput: null,
             
-            // MIDI data
-            midiEvents: [],           // Array of { timeMs, type, data: [status, data1, data2] }
-            currentEventIndex: 0,
-            isPlaying: false,
-            isRecording: false,
-            playbackStartTime: 0,
-            playbackOffset: 0,
-            recordingStartTime: 0,
+            // Track selection (1-4)
+            selectedTrack: 1,
             
-            // Loaded MIDI file data
-            midiFileData: null,
+            // MIDI data per track (4 tracks)
+            // Each track: { midiEvents: [], channel: trackIndex+1 }
+            tracks: [
+                { midiEvents: [], channel: 1 },
+                { midiEvents: [], channel: 2 },
+                { midiEvents: [], channel: 3 },
+                { midiEvents: [], channel: 4 }
+            ],
+            
+            // Loaded MIDI file data (temporary before insert)
+            loadedFileEvents: [],
+            loadedFileName: '',
+            
+            // Playback state - synced to graphic cursors
+            lastPlaybackTimeMs: [0, 0, 0, 0], // Per-track last processed time
+            currentEventIndices: [0, 0, 0, 0], // Per-track playback position
+            
+            // MIDI Display SVG layers
+            midiDisplayLayers: { top: [], bottom: [] }, // Per track SVG groups
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            timelineHeight: 8, // Match StaffCursors.timelineHeight
             
             init() {
-                // Get panel elements
-                this.panelEl = document.getElementById('midiPanel');
-                this.toggleEl = document.getElementById('midiPanelToggle');
+                // Get SVG elements
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
                 
                 // Get device elements
                 this.inputSelect = document.getElementById('midiInputSelect');
@@ -1885,54 +2245,168 @@
                 this.fileInput = document.getElementById('midiFileInput');
                 this.downloadBtn = document.getElementById('midiDownloadBtn');
                 this.exportCsvBtn = document.getElementById('midiExportCsvBtn');
+                this.insertBtn = document.getElementById('midiInsertBtn');
+                this.insertTimeDisplay = document.getElementById('midiInsertTime');
+                this.fileNameDisplay = document.getElementById('midiFileName');
                 
-                // Get transport elements
-                this.beginningBtn = document.getElementById('midiBeginningBtn');
-                this.prevEventBtn = document.getElementById('midiPrevEventBtn');
-                this.playPauseBtn = document.getElementById('midiPlayPauseBtn');
-                this.nextEventBtn = document.getElementById('midiNextEventBtn');
+                // Get display elements
                 this.timecodeDisplay = document.getElementById('midiTimecode');
-                
-                // Get record elements
-                this.recordBtn = document.getElementById('midiRecordBtn');
                 this.eventCountDisplay = document.getElementById('midiEventCount');
+                this.showGraphicItemsToggle = document.getElementById('showGraphicItems');
+                this.showMidiDisplayToggle = document.getElementById('showMidiDisplay');
+                
+                // Get track enable checkboxes
+                this.trackEnables = [
+                    document.getElementById('midiEnableT1'),
+                    document.getElementById('midiEnableT2'),
+                    document.getElementById('midiEnableT3'),
+                    document.getElementById('midiEnableT4')
+                ];
+                
+                // Set up track selection radio buttons
+                document.querySelectorAll('input[name="midiTrack"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        this.selectedTrack = parseInt(e.target.value);
+                        this.updateEventCount();
+                    });
+                });
                 
                 // Set up event listeners
-                this.toggleEl.addEventListener('click', () => this.toggle());
-                this.refreshBtn.addEventListener('click', () => this.refreshDevices());
-                this.inputSelect.addEventListener('change', (e) => this.selectInput(e.target.value));
-                this.outputSelect.addEventListener('change', (e) => this.selectOutput(e.target.value));
+                if (this.refreshBtn) this.refreshBtn.addEventListener('click', () => this.refreshDevices());
+                if (this.inputSelect) this.inputSelect.addEventListener('change', (e) => this.selectInput(e.target.value));
+                if (this.outputSelect) this.outputSelect.addEventListener('change', (e) => this.selectOutput(e.target.value));
                 
-                this.loadBtn.addEventListener('click', () => this.fileInput.click());
-                this.fileInput.addEventListener('change', (e) => this.loadMidiFile(e));
-                this.downloadBtn.addEventListener('click', () => this.downloadMidiFile());
-                this.exportCsvBtn.addEventListener('click', () => this.exportCsv());
+                if (this.loadBtn) this.loadBtn.addEventListener('click', () => this.fileInput.click());
+                if (this.fileInput) this.fileInput.addEventListener('change', (e) => this.loadMidiFile(e));
+                if (this.downloadBtn) this.downloadBtn.addEventListener('click', () => this.downloadMidiFile());
+                if (this.exportCsvBtn) this.exportCsvBtn.addEventListener('click', () => this.exportCsv());
+                if (this.insertBtn) this.insertBtn.addEventListener('click', () => this.insertAtEditCursor());
                 
-                this.beginningBtn.addEventListener('click', () => this.goToBeginning());
-                this.prevEventBtn.addEventListener('click', () => this.prevEvent());
-                this.playPauseBtn.addEventListener('click', () => this.togglePlayPause());
-                this.nextEventBtn.addEventListener('click', () => this.nextEvent());
+                // Set up display toggle listeners
+                if (this.showGraphicItemsToggle) {
+                    this.showGraphicItemsToggle.addEventListener('change', () => this.updateGraphicItemsVisibility());
+                }
+                if (this.showMidiDisplayToggle) {
+                    this.showMidiDisplayToggle.addEventListener('change', () => this.updateMidiDisplayVisibility());
+                }
                 
-                this.recordBtn.addEventListener('click', () => this.toggleRecord());
+                // Create MIDI display layers for each track
+                this.createMidiDisplayLayers();
                 
                 // Initialize Web MIDI API
                 this.initMidi();
                 
-                // Hook into animation for timecode updates
+                // Hook into animation for timecode updates, insert time sync, and cursor-synced playback
                 const originalOnDraw = AnimationEngine.onDraw;
                 AnimationEngine.onDraw = (frameNumber, elapsedMs) => {
                     if (originalOnDraw) originalOnDraw(frameNumber, elapsedMs);
                     this.updateTimecode();
-                    if (this.isPlaying) this.processPlayback();
+                    this.updateInsertTime();
+                    this.processCursorSyncedPlayback();
                 };
                 
-                console.log('MidiController initialized');
+                // Add resize handler to re-render MIDI display
+                window.addEventListener('resize', () => {
+                    this.renderAllMidiDisplays();
+                });
+                
+                console.log('MidiController initialized with cursor-synced playback');
             },
             
-            toggle() {
-                this.isOpen = !this.isOpen;
-                this.panelEl.classList.toggle('open', this.isOpen);
-                this.toggleEl.textContent = this.isOpen ? '▼ MIDI' : '▲ MIDI';
+            // Create SVG layers for MIDI display per track
+            createMidiDisplayLayers() {
+                if (!this.scoreTopEl || !this.scoreBottomEl) return;
+                for (let trackIndex = 0; trackIndex < 4; trackIndex++) {
+                    // Create groups for top and bottom score sections
+                    const topGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    const bottomGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    
+                    topGroup.setAttribute('id', `midi-display-t${trackIndex + 1}-top`);
+                    topGroup.setAttribute('class', 'midi-display-layer');
+                    bottomGroup.setAttribute('id', `midi-display-t${trackIndex + 1}-bottom`);
+                    bottomGroup.setAttribute('class', 'midi-display-layer');
+                    
+                    this.scoreTopEl.appendChild(topGroup);
+                    this.scoreBottomEl.appendChild(bottomGroup);
+                    
+                    this.midiDisplayLayers.top.push(topGroup);
+                    this.midiDisplayLayers.bottom.push(bottomGroup);
+                }
+            },
+            
+            // Update visibility of graphic items (curves, etc.)
+            updateGraphicItemsVisibility() {
+                const show = this.showGraphicItemsToggle?.checked ?? true;
+                // Hide/show all curve elements but keep timeline, cursors, staff dividers visible
+                document.querySelectorAll('.curve-path, .curve-fill, .curve-bounding-box').forEach(el => {
+                    el.style.display = show ? '' : 'none';
+                });
+            },
+            
+            // Update visibility of MIDI display layers
+            updateMidiDisplayVisibility() {
+                const show = this.showMidiDisplayToggle?.checked ?? true;
+                document.querySelectorAll('.midi-display-layer').forEach(el => {
+                    el.style.display = show ? '' : 'none';
+                });
+            },
+            
+            // Process MIDI playback synced to graphic cursor positions
+            processCursorSyncedPlayback() {
+                if (!window.ScoreTime || !ScoreTime.isPlaying) return;
+                
+                const currentScoreTimeMs = ScoreTime.now();
+                const currentDisplayTimeSec = (currentScoreTimeMs / 1000) - leadInSeconds;
+                const currentDisplayTimeMs = currentDisplayTimeSec * 1000;
+                
+                // Process each enabled track
+                for (let trackIndex = 0; trackIndex < 4; trackIndex++) {
+                    // Check if track is enabled
+                    if (!this.trackEnables[trackIndex] || !this.trackEnables[trackIndex].checked) continue;
+                    
+                    const trackEvents = this.tracks[trackIndex].midiEvents;
+                    if (trackEvents.length === 0) continue;
+                    
+                    // Send any events between last time and current time
+                    while (this.currentEventIndices[trackIndex] < trackEvents.length &&
+                           trackEvents[this.currentEventIndices[trackIndex]].timeMs <= currentDisplayTimeMs) {
+                        const event = trackEvents[this.currentEventIndices[trackIndex]];
+                        
+                        // Only send if we haven't already passed this event
+                        if (event.timeMs > this.lastPlaybackTimeMs[trackIndex]) {
+                            // Send to output if available
+                            if (this.selectedOutput) {
+                                this.selectedOutput.send(event.data);
+                            }
+                        }
+                        
+                        this.currentEventIndices[trackIndex]++;
+                    }
+                    
+                    this.lastPlaybackTimeMs[trackIndex] = currentDisplayTimeMs;
+                }
+            },
+            
+            // Reset playback indices when score time resets
+            resetPlaybackIndices() {
+                this.currentEventIndices = [0, 0, 0, 0];
+                this.lastPlaybackTimeMs = [0, 0, 0, 0];
+            },
+            
+            // Reset playback to a specific time (used when jumping to a position)
+            resetPlaybackToTime(targetTimeMs) {
+                for (let trackIndex = 0; trackIndex < 4; trackIndex++) {
+                    const trackEvents = this.tracks[trackIndex].midiEvents;
+                    
+                    // Find the first event at or after the target time
+                    let eventIndex = 0;
+                    while (eventIndex < trackEvents.length && trackEvents[eventIndex].timeMs < targetTimeMs) {
+                        eventIndex++;
+                    }
+                    
+                    this.currentEventIndices[trackIndex] = eventIndex;
+                    this.lastPlaybackTimeMs[trackIndex] = targetTimeMs;
+                }
             },
             
             // Web MIDI API initialization
@@ -1999,15 +2473,50 @@
             },
             
             onMidiMessage(event) {
-                if (this.isRecording) {
-                    const timeMs = performance.now() - this.recordingStartTime;
-                    this.midiEvents.push({
-                        timeMs: timeMs,
-                        type: this.getMidiEventType(event.data[0]),
-                        data: Array.from(event.data)
-                    });
-                    this.updateEventCount();
+                // MIDI input handling - can be extended for live input features
+                console.log('MIDI message received:', event.data);
+            },
+            
+            // Update insert time display from edit cursor position
+            updateInsertTime() {
+                if (window.EditCursor && this.insertTimeDisplay) {
+                    this.insertTimeDisplay.textContent = EditCursor.positionSeconds.toFixed(3);
                 }
+            },
+            
+            // Insert loaded MIDI file at edit cursor position into selected track
+            insertAtEditCursor() {
+                if (this.loadedFileEvents.length === 0) {
+                    alert('No MIDI file loaded. Load a MIDI file first.');
+                    return;
+                }
+                
+                const trackIndex = this.selectedTrack - 1;
+                const insertTimeMs = (window.EditCursor ? EditCursor.positionSeconds : 0) * 1000;
+                const channel = trackIndex + 1; // Track 1 = Channel 1, etc.
+                
+                // Add events to selected track with time offset and channel remapping
+                for (const event of this.loadedFileEvents) {
+                    const newEvent = {
+                        timeMs: event.timeMs + insertTimeMs,
+                        type: event.type,
+                        data: [...event.data]
+                    };
+                    
+                    // Remap channel for channel voice messages (0x80-0xEF)
+                    const statusByte = newEvent.data[0];
+                    if (statusByte >= 0x80 && statusByte < 0xF0) {
+                        newEvent.data[0] = (statusByte & 0xF0) | (channel - 1);
+                    }
+                    
+                    this.tracks[trackIndex].midiEvents.push(newEvent);
+                }
+                
+                // Sort events by time
+                this.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                
+                this.updateEventCount();
+                this.renderMidiDisplay(trackIndex); // Update MIDI display
             },
             
             getMidiEventType(statusByte) {
@@ -2033,7 +2542,9 @@
                 reader.onload = (e) => {
                     try {
                         this.parseMidiFile(e.target.result);
-                        console.log(`Loaded MIDI file: ${file.name}`);
+                        this.loadedFileName = file.name;
+                        this.fileNameDisplay.textContent = file.name;
+                        console.log(`Loaded MIDI file: ${file.name} (${this.loadedFileEvents.length} events)`);
                     } catch (err) {
                         console.error('Error parsing MIDI file:', err);
                         alert('Error parsing MIDI file');
@@ -2045,8 +2556,7 @@
             
             parseMidiFile(arrayBuffer) {
                 const data = new Uint8Array(arrayBuffer);
-                this.midiFileData = data;
-                this.midiEvents = [];
+                this.loadedFileEvents = [];
                 
                 // Simple MIDI file parser
                 let pos = 0;
@@ -2134,7 +2644,7 @@
                                 data2 = data[pos++];
                             }
                             
-                            this.midiEvents.push({
+                            this.loadedFileEvents.push({
                                 timeMs: trackTimeMs,
                                 type: this.getMidiEventType(status),
                                 data: eventType === 0xC0 || eventType === 0xD0 
@@ -2146,31 +2656,31 @@
                 }
                 
                 // Sort events by time
-                this.midiEvents.sort((a, b) => a.timeMs - b.timeMs);
-                this.currentEventIndex = 0;
-                this.updateEventCount();
-                this.goToBeginning();
+                this.loadedFileEvents.sort((a, b) => a.timeMs - b.timeMs);
             },
             
             downloadMidiFile() {
-                if (this.midiEvents.length === 0) {
-                    alert('No MIDI data to download');
+                const trackIndex = this.selectedTrack - 1;
+                const trackEvents = this.tracks[trackIndex].midiEvents;
+                
+                if (trackEvents.length === 0) {
+                    alert(`No MIDI data in Track ${this.selectedTrack} to download`);
                     return;
                 }
                 
-                // Create simple MIDI file from events
-                const midiData = this.createMidiFile();
+                // Create simple MIDI file from track events
+                const midiData = this.createMidiFile(trackEvents);
                 const blob = new Blob([midiData], { type: 'audio/midi' });
                 const url = URL.createObjectURL(blob);
                 
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'recording.mid';
+                a.download = `track${this.selectedTrack}.mid`;
                 a.click();
                 URL.revokeObjectURL(url);
             },
             
-            createMidiFile() {
+            createMidiFile(events) {
                 // Create a simple Format 0 MIDI file
                 const ticksPerBeat = 480;
                 const msPerTick = (500000 / 1000) / ticksPerBeat; // 120 BPM default
@@ -2179,7 +2689,7 @@
                 const trackData = [];
                 let lastTimeMs = 0;
                 
-                for (const event of this.midiEvents) {
+                for (const event of events) {
                     const deltaTicks = Math.round((event.timeMs - lastTimeMs) / msPerTick);
                     lastTimeMs = event.timeMs;
                     
@@ -2226,16 +2736,22 @@
             },
             
             exportCsv() {
-                if (this.midiEvents.length === 0) {
-                    alert('No MIDI data to export');
+                const trackIndex = this.selectedTrack - 1;
+                const trackEvents = this.tracks[trackIndex].midiEvents;
+                
+                if (trackEvents.length === 0) {
+                    alert(`No MIDI data in Track ${this.selectedTrack} to export`);
                     return;
                 }
                 
-                let csv = 'Time (ms),Type,Status,Data1,Data2\n';
-                for (const event of this.midiEvents) {
+                let csv = 'Time (ms),Time (sec),Type,Channel,Status,Data1,Data2,Note,Velocity\n';
+                for (const event of trackEvents) {
                     const data1 = event.data[1] !== undefined ? event.data[1] : '';
                     const data2 = event.data[2] !== undefined ? event.data[2] : '';
-                    csv += `${event.timeMs.toFixed(3)},${event.type},${event.data[0]},${data1},${data2}\n`;
+                    const channel = (event.data[0] & 0x0F) + 1;
+                    const noteName = event.type === 'noteOn' || event.type === 'noteOff' ? this.midiNoteToName(data1) : '';
+                    const velocity = event.type === 'noteOn' || event.type === 'noteOff' ? data2 : '';
+                    csv += `${event.timeMs.toFixed(3)},${(event.timeMs/1000).toFixed(3)},${event.type},${channel},${event.data[0]},${data1},${data2},${noteName},${velocity}\n`;
                 }
                 
                 const blob = new Blob([csv], { type: 'text/csv' });
@@ -2243,101 +2759,27 @@
                 
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'midi_events.csv';
+                a.download = `track${this.selectedTrack}_midi.csv`;
                 a.click();
                 URL.revokeObjectURL(url);
             },
             
-            // Transport controls
-            goToBeginning() {
-                this.currentEventIndex = 0;
-                this.playbackOffset = 0;
-                this.isPlaying = false;
-                this.playPauseBtn.textContent = '▶';
-                this.playPauseBtn.classList.remove('active');
-                this.updateTimecode();
+            midiNoteToName(noteNumber) {
+                const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(noteNumber / 12) - 1;
+                const note = notes[noteNumber % 12];
+                return `${note}${octave}`;
             },
             
-            prevEvent() {
-                if (this.currentEventIndex > 0) {
-                    this.currentEventIndex--;
-                    if (this.midiEvents.length > 0) {
-                        this.playbackOffset = this.midiEvents[this.currentEventIndex].timeMs;
-                    }
-                    this.updateTimecode();
-                }
-            },
-            
-            nextEvent() {
-                if (this.currentEventIndex < this.midiEvents.length - 1) {
-                    this.currentEventIndex++;
-                    this.playbackOffset = this.midiEvents[this.currentEventIndex].timeMs;
-                    this.updateTimecode();
-                }
-            },
-            
-            togglePlayPause() {
-                this.isPlaying = !this.isPlaying;
-                if (this.isPlaying) {
-                    this.playbackStartTime = performance.now() - this.playbackOffset;
-                    this.playPauseBtn.textContent = '⏸';
-                    this.playPauseBtn.classList.add('active');
-                } else {
-                    this.playbackOffset = performance.now() - this.playbackStartTime;
-                    this.playPauseBtn.textContent = '▶';
-                    this.playPauseBtn.classList.remove('active');
-                }
-            },
-            
-            processPlayback() {
-                if (!this.isPlaying || this.midiEvents.length === 0) return;
-                
-                const currentTime = performance.now() - this.playbackStartTime;
-                
-                // Send any events that should have played
-                while (this.currentEventIndex < this.midiEvents.length &&
-                       this.midiEvents[this.currentEventIndex].timeMs <= currentTime) {
-                    const event = this.midiEvents[this.currentEventIndex];
-                    
-                    // Send to output if available
-                    if (this.selectedOutput) {
-                        this.selectedOutput.send(event.data);
-                    }
-                    
-                    this.currentEventIndex++;
-                }
-                
-                // Check if playback is complete
-                if (this.currentEventIndex >= this.midiEvents.length) {
-                    this.isPlaying = false;
-                    this.playPauseBtn.textContent = '▶';
-                    this.playPauseBtn.classList.remove('active');
-                }
-            },
-            
-            toggleRecord() {
-                this.isRecording = !this.isRecording;
-                if (this.isRecording) {
-                    this.midiEvents = [];
-                    this.currentEventIndex = 0;
-                    this.recordingStartTime = performance.now();
-                    this.recordBtn.classList.add('active');
-                    this.recordBtn.textContent = '⏹ Stop';
-                    this.updateEventCount();
-                } else {
-                    this.recordBtn.classList.remove('active');
-                    this.recordBtn.textContent = '⏺ Record';
-                }
-            },
-            
+            // Update timecode display from cursor position (synced to ScoreTime)
             updateTimecode() {
-                let timeMs;
-                if (this.isPlaying) {
-                    timeMs = performance.now() - this.playbackStartTime;
-                } else if (this.isRecording) {
-                    timeMs = performance.now() - this.recordingStartTime;
-                } else {
-                    timeMs = this.playbackOffset;
+                if (!this.timecodeDisplay) return;
+                
+                let timeMs = 0;
+                if (window.ScoreTime) {
+                    const currentScoreTimeMs = ScoreTime.now();
+                    const currentDisplayTimeSec = (currentScoreTimeMs / 1000) - leadInSeconds;
+                    timeMs = Math.max(0, currentDisplayTimeSec * 1000);
                 }
                 
                 this.timecodeDisplay.textContent = this.formatTimecode(timeMs);
@@ -2354,26 +2796,1484 @@
             },
             
             updateEventCount() {
-                this.eventCountDisplay.textContent = `Events: ${this.midiEvents.length}`;
-            },
-            
-            // Get current MIDI events for external use
-            getEvents() {
-                return this.midiEvents;
-            },
-            
-            // Get current playback time in ms
-            getCurrentTimeMs() {
-                if (this.isPlaying) {
-                    return performance.now() - this.playbackStartTime;
+                if (this.eventCountDisplay) {
+                    const trackIndex = this.selectedTrack - 1;
+                    const trackEvents = this.tracks[trackIndex].midiEvents;
+                    this.eventCountDisplay.textContent = `T${this.selectedTrack} Events: ${trackEvents.length}`;
                 }
-                return this.playbackOffset;
+            },
+            
+            // Get current MIDI events for external use (selected track)
+            getEvents() {
+                const trackIndex = this.selectedTrack - 1;
+                return this.tracks[trackIndex].midiEvents;
+            },
+            
+            // Get all tracks' events
+            getAllTracks() {
+                return this.tracks;
+            },
+            
+            // Get current playback time in ms (synced to cursor)
+            getCurrentTimeMs() {
+                if (window.ScoreTime && ScoreTime.isRunning) {
+                    const currentScoreTimeMs = ScoreTime.now();
+                    const currentDisplayTimeSec = (currentScoreTimeMs / 1000) - leadInSeconds;
+                    return Math.max(0, currentDisplayTimeSec * 1000);
+                }
+                return 0;
+            },
+            
+            // Render MIDI events as SVG graphics for a track
+            // Layout per track (within track height):
+            // - Top 40%: Note rectangles (pitch mapped to height)
+            // - Next 15%: Velocity squares (black with white text)
+            // - Next 15%: CC0 squares (blue with white text)
+            // - Bottom 30%: CC7 line graph (0-127 height)
+            renderMidiDisplay(trackIndex) {
+                const trackEvents = this.tracks[trackIndex].midiEvents;
+                const topGroup = this.midiDisplayLayers.top[trackIndex];
+                const bottomGroup = this.midiDisplayLayers.bottom[trackIndex];
+                
+                // Clear existing display
+                topGroup.innerHTML = '';
+                bottomGroup.innerHTML = '';
+                
+                if (trackEvents.length === 0) return;
+                
+                // Get track dimensions
+                const scoreHeight = this.scoreTopEl.clientHeight;
+                const scoreWidth = this.scoreTopEl.clientWidth;
+                
+                // If dimensions are 0, the SVG hasn't been laid out yet - skip rendering
+                if (scoreWidth === 0 || scoreHeight === 0) return;
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const trackHeight = availableHeight / 4;
+                const trackY = this.timelineHeight + (trackIndex * trackHeight);
+                
+                // Layout heights within track:
+                // - Note line: 2px at very top
+                // - Velocity: small row just below note line
+                // - CC7: bottom half of track (vertical lines)
+                const noteLineHeight = 2;
+                const velocityRowHeight = 14; // enough for 12px square + padding
+                const cc7RowHeight = trackHeight * 0.50; // bottom half
+                
+                const noteRowY = trackY;
+                const velocityRowY = trackY + noteLineHeight + 2;
+                const cc7RowY = trackY + trackHeight - cc7RowHeight; // starts at bottom half
+                
+                // Calculate time-to-pixel conversion using GraphicTimeline's getSecondsPerPage()
+                let secondsPerPage = 10; // default
+                if (window.GraphicTimeline && typeof GraphicTimeline.getSecondsPerPage === 'function') {
+                    secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                }
+                const msPerPage = secondsPerPage * 1000;
+                const pixelsPerMs = scoreWidth / msPerPage;
+                
+                // Lead-in offset: MIDI events are in display time (0 = first beat)
+                // but pages are in actual time (0 = start of lead-in)
+                // So we need to add leadInSeconds to convert display time to actual time
+                const leadInMs = leadInSeconds * 1000;
+                
+                // Build note pairs (noteOn -> noteOff)
+                const activeNotes = {}; // key: note number, value: noteOn event
+                const notePairs = [];
+                const velocityEvents = [];
+                const cc0Events = [];
+                const cc7Events = [];
+                
+                for (const event of trackEvents) {
+                    const statusType = event.data[0] & 0xF0;
+                    
+                    if (statusType === 0x90 && event.data[2] > 0) {
+                        // Note On
+                        const noteNum = event.data[1];
+                        activeNotes[noteNum] = event;
+                        velocityEvents.push({ timeMs: event.timeMs, velocity: event.data[2], noteNum });
+                    } else if (statusType === 0x80 || (statusType === 0x90 && event.data[2] === 0)) {
+                        // Note Off
+                        const noteNum = event.data[1];
+                        if (activeNotes[noteNum]) {
+                            notePairs.push({
+                                noteNum,
+                                startMs: activeNotes[noteNum].timeMs,
+                                endMs: event.timeMs,
+                                velocity: activeNotes[noteNum].data[2]
+                            });
+                            delete activeNotes[noteNum];
+                        }
+                    } else if (statusType === 0xB0) {
+                        // Control Change
+                        const ccNum = event.data[1];
+                        const ccValue = event.data[2];
+                        if (ccNum === 0) {
+                            cc0Events.push({ timeMs: event.timeMs, value: ccValue });
+                        } else if (ccNum === 7) {
+                            cc7Events.push({ timeMs: event.timeMs, value: ccValue });
+                        }
+                    }
+                }
+                
+                // Determine how many pages we need to render
+                // Find the max time in the events (in display time)
+                // Convert to actual time by adding lead-in
+                let maxTimeMs = 0;
+                for (const event of trackEvents) {
+                    if (event.timeMs > maxTimeMs) maxTimeMs = event.timeMs;
+                }
+                const maxActualTimeMs = maxTimeMs + leadInMs;
+                const totalPages = Math.ceil(maxActualTimeMs / msPerPage) + 1;
+                
+                // Render events to appropriate pages (top = even pages, bottom = odd pages)
+                // Page times are in actual time (including lead-in)
+                for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+                    const isTopPage = pageNum % 2 === 0;
+                    const group = isTopPage ? topGroup : bottomGroup;
+                    const pageStartActualMs = pageNum * msPerPage;
+                    const pageEndActualMs = pageStartActualMs + msPerPage;
+                    
+                    // Convert to display time for event comparison
+                    const pageStartDisplayMs = pageStartActualMs - leadInMs;
+                    const pageEndDisplayMs = pageEndActualMs - leadInMs;
+                    
+                    // Render note lines (2px high at top of track)
+                    for (const note of notePairs) {
+                        // Check if note overlaps with this page (using display time)
+                        if (note.endMs < pageStartDisplayMs || note.startMs >= pageEndDisplayMs) continue;
+                        
+                        // Calculate X positions: convert display time to actual time, then to pixels
+                        const startActualMs = note.startMs + leadInMs;
+                        const endActualMs = note.endMs + leadInMs;
+                        const startX = Math.max(0, (startActualMs - pageStartActualMs) * pixelsPerMs);
+                        const endX = Math.min(scoreWidth, (endActualMs - pageStartActualMs) * pixelsPerMs);
+                        const width = Math.max(2, endX - startX);
+                        
+                        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        rect.setAttribute('x', startX);
+                        rect.setAttribute('y', noteRowY);
+                        rect.setAttribute('width', width);
+                        rect.setAttribute('height', noteLineHeight);
+                        rect.setAttribute('fill', 'black');
+                        rect.setAttribute('class', 'midi-note-rect');
+                        group.appendChild(rect);
+                    }
+                    
+                    // Render velocity squares (red with white text)
+                    for (const vel of velocityEvents) {
+                        if (vel.timeMs < pageStartDisplayMs || vel.timeMs >= pageEndDisplayMs) continue;
+                        
+                        const actualMs = vel.timeMs + leadInMs;
+                        const x = (actualMs - pageStartActualMs) * pixelsPerMs;
+                        const squareSize = 12;
+                        
+                        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        rect.setAttribute('x', x);
+                        rect.setAttribute('y', velocityRowY);
+                        rect.setAttribute('width', squareSize);
+                        rect.setAttribute('height', squareSize);
+                        rect.setAttribute('fill', '#E53935'); // Red
+                        rect.setAttribute('class', 'midi-velocity-rect');
+                        group.appendChild(rect);
+                        
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', x + squareSize / 2);
+                        text.setAttribute('y', velocityRowY + squareSize / 2 + 3);
+                        text.setAttribute('fill', 'white');
+                        text.setAttribute('font-size', '8');
+                        text.setAttribute('text-anchor', 'middle');
+                        text.setAttribute('class', 'midi-velocity-text');
+                        text.textContent = vel.velocity;
+                        group.appendChild(text);
+                    }
+                    
+                    // Render CC0 squares (blue with white text)
+                    for (const cc of cc0Events) {
+                        if (cc.timeMs < pageStartDisplayMs || cc.timeMs >= pageEndDisplayMs) continue;
+                        
+                        const actualMs = cc.timeMs + leadInMs;
+                        const x = (actualMs - pageStartActualMs) * pixelsPerMs;
+                        const squareSize = 12;
+                        
+                        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                        rect.setAttribute('x', x);
+                        rect.setAttribute('y', cc0RowY + 2);
+                        rect.setAttribute('width', squareSize);
+                        rect.setAttribute('height', squareSize);
+                        rect.setAttribute('fill', '#2196F3'); // Blue
+                        rect.setAttribute('class', 'midi-cc0-rect');
+                        group.appendChild(rect);
+                        
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', x + squareSize / 2);
+                        text.setAttribute('y', cc0RowY + 2 + squareSize / 2 + 3);
+                        text.setAttribute('fill', 'white');
+                        text.setAttribute('font-size', '8');
+                        text.setAttribute('text-anchor', 'middle');
+                        text.setAttribute('class', 'midi-cc0-text');
+                        text.textContent = cc.value;
+                        group.appendChild(text);
+                    }
+                    
+                    // Render CC7 as vertical lines from bottom up (value/127 * cc7RowHeight)
+                    for (const cc of cc7Events) {
+                        if (cc.timeMs < pageStartDisplayMs || cc.timeMs >= pageEndDisplayMs) continue;
+                        
+                        const actualMs = cc.timeMs + leadInMs;
+                        const x = (actualMs - pageStartActualMs) * pixelsPerMs;
+                        const valueRatio = cc.value / 127;
+                        const lineHeight = valueRatio * cc7RowHeight;
+                        const lineY = cc7RowY + cc7RowHeight - lineHeight; // start from bottom
+                        
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', x);
+                        line.setAttribute('y1', cc7RowY + cc7RowHeight); // bottom of CC7 area
+                        line.setAttribute('x2', x);
+                        line.setAttribute('y2', lineY); // top based on value
+                        line.setAttribute('stroke', '#4CAF50'); // Green
+                        line.setAttribute('stroke-width', '1');
+                        line.setAttribute('class', 'midi-cc7-line');
+                        group.appendChild(line);
+                    }
+                }
+            },
+            
+            // Render MIDI display for all tracks
+            renderAllMidiDisplays() {
+                for (let i = 0; i < 4; i++) {
+                    this.renderMidiDisplay(i);
+                }
+            },
+            
+            // Debug function to check state
+            debugState() {
+                let msg = '=== MidiController Debug State ===\n';
+                msg += 'loadedFileEvents: ' + this.loadedFileEvents.length + '\n';
+                msg += 'selectedTrack: ' + this.selectedTrack + '\n';
+                for (let i = 0; i < 4; i++) {
+                    msg += 'Track ' + (i+1) + ' events: ' + this.tracks[i].midiEvents.length + '\n';
+                }
+                msg += 'midiDisplayLayers.top: ' + this.midiDisplayLayers.top.length + '\n';
+                msg += 'midiDisplayLayers.bottom: ' + this.midiDisplayLayers.bottom.length + '\n';
+                msg += 'scoreTopEl: ' + (this.scoreTopEl ? 'found' : 'null') + '\n';
+                msg += 'scoreBottomEl: ' + (this.scoreBottomEl ? 'found' : 'null');
+                alert(msg);
+                return msg;
             }
         };
         
         // Initialize MIDI controller after DOM is ready
-        MidiController.init();
-        window.MidiController = MidiController;
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                MidiController.init();
+                window.MidiController = MidiController;
+            });
+        } else {
+            MidiController.init();
+            window.MidiController = MidiController;
+        }
+        
+        // Staff Y Positions - Named Y coordinates for each staff relative to page
+        // These define the vertical layout of the 4 staff sections
+        const StaffPositions = {
+            timelineHeight: 8,  // Y position where staves begin (below timeline numbers)
+            
+            // Get staff Y positions dynamically based on current page height
+            getPositions(scoreEl) {
+                const scoreHeight = scoreEl.clientHeight;
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const staffHeight = availableHeight / 4;
+                
+                return {
+                    Staff1Y: this.timelineHeight,
+                    Staff2Y: this.timelineHeight + staffHeight,
+                    Staff3Y: this.timelineHeight + (2 * staffHeight),
+                    Staff4Y: this.timelineHeight + (3 * staffHeight),
+                    staffHeight: staffHeight,
+                    availableHeight: availableHeight
+                };
+            }
+        };
+        window.StaffPositions = StaffPositions;
+        
+        // G Track System - Graphic tracks working in Staff Y dimensions
+        // Each G Track corresponds to a staff and stores graphic elements
+        const GTrackSystem = {
+            gTracks: [],       // Array of 4 G Track objects
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            initialized: false,
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                const positions = StaffPositions.getPositions(this.scoreTopEl);
+                
+                // Create 4 G Tracks
+                for (let i = 0; i < 4; i++) {
+                    const gTrack = this.createGTrack(i, positions);
+                    this.gTracks.push(gTrack);
+                }
+                
+                this.initialized = true;
+                console.log('GTrackSystem initialized with 4 G Tracks');
+            },
+            
+            createGTrack(trackIndex, positions) {
+                const yPositions = [positions.Staff1Y, positions.Staff2Y, positions.Staff3Y, positions.Staff4Y];
+                
+                return {
+                    index: trackIndex,
+                    name: `G Track ${trackIndex + 1}`,
+                    yPosition: yPositions[trackIndex],
+                    height: positions.staffHeight,
+                    
+                    // Graphic items array - stores all graphic elements for this track
+                    // Each item: { scoreTimeMs, duration, type, props }
+                    graphicItems: [],
+                    
+                    // Link to corresponding MIDI track in TrackSystem
+                    midiTrackIndex: trackIndex
+                };
+            },
+            
+            // Get G Track by index
+            getGTrack(index) {
+                if (index >= 0 && index < this.gTracks.length) {
+                    return this.gTracks[index];
+                }
+                return null;
+            },
+            
+            // Add graphic item to a G Track
+            addGraphicItem(trackIndex, item) {
+                if (trackIndex >= 0 && trackIndex < this.gTracks.length) {
+                    this.gTracks[trackIndex].graphicItems.push(item);
+                }
+            },
+            
+            // Update dimensions on resize
+            updateDimensions() {
+                const positions = StaffPositions.getPositions(this.scoreTopEl);
+                const yPositions = [positions.Staff1Y, positions.Staff2Y, positions.Staff3Y, positions.Staff4Y];
+                
+                this.gTracks.forEach((gTrack, index) => {
+                    gTrack.yPosition = yPositions[index];
+                    gTrack.height = positions.staffHeight;
+                });
+            }
+        };
+        
+        // Initialize G Track System
+        GTrackSystem.init();
+        window.GTrackSystem = GTrackSystem;
+        
+        // Edit Cursor - Neon yellow SVG line with draggable triangle handle
+        // Spans full page height, can be dragged across timeline
+        const EditCursor = {
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            lineTop: null,
+            lineBottom: null,
+            handleTop: null,
+            handleBottom: null,
+            currentSection: 'top',    // 'top' or 'bottom'
+            positionSeconds: 0,       // Current position in seconds
+            isDragging: false,
+            inputEl: null,
+            initialized: false,
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                this.inputEl = document.getElementById('editCursorSecondsInput');
+                
+                // Create edit cursor elements for ScoreTop
+                this.createCursorElements('top');
+                this.createCursorElements('bottom');
+                
+                // Set up input handling
+                this.inputEl.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.jumpToInputValue();
+                    }
+                });
+                
+                this.inputEl.addEventListener('blur', () => {
+                    this.jumpToInputValue();
+                });
+                
+                // Update on resize
+                window.addEventListener('resize', () => {
+                    this.updateDimensions();
+                });
+                
+                // Initial position
+                this.setPositionSeconds(0);
+                
+                this.initialized = true;
+                console.log('EditCursor initialized');
+            },
+            
+            // Triangle handle size (8px equilateral)
+            handleSize: 8,
+            
+            createCursorElements(section) {
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreHeight = scoreEl.clientHeight;
+                const positions = StaffPositions.getPositions(scoreEl);
+                
+                // Create vertical line spanning full page height below timeline
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', '0');
+                line.setAttribute('y1', positions.Staff1Y);
+                line.setAttribute('x2', '0');
+                line.setAttribute('y2', scoreHeight);
+                line.setAttribute('class', 'edit-cursor-line');
+                
+                // Create upside-down equilateral triangle handle at top of line (8px)
+                const handle = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                const h = this.handleSize;
+                const triHeight = h * Math.sqrt(3) / 2; // Height of equilateral triangle
+                handle.setAttribute('points', `0,0 ${h},0 ${h/2},${triHeight}`);
+                handle.setAttribute('class', 'edit-cursor-handle');
+                handle.setAttribute('transform', `translate(-${h/2}, ${positions.Staff1Y - triHeight})`);
+                
+                // Add drag handlers to both line and handle
+                line.addEventListener('mousedown', (e) => this.startDrag(e, section));
+                handle.addEventListener('mousedown', (e) => this.startDrag(e, section));
+                
+                // Add to SVG
+                scoreEl.appendChild(line);
+                scoreEl.appendChild(handle);
+                
+                if (section === 'top') {
+                    this.lineTop = line;
+                    this.handleTop = handle;
+                } else {
+                    this.lineBottom = line;
+                    this.handleBottom = handle;
+                    // Initially hide bottom cursor
+                    line.style.display = 'none';
+                    handle.style.display = 'none';
+                }
+            },
+            
+            startDrag(e, section) {
+                e.preventDefault();
+                this.isDragging = true;
+                this.dragSection = section;
+                
+                // Track current page for wrapping
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const actualSeconds = this.positionSeconds + leadInSeconds;
+                this.dragBasePage = Math.floor(actualSeconds / secondsPerPage);
+                
+                const onMouseMove = (e) => {
+                    if (!this.isDragging) return;
+                    
+                    const scoreEl = this.dragSection === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                    const rect = scoreEl.getBoundingClientRect();
+                    let xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+                    
+                    // Page toggle: wrap to other page when dragging past edges
+                    if (xPercent > 100) {
+                        // Dragged past right edge - toggle to other page
+                        this.dragSection = this.dragSection === 'top' ? 'bottom' : 'top';
+                        this.dragBasePage += 1;
+                        xPercent = 0;
+                    } else if (xPercent < 0) {
+                        // Dragged past left edge - toggle to other page (go back)
+                        if (this.dragBasePage > 0) {
+                            this.dragSection = this.dragSection === 'top' ? 'bottom' : 'top';
+                            this.dragBasePage -= 1;
+                            xPercent = 100;
+                        } else {
+                            // At page 0, clamp to 0 (minimum is -leadInSeconds)
+                            xPercent = 0;
+                        }
+                    }
+                    
+                    xPercent = Math.max(0, Math.min(100, xPercent));
+                    
+                    // Calculate seconds based on position
+                    const seconds = (this.dragBasePage + xPercent / 100) * secondsPerPage - leadInSeconds;
+                    
+                    // Clamp to minimum of -leadInSeconds
+                    const clampedSeconds = Math.max(-leadInSeconds, seconds);
+                    
+                    this.setPositionSeconds(clampedSeconds);
+                };
+                
+                const onMouseUp = () => {
+                    this.isDragging = false;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
+            setPositionSeconds(seconds) {
+                // Clamp to minimum of -leadInSeconds
+                this.positionSeconds = Math.max(-leadInSeconds, seconds);
+                
+                // Update input display
+                this.inputEl.value = this.positionSeconds.toFixed(3);
+                
+                // Calculate which section and x position
+                const actualSeconds = this.positionSeconds + leadInSeconds;
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const totalPages = Math.max(0, actualSeconds / secondsPerPage);
+                const pageNumber = Math.floor(totalPages);
+                const positionInPage = (totalPages - pageNumber) * 100;
+                
+                const inTop = pageNumber % 2 === 0;
+                
+                // Update visibility and position
+                if (inTop) {
+                    this.lineTop.style.display = 'block';
+                    this.handleTop.style.display = 'block';
+                    this.lineBottom.style.display = 'none';
+                    this.handleBottom.style.display = 'none';
+                    this.currentSection = 'top';
+                    this.updateCursorPosition(this.lineTop, this.handleTop, positionInPage);
+                } else {
+                    this.lineTop.style.display = 'none';
+                    this.handleTop.style.display = 'none';
+                    this.lineBottom.style.display = 'block';
+                    this.handleBottom.style.display = 'block';
+                    this.currentSection = 'bottom';
+                    this.updateCursorPosition(this.lineBottom, this.handleBottom, positionInPage);
+                }
+            },
+            
+            updateCursorPosition(line, handle, xPercent) {
+                const scoreEl = this.currentSection === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const xPixels = (xPercent / 100) * scoreWidth;
+                const positions = StaffPositions.getPositions(scoreEl);
+                const h = this.handleSize;
+                const triHeight = h * Math.sqrt(3) / 2;
+                
+                line.setAttribute('x1', xPixels);
+                line.setAttribute('x2', xPixels);
+                handle.setAttribute('transform', `translate(${xPixels - h/2}, ${positions.Staff1Y - triHeight})`);
+            },
+            
+            updateDimensions() {
+                const positions = StaffPositions.getPositions(this.scoreTopEl);
+                const scoreHeight = this.scoreTopEl.clientHeight;
+                
+                [this.lineTop, this.lineBottom].forEach(line => {
+                    if (line) {
+                        line.setAttribute('y1', positions.Staff1Y);
+                        line.setAttribute('y2', scoreHeight);
+                    }
+                });
+                
+                // Re-apply current position
+                this.setPositionSeconds(this.positionSeconds);
+            },
+            
+            jumpToInputValue() {
+                const seconds = parseFloat(this.inputEl.value) || 0;
+                this.setPositionSeconds(seconds);
+                
+                // Also jump playback cursors to this position
+                const actualSeconds = seconds + leadInSeconds;
+                ClockSync.socket.emit('scoreGoto', { seconds: actualSeconds });
+            },
+            
+            // Get current position in seconds
+            getPositionSeconds() {
+                return this.positionSeconds;
+            }
+        };
+        
+        // Initialize Edit Cursor
+        EditCursor.init();
+        window.EditCursor = EditCursor;
+        
+        // Composition Panel Controls
+        const CompositionPanel = {
+            panelEl: null,
+            toggleEl: null,
+            isOpen: false,
+            selectedGTrack: 'A',  // 'A' = all (full height), '1'-'4' = specific track
+            
+            init() {
+                this.panelEl = document.getElementById('compositionPanel');
+                this.toggleEl = document.getElementById('compositionPanelToggle');
+                
+                // Toggle panel open/close
+                this.toggleEl.addEventListener('click', () => this.toggle());
+                
+                // G Track radio button listeners
+                const radioButtons = document.querySelectorAll('input[name="gtrack"]');
+                radioButtons.forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        this.selectedGTrack = e.target.value;
+                        console.log(`G Track selected: ${this.selectedGTrack === 'A' ? 'All (full height)' : 'G' + this.selectedGTrack}`);
+                    });
+                });
+            },
+            
+            toggle() {
+                this.isOpen = !this.isOpen;
+                this.panelEl.classList.toggle('open', this.isOpen);
+                this.toggleEl.textContent = this.isOpen ? '◀ Composition' : '◀ Composition';
+            },
+            
+            // Get selected G Track: returns 'A' for all, or 1-4 for specific track
+            getSelectedGTrack() {
+                return this.selectedGTrack;
+            },
+            
+            // Get Y position and height for current selection
+            getSelectedTrackDimensions(scoreEl) {
+                const positions = StaffPositions.getPositions(scoreEl);
+                
+                if (this.selectedGTrack === 'A') {
+                    // Full height from Staff1Y to bottom
+                    return {
+                        y: positions.Staff1Y,
+                        height: positions.availableHeight
+                    };
+                } else {
+                    // Specific track
+                    const trackIndex = parseInt(this.selectedGTrack) - 1;
+                    const yPositions = [positions.Staff1Y, positions.Staff2Y, positions.Staff3Y, positions.Staff4Y];
+                    return {
+                        y: yPositions[trackIndex],
+                        height: positions.staffHeight
+                    };
+                }
+            }
+        };
+        
+        // Initialize Composition Panel
+        CompositionPanel.init();
+        window.CompositionPanel = CompositionPanel;
+        
+        // Curve Database - stores all curves with their attributes
+        const CurveDatabase = {
+            curves: [],
+            nextId: 1,
+            
+            add(curveData) {
+                const curve = {
+                    id: this.nextId++,
+                    ...curveData,
+                    createdAt: Date.now()
+                };
+                this.curves.push(curve);
+                return curve;
+            },
+            
+            get(id) {
+                return this.curves.find(c => c.id === id);
+            },
+            
+            update(id, updates) {
+                const curve = this.get(id);
+                if (curve) {
+                    Object.assign(curve, updates);
+                }
+                return curve;
+            },
+            
+            remove(id) {
+                const index = this.curves.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    this.curves.splice(index, 1);
+                }
+            },
+            
+            getAll() {
+                return this.curves;
+            }
+        };
+        window.CurveDatabase = CurveDatabase;
+        
+        // Color map for swatches
+        const ColorMap = {
+            brightOrange: 'rgba(240,75,0,255)',
+            brightBlue: 'rgba(56,126,211,255)',
+            mustard: 'rgba(244,182,0,255)',
+            brightRed: 'rgba(229,42,25,255)',
+            green: 'rgba(0,147,92,255)',
+            limeGreen: 'rgb(153,255,0)',
+            brightGreen: '#31d196',
+            navyBlue: 'rgba(28,72,121,255)',
+            plum: 'rgba(82,44,85,255)',
+            lavander: 'rgba(162,126,198,255)',
+            yellow: 'rgba(254,213,0,255)',
+            neonMagenta: 'rgb(255, 21, 160)'
+        };
+        
+        // Curve Maker - creates and manages curves on the timeline
+        // Features: auto-naming (CRV###), selection with bounding box, DAW-style curve drag
+        const CurveMaker = {
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            topCurveGroup: null,
+            bottomCurveGroup: null,
+            
+            // UI elements
+            nameDisplay: null,
+            startInput: null,
+            endInput: null,
+            y1Input: null,
+            y2Input: null,
+            drawBtn: null,
+            
+            // Curve naming
+            curveCounter: 0,
+            
+            // Selected curve
+            selectedCurve: null,
+            
+            // Dragging state
+            isDragging: false,
+            dragTarget: null,  // 'start', 'end', 'curve'
+            dragStartX: 0,
+            dragStartY: 0,
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                // Get UI elements
+                this.nameDisplay = document.getElementById('curveNameDisplay');
+                this.startInput = document.getElementById('curveStartInput');
+                this.endInput = document.getElementById('curveEndInput');
+                this.y1Input = document.getElementById('curveY1Input');
+                this.y2Input = document.getElementById('curveY2Input');
+                this.drawBtn = document.getElementById('curveDrawBtn');
+                
+                // Create curve container groups
+                this.topCurveGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.bottomCurveGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.topCurveGroup.setAttribute('class', 'curve-container');
+                this.bottomCurveGroup.setAttribute('class', 'curve-container');
+                this.scoreTopEl.appendChild(this.topCurveGroup);
+                this.scoreBottomEl.appendChild(this.bottomCurveGroup);
+                
+                // Draw button handler
+                this.drawBtn.addEventListener('click', () => this.createCurve());
+                
+                // Color swatch handlers - dynamic for selected curve
+                document.querySelectorAll('.color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => {
+                        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                        const newColor = e.target.dataset.color;
+                        if (this.selectedCurve) {
+                            this.selectedCurve.color = newColor;
+                            this.updateCurveRendering(this.selectedCurve);
+                            this.syncCurveToDatabase(this.selectedCurve);
+                        }
+                    });
+                });
+                
+                // Fill mode handlers - dynamic for selected curve
+                document.querySelectorAll('input[name="curveFill"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const newFillMode = e.target.value;
+                        if (this.selectedCurve) {
+                            this.selectedCurve.fillMode = newFillMode;
+                            this.updateCurveRendering(this.selectedCurve);
+                            this.syncCurveToDatabase(this.selectedCurve);
+                        }
+                    });
+                });
+                
+                // Input field handlers - dynamic for selected curve
+                this.startInput.addEventListener('change', () => this.updateSelectedFromInputs());
+                this.endInput.addEventListener('change', () => this.updateSelectedFromInputs());
+                this.y1Input.addEventListener('change', () => this.updateSelectedFromInputs());
+                this.y2Input.addEventListener('change', () => this.updateSelectedFromInputs());
+                
+                // Click on score to deselect
+                this.scoreTopEl.addEventListener('click', (e) => this.handleScoreClick(e, 'top'));
+                this.scoreBottomEl.addEventListener('click', (e) => this.handleScoreClick(e, 'bottom'));
+                
+                // Delete/Backspace to delete selected curve
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedCurve) {
+                        // Don't delete if focus is in an input field
+                        if (document.activeElement.tagName === 'INPUT') return;
+                        e.preventDefault();
+                        this.deleteSelectedCurve();
+                    }
+                });
+                
+                console.log('CurveMaker initialized');
+            },
+            
+            generateCurveName() {
+                this.curveCounter++;
+                return `CRV${String(this.curveCounter).padStart(3, '0')}`;
+            },
+            
+            generateCurveDataArray(curve) {
+                // TIMECODE-BASED SYSTEM: Generate samples at fixed time intervals
+                // Sample rate: 100 samples/second (10ms intervals) for smooth curves
+                // Each entry contains normalized Y value
+                // For G1-G4: normalized 0-1 from bottom to top of track
+                // For GA: normalized 0-1 from bottom of page to top of cursor area
+                
+                const SAMPLE_INTERVAL = 0.01; // 10ms = 100 samples/second
+                const startTime = curve.startSeconds;
+                const endTime = curve.endSeconds;
+                const duration = endTime - startTime;
+                
+                if (duration <= 0) return { startTime, endTime, sampleInterval: SAMPLE_INTERVAL, samples: [] };
+                
+                const sampleCount = Math.ceil(duration / SAMPLE_INTERVAL) + 1;
+                const samples = [];
+                const slope = curve.slope || 0;
+                
+                // Determine normalization bounds
+                const scoreEl = curve.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                let minY, maxY;
+                if (curve.gTrack === 'A') {
+                    // GA: full page height (bottom to cursor area top)
+                    minY = 0;
+                    maxY = scoreEl ? scoreEl.clientHeight : 600;
+                } else {
+                    // G1-G4: track bounds
+                    minY = curve.trackDims.y;
+                    maxY = curve.trackDims.y + curve.trackDims.height;
+                }
+                
+                // Calculate control points for bezier (same logic as rendering)
+                const curveWidth = Math.abs(curve.x2 - curve.x1);
+                const ctrlX = curve.x1 + (curveWidth * (0.5 + slope * 0.45));
+                const ctrlY = slope >= 0 
+                    ? curve.y1Pixel + (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5
+                    : curve.y2Pixel - (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5;
+                
+                // Generate samples at fixed time intervals
+                for (let i = 0; i < sampleCount; i++) {
+                    const time = startTime + (i * SAMPLE_INTERVAL);
+                    
+                    // Calculate normalized position (0 to 1) based on time
+                    const timeT = Math.min(1, (time - startTime) / duration);
+                    
+                    // For a quadratic bezier, we need to find t such that X(t) = targetX
+                    // X(t) = (1-t)²x1 + 2(1-t)t*ctrlX + t²x2
+                    // Since time maps linearly to X position, targetX = x1 + timeT * curveWidth
+                    const targetX = curve.x1 + timeT * curveWidth;
+                    
+                    // Solve for t using the quadratic bezier X equation
+                    // This is a quadratic equation: at² + bt + c = 0
+                    // where a = x1 - 2*ctrlX + x2, b = 2*(ctrlX - x1), c = x1 - targetX
+                    const a = curve.x1 - 2 * ctrlX + curve.x2;
+                    const b = 2 * (ctrlX - curve.x1);
+                    const c = curve.x1 - targetX;
+                    
+                    let t;
+                    if (Math.abs(a) < 0.0001) {
+                        // Linear case (ctrlX is at midpoint)
+                        t = timeT;
+                    } else {
+                        // Quadratic formula: t = (-b + sqrt(b² - 4ac)) / 2a
+                        const discriminant = b * b - 4 * a * c;
+                        if (discriminant < 0) {
+                            t = timeT; // Fallback
+                        } else {
+                            const sqrtD = Math.sqrt(discriminant);
+                            const t1 = (-b + sqrtD) / (2 * a);
+                            const t2 = (-b - sqrtD) / (2 * a);
+                            // Choose t in range [0, 1]
+                            t = (t1 >= 0 && t1 <= 1) ? t1 : t2;
+                            t = Math.max(0, Math.min(1, t));
+                        }
+                    }
+                    
+                    // Now calculate Y using the correct t value
+                    // Quadratic bezier: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
+                    const oneMinusT = 1 - t;
+                    const yPixel = oneMinusT * oneMinusT * curve.y1Pixel 
+                                 + 2 * oneMinusT * t * ctrlY 
+                                 + t * t * curve.y2Pixel;
+                    
+                    // Normalize: 0 = bottom (maxY pixel), 1 = top (minY pixel)
+                    // Note: SVG Y increases downward, so we invert
+                    const normalizedY = Math.max(0, Math.min(1, 1 - (yPixel - minY) / (maxY - minY)));
+                    
+                    samples.push(normalizedY);
+                }
+                
+                return {
+                    startTime,
+                    endTime,
+                    sampleInterval: SAMPLE_INTERVAL,
+                    samples  // Array of normalizedY values, indexed by time
+                };
+            },
+            
+            createCurve() {
+                const startSeconds = parseFloat(this.startInput.value) || 0;
+                const endSeconds = parseFloat(this.endInput.value) || 1;
+                const y1 = parseFloat(this.y1Input.value) || 0;
+                const y2 = parseFloat(this.y2Input.value) || 10;
+                const gTrack = CompositionPanel.getSelectedGTrack();
+                
+                // Get current fill mode and color from UI
+                const fillMode = document.querySelector('input[name="curveFill"]:checked').value;
+                const colorSwatch = document.querySelector('.color-swatch.selected');
+                const color = colorSwatch ? colorSwatch.dataset.color : 'brightOrange';
+                
+                // Get track dimensions
+                const trackDims = CompositionPanel.getSelectedTrackDimensions(this.scoreTopEl);
+                
+                // Calculate pixel positions
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                
+                // Determine which page(s) the curve spans
+                const startActual = startSeconds + leadInSeconds;
+                const endActual = endSeconds + leadInSeconds;
+                const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                
+                // Draw on the start page
+                const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const curveGroup = section === 'top' ? this.topCurveGroup : this.bottomCurveGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                // Calculate X positions as percentages within the page
+                const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                
+                // Calculate Y positions (0 = bottom of track, 10 = top of track)
+                const trackBottom = trackDims.y + trackDims.height;
+                const y1Pixel = trackBottom - (y1 / 10) * trackDims.height;
+                const y2Pixel = trackBottom - (y2 / 10) * trackDims.height;
+                
+                // Calculate pixel positions
+                const x1Pixel = (startXPercent / 100) * scoreWidth;
+                const x2Pixel = (endXPercent / 100) * scoreWidth;
+                
+                // DAW-style curve: single control point for curvature (tension)
+                // tension: 0 = straight line, positive = curve up, negative = curve down
+                const tension = 0;
+                
+                // Generate unique name
+                const name = this.generateCurveName();
+                
+                // Create curve data
+                const curveDataObj = {
+                    name,
+                    startSeconds,
+                    endSeconds,
+                    y1,
+                    y2,
+                    gTrack,
+                    color,
+                    fillMode,
+                    section,
+                    page: startPage,
+                    x1: x1Pixel,
+                    y1Pixel,
+                    x2: x2Pixel,
+                    y2Pixel,
+                    tension,  // DAW-style: vertical drag changes depth
+                    slope: 0,  // DAW-style: horizontal drag shifts apex position
+                    trackDims
+                };
+                
+                // Generate curveData array (normalized Y values for each horizontal pixel)
+                const curveDataArray = this.generateCurveDataArray(curveDataObj);
+                curveDataObj.curveData = curveDataArray;
+                
+                // Add to database
+                const curve = CurveDatabase.add(curveDataObj);
+                
+                // Add to G Track graphic data
+                if (gTrack !== 'A') {
+                    const trackIndex = parseInt(gTrack) - 1;
+                    if (window.GTrackSystem) {
+                        GTrackSystem.addGraphicItem(trackIndex, {
+                            type: 'curve',
+                            curveId: curve.id,
+                            curveName: curve.name,
+                            color: color,
+                            scoreTimeMs: startSeconds * 1000,
+                            duration: (endSeconds - startSeconds) * 1000,
+                            curveData: curveDataArray
+                        });
+                    }
+                }
+                
+                // Render the curve
+                this.renderCurve(curve, curveGroup, scoreEl);
+                
+                // Auto-select the new curve
+                this.selectCurve(curve);
+                
+                console.log(`Curve created: ${curve.name} (ID: ${curve.id})`);
+            },
+            
+            renderCurve(curve, curveGroup, scoreEl) {
+                const color = ColorMap[curve.color] || curve.color;
+                
+                // Create SVG group for this curve
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('data-curve-id', curve.id);
+                group.setAttribute('class', 'curve-element');
+                
+                // DAW-style curve shaping:
+                // slope controls where the "knee" is (-1 = left edge, +1 = right edge)
+                // Drag right = flat at start, steep rise at end
+                // Drag left = steep rise at start, flat at end
+                // Curve stays within Y bounds of endpoints (no protrusion)
+                const slope = curve.slope || 0;
+                const curveWidth = curve.x2 - curve.x1;
+                
+                // Control point X: slope moves it from left edge to right edge
+                // slope -1 = control at x1, slope +1 = control at x2, slope 0 = middle
+                const ctrlX = curve.x1 + (curveWidth * (0.5 + slope * 0.45));
+                
+                // Control point Y: stays at the Y value of the opposite endpoint
+                // This creates the "flat then steep" or "steep then flat" effect
+                // When slope > 0 (dragging right): ctrl Y near y1 (start), curve flat then rises
+                // When slope < 0 (dragging left): ctrl Y near y2 (end), curve rises then flat
+                const ctrlY = slope >= 0 
+                    ? curve.y1Pixel + (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5
+                    : curve.y2Pixel - (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5;
+                
+                // Create the quadratic bezier path
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const d = `M ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel}`;
+                
+                if (curve.fillMode === 'line') {
+                    path.setAttribute('d', d);
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', color);
+                    path.setAttribute('stroke-width', '2');
+                } else {
+                    const fillY = curve.fillMode === 'bottom' ? curve.trackDims.y + curve.trackDims.height : curve.trackDims.y;
+                    const filledD = `M ${curve.x1} ${fillY} L ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel} L ${curve.x2} ${fillY} Z`;
+                    path.setAttribute('d', filledD);
+                    path.setAttribute('fill', color);
+                    path.setAttribute('fill-opacity', '0.3');
+                    path.setAttribute('stroke', color);
+                    path.setAttribute('stroke-width', '2');
+                }
+                
+                path.style.cursor = 'pointer';
+                group.appendChild(path);
+                
+                // Create invisible wider hit area for easier clicking on the curve
+                const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                hitPath.setAttribute('d', d);
+                hitPath.setAttribute('fill', 'none');
+                hitPath.setAttribute('stroke', 'transparent');
+                hitPath.setAttribute('stroke-width', '20');
+                hitPath.style.cursor = 'pointer';
+                hitPath.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'curve'));
+                path.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'curve'));
+                group.appendChild(hitPath);
+                
+                // Create draggable endpoint circles
+                const pointRadius = 6;
+                
+                // Start point
+                const startPoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                startPoint.setAttribute('cx', curve.x1);
+                startPoint.setAttribute('cy', curve.y1Pixel);
+                startPoint.setAttribute('r', pointRadius);
+                startPoint.setAttribute('fill', color);
+                startPoint.setAttribute('stroke', '#fff');
+                startPoint.setAttribute('stroke-width', '2');
+                startPoint.style.cursor = 'ns-resize';
+                startPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'start'));
+                group.appendChild(startPoint);
+                
+                // End point
+                const endPoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                endPoint.setAttribute('cx', curve.x2);
+                endPoint.setAttribute('cy', curve.y2Pixel);
+                endPoint.setAttribute('r', pointRadius);
+                endPoint.setAttribute('fill', color);
+                endPoint.setAttribute('stroke', '#fff');
+                endPoint.setAttribute('stroke-width', '2');
+                endPoint.style.cursor = 'ns-resize';
+                endPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'end'));
+                group.appendChild(endPoint);
+                
+                // Bounding box (hidden by default, colored to match curve)
+                const bbox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                bbox.setAttribute('class', 'curve-bounding-box');
+                bbox.setAttribute('stroke', color);
+                bbox.setAttribute('fill', color);
+                bbox.style.display = 'none';
+                bbox.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'bbox'));
+                group.insertBefore(bbox, path);
+                
+                // Store element references
+                curve.elements = {
+                    group,
+                    path,
+                    hitPath,
+                    startPoint,
+                    endPoint,
+                    boundingBox: bbox
+                };
+                
+                curveGroup.appendChild(group);
+                this.updateBoundingBox(curve);
+            },
+            
+            handleCurveMouseDown(e, curve, target) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Select this curve
+                this.selectCurve(curve);
+                
+                // If clicking on bounding box (not on curve/endpoints), just select, don't drag
+                if (target === 'bbox') return;
+                
+                // Start dragging
+                this.isDragging = true;
+                this.dragTarget = target;
+                this.dragStartX = e.clientX;
+                this.dragStartY = e.clientY;
+                
+                const scoreEl = curve.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const rect = scoreEl.getBoundingClientRect();
+                
+                // Store initial curve state for curve drag
+                const initialTension = curve.tension;
+                const initialSlope = curve.slope || 0;  // slope: shifts the apex left/right
+                const initialY1 = curve.y1Pixel;
+                const initialY2 = curve.y2Pixel;
+                
+                const onMouseMove = (e) => {
+                    if (!this.isDragging) return;
+                    
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const deltaX = e.clientX - this.dragStartX;
+                    const deltaY = e.clientY - this.dragStartY;
+                    
+                    // Clamp Y to track bounds
+                    const clampedY = Math.max(curve.trackDims.y, Math.min(curve.trackDims.y + curve.trackDims.height, y));
+                    
+                    switch (this.dragTarget) {
+                        case 'start':
+                            // Vertical only - X stays fixed
+                            curve.y1Pixel = clampedY;
+                            break;
+                        case 'end':
+                            // Vertical only - X stays fixed
+                            curve.y2Pixel = clampedY;
+                            break;
+                        case 'curve':
+                            // DAW-style curve shaping - horizontal drag only
+                            // Maps mouse X position within curve bounds to slope (-1 to +1)
+                            // Drag right = flat start, steep end (slope +1)
+                            // Drag left = steep start, flat end (slope -1)
+                            const curveLeft = Math.min(curve.x1, curve.x2);
+                            const curveRight = Math.max(curve.x1, curve.x2);
+                            const curveWidth = curveRight - curveLeft;
+                            
+                            // Map mouse X to slope: left edge = -1, right edge = +1
+                            const relativeX = (x - curveLeft) / curveWidth;
+                            curve.slope = Math.max(-1, Math.min(1, (relativeX - 0.5) * 2));
+                            break;
+                    }
+                    
+                    // Update input fields
+                    this.updateInputsFromCurve(curve);
+                    
+                    // Re-render curve
+                    this.updateCurveRendering(curve);
+                    this.updateBoundingBox(curve);
+                    
+                    // Sync to database
+                    this.syncCurveToDatabase(curve);
+                };
+                
+                const onMouseUp = () => {
+                    this.isDragging = false;
+                    this.dragTarget = null;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
+            handleScoreClick(e, section) {
+                // Check if click was on a curve element
+                if (e.target.closest('.curve-element')) return;
+                
+                // Deselect current curve
+                this.deselectCurve();
+            },
+            
+            selectCurve(curve) {
+                // Deselect previous
+                if (this.selectedCurve && this.selectedCurve !== curve) {
+                    this.deselectCurve();
+                }
+                
+                this.selectedCurve = curve;
+                
+                // Show bounding box
+                if (curve.elements && curve.elements.boundingBox) {
+                    curve.elements.boundingBox.style.display = 'block';
+                }
+                
+                // Update UI to reflect selected curve
+                this.nameDisplay.value = curve.name;
+                this.updateInputsFromCurve(curve);
+                
+                // Update color swatch selection
+                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                const matchingSwatch = document.querySelector(`.color-swatch[data-color="${curve.color}"]`);
+                if (matchingSwatch) matchingSwatch.classList.add('selected');
+                
+                // Update fill mode selection
+                document.querySelector(`input[name="curveFill"][value="${curve.fillMode}"]`).checked = true;
+            },
+            
+            deselectCurve() {
+                if (this.selectedCurve && this.selectedCurve.elements) {
+                    this.selectedCurve.elements.boundingBox.style.display = 'none';
+                }
+                this.selectedCurve = null;
+                this.nameDisplay.value = '';
+            },
+            
+            deleteSelectedCurve() {
+                if (!this.selectedCurve) return;
+                
+                const curve = this.selectedCurve;
+                const curveName = curve.name;
+                
+                // Remove SVG elements from DOM
+                if (curve.elements && curve.elements.group) {
+                    curve.elements.group.remove();
+                }
+                
+                // Remove from G Track graphic items
+                if (curve.gTrack !== 'A' && window.GTrackSystem) {
+                    const trackIndex = parseInt(curve.gTrack) - 1;
+                    const gTrack = GTrackSystem.getGTrack(trackIndex);
+                    if (gTrack) {
+                        const itemIndex = gTrack.graphicItems.findIndex(i => i.curveId === curve.id);
+                        if (itemIndex !== -1) {
+                            gTrack.graphicItems.splice(itemIndex, 1);
+                        }
+                    }
+                }
+                
+                // Remove from CurveDatabase
+                CurveDatabase.remove(curve.id);
+                
+                // Clear selection
+                this.selectedCurve = null;
+                this.nameDisplay.value = '';
+                
+                console.log(`Curve deleted: ${curveName}`);
+            },
+            
+            updateBoundingBox(curve) {
+                if (!curve.elements || !curve.elements.boundingBox) return;
+                
+                const bbox = curve.elements.boundingBox;
+                const padding = 8;
+                const minX = Math.min(curve.x1, curve.x2) - padding;
+                const maxX = Math.max(curve.x1, curve.x2) + padding;
+                const minY = Math.min(curve.y1Pixel, curve.y2Pixel) - padding - Math.abs(curve.tension) * curve.trackDims.height * 0.5;
+                const maxY = Math.max(curve.y1Pixel, curve.y2Pixel) + padding + Math.abs(curve.tension) * curve.trackDims.height * 0.5;
+                
+                bbox.setAttribute('x', minX);
+                bbox.setAttribute('y', Math.max(curve.trackDims.y, minY));
+                bbox.setAttribute('width', maxX - minX);
+                bbox.setAttribute('height', Math.min(curve.trackDims.height, maxY - minY));
+            },
+            
+            updateInputsFromCurve(curve) {
+                const scoreEl = curve.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                
+                // Convert X pixels back to seconds
+                const startXPercent = (curve.x1 / scoreWidth) * 100;
+                const endXPercent = (curve.x2 / scoreWidth) * 100;
+                const startSeconds = (curve.page + startXPercent / 100) * secondsPerPage - leadInSeconds;
+                const endSeconds = (curve.page + endXPercent / 100) * secondsPerPage - leadInSeconds;
+                
+                // Convert Y pixels back to relative (0-10)
+                const trackBottom = curve.trackDims.y + curve.trackDims.height;
+                const y1 = ((trackBottom - curve.y1Pixel) / curve.trackDims.height) * 10;
+                const y2 = ((trackBottom - curve.y2Pixel) / curve.trackDims.height) * 10;
+                
+                // Update inputs
+                this.startInput.value = startSeconds.toFixed(3);
+                this.endInput.value = endSeconds.toFixed(3);
+                this.y1Input.value = Math.max(0, Math.min(10, y1)).toFixed(1);
+                this.y2Input.value = Math.max(0, Math.min(10, y2)).toFixed(1);
+                
+                // Update curve data
+                curve.startSeconds = startSeconds;
+                curve.endSeconds = endSeconds;
+                curve.y1 = y1;
+                curve.y2 = y2;
+            },
+            
+            updateSelectedFromInputs() {
+                if (!this.selectedCurve) return;
+                
+                const curve = this.selectedCurve;
+                const scoreEl = curve.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                
+                // Read values from inputs
+                const startSeconds = parseFloat(this.startInput.value) || 0;
+                const endSeconds = parseFloat(this.endInput.value) || 1;
+                const y1 = parseFloat(this.y1Input.value) || 0;
+                const y2 = parseFloat(this.y2Input.value) || 10;
+                
+                // Convert to pixels
+                const startActual = startSeconds + leadInSeconds;
+                const endActual = endSeconds + leadInSeconds;
+                const startXPercent = ((startActual / secondsPerPage) - curve.page) * 100;
+                const endXPercent = ((endActual / secondsPerPage) - curve.page) * 100;
+                
+                curve.x1 = (startXPercent / 100) * scoreWidth;
+                curve.x2 = (endXPercent / 100) * scoreWidth;
+                
+                const trackBottom = curve.trackDims.y + curve.trackDims.height;
+                curve.y1Pixel = trackBottom - (y1 / 10) * curve.trackDims.height;
+                curve.y2Pixel = trackBottom - (y2 / 10) * curve.trackDims.height;
+                
+                curve.startSeconds = startSeconds;
+                curve.endSeconds = endSeconds;
+                curve.y1 = y1;
+                curve.y2 = y2;
+                
+                // Update rendering
+                this.updateCurveRendering(curve);
+                this.updateBoundingBox(curve);
+                this.syncCurveToDatabase(curve);
+            },
+            
+            syncCurveToDatabase(curve) {
+                // Regenerate curveData array when curve is modified
+                const curveDataArray = this.generateCurveDataArray(curve);
+                curve.curveData = curveDataArray;
+                
+                // Update curve in database
+                CurveDatabase.update(curve.id, {
+                    startSeconds: curve.startSeconds,
+                    endSeconds: curve.endSeconds,
+                    y1: curve.y1,
+                    y2: curve.y2,
+                    color: curve.color,
+                    fillMode: curve.fillMode,
+                    tension: curve.tension,
+                    slope: curve.slope,
+                    x1: curve.x1,
+                    y1Pixel: curve.y1Pixel,
+                    x2: curve.x2,
+                    y2Pixel: curve.y2Pixel,
+                    curveData: curveDataArray
+                });
+                
+                // Update in G Track if applicable
+                if (curve.gTrack !== 'A' && window.GTrackSystem) {
+                    const trackIndex = parseInt(curve.gTrack) - 1;
+                    const gTrack = GTrackSystem.getGTrack(trackIndex);
+                    if (gTrack) {
+                        const item = gTrack.graphicItems.find(i => i.curveId === curve.id);
+                        if (item) {
+                            item.scoreTimeMs = curve.startSeconds * 1000;
+                            item.duration = (curve.endSeconds - curve.startSeconds) * 1000;
+                            item.curveData = curveDataArray;
+                            item.color = curve.color;
+                        }
+                    }
+                }
+            },
+            
+            updateCurveRendering(curve) {
+                if (!curve.elements) return;
+                
+                const { path, hitPath, startPoint, endPoint, boundingBox } = curve.elements;
+                const color = ColorMap[curve.color] || curve.color;
+                
+                // DAW-style curve shaping:
+                // slope controls where the "knee" is (-1 = left edge, +1 = right edge)
+                // Drag right = flat at start, steep rise at end
+                // Drag left = steep rise at start, flat at end
+                // Curve stays within Y bounds of endpoints (no protrusion)
+                const slope = curve.slope || 0;
+                const curveWidth = Math.abs(curve.x2 - curve.x1);
+                
+                // Control point X: slope moves it from left edge to right edge
+                // slope -1 = control at x1, slope +1 = control at x2, slope 0 = middle
+                const ctrlX = curve.x1 + (curveWidth * (0.5 + slope * 0.45));
+                
+                // Control point Y: stays at the Y value of the opposite endpoint
+                // This creates the "flat then steep" or "steep then flat" effect
+                // When slope > 0 (dragging right): ctrl Y near y1 (start), curve flat then rises
+                // When slope < 0 (dragging left): ctrl Y near y2 (end), curve rises then flat
+                const ctrlY = slope >= 0 
+                    ? curve.y1Pixel + (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5
+                    : curve.y2Pixel - (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5;
+                
+                // Update path
+                const d = `M ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel}`;
+                
+                if (curve.fillMode === 'line') {
+                    path.setAttribute('d', d);
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', color);
+                } else {
+                    const fillY = curve.fillMode === 'bottom' ? curve.trackDims.y + curve.trackDims.height : curve.trackDims.y;
+                    const filledD = `M ${curve.x1} ${fillY} L ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel} L ${curve.x2} ${fillY} Z`;
+                    path.setAttribute('d', filledD);
+                    path.setAttribute('fill', color);
+                    path.setAttribute('fill-opacity', '0.3');
+                    path.setAttribute('stroke', color);
+                }
+                
+                // Update hit path for easier clicking
+                if (hitPath) {
+                    hitPath.setAttribute('d', d);
+                }
+                
+                // Update endpoint colors
+                startPoint.setAttribute('fill', color);
+                endPoint.setAttribute('fill', color);
+                
+                // Update bounding box color
+                boundingBox.setAttribute('stroke', color);
+                boundingBox.setAttribute('fill', color);
+                
+                // Update points positions
+                startPoint.setAttribute('cx', curve.x1);
+                startPoint.setAttribute('cy', curve.y1Pixel);
+                endPoint.setAttribute('cx', curve.x2);
+                endPoint.setAttribute('cy', curve.y2Pixel);
+            }
+        };
+        
+        // Initialize Curve Maker
+        CurveMaker.init();
+        window.CurveMaker = CurveMaker;
     </script>
 </body>
 </html>
