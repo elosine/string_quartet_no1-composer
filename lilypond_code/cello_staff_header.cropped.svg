@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="10.27mm" height="12.72mm" viewBox="-0.7500 -1.5930 5.8450 7.2360">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0000, 4.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(0.0000, 3.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(0.0000, 2.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(0.0000, 1.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(0.0000, 0.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(0.8000, 1.0250)">
+<path transform="scale(0.0025, -0.0025)" d="M559 -125c0 27 22 49 49 49s49 -22 49 -49s-22 -49 -49 -49s-49 22 -49 49zM559 125c0 27 22 49 49 49s49 -22 49 -49s-22 -49 -49 -49s-49 22 -49 49zM229 267c174 0 296 -90 296 -255c0 -263 -262 -415 -513 -524c-4 -4 -8 -6 -12 -6c-9 0 -18 9 -18 18c0 4 2 8 6 12
+c198 117 403 264 403 489c0 117 -57 232 -162 232c-65 0 -107 -50 -128 -115c4 1 7 1 11 1c55 0 100 -45 100 -100c0 -58 -44 -107 -100 -107c-60 0 -112 48 -112 107c0 134 99 248 229 248z" fill="currentColor"/>
+</g>
+<g transform="translate(-0.7500, -0.2250)">
+<path transform="scale(0.0040, -0.0040)" d="M0 -56v87c0 14 11 25 25 25h50c159 0 271 136 362 270c11 17 37 -1 26 -18c-99 -144 -215 -364 -388 -364h-75z" fill="currentColor"/>
+</g>
+<g transform="translate(-0.7500, 4.2750)">
+<path transform="scale(0.0040, -0.0040)" d="M0 56h75c173 0 289 -220 388 -364c11 -17 -15 -35 -26 -18c-91 134 -203 270 -362 270h-50c-14 0 -25 11 -25 25v87z" fill="currentColor"/>
+</g>
+<g transform="translate(-0.7500, 2.0250)">
+<rect x="0.0000" y="-2.0700" width="0.4500" height="4.1400" ry="0.0000" fill="currentColor"/>
+</g>
+</svg>

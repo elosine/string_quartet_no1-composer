@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="30.27mm" height="297.00mm" viewBox="0.0000 -0.0000 17.2261 169.0094">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(5.6906, 5.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(5.6906, 4.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(5.6906, 3.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(5.6906, 2.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(5.6906, 1.0250)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="5.0950" y2="0"/>
+</g>
+<g transform="translate(6.4906, 3.0250)">
+<path transform="scale(0.0025, -0.0025)" d="M338 0c0 -31 3 -71 40 -71c29 0 55 36 86 36c123 0 226 -94 226 -215c0 -166 -86 -250 -253 -250c-81 0 -150 61 -150 140c0 42 33 75 75 75s75 -33 75 -75c0 -37 -43 -38 -43 -75c0 -20 21 -33 43 -33c113 0 134 89 134 218c0 108 -13 183 -107 183
+c-67 0 -110 -69 -110 -142c0 -11 -8 -16 -16 -16s-17 5 -17 16c0 72 -30 141 -83 189v-464c0 -9 -7 -16 -16 -16h-16c-9 0 -16 7 -16 16v968c0 9 7 16 16 16h16c9 0 16 -7 16 -16v-464c53 48 83 117 83 189c0 11 9 16 17 16s16 -5 16 -16c0 -73 43 -142 110 -142
+c94 0 107 75 107 183c0 129 -21 218 -134 218c-22 0 -43 -13 -43 -33c0 -37 43 -38 43 -75c0 -42 -33 -75 -75 -75s-75 33 -75 75c0 79 69 140 150 140c167 0 253 -84 253 -250c0 -121 -103 -215 -226 -215c-31 0 -57 36 -86 36c-37 0 -40 -40 -40 -71zM125 -500h-109
+c-9 0 -16 7 -16 16v968c0 9 7 16 16 16h109c9 0 16 -7 16 -16v-968c0 -9 -7 -16 -16 -16z" fill="currentColor"/>
+</g>
+<g transform="translate(4.9406, 0.7750)">
+<path transform="scale(0.0040, -0.0040)" d="M0 -56v87c0 14 11 25 25 25h50c159 0 271 136 362 270c11 17 37 -1 26 -18c-99 -144 -215 -364 -388 -364h-75z" fill="currentColor"/>
+</g>
+<g transform="translate(4.9406, 5.2750)">
+<path transform="scale(0.0040, -0.0040)" d="M0 56h75c173 0 289 -220 388 -364c11 -17 -15 -35 -26 -18c-91 134 -203 270 -362 270h-50c-14 0 -25 11 -25 25v87z" fill="currentColor"/>
+</g>
+<g transform="translate(4.9406, 3.0250)">
+<rect x="0.0000" y="-2.0700" width="0.4500" height="4.1400" ry="0.0000" fill="currentColor"/>
+</g>
+</svg>

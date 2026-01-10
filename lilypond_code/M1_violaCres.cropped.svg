@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="18.99mm" height="23.37mm" viewBox="0.0000 -0.0000 10.8045 13.3013">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0000, 5.4873)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="10.8045" y2="0"/>
+</g>
+<g transform="translate(0.0000, 4.4873)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="10.8045" y2="0"/>
+</g>
+<g transform="translate(0.0000, 3.4873)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="10.8045" y2="0"/>
+</g>
+<g transform="translate(0.0000, 2.4873)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="10.8045" y2="0"/>
+</g>
+<g transform="translate(0.0000, 1.4873)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0250" y1="0" x2="10.8045" y2="0"/>
+</g>
+<g transform="translate(0.0000, 6.4873)">
+<rect x="1.8250" y="-0.0750" width="1.6262" height="0.1500" ry="0.0750" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M1_violaCres.ly:52:10:11">
+<g transform="translate(4.6560, 12.9763)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0000" y1="0.0000" x2="4.8490" y2="0.3000"/>
+</g>
+<g transform="translate(4.6560, 12.9763)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0500" stroke="currentColor" x1="0.0000" y1="-0.0000" x2="4.8490" y2="-0.3000"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M1_violaCres.ly:52:2:3">
+<g transform="translate(2.0000, 6.4873)">
+<path transform="scale(0.0034, -0.0034)" d="M312 64c0 24 -20 41 -41 41c-4 0 -8 -1 -12 -2c-30 -9 -77 -38 -113 -62s-83 -54 -103 -78c-7 -8 -10 -17 -10 -27c0 -24 20 -41 41 -41c4 0 8 1 12 2c30 9 77 38 113 62s83 54 103 78c7 8 10 17 10 27zM259 137c48 0 86 -22 86 -74c0 -18 -4 -38 -10 -56
+c-12 -38 -30 -73 -63 -95c-53 -36 -113 -49 -186 -49c-48 0 -86 22 -86 74c0 18 4 38 10 56c12 38 31 73 64 95c53 36 112 49 185 49z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M1_violaCres.ly:53:2:3">
+<g transform="translate(2.0000, 0.9623)">
+<text font-family="serif" font-style="italic" font-size="1.3860" text-anchor="start" fill="currentColor">
+<tspan>senza vib.</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M1_violaCres.ly:52:6:7">
+<g transform="translate(1.5049, 8.2763)">
+<g>
+<path transform="scale(0.0020, -0.0020)" d="M233 243c-57 0 -104 -112 -104 -178c0 -22 9 -38 31 -38c17 0 35 12 47 28c24 33 51 118 51 155c0 18 -7 33 -25 33zM70 243c-52 0 -44 -123 -101 -123c-12 0 -21 6 -21 18c0 4 1 8 3 13c30 68 75 141 136 141c33 0 53 -23 60 -52c29 31 67 52 103 52
+c69 0 107 -49 107 -114c0 -94 -82 -190 -160 -190c-27 0 -52 5 -73 17c-10 6 -24 5 -27 -4l-17 -51c-3 -8 -4 -16 -4 -23c0 -24 10 -29 32 -31c13 -1 19 -11 19 -21s-7 -21 -20 -21c-35 0 -72 5 -108 5c-37 0 -74 -5 -109 -5c-13 0 -20 11 -20 21c0 23 29 22 52 23
+c25 2 49 15 57 39l92 272c3 9 7 18 7 25c0 5 -2 9 -8 9z" fill="currentColor"/>
+
+<path transform="translate(0.7170, 0.0000) scale(0.0020, -0.0020)" d="M233 243c-57 0 -104 -112 -104 -178c0 -22 9 -38 31 -38c17 0 35 12 47 28c24 33 51 118 51 155c0 18 -7 33 -25 33zM70 243c-52 0 -44 -123 -101 -123c-12 0 -21 6 -21 18c0 4 1 8 3 13c30 68 75 141 136 141c33 0 53 -23 60 -52c29 31 67 52 103 52
+c69 0 107 -49 107 -114c0 -94 -82 -190 -160 -190c-27 0 -52 5 -73 17c-10 6 -24 5 -27 -4l-17 -51c-3 -8 -4 -16 -4 -23c0 -24 10 -29 32 -31c13 -1 19 -11 19 -21s-7 -21 -20 -21c-35 0 -72 5 -108 5c-37 0 -74 -5 -109 -5c-13 0 -20 11 -20 21c0 23 29 22 52 23
+c25 2 49 15 57 39l92 272c3 9 7 18 7 25c0 5 -2 9 -8 9z" fill="currentColor"/>
+
+<path transform="translate(1.4340, 0.0000) scale(0.0020, -0.0020)" d="M233 243c-57 0 -104 -112 -104 -178c0 -22 9 -38 31 -38c17 0 35 12 47 28c24 33 51 118 51 155c0 18 -7 33 -25 33zM70 243c-52 0 -44 -123 -101 -123c-12 0 -21 6 -21 18c0 4 1 8 3 13c30 68 75 141 136 141c33 0 53 -23 60 -52c29 31 67 52 103 52
+c69 0 107 -49 107 -114c0 -94 -82 -190 -160 -190c-27 0 -52 5 -73 17c-10 6 -24 5 -27 -4l-17 -51c-3 -8 -4 -16 -4 -23c0 -24 10 -29 32 -31c13 -1 19 -11 19 -21s-7 -21 -20 -21c-35 0 -72 5 -108 5c-37 0 -74 -5 -109 -5c-13 0 -20 11 -20 21c0 23 29 22 52 23
+c25 2 49 15 57 39l92 272c3 9 7 18 7 25c0 5 -2 9 -8 9z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<g transform="translate(0.8722, 6.4873)">
+<path transform="scale(0.0028, -0.0028)" d="M0 114c0 12 7 22 18 26l37 15v151c0 12 10 22 22 22s22 -10 22 -22v-134l77 29v152c0 12 10 22 22 22s22 -10 22 -22v-134l16 6c3 1 8 2 11 2c15 0 28 -12 28 -28v-50c0 -12 -7 -23 -18 -27l-37 -14v-152l16 7c3 1 8 2 11 2c15 0 28 -13 28 -29v-50c0 -12 -7 -22 -18 -26
+l-37 -15v-151c0 -12 -10 -22 -22 -22s-22 10 -22 22v134l-77 -29v-152c0 -12 -10 -22 -22 -22s-22 10 -22 22v134l-16 -6c-3 -1 -8 -2 -11 -2c-15 0 -28 12 -28 28v50c0 12 7 23 18 27l37 14v152l-16 -7c-3 -1 -8 -2 -11 -2c-15 0 -28 13 -28 29v50zM176 91l-77 -30v-152
+l77 30v152z" fill="currentColor"/>
+</g>
+</svg>
