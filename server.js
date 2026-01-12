@@ -338,6 +338,101 @@ app.post('/api/score/export/midi', (req, res) => {
 });
 
 // ============================================
+// CURVE LIBRARY SYSTEM
+// ============================================
+
+const CURVE_LIBRARY_DIR = path.join(__dirname, 'curve_library');
+
+// Ensure curve library directory exists
+if (!fs.existsSync(CURVE_LIBRARY_DIR)) {
+    fs.mkdirSync(CURVE_LIBRARY_DIR, { recursive: true });
+}
+
+// Save curve to library
+app.post('/api/curve-library/save', (req, res) => {
+    const { curveData } = req.body;
+    if (!curveData || !curveData.name) {
+        return res.status(400).json({ success: false, error: 'Curve data with name required' });
+    }
+    
+    const filename = `${curveData.name}.json`;
+    const filepath = path.join(CURVE_LIBRARY_DIR, filename);
+    
+    try {
+        curveData.savedAt = new Date().toISOString();
+        fs.writeFileSync(filepath, JSON.stringify(curveData, null, 2));
+        console.log(`Curve saved to library: ${filename}`);
+        res.json({ success: true, filename, name: curveData.name });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// List all curves in library
+app.get('/api/curve-library/list', (req, res) => {
+    try {
+        const files = fs.readdirSync(CURVE_LIBRARY_DIR)
+            .filter(f => f.endsWith('.json'))
+            .map(f => {
+                const filepath = path.join(CURVE_LIBRARY_DIR, f);
+                try {
+                    const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+                    return {
+                        name: data.name,
+                        filename: f,
+                        description: data.description || '',
+                        savedAt: data.savedAt || '',
+                        gTrack: data.gTrack,
+                        duration: data.endSeconds - data.startSeconds
+                    };
+                } catch {
+                    return null;
+                }
+            })
+            .filter(f => f !== null)
+            .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+        res.json({ success: true, curves: files });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Load curve from library
+app.get('/api/curve-library/load/:name', (req, res) => {
+    const filename = `${req.params.name}.json`;
+    const filepath = path.join(CURVE_LIBRARY_DIR, filename);
+    
+    if (!fs.existsSync(filepath)) {
+        return res.status(404).json({ success: false, error: 'Curve not found' });
+    }
+    
+    try {
+        const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+        res.json({ success: true, curveData: data });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Delete curve from library
+app.delete('/api/curve-library/delete/:name', (req, res) => {
+    const filename = `${req.params.name}.json`;
+    const filepath = path.join(CURVE_LIBRARY_DIR, filename);
+    
+    if (!fs.existsSync(filepath)) {
+        return res.status(404).json({ success: false, error: 'Curve not found' });
+    }
+    
+    try {
+        fs.unlinkSync(filepath);
+        console.log(`Curve deleted from library: ${filename}`);
+        res.json({ success: true, name: req.params.name });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// ============================================
 // LILYPOND RENDERING SYSTEM
 // ============================================
 

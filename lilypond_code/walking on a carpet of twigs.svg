@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="50.000004mm"
+   height="50mm"
+   viewBox="0 0 50.000004 50"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   sodipodi:docname="walking on a carpet of twigs.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="5.5786439"
+     inkscape:cx="-24.289057"
+     inkscape:cy="97.156227"
+     inkscape:window-width="3440"
+     inkscape:window-height="1346"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true">
+    <sodipodi:guide
+       position="25.041928,35.913915"
+       orientation="1,0"
+       id="guide3"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="32.345823,25.052928"
+       orientation="0,-1"
+       id="guide4"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-42.427818,-81.598541)">
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.0572965"
+       id="rect3"
+       width="49.942707"
+       height="49.942703"
+       x="42.465565"
+       y="81.62719" />
+    <g
+       id="g3"
+       transform="matrix(1.7572985,0,0,1.7572985,63.700669,118.98203)">
+      <g
+         id="g7"
+         transform="translate(-2.1160621,-10.582828)">
+        <a
+           style="color:inherit"
+           xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M2a_jete.ly:86:8:9"
+           id="a1">
+          <g
+             transform="translate(2.5691,13.1467)"
+             id="g1">
+            <path
+               transform="scale(0.0032,-0.0032)"
+               d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
+               fill="currentColor"
+               id="path1" />
+          </g>
+        </a>
+        <a
+           style="color:inherit"
+           xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M2a_jete.ly:86:17:18"
+           id="a2"
+           transform="translate(-0.05539868,6.9340687)">
+          <g
+             transform="translate(2.5691,5.1714)"
+             id="g2">
+            <text
+               font-family="'Crimson Pro Light'"
+               font-style="italic"
+               font-size="1.96px"
+               text-anchor="start"
+               fill="currentColor"
+               id="text1"><tspan
+                 id="tspan1"
+                 style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">ricochet</tspan></text>
+          </g>
+        </a>
+        <a
+           style="color:inherit"
+           xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M2a_jete.ly:86:13:14"
+           id="a5">
+          <g
+             transform="translate(2.2659,16.1597)"
+             id="g5">
+            <g
+               id="g4">
+              <path
+                 transform="scale(0.002,-0.002)"
+                 d="m 180,219 c 0,6 6,12 6,18 0,10 -8,19 -19,19 -21,0 -42,-11 -42,-30 0,-16 16,-26 31,-33 34,-17 69,-39 69,-76 C 225,51 170,0 103,0 60,0 26,36 26,80 c 0,21 12,42 31,42 18,0 32,-15 32,-33 C 89,76 67,73 67,60 67,47 82,41 96,41 c 35,0 69,17 69,48 0,55 -101,54 -101,109 0,51 40,94 90,94 60,0 85,-36 85,-64 0,-17 -10,-31 -27,-31 -18,0 -32,11 -32,22 z"
+                 fill="currentColor"
+                 id="path2" />
+              <path
+                 transform="matrix(0.002,0,0,-0.002,0.4097,0)"
+                 d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+                 fill="currentColor"
+                 id="path3" />
+              <path
+                 transform="matrix(0.002,0,0,-0.002,1.0584,0)"
+                 d="m 128,192 c -24,0 -50,-7 -71,-7 -9,0 -15,3 -15,12 0,30 28,70 57,70 34,0 60,-34 94,-34 13,0 24,6 33,15 5,4 9,7 14,7 11,0 21,-11 21,-22 0,-5 -2,-10 -7,-15 L 102,71 c 26,-5 47,-30 74,-30 33,0 59,23 59,49 0,7 -4,15 -4,22 0,12 10,20 21,20 25,0 34,-55 34,-77 0,-63 -70,-97 -140,-97 -35,0 -38,59 -73,59 C 59,17 45,15 35,6 30,2 26,0 21,0 10,0 0,10 0,21 0,26 1,31 6,36 l 161,156 h -3 z"
+                 fill="currentColor"
+                 id="path4" />
+            </g>
+          </g>
+        </a>
+        <a
+           style="color:inherit"
+           xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M2a_jete.ly:86:11:12"
+           id="a6">
+          <g
+             transform="translate(3.0853,13.7854)"
+             id="g6">
+            <path
+               transform="scale(0.004,-0.004)"
+               d="m 112,0 c 9,0 16,-10 12,-18 L 11,-268 c -2,-4 -6,-7 -11,-7 -5,0 -9,3 -11,7 l -113,250 c -4,8 3,18 12,18 h 66 c 5,0 10,-3 12,-7 l 68,-150 67,150 c 2,4 6,7 11,7 z"
+               fill="currentColor"
+               id="path5" />
+          </g>
+        </a>
+      </g>
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:0.034032"
+         id="rect7"
+         width="6.1487961"
+         height="6.1580291"
+         x="0.017015999"
+         y="0.017015999" />
+    </g>
+    <g
+       id="g2-5"
+       transform="matrix(1.7572985,0,0,1.7572985,59.7417,83.333751)">
+      <g
+         transform="translate(0.1441168,3.9536688)"
+         id="g1-5">
+        <path
+           transform="scale(0.0032,-0.0032)"
+           d="m 163,42 111,92 c 3,3 7,4 11,4 4,0 8,-1 11,-4 l 23,-19 c 4,-3 6,-8 6,-13 0,-5 -2,-11 -6,-14 L 213,0 319,-88 c 4,-3 6,-9 6,-14 0,-5 -2,-10 -6,-13 l -23,-19 c -3,-3 -7,-4 -11,-4 -4,0 -8,1 -11,4 L 163,-42 52,-134 c -3,-3 -8,-4 -12,-4 -4,0 -8,1 -11,4 l -23,19 c -4,3 -6,8 -6,13 0,5 2,11 6,14 L 112,0 6,88 c -4,3 -6,9 -6,14 0,5 2,10 6,13 l 23,19 c 3,3 7,4 11,4 4,0 9,-1 12,-4 z"
+           fill="currentColor"
+           id="path1-1" />
+      </g>
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.7461px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text1-7"
+         x="0.091886401"
+         y="1.3368303"><tspan
+           id="tspan1-1"
+           style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">col legno battuto</tspan></text>
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:0.0216546"
+         id="rect6"
+         width="10.666918"
+         height="5.9661827"
+         x="0.0108273"
+         y="0.0108273" />
+      <g
+         transform="translate(0.1310592,3.1355314)"
+         id="g3-1">
+        <text
+           font-family="'Crimson Pro Light'"
+           font-style="italic"
+           font-size="1.7461px"
+           text-anchor="start"
+           fill="currentColor"
+           id="text2"><tspan
+             id="tspan2"
+             style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">ricochet</tspan></text>
+      </g>
+      <g
+         transform="translate(0.6603168,4.5923688)"
+         id="g4-5">
+        <path
+           transform="scale(0.004,-0.004)"
+           d="m 112,0 c 9,0 16,-10 12,-18 L 11,-268 c -2,-4 -6,-7 -11,-7 -5,0 -9,3 -11,7 l -113,250 c -4,8 3,18 12,18 h 66 c 5,0 10,-3 12,-7 l 68,-150 67,150 c 2,4 6,7 11,7 z"
+           fill="currentColor"
+           id="path3-2" />
+      </g>
+    </g>
+    <g
+       id="g5-2"
+       transform="matrix(1.7572986,0,0,1.7572986,85.851012,95.530124)">
+      <g
+         transform="translate(1.5395814,0.25583336)"
+         id="g1-3">
+        <path
+           transform="scale(0.004,-0.004)"
+           d="m 0,0 c 0,-177 201,-293 201,-470 0,-33 -9,-65 -23,-95 18,-37 29,-75 29,-117 0,-63 -15,-125 -41,-183 -5,-8 -13,-12 -20,-12 -13,0 -26,11 -23,27 26,52 42,110 42,168 0,97 -94,190 -165,257 v -75 H -16 V 0 Z m 151,-517 c 5,15 8,31 8,47 0,96 -91,190 -159,257 0,-118 90,-206 151,-304 z"
+           fill="currentColor"
+           id="path1-3" />
+      </g>
+      <g
+         transform="translate(1.4745814,4.7158334)"
+         id="g2-4">
+        <rect
+           x="-0.064999998"
+           y="-4.5"
+           width="0.13"
+           height="7.3639998"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect1-1" />
+      </g>
+      <g
+         transform="translate(1.0233814,9.3198334)"
+         id="g3-13">
+        <path
+           transform="scale(0.0045,-0.0045)"
+           d="m 15,0 c 0,-8 -7,-15 -15,-15 -8,0 -15,7 -15,15 v 102 c -50,-7 -88,-50 -88,-102 0,-57 46,-103 103,-103 57,0 103,46 103,103 0,52 -38,95 -88,102 z m -30,132 v 68 c 0,8 7,15 15,15 8,0 15,-7 15,-15 V 132 C 82,125 133,69 133,0 133,-74 74,-133 0,-133 c -74,0 -133,59 -133,133 0,69 51,125 118,132 z"
+           fill="currentColor"
+           id="path2-8" />
+      </g>
+      <g
+         transform="translate(0.5071814,7.7158334)"
+         id="g4-7">
+        <path
+           transform="scale(0.0032,-0.0032)"
+           d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
+           fill="currentColor"
+           id="path3-4" />
+      </g>
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:0.0301483"
+         id="rect4-2"
+         width="2.7523153"
+         height="10.158413"
+         x="0.01507415"
+         y="0.01507415" />
+    </g>
+    <g
+       id="g25"
+       transform="matrix(1.7572985,0,0,1.7572985,44.115009,96.533835)">
+      <g
+         id="g24"
+         transform="matrix(0.55845031,0,0,0.55845031,0.1405699,1.3190757)">
+        <g
+           transform="translate(6.7183559,8.090984)"
+           id="g1-31">
+          <path
+             transform="scale(0.0028,-0.0028)"
+             d="m 208,139 c 61,0 117,-33 117,-99 0,-71 -52,-119 -99,-147 -34,-20 -71,-32 -110,-32 -61,0 -116,33 -116,99 0,71 51,119 98,147 34,20 71,32 110,32 z"
+             fill="currentColor"
+             id="path1-9" />
+        </g>
+        <rect
+           x="7.506156"
+           y="3.5909841"
+           width="0.13"
+           height="4.3856001"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect1" />
+        <rect
+           x="6.7183561"
+           y="10.205384"
+           width="0.13"
+           height="4.4889998"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect2" />
+        <g
+           transform="translate(6.7183559,10.090984)"
+           id="g4-8">
+          <path
+             transform="scale(0.0028,-0.0028)"
+             d="m 208,139 c 61,0 117,-33 117,-99 0,-71 -52,-119 -99,-147 -34,-20 -71,-32 -110,-32 -61,0 -116,33 -116,99 0,71 51,119 98,147 34,20 71,32 110,32 z"
+             fill="currentColor"
+             id="path3-6" />
+        </g>
+        <rect
+           x="4.946156"
+           y="3.5909841"
+           width="0.13"
+           height="2.3856001"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect4" />
+        <g
+           transform="translate(2.3861559,3.590984)"
+           id="g6-5">
+          <polygon
+             stroke-linejoin="round"
+             stroke-linecap="round"
+             stroke-width="0.08"
+             fill="currentColor"
+             stroke="currentColor"
+             points="0.04,-0.152 8.0821,-0.152 8.0821,0.152 0.04,0.152 "
+             id="polygon5" />
+        </g>
+        <g
+           transform="translate(2.3861559,4.2389839)"
+           id="g7-0">
+          <polygon
+             stroke-linejoin="round"
+             stroke-linecap="round"
+             stroke-width="0.08"
+             fill="currentColor"
+             stroke="currentColor"
+             points="0.04,-0.152 8.0821,-0.152 8.0821,0.152 0.04,0.152 "
+             id="polygon6" />
+        </g>
+        <g
+           transform="translate(2.3861559,4.8869839)"
+           id="g8">
+          <polygon
+             stroke-linejoin="round"
+             stroke-linecap="round"
+             stroke-width="0.08"
+             fill="currentColor"
+             stroke="currentColor"
+             points="0.04,-0.152 8.0821,-0.152 8.0821,0.152 0.04,0.152 "
+             id="polygon7" />
+        </g>
+        <g
+           transform="translate(0.3183559,13.652984)"
+           id="g9">
+          <polygon
+             stroke-linejoin="round"
+             stroke-linecap="round"
+             stroke-width="0.08"
+             fill="currentColor"
+             stroke="currentColor"
+             points="0.04,-0.152 9.05,-0.51 9.05,-0.206 0.04,0.152 "
+             id="polygon8" />
+        </g>
+        <g
+           transform="translate(0.3183559,14.300984)"
+           id="g10">
+          <polygon
+             stroke-linejoin="round"
+             stroke-linecap="round"
+             stroke-width="0.08"
+             fill="currentColor"
+             stroke="currentColor"
+             points="0.04,-0.152 9.05,-0.51 9.05,-0.206 0.04,0.152 "
+             id="polygon9" />
+        </g>
+        <g
+           transform="translate(0.3183559,14.948984)"
+           id="g11">
+          <polygon
+             stroke-linejoin="round"
+             stroke-linecap="round"
+             stroke-width="0.08"
+             fill="currentColor"
+             stroke="currentColor"
+             points="0.04,-0.152 9.05,-0.51 9.05,-0.206 0.04,0.152 "
+             id="polygon10" />
+        </g>
+        <rect
+           x="10.378256"
+           y="3.5909841"
+           width="0.13"
+           height="10.3856"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect11" />
+        <rect
+           x="9.2783556"
+           y="11.205384"
+           width="0.13"
+           height="3.3880999"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect12" />
+        <g
+           transform="translate(9.5903559,14.090984)"
+           id="g14">
+          <path
+             transform="scale(0.0028,-0.0028)"
+             d="m 208,139 c 61,0 117,-33 117,-99 0,-71 -52,-119 -99,-147 -34,-20 -71,-32 -110,-32 -61,0 -116,33 -116,99 0,71 51,119 98,147 34,20 71,32 110,32 z"
+             fill="currentColor"
+             id="path13" />
+        </g>
+        <g
+           transform="translate(9.2783559,11.090984)"
+           id="g15">
+          <path
+             transform="scale(0.0028,-0.0028)"
+             d="m 208,139 c 61,0 117,-33 117,-99 0,-71 -52,-119 -99,-147 -34,-20 -71,-32 -110,-32 -61,0 -116,33 -116,99 0,71 51,119 98,147 34,20 71,32 110,32 z"
+             fill="currentColor"
+             id="path14" />
+        </g>
+        <rect
+           x="0.31835586"
+           y="11.705384"
+           width="0.13"
+           height="3.2409999"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect15" />
+        <g
+           transform="translate(0.3183559,11.590984)"
+           id="g17">
+          <path
+             transform="scale(0.0028,-0.0028)"
+             d="m 208,139 c 61,0 117,-33 117,-99 0,-71 -52,-119 -99,-147 -34,-20 -71,-32 -110,-32 -61,0 -116,33 -116,99 0,71 51,119 98,147 34,20 71,32 110,32 z"
+             fill="currentColor"
+             id="path16" />
+        </g>
+        <g
+           transform="translate(1.5983559,12.590984)"
+           id="g18">
+          <path
+             transform="scale(0.0028,-0.0028)"
+             d="m 208,139 c 61,0 117,-33 117,-99 0,-71 -52,-119 -99,-147 -34,-20 -71,-32 -110,-32 -61,0 -116,33 -116,99 0,71 51,119 98,147 34,20 71,32 110,32 z"
+             fill="currentColor"
+             id="path17" />
+        </g>
+        <rect
+           x="2.3861558"
+           y="3.5909841"
+           width="0.13"
+           height="8.8856001"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect18" />
+        <rect
+           x="4.1583557"
+           y="10.705384"
+           width="0.13"
+           height="4.0897999"
+           ry="0.039999999"
+           fill="currentColor"
+           id="rect19" />
+        <g
+           transform="translate(4.1583559,6.0909839)"
+           id="g21">
+          <path
+             transform="scale(0.0028,-0.0028)"
+             d="m 208,139 c 61,0 117,-33 117,-99 0,-71 -52,-119 -99,-147 -34,-20 -71,-32 -110,-32 -61,0 -116,33 -116,99 0,71 51,119 98,147 34,20 71,32 110,32 z"
+             fill="currentColor"
+             id="path20" />
+        </g>
+        <g
+           transform="translate(4.1583559,10.590984)"
+           id="g22">
+          <path
+             transform="scale(0.0028,-0.0028)"
+             d="m 208,139 c 61,0 117,-33 117,-99 0,-71 -52,-119 -99,-147 -34,-20 -71,-32 -110,-32 -61,0 -116,33 -116,99 0,71 51,119 98,147 34,20 71,32 110,32 z"
+             fill="currentColor"
+             id="path21" />
+        </g>
+      </g>
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.7461px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text2-2"
+         x="0.25956732"
+         y="2.9328792"><tspan
+           id="tspan2-8"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light'">L.H.</tspan></text>
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.7461px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text22"
+         x="0.22073613"
+         y="10.972918"><tspan
+           id="tspan22"
+           style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light'">R.H.</tspan></text>
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.7461px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text23"
+         x="0.36747828"
+         y="1.3198948"><tspan
+           id="tspan23"
+           style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">pizz</tspan></text>
+      <rect
+         style="fill:none;stroke:#000000;stroke-width:0.0181427"
+         id="rect23"
+         width="6.2125463"
+         height="11.310949"
+         x="0.0090713501"
+         y="0.0090713501" />
+    </g>
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:0.059"
+       id="circle12"
+       sodipodi:type="arc"
+       sodipodi:cx="69.133202"
+       sodipodi:cy="106.5318"
+       sodipodi:rx="20.749704"
+       sodipodi:ry="20.749704"
+       sodipodi:start="0.33855568"
+       sodipodi:end="1.3031611"
+       sodipodi:arc-type="arc"
+       d="M 88.705056,113.4233 A 20.749704,20.749704 0 0 1 74.620494,126.54279"
+       sodipodi:open="true" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:0.059"
+       id="circle13"
+       sodipodi:type="arc"
+       sodipodi:cx="69.133202"
+       sodipodi:cy="106.5318"
+       sodipodi:rx="20.749704"
+       sodipodi:ry="20.749704"
+       sodipodi:start="5.1830967"
+       sodipodi:end="5.7227537"
+       sodipodi:arc-type="arc"
+       d="m 78.543548,88.038676 a 20.749704,20.749704 0 0 1 8.165188,7.46358"
+       sodipodi:open="true" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:0.059"
+       id="circle14"
+       sodipodi:type="arc"
+       sodipodi:cx="69.133202"
+       sodipodi:cy="106.5318"
+       sodipodi:rx="20.749704"
+       sodipodi:ry="20.749704"
+       sodipodi:start="3.6451262"
+       sodipodi:end="4.2424599"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="m 50.958888,96.519579 a 20.749704,20.749704 0 0 1 8.778369,-8.488224" />
+    <path
+       style="display:inline;fill:none;stroke:#000000;stroke-width:0.059"
+       id="circle15"
+       sodipodi:type="arc"
+       sodipodi:cx="69.133202"
+       sodipodi:cy="106.5318"
+       sodipodi:rx="20.749704"
+       sodipodi:ry="20.749704"
+       sodipodi:start="1.8441809"
+       sodipodi:end="2.642017"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="M 63.53095,126.51091 A 20.749704,20.749704 0 0 1 50.919403,116.47201" />
+  </g>
+</svg>

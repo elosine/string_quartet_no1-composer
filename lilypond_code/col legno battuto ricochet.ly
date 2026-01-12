@@ -50,7 +50,7 @@
         
         
         \override Stem.details.beamed-lengths = #'(5.5)
-        \override Stem.details.lengths = #'(5.5)
+        \override Stem.details.lengths = #'(7.5)
         
         % \override NoteColumn.accent-skip = ##t
         
@@ -61,47 +61,41 @@
         %////////////////////////////////////////////////////////////////////
         % NOTATION HERE /////////////////////////////////////////////////////
         
-        % 1. Makes the note stems invisible (purely for your specific visual style)
-        \override Stem.transparent = ##t 
-
-        % 2. Tells LilyPond it's okay to draw a hairpin that is almost zero length
-        % Without this, LilyPond defaults to a minimum length (usually 2-3 units)
-        \override Hairpin.minimum-length = #0.1
-        % 3. This is the "secret sauce": it tells the layout engine to pretend the 
-        % "ppp" text has no width. This allows the hairpin to start immediately 
-        % instead of being pushed to the right by the edges of the text.
-        \once \override DynamicText.extra-spacing-width = #'(+inf.0 . -inf.0)
-        % 4. Removes the mandatory gap between the dynamic (ppp) and the start of the hairpin.
-        % Setting this to 0 lets the hairpin touch the dynamic text.
-        \override Hairpin.bound-details.left.padding = #0
-        % 5. The Music:
-        % dis2\ppp\<  -> Starts a D# half note, very soft, and begins the crescendo.
-        % s64\!       -> Skips only a 64th note (extremely short time) and ends the hairpin.
-        
-        % 1. Use markup to call the specific font and style
-        % 2. \italic ensures the text is slanted
-        % 3. \fontsize adjusts it to match your other small dynamics
-        dis2\ppp\<^\markup { 
-          \override #'(font-name . "Crimson Pro Light Italic") 
-          \fontsize #-6 
-          "Non-Vib" 
-        } 
-        
-        % 4. The spacer to end the hairpin
-        s4\!
-        
-        %dis2\ppp\< s8\!
-        
         % Notes Only, No Staff
-        %     \stopStaff
-        %         \override NoteHead.transparent = ##t
-        %         \override NoteHead.no-ledgers = ##t 
-        %         \override Script.transparent = ##t
-        %         \override Stem.transparent = ##t  
-        %         \override TupletBracket.bracket-visibility = ##f
-        %         \override TupletNumber.transparent = ##t
-        %         \override Staff.Clef.transparent =##t
-        %         \override Staff.BarLine.transparent =##t
+        \stopStaff
+%         \override NoteHead.transparent = ##t
+        \override NoteHead.no-ledgers = ##t 
+%         \override Script.transparent = ##t
+        \override Stem.transparent = ##t  
+        \override TupletBracket.bracket-visibility = ##f
+        \override TupletNumber.transparent = ##t
+        \override Staff.Clef.transparent =##t
+        \override Staff.BarLine.transparent =##t
+        
+        %Col Legno Battuto Ricochet     
+  
+        \clef alto
+        \time 2/4
+  
+        % 1. Use 'cross' style noteheads to indicate a percussive wood-stroke
+        \override NoteHead.style = #'cross
+  
+        % 2. d16: D3 as a 16th note (one ledger line below staff in Alto clef)
+        % -^ : The marcato accent (strongest attack)
+        % \column: Stacks the instructions vertically to save horizontal space
+        d16-^^\markup { 
+          \column {
+            \line { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-2 "col Legno battuto" }
+            \line { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-2 "ricochet" }
+          }
+        }
+  
+        % 3. Spacer rests to fill the rest of the measure (invisible)
+        s8. s4 
+  
+        % 4. Revert notehead style so future notes are normal
+        \revert NoteHead.style
+        
 
         % To Restart Staff After Stopping Staff
         %    \startStaff
@@ -226,7 +220,7 @@
       \context {
         \Score
         %proportionalNotationDuration = #(ly:make-moment 1/20) %smallest space quintuplet or 5*4
-       %  proportionalNotationDuration = #(ly:make-moment 1/16) %smallest space quintuplet or 5*4
+        %  proportionalNotationDuration = #(ly:make-moment 1/16) %smallest space quintuplet or 5*4
 
         proportionalNotationDuration = #(ly:make-moment 1/28)
         %proportionalNotationDuration = #(ly:make-moment 1/8)

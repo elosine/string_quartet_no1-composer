@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="18.783012mm"
+   height="10.522417mm"
+   viewBox="0 0 10.688574 5.9878363"
+   id="svg6"
+   sodipodi:docname="col legno battuto ricochet_inkscape.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs6" />
+  <sodipodi:namedview
+     id="namedview6"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showguides="true"
+     inkscape:zoom="11.530649"
+     inkscape:cx="41.36801"
+     inkscape:cy="40.283942"
+     inkscape:window-width="3440"
+     inkscape:window-height="1346"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6">
+    <sodipodi:guide
+       position="0.1212482,278.84382"
+       orientation="1,0"
+       id="guide6"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <g
+     transform="translate(0.1441168,3.9536688)"
+     id="g1">
+    <path
+       transform="scale(0.0032,-0.0032)"
+       d="m 163,42 111,92 c 3,3 7,4 11,4 4,0 8,-1 11,-4 l 23,-19 c 4,-3 6,-8 6,-13 0,-5 -2,-11 -6,-14 L 213,0 319,-88 c 4,-3 6,-9 6,-14 0,-5 -2,-10 -6,-13 l -23,-19 c -3,-3 -7,-4 -11,-4 -4,0 -8,1 -11,4 L 163,-42 52,-134 c -3,-3 -8,-4 -12,-4 -4,0 -8,1 -11,4 l -23,19 c -4,3 -6,8 -6,13 0,5 2,11 6,14 L 112,0 6,88 c -4,3 -6,9 -6,14 0,5 2,10 6,13 l 23,19 c 3,3 7,4 11,4 4,0 9,-1 12,-4 z"
+       fill="currentColor"
+       id="path1" />
+  </g>
+  <text
+     font-family="'Crimson Pro Light'"
+     font-style="italic"
+     font-size="1.7461px"
+     text-anchor="start"
+     fill="currentColor"
+     id="text1"
+     x="0.091886401"
+     y="1.3368303"><tspan
+       id="tspan1"
+       style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">col legno battuto</tspan></text>
+  <rect
+     style="fill:none;stroke:#000000;stroke-width:0.0216546"
+     id="rect6"
+     width="10.666918"
+     height="5.9661827"
+     x="0.0108273"
+     y="0.0108273" />
+  <g
+     transform="translate(0.1310592,3.1355314)"
+     id="g3">
+    <text
+       font-family="'Crimson Pro Light'"
+       font-style="italic"
+       font-size="1.7461px"
+       text-anchor="start"
+       fill="currentColor"
+       id="text2"><tspan
+         id="tspan2"
+         style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">ricochet</tspan></text>
+  </g>
+  <g
+     transform="translate(0.6603168,4.5923688)"
+     id="g4">
+    <path
+       transform="scale(0.004,-0.004)"
+       d="m 112,0 c 9,0 16,-10 12,-18 L 11,-268 c -2,-4 -6,-7 -11,-7 -5,0 -9,3 -11,7 l -113,250 c -4,8 3,18 12,18 h 66 c 5,0 10,-3 12,-7 l 68,-150 67,150 c 2,4 6,7 11,7 z"
+       fill="currentColor"
+       id="path3" />
+  </g>
+</svg>

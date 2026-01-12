@@ -2,18 +2,18 @@
 
 \paper{
   paper-width = 130
-  paper-height = 500
+  paper-height = 100
 
-  top-margin = 5
-  bottom-margin = 10
+  top-margin = 0
+  bottom-margin = 0
   left-margin = 1
   right-margin = 1
   
   system-system-spacing =
   #'((basic-distance . 15)  %this controls space between lines default = 12
-                            (minimum-distance . 8)
-                            (padding . 2)
-                            (stretchability . 60)) 
+      (minimum-distance . 8)
+      (padding . 1)
+      (stretchability . 60)) 
 
 }
 
@@ -32,7 +32,6 @@
       \new Staff \with {
         \omit TimeSignature
         \omit BarLine
-        \clef alto
         \omit Clef
         \omit KeySignature
         \override StaffSymbol.thickness = #1 %thickness of stafflines, ledger lines, and stems
@@ -40,57 +39,30 @@
       }
 
       {
-        \time 6/4
+        \time 8/4
         \override TupletBracket.bracket-visibility = ##t
         \override TupletNumber.visibility = ##f
         %\once \override TupletNumber #'text = "7:4"
-        %\set tupletFullLength = ##t %http://lilypond.org/doc/v2.19/Documentation/snippets/rhythms      
+        %\set tupletFullLength = ##t %http://lilypond.org/doc/v2.19/Documentation/snippets/rhythms
+        
         \override NoteHead.font-size = #-2
-        \override DynamicText.font-size = #-6
+        \override DynamicText.font-size = #-2
+        
+       % \override Stem.details.beamed-lengths = #'(7)
+        %\override Stem.details.lengths = #'(7)
         
         
         \override Stem.details.beamed-lengths = #'(5.5)
+        \override Stem.details.lengths = #'(5.5)
         \override Stem.details.lengths = #'(5.5)
         
         % \override NoteColumn.accent-skip = ##t
         
         \override Accidental.font-size = -4 
-        %         \stopStaff
-
-        %/////////////////////////////////////////////////////////////////////
-        %////////////////////////////////////////////////////////////////////
-        % NOTATION HERE /////////////////////////////////////////////////////
-        
-        % 1. Makes the note stems invisible (purely for your specific visual style)
-        \override Stem.transparent = ##t 
-
-        % 2. Tells LilyPond it's okay to draw a hairpin that is almost zero length
-        % Without this, LilyPond defaults to a minimum length (usually 2-3 units)
-        \override Hairpin.minimum-length = #0.1
-        % 3. This is the "secret sauce": it tells the layout engine to pretend the 
-        % "ppp" text has no width. This allows the hairpin to start immediately 
-        % instead of being pushed to the right by the edges of the text.
-        \once \override DynamicText.extra-spacing-width = #'(+inf.0 . -inf.0)
-        % 4. Removes the mandatory gap between the dynamic (ppp) and the start of the hairpin.
-        % Setting this to 0 lets the hairpin touch the dynamic text.
-        \override Hairpin.bound-details.left.padding = #0
-        % 5. The Music:
-        % dis2\ppp\<  -> Starts a D# half note, very soft, and begins the crescendo.
-        % s64\!       -> Skips only a 64th note (extremely short time) and ends the hairpin.
-        
-        % 1. Use markup to call the specific font and style
-        % 2. \italic ensures the text is slanted
-        % 3. \fontsize adjusts it to match your other small dynamics
-        dis2\ppp\<^\markup { 
-          \override #'(font-name . "Crimson Pro Light Italic") 
-          \fontsize #-6 
-          "Non-Vib" 
-        } 
-        
-        % 4. The spacer to end the hairpin
-        s4\!
-        
-        %dis2\ppp\< s8\!
+        \stopStaff
+        r4    e'4-^\sf    \tuplet 3/2 {e'8-^\sf e' e'}   e'16 e'e'e'   r8. [e'16]   r8 [e'8]   r8 [e'16 e']     e'16 [e' r8]
+        r4    e'4    \tuplet 3/2 {e'8 e' e'}   e'16 e'e'e'   r8. [e'16]   r8 [e'8]   r8 [e'16 e']     e'16 [e' r8]    
+        e'4 e'e'e'e'e'e'e'
         
         % Notes Only, No Staff
         %     \stopStaff
@@ -226,9 +198,9 @@
       \context {
         \Score
         %proportionalNotationDuration = #(ly:make-moment 1/20) %smallest space quintuplet or 5*4
-       %  proportionalNotationDuration = #(ly:make-moment 1/16) %smallest space quintuplet or 5*4
+        proportionalNotationDuration = #(ly:make-moment 1/16) %smallest space quintuplet or 5*4
 
-        proportionalNotationDuration = #(ly:make-moment 1/28)
+        %proportionalNotationDuration = #(ly:make-moment 1/28)
         %proportionalNotationDuration = #(ly:make-moment 1/8)
         %\override SpacingSpanner.uniform-stretching = ##t
         %  \override SpacingSpanner.strict-note-spacing = ##t
@@ -241,7 +213,7 @@
 
       indent = 0
       %line-width = 158
-      line-width = 30
+      line-width = 100
       #(layout-set-staff-size 20) %staff height
       % \hide Stem
       %\hide NoteHead

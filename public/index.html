@@ -747,6 +747,24 @@
                 </div>
                 
                 <div class="section-divider"></div>
+                <div class="section-label">Curve Segments</div>
+                
+                <div class="curve-input-row">
+                    <button id="segmentX1Btn" class="control-btn" style="font-size: 10px; width: 30px;">X1</button>
+                    <input type="number" id="segmentX1Input" class="curve-input" value="0.0" step="0.1" style="width: 60px;">
+                    <span style="font-size: 10px; color: #888;">s</span>
+                </div>
+                <div class="curve-input-row">
+                    <button id="segmentX2Btn" class="control-btn" style="font-size: 10px; width: 30px;">X2</button>
+                    <input type="number" id="segmentX2Input" class="curve-input" value="0.0" step="0.1" style="width: 60px;">
+                    <span style="font-size: 10px; color: #888;">s</span>
+                </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="segmentCreateBtn" class="control-btn" style="font-size: 10px;">Segment</button>
+                    <button id="segmentClearBtn" class="control-btn" style="font-size: 10px;">Clear</button>
+                </div>
+                
+                <div class="section-divider"></div>
                 <div class="section-label">Curve Maker</div>
                 
                 <div class="curve-input-row">
@@ -771,6 +789,26 @@
                 </div>
                 
                 <button id="curveDrawBtn" class="curve-draw-btn">Draw</button>
+                <button id="curveDeleteBtn" class="curve-draw-btn" style="margin-top: 5px;">Delete</button>
+                <button id="curveSaveBtn" class="curve-draw-btn" style="margin-top: 5px;">Save</button>
+                
+                <div class="curve-input-row" style="margin-top: 8px;">
+                    <label style="font-size: 10px;">Description</label>
+                </div>
+                <textarea id="curveDescriptionInput" class="curve-input" style="width: 100%; height: 40px; resize: vertical; font-size: 10px;" placeholder="Curve description..."></textarea>
+                
+                <div class="curve-input-row" style="margin-top: 8px;">
+                    <label style="font-size: 10px;">Recall Curve</label>
+                </div>
+                <div id="curveRecallDropdown" class="custom-dropdown" style="width: 100%; position: relative;">
+                    <div id="curveRecallSelected" class="custom-dropdown-selected" style="font-size: 10px; padding: 4px 6px; background: rgba(40,40,50,0.9); border: 1px solid #555; border-radius: 3px; cursor: pointer; min-height: 20px;">
+                        -- Select Saved Curve --
+                    </div>
+                    <div id="curveRecallOptions" class="custom-dropdown-options" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: rgba(30,30,40,0.98); border: 1px solid #555; border-top: none; border-radius: 0 0 3px 3px; z-index: 1000;">
+                    </div>
+                </div>
+                <input type="hidden" id="curveRecallSelect" value="">
+                <button id="curveInsertBtn" class="curve-draw-btn" style="margin-top: 5px;">Insert at Edit Line</button>
                 
                 <div class="curve-fill-toggle">
                     <input type="radio" id="curveFillLine" name="curveFill" value="line" checked>
@@ -831,34 +869,6 @@
                     <button id="svgDeleteBtn" class="control-btn" style="font-size: 10px; background: var(--clr-darkRed);">Delete</button>
                 </div>
                 
-                <div class="section-divider"></div>
-                <div class="section-label">Notation (LilyPond)</div>
-                
-                <div class="curve-input-row">
-                    <label>Name</label>
-                    <input type="text" id="notationNameInput" class="curve-input" value="snippet" style="width: 80px;">
-                </div>
-                <div class="curve-input-row">
-                    <label>Width</label>
-                    <input type="number" id="notationWidthInput" class="curve-input" value="100" min="20" max="500" style="width: 50px;">
-                    <span style="font-size: 10px; color: #888;">mm</span>
-                </div>
-                <textarea id="lilypondCodeInput" placeholder="Enter LilyPond code...&#10;e.g.: { c'4 d' e' f' }" style="width: 100%; height: 60px; font-family: monospace; font-size: 10px; background: rgba(30,30,40,0.9); color: #ddd; border: 1px solid #444; resize: vertical;"></textarea>
-                <div class="control-row" style="margin-top: 5px;">
-                    <button id="notationRenderBtn" class="control-btn" style="font-size: 10px;">Render SVG</button>
-                    <button id="notationPlaceBtn" class="control-btn" style="font-size: 10px;">Place</button>
-                </div>
-                <div class="control-row">
-                    <select id="notationListSelect" style="font-size: 10px; width: 100%; padding: 2px;">
-                        <option value="">-- Rendered Notation --</option>
-                    </select>
-                </div>
-                <div class="control-row">
-                    <label style="font-size: 10px;">Scale:</label>
-                    <input type="range" id="notationScaleSlider" min="0.2" max="3" step="0.1" value="1" style="width: 80px;">
-                    <span id="notationScaleValue" style="font-size: 10px;">1.0</span>
-                </div>
-                <div id="notationStatus" style="font-size: 9px; color: #888; margin-top: 3px;">Ready</div>
             </div>
             
             <div class="menu-section">
@@ -1529,6 +1539,15 @@
                 document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
                 document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
                 
+                // Re-render SVG elements on window resize (debounced)
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        this.reRenderAllElements();
+                    }, 100);
+                });
+                
                 console.log('SVGElementManager initialized');
             },
             
@@ -1596,6 +1615,12 @@
                 const currentPage = window.GraphicTimeline ? GraphicTimeline.currentTopPage : 0;
                 const section = 'top'; // SVGs are always added to top section initially
                 
+                // Calculate percentage positions for resize handling
+                const xPercent = (trackX / scoreWidth) * 100;
+                const yPercent = (trackY / scoreHeight) * 100;
+                const widthPercent = (width / scoreWidth) * 100;
+                const heightPercent = (height / scoreHeight) * 100;
+                
                 // Store element data
                 const elementData = {
                     id: id,
@@ -1604,9 +1629,13 @@
                     image: image,
                     x: trackX,
                     y: trackY,
+                    xPercent: xPercent,
+                    yPercent: yPercent,
                     width: width,
                     height: height,
                     scale: 1,
+                    baseScale: 1,
+                    baseScoreWidth: scoreWidth,
                     track: track,
                     page: currentPage,
                     section: section
@@ -1740,6 +1769,11 @@
                     const newScale = Math.max(0.1, Math.min(5, this.elementStartScale * scaleFactor));
                     this.selectedElement.scale = newScale;
                     
+                    // Update baseScale and baseScoreWidth for resize handling
+                    const scoreWidth = this.scoreTopEl?.clientWidth || 1;
+                    this.selectedElement.baseScale = newScale;
+                    this.selectedElement.baseScoreWidth = scoreWidth;
+                    
                     this.updateElementTransform(this.selectedElement);
                     this.updateUIFromSelected();
                     // Update connectors when element is resized
@@ -1754,6 +1788,12 @@
                 
                 this.selectedElement.x = this.elementStartX + dx;
                 this.selectedElement.y = this.elementStartY + dy;
+                
+                // Update percentage positions for resize handling
+                const scoreWidth = this.scoreTopEl?.clientWidth || 1;
+                const scoreHeight = this.scoreTopEl?.clientHeight || 1;
+                this.selectedElement.xPercent = (this.selectedElement.x / scoreWidth) * 100;
+                this.selectedElement.yPercent = (this.selectedElement.y / scoreHeight) * 100;
                 
                 this.updateElementTransform(this.selectedElement);
                 this.updateUIFromSelected();
@@ -1882,14 +1922,21 @@
             
             // Export data for saving
             exportData() {
+                const scoreWidth = this.scoreTopEl?.clientWidth || 1;
+                const scoreHeight = this.scoreTopEl?.clientHeight || 1;
+                
                 return this.elements.map(el => ({
                     id: el.id,
                     name: el.name,
                     x: el.x,
                     y: el.y,
+                    xPercent: el.xPercent || (el.x / scoreWidth) * 100,
+                    yPercent: el.yPercent || (el.y / scoreHeight) * 100,
                     width: el.width,
                     height: el.height,
                     scale: el.scale,
+                    baseScale: el.baseScale || el.scale,
+                    baseScoreWidth: el.baseScoreWidth || scoreWidth,
                     track: this.getTrackFromY(el.y),
                     page: el.page || 0,
                     section: el.section || 'top',
@@ -1907,6 +1954,9 @@
                 this.removeResizeHandles();
                 this.selectedElement = null;
                 
+                const scoreWidth = this.scoreTopEl?.clientWidth || 1;
+                const scoreHeight = this.scoreTopEl?.clientHeight || 1;
+                
                 // Recreate elements
                 data.forEach(elData => {
                     const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -1920,16 +1970,24 @@
                     
                     wrapper.appendChild(image);
                     
+                    // Calculate pixel positions from percentages if available
+                    const x = elData.xPercent !== undefined ? (elData.xPercent / 100) * scoreWidth : elData.x;
+                    const y = elData.yPercent !== undefined ? (elData.yPercent / 100) * scoreHeight : elData.y;
+                    
                     const elementData = {
                         id: elData.id,
                         name: elData.name,
                         wrapper: wrapper,
                         image: image,
-                        x: elData.x,
-                        y: elData.y,
+                        x: x,
+                        y: y,
+                        xPercent: elData.xPercent || (elData.x / scoreWidth) * 100,
+                        yPercent: elData.yPercent || (elData.y / scoreHeight) * 100,
                         width: elData.width,
                         height: elData.height,
                         scale: elData.scale,
+                        baseScale: elData.baseScale || elData.scale,
+                        baseScoreWidth: elData.baseScoreWidth || scoreWidth,
                         track: elData.track,
                         page: elData.page || 0,
                         section: elData.section || 'top'
@@ -1950,6 +2008,33 @@
                 
                 this.updateElementList();
                 console.log(`SVGElementManager: Imported ${this.elements.length} elements`);
+            },
+            
+            // Re-render all elements on window resize
+            reRenderAllElements() {
+                const scoreWidth = this.scoreTopEl?.clientWidth || 1;
+                const scoreHeight = this.scoreTopEl?.clientHeight || 1;
+                
+                this.elements.forEach(el => {
+                    // Recalculate pixel positions from percentages
+                    if (el.xPercent !== undefined && el.yPercent !== undefined) {
+                        el.x = (el.xPercent / 100) * scoreWidth;
+                        el.y = (el.yPercent / 100) * scoreHeight;
+                        
+                        // Scale proportionally based on original score width
+                        if (el.baseScoreWidth) {
+                            const sizeRatio = scoreWidth / el.baseScoreWidth;
+                            el.scale = el.baseScale * sizeRatio;
+                        }
+                        
+                        this.updateElementTransform(el);
+                    }
+                });
+                
+                // Update resize handles if element is selected
+                if (this.selectedElement) {
+                    this.updateResizeHandles();
+                }
             }
         };
         
@@ -2052,6 +2137,15 @@
                     if (e.target === this.scoreBottomEl || e.target.tagName === 'svg') {
                         this.deselectAll();
                     }
+                });
+                
+                // Re-render connectors on window resize (debounced, after other elements update)
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        this.updateAllConnectors();
+                    }, 150);  // Slightly longer delay to ensure connected objects update first
                 });
                 
                 console.log('FlowchartConnector initialized');
@@ -2598,6 +2692,12 @@
                 if (this.connectMode) {
                     this.updateConnectionNodes();
                 }
+            },
+            
+            // Re-render all connectors on window resize
+            reRenderAllConnectors() {
+                // Connectors are based on connected objects, so just update all
+                this.updateAllConnectors();
             },
             
             // Show/hide connectors based on current page
@@ -3857,13 +3957,16 @@
                 const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
                 const targetPage = Math.floor(targetSeconds / secondsPerPage);
                 
+                // Always show the target page and the NEXT page (future), not the previous page
                 this.tracks.forEach(track => {
                     if (targetPage % 2 === 0) {
+                        // Target is on an even page (top section)
                         track.currentTopPage = targetPage;
-                        track.currentBottomPage = targetPage > 0 ? targetPage - 1 : 1;
+                        track.currentBottomPage = targetPage + 1;  // Show future page
                     } else {
+                        // Target is on an odd page (bottom section)
                         track.currentBottomPage = targetPage;
-                        track.currentTopPage = targetPage - 1;
+                        track.currentTopPage = targetPage + 1;  // Show future page
                     }
                 });
                 this.renderAllTracks();
@@ -4079,6 +4182,7 @@
                 if (window.SVGElementManager) SVGElementManager.updateVisibility();
                 if (window.CurveMaker) CurveMaker.updateVisibility();
                 if (window.FlowchartConnector) FlowchartConnector.updateVisibility();
+                if (window.MidiController) MidiController.updateMidiDisplayVisibility();
                 
                 // Show staff headers only on page 0 (top) or page 1 (bottom)
                 if (window.StaffCursors && StaffCursors.staffHeaderGroup) {
@@ -4099,13 +4203,16 @@
                 const secondsPerPage = this.getSecondsPerPage();
                 const targetPage = Math.floor(targetSeconds / secondsPerPage);
                 
+                // Always show the target page and the NEXT page (future), not the previous page
                 if (targetPage % 2 === 0) {
+                    // Target is on an even page (top section)
                     this.currentTopPage = targetPage;
-                    this.currentBottomPage = targetPage > 0 ? targetPage - 1 : 1;
+                    this.currentBottomPage = targetPage + 1;  // Show future page
                     this.lastCursorSection = 'top';
                 } else {
+                    // Target is on an odd page (bottom section)
                     this.currentBottomPage = targetPage;
-                    this.currentTopPage = targetPage - 1;
+                    this.currentTopPage = targetPage + 1;  // Show future page
                     this.lastCursorSection = 'bottom';
                 }
                 this.renderTicks();
@@ -4309,14 +4416,6 @@
                 });
             },
             
-            // Update visibility of MIDI display layers
-            updateMidiDisplayVisibility() {
-                const show = this.showMidiDisplayToggle?.checked ?? true;
-                document.querySelectorAll('.midi-display-layer').forEach(el => {
-                    el.style.display = show ? '' : 'none';
-                });
-            },
-            
             // Process MIDI playback synced to graphic cursor positions
             processCursorSyncedPlayback() {
                 if (!window.ScoreTime || !ScoreTime.isPlaying) return;
@@ -4486,6 +4585,7 @@
                 
                 this.updateEventCount();
                 this.renderMidiDisplay(trackIndex); // Update MIDI display
+                this.updateMidiDisplayVisibility(); // Apply page visibility
             },
             
             getMidiEventType(statusByte) {
@@ -4926,6 +5026,7 @@
                         rect.setAttribute('height', noteLineHeight);
                         rect.setAttribute('fill', 'black');
                         rect.setAttribute('class', 'midi-note-rect');
+                        rect.setAttribute('data-page', pageNum);
                         group.appendChild(rect);
                     }
                     
@@ -4944,6 +5045,7 @@
                         rect.setAttribute('height', squareSize);
                         rect.setAttribute('fill', '#E53935'); // Red
                         rect.setAttribute('class', 'midi-velocity-rect');
+                        rect.setAttribute('data-page', pageNum);
                         group.appendChild(rect);
                         
                         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -4953,6 +5055,7 @@
                         text.setAttribute('font-size', '8');
                         text.setAttribute('text-anchor', 'middle');
                         text.setAttribute('class', 'midi-velocity-text');
+                        text.setAttribute('data-page', pageNum);
                         text.textContent = vel.velocity;
                         group.appendChild(text);
                     }
@@ -4966,6 +5069,7 @@
                         label.setAttribute('font-family', 'Lato, sans-serif');
                         label.setAttribute('font-size', '9');
                         label.setAttribute('class', 'midi-cc-label');
+                        label.setAttribute('data-page', pageNum);
                         label.textContent = `CC${selectedCCNum} - ${ccName}`;
                         group.appendChild(label);
                     }
@@ -4988,6 +5092,7 @@
                         line.setAttribute('stroke', '#4CAF50'); // Green
                         line.setAttribute('stroke-width', '1');
                         line.setAttribute('class', 'midi-cc-line');
+                        line.setAttribute('data-page', pageNum);
                         group.appendChild(line);
                     }
                 }
@@ -4997,6 +5102,55 @@
             renderAllMidiDisplays() {
                 for (let i = 0; i < 4; i++) {
                     this.renderMidiDisplay(i);
+                }
+                // Apply visibility after rendering
+                this.updateMidiDisplayVisibility();
+            },
+            
+            // Update visibility of MIDI display elements based on toggle and current page
+            updateMidiDisplayVisibility() {
+                const showMidi = this.showMidiDisplayToggle?.checked ?? true;
+                
+                // If MIDI display is toggled off, hide all layers
+                if (!showMidi) {
+                    for (const topGroup of this.midiDisplayLayers.top) {
+                        topGroup.style.display = 'none';
+                    }
+                    for (const bottomGroup of this.midiDisplayLayers.bottom) {
+                        bottomGroup.style.display = 'none';
+                    }
+                    return;
+                }
+                
+                // MIDI display is on - show layers and apply page-based visibility
+                for (const topGroup of this.midiDisplayLayers.top) {
+                    topGroup.style.display = '';
+                }
+                for (const bottomGroup of this.midiDisplayLayers.bottom) {
+                    bottomGroup.style.display = '';
+                }
+                
+                if (!window.GraphicTimeline) return;
+                
+                const currentTopPage = GraphicTimeline.currentTopPage;
+                const currentBottomPage = GraphicTimeline.currentBottomPage;
+                
+                // Update top layers - show only elements matching currentTopPage
+                for (const topGroup of this.midiDisplayLayers.top) {
+                    const elements = topGroup.querySelectorAll('[data-page]');
+                    elements.forEach(el => {
+                        const elPage = parseInt(el.getAttribute('data-page'), 10);
+                        el.style.display = (elPage === currentTopPage) ? '' : 'none';
+                    });
+                }
+                
+                // Update bottom layers - show only elements matching currentBottomPage
+                for (const bottomGroup of this.midiDisplayLayers.bottom) {
+                    const elements = bottomGroup.querySelectorAll('[data-page]');
+                    elements.forEach(el => {
+                        const elPage = parseInt(el.getAttribute('data-page'), 10);
+                        el.style.display = (elPage === currentBottomPage) ? '' : 'none';
+                    });
                 }
             },
             
@@ -5227,43 +5381,51 @@
                 this.isDragging = true;
                 this.dragSection = section;
                 
-                // Track current page for wrapping
                 const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
-                const actualSeconds = this.positionSeconds + leadInSeconds;
-                this.dragBasePage = Math.floor(actualSeconds / secondsPerPage);
                 
                 const onMouseMove = (e) => {
                     if (!this.isDragging) return;
                     
-                    const scoreEl = this.dragSection === 'top' ? this.scoreTopEl : this.scoreBottomEl;
-                    const rect = scoreEl.getBoundingClientRect();
-                    let xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+                    // Determine which section (top/bottom) based on vertical mouse position
+                    const topRect = this.scoreTopEl.getBoundingClientRect();
+                    const bottomRect = this.scoreBottomEl.getBoundingClientRect();
                     
-                    // Page toggle: wrap to other page when dragging past edges
-                    if (xPercent > 100) {
-                        // Dragged past right edge - toggle to other page
-                        this.dragSection = this.dragSection === 'top' ? 'bottom' : 'top';
-                        this.dragBasePage += 1;
-                        xPercent = 0;
-                    } else if (xPercent < 0) {
-                        // Dragged past left edge - toggle to other page (go back)
-                        if (this.dragBasePage > 0) {
-                            this.dragSection = this.dragSection === 'top' ? 'bottom' : 'top';
-                            this.dragBasePage -= 1;
-                            xPercent = 100;
-                        } else {
-                            // At page 0, clamp to 0 (minimum is -leadInSeconds)
-                            xPercent = 0;
-                        }
+                    let targetSection;
+                    let scoreEl;
+                    let rect;
+                    
+                    if (e.clientY < bottomRect.top) {
+                        // Mouse is above bottom section - use top
+                        targetSection = 'top';
+                        scoreEl = this.scoreTopEl;
+                        rect = topRect;
+                    } else {
+                        // Mouse is in or below bottom section - use bottom
+                        targetSection = 'bottom';
+                        scoreEl = this.scoreBottomEl;
+                        rect = bottomRect;
                     }
                     
+                    // Get the current page for the target section from GraphicTimeline
+                    let currentPage;
+                    if (window.GraphicTimeline) {
+                        currentPage = targetSection === 'top' ? GraphicTimeline.currentTopPage : GraphicTimeline.currentBottomPage;
+                    } else {
+                        currentPage = 0;
+                    }
+                    
+                    // Calculate X position as percentage within the target section
+                    let xPercent = ((e.clientX - rect.left) / rect.width) * 100;
                     xPercent = Math.max(0, Math.min(100, xPercent));
                     
-                    // Calculate seconds based on position
-                    const seconds = (this.dragBasePage + xPercent / 100) * secondsPerPage - leadInSeconds;
+                    // Calculate seconds based on the target section's page and x position
+                    const seconds = (currentPage + xPercent / 100) * secondsPerPage - leadInSeconds;
                     
                     // Clamp to minimum of -leadInSeconds
                     const clampedSeconds = Math.max(-leadInSeconds, seconds);
+                    
+                    // Update drag section for visual feedback
+                    this.dragSection = targetSection;
                     
                     this.setPositionSeconds(clampedSeconds);
                 };
@@ -5343,10 +5505,7 @@
             jumpToInputValue() {
                 const seconds = parseFloat(this.inputEl.value) || 0;
                 this.setPositionSeconds(seconds);
-                
-                // Also jump playback cursors to this position
-                const actualSeconds = seconds + leadInSeconds;
-                ClockSync.socket.emit('scoreGoto', { seconds: actualSeconds });
+                // Edit cursor only - does not move scrolling/playback cursors
             },
             
             // Get current position in seconds
@@ -6438,6 +6597,12 @@
             dragStartX: 0,
             dragStartY: 0,
             
+            // Segment extraction state
+            segmentX1Line: null,
+            segmentX2Line: null,
+            segmentX1Seconds: null,
+            segmentX2Seconds: null,
+            
             init() {
                 this.scoreTopEl = document.getElementById('ScoreTop');
                 this.scoreBottomEl = document.getElementById('ScoreBottom');
@@ -6449,6 +6614,37 @@
                 this.y1Input = document.getElementById('curveY1Input');
                 this.y2Input = document.getElementById('curveY2Input');
                 this.drawBtn = document.getElementById('curveDrawBtn');
+                this.saveBtn = document.getElementById('curveSaveBtn');
+                this.descriptionInput = document.getElementById('curveDescriptionInput');
+                this.recallSelect = document.getElementById('curveRecallSelect');
+                this.recallDropdown = document.getElementById('curveRecallDropdown');
+                this.recallSelected = document.getElementById('curveRecallSelected');
+                this.recallOptions = document.getElementById('curveRecallOptions');
+                this.insertBtn = document.getElementById('curveInsertBtn');
+                
+                // Custom dropdown toggle handler
+                if (this.recallSelected) {
+                    this.recallSelected.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isOpen = this.recallOptions.style.display !== 'none';
+                        this.recallOptions.style.display = isOpen ? 'none' : 'block';
+                    });
+                }
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (this.recallOptions && !this.recallDropdown?.contains(e.target)) {
+                        this.recallOptions.style.display = 'none';
+                    }
+                });
+                
+                // Segment extraction UI elements
+                this.segmentX1Btn = document.getElementById('segmentX1Btn');
+                this.segmentX1Input = document.getElementById('segmentX1Input');
+                this.segmentX2Btn = document.getElementById('segmentX2Btn');
+                this.segmentX2Input = document.getElementById('segmentX2Input');
+                this.segmentCreateBtn = document.getElementById('segmentCreateBtn');
+                this.segmentClearBtn = document.getElementById('segmentClearBtn');
                 
                 // Create curve container groups
                 this.topCurveGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -6460,6 +6656,35 @@
                 
                 // Draw button handler
                 this.drawBtn.addEventListener('click', () => this.createCurve());
+                
+                // Save button handler - save selected curve to library
+                this.saveBtn.addEventListener('click', () => this.saveCurveToLibrary());
+                
+                // Insert button handler - insert recalled curve at edit line
+                this.insertBtn.addEventListener('click', () => this.insertRecalledCurve());
+                
+                // Load curve library on init
+                this.loadCurveLibrary();
+                
+                // Segment extraction handlers
+                if (this.segmentX1Btn) {
+                    this.segmentX1Btn.addEventListener('click', () => this.setSegmentX1());
+                }
+                if (this.segmentX1Input) {
+                    this.segmentX1Input.addEventListener('change', () => this.updateSegmentX1FromInput());
+                }
+                if (this.segmentX2Btn) {
+                    this.segmentX2Btn.addEventListener('click', () => this.setSegmentX2());
+                }
+                if (this.segmentX2Input) {
+                    this.segmentX2Input.addEventListener('change', () => this.updateSegmentX2FromInput());
+                }
+                if (this.segmentCreateBtn) {
+                    this.segmentCreateBtn.addEventListener('click', () => this.createSegment());
+                }
+                if (this.segmentClearBtn) {
+                    this.segmentClearBtn.addEventListener('click', () => this.clearSegmentLines());
+                }
                 
                 // Color swatch handlers - dynamic for selected curve
                 document.querySelectorAll('.color-swatch').forEach(swatch => {
@@ -6501,22 +6726,33 @@
                 this.scoreTopEl.addEventListener('click', (e) => this.handleScoreClick(e, 'top'));
                 this.scoreBottomEl.addEventListener('click', (e) => this.handleScoreClick(e, 'bottom'));
                 
-                // Delete/Backspace to delete selected curve
-                document.addEventListener('keydown', (e) => {
-                    if ((e.key === 'Delete' || e.key === 'Backspace') && this.selectedCurve) {
-                        // Don't delete if focus is in an input field
-                        if (document.activeElement.tagName === 'INPUT') return;
-                        e.preventDefault();
-                        this.deleteSelectedCurve();
-                    }
+                // Delete button handler
+                this.deleteBtn = document.getElementById('curveDeleteBtn');
+                if (this.deleteBtn) {
+                    this.deleteBtn.addEventListener('click', () => this.deleteSelectedCurve());
+                }
+                
+                // Re-render curves on window resize (debounced)
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        this.reloadFromDatabase();
+                    }, 100);
                 });
                 
                 console.log('CurveMaker initialized');
             },
             
             generateCurveName() {
-                this.curveCounter++;
-                return `CRV${String(this.curveCounter).padStart(3, '0')}`;
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                return `CRV_${year}${month}${day}_${hours}${minutes}${seconds}`;
             },
             
             generateCurveDataArray(curve) {
@@ -7329,12 +7565,24 @@
                 const groupKey = section === 'top' ? 'continuationGroupTop' : 'continuationGroupBottom';
                 const pathKey = section === 'top' ? 'continuationPathTop' : 'continuationPathBottom';
                 
-                // Create or update continuation segment (display only - no interactivity)
-                // All controls are on the first segment
+                // Create or update continuation segment
+                // Clickable to select the curve, but all controls remain on the first segment
+                const hitPathKey = section === 'top' ? 'continuationHitPathTop' : 'continuationHitPathBottom';
+                
                 if (!curve.elements[groupKey]) {
                     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     group.classList.add('curve-continuation');
+                    group.classList.add('curve-element');
                     group.setAttribute('data-curve-id', curve.id);
+                    
+                    // Hit path for click detection (wider, invisible)
+                    const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    hitPath.setAttribute('fill', 'none');
+                    hitPath.setAttribute('stroke', 'transparent');
+                    hitPath.setAttribute('stroke-width', '12');
+                    hitPath.setAttribute('stroke-linecap', 'round');
+                    hitPath.style.cursor = 'pointer';
+                    group.appendChild(hitPath);
                     
                     // Main path (display only)
                     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -7342,16 +7590,27 @@
                     path.setAttribute('stroke', ColorMap[curve.color] || curve.color);
                     path.setAttribute('stroke-width', '2');
                     path.setAttribute('stroke-linecap', 'round');
-                    path.style.pointerEvents = 'none'; // No interaction
+                    path.style.pointerEvents = 'none'; // Visual only, hit path handles clicks
                     group.appendChild(path);
+                    
+                    // Add click handler to select the parent curve
+                    hitPath.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectCurve(curve);
+                    });
                     
                     curve.elements[groupKey] = group;
                     curve.elements[pathKey] = path;
+                    curve.elements[hitPathKey] = hitPath;
                 }
                 
                 const color = ColorMap[curve.color] || curve.color;
                 if (pathD) {
                     curve.elements[pathKey].setAttribute('d', pathD);
+                    // Update hit path with same path data for click detection
+                    if (curve.elements[hitPathKey]) {
+                        curve.elements[hitPathKey].setAttribute('d', pathD);
+                    }
                 }
                 curve.elements[pathKey].setAttribute('stroke', color);
                 
@@ -7811,12 +8070,39 @@
                 
                 // Recreate curves from database
                 const dbCurves = CurveDatabase.getAll();
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                
                 for (const dbCurve of dbCurves) {
                     // Recreate the curve visual elements
                     const curve = { ...dbCurve };
                     
-                    // Determine which container to use
+                    // Determine which container to use based on section
                     const container = curve.section === 'bottom' ? this.bottomCurveGroup : this.topCurveGroup;
+                    const scoreEl = curve.section === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
+                    const scoreWidth = scoreEl.clientWidth;
+                    
+                    // Recalculate X positions from time-based values
+                    const startActual = curve.startSeconds + leadInSeconds;
+                    const endActual = curve.endSeconds + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                    const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                    curve.x1 = (startXPercent / 100) * scoreWidth;
+                    curve.x2 = (endXPercent / 100) * scoreWidth;
+                    
+                    // Recalculate Y positions from normalized y1/y2 (0-10 scale)
+                    if (curve.gTrack && window.CompositionPanel) {
+                        const trackDims = CompositionPanel.getTrackDimensions(curve.gTrack, scoreEl);
+                        if (trackDims && trackDims.height) {
+                            curve.trackDims = trackDims;
+                            const trackBottom = trackDims.y + trackDims.height;
+                            const trackHeight = trackDims.height;
+                            curve.y1Pixel = trackBottom - (curve.y1 / 10) * trackHeight;
+                            curve.y2Pixel = trackBottom - (curve.y2 / 10) * trackHeight;
+                            curve.origY1Pixel = curve.y1Pixel;
+                            curve.origY2Pixel = curve.y2Pixel;
+                        }
+                    }
                     
                     // Create SVG elements for the curve
                     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -7924,12 +8210,580 @@
                 
                 // Update visibility to show all visible segments immediately
                 this.updateVisibility();
+            },
+            
+            // Re-render all curves on window resize
+            reRenderAllCurves() {
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                
+                for (const curve of this.curves) {
+                    // Recalculate pixel positions from time-based values
+                    const startActual = curve.startSeconds + leadInSeconds;
+                    const endActual = curve.endSeconds + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    
+                    // Determine section based on page
+                    const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                    const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                    const scoreWidth = scoreEl.clientWidth;
+                    
+                    // Calculate X positions as percentages within the page
+                    const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                    const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                    
+                    // Update pixel X positions
+                    curve.x1 = (startXPercent / 100) * scoreWidth;
+                    curve.x2 = (endXPercent / 100) * scoreWidth;
+                    
+                    // Recalculate Y positions if trackDims exists
+                    if (curve.trackDims && curve.gTrack) {
+                        // Get fresh track dimensions
+                        const trackDims = window.CompositionPanel ? 
+                            CompositionPanel.getTrackDimensions(scoreEl, curve.gTrack) : curve.trackDims;
+                        
+                        if (trackDims) {
+                            curve.trackDims = trackDims;
+                            const trackBottom = trackDims.y + trackDims.height;
+                            const trackHeight = trackDims.height;
+                            
+                            // Recalculate Y pixel positions from normalized y1/y2 (0-10 scale)
+                            curve.y1Pixel = trackBottom - (curve.y1 / 10) * trackHeight;
+                            curve.y2Pixel = trackBottom - (curve.y2 / 10) * trackHeight;
+                            curve.origY1Pixel = curve.y1Pixel;
+                            curve.origY2Pixel = curve.y2Pixel;
+                        }
+                    }
+                    
+                    // Update the curve rendering
+                    this.updateCurveRendering(curve);
+                    this.updateBoundingBox(curve);
+                }
+                
+                // Update visibility for multi-page curves
+                this.updateVisibility();
+            },
+            
+            // Save selected curve to library
+            async saveCurveToLibrary() {
+                if (!this.selectedCurve) {
+                    alert('No curve selected. Select a curve to save.');
+                    return;
+                }
+                
+                const curve = this.selectedCurve;
+                const description = this.descriptionInput?.value || '';
+                
+                // Build complete curve data for saving
+                const curveData = {
+                    name: curve.name,
+                    description: description,
+                    // Core curve parameters (relative/normalized)
+                    startSeconds: curve.startSeconds,
+                    endSeconds: curve.endSeconds,
+                    y1: curve.y1,
+                    y2: curve.y2,
+                    gTrack: curve.gTrack,
+                    color: curve.color,
+                    fillMode: curve.fillMode,
+                    tension: curve.tension || 0,
+                    slope: curve.slope || 0,
+                    // Curve data array for playback
+                    curveData: curve.curveData,
+                    // Duration for easy reference
+                    duration: curve.endSeconds - curve.startSeconds
+                };
+                
+                try {
+                    const response = await fetch('/api/curve-library/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ curveData })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log(`Curve saved to library: ${curve.name}`);
+                        alert(`Curve "${curve.name}" saved to library.`);
+                        // Refresh the recall dropdown
+                        this.loadCurveLibrary();
+                    } else {
+                        alert(`Failed to save curve: ${result.error}`);
+                    }
+                } catch (err) {
+                    console.error('Error saving curve:', err);
+                    alert(`Error saving curve: ${err.message}`);
+                }
+            },
+            
+            // Load curve library into recall dropdown
+            async loadCurveLibrary() {
+                if (!this.recallOptions) return;
+                
+                try {
+                    const response = await fetch('/api/curve-library/list');
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Clear existing options
+                        this.recallOptions.innerHTML = '';
+                        
+                        // Reset hidden input and selected display
+                        if (this.recallSelect) this.recallSelect.value = '';
+                        if (this.recallSelected) this.recallSelected.textContent = '-- Select Saved Curve --';
+                        
+                        // Add placeholder option
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'custom-dropdown-option';
+                        placeholder.style.cssText = 'padding: 6px 8px; cursor: pointer; font-size: 10px; color: #888; border-bottom: 1px solid #444;';
+                        placeholder.textContent = '-- Select Saved Curve --';
+                        placeholder.dataset.value = '';
+                        placeholder.addEventListener('click', () => this.selectRecallOption('', '-- Select Saved Curve --'));
+                        placeholder.addEventListener('mouseenter', () => placeholder.style.background = 'rgba(60,60,80,0.8)');
+                        placeholder.addEventListener('mouseleave', () => placeholder.style.background = '');
+                        this.recallOptions.appendChild(placeholder);
+                        
+                        // Add curves to dropdown with full descriptions
+                        for (const curve of result.curves) {
+                            const option = document.createElement('div');
+                            option.className = 'custom-dropdown-option';
+                            option.style.cssText = 'padding: 6px 8px; cursor: pointer; border-bottom: 1px solid #333;';
+                            option.dataset.value = curve.name;
+                            
+                            // Name line
+                            const nameLine = document.createElement('div');
+                            nameLine.style.cssText = 'font-size: 10px; font-weight: bold; color: #ddd;';
+                            const dur = curve.duration ? ` (${curve.duration.toFixed(1)}s)` : '';
+                            nameLine.textContent = `${curve.name}${dur}`;
+                            option.appendChild(nameLine);
+                            
+                            // Description line (full text, wrapped)
+                            if (curve.description) {
+                                const descLine = document.createElement('div');
+                                descLine.style.cssText = 'font-size: 9px; color: #999; margin-top: 2px; white-space: normal; word-wrap: break-word;';
+                                descLine.textContent = curve.description;
+                                option.appendChild(descLine);
+                            }
+                            
+                            option.addEventListener('click', () => this.selectRecallOption(curve.name, `${curve.name}${dur}`));
+                            option.addEventListener('mouseenter', () => option.style.background = 'rgba(60,60,80,0.8)');
+                            option.addEventListener('mouseleave', () => option.style.background = '');
+                            this.recallOptions.appendChild(option);
+                        }
+                        
+                        console.log(`Loaded ${result.curves.length} curves from library`);
+                    }
+                } catch (err) {
+                    console.error('Error loading curve library:', err);
+                }
+            },
+            
+            // Select an option from the custom recall dropdown
+            selectRecallOption(value, displayText) {
+                if (this.recallSelect) this.recallSelect.value = value;
+                if (this.recallSelected) this.recallSelected.textContent = displayText;
+                if (this.recallOptions) this.recallOptions.style.display = 'none';
+            },
+            
+            // Insert recalled curve at edit line position
+            async insertRecalledCurve() {
+                const selectedName = this.recallSelect?.value;
+                if (!selectedName) {
+                    alert('Select a curve from the library to insert.');
+                    return;
+                }
+                
+                // Get insertion point from edit cursor (yellow line position)
+                let insertionSeconds = 0;
+                if (window.EditCursor && typeof EditCursor.getPositionSeconds === 'function') {
+                    insertionSeconds = EditCursor.getPositionSeconds();
+                } else if (window.EditCursor) {
+                    insertionSeconds = EditCursor.positionSeconds || 0;
+                } else {
+                    // Fallback: use current score time
+                    const scoreTimeMs = window.ScoreTime ? ScoreTime.now() : 0;
+                    insertionSeconds = (scoreTimeMs / 1000) - leadInSeconds;
+                }
+                
+                // Get target track from CompositionPanel G track selection
+                const targetGTrack = window.CompositionPanel ? CompositionPanel.getSelectedGTrack() : '1';
+                
+                try {
+                    const response = await fetch(`/api/curve-library/load/${encodeURIComponent(selectedName)}`);
+                    const result = await response.json();
+                    
+                    if (!result.success) {
+                        alert(`Failed to load curve: ${result.error}`);
+                        return;
+                    }
+                    
+                    const savedCurve = result.curveData;
+                    const duration = savedCurve.duration || (savedCurve.endSeconds - savedCurve.startSeconds);
+                    
+                    // Calculate new start/end times based on insertion point
+                    const newStartSeconds = insertionSeconds;
+                    const newEndSeconds = insertionSeconds + duration;
+                    
+                    // Get track dimensions for the target track
+                    const trackDims = window.CompositionPanel ? 
+                        CompositionPanel.getSelectedTrackDimensions(this.scoreTopEl) : null;
+                    
+                    // Determine which page(s) the curve spans
+                    const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                    const startActual = newStartSeconds + leadInSeconds;
+                    const endActual = newEndSeconds + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    
+                    // Draw on the start page
+                    const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                    const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                    const curveGroup = section === 'top' ? this.topCurveGroup : this.bottomCurveGroup;
+                    const scoreWidth = scoreEl.clientWidth;
+                    
+                    // Calculate X positions as percentages within the page
+                    const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                    const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                    
+                    // Calculate Y positions using saved normalized values
+                    const trackBottom = trackDims ? trackDims.y + trackDims.height : 100;
+                    const trackHeight = trackDims ? trackDims.height : 100;
+                    const y1Pixel = trackBottom - (savedCurve.y1 / 10) * trackHeight;
+                    const y2Pixel = trackBottom - (savedCurve.y2 / 10) * trackHeight;
+                    
+                    // Calculate pixel positions
+                    const x1Pixel = (startXPercent / 100) * scoreWidth;
+                    const x2Pixel = (endXPercent / 100) * scoreWidth;
+                    
+                    // Generate new unique name
+                    const name = this.generateCurveName();
+                    
+                    // Create new curve data object
+                    const curveDataObj = {
+                        name,
+                        startSeconds: newStartSeconds,
+                        endSeconds: newEndSeconds,
+                        y1: savedCurve.y1,
+                        y2: savedCurve.y2,
+                        gTrack: targetGTrack,
+                        color: savedCurve.color,
+                        fillMode: savedCurve.fillMode,
+                        section,
+                        page: startPage,
+                        x1: x1Pixel,
+                        y1Pixel,
+                        x2: x2Pixel,
+                        y2Pixel,
+                        origY1Pixel: y1Pixel,
+                        origY2Pixel: y2Pixel,
+                        tension: savedCurve.tension || 0,
+                        slope: savedCurve.slope || 0,
+                        trackDims
+                    };
+                    
+                    // Regenerate curve data array for new position
+                    const curveDataArray = this.generateCurveDataArray(curveDataObj);
+                    curveDataObj.curveData = curveDataArray;
+                    
+                    // Add to database
+                    const curve = CurveDatabase.add(curveDataObj);
+                    
+                    // Mark score as dirty
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    
+                    // Add to G Track graphic data
+                    if (targetGTrack !== 'A') {
+                        const trackIndex = parseInt(targetGTrack) - 1;
+                        if (window.GTrackSystem) {
+                            GTrackSystem.addGraphicItem(trackIndex, {
+                                type: 'curve',
+                                curveId: curve.id,
+                                curveName: curve.name,
+                                color: savedCurve.color,
+                                fillMode: savedCurve.fillMode,
+                                scoreTimeMs: newStartSeconds * 1000,
+                                duration: duration * 1000,
+                                curveData: curveDataArray
+                            });
+                        }
+                    }
+                    
+                    // Render the curve
+                    this.renderCurve(curve, curveGroup, scoreEl);
+                    
+                    // Add to curves array
+                    this.curves.push(curve);
+                    
+                    // Update visibility for multi-page curves
+                    this.updateVisibility();
+                    
+                    // Auto-select the new curve
+                    this.selectCurve(curve);
+                    
+                    console.log(`Curve inserted: ${curve.name} at ${newStartSeconds}s on track ${targetGTrack}`);
+                    
+                } catch (err) {
+                    console.error('Error inserting curve:', err);
+                    alert(`Error inserting curve: ${err.message}`);
+                }
+            },
+            
+            // Set X1 segment marker at edit cursor position
+            setSegmentX1() {
+                if (!this.selectedCurve) {
+                    alert('Select a curve first to set segment markers.');
+                    return;
+                }
+                
+                // Get current edit cursor position
+                let seconds = 0;
+                if (window.EditCursor && typeof EditCursor.getPositionSeconds === 'function') {
+                    seconds = EditCursor.getPositionSeconds();
+                } else if (window.EditCursor) {
+                    seconds = EditCursor.positionSeconds || 0;
+                }
+                
+                // Clamp to curve bounds
+                seconds = Math.max(this.selectedCurve.startSeconds, Math.min(this.selectedCurve.endSeconds, seconds));
+                
+                this.segmentX1Seconds = seconds;
+                if (this.segmentX1Input) {
+                    this.segmentX1Input.value = seconds.toFixed(1);
+                }
+                
+                this.renderSegmentLine('x1', seconds);
+            },
+            
+            // Set X2 segment marker at edit cursor position
+            setSegmentX2() {
+                if (!this.selectedCurve) {
+                    alert('Select a curve first to set segment markers.');
+                    return;
+                }
+                
+                // Get current edit cursor position
+                let seconds = 0;
+                if (window.EditCursor && typeof EditCursor.getPositionSeconds === 'function') {
+                    seconds = EditCursor.getPositionSeconds();
+                } else if (window.EditCursor) {
+                    seconds = EditCursor.positionSeconds || 0;
+                }
+                
+                // Clamp to curve bounds
+                seconds = Math.max(this.selectedCurve.startSeconds, Math.min(this.selectedCurve.endSeconds, seconds));
+                
+                this.segmentX2Seconds = seconds;
+                if (this.segmentX2Input) {
+                    this.segmentX2Input.value = seconds.toFixed(1);
+                }
+                
+                this.renderSegmentLine('x2', seconds);
+            },
+            
+            // Update X1 from input field
+            updateSegmentX1FromInput() {
+                if (!this.selectedCurve) return;
+                
+                let seconds = parseFloat(this.segmentX1Input?.value) || 0;
+                seconds = Math.max(this.selectedCurve.startSeconds, Math.min(this.selectedCurve.endSeconds, seconds));
+                
+                this.segmentX1Seconds = seconds;
+                this.segmentX1Input.value = seconds.toFixed(1);
+                this.renderSegmentLine('x1', seconds);
+            },
+            
+            // Update X2 from input field
+            updateSegmentX2FromInput() {
+                if (!this.selectedCurve) return;
+                
+                let seconds = parseFloat(this.segmentX2Input?.value) || 0;
+                seconds = Math.max(this.selectedCurve.startSeconds, Math.min(this.selectedCurve.endSeconds, seconds));
+                
+                this.segmentX2Seconds = seconds;
+                this.segmentX2Input.value = seconds.toFixed(1);
+                this.renderSegmentLine('x2', seconds);
+            },
+            
+            // Render a dotted yellow vertical line at the given time position
+            renderSegmentLine(which, seconds) {
+                if (!this.selectedCurve) return;
+                
+                const curve = this.selectedCurve;
+                const trackDims = curve.trackDims;
+                if (!trackDims) return;
+                
+                // Remove existing line
+                if (which === 'x1' && this.segmentX1Line) {
+                    this.segmentX1Line.remove();
+                    this.segmentX1Line = null;
+                }
+                if (which === 'x2' && this.segmentX2Line) {
+                    this.segmentX2Line.remove();
+                    this.segmentX2Line = null;
+                }
+                
+                // Calculate position
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const actualSeconds = seconds + leadInSeconds;
+                const pageNumber = Math.floor(actualSeconds / secondsPerPage);
+                const section = pageNumber % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const curveGroup = section === 'top' ? this.topCurveGroup : this.bottomCurveGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                // Calculate X position within the page
+                const xPercent = ((actualSeconds / secondsPerPage) - pageNumber) * 100;
+                const xPixel = (xPercent / 100) * scoreWidth;
+                
+                // Create dotted yellow line spanning track height
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', xPixel);
+                line.setAttribute('y1', trackDims.y);
+                line.setAttribute('x2', xPixel);
+                line.setAttribute('y2', trackDims.y + trackDims.height);
+                line.setAttribute('stroke', 'yellow');
+                line.setAttribute('stroke-width', '2');
+                line.setAttribute('stroke-dasharray', '4,4');
+                line.setAttribute('class', 'segment-marker-line');
+                
+                curveGroup.appendChild(line);
+                
+                if (which === 'x1') {
+                    this.segmentX1Line = line;
+                } else {
+                    this.segmentX2Line = line;
+                }
+            },
+            
+            // Clear segment marker lines
+            clearSegmentLines() {
+                if (this.segmentX1Line) {
+                    this.segmentX1Line.remove();
+                    this.segmentX1Line = null;
+                }
+                if (this.segmentX2Line) {
+                    this.segmentX2Line.remove();
+                    this.segmentX2Line = null;
+                }
+                this.segmentX1Seconds = null;
+                this.segmentX2Seconds = null;
+                if (this.segmentX1Input) this.segmentX1Input.value = '0.0';
+                if (this.segmentX2Input) this.segmentX2Input.value = '0.0';
+            },
+            
+            // Create a new curve segment from X1 to X2 and save to library
+            async createSegment() {
+              try {
+                
+                if (!this.selectedCurve) {
+                    alert('Select a curve first.');
+                    return;
+                }
+                
+                if (this.segmentX1Seconds === null || this.segmentX2Seconds === null) {
+                    alert('Set both X1 and X2 markers first.');
+                    return;
+                }
+                
+                // Ensure X1 < X2
+                const startSeconds = Math.min(this.segmentX1Seconds, this.segmentX2Seconds);
+                const endSeconds = Math.max(this.segmentX1Seconds, this.segmentX2Seconds);
+                
+                if (startSeconds === endSeconds) {
+                    alert('X1 and X2 must be different.');
+                    return;
+                }
+                
+                const curve = this.selectedCurve;
+                const duration = endSeconds - startSeconds;
+                
+                // Calculate Y values at X1 and X2 by interpolating from original curve
+                const curveStartSeconds = curve.startSeconds;
+                const curveDuration = curve.endSeconds - curve.startSeconds;
+                
+                // Normalized positions within the original curve (0-1)
+                const t1 = (startSeconds - curveStartSeconds) / curveDuration;
+                const t2 = (endSeconds - curveStartSeconds) / curveDuration;
+                
+                // Interpolate Y values (linear interpolation based on original y1/y2)
+                const y1 = curve.y1 + (curve.y2 - curve.y1) * t1;
+                const y2 = curve.y1 + (curve.y2 - curve.y1) * t2;
+                
+                // Extract the relevant portion of curveData samples array
+                // curveData is an object with { startTime, endTime, sampleInterval, samples }
+                // samples are at 100 samples/second (10ms intervals)
+                const SAMPLE_INTERVAL = 0.01;
+                const segmentStartIndex = Math.floor((startSeconds - curveStartSeconds) / SAMPLE_INTERVAL);
+                const segmentEndIndex = Math.ceil((endSeconds - curveStartSeconds) / SAMPLE_INTERVAL);
+                
+                // Extract samples from the curveData object
+                let segmentSamples = [];
+                if (curve.curveData && curve.curveData.samples && Array.isArray(curve.curveData.samples)) {
+                    segmentSamples = curve.curveData.samples.slice(segmentStartIndex, segmentEndIndex + 1);
+                }
+                
+                // Build segment curveData object
+                const segmentCurveData = {
+                    startTime: 0,
+                    endTime: duration,
+                    sampleInterval: SAMPLE_INTERVAL,
+                    samples: segmentSamples
+                };
+                
+                // Generate unique name with timestamp
+                const name = this.generateCurveName();
+                
+                // Build segment curve data for saving to library
+                // Include user's description field text if provided
+                const userDescription = this.descriptionInput?.value?.trim() || '';
+                const autoDescription = 'Segment from ' + curve.name + ' (' + startSeconds.toFixed(1) + 's - ' + endSeconds.toFixed(1) + 's)';
+                const fullDescription = userDescription ? autoDescription + ' - ' + userDescription : autoDescription;
+                
+                const segmentData = {
+                    name: name,
+                    description: fullDescription,
+                    startSeconds: 0,  // Normalized to start at 0 for library storage
+                    endSeconds: duration,
+                    y1: y1,
+                    y2: y2,
+                    gTrack: curve.gTrack,
+                    color: curve.color,
+                    fillMode: curve.fillMode,
+                    tension: curve.tension || 0,
+                    slope: curve.slope || 0,
+                    curveData: segmentCurveData,
+                    duration: duration
+                };
+                
+                // Save to curve library
+                try {
+                    const response = await fetch('/api/curve-library/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ curveData: segmentData })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log('Segment saved to library:', name);
+                        // Refresh the recall dropdown
+                        this.loadCurveLibrary();
+                        // Clear segment lines
+                        this.clearSegmentLines();
+                    } else {
+                        console.error('Failed to save segment:', result.error);
+                    }
+                } catch (err) {
+                    console.error('Error saving segment:', err.message);
+                }
+              } catch (outerErr) {
+                console.error('OUTER ERROR:', outerErr.message);
+              }
             }
         };
         
         // Initialize Curve Maker
         CurveMaker.init();
         window.CurveMaker = CurveMaker;
+        
         
         // Initialize Score Manager (after all other systems)
         ScoreManager.init();
