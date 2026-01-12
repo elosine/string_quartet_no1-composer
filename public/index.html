@@ -873,10 +873,12 @@
                 <div class="section-divider"></div>
                 <div class="section-label">Motive Maker</div>
                 
+                <!-- DISABLED: Name field (code kept in MotiveMaker)
                 <div class="curve-input-row">
                     <label>Name</label>
                     <input type="text" id="motiveNameDisplay" class="curve-input" value="" readonly style="background: rgba(40,40,50,0.8); color: #aaa;">
                 </div>
+                -->
                 <div class="curve-input-row">
                     <label>Start</label>
                     <input type="text" id="motiveStartInput" class="curve-input" value="0.000">
@@ -886,6 +888,7 @@
                     <input type="text" id="motiveEndInput" class="curve-input" value="1.000">
                 </div>
                 
+                <!-- DISABLED: Badge section (code kept in MotiveMaker)
                 <div class="curve-input-row" style="margin-top: 8px;">
                     <label style="font-size: 10px;">Badge</label>
                     <button id="motiveBadgeUploadBtn" class="curve-draw-btn" style="font-size: 9px; padding: 2px 6px; margin-left: 5px; background: #2d5a4a; border-color: #3d6a5a;">Upload</button>
@@ -895,7 +898,9 @@
                 <div id="motiveBadgePreview" style="width: 100%; height: 30px; background: rgba(30,30,40,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                     <span style="font-size: 9px; color: #666;">No badge</span>
                 </div>
+                -->
                 
+                <!-- DISABLED: Notation section (code kept in MotiveMaker)
                 <div class="curve-input-row" style="margin-top: 8px;">
                     <label style="font-size: 10px;">Notation</label>
                     <button id="motiveNotationUploadBtn" class="curve-draw-btn" style="font-size: 9px; padding: 2px 6px; margin-left: 5px; background: #2d5a4a; border-color: #3d6a5a;">Upload</button>
@@ -905,16 +910,22 @@
                 <div id="motiveNotationPreview" style="width: 100%; height: 40px; background: #ffffff; border: 1px solid #444; border-radius: 3px; margin-top: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                     <span style="font-size: 9px; color: #666;">No notation</span>
                 </div>
+                -->
                 
                 <button id="motiveDrawBtn" class="curve-draw-btn" style="background: #2d5a4a; border-color: #3d6a5a;">Draw</button>
                 <button id="motiveDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: #2d5a4a; border-color: #3d6a5a;">Delete</button>
+                <!-- DISABLED: Save button (code kept in MotiveMaker)
                 <button id="motiveSaveBtn" class="curve-draw-btn" style="margin-top: 5px; background: #2d5a4a; border-color: #3d6a5a;">Save</button>
+                -->
                 
+                <!-- DISABLED: Description field (code kept in MotiveMaker)
                 <div class="curve-input-row" style="margin-top: 8px;">
                     <label style="font-size: 10px;">Description</label>
                 </div>
                 <textarea id="motiveDescriptionInput" class="curve-input" style="width: 100%; height: 40px; resize: vertical; font-size: 10px;" placeholder="Motive description..."></textarea>
+                -->
                 
+                <!-- DISABLED: Recall section and Insert button (code kept in MotiveMaker)
                 <div class="curve-input-row" style="margin-top: 8px;">
                     <label style="font-size: 10px;">Recall Motive</label>
                 </div>
@@ -927,7 +938,9 @@
                 </div>
                 <input type="hidden" id="motiveRecallSelect" value="">
                 <button id="motiveInsertBtn" class="curve-draw-btn" style="margin-top: 5px; background: #2d5a4a; border-color: #3d6a5a;">Insert at Edit Line</button>
+                -->
                 
+<!-- DISABLED: Motive Color swatches - now using curve color swatches
                 <div class="section-label" style="margin-top: 10px;">Motive Color</div>
                 <div class="color-swatches" id="motiveColorSwatches">
                     <div class="motive-color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
@@ -943,6 +956,7 @@
                     <div class="motive-color-swatch" data-color="yellow" style="background: var(--clr-yellow); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
                     <div class="motive-color-swatch selected" data-color="neonMagenta" style="background: var(--clr-neonMagenta); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px; outline: 2px solid white;"></div>
                 </div>
+                -->
                 
                 <div class="section-divider"></div>
                 <div class="section-label">SVG Elements</div>
@@ -1079,7 +1093,7 @@
                     <span id="midiEventCount" style="font-size: 11px; color: var(--clr-lightGrey);">Events: 0</span>
                 </div>
                 <div class="control-row" style="margin-top: 10px;">
-                    <button id="goStopBtn" class="control-btn" onclick="if(window.CursorControls) CursorControls.toggleGoStop();">Go</button>
+                    <button id="goStopBtn" class="control-btn" onclick="if(window.CursorControls) CursorControls.toggleGoStop();">Play</button>
                 </div>
             </div>
             <div class="menu-section">
@@ -1214,6 +1228,7 @@
     
     <div id="ScoreContainer">
         <div class="score-row">
+            <!-- DISABLED: Static motive panels (code kept for future reference)
             <div class="static-motive-panel" data-section="top">
                 <div class="static-motive-box" data-track="1">
                     <div class="static-motive-slot" data-slot="top"></div>
@@ -1232,9 +1247,11 @@
                     <div class="static-motive-slot" data-slot="bottom"></div>
                 </div>
             </div>
+            -->
             <svg id="ScoreTop"></svg>
         </div>
         <div class="score-row">
+            <!-- DISABLED: Static motive panels (code kept for future reference)
             <div class="static-motive-panel" data-section="bottom">
                 <div class="static-motive-box" data-track="1">
                     <div class="static-motive-slot" data-slot="top"></div>
@@ -1253,6 +1270,7 @@
                     <div class="static-motive-slot" data-slot="bottom"></div>
                 </div>
             </div>
+            -->
             <svg id="ScoreBottom"></svg>
         </div>
     </div>
@@ -1599,7 +1617,7 @@
             onScoreStop(data) {
                 ScoreTime.isPlaying = false;
                 ScoreTime.currentScoreTimeMs = data.currentScoreTimeMs;
-                this.goStopBtn.textContent = 'Go';
+                this.goStopBtn.textContent = 'Play';
                 this.goStopBtn.classList.remove('active');
                 console.log(`Score STOP - frozen at ${data.currentScoreTimeMs}ms`);
             },
@@ -1608,7 +1626,7 @@
                 ScoreTime.isPlaying = false;
                 ScoreTime.currentScoreTimeMs = data.currentScoreTimeMs;
                 serverTempoHistory = data.tempoHistory;
-                this.goStopBtn.textContent = 'Go';
+                this.goStopBtn.textContent = 'Play';
                 this.goStopBtn.classList.remove('active');
                 // Update input to reflect the new position (convert from actual to display time)
                 const displaySeconds = data.targetSeconds - leadInSeconds;
@@ -3033,11 +3051,11 @@
                 window.addEventListener('resize', () => {
                     this.updateCursorDimensions();
                     this.updateStaffHeaders();
-                    this.updateMotiveContainerWidths();
+                    // DISABLED: this.updateMotiveContainerWidths();
                 });
                 
-                // Initial motive container sizing
-                this.updateMotiveContainerWidths();
+                // DISABLED: Initial motive container sizing
+                // this.updateMotiveContainerWidths();
                 
                 // Log initial dimensions
                 this.updateCursorDimensions();
@@ -3066,7 +3084,7 @@
                 
                 // Update UI button state
                 if (window.CursorControls && CursorControls.goStopBtn) {
-                    CursorControls.goStopBtn.textContent = ScoreTime.isPlaying ? 'Stop' : 'Go';
+                    CursorControls.goStopBtn.textContent = ScoreTime.isPlaying ? 'Stop' : 'Play';
                     CursorControls.goStopBtn.classList.toggle('active', ScoreTime.isPlaying);
                 }
                 
@@ -3235,78 +3253,45 @@
                     follower.style.display = 'none';
                 });
                 
-                // Create motive dial groups (square with pie/dial animation)
-                // The dial is a square matching staffHeight x staffHeight, positioned left of curve follower
-                const createMotiveDialGroup = (isCountdown = false) => {
+                // Create motive pie dial (1/8 staff height square with pie animation and wand)
+                // Positioned left of curve meter, flush with top
+                const createMotivePie = () => {
                     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     group.style.display = 'none';
                     
-                    // Square border (black, inset) - size set dynamically in updateMotiveFollower
+                    // Square border (black)
                     const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                     border.setAttribute('fill', 'none');
                     border.setAttribute('stroke', 'black');
                     border.setAttribute('stroke-width', '1');
                     group.appendChild(border);
                     
-                    // Pie arc (decreasing fill)
+                    // Pie arc (decreasing fill) - color set dynamically
                     const arc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                    // Countdown dial is always yellow, main dial uses motive color
-                    arc.setAttribute('fill', isCountdown ? 'yellow' : this.colors[staffIndex]);
-                    arc.setAttribute('opacity', '0.25'); // 25% opacity for both dials
+                    arc.setAttribute('fill', this.colors[staffIndex]);
+                    arc.setAttribute('opacity', '0.5');
                     group.appendChild(arc);
                     
-                    // Clock hand/wand (black, 2px, 25% opacity)
+                    // Clock hand/wand (1px black line)
                     const hand = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                     hand.setAttribute('stroke', 'black');
-                    hand.setAttribute('stroke-width', '2');
+                    hand.setAttribute('stroke-width', '1');
                     hand.setAttribute('stroke-linecap', 'round');
-                    hand.setAttribute('opacity', '0.25');
                     group.appendChild(hand);
                     
-                    return { group, border, arc, hand, isCountdown };
+                    return { group, border, arc, hand };
                 };
                 
-                // Main dial (shows progress during motive)
-                const motiveDialTop = createMotiveDialGroup(false);
-                const motiveDialBottom = createMotiveDialGroup(false);
-                
-                // Countdown dial (yellow, appears 3 seconds before motive)
-                const countdownDialTop = createMotiveDialGroup(true);
-                const countdownDialBottom = createMotiveDialGroup(true);
-                
-                // Create motive notation display (SVG image that appears under dials)
-                const createNotationDisplay = () => {
-                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                    group.style.display = 'none';
-                    
-                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
-                    image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-                    group.appendChild(image);
-                    
-                    return { group, image };
-                };
-                
-                // Scroll Window 1: Upcoming motive notation (under countdown dial)
-                const upcomingNotationTop = createNotationDisplay();
-                const upcomingNotationBottom = createNotationDisplay();
-                
-                // Scroll Window 2: Active motive notation (under main dial)
-                const activeNotationTop = createNotationDisplay();
-                const activeNotationBottom = createNotationDisplay();
+                const motivePieTop = createMotivePie();
+                const motivePieBottom = createMotivePie();
                 
                 // Add to SVG elements
                 this.scoreTopEl.appendChild(meterOutlineTop);
                 this.scoreBottomEl.appendChild(meterOutlineBottom);
                 this.scoreTopEl.appendChild(cursorTop);
                 this.scoreBottomEl.appendChild(cursorBottom);
-                this.scoreTopEl.appendChild(countdownDialTop.group);
-                this.scoreBottomEl.appendChild(countdownDialBottom.group);
-                this.scoreTopEl.appendChild(motiveDialTop.group);
-                this.scoreBottomEl.appendChild(motiveDialBottom.group);
-                this.scoreTopEl.appendChild(upcomingNotationTop.group);
-                this.scoreBottomEl.appendChild(upcomingNotationBottom.group);
-                this.scoreTopEl.appendChild(activeNotationTop.group);
-                this.scoreBottomEl.appendChild(activeNotationBottom.group);
+                this.scoreTopEl.appendChild(motivePieTop.group);
+                this.scoreBottomEl.appendChild(motivePieBottom.group);
                 this.scoreTopEl.appendChild(curveFollowerTop);
                 this.scoreBottomEl.appendChild(curveFollowerBottom);
                 
@@ -3318,16 +3303,8 @@
                     curveFollowerBottom: curveFollowerBottom,
                     meterOutlineTop: meterOutlineTop,
                     meterOutlineBottom: meterOutlineBottom,
-                    motiveDialTop: motiveDialTop,
-                    motiveDialBottom: motiveDialBottom,
-                    countdownDialTop: countdownDialTop,
-                    countdownDialBottom: countdownDialBottom,
-                    // Scroll Window 1: upcoming motive notation (under countdown dial)
-                    upcomingNotationTop: upcomingNotationTop,
-                    upcomingNotationBottom: upcomingNotationBottom,
-                    // Scroll Window 2: active motive notation (under main dial)
-                    activeNotationTop: activeNotationTop,
-                    activeNotationBottom: activeNotationBottom,
+                    motivePieTop: motivePieTop,
+                    motivePieBottom: motivePieBottom,
                     currentSection: 'top',  // 'top' or 'bottom'
                     xPosition: 0,           // Current x position in pixels
                     currentCurveValue: null, // Current normalized Y value from curve
@@ -3544,6 +3521,7 @@
                 });
             },
             
+            /* DISABLED: Static motive windows (code kept for future reference)
             // Update static motive panel and box dimensions to match scrolling windows
             updateMotiveContainerWidths() {
                 const scoreHeight = this.scoreTopEl?.clientHeight || 0;
@@ -3580,10 +3558,14 @@
                     box.style.width = `${halfHeight}px`;
                 });
             },
+            */
             
             // Update static motive windows with upcoming motive notation
             // Each section (top/bottom) looks ahead from its own page start time
             updateStaticMotiveWindows(currentScoreTimeMs, totalPagesTraveled) {
+                // DISABLED: Static motive windows removed from UI
+                return;
+                /*
                 if (!window.MotiveMaker) return;
                 
                 // Get page numbers from GraphicTimeline if available
@@ -3628,11 +3610,15 @@
                         this.updateStaticWindowContent(bottomBox, bottomMotives);
                     }
                 }
+                */
             },
             
             // Update the content of static motive slots in a box
             // Top slot: current/active motive, Bottom slot: upcoming motive
             updateStaticWindowContent(box, motives) {
+                // DISABLED: Static motive windows removed from UI
+                return;
+                /*
                 const topSlot = box.querySelector('.static-motive-slot[data-slot="top"]');
                 const bottomSlot = box.querySelector('.static-motive-slot[data-slot="bottom"]');
                 
@@ -3667,6 +3653,7 @@
                     const img = bottomSlot.querySelector('img');
                     if (img) img.remove();
                 }
+                */
             },
             
             update() {
@@ -3721,11 +3708,112 @@
                     // Update curve follower for this track
                     this.updateCurveFollower(cursor, staffIndex, xPixel, xPercent, currentSection, currentDisplayTimeSec);
                     
-                    // Update motive follower for this track
-                    this.updateMotiveFollower(cursor, staffIndex, xPixel, xPercent, currentSection, currentDisplayTimeSec);
+                    // Update motive pie for this track
+                    this.updateMotivePie(cursor, staffIndex, xPixel, currentSection, currentDisplayTimeSec);
                 });
             },
             
+            // Update motive pie dial - shows when cursor is within a motive, empties as motive progresses
+            updateMotivePie(cursor, staffIndex, xPixel, section, currentTimeSec) {
+                const pie = section === 'top' ? cursor.motivePieTop : cursor.motivePieBottom;
+                const otherPie = section === 'top' ? cursor.motivePieBottom : cursor.motivePieTop;
+                
+                if (!pie || !pie.group) return;
+                
+                // Hide on inactive section
+                if (otherPie && otherPie.group) otherPie.group.style.display = 'none';
+                
+                // Get gTrack for this staff
+                const gTrack = String(staffIndex + 1);
+                
+                // Check if we're within a motive
+                if (!window.MotiveMaker) {
+                    pie.group.style.display = 'none';
+                    return;
+                }
+                
+                // Find active motive at current time for this track
+                const motives = MotiveMaker.motives.filter(m => 
+                    m.gTrack === gTrack && 
+                    currentTimeSec >= m.startSeconds && 
+                    currentTimeSec <= m.endSeconds
+                );
+                
+                if (motives.length === 0) {
+                    pie.group.style.display = 'none';
+                    return;
+                }
+                
+                const motive = motives[0];
+                const progress = (currentTimeSec - motive.startSeconds) / (motive.endSeconds - motive.startSeconds);
+                
+                // Get track dimensions
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreHeight = scoreEl.clientHeight;
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const staffHeight = availableHeight / 4;
+                const yPosition = this.timelineHeight + (staffIndex * staffHeight);
+                
+                // Pie size is 1/4 the staff height
+                const pieSize = staffHeight / 4;
+                
+                // Position: left of curve meter (which is at xPixel - 11), flush with top of track
+                // Curve meter is 8px wide at x = xPixel - 11
+                const pieX = xPixel - 11 - pieSize - 2; // 2px gap from curve meter
+                const pieY = yPosition;
+                
+                // Update border
+                pie.border.setAttribute('x', pieX);
+                pie.border.setAttribute('y', pieY);
+                pie.border.setAttribute('width', pieSize);
+                pie.border.setAttribute('height', pieSize);
+                
+                // Set pie color to motive color
+                const color = ColorMap[motive.color] || motive.color;
+                pie.arc.setAttribute('fill', color);
+                
+                // Calculate pie arc (starts full, empties clockwise)
+                const centerX = pieX + pieSize / 2;
+                const centerY = pieY + pieSize / 2;
+                const radius = pieSize / 2 - 1;
+                
+                // Remaining portion (1 - progress)
+                const remaining = 1 - progress;
+                
+                if (remaining <= 0) {
+                    pie.arc.setAttribute('d', '');
+                } else if (remaining >= 1) {
+                    // Full circle
+                    pie.arc.setAttribute('d', `M ${centerX} ${centerY} m -${radius} 0 a ${radius} ${radius} 0 1 0 ${radius * 2} 0 a ${radius} ${radius} 0 1 0 -${radius * 2} 0`);
+                } else {
+                    // Partial pie - empties clockwise from 12 o'clock
+                    // Start edge moves clockwise as progress increases
+                    const startAngle = -Math.PI / 2 + (progress * 2 * Math.PI);
+                    const endAngle = -Math.PI / 2 + (2 * Math.PI); // Always ends at 12 o'clock
+                    
+                    const x1 = centerX + radius * Math.cos(startAngle);
+                    const y1 = centerY + radius * Math.sin(startAngle);
+                    const x2 = centerX + radius * Math.cos(endAngle);
+                    const y2 = centerY + radius * Math.sin(endAngle);
+                    
+                    const largeArc = remaining > 0.5 ? 1 : 0;
+                    
+                    pie.arc.setAttribute('d', `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z`);
+                }
+                
+                // Update clock hand/wand - spins clockwise from 12 o'clock
+                const handAngle = -Math.PI / 2 + (progress * 2 * Math.PI);
+                const handX = centerX + radius * Math.cos(handAngle);
+                const handY = centerY + radius * Math.sin(handAngle);
+                pie.hand.setAttribute('x1', centerX);
+                pie.hand.setAttribute('y1', centerY);
+                pie.hand.setAttribute('x2', handX);
+                pie.hand.setAttribute('y2', handY);
+                
+                pie.group.style.display = '';
+            },
+            
+            /* DISABLED: updateMotiveFollower - motive system disabled (code kept for future reference)
             // Update motive dials based on motive intersection
             // Main dial: shows progress through the motive (empties as motive progresses)
             // Countdown dial: appears 3 seconds before motive, empties as countdown progresses
@@ -3936,6 +4024,7 @@
                     }
                 }
             },
+            /* END OF DISABLED updateMotiveFollower */
             
             // Update curve follower rectangle based on curve intersection
             // TIMECODE-BASED SYSTEM: O(1) lookup using time-indexed samples
@@ -9430,9 +9519,560 @@
         
         
         // ============================================
-        // MOTIVE MAKER - creates and manages motives (straight lines at top of tracks)
+        // MOTIVE MAKER (SIMPLIFIED) - Line-only version
+        // Creates colored lines on tracks with selection/deletion
         // ============================================
         const MotiveMaker = {
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            topMotiveGroup: null,
+            bottomMotiveGroup: null,
+            motives: [],
+            selectedMotive: null,
+            selectedColor: 'neonMagenta',
+            
+            // UI elements
+            startInput: null,
+            endInput: null,
+            drawBtn: null,
+            deleteBtn: null,
+            colorSwatches: null,
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                // Get UI elements
+                this.startInput = document.getElementById('motiveStartInput');
+                this.endInput = document.getElementById('motiveEndInput');
+                this.drawBtn = document.getElementById('motiveDrawBtn');
+                this.deleteBtn = document.getElementById('motiveDeleteBtn');
+                // Use the shared color swatches (same as curves)
+                this.colorSwatches = document.getElementById('colorSwatches');
+                
+                // Create motive container groups
+                this.topMotiveGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.bottomMotiveGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.topMotiveGroup.setAttribute('class', 'motive-container');
+                this.bottomMotiveGroup.setAttribute('class', 'motive-container');
+                this.scoreTopEl.appendChild(this.topMotiveGroup);
+                this.scoreBottomEl.appendChild(this.bottomMotiveGroup);
+                
+                // Draw button handler
+                if (this.drawBtn) {
+                    this.drawBtn.addEventListener('click', () => this.createMotive());
+                }
+                
+                // Delete button handler
+                if (this.deleteBtn) {
+                    this.deleteBtn.addEventListener('click', () => this.deleteSelectedMotive());
+                }
+                
+                // Input field handlers for editing selected motive
+                if (this.startInput) {
+                    this.startInput.addEventListener('change', () => this.updateSelectedFromInputs());
+                }
+                if (this.endInput) {
+                    this.endInput.addEventListener('change', () => this.updateSelectedFromInputs());
+                }
+                
+                // Click on score to deselect
+                this.scoreTopEl.addEventListener('click', (e) => this.handleScoreClick(e));
+                this.scoreBottomEl.addEventListener('click', (e) => this.handleScoreClick(e));
+                
+                // Re-render motives on window resize (debounced)
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        this.reloadFromDatabase();
+                    }, 100);
+                });
+                
+                console.debug('MotiveMaker (simplified) initialized');
+            },
+            
+            createMotive() {
+                const startSeconds = parseFloat(this.startInput.value) || 0;
+                const endSeconds = parseFloat(this.endInput.value) || 1;
+                const gTrack = CompositionPanel.getSelectedGTrack();
+                
+                // Ignore GA selection for motives - default to track 1
+                const actualGTrack = gTrack === 'A' ? '1' : gTrack;
+                
+                // Get track dimensions
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const startActual = startSeconds + leadInSeconds;
+                const endActual = endSeconds + leadInSeconds;
+                const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                
+                const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const motiveGroup = section === 'top' ? this.topMotiveGroup : this.bottomMotiveGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                const trackDims = window.CompositionPanel ? 
+                    CompositionPanel.getTrackDimensions(actualGTrack, scoreEl) : null;
+                
+                // Calculate X positions
+                const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                const x1Pixel = (startXPercent / 100) * scoreWidth;
+                const x2Pixel = (endXPercent / 100) * scoreWidth;
+                
+                // Get selected color from shared swatches
+                const selectedSwatch = this.colorSwatches?.querySelector('.color-swatch.selected');
+                const color = selectedSwatch?.dataset.color || 'brightOrange';
+                
+                // Create motive data
+                const motiveDataObj = {
+                    startSeconds,
+                    endSeconds,
+                    gTrack: actualGTrack,
+                    color: color,
+                    section,
+                    page: startPage,
+                    x1: x1Pixel,
+                    x2: x2Pixel,
+                    trackDims
+                };
+                
+                // Add to database
+                const motive = MotiveDatabase.add(motiveDataObj);
+                
+                // Mark score as dirty
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // Render the motive
+                this.renderMotive(motive, motiveGroup, scoreEl);
+                
+                // Add to motives array
+                this.motives.push(motive);
+                
+                // Update visibility
+                this.updateVisibility();
+                
+                // Auto-select the new motive
+                this.selectMotive(motive);
+                
+                console.debug(`Motive created (ID: ${motive.id})`);
+            },
+            
+            renderMotive(motive, motiveGroup, scoreEl) {
+                const color = ColorMap[motive.color] || motive.color;
+                const trackDims = motive.trackDims;
+                
+                // Create SVG group for this motive
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('data-motive-id', motive.id);
+                group.setAttribute('class', 'motive-element');
+                
+                // Line Y position at top of track
+                const lineY = trackDims ? trackDims.y + 5 : 10;
+                
+                // Create the line
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', motive.x1);
+                line.setAttribute('y1', lineY);
+                line.setAttribute('x2', motive.x2);
+                line.setAttribute('y2', lineY);
+                line.setAttribute('stroke', color);
+                line.setAttribute('stroke-width', '3');
+                line.setAttribute('stroke-linecap', 'round');
+                line.style.cursor = 'pointer';
+                group.appendChild(line);
+                
+                // Create invisible wider hit area for easier clicking
+                const hitLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                hitLine.setAttribute('x1', motive.x1);
+                hitLine.setAttribute('y1', lineY);
+                hitLine.setAttribute('x2', motive.x2);
+                hitLine.setAttribute('y2', lineY);
+                hitLine.setAttribute('stroke', 'transparent');
+                hitLine.setAttribute('stroke-width', '15');
+                hitLine.style.cursor = 'pointer';
+                hitLine.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectMotive(motive);
+                });
+                group.appendChild(hitLine);
+                
+                // Create selection highlight (yellow glow, hidden by default)
+                const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                highlight.setAttribute('x1', motive.x1);
+                highlight.setAttribute('y1', lineY);
+                highlight.setAttribute('x2', motive.x2);
+                highlight.setAttribute('y2', lineY);
+                highlight.setAttribute('stroke', 'yellow');
+                highlight.setAttribute('stroke-width', '7');
+                highlight.setAttribute('stroke-linecap', 'round');
+                highlight.setAttribute('stroke-opacity', '0.5');
+                highlight.style.display = 'none';
+                group.insertBefore(highlight, line);
+                
+                // Store element references
+                motive.elements = { group, line, hitLine, highlight, lineY };
+                
+                motiveGroup.appendChild(group);
+            },
+            
+            selectMotive(motive) {
+                // Deselect previous
+                if (this.selectedMotive && this.selectedMotive.elements) {
+                    if (this.selectedMotive.elements.highlight) {
+                        this.selectedMotive.elements.highlight.style.display = 'none';
+                    }
+                }
+                
+                this.selectedMotive = motive;
+                
+                // Show selection highlight
+                if (motive.elements && motive.elements.highlight) {
+                    motive.elements.highlight.style.display = '';
+                }
+                
+                // Update UI
+                if (this.startInput) this.startInput.value = motive.startSeconds.toFixed(3);
+                if (this.endInput) this.endInput.value = motive.endSeconds.toFixed(3);
+                
+                // Update shared color swatch selection to match motive's color
+                if (this.colorSwatches) {
+                    this.colorSwatches.querySelectorAll('.color-swatch').forEach(s => {
+                        s.classList.remove('selected');
+                        if (s.dataset.color === motive.color) {
+                            s.classList.add('selected');
+                        }
+                    });
+                }
+            },
+            
+            deselectMotive() {
+                if (this.selectedMotive && this.selectedMotive.elements) {
+                    if (this.selectedMotive.elements.highlight) {
+                        this.selectedMotive.elements.highlight.style.display = 'none';
+                    }
+                }
+                this.selectedMotive = null;
+            },
+            
+            handleScoreClick(e) {
+                const target = e.target;
+                const motiveGroup = target.closest('.motive-element');
+                if (!motiveGroup) {
+                    this.deselectMotive();
+                }
+            },
+            
+            deleteSelectedMotive() {
+                if (!this.selectedMotive) return;
+                
+                const motive = this.selectedMotive;
+                
+                // Remove from DOM
+                if (motive.elements && motive.elements.group) {
+                    motive.elements.group.remove();
+                }
+                
+                // Remove continuation segments if they exist
+                if (motive.elements && motive.elements.continuationGroupTop) {
+                    motive.elements.continuationGroupTop.remove();
+                }
+                if (motive.elements && motive.elements.continuationGroupBottom) {
+                    motive.elements.continuationGroupBottom.remove();
+                }
+                
+                // Remove from database
+                MotiveDatabase.remove(motive.id);
+                
+                // Remove from local array
+                const index = this.motives.findIndex(m => m.id === motive.id);
+                if (index !== -1) {
+                    this.motives.splice(index, 1);
+                }
+                
+                // Mark score as dirty
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                this.deselectMotive();
+                console.debug(`Motive deleted (ID: ${motive.id})`);
+            },
+            
+            updateSelectedFromInputs() {
+                if (!this.selectedMotive) return;
+                
+                const motive = this.selectedMotive;
+                const newStart = parseFloat(this.startInput.value) || 0;
+                const newEnd = parseFloat(this.endInput.value) || 1;
+                
+                // Update motive data
+                motive.startSeconds = newStart;
+                motive.endSeconds = newEnd;
+                
+                // Recalculate positions
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const startActual = newStart + leadInSeconds;
+                const endActual = newEnd + leadInSeconds;
+                const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                
+                const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                
+                motive.x1 = (startXPercent / 100) * scoreWidth;
+                motive.x2 = (endXPercent / 100) * scoreWidth;
+                motive.page = startPage;
+                motive.section = section;
+                
+                // Update rendering
+                this.updateMotiveRendering(motive);
+                this.syncMotiveToDatabase(motive);
+                this.updateVisibility();
+            },
+            
+            updateMotiveRendering(motive) {
+                if (!motive.elements) return;
+                
+                const { line, hitLine, highlight } = motive.elements;
+                const color = ColorMap[motive.color] || motive.color;
+                const trackDims = motive.trackDims;
+                const lineY = trackDims ? trackDims.y + 5 : 10;
+                
+                // Update line positions
+                line.setAttribute('x1', motive.x1);
+                line.setAttribute('x2', motive.x2);
+                line.setAttribute('y1', lineY);
+                line.setAttribute('y2', lineY);
+                line.setAttribute('stroke', color);
+                
+                hitLine.setAttribute('x1', motive.x1);
+                hitLine.setAttribute('x2', motive.x2);
+                hitLine.setAttribute('y1', lineY);
+                hitLine.setAttribute('y2', lineY);
+                
+                highlight.setAttribute('x1', motive.x1);
+                highlight.setAttribute('x2', motive.x2);
+                highlight.setAttribute('y1', lineY);
+                highlight.setAttribute('y2', lineY);
+                
+                motive.elements.lineY = lineY;
+            },
+            
+            syncMotiveToDatabase(motive) {
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                MotiveDatabase.update(motive.id, {
+                    startSeconds: motive.startSeconds,
+                    endSeconds: motive.endSeconds,
+                    color: motive.color,
+                    x1: motive.x1,
+                    x2: motive.x2
+                });
+            },
+            
+            // Show/hide motives based on current page (supports multi-page motives)
+            updateVisibility() {
+                if (!window.GraphicTimeline) return;
+                
+                const topPage = GraphicTimeline.currentTopPage;
+                const bottomPage = GraphicTimeline.currentBottomPage;
+                const secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                const leadInSec = leadInSeconds;
+                
+                for (const motive of this.motives) {
+                    if (!motive.elements || !motive.elements.group) continue;
+                    
+                    // Calculate which pages this motive spans
+                    const startActual = motive.startSeconds + leadInSec;
+                    const endActual = motive.endSeconds + leadInSec;
+                    const motiveStartPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const motiveEndPage = Math.floor(Math.max(0, endActual) / secondsPerPage);
+                    
+                    // Check if motive overlaps with visible pages
+                    const overlapsTop = motiveStartPage <= topPage && motiveEndPage >= topPage;
+                    const overlapsBottom = motiveStartPage <= bottomPage && motiveEndPage >= bottomPage;
+                    const visible = overlapsTop || overlapsBottom;
+                    
+                    const isMultiPage = motiveEndPage > motiveStartPage;
+                    
+                    if (!isMultiPage) {
+                        // Single-page motive: simple show/hide
+                        motive.elements.group.style.display = visible ? '' : 'none';
+                        if (motive.elements.continuationGroupTop) {
+                            motive.elements.continuationGroupTop.style.display = 'none';
+                        }
+                        if (motive.elements.continuationGroupBottom) {
+                            motive.elements.continuationGroupBottom.style.display = 'none';
+                        }
+                    } else {
+                        // Multi-page motive: show segments on each visible page
+                        if (overlapsTop && topPage === motiveStartPage) {
+                            motive.elements.group.style.display = '';
+                            this.clipMotiveToPageEnd(motive, motiveStartPage, secondsPerPage, leadInSec);
+                        } else if (overlapsBottom && bottomPage === motiveStartPage) {
+                            motive.elements.group.style.display = '';
+                            this.clipMotiveToPageEnd(motive, motiveStartPage, secondsPerPage, leadInSec);
+                        } else {
+                            motive.elements.group.style.display = 'none';
+                        }
+                        
+                        // Continuation segments
+                        const showContinuationOnTop = overlapsTop && topPage > motiveStartPage && topPage <= motiveEndPage;
+                        const showContinuationOnBottom = overlapsBottom && bottomPage > motiveStartPage && bottomPage <= motiveEndPage;
+                        
+                        if (showContinuationOnTop) {
+                            this.showContinuationSegment(motive, topPage, secondsPerPage, leadInSec, 'top');
+                        } else if (motive.elements.continuationGroupTop) {
+                            motive.elements.continuationGroupTop.style.display = 'none';
+                        }
+                        
+                        if (showContinuationOnBottom) {
+                            this.showContinuationSegment(motive, bottomPage, secondsPerPage, leadInSec, 'bottom');
+                        } else if (motive.elements.continuationGroupBottom) {
+                            motive.elements.continuationGroupBottom.style.display = 'none';
+                        }
+                    }
+                }
+            },
+            
+            clipMotiveToPageEnd(motive, page, secondsPerPage, leadInSec) {
+                if (!motive.elements || !motive.elements.line) return;
+                
+                const endActual = motive.endSeconds + leadInSec;
+                const pageEndTime = (page + 1) * secondsPerPage;
+                
+                if (endActual <= pageEndTime) return; // No clipping needed
+                
+                const section = page % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                // Clip x2 to page edge
+                motive.elements.line.setAttribute('x2', scoreWidth);
+                motive.elements.hitLine.setAttribute('x2', scoreWidth);
+                motive.elements.highlight.setAttribute('x2', scoreWidth);
+            },
+            
+            showContinuationSegment(motive, page, secondsPerPage, leadInSec, sectionHint) {
+                const startActual = motive.startSeconds + leadInSec;
+                const endActual = motive.endSeconds + leadInSec;
+                const pageStartTime = page * secondsPerPage;
+                const pageEndTime = (page + 1) * secondsPerPage;
+                
+                const clippedStartActual = Math.max(startActual, pageStartTime);
+                const clippedEndActual = Math.min(endActual, pageEndTime);
+                
+                const section = sectionHint || (page % 2 === 0 ? 'top' : 'bottom');
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const targetContainer = section === 'top' ? this.topMotiveGroup : this.bottomMotiveGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                // X positions within this page
+                const startXPercent = ((clippedStartActual / secondsPerPage) - page) * 100;
+                const endXPercent = ((clippedEndActual / secondsPerPage) - page) * 100;
+                const x1Pixel = (startXPercent / 100) * scoreWidth;
+                const x2Pixel = (endXPercent / 100) * scoreWidth;
+                
+                // Get track dimensions for this section
+                let trackDims = motive.trackDims;
+                if (motive.gTrack && window.CompositionPanel) {
+                    trackDims = CompositionPanel.getTrackDimensions(motive.gTrack, scoreEl) || motive.trackDims;
+                }
+                const lineY = trackDims ? trackDims.y + 5 : 10;
+                
+                const groupKey = section === 'top' ? 'continuationGroupTop' : 'continuationGroupBottom';
+                const lineKey = section === 'top' ? 'continuationLineTop' : 'continuationLineBottom';
+                
+                if (!motive.elements[groupKey]) {
+                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.classList.add('motive-continuation');
+                    group.setAttribute('data-motive-id', motive.id);
+                    
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('stroke-width', '3');
+                    line.setAttribute('stroke-linecap', 'round');
+                    line.style.cursor = 'pointer';
+                    line.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectMotive(motive);
+                    });
+                    group.appendChild(line);
+                    
+                    motive.elements[groupKey] = group;
+                    motive.elements[lineKey] = line;
+                }
+                
+                const color = ColorMap[motive.color] || motive.color;
+                
+                motive.elements[lineKey].setAttribute('x1', x1Pixel);
+                motive.elements[lineKey].setAttribute('y1', lineY);
+                motive.elements[lineKey].setAttribute('x2', x2Pixel);
+                motive.elements[lineKey].setAttribute('y2', lineY);
+                motive.elements[lineKey].setAttribute('stroke', color);
+                
+                motive.elements[groupKey].style.display = '';
+                
+                if (motive.elements[groupKey].parentNode !== targetContainer) {
+                    targetContainer.appendChild(motive.elements[groupKey]);
+                }
+            },
+            
+            reloadFromDatabase() {
+                // Clear existing motive elements
+                if (this.topMotiveGroup) this.topMotiveGroup.innerHTML = '';
+                if (this.bottomMotiveGroup) this.bottomMotiveGroup.innerHTML = '';
+                this.motives = [];
+                this.selectedMotive = null;
+                
+                // Recreate motives from database
+                const dbMotives = MotiveDatabase.getAll();
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                
+                for (const dbMotive of dbMotives) {
+                    const motive = { ...dbMotive };
+                    
+                    // Recalculate positions
+                    const startActual = motive.startSeconds + leadInSeconds;
+                    const endActual = motive.endSeconds + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                    const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                    const motiveGroup = section === 'top' ? this.topMotiveGroup : this.bottomMotiveGroup;
+                    const scoreWidth = scoreEl.clientWidth;
+                    
+                    const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                    const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                    motive.x1 = (startXPercent / 100) * scoreWidth;
+                    motive.x2 = (endXPercent / 100) * scoreWidth;
+                    motive.section = section;
+                    motive.page = startPage;
+                    
+                    // Recalculate track dimensions
+                    if (motive.gTrack && window.CompositionPanel) {
+                        motive.trackDims = CompositionPanel.getTrackDimensions(motive.gTrack, scoreEl);
+                    }
+                    
+                    // Render
+                    this.renderMotive(motive, motiveGroup, scoreEl);
+                    this.motives.push(motive);
+                }
+                
+                console.debug(`MotiveMaker: Reloaded ${this.motives.length} motives from database`);
+                this.updateVisibility();
+            }
+        };
+        
+        // Initialize Motive Maker
+        MotiveMaker.init();
+        window.MotiveMaker = MotiveMaker;
+        
+        /* DISABLED: Full MotiveMaker - entire system commented out (code kept for future reference)
+        // ============================================
+        // MOTIVE MAKER (FULL VERSION) - creates and manages motives with badges, notation, library
+        // ============================================
+        const MotiveMakerFull = {
             scoreTopEl: null,
             scoreBottomEl: null,
             topMotiveGroup: null,
@@ -10824,8 +11464,9 @@
         MotiveMaker.init();
         window.MotiveMaker = MotiveMaker;
         
-        // Create test motives for development
-        MotiveMaker.createTestMotives();
+        // DISABLED: Test motives removed
+        // MotiveMaker.createTestMotives();
+        /* END OF DISABLED MotiveMaker */
         
         
         // Initialize Score Manager (after all other systems)
