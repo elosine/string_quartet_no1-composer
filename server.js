@@ -433,6 +433,101 @@ app.delete('/api/curve-library/delete/:name', (req, res) => {
 });
 
 // ============================================
+// MOTIVE LIBRARY SYSTEM
+// ============================================
+
+const MOTIVE_LIBRARY_DIR = path.join(__dirname, 'motive_library');
+
+// Ensure motive library directory exists
+if (!fs.existsSync(MOTIVE_LIBRARY_DIR)) {
+    fs.mkdirSync(MOTIVE_LIBRARY_DIR, { recursive: true });
+}
+
+// Save motive to library
+app.post('/api/motive-library/save', (req, res) => {
+    const { motiveData } = req.body;
+    if (!motiveData || !motiveData.name) {
+        return res.status(400).json({ success: false, error: 'Motive data with name required' });
+    }
+    
+    const filename = `${motiveData.name}.json`;
+    const filepath = path.join(MOTIVE_LIBRARY_DIR, filename);
+    
+    try {
+        motiveData.savedAt = new Date().toISOString();
+        fs.writeFileSync(filepath, JSON.stringify(motiveData, null, 2));
+        console.log(`Motive saved to library: ${filename}`);
+        res.json({ success: true, filename, name: motiveData.name });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// List all motives in library
+app.get('/api/motive-library/list', (req, res) => {
+    try {
+        const files = fs.readdirSync(MOTIVE_LIBRARY_DIR)
+            .filter(f => f.endsWith('.json'))
+            .map(f => {
+                const filepath = path.join(MOTIVE_LIBRARY_DIR, f);
+                try {
+                    const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+                    return {
+                        name: data.name,
+                        filename: f,
+                        description: data.description || '',
+                        savedAt: data.savedAt || '',
+                        gTrack: data.gTrack,
+                        duration: data.duration || (data.endSeconds - data.startSeconds)
+                    };
+                } catch {
+                    return null;
+                }
+            })
+            .filter(f => f !== null)
+            .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+        res.json({ success: true, motives: files });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Load motive from library
+app.get('/api/motive-library/load/:name', (req, res) => {
+    const filename = `${req.params.name}.json`;
+    const filepath = path.join(MOTIVE_LIBRARY_DIR, filename);
+    
+    if (!fs.existsSync(filepath)) {
+        return res.status(404).json({ success: false, error: 'Motive not found' });
+    }
+    
+    try {
+        const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+        res.json({ success: true, motiveData: data });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Delete motive from library
+app.delete('/api/motive-library/delete/:name', (req, res) => {
+    const filename = `${req.params.name}.json`;
+    const filepath = path.join(MOTIVE_LIBRARY_DIR, filename);
+    
+    if (!fs.existsSync(filepath)) {
+        return res.status(404).json({ success: false, error: 'Motive not found' });
+    }
+    
+    try {
+        fs.unlinkSync(filepath);
+        console.log(`Motive deleted from library: ${filename}`);
+        res.json({ success: true, name: req.params.name });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// ============================================
 // LILYPOND RENDERING SYSTEM
 // ============================================
 

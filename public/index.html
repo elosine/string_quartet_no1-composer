@@ -73,21 +73,56 @@
             display: flex;
             flex-direction: column;
         }
+        .score-row {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+        }
+        .static-motive-panel {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-sizing: border-box;
+        }
+        .static-motive-box {
+            background: white;
+            margin: 0;
+            padding: 0;
+            border: 1px solid black;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .static-motive-slot {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid black;
+            box-sizing: border-box;
+        }
+        .static-motive-slot img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
         #ScoreTop {
             background: white;
-            width: 100%;
             flex: 1;
-            margin-top: 5px;
-            margin-bottom: 5px;
+            margin: 5px 5px 5px 0;
             border: none;
             position: relative;
         }
         #ScoreBottom {
             background: white;
-            width: 100%;
             flex: 1;
-            margin-top: 5px;
-            margin-bottom: 5px;
+            margin: 5px 5px 5px 0;
             border: none;
             position: relative;
         }
@@ -836,6 +871,80 @@
                 </div>
                 
                 <div class="section-divider"></div>
+                <div class="section-label">Motive Maker</div>
+                
+                <div class="curve-input-row">
+                    <label>Name</label>
+                    <input type="text" id="motiveNameDisplay" class="curve-input" value="" readonly style="background: rgba(40,40,50,0.8); color: #aaa;">
+                </div>
+                <div class="curve-input-row">
+                    <label>Start</label>
+                    <input type="text" id="motiveStartInput" class="curve-input" value="0.000">
+                </div>
+                <div class="curve-input-row">
+                    <label>End</label>
+                    <input type="text" id="motiveEndInput" class="curve-input" value="1.000">
+                </div>
+                
+                <div class="curve-input-row" style="margin-top: 8px;">
+                    <label style="font-size: 10px;">Badge</label>
+                    <button id="motiveBadgeUploadBtn" class="curve-draw-btn" style="font-size: 9px; padding: 2px 6px; margin-left: 5px; background: #2d5a4a; border-color: #3d6a5a;">Upload</button>
+                    <button id="motiveBadgeClearBtn" class="curve-draw-btn" style="font-size: 9px; padding: 2px 6px; margin-left: 2px; background: #2d5a4a; border-color: #3d6a5a;">Clear</button>
+                    <input type="file" id="motiveBadgeFileInput" class="file-input-hidden" accept=".svg,.png,.jpg,.jpeg" style="display: none;">
+                </div>
+                <div id="motiveBadgePreview" style="width: 100%; height: 30px; background: rgba(30,30,40,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <span style="font-size: 9px; color: #666;">No badge</span>
+                </div>
+                
+                <div class="curve-input-row" style="margin-top: 8px;">
+                    <label style="font-size: 10px;">Notation</label>
+                    <button id="motiveNotationUploadBtn" class="curve-draw-btn" style="font-size: 9px; padding: 2px 6px; margin-left: 5px; background: #2d5a4a; border-color: #3d6a5a;">Upload</button>
+                    <button id="motiveNotationClearBtn" class="curve-draw-btn" style="font-size: 9px; padding: 2px 6px; margin-left: 2px; background: #2d5a4a; border-color: #3d6a5a;">Clear</button>
+                    <input type="file" id="motiveNotationFileInput" class="file-input-hidden" accept=".svg,.png,.jpg,.jpeg" style="display: none;">
+                </div>
+                <div id="motiveNotationPreview" style="width: 100%; height: 40px; background: #ffffff; border: 1px solid #444; border-radius: 3px; margin-top: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <span style="font-size: 9px; color: #666;">No notation</span>
+                </div>
+                
+                <button id="motiveDrawBtn" class="curve-draw-btn" style="background: #2d5a4a; border-color: #3d6a5a;">Draw</button>
+                <button id="motiveDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: #2d5a4a; border-color: #3d6a5a;">Delete</button>
+                <button id="motiveSaveBtn" class="curve-draw-btn" style="margin-top: 5px; background: #2d5a4a; border-color: #3d6a5a;">Save</button>
+                
+                <div class="curve-input-row" style="margin-top: 8px;">
+                    <label style="font-size: 10px;">Description</label>
+                </div>
+                <textarea id="motiveDescriptionInput" class="curve-input" style="width: 100%; height: 40px; resize: vertical; font-size: 10px;" placeholder="Motive description..."></textarea>
+                
+                <div class="curve-input-row" style="margin-top: 8px;">
+                    <label style="font-size: 10px;">Recall Motive</label>
+                </div>
+                <div id="motiveRecallDropdown" class="custom-dropdown" style="width: 100%; position: relative;">
+                    <div id="motiveRecallSelected" class="custom-dropdown-selected" style="font-size: 10px; padding: 4px 6px; background: rgba(40,40,50,0.9); border: 1px solid #555; border-radius: 3px; cursor: pointer; min-height: 20px;">
+                        -- Select Saved Motive --
+                    </div>
+                    <div id="motiveRecallOptions" class="custom-dropdown-options" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: rgba(30,30,40,0.98); border: 1px solid #555; border-top: none; border-radius: 0 0 3px 3px; z-index: 1000;">
+                    </div>
+                </div>
+                <input type="hidden" id="motiveRecallSelect" value="">
+                <button id="motiveInsertBtn" class="curve-draw-btn" style="margin-top: 5px; background: #2d5a4a; border-color: #3d6a5a;">Insert at Edit Line</button>
+                
+                <div class="section-label" style="margin-top: 10px;">Motive Color</div>
+                <div class="color-swatches" id="motiveColorSwatches">
+                    <div class="motive-color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="mustard" style="background: var(--clr-mustard); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="brightRed" style="background: var(--clr-brightRed); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="green" style="background: var(--clr-green); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="limeGreen" style="background: var(--clr-limeGreen); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="plum" style="background: var(--clr-plum); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="lavander" style="background: var(--clr-lavander); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch" data-color="yellow" style="background: var(--clr-yellow); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="motive-color-swatch selected" data-color="neonMagenta" style="background: var(--clr-neonMagenta); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px; outline: 2px solid white;"></div>
+                </div>
+                
+                <div class="section-divider"></div>
                 <div class="section-label">SVG Elements</div>
                 
                 <div class="control-row">
@@ -939,6 +1048,7 @@
                     <button id="connectorDeleteBtn" class="control-btn" style="font-size: 10px; background: var(--clr-darkRed);">Delete</button>
                 </div>
             </div>
+            
         </div>
         <div id="compositionPanelToggle">◀ Composition</div>
     </div>
@@ -1103,8 +1213,48 @@
     </div>
     
     <div id="ScoreContainer">
-        <svg id="ScoreTop"></svg>
-        <svg id="ScoreBottom"></svg>
+        <div class="score-row">
+            <div class="static-motive-panel" data-section="top">
+                <div class="static-motive-box" data-track="1">
+                    <div class="static-motive-slot" data-slot="top"></div>
+                    <div class="static-motive-slot" data-slot="bottom"></div>
+                </div>
+                <div class="static-motive-box" data-track="2">
+                    <div class="static-motive-slot" data-slot="top"></div>
+                    <div class="static-motive-slot" data-slot="bottom"></div>
+                </div>
+                <div class="static-motive-box" data-track="3">
+                    <div class="static-motive-slot" data-slot="top"></div>
+                    <div class="static-motive-slot" data-slot="bottom"></div>
+                </div>
+                <div class="static-motive-box" data-track="4">
+                    <div class="static-motive-slot" data-slot="top"></div>
+                    <div class="static-motive-slot" data-slot="bottom"></div>
+                </div>
+            </div>
+            <svg id="ScoreTop"></svg>
+        </div>
+        <div class="score-row">
+            <div class="static-motive-panel" data-section="bottom">
+                <div class="static-motive-box" data-track="1">
+                    <div class="static-motive-slot" data-slot="top"></div>
+                    <div class="static-motive-slot" data-slot="bottom"></div>
+                </div>
+                <div class="static-motive-box" data-track="2">
+                    <div class="static-motive-slot" data-slot="top"></div>
+                    <div class="static-motive-slot" data-slot="bottom"></div>
+                </div>
+                <div class="static-motive-box" data-track="3">
+                    <div class="static-motive-slot" data-slot="top"></div>
+                    <div class="static-motive-slot" data-slot="bottom"></div>
+                </div>
+                <div class="static-motive-box" data-track="4">
+                    <div class="static-motive-slot" data-slot="top"></div>
+                    <div class="static-motive-slot" data-slot="bottom"></div>
+                </div>
+            </div>
+            <svg id="ScoreBottom"></svg>
+        </div>
     </div>
     
     
@@ -2883,7 +3033,11 @@
                 window.addEventListener('resize', () => {
                     this.updateCursorDimensions();
                     this.updateStaffHeaders();
+                    this.updateMotiveContainerWidths();
                 });
+                
+                // Initial motive container sizing
+                this.updateMotiveContainerWidths();
                 
                 // Log initial dimensions
                 this.updateCursorDimensions();
@@ -3081,11 +3235,78 @@
                     follower.style.display = 'none';
                 });
                 
-                // Add to SVG elements (outline first, then fill on top)
+                // Create motive dial groups (square with pie/dial animation)
+                // The dial is a square matching staffHeight x staffHeight, positioned left of curve follower
+                const createMotiveDialGroup = (isCountdown = false) => {
+                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.style.display = 'none';
+                    
+                    // Square border (black, inset) - size set dynamically in updateMotiveFollower
+                    const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    border.setAttribute('fill', 'none');
+                    border.setAttribute('stroke', 'black');
+                    border.setAttribute('stroke-width', '1');
+                    group.appendChild(border);
+                    
+                    // Pie arc (decreasing fill)
+                    const arc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    // Countdown dial is always yellow, main dial uses motive color
+                    arc.setAttribute('fill', isCountdown ? 'yellow' : this.colors[staffIndex]);
+                    arc.setAttribute('opacity', '0.25'); // 25% opacity for both dials
+                    group.appendChild(arc);
+                    
+                    // Clock hand/wand (black, 2px, 25% opacity)
+                    const hand = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    hand.setAttribute('stroke', 'black');
+                    hand.setAttribute('stroke-width', '2');
+                    hand.setAttribute('stroke-linecap', 'round');
+                    hand.setAttribute('opacity', '0.25');
+                    group.appendChild(hand);
+                    
+                    return { group, border, arc, hand, isCountdown };
+                };
+                
+                // Main dial (shows progress during motive)
+                const motiveDialTop = createMotiveDialGroup(false);
+                const motiveDialBottom = createMotiveDialGroup(false);
+                
+                // Countdown dial (yellow, appears 3 seconds before motive)
+                const countdownDialTop = createMotiveDialGroup(true);
+                const countdownDialBottom = createMotiveDialGroup(true);
+                
+                // Create motive notation display (SVG image that appears under dials)
+                const createNotationDisplay = () => {
+                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.style.display = 'none';
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                    group.appendChild(image);
+                    
+                    return { group, image };
+                };
+                
+                // Scroll Window 1: Upcoming motive notation (under countdown dial)
+                const upcomingNotationTop = createNotationDisplay();
+                const upcomingNotationBottom = createNotationDisplay();
+                
+                // Scroll Window 2: Active motive notation (under main dial)
+                const activeNotationTop = createNotationDisplay();
+                const activeNotationBottom = createNotationDisplay();
+                
+                // Add to SVG elements
                 this.scoreTopEl.appendChild(meterOutlineTop);
                 this.scoreBottomEl.appendChild(meterOutlineBottom);
                 this.scoreTopEl.appendChild(cursorTop);
                 this.scoreBottomEl.appendChild(cursorBottom);
+                this.scoreTopEl.appendChild(countdownDialTop.group);
+                this.scoreBottomEl.appendChild(countdownDialBottom.group);
+                this.scoreTopEl.appendChild(motiveDialTop.group);
+                this.scoreBottomEl.appendChild(motiveDialBottom.group);
+                this.scoreTopEl.appendChild(upcomingNotationTop.group);
+                this.scoreBottomEl.appendChild(upcomingNotationBottom.group);
+                this.scoreTopEl.appendChild(activeNotationTop.group);
+                this.scoreBottomEl.appendChild(activeNotationBottom.group);
                 this.scoreTopEl.appendChild(curveFollowerTop);
                 this.scoreBottomEl.appendChild(curveFollowerBottom);
                 
@@ -3097,9 +3318,20 @@
                     curveFollowerBottom: curveFollowerBottom,
                     meterOutlineTop: meterOutlineTop,
                     meterOutlineBottom: meterOutlineBottom,
+                    motiveDialTop: motiveDialTop,
+                    motiveDialBottom: motiveDialBottom,
+                    countdownDialTop: countdownDialTop,
+                    countdownDialBottom: countdownDialBottom,
+                    // Scroll Window 1: upcoming motive notation (under countdown dial)
+                    upcomingNotationTop: upcomingNotationTop,
+                    upcomingNotationBottom: upcomingNotationBottom,
+                    // Scroll Window 2: active motive notation (under main dial)
+                    activeNotationTop: activeNotationTop,
+                    activeNotationBottom: activeNotationBottom,
                     currentSection: 'top',  // 'top' or 'bottom'
                     xPosition: 0,           // Current x position in pixels
-                    currentCurveValue: null // Current normalized Y value from curve
+                    currentCurveValue: null, // Current normalized Y value from curve
+                    currentMotiveProgress: null // Current normalized progress through motive
                 };
             },
             
@@ -3110,7 +3342,7 @@
                 const availableHeight = scoreHeight - this.timelineHeight;
                 const staffHeight = availableHeight / 4;
                 
-                console.log(`ScoreTop dimensions: ${scoreWidth}px x ${scoreHeight}px, Staff cursor height: ${staffHeight.toFixed(1)}px`);
+                // console.log(`ScoreTop dimensions: ${scoreWidth}px x ${scoreHeight}px, Staff cursor height: ${staffHeight.toFixed(1)}px`);
                 
                 this.cursors.forEach((cursor, staffIndex) => {
                     const yPosition = this.timelineHeight + (staffIndex * staffHeight);
@@ -3127,6 +3359,7 @@
                         el.setAttribute('y', yPosition);
                         el.setAttribute('height', staffHeight);
                     });
+                    // Motive dials don't need resize - they use fixed size and are positioned dynamically
                 });
                 
                 // Also update staff dividers on resize
@@ -3311,6 +3544,131 @@
                 });
             },
             
+            // Update static motive panel and box dimensions to match scrolling windows
+            updateMotiveContainerWidths() {
+                const scoreHeight = this.scoreTopEl?.clientHeight || 0;
+                if (!scoreHeight) return;
+                
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const staffHeight = availableHeight / 4;
+                const halfHeight = staffHeight / 2; // Same as scrolling motive window height
+                
+                // Update all static motive panels - width matches halfHeight, use relative positioning
+                // Account for ScoreTop/Bottom margin (5px top, 5px bottom)
+                const panels = document.querySelectorAll('.static-motive-panel');
+                panels.forEach(panel => {
+                    panel.style.width = `${halfHeight}px`;
+                    panel.style.height = `${scoreHeight}px`;
+                    panel.style.position = 'relative';
+                    panel.style.marginTop = '5px'; // Match ScoreTop/Bottom top margin
+                    panel.style.marginBottom = '5px'; // Match ScoreTop/Bottom bottom margin
+                });
+                
+                // Position 4th box (track 4) so its BOTTOM aligns with panel bottom (which = ScoreTop bottom)
+                // For track 4: bottom of box should be at scoreHeight
+                // So top of box = scoreHeight - staffHeight
+                const boxes = document.querySelectorAll('.static-motive-box');
+                boxes.forEach(box => {
+                    const track = parseInt(box.dataset.track);
+                    // Calculate from bottom: track 4 bottom = scoreHeight, track 4 top = scoreHeight - staffHeight
+                    const yPosition = scoreHeight - ((5 - track) * staffHeight);
+                    
+                    box.style.position = 'absolute';
+                    box.style.top = `${yPosition}px`;
+                    box.style.left = '0';
+                    box.style.height = `${staffHeight}px`;
+                    box.style.width = `${halfHeight}px`;
+                });
+            },
+            
+            // Update static motive windows with upcoming motive notation
+            // Each section (top/bottom) looks ahead from its own page start time
+            updateStaticMotiveWindows(currentScoreTimeMs, totalPagesTraveled) {
+                if (!window.MotiveMaker) return;
+                
+                // Get page numbers from GraphicTimeline if available
+                let topPageNumber = 0;
+                let bottomPageNumber = 1;
+                
+                if (window.GraphicTimeline) {
+                    topPageNumber = GraphicTimeline.currentTopPage || 0;
+                    bottomPageNumber = GraphicTimeline.currentBottomPage || 1;
+                } else {
+                    // Fallback calculation
+                    topPageNumber = Math.floor(totalPagesTraveled / 2) * 2;
+                    bottomPageNumber = topPageNumber + 1;
+                }
+                
+                // Calculate page start times using GraphicTimeline's method or fallback
+                const secondsPerPage = window.GraphicTimeline ? 
+                    GraphicTimeline.getSecondsPerPage() : 
+                    (60 / beatsPerMinute) * beatsPerPage;
+                
+                // Page start time = page number * secondsPerPage, minus lead-in for timeline position
+                const topPageStartTime = (topPageNumber * secondsPerPage) - leadInSeconds;
+                const bottomPageStartTime = (bottomPageNumber * secondsPerPage) - leadInSeconds;
+                
+                // Update each track's static windows
+                for (let track = 1; track <= 4; track++) {
+                    const gTrack = String(track);
+                    
+                    // Update top section windows (look ahead from top page start)
+                    const topPanel = document.querySelector(`.static-motive-panel[data-section="top"]`);
+                    const topBox = topPanel?.querySelector(`.static-motive-box[data-track="${track}"]`);
+                    if (topBox) {
+                        const topMotives = MotiveMaker.getNextTwoMotives(gTrack, topPageStartTime);
+                        this.updateStaticWindowContent(topBox, topMotives);
+                    }
+                    
+                    // Update bottom section windows (look ahead from bottom page start)
+                    const bottomPanel = document.querySelector(`.static-motive-panel[data-section="bottom"]`);
+                    const bottomBox = bottomPanel?.querySelector(`.static-motive-box[data-track="${track}"]`);
+                    if (bottomBox) {
+                        const bottomMotives = MotiveMaker.getNextTwoMotives(gTrack, bottomPageStartTime);
+                        this.updateStaticWindowContent(bottomBox, bottomMotives);
+                    }
+                }
+            },
+            
+            // Update the content of static motive slots in a box
+            // Top slot: current/active motive, Bottom slot: upcoming motive
+            updateStaticWindowContent(box, motives) {
+                const topSlot = box.querySelector('.static-motive-slot[data-slot="top"]');
+                const bottomSlot = box.querySelector('.static-motive-slot[data-slot="bottom"]');
+                
+                if (!topSlot || !bottomSlot) return;
+                
+                // Top slot: current/next motive (window2Motive)
+                if (motives.window2Motive && motives.window2Motive.notationSrc) {
+                    let img = topSlot.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        topSlot.appendChild(img);
+                    }
+                    if (img.src !== motives.window2Motive.notationSrc) {
+                        img.src = motives.window2Motive.notationSrc;
+                    }
+                } else {
+                    const img = topSlot.querySelector('img');
+                    if (img) img.remove();
+                }
+                
+                // Bottom slot: next-after-that motive (window1Motive)
+                if (motives.window1Motive && motives.window1Motive.notationSrc) {
+                    let img = bottomSlot.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        bottomSlot.appendChild(img);
+                    }
+                    if (img.src !== motives.window1Motive.notationSrc) {
+                        img.src = motives.window1Motive.notationSrc;
+                    }
+                } else {
+                    const img = bottomSlot.querySelector('img');
+                    if (img) img.remove();
+                }
+            },
+            
             update() {
                 // Get current score time (not clock time)
                 const currentScoreTimeMs = ScoreTime.now();
@@ -3318,6 +3676,9 @@
                 // Calculate total pages traveled using tempo history and score time
                 // 1 page = 100% of one ScoreTop or ScoreBottom width
                 const totalPagesTraveled = this.calculateTotalPages(currentScoreTimeMs);
+                
+                // Update static motive windows (they look ahead from each page's start time)
+                this.updateStaticMotiveWindows(currentScoreTimeMs, totalPagesTraveled);
                 
                 // Total cycle is 2 pages (top + bottom)
                 // Position within cycle: 0-1 = top, 1-2 = bottom
@@ -3359,7 +3720,221 @@
                     
                     // Update curve follower for this track
                     this.updateCurveFollower(cursor, staffIndex, xPixel, xPercent, currentSection, currentDisplayTimeSec);
+                    
+                    // Update motive follower for this track
+                    this.updateMotiveFollower(cursor, staffIndex, xPixel, xPercent, currentSection, currentDisplayTimeSec);
                 });
+            },
+            
+            // Update motive dials based on motive intersection
+            // Main dial: shows progress through the motive (empties as motive progresses)
+            // Countdown dial: appears 3 seconds before motive, empties as countdown progresses
+            updateMotiveFollower(cursor, staffIndex, xPixel, xPercent, section, currentTimeSec) {
+                const mainDial = section === 'top' ? cursor.motiveDialTop : cursor.motiveDialBottom;
+                const otherMainDial = section === 'top' ? cursor.motiveDialBottom : cursor.motiveDialTop;
+                const countdownDial = section === 'top' ? cursor.countdownDialTop : cursor.countdownDialBottom;
+                const otherCountdownDial = section === 'top' ? cursor.countdownDialBottom : cursor.countdownDialTop;
+                
+                if (!mainDial || !mainDial.group) return;
+                if (!countdownDial || !countdownDial.group) return;
+                
+                // Hide on inactive section
+                if (otherMainDial && otherMainDial.group) otherMainDial.group.style.display = 'none';
+                if (otherCountdownDial && otherCountdownDial.group) otherCountdownDial.group.style.display = 'none';
+                
+                // Get gTrack for this staff
+                const gTrack = String(staffIndex + 1);
+                
+                // Get track dimensions for positioning
+                const scoreHeight = this.scoreTopEl.clientHeight;
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const staffHeight = availableHeight / 4;
+                const yPosition = this.timelineHeight + (staffIndex * staffHeight);
+                
+                // Dial is half height (stacked vertically)
+                const dialSize = staffHeight; // Full staff height for width calculations
+                const halfHeight = staffHeight / 2; // Half height for each dial
+                const dialRadius = (halfHeight / 2) - 1; // Radius based on half height
+                const cx = halfHeight / 2; // Center X within half-height square
+                const cy = halfHeight / 2; // Center Y within half-height square
+                
+                // Check if MotiveMaker exists
+                if (!window.MotiveMaker) {
+                    mainDial.group.style.display = 'none';
+                    countdownDial.group.style.display = 'none';
+                    cursor.currentMotiveProgress = null;
+                    return;
+                }
+                
+                // Check for active motive (cursor is within motive time range)
+                const motiveInfo = MotiveMaker.getMotiveProgressAtTime(gTrack, currentTimeSec);
+                
+                // Check for upcoming motive (within 3 seconds) - for countdown dial animation
+                const upcomingInfo = MotiveMaker.getUpcomingMotiveAtTime(gTrack, currentTimeSec, 3);
+                
+                // Get next upcoming motive (regardless of time) - for Scroll Window 1 notation
+                const nextMotiveInfo = MotiveMaker.getNextUpcomingMotive(gTrack, currentTimeSec);
+                
+                // === COUNTDOWN DIAL (yellow, 3 seconds before motive) - BOTTOM of stack ===
+                if (upcomingInfo && !motiveInfo) {
+                    // Show countdown dial
+                    countdownDial.group.style.display = 'block';
+                    
+                    // Update border size (half height square)
+                    countdownDial.border.setAttribute('width', halfHeight);
+                    countdownDial.border.setAttribute('height', halfHeight);
+                    
+                    // Position countdown dial at bottom of stack, overlaying notation window
+                    const cursorX = (xPercent / 100) * this.scoreTopEl.clientWidth;
+                    const idealCountdownX = cursorX - dialSize - 4; // Same X as notation windows
+                    const countdownX = Math.max(0, idealCountdownX) + (dialSize - halfHeight) / 2; // Center within window width
+                    const countdownY = yPosition + halfHeight; // Bottom half of track
+                    countdownDial.group.setAttribute('transform', `translate(${countdownX}, ${countdownY})`);
+                    
+                    // Calculate countdown progress (0 = 3 seconds before, 1 = motive starts)
+                    const countdownProgress = upcomingInfo.countdownProgress;
+                    
+                    // Countdown empties as it progresses (starts full, ends empty)
+                    const remainingAngle = (1 - countdownProgress) * 360;
+                    const angleDegrees = countdownProgress * 360;
+                    const angleRadians = (angleDegrees - 90) * (Math.PI / 180);
+                    const startAngle = angleDegrees - 90;
+                    const endAngle = 360 - 90;
+                    
+                    // Create arc path for remaining pie slice
+                    if (remainingAngle > 0 && remainingAngle < 360) {
+                        const startRad = startAngle * (Math.PI / 180);
+                        const endRad = endAngle * (Math.PI / 180);
+                        const x1 = cx + dialRadius * Math.cos(startRad);
+                        const y1 = cy + dialRadius * Math.sin(startRad);
+                        const x2 = cx + dialRadius * Math.cos(endRad);
+                        const y2 = cy + dialRadius * Math.sin(endRad);
+                        const largeArc = remainingAngle > 180 ? 1 : 0;
+                        countdownDial.arc.setAttribute('d', `M ${cx} ${cy} L ${x1} ${y1} A ${dialRadius} ${dialRadius} 0 ${largeArc} 1 ${x2} ${y2} Z`);
+                    } else if (remainingAngle >= 360) {
+                        countdownDial.arc.setAttribute('d', `M ${cx} ${cy} m -${dialRadius} 0 a ${dialRadius} ${dialRadius} 0 1 0 ${dialRadius * 2} 0 a ${dialRadius} ${dialRadius} 0 1 0 -${dialRadius * 2} 0`);
+                    } else {
+                        countdownDial.arc.setAttribute('d', '');
+                    }
+                    
+                    // Update clock hand
+                    const handEndX = cx + dialRadius * Math.cos(angleRadians);
+                    const handEndY = cy + dialRadius * Math.sin(angleRadians);
+                    countdownDial.hand.setAttribute('x1', cx);
+                    countdownDial.hand.setAttribute('y1', cy);
+                    countdownDial.hand.setAttribute('x2', handEndX);
+                    countdownDial.hand.setAttribute('y2', handEndY);
+                } else {
+                    countdownDial.group.style.display = 'none';
+                }
+                
+                // === MAIN DIAL (motive color, during motive) - TOP of stack ===
+                if (motiveInfo) {
+                    mainDial.group.style.display = 'block';
+                    
+                    // Update border size (half height square)
+                    mainDial.border.setAttribute('width', halfHeight);
+                    mainDial.border.setAttribute('height', halfHeight);
+                    
+                    // Position main dial at top of stack, overlaying notation window
+                    const cursorX = (xPercent / 100) * this.scoreTopEl.clientWidth;
+                    const idealDialX = cursorX - dialSize - 4; // Same X as notation windows
+                    const dialX = Math.max(0, idealDialX) + (dialSize - halfHeight) / 2; // Center within window width
+                    const dialY = yPosition; // Top of track
+                    mainDial.group.setAttribute('transform', `translate(${dialX}, ${dialY})`);
+                    
+                    // Get motive color
+                    const motiveColor = motiveInfo.color ? (ColorMap[motiveInfo.color] || motiveInfo.color) : this.colors[staffIndex];
+                    
+                    // Calculate progress (0 = start, 1 = end)
+                    const progress = motiveInfo.progress;
+                    const angleDegrees = progress * 360;
+                    const angleRadians = (angleDegrees - 90) * (Math.PI / 180);
+                    const remainingAngle = (1 - progress) * 360;
+                    const startAngle = angleDegrees - 90;
+                    const endAngle = 360 - 90;
+                    
+                    // Create arc path for remaining pie slice
+                    if (remainingAngle > 0 && remainingAngle < 360) {
+                        const startRad = startAngle * (Math.PI / 180);
+                        const endRad = endAngle * (Math.PI / 180);
+                        const x1 = cx + dialRadius * Math.cos(startRad);
+                        const y1 = cy + dialRadius * Math.sin(startRad);
+                        const x2 = cx + dialRadius * Math.cos(endRad);
+                        const y2 = cy + dialRadius * Math.sin(endRad);
+                        const largeArc = remainingAngle > 180 ? 1 : 0;
+                        mainDial.arc.setAttribute('d', `M ${cx} ${cy} L ${x1} ${y1} A ${dialRadius} ${dialRadius} 0 ${largeArc} 1 ${x2} ${y2} Z`);
+                        mainDial.arc.setAttribute('fill', motiveColor);
+                    } else if (remainingAngle >= 360) {
+                        mainDial.arc.setAttribute('d', `M ${cx} ${cy} m -${dialRadius} 0 a ${dialRadius} ${dialRadius} 0 1 0 ${dialRadius * 2} 0 a ${dialRadius} ${dialRadius} 0 1 0 -${dialRadius * 2} 0`);
+                        mainDial.arc.setAttribute('fill', motiveColor);
+                    } else {
+                        mainDial.arc.setAttribute('d', '');
+                    }
+                    
+                    // Update clock hand
+                    const handEndX = cx + dialRadius * Math.cos(angleRadians);
+                    const handEndY = cy + dialRadius * Math.sin(angleRadians);
+                    mainDial.hand.setAttribute('x1', cx);
+                    mainDial.hand.setAttribute('y1', cy);
+                    mainDial.hand.setAttribute('x2', handEndX);
+                    mainDial.hand.setAttribute('y2', handEndY);
+                    
+                    cursor.currentMotiveProgress = progress;
+                } else {
+                    mainDial.group.style.display = 'none';
+                    cursor.currentMotiveProgress = null;
+                }
+                
+                // === SCROLL WINDOWS: Stacked vertically, half height each, just left of cursor ===
+                const upcomingNotation = section === 'top' ? cursor.upcomingNotationTop : cursor.upcomingNotationBottom;
+                const otherUpcomingNotation = section === 'top' ? cursor.upcomingNotationBottom : cursor.upcomingNotationTop;
+                const activeNotation = section === 'top' ? cursor.activeNotationTop : cursor.activeNotationBottom;
+                const otherActiveNotation = section === 'top' ? cursor.activeNotationBottom : cursor.activeNotationTop;
+                
+                // Hide on inactive section
+                if (otherUpcomingNotation && otherUpcomingNotation.group) {
+                    otherUpcomingNotation.group.style.display = 'none';
+                }
+                if (otherActiveNotation && otherActiveNotation.group) {
+                    otherActiveNotation.group.style.display = 'none';
+                }
+                
+                // Calculate stacked window dimensions (reuse halfHeight and dialSize from above)
+                const cursorX = (xPercent / 100) * this.scoreTopEl.clientWidth;
+                const windowWidth = dialSize; // Same width as staff height (square when stacked)
+                const idealWindowX = cursorX - windowWidth - 4; // Just left of cursor with small gap
+                const windowX = Math.max(0, idealWindowX);
+                
+                // SCROLL WINDOW 2: Active/current notation (TOP of stack)
+                if (activeNotation && activeNotation.group) {
+                    if (motiveInfo && motiveInfo.notationSrc) {
+                        activeNotation.group.style.display = 'block';
+                        const windowY = yPosition; // Top of track
+                        
+                        activeNotation.group.setAttribute('transform', `translate(${windowX}, ${windowY})`);
+                        activeNotation.image.setAttribute('href', motiveInfo.notationSrc);
+                        activeNotation.image.setAttribute('width', windowWidth);
+                        activeNotation.image.setAttribute('height', halfHeight);
+                    } else {
+                        activeNotation.group.style.display = 'none';
+                    }
+                }
+                
+                // SCROLL WINDOW 1: Upcoming notation (BOTTOM of stack)
+                if (upcomingNotation && upcomingNotation.group) {
+                    if (nextMotiveInfo && !motiveInfo && nextMotiveInfo.notationSrc) {
+                        upcomingNotation.group.style.display = 'block';
+                        const windowY = yPosition + halfHeight; // Bottom half of track
+                        
+                        upcomingNotation.group.setAttribute('transform', `translate(${windowX}, ${windowY})`);
+                        upcomingNotation.image.setAttribute('href', nextMotiveInfo.notationSrc);
+                        upcomingNotation.image.setAttribute('width', windowWidth);
+                        upcomingNotation.image.setAttribute('height', halfHeight);
+                    } else {
+                        upcomingNotation.group.style.display = 'none';
+                    }
+                }
             },
             
             // Update curve follower rectangle based on curve intersection
@@ -4177,10 +4752,11 @@
                 }
             },
             
-            // Update visibility of all graphic objects (SVGs, curves, connectors)
+            // Update visibility of all graphic objects (SVGs, curves, connectors, motives)
             updateGraphicObjectsVisibility() {
                 if (window.SVGElementManager) SVGElementManager.updateVisibility();
                 if (window.CurveMaker) CurveMaker.updateVisibility();
+                if (window.MotiveMaker) MotiveMaker.updateVisibility();
                 if (window.FlowchartConnector) FlowchartConnector.updateVisibility();
                 if (window.MidiController) MidiController.updateMidiDisplayVisibility();
                 
@@ -5640,6 +6216,62 @@
         };
         window.CurveDatabase = CurveDatabase;
         
+        // Motive Database - stores all motives with their attributes
+        const MotiveDatabase = {
+            motives: [],
+            nextId: 1,
+            
+            add(motiveData) {
+                const motive = {
+                    id: this.nextId++,
+                    ...motiveData,
+                    createdAt: Date.now()
+                };
+                this.motives.push(motive);
+                return motive;
+            },
+            
+            get(id) {
+                return this.motives.find(m => m.id === id);
+            },
+            
+            update(id, updates) {
+                const motive = this.get(id);
+                if (motive) {
+                    Object.assign(motive, updates);
+                }
+                return motive;
+            },
+            
+            remove(id) {
+                const index = this.motives.findIndex(m => m.id === id);
+                if (index !== -1) {
+                    this.motives.splice(index, 1);
+                    return true;
+                }
+                return false;
+            },
+            
+            getAll() {
+                return this.motives;
+            },
+            
+            exportData() {
+                return {
+                    motives: this.motives,
+                    nextId: this.nextId
+                };
+            },
+            
+            importData(data) {
+                if (data && data.motives) {
+                    this.motives = data.motives;
+                    this.nextId = data.nextId || (this.motives.length > 0 ? Math.max(...this.motives.map(m => m.id)) + 1 : 1);
+                }
+            }
+        };
+        window.MotiveDatabase = MotiveDatabase;
+        
         // ============================================
         // SCORE MANAGER - Client-side persistence
         // ============================================
@@ -5794,6 +6426,18 @@
                         // Re-render curves if CurveMaker exists
                         if (window.CurveMaker) {
                             CurveMaker.reloadFromDatabase();
+                        }
+                    }
+                );
+                
+                // MotiveDatabase
+                this.registerSource('databases.motives',
+                    () => MotiveDatabase.exportData(),
+                    (data) => {
+                        MotiveDatabase.importData(data);
+                        // Re-render motives if MotiveMaker exists
+                        if (window.MotiveMaker) {
+                            MotiveMaker.reloadFromDatabase();
                         }
                     }
                 );
@@ -8783,6 +9427,1405 @@
         // Initialize Curve Maker
         CurveMaker.init();
         window.CurveMaker = CurveMaker;
+        
+        
+        // ============================================
+        // MOTIVE MAKER - creates and manages motives (straight lines at top of tracks)
+        // ============================================
+        const MotiveMaker = {
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            topMotiveGroup: null,
+            bottomMotiveGroup: null,
+            
+            // Rendered motives with elements
+            motives: [],
+            
+            // UI elements
+            nameDisplay: null,
+            startInput: null,
+            endInput: null,
+            drawBtn: null,
+            deleteBtn: null,
+            saveBtn: null,
+            descriptionInput: null,
+            recallDropdown: null,
+            recallSelected: null,
+            recallOptions: null,
+            recallSelect: null,
+            insertBtn: null,
+            colorSwatches: null,
+            
+            // Badge upload elements
+            badgeUploadBtn: null,
+            badgeClearBtn: null,
+            badgeFileInput: null,
+            badgePreview: null,
+            currentBadgeData: null, // Base64 data URL for current badge
+            
+            // Notation upload elements
+            notationUploadBtn: null,
+            notationClearBtn: null,
+            notationFileInput: null,
+            notationPreview: null,
+            currentNotationData: null, // Base64 data URL for current notation
+            
+            // Selected motive
+            selectedMotive: null,
+            selectedColor: 'neonMagenta',
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                // Get UI elements
+                this.nameDisplay = document.getElementById('motiveNameDisplay');
+                this.startInput = document.getElementById('motiveStartInput');
+                this.endInput = document.getElementById('motiveEndInput');
+                this.drawBtn = document.getElementById('motiveDrawBtn');
+                this.deleteBtn = document.getElementById('motiveDeleteBtn');
+                this.saveBtn = document.getElementById('motiveSaveBtn');
+                this.descriptionInput = document.getElementById('motiveDescriptionInput');
+                this.recallDropdown = document.getElementById('motiveRecallDropdown');
+                this.recallSelected = document.getElementById('motiveRecallSelected');
+                this.recallOptions = document.getElementById('motiveRecallOptions');
+                this.recallSelect = document.getElementById('motiveRecallSelect');
+                this.insertBtn = document.getElementById('motiveInsertBtn');
+                this.colorSwatches = document.getElementById('motiveColorSwatches');
+                
+                // Badge upload elements
+                this.badgeUploadBtn = document.getElementById('motiveBadgeUploadBtn');
+                this.badgeClearBtn = document.getElementById('motiveBadgeClearBtn');
+                this.badgeFileInput = document.getElementById('motiveBadgeFileInput');
+                this.badgePreview = document.getElementById('motiveBadgePreview');
+                
+                // Notation upload elements
+                this.notationUploadBtn = document.getElementById('motiveNotationUploadBtn');
+                this.notationClearBtn = document.getElementById('motiveNotationClearBtn');
+                this.notationFileInput = document.getElementById('motiveNotationFileInput');
+                this.notationPreview = document.getElementById('motiveNotationPreview');
+                
+                // Create motive container groups
+                this.topMotiveGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.bottomMotiveGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.topMotiveGroup.setAttribute('class', 'motive-container');
+                this.bottomMotiveGroup.setAttribute('class', 'motive-container');
+                this.scoreTopEl.appendChild(this.topMotiveGroup);
+                this.scoreBottomEl.appendChild(this.bottomMotiveGroup);
+                
+                // Draw button handler
+                if (this.drawBtn) {
+                    this.drawBtn.addEventListener('click', () => this.createMotive());
+                }
+                
+                // Delete button handler
+                if (this.deleteBtn) {
+                    this.deleteBtn.addEventListener('click', () => this.deleteSelectedMotive());
+                }
+                
+                // Save button handler
+                if (this.saveBtn) {
+                    this.saveBtn.addEventListener('click', () => this.saveMotiveToLibrary());
+                }
+                
+                // Insert button handler
+                if (this.insertBtn) {
+                    this.insertBtn.addEventListener('click', () => this.insertRecalledMotive());
+                }
+                
+                // Custom dropdown toggle handler
+                if (this.recallSelected) {
+                    this.recallSelected.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const isOpen = this.recallOptions.style.display !== 'none';
+                        this.recallOptions.style.display = isOpen ? 'none' : 'block';
+                    });
+                }
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (this.recallOptions && !this.recallDropdown?.contains(e.target)) {
+                        this.recallOptions.style.display = 'none';
+                    }
+                });
+                
+                // Color swatch handlers
+                if (this.colorSwatches) {
+                    this.colorSwatches.querySelectorAll('.motive-color-swatch').forEach(swatch => {
+                        swatch.addEventListener('click', (e) => {
+                            this.colorSwatches.querySelectorAll('.motive-color-swatch').forEach(s => {
+                                s.classList.remove('selected');
+                                s.style.outline = '';
+                            });
+                            e.target.classList.add('selected');
+                            e.target.style.outline = '2px solid white';
+                            this.selectedColor = e.target.dataset.color;
+                            if (this.selectedMotive) {
+                                this.selectedMotive.color = this.selectedColor;
+                                this.updateMotiveRendering(this.selectedMotive);
+                                this.syncMotiveToDatabase(this.selectedMotive);
+                            }
+                        });
+                    });
+                }
+                
+                // Badge upload handlers
+                if (this.badgeUploadBtn) {
+                    this.badgeUploadBtn.addEventListener('click', () => {
+                        this.badgeFileInput?.click();
+                    });
+                }
+                
+                if (this.badgeFileInput) {
+                    this.badgeFileInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            this.handleBadgeUpload(file);
+                        }
+                    });
+                }
+                
+                if (this.badgeClearBtn) {
+                    this.badgeClearBtn.addEventListener('click', () => {
+                        this.clearBadge();
+                    });
+                }
+                
+                // Notation upload handlers
+                if (this.notationUploadBtn) {
+                    this.notationUploadBtn.addEventListener('click', () => {
+                        this.notationFileInput?.click();
+                    });
+                }
+                
+                if (this.notationFileInput) {
+                    this.notationFileInput.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            this.handleNotationUpload(file);
+                        }
+                    });
+                }
+                
+                if (this.notationClearBtn) {
+                    this.notationClearBtn.addEventListener('click', () => {
+                        this.clearNotation();
+                    });
+                }
+                
+                // Input field handlers for editing selected motive
+                if (this.startInput) {
+                    this.startInput.addEventListener('change', () => this.updateSelectedFromInputs());
+                }
+                if (this.endInput) {
+                    this.endInput.addEventListener('change', () => this.updateSelectedFromInputs());
+                }
+                
+                // Click on score to deselect
+                this.scoreTopEl.addEventListener('click', (e) => this.handleScoreClick(e, 'top'));
+                this.scoreBottomEl.addEventListener('click', (e) => this.handleScoreClick(e, 'bottom'));
+                
+                // Re-render motives on window resize (debounced)
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => {
+                        this.reloadFromDatabase();
+                    }, 100);
+                });
+                
+                // Load motive library
+                this.loadMotiveLibrary();
+                
+                console.debug('MotiveMaker initialized');
+            },
+            
+            // Create test motives for development
+            createTestMotives() {
+                const badgeSrc = '/SVG_graphics/walking on a carpet of twigs badge.png';
+                const notationSrc1 = '/SVG_graphics/walking on a carpet of twigs motive.svg';
+                const notationSrc2 = '/SVG_graphics/bartok pizz_b.svg';
+                
+                const testMotives = [
+                    {
+                        name: 'MOT_TEST_001',
+                        startSeconds: 4.5,
+                        endSeconds: 5.25,
+                        gTrack: '1',
+                        color: 'neonMagenta',
+                        description: 'Test motive 4.5-5.25 seconds',
+                        badgeSrc,
+                        notationSrc: notationSrc1
+                    },
+                    {
+                        name: 'MOT_TEST_002',
+                        startSeconds: 10,
+                        endSeconds: 14,
+                        gTrack: '1',
+                        color: 'neonMagenta',
+                        description: 'Test motive 10-14 seconds',
+                        badgeSrc,
+                        notationSrc: notationSrc2
+                    },
+                    {
+                        name: 'MOT_TEST_003',
+                        startSeconds: 19,
+                        endSeconds: 24,
+                        gTrack: '1',
+                        color: 'neonMagenta',
+                        description: 'Test motive 19-24 seconds',
+                        badgeSrc,
+                        notationSrc: notationSrc1
+                    },
+                    {
+                        name: 'MOT_TEST_004',
+                        startSeconds: 28,
+                        endSeconds: 34,
+                        gTrack: '1',
+                        color: 'neonMagenta',
+                        description: 'Test motive 28-34 seconds',
+                        badgeSrc,
+                        notationSrc: notationSrc2
+                    }
+                ];
+                
+                for (const testMotiveData of testMotives) {
+                    try {
+                        // Calculate positions
+                        const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                        const startActual = testMotiveData.startSeconds + leadInSeconds;
+                        const endActual = testMotiveData.endSeconds + leadInSeconds;
+                        const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                        const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                        const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                        const motiveGroup = section === 'top' ? this.topMotiveGroup : this.bottomMotiveGroup;
+                        const scoreWidth = scoreEl.clientWidth;
+                        
+                        // Get track dimensions
+                        const trackDims = window.CompositionPanel ? 
+                            CompositionPanel.getTrackDimensions(testMotiveData.gTrack, scoreEl) : null;
+                        
+                        // Calculate X positions
+                        const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                        const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                        const x1Pixel = (startXPercent / 100) * scoreWidth;
+                        const x2Pixel = (endXPercent / 100) * scoreWidth;
+                        
+                        // Create full motive data
+                        const motiveDataObj = {
+                            ...testMotiveData,
+                            section,
+                            page: startPage,
+                            x1: x1Pixel,
+                            x2: x2Pixel,
+                            trackDims
+                        };
+                        
+                        // Generate motive data array (normalized progress values)
+                        motiveDataObj.motiveData = this.generateMotiveDataArray(motiveDataObj);
+                        
+                        // Add to database
+                        const motive = MotiveDatabase.add(motiveDataObj);
+                        
+                        // Render the motive
+                        this.renderMotive(motive, motiveGroup, scoreEl);
+                        
+                        // Add to motives array
+                        this.motives.push(motive);
+                        
+                        console.debug(`Test motive created: ${motive.name} (${motive.startSeconds}-${motive.endSeconds}s)`);
+                    } catch (err) {
+                        console.error('Error creating test motive:', err);
+                    }
+                }
+                
+                // Update visibility
+                this.updateVisibility();
+            },
+            
+            generateMotiveName() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                return `MOT_${year}${month}${day}_${hours}${minutes}${seconds}`;
+            },
+            
+            // Generate normalized pixel-by-pixel array of motive progress
+            // At each X pixel, returns normalized value (0-1) of progress through the motive
+            generateMotiveDataArray(motive) {
+                const SAMPLE_INTERVAL = 0.01; // 10ms = 100 samples/second
+                // Use display time (without lead-in) for time-based lookups
+                const startTime = motive.startSeconds;
+                const endTime = motive.endSeconds;
+                const duration = endTime - startTime;
+                
+                if (duration <= 0) return { startTime, endTime, sampleInterval: SAMPLE_INTERVAL, samples: [], duration };
+                
+                const sampleCount = Math.ceil(duration / SAMPLE_INTERVAL) + 1;
+                const samples = [];
+                
+                // For a straight line motive, the normalized value is simply the progress (0 to 1)
+                for (let i = 0; i < sampleCount; i++) {
+                    const progress = i / (sampleCount - 1);
+                    samples.push(Math.max(0, Math.min(1, progress)));
+                }
+                
+                return {
+                    startTime,
+                    endTime,
+                    sampleInterval: SAMPLE_INTERVAL,
+                    samples,
+                    duration
+                };
+            },
+            
+            createMotive() {
+                const startSeconds = parseFloat(this.startInput.value) || 0;
+                const endSeconds = parseFloat(this.endInput.value) || 1;
+                const gTrack = CompositionPanel.getSelectedGTrack();
+                
+                // Ignore GA selection for motives - default to track 1
+                const actualGTrack = gTrack === 'A' ? '1' : gTrack;
+                
+                // Get track dimensions
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const startActual = startSeconds + leadInSeconds;
+                const endActual = endSeconds + leadInSeconds;
+                const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                
+                const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const motiveGroup = section === 'top' ? this.topMotiveGroup : this.bottomMotiveGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                const trackDims = window.CompositionPanel ? 
+                    CompositionPanel.getTrackDimensions(actualGTrack, scoreEl) : null;
+                
+                // Calculate X positions
+                const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                const x1Pixel = (startXPercent / 100) * scoreWidth;
+                const x2Pixel = (endXPercent / 100) * scoreWidth;
+                
+                // Generate unique name
+                const name = this.generateMotiveName();
+                
+                // Create motive data
+                const motiveDataObj = {
+                    name,
+                    startSeconds,
+                    endSeconds,
+                    gTrack: actualGTrack,
+                    color: this.selectedColor,
+                    section,
+                    page: startPage,
+                    x1: x1Pixel,
+                    x2: x2Pixel,
+                    trackDims,
+                    badgeSrc: this.currentBadgeData,
+                    notationSrc: this.currentNotationData
+                };
+                
+                // Generate motive data array
+                motiveDataObj.motiveData = this.generateMotiveDataArray(motiveDataObj);
+                
+                // Add to database
+                const motive = MotiveDatabase.add(motiveDataObj);
+                
+                // Mark score as dirty
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // Render the motive
+                this.renderMotive(motive, motiveGroup, scoreEl);
+                
+                // Add to motives array
+                this.motives.push(motive);
+                
+                // Update visibility
+                this.updateVisibility();
+                
+                // Auto-select the new motive
+                this.selectMotive(motive);
+                
+                console.debug(`Motive created: ${motive.name} (ID: ${motive.id})`);
+            },
+            
+            renderMotive(motive, motiveGroup, scoreEl) {
+                const color = ColorMap[motive.color] || motive.color;
+                const trackDims = motive.trackDims;
+                
+                // Create SVG group for this motive
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('data-motive-id', motive.id);
+                group.setAttribute('class', 'motive-element');
+                
+                // Badge height is 30% of track height (if badge exists)
+                const trackHeight = trackDims ? trackDims.height : 100;
+                const badgeHeight = motive.badgeSrc ? Math.floor(trackHeight * 0.30) : 0;
+                const badgeMargin = motive.badgeSrc ? 2 : 0;
+                
+                // Motive line is below the badge
+                const lineY = trackDims ? trackDims.y + badgeHeight + badgeMargin + 2 : 10;
+                
+                // Create badge image if badge source exists
+                let badge = null;
+                if (motive.badgeSrc) {
+                    badge = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    badge.setAttribute('href', motive.badgeSrc);
+                    badge.setAttribute('x', motive.x1);
+                    badge.setAttribute('y', trackDims ? trackDims.y + 2 : 2);
+                    badge.setAttribute('height', badgeHeight);
+                    // Width will be set by preserveAspectRatio
+                    badge.setAttribute('preserveAspectRatio', 'xMinYMin meet');
+                    badge.style.cursor = 'pointer';
+                    badge.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectMotive(motive);
+                    });
+                    group.appendChild(badge);
+                }
+                
+                // Create the line
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', motive.x1);
+                line.setAttribute('y1', lineY);
+                line.setAttribute('x2', motive.x2);
+                line.setAttribute('y2', lineY);
+                line.setAttribute('stroke', color);
+                line.setAttribute('stroke-width', '3');
+                line.setAttribute('stroke-linecap', 'round');
+                line.style.cursor = 'pointer';
+                group.appendChild(line);
+                
+                // Create invisible wider hit area for easier clicking
+                const hitLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                hitLine.setAttribute('x1', motive.x1);
+                hitLine.setAttribute('y1', lineY);
+                hitLine.setAttribute('x2', motive.x2);
+                hitLine.setAttribute('y2', lineY);
+                hitLine.setAttribute('stroke', 'transparent');
+                hitLine.setAttribute('stroke-width', '15');
+                hitLine.style.cursor = 'pointer';
+                hitLine.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectMotive(motive);
+                });
+                group.appendChild(hitLine);
+                
+                // Create selection highlight (yellow glow, hidden by default)
+                const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                highlight.setAttribute('x1', motive.x1);
+                highlight.setAttribute('y1', lineY);
+                highlight.setAttribute('x2', motive.x2);
+                highlight.setAttribute('y2', lineY);
+                highlight.setAttribute('stroke', 'yellow');
+                highlight.setAttribute('stroke-width', '7');
+                highlight.setAttribute('stroke-linecap', 'round');
+                highlight.setAttribute('stroke-opacity', '0.5');
+                highlight.style.display = 'none';
+                group.insertBefore(highlight, line);
+                
+                // Store element references
+                motive.elements = {
+                    group,
+                    line,
+                    hitLine,
+                    highlight,
+                    badge,
+                    lineY,
+                    badgeHeight
+                };
+                
+                motiveGroup.appendChild(group);
+            },
+            
+            selectMotive(motive) {
+                // Deselect previous
+                if (this.selectedMotive && this.selectedMotive.elements) {
+                    if (this.selectedMotive.elements.highlight) {
+                        this.selectedMotive.elements.highlight.style.display = 'none';
+                    }
+                }
+                
+                this.selectedMotive = motive;
+                
+                // Show selection highlight (yellow glow like connector system)
+                if (motive.elements && motive.elements.highlight) {
+                    motive.elements.highlight.style.display = '';
+                }
+                
+                // Update UI
+                if (this.nameDisplay) this.nameDisplay.value = motive.name;
+                if (this.startInput) this.startInput.value = motive.startSeconds.toFixed(3);
+                if (this.endInput) this.endInput.value = motive.endSeconds.toFixed(3);
+                if (this.descriptionInput) this.descriptionInput.value = motive.description || '';
+                
+                // Update color swatch selection
+                if (this.colorSwatches) {
+                    this.colorSwatches.querySelectorAll('.motive-color-swatch').forEach(s => {
+                        s.classList.remove('selected');
+                        s.style.outline = '';
+                        if (s.dataset.color === motive.color) {
+                            s.classList.add('selected');
+                            s.style.outline = '2px solid white';
+                        }
+                    });
+                }
+                this.selectedColor = motive.color;
+                
+                // Update badge preview
+                this.updateBadgePreview(motive.badgeSrc);
+                
+                // Update notation preview
+                this.updateNotationPreview(motive.notationSrc);
+            },
+            
+            deselectMotive() {
+                if (this.selectedMotive && this.selectedMotive.elements) {
+                    if (this.selectedMotive.elements.highlight) {
+                        this.selectedMotive.elements.highlight.style.display = 'none';
+                    }
+                }
+                this.selectedMotive = null;
+                
+                // Clear UI
+                if (this.nameDisplay) this.nameDisplay.value = '';
+                
+                // Clear badge preview
+                this.updateBadgePreview(null);
+                
+                // Clear notation preview
+                this.updateNotationPreview(null);
+            },
+            
+            handleScoreClick(e, section) {
+                // Check if click was on a motive element
+                const target = e.target;
+                const motiveGroup = target.closest('.motive-element');
+                if (!motiveGroup) {
+                    this.deselectMotive();
+                }
+            },
+            
+            deleteSelectedMotive() {
+                if (!this.selectedMotive) return;
+                
+                const motive = this.selectedMotive;
+                
+                // Remove from DOM
+                if (motive.elements && motive.elements.group) {
+                    motive.elements.group.remove();
+                }
+                
+                // Remove continuation segments
+                if (motive.elements && motive.elements.continuationGroupTop) {
+                    motive.elements.continuationGroupTop.remove();
+                }
+                if (motive.elements && motive.elements.continuationGroupBottom) {
+                    motive.elements.continuationGroupBottom.remove();
+                }
+                
+                // Remove from database
+                MotiveDatabase.remove(motive.id);
+                
+                // Remove from local array
+                const index = this.motives.findIndex(m => m.id === motive.id);
+                if (index !== -1) {
+                    this.motives.splice(index, 1);
+                }
+                
+                // Mark score as dirty
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                this.deselectMotive();
+                console.debug(`Motive deleted: ${motive.name}`);
+            },
+            
+            updateSelectedFromInputs() {
+                if (!this.selectedMotive) return;
+                
+                const motive = this.selectedMotive;
+                const newStart = parseFloat(this.startInput.value) || 0;
+                const newEnd = parseFloat(this.endInput.value) || 1;
+                
+                // Update motive data
+                motive.startSeconds = newStart;
+                motive.endSeconds = newEnd;
+                
+                // Recalculate positions
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const startActual = newStart + leadInSeconds;
+                const endActual = newEnd + leadInSeconds;
+                const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                
+                const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                
+                motive.x1 = (startXPercent / 100) * scoreWidth;
+                motive.x2 = (endXPercent / 100) * scoreWidth;
+                motive.page = startPage;
+                motive.section = section;
+                
+                // Regenerate motive data array
+                motive.motiveData = this.generateMotiveDataArray(motive);
+                
+                // Update rendering
+                this.updateMotiveRendering(motive);
+                this.syncMotiveToDatabase(motive);
+                this.updateVisibility();
+            },
+            
+            updateMotiveRendering(motive) {
+                if (!motive.elements) return;
+                
+                const { line, hitLine, highlight, badge, group } = motive.elements;
+                const color = ColorMap[motive.color] || motive.color;
+                const trackDims = motive.trackDims;
+                
+                // Recalculate badge height and line Y position
+                const trackHeight = trackDims ? trackDims.height : 100;
+                const badgeHeight = motive.badgeSrc ? Math.floor(trackHeight * 0.30) : 0;
+                const badgeMargin = motive.badgeSrc ? 2 : 0;
+                const lineY = trackDims ? trackDims.y + badgeHeight + badgeMargin + 2 : 10;
+                
+                // Update line positions
+                line.setAttribute('x1', motive.x1);
+                line.setAttribute('x2', motive.x2);
+                line.setAttribute('y1', lineY);
+                line.setAttribute('y2', lineY);
+                line.setAttribute('stroke', color);
+                
+                hitLine.setAttribute('x1', motive.x1);
+                hitLine.setAttribute('x2', motive.x2);
+                hitLine.setAttribute('y1', lineY);
+                hitLine.setAttribute('y2', lineY);
+                
+                highlight.setAttribute('x1', motive.x1);
+                highlight.setAttribute('x2', motive.x2);
+                highlight.setAttribute('y1', lineY);
+                highlight.setAttribute('y2', lineY);
+                
+                // Update or create/remove badge
+                if (motive.badgeSrc) {
+                    if (badge) {
+                        // Update existing badge
+                        badge.setAttribute('href', motive.badgeSrc);
+                        badge.setAttribute('x', motive.x1);
+                        badge.setAttribute('y', trackDims ? trackDims.y + 2 : 2);
+                        badge.setAttribute('height', badgeHeight);
+                        badge.style.display = '';
+                    } else {
+                        // Create new badge
+                        const newBadge = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                        newBadge.setAttribute('href', motive.badgeSrc);
+                        newBadge.setAttribute('x', motive.x1);
+                        newBadge.setAttribute('y', trackDims ? trackDims.y + 2 : 2);
+                        newBadge.setAttribute('height', badgeHeight);
+                        newBadge.setAttribute('preserveAspectRatio', 'xMinYMin meet');
+                        newBadge.style.cursor = 'pointer';
+                        newBadge.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.selectMotive(motive);
+                        });
+                        group.insertBefore(newBadge, group.firstChild);
+                        motive.elements.badge = newBadge;
+                    }
+                } else if (badge) {
+                    // Remove badge if it exists but badgeSrc is null
+                    badge.style.display = 'none';
+                }
+                
+                // Store updated lineY
+                motive.elements.lineY = lineY;
+            },
+            
+            syncMotiveToDatabase(motive) {
+                // Mark score as dirty
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // Update in database
+                MotiveDatabase.update(motive.id, {
+                    startSeconds: motive.startSeconds,
+                    endSeconds: motive.endSeconds,
+                    color: motive.color,
+                    x1: motive.x1,
+                    x2: motive.x2,
+                    motiveData: motive.motiveData,
+                    badgeSrc: motive.badgeSrc,
+                    notationSrc: motive.notationSrc
+                });
+            },
+            
+            handleBadgeUpload(file) {
+                const validTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/jpg'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please upload an SVG, PNG, or JPEG image.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const dataUrl = e.target.result;
+                    this.currentBadgeData = dataUrl;
+                    
+                    // Update preview
+                    if (this.badgePreview) {
+                        this.badgePreview.innerHTML = `<img src="${dataUrl}" style="max-height: 100%; max-width: 100%; object-fit: contain;">`;
+                    }
+                    
+                    // If a motive is selected, update it with the badge
+                    if (this.selectedMotive) {
+                        this.selectedMotive.badgeSrc = dataUrl;
+                        this.updateMotiveRendering(this.selectedMotive);
+                        this.syncMotiveToDatabase(this.selectedMotive);
+                        this.updateVisibility();
+                    }
+                };
+                reader.readAsDataURL(file);
+            },
+            
+            clearBadge() {
+                this.currentBadgeData = null;
+                
+                // Reset preview
+                if (this.badgePreview) {
+                    this.badgePreview.innerHTML = '<span style="font-size: 9px; color: #666;">No badge</span>';
+                }
+                
+                // If a motive is selected, remove its badge
+                if (this.selectedMotive) {
+                    this.selectedMotive.badgeSrc = null;
+                    this.updateMotiveRendering(this.selectedMotive);
+                    this.syncMotiveToDatabase(this.selectedMotive);
+                    this.updateVisibility();
+                }
+                
+                // Reset file input
+                if (this.badgeFileInput) {
+                    this.badgeFileInput.value = '';
+                }
+            },
+            
+            updateBadgePreview(badgeSrc) {
+                if (this.badgePreview) {
+                    if (badgeSrc) {
+                        this.badgePreview.innerHTML = `<img src="${badgeSrc}" style="max-height: 100%; max-width: 100%; object-fit: contain;">`;
+                        this.currentBadgeData = badgeSrc;
+                    } else {
+                        this.badgePreview.innerHTML = '<span style="font-size: 9px; color: #666;">No badge</span>';
+                        this.currentBadgeData = null;
+                    }
+                }
+            },
+            
+            handleNotationUpload(file) {
+                const validTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'image/jpg'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Please upload an SVG, PNG, or JPEG image.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const dataUrl = e.target.result;
+                    this.currentNotationData = dataUrl;
+                    
+                    // Update preview
+                    if (this.notationPreview) {
+                        this.notationPreview.innerHTML = `<img src="${dataUrl}" style="max-height: 100%; max-width: 100%; object-fit: contain;">`;
+                    }
+                    
+                    // If a motive is selected, update it with the notation
+                    if (this.selectedMotive) {
+                        this.selectedMotive.notationSrc = dataUrl;
+                        this.syncMotiveToDatabase(this.selectedMotive);
+                    }
+                };
+                reader.readAsDataURL(file);
+            },
+            
+            clearNotation() {
+                this.currentNotationData = null;
+                
+                // Reset preview
+                if (this.notationPreview) {
+                    this.notationPreview.innerHTML = '<span style="font-size: 9px; color: #666;">No notation</span>';
+                }
+                
+                // If a motive is selected, remove its notation
+                if (this.selectedMotive) {
+                    this.selectedMotive.notationSrc = null;
+                    this.syncMotiveToDatabase(this.selectedMotive);
+                }
+                
+                // Reset file input
+                if (this.notationFileInput) {
+                    this.notationFileInput.value = '';
+                }
+            },
+            
+            updateNotationPreview(notationSrc) {
+                if (this.notationPreview) {
+                    if (notationSrc) {
+                        this.notationPreview.innerHTML = `<img src="${notationSrc}" style="max-height: 100%; max-width: 100%; object-fit: contain;">`;
+                        this.currentNotationData = notationSrc;
+                    } else {
+                        this.notationPreview.innerHTML = '<span style="font-size: 9px; color: #666;">No notation</span>';
+                        this.currentNotationData = null;
+                    }
+                }
+            },
+            
+            // Show/hide motives based on current page (supports multi-page motives)
+            updateVisibility() {
+                if (!window.GraphicTimeline) return;
+                
+                const topPage = GraphicTimeline.currentTopPage;
+                const bottomPage = GraphicTimeline.currentBottomPage;
+                const secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                const leadInSec = leadInSeconds;
+                
+                for (const motive of this.motives) {
+                    if (!motive.elements || !motive.elements.group) continue;
+                    
+                    // Calculate which pages this motive spans
+                    const startActual = motive.startSeconds + leadInSec;
+                    const endActual = motive.endSeconds + leadInSec;
+                    const motiveStartPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const motiveEndPage = Math.floor(Math.max(0, endActual) / secondsPerPage);
+                    
+                    // Check if motive overlaps with visible pages
+                    const overlapsTop = motiveStartPage <= topPage && motiveEndPage >= topPage;
+                    const overlapsBottom = motiveStartPage <= bottomPage && motiveEndPage >= bottomPage;
+                    const visible = overlapsTop || overlapsBottom;
+                    
+                    const isMultiPage = motiveEndPage > motiveStartPage;
+                    
+                    if (!isMultiPage) {
+                        // Single-page motive: simple show/hide
+                        motive.elements.group.style.display = visible ? '' : 'none';
+                        if (motive.elements.continuationGroupTop) {
+                            motive.elements.continuationGroupTop.style.display = 'none';
+                        }
+                        if (motive.elements.continuationGroupBottom) {
+                            motive.elements.continuationGroupBottom.style.display = 'none';
+                        }
+                    } else {
+                        // Multi-page motive: show segments on each visible page
+                        if (overlapsTop && topPage === motiveStartPage) {
+                            motive.elements.group.style.display = '';
+                            this.clipMotiveToPageEnd(motive, motiveStartPage, secondsPerPage, leadInSec);
+                        } else if (overlapsBottom && bottomPage === motiveStartPage) {
+                            motive.elements.group.style.display = '';
+                            this.clipMotiveToPageEnd(motive, motiveStartPage, secondsPerPage, leadInSec);
+                        } else {
+                            motive.elements.group.style.display = 'none';
+                        }
+                        
+                        // Continuation segments
+                        const showContinuationOnTop = overlapsTop && topPage > motiveStartPage && topPage <= motiveEndPage;
+                        const showContinuationOnBottom = overlapsBottom && bottomPage > motiveStartPage && bottomPage <= motiveEndPage;
+                        
+                        if (showContinuationOnTop) {
+                            this.showContinuationSegment(motive, topPage, secondsPerPage, leadInSec, 'top');
+                        } else if (motive.elements.continuationGroupTop) {
+                            motive.elements.continuationGroupTop.style.display = 'none';
+                        }
+                        
+                        if (showContinuationOnBottom) {
+                            this.showContinuationSegment(motive, bottomPage, secondsPerPage, leadInSec, 'bottom');
+                        } else if (motive.elements.continuationGroupBottom) {
+                            motive.elements.continuationGroupBottom.style.display = 'none';
+                        }
+                    }
+                }
+            },
+            
+            clipMotiveToPageEnd(motive, page, secondsPerPage, leadInSec) {
+                if (!motive.elements || !motive.elements.line) return;
+                
+                const endActual = motive.endSeconds + leadInSec;
+                const pageEndTime = (page + 1) * secondsPerPage;
+                
+                if (endActual <= pageEndTime) return; // No clipping needed
+                
+                const section = page % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                // Clip x2 to page edge
+                motive.elements.line.setAttribute('x2', scoreWidth);
+                motive.elements.hitLine.setAttribute('x2', scoreWidth);
+                motive.elements.highlight.setAttribute('x2', scoreWidth);
+            },
+            
+            showContinuationSegment(motive, page, secondsPerPage, leadInSec, sectionHint) {
+                const startActual = motive.startSeconds + leadInSec;
+                const endActual = motive.endSeconds + leadInSec;
+                const pageStartTime = page * secondsPerPage;
+                const pageEndTime = (page + 1) * secondsPerPage;
+                
+                const clippedStartActual = Math.max(startActual, pageStartTime);
+                const clippedEndActual = Math.min(endActual, pageEndTime);
+                
+                const section = sectionHint || (page % 2 === 0 ? 'top' : 'bottom');
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const targetContainer = section === 'top' ? this.topMotiveGroup : this.bottomMotiveGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                // X positions within this page
+                const startXPercent = ((clippedStartActual / secondsPerPage) - page) * 100;
+                const endXPercent = ((clippedEndActual / secondsPerPage) - page) * 100;
+                const x1Pixel = (startXPercent / 100) * scoreWidth;
+                const x2Pixel = (endXPercent / 100) * scoreWidth;
+                
+                // Get track dimensions for this section
+                let trackDims = motive.trackDims;
+                if (motive.gTrack && window.CompositionPanel) {
+                    trackDims = CompositionPanel.getTrackDimensions(motive.gTrack, scoreEl) || motive.trackDims;
+                }
+                // Badge height is 30% of track height (if badge exists)
+                const trackHeight = trackDims ? trackDims.height : 100;
+                const badgeHeight = motive.badgeSrc ? Math.floor(trackHeight * 0.30) : 0;
+                const badgeMargin = motive.badgeSrc ? 2 : 0;
+                const lineY = trackDims ? trackDims.y + badgeHeight + badgeMargin + 2 : 10;
+                
+                const groupKey = section === 'top' ? 'continuationGroupTop' : 'continuationGroupBottom';
+                const lineKey = section === 'top' ? 'continuationLineTop' : 'continuationLineBottom';
+                const badgeKey = section === 'top' ? 'continuationBadgeTop' : 'continuationBadgeBottom';
+                
+                if (!motive.elements[groupKey]) {
+                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.classList.add('motive-continuation');
+                    group.setAttribute('data-motive-id', motive.id);
+                    
+                    // Create badge for continuation segment if badge exists
+                    if (motive.badgeSrc) {
+                        const contBadge = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                        contBadge.setAttribute('href', motive.badgeSrc);
+                        contBadge.setAttribute('height', badgeHeight);
+                        contBadge.setAttribute('preserveAspectRatio', 'xMinYMin meet');
+                        contBadge.style.cursor = 'pointer';
+                        contBadge.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            this.selectMotive(motive);
+                        });
+                        group.appendChild(contBadge);
+                        motive.elements[badgeKey] = contBadge;
+                    }
+                    
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('stroke-width', '3');
+                    line.setAttribute('stroke-linecap', 'round');
+                    line.style.cursor = 'pointer';
+                    line.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectMotive(motive);
+                    });
+                    group.appendChild(line);
+                    
+                    motive.elements[groupKey] = group;
+                    motive.elements[lineKey] = line;
+                }
+                
+                const color = ColorMap[motive.color] || motive.color;
+                
+                // Update badge position (at start of this segment)
+                if (motive.elements[badgeKey]) {
+                    motive.elements[badgeKey].setAttribute('x', x1Pixel);
+                    motive.elements[badgeKey].setAttribute('y', trackDims ? trackDims.y + 2 : 2);
+                    motive.elements[badgeKey].setAttribute('height', badgeHeight);
+                }
+                
+                motive.elements[lineKey].setAttribute('x1', x1Pixel);
+                motive.elements[lineKey].setAttribute('y1', lineY);
+                motive.elements[lineKey].setAttribute('x2', x2Pixel);
+                motive.elements[lineKey].setAttribute('y2', lineY);
+                motive.elements[lineKey].setAttribute('stroke', color);
+                
+                motive.elements[groupKey].style.display = '';
+                
+                if (motive.elements[groupKey].parentNode !== targetContainer) {
+                    targetContainer.appendChild(motive.elements[groupKey]);
+                }
+            },
+            
+            reloadFromDatabase() {
+                // Clear existing motive elements
+                if (this.topMotiveGroup) this.topMotiveGroup.innerHTML = '';
+                if (this.bottomMotiveGroup) this.bottomMotiveGroup.innerHTML = '';
+                this.motives = [];
+                this.selectedMotive = null;
+                
+                // Recreate motives from database
+                const dbMotives = MotiveDatabase.getAll();
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                
+                for (const dbMotive of dbMotives) {
+                    const motive = { ...dbMotive };
+                    
+                    // Recalculate positions
+                    const startActual = motive.startSeconds + leadInSeconds;
+                    const endActual = motive.endSeconds + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                    const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                    const motiveGroup = section === 'top' ? this.topMotiveGroup : this.bottomMotiveGroup;
+                    const scoreWidth = scoreEl.clientWidth;
+                    
+                    const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                    const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                    motive.x1 = (startXPercent / 100) * scoreWidth;
+                    motive.x2 = (endXPercent / 100) * scoreWidth;
+                    motive.section = section;
+                    motive.page = startPage;
+                    
+                    // Recalculate track dimensions
+                    if (motive.gTrack && window.CompositionPanel) {
+                        motive.trackDims = CompositionPanel.getTrackDimensions(motive.gTrack, scoreEl);
+                    }
+                    
+                    // Render
+                    this.renderMotive(motive, motiveGroup, scoreEl);
+                    this.motives.push(motive);
+                }
+                
+                console.debug(`MotiveMaker: Reloaded ${this.motives.length} motives from database`);
+                this.updateVisibility();
+            },
+            
+            // Library operations
+            async saveMotiveToLibrary() {
+                if (!this.selectedMotive) {
+                    alert('No motive selected. Select a motive to save.');
+                    return;
+                }
+                
+                const motive = this.selectedMotive;
+                const description = this.descriptionInput?.value || '';
+                
+                const motiveData = {
+                    name: motive.name,
+                    description: description,
+                    startSeconds: motive.startSeconds,
+                    endSeconds: motive.endSeconds,
+                    gTrack: motive.gTrack,
+                    color: motive.color,
+                    motiveData: motive.motiveData,
+                    duration: motive.endSeconds - motive.startSeconds,
+                    badgeSrc: motive.badgeSrc,
+                    notationSrc: motive.notationSrc
+                };
+                
+                try {
+                    const response = await fetch('/api/motive-library/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ motiveData })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        console.debug(`Motive saved to library: ${motive.name}`);
+                        alert(`Motive "${motive.name}" saved to library.`);
+                        this.loadMotiveLibrary();
+                    } else {
+                        alert(`Failed to save motive: ${result.error}`);
+                    }
+                } catch (err) {
+                    console.error('Error saving motive:', err);
+                    alert(`Error saving motive: ${err.message}`);
+                }
+            },
+            
+            async loadMotiveLibrary() {
+                if (!this.recallOptions) return;
+                
+                try {
+                    const response = await fetch('/api/motive-library/list');
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.recallOptions.innerHTML = '';
+                        
+                        if (this.recallSelect) this.recallSelect.value = '';
+                        if (this.recallSelected) this.recallSelected.textContent = '-- Select Saved Motive --';
+                        
+                        // Placeholder option
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'custom-dropdown-option';
+                        placeholder.style.cssText = 'padding: 6px 8px; cursor: pointer; font-size: 10px; color: #888; border-bottom: 1px solid #444;';
+                        placeholder.textContent = '-- Select Saved Motive --';
+                        placeholder.dataset.value = '';
+                        placeholder.addEventListener('click', () => this.selectRecallOption('', '-- Select Saved Motive --'));
+                        placeholder.addEventListener('mouseenter', () => placeholder.style.background = 'rgba(60,60,80,0.8)');
+                        placeholder.addEventListener('mouseleave', () => placeholder.style.background = '');
+                        this.recallOptions.appendChild(placeholder);
+                        
+                        for (const motive of result.motives) {
+                            const option = document.createElement('div');
+                            option.className = 'custom-dropdown-option';
+                            option.style.cssText = 'padding: 6px 8px; cursor: pointer; border-bottom: 1px solid #333;';
+                            option.dataset.value = motive.name;
+                            
+                            const nameLine = document.createElement('div');
+                            nameLine.style.cssText = 'font-size: 10px; font-weight: bold; color: #ddd;';
+                            const dur = motive.duration ? ` (${motive.duration.toFixed(1)}s)` : '';
+                            nameLine.textContent = `${motive.name}${dur}`;
+                            option.appendChild(nameLine);
+                            
+                            if (motive.description) {
+                                const descLine = document.createElement('div');
+                                descLine.style.cssText = 'font-size: 9px; color: #999; margin-top: 2px;';
+                                descLine.textContent = motive.description;
+                                option.appendChild(descLine);
+                            }
+                            
+                            option.addEventListener('click', () => this.selectRecallOption(motive.name, `${motive.name}${dur}`));
+                            option.addEventListener('mouseenter', () => option.style.background = 'rgba(60,60,80,0.8)');
+                            option.addEventListener('mouseleave', () => option.style.background = '');
+                            this.recallOptions.appendChild(option);
+                        }
+                        
+                        console.debug(`Loaded ${result.motives.length} motives from library`);
+                    }
+                } catch (err) {
+                    console.debug('Motive library not available yet');
+                }
+            },
+            
+            selectRecallOption(value, displayText) {
+                if (this.recallSelect) this.recallSelect.value = value;
+                if (this.recallSelected) this.recallSelected.textContent = displayText;
+                if (this.recallOptions) this.recallOptions.style.display = 'none';
+            },
+            
+            async insertRecalledMotive() {
+                const selectedName = this.recallSelect?.value;
+                if (!selectedName) {
+                    alert('Select a motive from the library to insert.');
+                    return;
+                }
+                
+                let insertionSeconds = 0;
+                if (window.EditCursor && typeof EditCursor.getPositionSeconds === 'function') {
+                    insertionSeconds = EditCursor.getPositionSeconds();
+                } else if (window.EditCursor) {
+                    insertionSeconds = EditCursor.positionSeconds || 0;
+                }
+                
+                const targetGTrack = window.CompositionPanel ? CompositionPanel.getSelectedGTrack() : '1';
+                const actualGTrack = targetGTrack === 'A' ? '1' : targetGTrack;
+                
+                try {
+                    const response = await fetch(`/api/motive-library/load/${encodeURIComponent(selectedName)}`);
+                    const result = await response.json();
+                    
+                    if (!result.success) {
+                        alert(`Failed to load motive: ${result.error}`);
+                        return;
+                    }
+                    
+                    const savedMotive = result.motiveData;
+                    const duration = savedMotive.duration || (savedMotive.endSeconds - savedMotive.startSeconds);
+                    
+                    const newStartSeconds = insertionSeconds;
+                    const newEndSeconds = insertionSeconds + duration;
+                    
+                    // Calculate positions
+                    const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                    const startActual = newStartSeconds + leadInSeconds;
+                    const endActual = newEndSeconds + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    
+                    const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                    const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                    const motiveGroup = section === 'top' ? this.topMotiveGroup : this.bottomMotiveGroup;
+                    const scoreWidth = scoreEl.clientWidth;
+                    
+                    const trackDims = window.CompositionPanel ? 
+                        CompositionPanel.getTrackDimensions(actualGTrack, scoreEl) : null;
+                    
+                    const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                    const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
+                    const x1Pixel = (startXPercent / 100) * scoreWidth;
+                    const x2Pixel = (endXPercent / 100) * scoreWidth;
+                    
+                    const name = this.generateMotiveName();
+                    
+                    const motiveDataObj = {
+                        name,
+                        startSeconds: newStartSeconds,
+                        endSeconds: newEndSeconds,
+                        gTrack: actualGTrack,
+                        color: savedMotive.color,
+                        section,
+                        page: startPage,
+                        x1: x1Pixel,
+                        x2: x2Pixel,
+                        trackDims,
+                        badgeSrc: savedMotive.badgeSrc,
+                        notationSrc: savedMotive.notationSrc
+                    };
+                    
+                    motiveDataObj.motiveData = this.generateMotiveDataArray(motiveDataObj);
+                    
+                    const motive = MotiveDatabase.add(motiveDataObj);
+                    
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    
+                    this.renderMotive(motive, motiveGroup, scoreEl);
+                    this.motives.push(motive);
+                    this.updateVisibility();
+                    this.selectMotive(motive);
+                    
+                    console.debug(`Motive inserted: ${motive.name} at ${newStartSeconds}s`);
+                    
+                } catch (err) {
+                    console.error('Error inserting motive:', err);
+                    alert(`Error inserting motive: ${err.message}`);
+                }
+            },
+            
+            // Get motive progress value at a given time (for motive follower)
+            getMotiveProgressAtTime(gTrack, timeSec) {
+                for (const motive of this.motives) {
+                    if (motive.gTrack !== gTrack) continue;
+                    if (!motive.motiveData) continue;
+                    
+                    const { startTime, endTime, sampleInterval, samples } = motive.motiveData;
+                    
+                    if (timeSec >= startTime && timeSec <= endTime) {
+                        const timeOffset = timeSec - startTime;
+                        const sampleIndex = Math.floor(timeOffset / sampleInterval);
+                        
+                        if (sampleIndex >= 0 && sampleIndex < samples.length) {
+                            return {
+                                motive,
+                                progress: samples[sampleIndex],
+                                color: motive.color,
+                                notationSrc: motive.notationSrc
+                            };
+                        }
+                    }
+                }
+                return null;
+            },
+            
+            // Get upcoming motive within lookahead seconds (for countdown dial)
+            getUpcomingMotiveAtTime(gTrack, timeSec, lookaheadSeconds = 3) {
+                for (const motive of this.motives) {
+                    if (motive.gTrack !== gTrack) continue;
+                    if (!motive.motiveData) continue;
+                    
+                    const { startTime } = motive.motiveData;
+                    const timeUntilStart = startTime - timeSec;
+                    
+                    // Check if motive starts within lookahead window (but hasn't started yet)
+                    if (timeUntilStart > 0 && timeUntilStart <= lookaheadSeconds) {
+                        // Calculate countdown progress (0 = lookahead seconds before, 1 = about to start)
+                        const countdownProgress = 1 - (timeUntilStart / lookaheadSeconds);
+                        
+                        return {
+                            motive,
+                            countdownProgress,
+                            timeUntilStart,
+                            color: motive.color,
+                            notationSrc: motive.notationSrc
+                        };
+                    }
+                }
+                return null;
+            },
+            
+            // Get the next upcoming motive (regardless of time distance)
+            getNextUpcomingMotive(gTrack, timeSec) {
+                let nextMotive = null;
+                let minTimeUntilStart = Infinity;
+                
+                for (const motive of this.motives) {
+                    if (motive.gTrack !== gTrack) continue;
+                    if (!motive.motiveData) continue;
+                    
+                    const { startTime } = motive.motiveData;
+                    const timeUntilStart = startTime - timeSec;
+                    
+                    // Find the next motive that hasn't started yet
+                    if (timeUntilStart > 0 && timeUntilStart < minTimeUntilStart) {
+                        minTimeUntilStart = timeUntilStart;
+                        nextMotive = motive;
+                    }
+                }
+                
+                if (nextMotive) {
+                    return {
+                        motive: nextMotive,
+                        timeUntilStart: minTimeUntilStart,
+                        color: nextMotive.color,
+                        notationSrc: nextMotive.notationSrc
+                    };
+                }
+                return null;
+            },
+            
+            // Get the next two motives for static windows from a given page start time
+            // Returns: window2Motive (top slot - current/next), window1Motive (bottom slot - the one after)
+            getNextTwoMotives(gTrack, pageStartTimeSec) {
+                // Get all motives for this track that are active at or start after the page start time
+                // A motive is relevant if: it ends after pageStartTimeSec (still active or upcoming)
+                const relevantMotives = this.motives
+                    .filter(m => m.gTrack === gTrack && m.motiveData)
+                    .filter(m => {
+                        const endTime = m.motiveData.startTime + m.motiveData.duration;
+                        return endTime > pageStartTimeSec; // Motive ends after page starts
+                    })
+                    .sort((a, b) => a.motiveData.startTime - b.motiveData.startTime);
+                
+                let window2Motive = null; // Top slot: current or next upcoming
+                let window1Motive = null; // Bottom slot: the one after window2
+                
+                // First motive is the current/next one (top slot)
+                if (relevantMotives.length > 0) {
+                    const m = relevantMotives[0];
+                    const isActive = m.motiveData.startTime <= pageStartTimeSec && 
+                                     (m.motiveData.startTime + m.motiveData.duration) > pageStartTimeSec;
+                    window2Motive = {
+                        motive: m,
+                        notationSrc: m.notationSrc,
+                        color: m.color,
+                        isActive: isActive
+                    };
+                }
+                
+                // Second motive is the one after (bottom slot)
+                if (relevantMotives.length > 1) {
+                    const m = relevantMotives[1];
+                    window1Motive = {
+                        motive: m,
+                        notationSrc: m.notationSrc,
+                        color: m.color,
+                        isActive: false
+                    };
+                }
+                
+                return { window1Motive, window2Motive };
+            }
+        };
+        
+        // Initialize Motive Maker
+        MotiveMaker.init();
+        window.MotiveMaker = MotiveMaker;
+        
+        // Create test motives for development
+        MotiveMaker.createTestMotives();
         
         
         // Initialize Score Manager (after all other systems)
