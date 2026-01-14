@@ -768,19 +768,6 @@
                 <div class="control-row">
                     <input type="text" id="editCursorSecondsInput" class="edit-cursor-input" value="0.000">
                 </div>
-                <div class="gtrack-radio-group">
-                    <input type="radio" id="gtrackG1" name="gtrack" value="1">
-                    <label for="gtrackG1">G1</label>
-                    <input type="radio" id="gtrackG2" name="gtrack" value="2">
-                    <label for="gtrackG2">G2</label>
-                    <input type="radio" id="gtrackG3" name="gtrack" value="3">
-                    <label for="gtrackG3">G3</label>
-                    <input type="radio" id="gtrackG4" name="gtrack" value="4">
-                    <label for="gtrackG4">G4</label>
-                    <input type="radio" id="gtrackGA" name="gtrack" value="A" checked>
-                    <label for="gtrackGA">GA</label>
-                </div>
-                
                 <div class="section-divider"></div>
                 <div class="section-label">Curve Segments</div>
                 
@@ -852,6 +839,19 @@
                     <label for="curveFillBottom">Fill ↓</label>
                     <input type="radio" id="curveFillTop" name="curveFill" value="top">
                     <label for="curveFillTop">Fill ↑</label>
+                </div>
+                
+                <div class="gtrack-radio-group">
+                    <input type="radio" id="gtrackG1" name="gtrack" value="1">
+                    <label for="gtrackG1">T1</label>
+                    <input type="radio" id="gtrackG2" name="gtrack" value="2">
+                    <label for="gtrackG2">T2</label>
+                    <input type="radio" id="gtrackG3" name="gtrack" value="3">
+                    <label for="gtrackG3">T3</label>
+                    <input type="radio" id="gtrackG4" name="gtrack" value="4">
+                    <label for="gtrackG4">T4</label>
+                    <input type="radio" id="gtrackGA" name="gtrack" value="A" checked>
+                    <label for="gtrackGA">TA</label>
                 </div>
                 
                 <div class="section-label" style="margin-top: 10px;">Color</div>
@@ -988,6 +988,13 @@
                         <option value="4">Track 4</option>
                     </select>
                 </div>
+                <div class="curve-input-row">
+                    <label>Section</label>
+                    <select id="svgSectionSelect" style="font-size: 10px; padding: 2px;">
+                        <option value="top">Top</option>
+                        <option value="bottom">Bottom</option>
+                    </select>
+                </div>
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="svgDeleteBtn" class="control-btn" style="font-size: 10px; background: var(--clr-darkRed);">Delete</button>
                 </div>
@@ -1097,13 +1104,13 @@
                 </div>
             </div>
             <div class="menu-section">
-                <h3>Jump To</h3>
+                <h3 style="color: var(--clr-yellow);">Jump To</h3>
                 <div class="control-row">
                     <label>Second</label>
                     <input type="number" id="gotoSecondInput" step="0.01" value="0">
                 </div>
                 <div class="control-row">
-                    <button id="gotoBtn" class="control-btn">Go</button>
+                    <button id="gotoBtn" class="control-btn" style="background: var(--clr-yellow); color: black;">Go</button>
                 </div>
             </div>
             <div class="menu-section">
@@ -1676,15 +1683,20 @@
                 this.scaleSlider = document.getElementById('svgScaleSlider');
                 this.scaleValue = document.getElementById('svgScaleValue');
                 this.trackSelect = document.getElementById('svgTrackSelect');
+                this.sectionSelect = document.getElementById('svgSectionSelect');
                 this.deleteBtn = document.getElementById('svgDeleteBtn');
                 
                 this.scoreTopEl = document.getElementById('ScoreTop');
                 this.scoreBottomEl = document.getElementById('ScoreBottom');
                 
-                // Create container group for SVG elements
+                // Create container groups for SVG elements (one for each score section)
                 this.containerTop = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                this.containerTop.setAttribute('id', 'svg-elements-container');
+                this.containerTop.setAttribute('id', 'svg-elements-container-top');
                 this.scoreTopEl.appendChild(this.containerTop);
+                
+                this.containerBottom = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.containerBottom.setAttribute('id', 'svg-elements-container-bottom');
+                this.scoreBottomEl.appendChild(this.containerBottom);
                 
                 // Event listeners
                 this.insertBtn.addEventListener('click', () => this.fileInput.click());
@@ -1695,10 +1707,16 @@
                 this.posYInput.addEventListener('change', () => this.updateSelectedPosition());
                 this.scaleSlider.addEventListener('input', () => this.updateSelectedScale());
                 this.trackSelect.addEventListener('change', () => this.updateSelectedTrack());
+                this.sectionSelect.addEventListener('change', () => this.updateSelectedSection());
                 
                 // Click on score to deselect
                 this.scoreTopEl.addEventListener('click', (e) => {
                     if (e.target === this.scoreTopEl || e.target.tagName === 'svg') {
+                        this.deselectAll();
+                    }
+                });
+                this.scoreBottomEl.addEventListener('click', (e) => {
+                    if (e.target === this.scoreBottomEl || e.target.tagName === 'svg') {
                         this.deselectAll();
                     }
                 });
@@ -1779,9 +1797,11 @@
                 const trackY = timelineHeight + ((track - 1) * staffHeight) + (staffHeight / 2) - (height / 2);
                 const trackX = scoreWidth * 0.2; // Start at 20% from left
                 
-                // Get current page from GraphicTimeline
-                const currentPage = window.GraphicTimeline ? GraphicTimeline.currentTopPage : 0;
-                const section = 'top'; // SVGs are always added to top section initially
+                // Get section from selector and determine page
+                const section = this.sectionSelect?.value || 'top';
+                const currentPage = window.GraphicTimeline 
+                    ? (section === 'top' ? GraphicTimeline.currentTopPage : GraphicTimeline.currentBottomPage)
+                    : (section === 'top' ? 0 : 1);
                 
                 // Calculate percentage positions for resize handling
                 const xPercent = (trackX / scoreWidth) * 100;
@@ -1814,8 +1834,9 @@
                 // Apply initial transform
                 this.updateElementTransform(elementData);
                 
-                // Add to container
-                this.containerTop.appendChild(wrapper);
+                // Add to correct container based on section
+                const targetContainer = section === 'top' ? this.containerTop : this.containerBottom;
+                targetContainer.appendChild(wrapper);
                 
                 // Add drag handlers
                 wrapper.addEventListener('mousedown', (e) => this.handleElementMouseDown(e, elementData));
@@ -1847,6 +1868,11 @@
                 const handleSize = 8;
                 const corners = ['se']; // Just SE corner for proportional resize
                 
+                // Use correct container based on element's section
+                const targetContainer = this.selectedElement.section === 'bottom' 
+                    ? this.containerBottom 
+                    : this.containerTop;
+                
                 corners.forEach(corner => {
                     const handle = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                     handle.setAttribute('width', handleSize);
@@ -1857,7 +1883,7 @@
                     
                     handle.addEventListener('mousedown', (e) => this.handleResizeMouseDown(e, corner));
                     
-                    this.containerTop.appendChild(handle);
+                    targetContainer.appendChild(handle);
                     this.resizeHandles.push(handle);
                 });
                 
@@ -2004,6 +2030,7 @@
                 this.scaleSlider.value = this.selectedElement.scale;
                 this.scaleValue.textContent = this.selectedElement.scale.toFixed(2);
                 this.trackSelect.value = this.selectedElement.track;
+                this.sectionSelect.value = this.selectedElement.section || 'top';
             },
             
             updateSelectedPosition() {
@@ -2035,6 +2062,25 @@
                 
                 this.updateElementTransform(this.selectedElement);
                 this.updateUIFromSelected();
+            },
+            
+            updateSelectedSection() {
+                if (!this.selectedElement) return;
+                const section = this.sectionSelect.value;
+                this.selectedElement.section = section;
+                
+                // Update page to match the current page of the new section
+                if (window.GraphicTimeline) {
+                    this.selectedElement.page = section === 'top' 
+                        ? GraphicTimeline.currentTopPage 
+                        : GraphicTimeline.currentBottomPage;
+                }
+                
+                // Move to correct container
+                const targetContainer = section === 'top' ? this.containerTop : this.containerBottom;
+                targetContainer.appendChild(this.selectedElement.wrapper);
+                
+                this.updateVisibility();
             },
             
             deleteSelected() {
@@ -2074,7 +2120,17 @@
                 return Math.max(1, Math.min(4, track));
             },
             
-            // Show/hide elements based on current page
+            // Bring SVG containers to front (call after other elements are initialized)
+            bringToFront() {
+                if (this.containerTop && this.scoreTopEl) {
+                    this.scoreTopEl.appendChild(this.containerTop);
+                }
+                if (this.containerBottom && this.scoreBottomEl) {
+                    this.scoreBottomEl.appendChild(this.containerBottom);
+                }
+            },
+            
+            // Show/hide elements based on current page and move to correct container
             updateVisibility() {
                 if (!window.GraphicTimeline) return;
                 
@@ -2082,8 +2138,22 @@
                 const bottomPage = GraphicTimeline.currentBottomPage;
                 
                 this.elements.forEach(el => {
-                    // Show element if its page matches the current top page (all SVGs are in top section)
-                    const visible = el.page === topPage;
+                    let visible = false;
+                    let targetContainer = null;
+                    
+                    if (el.section === 'top') {
+                        visible = el.page === topPage;
+                        targetContainer = this.containerTop;
+                    } else {
+                        visible = el.page === bottomPage;
+                        targetContainer = this.containerBottom;
+                    }
+                    
+                    // Move to correct container if needed
+                    if (el.wrapper.parentNode !== targetContainer) {
+                        targetContainer.appendChild(el.wrapper);
+                    }
+                    
                     el.wrapper.style.display = visible ? '' : 'none';
                 });
             },
@@ -3248,7 +3318,7 @@
                     follower.setAttribute('height', staffHeight);
                     follower.setAttribute('fill', this.colors[staffIndex]);
                     follower.setAttribute('stroke', 'none');
-                    follower.setAttribute('opacity', '0.65');
+                    follower.setAttribute('opacity', '0.3');
                     follower.setAttribute('x', '-11'); // 8px width + 3px gap left of cursor
                     follower.style.display = 'none';
                 });
@@ -3269,7 +3339,7 @@
                     // Pie arc (decreasing fill) - color set dynamically
                     const arc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                     arc.setAttribute('fill', this.colors[staffIndex]);
-                    arc.setAttribute('opacity', '0.5');
+                    arc.setAttribute('opacity', '0.3');
                     group.appendChild(arc);
                     
                     // Clock hand/wand (1px black line)
@@ -7730,6 +7800,7 @@
                     path.setAttribute('fill', 'none');
                     path.setAttribute('stroke', color);
                     path.setAttribute('stroke-width', '2');
+                    path.setAttribute('opacity', '0.3');
                 } else {
                     const fillY = curve.fillMode === 'bottom' ? curve.trackDims.y + curve.trackDims.height : curve.trackDims.y;
                     const filledD = `M ${curve.x1} ${fillY} L ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel} L ${curve.x2} ${fillY} Z`;
@@ -7738,6 +7809,7 @@
                     path.setAttribute('fill-opacity', '0.3');
                     path.setAttribute('stroke', color);
                     path.setAttribute('stroke-width', '2');
+                    path.setAttribute('opacity', '0.3');
                 }
                 
                 path.style.cursor = 'pointer';
@@ -8354,6 +8426,7 @@
                 } else {
                     curve.elements[pathKey].setAttribute('fill', 'none');
                 }
+                curve.elements[pathKey].setAttribute('opacity', '0.3');
                 
                 curve.elements[groupKey].style.display = '';
                 
@@ -8759,6 +8832,7 @@
                     path.setAttribute('d', d);
                     path.setAttribute('fill', 'none');
                     path.setAttribute('stroke', color);
+                    path.setAttribute('opacity', '0.3');
                 } else {
                     const fillY = curve.fillMode === 'bottom' ? curve.trackDims.y + curve.trackDims.height : curve.trackDims.y;
                     const filledD = `M ${curve.x1} ${fillY} L ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel} L ${curve.x2} ${fillY} Z`;
@@ -8766,6 +8840,7 @@
                     path.setAttribute('fill', color);
                     path.setAttribute('fill-opacity', '0.3');
                     path.setAttribute('stroke', color);
+                    path.setAttribute('opacity', '0.3');
                 }
                 
                 // Update hit path for easier clicking
@@ -9517,6 +9592,11 @@
         CurveMaker.init();
         window.CurveMaker = CurveMaker;
         
+        // Bring SVG elements containers to front (after curves are initialized)
+        // This ensures inserted SVGs appear on top of curves for selection
+        if (window.SVGElementManager) {
+            SVGElementManager.bringToFront();
+        }
         
         // ============================================
         // MOTIVE MAKER (SIMPLIFIED) - Line-only version
@@ -10067,6 +10147,11 @@
         // Initialize Motive Maker
         MotiveMaker.init();
         window.MotiveMaker = MotiveMaker;
+        
+        // Bring SVG elements containers to front (after motives are initialized)
+        if (window.SVGElementManager) {
+            SVGElementManager.bringToFront();
+        }
         
         /* DISABLED: Full MotiveMaker - entire system commented out (code kept for future reference)
         // ============================================
