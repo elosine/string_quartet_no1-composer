@@ -1163,6 +1163,9 @@
                     <button id="midiInsertBtn" class="control-btn">Insert</button>
                     <span id="midiInsertTime" class="timecode-display-small">0.000</span>
                 </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="midiDeleteSnippetBtn" class="control-btn" style="background: #E53935;">Delete Snippet</button>
+                </div>
                 <div class="control-row" style="margin-top: 10px;">
                     <button id="midiDownloadBtn" class="control-btn">Download MIDI</button>
                 </div>
@@ -5123,6 +5126,15 @@
             scoreBottomEl: null,
             timelineHeight: 8, // Match StaffCursors.timelineHeight
             
+            // Snippet selection state
+            selectedSnippet: null,
+            snippets: [], // Rendered snippets with DOM elements
+            deleteBtn: null,
+            
+            // Color palette for snippets (cycles through)
+            snippetColors: ['#2196F3', '#4CAF50', '#FF9800', '#9C27B0', '#00BCD4', '#E91E63', '#8BC34A', '#FF5722'],
+            nextColorIndex: 0,
+            
             init() {
                 // Get SVG elements
                 this.scoreTopEl = document.getElementById('ScoreTop');
@@ -5175,6 +5187,26 @@
                 if (this.downloadBtn) this.downloadBtn.addEventListener('click', () => this.downloadMidiFile());
                 if (this.exportCsvBtn) this.exportCsvBtn.addEventListener('click', () => this.exportCsv());
                 if (this.insertBtn) this.insertBtn.addEventListener('click', () => this.insertAtEditCursor());
+                
+                // Get and set up delete button
+                this.deleteBtn = document.getElementById('midiDeleteSnippetBtn');
+                if (this.deleteBtn) this.deleteBtn.addEventListener('click', () => this.deleteSelectedSnippet());
+                
+                // Click on score to deselect snippet
+                if (this.scoreTopEl) {
+                    this.scoreTopEl.addEventListener('click', (e) => {
+                        if (!e.target.closest('.midi-snippet-hit')) {
+                            this.deselectSnippet();
+                        }
+                    });
+                }
+                if (this.scoreBottomEl) {
+                    this.scoreBottomEl.addEventListener('click', (e) => {
+                        if (!e.target.closest('.midi-snippet-hit')) {
+                            this.deselectSnippet();
+                        }
+                    });
+                }
                 
                 // Set up display toggle listeners
                 if (this.showGraphicItemsToggle) {
@@ -5376,7 +5408,7 @@
                 }
             },
             
-            // Insert loaded MIDI file at edit cursor position into selected track
+            // Insert loaded MIDI file at edit cursor position into selected track as a snippet
             insertAtEditCursor() {
                 if (this.loadedFileEvents.length === 0) {
                     alert('No MIDI file loaded. Load a MIDI file first.');
@@ -5384,13 +5416,23 @@
                 }
                 
                 const trackIndex = this.selectedTrack - 1;
-                const insertTimeMs = (window.EditCursor ? EditCursor.positionSeconds : 0) * 1000;
+                const insertTimeSec = window.EditCursor ? EditCursor.positionSeconds : 0;
+                const insertTimeMs = insertTimeSec * 1000;
                 const channel = trackIndex + 1; // Track 1 = Channel 1, etc.
                 
-                // Add events to selected track with time offset and channel remapping
+                // Calculate snippet duration from loaded events
+                let maxEventTimeMs = 0;
+                for (const event of this.loadedFileEvents) {
+                    if (event.timeMs > maxEventTimeMs) maxEventTimeMs = event.timeMs;
+                }
+                const durationSec = maxEventTimeMs / 1000;
+                
+                // Create events with time offset and channel remapping
+                const snippetEvents = [];
                 for (const event of this.loadedFileEvents) {
                     const newEvent = {
                         timeMs: event.timeMs + insertTimeMs,
+                        relativeTimeMs: event.timeMs, // Time relative to snippet start
                         type: event.type,
                         data: [...event.data]
                     };
@@ -5401,7 +5443,31 @@
                         newEvent.data[0] = (statusByte & 0xF0) | (channel - 1);
                     }
                     
-                    this.tracks[trackIndex].midiEvents.push(newEvent);
+                    snippetEvents.push(newEvent);
+                }
+                
+                // Get next color from palette
+                const color = this.snippetColors[this.nextColorIndex % this.snippetColors.length];
+                this.nextColorIndex++;
+                
+                // Create snippet object and add to database
+                const snippetData = {
+                    name: this.loadedFileName || `MIDI_${Date.now()}`,
+                    trackIndex: trackIndex,
+                    startSeconds: insertTimeSec,
+                    endSeconds: insertTimeSec + durationSec,
+                    events: snippetEvents,
+                    color: color
+                };
+                
+                const snippet = MidiSnippetDatabase.add(snippetData);
+                
+                // Also add events to track for playback (legacy compatibility)
+                for (const event of snippetEvents) {
+                    this.tracks[trackIndex].midiEvents.push({
+                        ...event,
+                        snippetId: snippet.id // Tag events with snippet ID
+                    });
                 }
                 
                 // Sort events by time
@@ -5411,8 +5477,118 @@
                 if (window.ScoreManager) ScoreManager.markDirty();
                 
                 this.updateEventCount();
-                this.renderMidiDisplay(trackIndex); // Update MIDI display
-                this.updateMidiDisplayVisibility(); // Apply page visibility
+                this.renderAllMidiDisplays();
+                this.updateMidiDisplayVisibility();
+                
+                console.debug(`MIDI snippet inserted: ${snippet.name} (ID: ${snippet.id}) at ${insertTimeSec.toFixed(2)}s on track ${trackIndex + 1}`);
+            },
+            
+            // Select a snippet
+            selectSnippet(snippet) {
+                // Deselect previous
+                if (this.selectedSnippet && this.selectedSnippet.elements?.highlight) {
+                    this.selectedSnippet.elements.highlight.style.display = 'none';
+                }
+                
+                this.selectedSnippet = snippet;
+                
+                // Show highlight
+                if (snippet.elements?.highlight) {
+                    snippet.elements.highlight.style.display = '';
+                }
+                
+                console.debug(`Selected MIDI snippet: ${snippet.name} (ID: ${snippet.id})`);
+            },
+            
+            // Deselect current snippet
+            deselectSnippet() {
+                if (this.selectedSnippet && this.selectedSnippet.elements?.highlight) {
+                    this.selectedSnippet.elements.highlight.style.display = 'none';
+                }
+                this.selectedSnippet = null;
+            },
+            
+            // Delete the selected snippet
+            deleteSelectedSnippet() {
+                if (!this.selectedSnippet) {
+                    alert('No MIDI snippet selected. Click on a snippet to select it first.');
+                    return;
+                }
+                
+                const snippet = this.selectedSnippet;
+                const trackIndex = snippet.trackIndex;
+                
+                // Remove events with this snippet ID from track
+                this.tracks[trackIndex].midiEvents = this.tracks[trackIndex].midiEvents.filter(
+                    e => e.snippetId !== snippet.id
+                );
+                
+                // Remove DOM elements
+                if (snippet.elements?.group) {
+                    snippet.elements.group.remove();
+                }
+                // Remove continuation elements if any
+                if (snippet.elements?.continuationGroupTop) {
+                    snippet.elements.continuationGroupTop.remove();
+                }
+                if (snippet.elements?.continuationGroupBottom) {
+                    snippet.elements.continuationGroupBottom.remove();
+                }
+                
+                // Remove from local snippets array
+                const localIndex = this.snippets.findIndex(s => s.id === snippet.id);
+                if (localIndex !== -1) {
+                    this.snippets.splice(localIndex, 1);
+                }
+                
+                // Remove from database
+                MidiSnippetDatabase.remove(snippet.id);
+                
+                // Mark score as dirty
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                this.selectedSnippet = null;
+                this.updateEventCount();
+                
+                console.debug(`Deleted MIDI snippet: ${snippet.name} (ID: ${snippet.id})`);
+            },
+            
+            // Reload snippets from database (called after score load)
+            reloadFromDatabase() {
+                // Clear existing snippet elements
+                for (const snippet of this.snippets) {
+                    if (snippet.elements?.group) snippet.elements.group.remove();
+                    if (snippet.elements?.continuationGroupTop) snippet.elements.continuationGroupTop.remove();
+                    if (snippet.elements?.continuationGroupBottom) snippet.elements.continuationGroupBottom.remove();
+                }
+                this.snippets = [];
+                this.selectedSnippet = null;
+                
+                // Clear all track events
+                for (let i = 0; i < 4; i++) {
+                    this.tracks[i].midiEvents = [];
+                }
+                
+                // Rebuild from database
+                const allSnippets = MidiSnippetDatabase.getAll();
+                for (const snippetData of allSnippets) {
+                    // Add events back to track
+                    const trackIndex = snippetData.trackIndex;
+                    for (const event of snippetData.events) {
+                        this.tracks[trackIndex].midiEvents.push({
+                            ...event,
+                            snippetId: snippetData.id
+                        });
+                    }
+                    
+                    // Sort events
+                    this.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                }
+                
+                // Re-render displays
+                this.renderAllMidiDisplays();
+                this.updateMidiDisplayVisibility();
+                this.updateEventCount();
             },
             
             getMidiEventType(statusByte) {
@@ -5930,8 +6106,212 @@
                 for (let i = 0; i < 4; i++) {
                     this.renderMidiDisplay(i);
                 }
+                // Render snippet overlays (colored boundaries with click handlers)
+                this.renderSnippetOverlays();
                 // Apply visibility after rendering
                 this.updateMidiDisplayVisibility();
+            },
+            
+            // Render snippet overlays with colored boundaries and selection highlights
+            renderSnippetOverlays() {
+                // Clear existing snippet elements
+                for (const snippet of this.snippets) {
+                    if (snippet.elements?.group) snippet.elements.group.remove();
+                    if (snippet.elements?.continuationGroupTop) snippet.elements.continuationGroupTop.remove();
+                    if (snippet.elements?.continuationGroupBottom) snippet.elements.continuationGroupBottom.remove();
+                }
+                this.snippets = [];
+                
+                const allSnippets = MidiSnippetDatabase.getAll();
+                if (allSnippets.length === 0) return;
+                
+                const scoreHeight = this.scoreTopEl.clientHeight;
+                const scoreWidth = this.scoreTopEl.clientWidth;
+                if (scoreWidth === 0 || scoreHeight === 0) return;
+                
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const trackHeight = availableHeight / 4;
+                
+                let secondsPerPage = 10;
+                if (window.GraphicTimeline && typeof GraphicTimeline.getSecondsPerPage === 'function') {
+                    secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                }
+                
+                for (const snippetData of allSnippets) {
+                    const trackIndex = snippetData.trackIndex;
+                    const trackY = this.timelineHeight + (trackIndex * trackHeight);
+                    
+                    // Calculate which page the snippet starts on
+                    const startActualSec = snippetData.startSeconds + leadInSeconds;
+                    const endActualSec = snippetData.endSeconds + leadInSeconds;
+                    const startPage = Math.floor(startActualSec / secondsPerPage);
+                    const endPage = Math.floor(endActualSec / secondsPerPage);
+                    
+                    // Create snippet object with elements reference
+                    const snippet = {
+                        ...snippetData,
+                        elements: {}
+                    };
+                    
+                    // Render on start page
+                    const isTopPage = startPage % 2 === 0;
+                    const group = isTopPage ? this.midiDisplayLayers.top[trackIndex] : this.midiDisplayLayers.bottom[trackIndex];
+                    
+                    // Calculate X positions
+                    const pageStartSec = startPage * secondsPerPage;
+                    const x1 = (startActualSec - pageStartSec) / secondsPerPage * scoreWidth;
+                    const pageEndSec = (startPage + 1) * secondsPerPage;
+                    const snippetEndOnPage = Math.min(endActualSec, pageEndSec);
+                    const x2 = (snippetEndOnPage - pageStartSec) / secondsPerPage * scoreWidth;
+                    
+                    // Create snippet group
+                    const snippetGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    snippetGroup.setAttribute('class', 'midi-snippet-group');
+                    snippetGroup.setAttribute('data-snippet-id', snippet.id);
+                    snippetGroup.setAttribute('data-page', startPage);
+                    
+                    // Background rectangle (semi-transparent)
+                    const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    bgRect.setAttribute('x', x1);
+                    bgRect.setAttribute('y', trackY);
+                    bgRect.setAttribute('width', Math.max(2, x2 - x1));
+                    bgRect.setAttribute('height', trackHeight);
+                    bgRect.setAttribute('fill', snippet.color);
+                    bgRect.setAttribute('fill-opacity', '0.15');
+                    bgRect.setAttribute('data-page', startPage);
+                    snippetGroup.appendChild(bgRect);
+                    
+                    // Left border line
+                    const leftLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    leftLine.setAttribute('x1', x1);
+                    leftLine.setAttribute('y1', trackY);
+                    leftLine.setAttribute('x2', x1);
+                    leftLine.setAttribute('y2', trackY + trackHeight);
+                    leftLine.setAttribute('stroke', snippet.color);
+                    leftLine.setAttribute('stroke-width', '2');
+                    leftLine.setAttribute('data-page', startPage);
+                    snippetGroup.appendChild(leftLine);
+                    
+                    // Right border line (only if snippet ends on this page)
+                    if (endActualSec <= pageEndSec) {
+                        const rightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        rightLine.setAttribute('x1', x2);
+                        rightLine.setAttribute('y1', trackY);
+                        rightLine.setAttribute('x2', x2);
+                        rightLine.setAttribute('y2', trackY + trackHeight);
+                        rightLine.setAttribute('stroke', snippet.color);
+                        rightLine.setAttribute('stroke-width', '2');
+                        rightLine.setAttribute('data-page', startPage);
+                        snippetGroup.appendChild(rightLine);
+                    }
+                    
+                    // Selection highlight (hidden by default)
+                    const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    highlight.setAttribute('x', x1 - 2);
+                    highlight.setAttribute('y', trackY - 2);
+                    highlight.setAttribute('width', Math.max(6, x2 - x1 + 4));
+                    highlight.setAttribute('height', trackHeight + 4);
+                    highlight.setAttribute('fill', 'none');
+                    highlight.setAttribute('stroke', 'yellow');
+                    highlight.setAttribute('stroke-width', '3');
+                    highlight.setAttribute('data-page', startPage);
+                    highlight.style.display = 'none';
+                    snippetGroup.appendChild(highlight);
+                    
+                    // Hit area for clicking (transparent)
+                    const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    hitArea.setAttribute('x', x1);
+                    hitArea.setAttribute('y', trackY);
+                    hitArea.setAttribute('width', Math.max(10, x2 - x1));
+                    hitArea.setAttribute('height', trackHeight);
+                    hitArea.setAttribute('fill', 'transparent');
+                    hitArea.setAttribute('class', 'midi-snippet-hit');
+                    hitArea.setAttribute('data-page', startPage);
+                    hitArea.style.cursor = 'pointer';
+                    hitArea.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectSnippet(snippet);
+                    });
+                    snippetGroup.appendChild(hitArea);
+                    
+                    group.appendChild(snippetGroup);
+                    snippet.elements.group = snippetGroup;
+                    snippet.elements.highlight = highlight;
+                    snippet.elements.bgRect = bgRect;
+                    
+                    // Handle multi-page snippets - render continuation segments
+                    if (endPage > startPage) {
+                        for (let page = startPage + 1; page <= endPage; page++) {
+                            this.renderSnippetContinuation(snippet, page, trackIndex, trackY, trackHeight, scoreWidth, secondsPerPage, endActualSec);
+                        }
+                    }
+                    
+                    this.snippets.push(snippet);
+                }
+            },
+            
+            // Render continuation segment for multi-page snippets
+            renderSnippetContinuation(snippet, page, trackIndex, trackY, trackHeight, scoreWidth, secondsPerPage, endActualSec) {
+                const isTopPage = page % 2 === 0;
+                const group = isTopPage ? this.midiDisplayLayers.top[trackIndex] : this.midiDisplayLayers.bottom[trackIndex];
+                
+                const pageStartSec = page * secondsPerPage;
+                const pageEndSec = (page + 1) * secondsPerPage;
+                const snippetEndOnPage = Math.min(endActualSec, pageEndSec);
+                
+                const x1 = 0; // Continuation starts at left edge
+                const x2 = (snippetEndOnPage - pageStartSec) / secondsPerPage * scoreWidth;
+                
+                const contGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                contGroup.setAttribute('class', 'midi-snippet-continuation');
+                contGroup.setAttribute('data-snippet-id', snippet.id);
+                contGroup.setAttribute('data-page', page);
+                
+                // Background rectangle
+                const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                bgRect.setAttribute('x', x1);
+                bgRect.setAttribute('y', trackY);
+                bgRect.setAttribute('width', Math.max(2, x2 - x1));
+                bgRect.setAttribute('height', trackHeight);
+                bgRect.setAttribute('fill', snippet.color);
+                bgRect.setAttribute('fill-opacity', '0.15');
+                bgRect.setAttribute('data-page', page);
+                contGroup.appendChild(bgRect);
+                
+                // Right border line (if snippet ends on this page)
+                if (endActualSec <= pageEndSec) {
+                    const rightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    rightLine.setAttribute('x1', x2);
+                    rightLine.setAttribute('y1', trackY);
+                    rightLine.setAttribute('x2', x2);
+                    rightLine.setAttribute('y2', trackY + trackHeight);
+                    rightLine.setAttribute('stroke', snippet.color);
+                    rightLine.setAttribute('stroke-width', '2');
+                    rightLine.setAttribute('data-page', page);
+                    contGroup.appendChild(rightLine);
+                }
+                
+                // Hit area for clicking
+                const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                hitArea.setAttribute('x', x1);
+                hitArea.setAttribute('y', trackY);
+                hitArea.setAttribute('width', Math.max(10, x2 - x1));
+                hitArea.setAttribute('height', trackHeight);
+                hitArea.setAttribute('fill', 'transparent');
+                hitArea.setAttribute('class', 'midi-snippet-hit');
+                hitArea.setAttribute('data-page', page);
+                hitArea.style.cursor = 'pointer';
+                hitArea.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectSnippet(snippet);
+                });
+                contGroup.appendChild(hitArea);
+                
+                group.appendChild(contGroup);
+                
+                // Store continuation reference
+                const groupKey = isTopPage ? 'continuationGroupTop' : 'continuationGroupBottom';
+                snippet.elements[groupKey] = contGroup;
             },
             
             // Update visibility of MIDI display elements based on toggle and current page
@@ -6523,10 +6903,73 @@
         };
         window.MotiveDatabase = MotiveDatabase;
         
+        // MIDI Snippet Database - stores MIDI file insertions as distinct objects
+        const MidiSnippetDatabase = {
+            snippets: [],
+            nextId: 1,
+            
+            add(snippetData) {
+                const snippet = {
+                    id: this.nextId++,
+                    ...snippetData,
+                    createdAt: Date.now()
+                };
+                this.snippets.push(snippet);
+                return snippet;
+            },
+            
+            get(id) {
+                return this.snippets.find(s => s.id === id);
+            },
+            
+            update(id, updates) {
+                const snippet = this.get(id);
+                if (snippet) {
+                    Object.assign(snippet, updates);
+                }
+                return snippet;
+            },
+            
+            remove(id) {
+                const index = this.snippets.findIndex(s => s.id === id);
+                if (index !== -1) {
+                    this.snippets.splice(index, 1);
+                    return true;
+                }
+                return false;
+            },
+            
+            getAll() {
+                return this.snippets;
+            },
+            
+            getByTrack(trackIndex) {
+                return this.snippets.filter(s => s.trackIndex === trackIndex);
+            },
+            
+            exportData() {
+                return {
+                    snippets: this.snippets,
+                    nextId: this.nextId
+                };
+            },
+            
+            importData(data) {
+                if (data && data.snippets) {
+                    this.snippets = data.snippets;
+                    this.nextId = data.nextId || (this.snippets.length > 0 ? Math.max(...this.snippets.map(s => s.id)) + 1 : 1);
+                }
+            }
+        };
+        window.MidiSnippetDatabase = MidiSnippetDatabase;
+        
         // ============================================
         // SCORE MANAGER - Client-side persistence
         // ============================================
         const ScoreManager = {
+            // Current save format version - increment when structure changes
+            CURRENT_VERSION: '1.0',
+            
             // UI elements
             nameInput: null,
             saveBtn: null,
@@ -6693,6 +7136,18 @@
                     }
                 );
                 
+                // MidiSnippetDatabase
+                this.registerSource('databases.midiSnippets',
+                    () => MidiSnippetDatabase.exportData(),
+                    (data) => {
+                        MidiSnippetDatabase.importData(data);
+                        // Re-render MIDI display if MidiController exists
+                        if (window.MidiController) {
+                            MidiController.reloadFromDatabase();
+                        }
+                    }
+                );
+                
                 // SVGElementManager - inserted SVG elements
                 this.registerSource('svgElements',
                     () => window.SVGElementManager ? SVGElementManager.exportData() : [],
@@ -6727,10 +7182,51 @@
                 }
             },
             
+            // Migrate data from older versions to current version
+            // Add migration logic here when version changes
+            migrateData(data) {
+                const version = data.version || '0.0'; // Pre-versioned saves
+                
+                // Example migration pattern for future use:
+                // if (this.compareVersions(version, '1.1') < 0) {
+                //     // Migrate from pre-1.1 to 1.1
+                //     data.newSection = data.newSection ?? [];
+                //     console.log('ScoreManager: Migrated data from', version, 'to 1.1');
+                // }
+                
+                // Always ensure required structures exist with defaults
+                data.metadata = data.metadata ?? { title: 'Untitled', created: new Date().toISOString(), modified: new Date().toISOString(), author: '' };
+                data.tempoHistory = data.tempoHistory ?? [{ scoreTimeMs: 0, bpm: 60, beatsPerPage: 8 }];
+                data.midiTracks = data.midiTracks ?? [];
+                data.graphicTracks = data.graphicTracks ?? [];
+                data.databases = data.databases ?? {};
+                data.databases.midiSnippets = data.databases.midiSnippets ?? { snippets: [], nextId: 1 };
+                data.svgElements = data.svgElements ?? [];
+                data.connectors = data.connectors ?? [];
+                
+                // Update version to current after migration
+                data.version = this.CURRENT_VERSION;
+                
+                return data;
+            },
+            
+            // Compare version strings (returns -1, 0, or 1)
+            compareVersions(v1, v2) {
+                const parts1 = v1.split('.').map(Number);
+                const parts2 = v2.split('.').map(Number);
+                for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+                    const p1 = parts1[i] || 0;
+                    const p2 = parts2[i] || 0;
+                    if (p1 < p2) return -1;
+                    if (p1 > p2) return 1;
+                }
+                return 0;
+            },
+            
             // Collect all data from registered sources
             collectAllData() {
                 const data = {
-                    version: '1.0',
+                    version: this.CURRENT_VERSION,
                     metadata: {
                         title: this.nameInput?.value || 'Untitled Score',
                         created: new Date().toISOString(),
@@ -6771,6 +7267,9 @@
             
             // Distribute loaded data to all registered sources
             distributeData(data) {
+                // Migrate data from older versions before distributing
+                data = this.migrateData(data);
+                
                 for (const [name, source] of this.registeredSources) {
                     try {
                         let sourceData;
