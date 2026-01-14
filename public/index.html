@@ -1096,6 +1096,19 @@
                         <label for="midiEnableT4">T4</label>
                     </div>
                 </div>
+                <div class="track-enable-group" style="margin-top: 8px;">
+                    <label class="track-enable-label">Output Channels:</label>
+                    <div class="track-toggles">
+                        <label for="midiChannelT1" style="font-size: 10px;">T1:</label>
+                        <input type="number" id="midiChannelT1" min="1" max="16" value="1" style="width: 35px; font-size: 10px;">
+                        <label for="midiChannelT2" style="font-size: 10px;">T2:</label>
+                        <input type="number" id="midiChannelT2" min="1" max="16" value="2" style="width: 35px; font-size: 10px;">
+                        <label for="midiChannelT3" style="font-size: 10px;">T3:</label>
+                        <input type="number" id="midiChannelT3" min="1" max="16" value="3" style="width: 35px; font-size: 10px;">
+                        <label for="midiChannelT4" style="font-size: 10px;">T4:</label>
+                        <input type="number" id="midiChannelT4" min="1" max="16" value="4" style="width: 35px; font-size: 10px;">
+                    </div>
+                </div>
                 <div class="control-row">
                     <span id="midiEventCount" style="font-size: 11px; color: var(--clr-lightGrey);">Events: 0</span>
                 </div>
@@ -1165,12 +1178,6 @@
                 </div>
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="midiDeleteSnippetBtn" class="control-btn" style="background: #E53935;">Delete Snippet</button>
-                </div>
-                <div class="control-row" style="margin-top: 10px;">
-                    <button id="midiDownloadBtn" class="control-btn">Download MIDI</button>
-                </div>
-                <div class="control-row">
-                    <button id="midiExportCsvBtn" class="control-btn">Export CSV</button>
                 </div>
             </div>
             
@@ -5064,8 +5071,6 @@
             // File elements
             loadBtn: null,
             fileInput: null,
-            downloadBtn: null,
-            exportCsvBtn: null,
             insertBtn: null,
             insertTimeDisplay: null,
             fileNameDisplay: null,
@@ -5094,6 +5099,9 @@
             
             // Track enable checkboxes
             trackEnables: [null, null, null, null],
+            
+            // Track output channel inputs
+            trackChannels: [null, null, null, null],
             
             // MIDI state
             midiAccess: null,
@@ -5148,8 +5156,6 @@
                 // Get file elements
                 this.loadBtn = document.getElementById('midiLoadBtn');
                 this.fileInput = document.getElementById('midiFileInput');
-                this.downloadBtn = document.getElementById('midiDownloadBtn');
-                this.exportCsvBtn = document.getElementById('midiExportCsvBtn');
                 this.insertBtn = document.getElementById('midiInsertBtn');
                 this.insertTimeDisplay = document.getElementById('midiInsertTime');
                 this.fileNameDisplay = document.getElementById('midiFileName');
@@ -5169,6 +5175,14 @@
                     document.getElementById('midiEnableT4')
                 ];
                 
+                // Get track output channel inputs
+                this.trackChannels = [
+                    document.getElementById('midiChannelT1'),
+                    document.getElementById('midiChannelT2'),
+                    document.getElementById('midiChannelT3'),
+                    document.getElementById('midiChannelT4')
+                ];
+                
                 // Set up track selection radio buttons
                 document.querySelectorAll('input[name="midiTrack"]').forEach(radio => {
                     radio.addEventListener('change', (e) => {
@@ -5184,8 +5198,6 @@
                 
                 if (this.loadBtn) this.loadBtn.addEventListener('click', () => this.fileInput.click());
                 if (this.fileInput) this.fileInput.addEventListener('change', (e) => this.loadMidiFile(e));
-                if (this.downloadBtn) this.downloadBtn.addEventListener('click', () => this.downloadMidiFile());
-                if (this.exportCsvBtn) this.exportCsvBtn.addEventListener('click', () => this.exportCsv());
                 if (this.insertBtn) this.insertBtn.addEventListener('click', () => this.insertAtEditCursor());
                 
                 // Get and set up delete button
@@ -5291,6 +5303,9 @@
                     const trackEvents = this.tracks[trackIndex].midiEvents;
                     if (trackEvents.length === 0) continue;
                     
+                    // Get output channel from UI (1-16), convert to 0-15 for MIDI
+                    const outputChannel = (parseInt(this.trackChannels[trackIndex]?.value) || (trackIndex + 1)) - 1;
+                    
                     // Send any events between last time and current time
                     while (this.currentEventIndices[trackIndex] < trackEvents.length &&
                            trackEvents[this.currentEventIndices[trackIndex]].timeMs <= currentDisplayTimeMs) {
@@ -5300,7 +5315,13 @@
                         if (event.timeMs > this.lastPlaybackTimeMs[trackIndex]) {
                             // Send to output if available
                             if (this.selectedOutput) {
-                                this.selectedOutput.send(event.data);
+                                // Remap channel for channel voice messages (0x80-0xEF)
+                                const data = [...event.data];
+                                const statusByte = data[0];
+                                if (statusByte >= 0x80 && statusByte < 0xF0) {
+                                    data[0] = (statusByte & 0xF0) | outputChannel;
+                                }
+                                this.selectedOutput.send(data);
                             }
                         }
                         
