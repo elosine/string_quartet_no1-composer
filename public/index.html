@@ -1536,6 +1536,18 @@
                     if (window.GraphicTimeline) GraphicTimeline.renderTicks();
                     // Update staff headers position
                     if (window.StaffCursors) StaffCursors.updateStaffHeaders();
+                    // Recalculate curve positions with new lead-in
+                    if (window.CurveMaker) CurveMaker.reloadFromDatabase();
+                    // Recalculate motive positions with new lead-in
+                    if (window.MotiveMaker) MotiveMaker.reloadFromDatabase();
+                    // Recalculate notation positions with new lead-in
+                    if (window.NotationManager) NotationManager.reloadPlacedNotations();
+                    // Re-render MIDI display with new lead-in
+                    if (window.MidiController) MidiController.renderAllMidiDisplays();
+                    // Recalculate SVG element positions with new lead-in (time-based positioning)
+                    if (window.SVGElementManager) SVGElementManager.reRenderAllElements();
+                    // Update connectors AFTER all objects have moved
+                    if (window.FlowchartConnector) FlowchartConnector.updateAllConnectors();
                 });
                 
                 // Set initial min values based on default lead-in
@@ -1803,11 +1815,14 @@
                     ? (section === 'top' ? GraphicTimeline.currentTopPage : GraphicTimeline.currentBottomPage)
                     : (section === 'top' ? 0 : 1);
                 
-                // Calculate percentage positions for resize handling
+                // Calculate time-based position (startSeconds)
+                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
                 const xPercent = (trackX / scoreWidth) * 100;
+                // Convert page + xPercent to startSeconds (display time, where 0 = first beat)
+                const startSeconds = (currentPage * secondsPerPage) + (xPercent / 100 * secondsPerPage) - leadInSeconds;
+                
+                // Calculate Y as percentage of track height (0 = top of track, 100 = bottom)
                 const yPercent = (trackY / scoreHeight) * 100;
-                const widthPercent = (width / scoreWidth) * 100;
-                const heightPercent = (height / scoreHeight) * 100;
                 
                 // Store element data
                 const elementData = {
@@ -1817,8 +1832,9 @@
                     image: image,
                     x: trackX,
                     y: trackY,
-                    xPercent: xPercent,
-                    yPercent: yPercent,
+                    startSeconds: startSeconds,  // Time-based X position
+                    yPercent: yPercent,          // Y as percentage of score height
+                    xPercent: xPercent,          // Keep for backward compatibility
                     width: width,
                     height: height,
                     scale: 1,
@@ -1988,6 +2004,11 @@
                 const scoreHeight = this.scoreTopEl?.clientHeight || 1;
                 this.selectedElement.xPercent = (this.selectedElement.x / scoreWidth) * 100;
                 this.selectedElement.yPercent = (this.selectedElement.y / scoreHeight) * 100;
+                
+                // Update time-based startSeconds from new X position
+                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
+                const currentPage = this.selectedElement.page || 0;
+                this.selectedElement.startSeconds = (currentPage * secondsPerPage) + (this.selectedElement.xPercent / 100 * secondsPerPage) - leadInSeconds;
                 
                 this.updateElementTransform(this.selectedElement);
                 this.updateUIFromSelected();
@@ -2168,6 +2189,7 @@
                     name: el.name,
                     x: el.x,
                     y: el.y,
+                    startSeconds: el.startSeconds,  // Time-based X position
                     xPercent: el.xPercent || (el.x / scoreWidth) * 100,
                     yPercent: el.yPercent || (el.y / scoreHeight) * 100,
                     width: el.width,
@@ -2194,6 +2216,7 @@
                 
                 const scoreWidth = this.scoreTopEl?.clientWidth || 1;
                 const scoreHeight = this.scoreTopEl?.clientHeight || 1;
+                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
                 
                 // Recreate elements
                 data.forEach(elData => {
@@ -2208,8 +2231,29 @@
                     
                     wrapper.appendChild(image);
                     
-                    // Calculate pixel positions from percentages if available
-                    const x = elData.xPercent !== undefined ? (elData.xPercent / 100) * scoreWidth : elData.x;
+                    // Determine startSeconds - use saved value or convert from old format
+                    let startSeconds;
+                    if (elData.startSeconds !== undefined) {
+                        // New format: use saved startSeconds
+                        startSeconds = elData.startSeconds;
+                    } else {
+                        // Old format: convert from page + xPercent to startSeconds
+                        const oldPage = elData.page || 0;
+                        const oldXPercent = elData.xPercent || 0;
+                        startSeconds = (oldPage * secondsPerPage) + (oldXPercent / 100 * secondsPerPage) - leadInSeconds;
+                        console.debug(`SVGElementManager: Converted old format element ${elData.id} to startSeconds=${startSeconds}`);
+                    }
+                    
+                    // Calculate page and section from startSeconds
+                    const startActual = startSeconds + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const section = startPage % 2 === 0 ? 'top' : 'bottom';
+                    
+                    // Calculate X position from startSeconds
+                    const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                    const x = (startXPercent / 100) * scoreWidth;
+                    
+                    // Calculate Y position from yPercent
                     const y = elData.yPercent !== undefined ? (elData.yPercent / 100) * scoreHeight : elData.y;
                     
                     const elementData = {
@@ -2219,7 +2263,8 @@
                         image: image,
                         x: x,
                         y: y,
-                        xPercent: elData.xPercent || (elData.x / scoreWidth) * 100,
+                        startSeconds: startSeconds,  // Time-based X position
+                        xPercent: startXPercent,     // Calculated from startSeconds
                         yPercent: elData.yPercent || (elData.y / scoreHeight) * 100,
                         width: elData.width,
                         height: elData.height,
@@ -2227,13 +2272,16 @@
                         baseScale: elData.baseScale || elData.scale,
                         baseScoreWidth: elData.baseScoreWidth || scoreWidth,
                         track: elData.track,
-                        page: elData.page || 0,
-                        section: elData.section || 'top'
+                        page: startPage,
+                        section: section
                     };
                     
                     this.elements.push(elementData);
                     this.updateElementTransform(elementData);
-                    this.containerTop.appendChild(wrapper);
+                    
+                    // Add to correct container based on section
+                    const targetContainer = section === 'top' ? this.containerTop : this.containerBottom;
+                    targetContainer.appendChild(wrapper);
                     
                     // Add drag handlers
                     wrapper.addEventListener('mousedown', (e) => this.handleElementMouseDown(e, elementData));
@@ -2245,29 +2293,57 @@
                 });
                 
                 this.updateElementList();
-                console.log(`SVGElementManager: Imported ${this.elements.length} elements`);
+                this.updateVisibility();
+                console.debug(`SVGElementManager: Imported ${this.elements.length} elements`);
             },
             
-            // Re-render all elements on window resize
+            // Re-render all elements on window resize or lead-in change
             reRenderAllElements() {
                 const scoreWidth = this.scoreTopEl?.clientWidth || 1;
                 const scoreHeight = this.scoreTopEl?.clientHeight || 1;
+                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
                 
                 this.elements.forEach(el => {
-                    // Recalculate pixel positions from percentages
-                    if (el.xPercent !== undefined && el.yPercent !== undefined) {
-                        el.x = (el.xPercent / 100) * scoreWidth;
-                        el.y = (el.yPercent / 100) * scoreHeight;
+                    // Recalculate positions from time-based startSeconds
+                    if (el.startSeconds !== undefined) {
+                        // Calculate page and section from startSeconds
+                        const startActual = el.startSeconds + leadInSeconds;
+                        const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                        const section = startPage % 2 === 0 ? 'top' : 'bottom';
                         
-                        // Scale proportionally based on original score width
-                        if (el.baseScoreWidth) {
-                            const sizeRatio = scoreWidth / el.baseScoreWidth;
-                            el.scale = el.baseScale * sizeRatio;
+                        // Calculate X position from startSeconds
+                        const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
+                        el.x = (startXPercent / 100) * scoreWidth;
+                        el.xPercent = startXPercent;
+                        el.page = startPage;
+                        el.section = section;
+                        
+                        // Move to correct container if section changed
+                        const targetContainer = section === 'top' ? this.containerTop : this.containerBottom;
+                        if (el.wrapper.parentNode !== targetContainer) {
+                            targetContainer.appendChild(el.wrapper);
                         }
-                        
-                        this.updateElementTransform(el);
+                    } else if (el.xPercent !== undefined) {
+                        // Fallback for old percentage-based elements
+                        el.x = (el.xPercent / 100) * scoreWidth;
                     }
+                    
+                    // Y position from yPercent
+                    if (el.yPercent !== undefined) {
+                        el.y = (el.yPercent / 100) * scoreHeight;
+                    }
+                    
+                    // Scale proportionally based on original score width
+                    if (el.baseScoreWidth) {
+                        const sizeRatio = scoreWidth / el.baseScoreWidth;
+                        el.scale = el.baseScale * sizeRatio;
+                    }
+                    
+                    this.updateElementTransform(el);
                 });
+                
+                // Update visibility based on current page
+                this.updateVisibility();
                 
                 // Update resize handles if element is selected
                 if (this.selectedElement) {
@@ -2467,8 +2543,9 @@
                 existingNodes.forEach(n => n.remove());
                 
                 if (this.connectMode) {
-                    const w = el.width * el.scale;
-                    const h = el.height * el.scale;
+                    // Use unscaled width/height since wrapper transform already applies scale
+                    const w = el.width;
+                    const h = el.height;
                     // 8 nodes: 4 sides + 4 corners
                     const nodePositions = [
                         { x: w/2, y: 0, side: 'top' },
@@ -2925,7 +3002,22 @@
             },
             
             updateAllConnectors() {
-                this.connectors.forEach(conn => this.updateConnectorRendering(conn));
+                this.connectors.forEach(conn => {
+                    // Update connector's section based on start object's current section
+                    const startObj = this.getObjectById(conn.startId, conn.startType);
+                    if (startObj && startObj.section) {
+                        const newSection = startObj.section;
+                        if (conn.section !== newSection) {
+                            conn.section = newSection;
+                            // Move to correct container
+                            const targetContainer = newSection === 'top' ? this.topConnectorGroup : this.bottomConnectorGroup;
+                            if (conn.elements && conn.elements.group && conn.elements.group.parentNode !== targetContainer) {
+                                targetContainer.appendChild(conn.elements.group);
+                            }
+                        }
+                    }
+                    this.updateConnectorRendering(conn);
+                });
                 // Also refresh connection nodes if in connect mode
                 if (this.connectMode) {
                     this.updateConnectionNodes();
@@ -7136,9 +7228,10 @@
                 // Calculate X position based on score time
                 const scoreWidth = container.ownerSVGElement?.clientWidth || 1000;
                 const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
-                const leadInSeconds = window.ScoreTime ? ScoreTime.leadInSeconds : 3;
+                // Use global leadInSeconds variable
+                const leadInSec = window.leadInSeconds !== undefined ? window.leadInSeconds : leadInSeconds;
                 
-                const totalSeconds = (placed.scoreTimeMs / 1000) + leadInSeconds;
+                const totalSeconds = (placed.scoreTimeMs / 1000) + leadInSec;
                 const xPercent = (totalSeconds / secondsPerPage) * 100;
                 
                 // Calculate Y position based on G track
@@ -7301,6 +7394,17 @@
                 console.log(`NotationManager: Imported ${this.items.length} items, ${this.placedNotations.length} placed`);
             },
             
+            // Reload all placed notations (recalculate positions based on current leadInSeconds)
+            reloadPlacedNotations() {
+                // Re-render each placed notation with updated positions
+                this.placedNotations.forEach(p => {
+                    if (p.element) {
+                        p.element.remove();
+                    }
+                    this.renderPlacedNotation(p);
+                });
+            },
+            
             // Place string quartet staff labels in the lead-in area (before time 0)
             placeStaffLabels(svgPath = '/notation/string_quartet_template.svg') {
                 const scoreTop = document.getElementById('ScoreTop');
@@ -7314,8 +7418,8 @@
                 const trackHeight = (scoreHeight - timelineHeight) / 4;
                 
                 // Calculate position: place at the start of lead-in, before time 0
-                // Lead-in is typically 3 seconds, so we position at the very left edge
-                const leadInSeconds = window.ScoreTime ? ScoreTime.leadInSeconds : 3;
+                // Use global leadInSeconds variable
+                const leadInSec = window.leadInSeconds !== undefined ? window.leadInSeconds : leadInSeconds;
                 const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
                 
                 // Position just before time 0 - calculate X so the right edge is at time 0
@@ -8884,15 +8988,21 @@
                     // Recreate the curve visual elements
                     const curve = { ...dbCurve };
                     
-                    // Determine which container to use based on section
+                    // Recalculate page and section from time-based values
+                    const startActual = curve.startSeconds + leadInSeconds;
+                    const endActual = curve.endSeconds + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    
+                    // Update page and section based on new lead-in
+                    curve.page = startPage;
+                    curve.section = startPage % 2 === 0 ? 'top' : 'bottom';
+                    
+                    // Determine which container to use based on recalculated section
                     const container = curve.section === 'bottom' ? this.bottomCurveGroup : this.topCurveGroup;
                     const scoreEl = curve.section === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
                     const scoreWidth = scoreEl.clientWidth;
                     
-                    // Recalculate X positions from time-based values
-                    const startActual = curve.startSeconds + leadInSeconds;
-                    const endActual = curve.endSeconds + leadInSeconds;
-                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    // Recalculate X positions
                     const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
                     const endXPercent = ((endActual / secondsPerPage) - startPage) * 100;
                     curve.x1 = (startXPercent / 100) * scoreWidth;
