@@ -5125,7 +5125,7 @@
             loadedFileName: '',
             
             // Playback state - synced to graphic cursors
-            lastPlaybackTimeMs: [0, 0, 0, 0], // Per-track last processed time
+            lastPlaybackTimeMs: [-1, -1, -1, -1], // Per-track last processed time (-1 so events at time 0 are sent)
             currentEventIndices: [0, 0, 0, 0], // Per-track playback position
             
             // MIDI Display SVG layers
@@ -5335,7 +5335,7 @@
             // Reset playback indices when score time resets
             resetPlaybackIndices() {
                 this.currentEventIndices = [0, 0, 0, 0];
-                this.lastPlaybackTimeMs = [0, 0, 0, 0];
+                this.lastPlaybackTimeMs = [-1, -1, -1, -1]; // Use -1 so events at time 0 are sent
             },
             
             // Reset playback to a specific time (used when jumping to a position)
