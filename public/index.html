@@ -5648,43 +5648,41 @@
             },
             
             parseMidiFile(arrayBuffer) {
-                const data = new Uint8Array(arrayBuffer);
+                const fileData = new Uint8Array(arrayBuffer);
                 this.loadedFileEvents = [];
                 
                 // Simple MIDI file parser
                 let pos = 0;
                 
                 // Check header
-                const header = String.fromCharCode(data[0], data[1], data[2], data[3]);
+                const header = String.fromCharCode(fileData[0], fileData[1], fileData[2], fileData[3]);
                 if (header !== 'MThd') {
                     throw new Error('Invalid MIDI file header');
                 }
                 
                 pos = 4;
-                const headerLength = (data[pos] << 24) | (data[pos+1] << 16) | (data[pos+2] << 8) | data[pos+3];
+                const headerLength = (fileData[pos] << 24) | (fileData[pos+1] << 16) | (fileData[pos+2] << 8) | fileData[pos+3];
                 pos += 4;
                 
-                const format = (data[pos] << 8) | data[pos+1];
-                const numTracks = (data[pos+2] << 8) | data[pos+3];
-                const division = (data[pos+4] << 8) | data[pos+5];
+                const format = (fileData[pos] << 8) | fileData[pos+1];
+                const numTracks = (fileData[pos+2] << 8) | fileData[pos+3];
+                const division = (fileData[pos+4] << 8) | fileData[pos+5];
                 pos += headerLength;
                 
                 // Parse tracks
-                let currentTimeMs = 0;
                 const ticksPerBeat = division;
-                const microsecondsPerBeat = 500000; // Default 120 BPM
-                const msPerTick = (microsecondsPerBeat / 1000) / ticksPerBeat;
+                let microsecondsPerBeat = 500000; // Default 120 BPM
                 
                 for (let track = 0; track < numTracks; track++) {
-                    const trackHeader = String.fromCharCode(data[pos], data[pos+1], data[pos+2], data[pos+3]);
+                    const trackHeader = String.fromCharCode(fileData[pos], fileData[pos+1], fileData[pos+2], fileData[pos+3]);
                     if (trackHeader !== 'MTrk') continue;
                     
                     pos += 4;
-                    const trackLength = (data[pos] << 24) | (data[pos+1] << 16) | (data[pos+2] << 8) | data[pos+3];
+                    const trackLength = (fileData[pos] << 24) | (fileData[pos+1] << 16) | (fileData[pos+2] << 8) | fileData[pos+3];
                     pos += 4;
                     
                     const trackEnd = pos + trackLength;
-                    let trackTimeMs = 0;
+                    let trackTimeTicks = 0; // Track time in ticks for accurate tempo handling
                     let runningStatus = 0;
                     
                     while (pos < trackEnd) {
@@ -5692,14 +5690,18 @@
                         let deltaTime = 0;
                         let byte;
                         do {
-                            byte = data[pos++];
+                            byte = fileData[pos++];
                             deltaTime = (deltaTime << 7) | (byte & 0x7F);
                         } while (byte & 0x80);
                         
-                        trackTimeMs += deltaTime * msPerTick;
+                        trackTimeTicks += deltaTime;
+                        
+                        // Convert ticks to ms using current tempo
+                        const msPerTick = (microsecondsPerBeat / 1000) / ticksPerBeat;
+                        const trackTimeMs = trackTimeTicks * msPerTick;
                         
                         // Read event
-                        let status = data[pos];
+                        let status = fileData[pos];
                         if (status < 0x80) {
                             // Running status
                             status = runningStatus;
@@ -5714,27 +5716,34 @@
                         
                         if (status === 0xFF) {
                             // Meta event
-                            const metaType = data[pos++];
+                            const metaType = fileData[pos++];
                             let length = 0;
                             do {
-                                byte = data[pos++];
+                                byte = fileData[pos++];
                                 length = (length << 7) | (byte & 0x7F);
                             } while (byte & 0x80);
+                            
+                            // Handle tempo meta event (type 0x51)
+                            if (metaType === 0x51 && length === 3) {
+                                microsecondsPerBeat = (fileData[pos] << 16) | (fileData[pos+1] << 8) | fileData[pos+2];
+                                const bpm = 60000000 / microsecondsPerBeat;
+                                console.debug(`MIDI tempo change: ${bpm.toFixed(1)} BPM`);
+                            }
                             pos += length;
                         } else if (status === 0xF0 || status === 0xF7) {
                             // SysEx
                             let length = 0;
                             do {
-                                byte = data[pos++];
+                                byte = fileData[pos++];
                                 length = (length << 7) | (byte & 0x7F);
                             } while (byte & 0x80);
                             pos += length;
                         } else if (eventType >= 0x80 && eventType <= 0xE0) {
                             // Channel event
-                            const data1 = data[pos++];
+                            const data1 = fileData[pos++];
                             let data2 = 0;
                             if (eventType !== 0xC0 && eventType !== 0xD0) {
-                                data2 = data[pos++];
+                                data2 = fileData[pos++];
                             }
                             
                             this.loadedFileEvents.push({
