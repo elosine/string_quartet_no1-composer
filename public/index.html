@@ -5571,6 +5571,10 @@
                 this.selectedSnippet = null;
                 this.updateEventCount();
                 
+                // Re-render MIDI display for the affected track to remove graphics
+                this.renderMidiDisplay(trackIndex);
+                this.updateMidiDisplayVisibility();
+                
                 console.debug(`Deleted MIDI snippet: ${snippet.name} (ID: ${snippet.id})`);
             },
             

@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "2026-01-14c_work_score",
-    "created": "2026-01-15T01:45:58.056Z",
-    "modified": "2026-01-15T01:45:58.060Z",
+    "created": "2026-01-15T01:44:29.096Z",
+    "modified": "2026-01-15T01:44:29.100Z",
     "author": ""
   },
   "tempoHistory": [
@@ -24,7 +24,1002 @@
     },
     {
       "channel": 3,
-      "midiEvents": []
+      "midiEvents": [
+        {
+          "timeMs": 0,
+          "relativeTimeMs": 0,
+          "type": "controlChange",
+          "data": [
+            178,
+            0,
+            7
+          ],
+          "snippetId": 3,
+          "timestamp": 0
+        },
+        {
+          "timeMs": 0,
+          "relativeTimeMs": 0,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            23
+          ],
+          "snippetId": 3,
+          "timestamp": 0
+        },
+        {
+          "timeMs": 0,
+          "relativeTimeMs": 0,
+          "type": "controlChange",
+          "data": [
+            178,
+            32,
+            87
+          ],
+          "snippetId": 3,
+          "timestamp": 0
+        },
+        {
+          "timeMs": 0,
+          "relativeTimeMs": 0,
+          "type": "programChange",
+          "data": [
+            194,
+            5
+          ],
+          "snippetId": 3,
+          "timestamp": 0
+        },
+        {
+          "timeMs": 0,
+          "relativeTimeMs": 0,
+          "type": "controlChange",
+          "data": [
+            178,
+            0,
+            7
+          ],
+          "snippetId": 3,
+          "timestamp": 0
+        },
+        {
+          "timeMs": 0,
+          "relativeTimeMs": 0,
+          "type": "controlChange",
+          "data": [
+            178,
+            32,
+            87
+          ],
+          "snippetId": 3,
+          "timestamp": 0
+        },
+        {
+          "timeMs": 0,
+          "relativeTimeMs": 0,
+          "type": "programChange",
+          "data": [
+            194,
+            5
+          ],
+          "snippetId": 3,
+          "timestamp": 0
+        },
+        {
+          "timeMs": 0,
+          "relativeTimeMs": 0,
+          "type": "noteOn",
+          "data": [
+            146,
+            51,
+            127
+          ],
+          "snippetId": 3,
+          "timestamp": 0
+        },
+        {
+          "timeMs": 394.7916666666667,
+          "relativeTimeMs": 394.7916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            24
+          ],
+          "snippetId": 3,
+          "timestamp": 394.7916666666667
+        },
+        {
+          "timeMs": 676.0416666666667,
+          "relativeTimeMs": 676.0416666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            25
+          ],
+          "snippetId": 3,
+          "timestamp": 676.0416666666667
+        },
+        {
+          "timeMs": 863.5416666666667,
+          "relativeTimeMs": 863.5416666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            26
+          ],
+          "snippetId": 3,
+          "timestamp": 863.5416666666667
+        },
+        {
+          "timeMs": 1019.7916666666667,
+          "relativeTimeMs": 1019.7916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            27
+          ],
+          "snippetId": 3,
+          "timestamp": 1019.7916666666667
+        },
+        {
+          "timeMs": 1144.7916666666667,
+          "relativeTimeMs": 1144.7916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            28
+          ],
+          "snippetId": 3,
+          "timestamp": 1144.7916666666667
+        },
+        {
+          "timeMs": 1269.7916666666667,
+          "relativeTimeMs": 1269.7916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            29
+          ],
+          "snippetId": 3,
+          "timestamp": 1269.7916666666667
+        },
+        {
+          "timeMs": 1363.5416666666667,
+          "relativeTimeMs": 1363.5416666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            30
+          ],
+          "snippetId": 3,
+          "timestamp": 1363.5416666666667
+        },
+        {
+          "timeMs": 1457.2916666666667,
+          "relativeTimeMs": 1457.2916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            31
+          ],
+          "snippetId": 3,
+          "timestamp": 1457.2916666666667
+        },
+        {
+          "timeMs": 1551.0416666666667,
+          "relativeTimeMs": 1551.0416666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            32
+          ],
+          "snippetId": 3,
+          "timestamp": 1551.0416666666667
+        },
+        {
+          "timeMs": 1613.5416666666667,
+          "relativeTimeMs": 1613.5416666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            33
+          ],
+          "snippetId": 3,
+          "timestamp": 1613.5416666666667
+        },
+        {
+          "timeMs": 1676.0416666666667,
+          "relativeTimeMs": 1676.0416666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            34
+          ],
+          "snippetId": 3,
+          "timestamp": 1676.0416666666667
+        },
+        {
+          "timeMs": 1769.7916666666667,
+          "relativeTimeMs": 1769.7916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            35
+          ],
+          "snippetId": 3,
+          "timestamp": 1769.7916666666667
+        },
+        {
+          "timeMs": 1832.2916666666667,
+          "relativeTimeMs": 1832.2916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            36
+          ],
+          "snippetId": 3,
+          "timestamp": 1832.2916666666667
+        },
+        {
+          "timeMs": 1894.7916666666667,
+          "relativeTimeMs": 1894.7916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            37
+          ],
+          "snippetId": 3,
+          "timestamp": 1894.7916666666667
+        },
+        {
+          "timeMs": 1957.2916666666667,
+          "relativeTimeMs": 1957.2916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            38
+          ],
+          "snippetId": 3,
+          "timestamp": 1957.2916666666667
+        },
+        {
+          "timeMs": 2019.7916666666667,
+          "relativeTimeMs": 2019.7916666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            39
+          ],
+          "snippetId": 3,
+          "timestamp": 2019.7916666666667
+        },
+        {
+          "timeMs": 2051.041666666667,
+          "relativeTimeMs": 2051.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            40
+          ],
+          "snippetId": 3,
+          "timestamp": 2051.041666666667
+        },
+        {
+          "timeMs": 2113.541666666667,
+          "relativeTimeMs": 2113.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            41
+          ],
+          "snippetId": 3,
+          "timestamp": 2113.541666666667
+        },
+        {
+          "timeMs": 2176.041666666667,
+          "relativeTimeMs": 2176.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            42
+          ],
+          "snippetId": 3,
+          "timestamp": 2176.041666666667
+        },
+        {
+          "timeMs": 2207.291666666667,
+          "relativeTimeMs": 2207.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            43
+          ],
+          "snippetId": 3,
+          "timestamp": 2207.291666666667
+        },
+        {
+          "timeMs": 2269.791666666667,
+          "relativeTimeMs": 2269.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            44
+          ],
+          "snippetId": 3,
+          "timestamp": 2269.791666666667
+        },
+        {
+          "timeMs": 2301.041666666667,
+          "relativeTimeMs": 2301.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            45
+          ],
+          "snippetId": 3,
+          "timestamp": 2301.041666666667
+        },
+        {
+          "timeMs": 2363.541666666667,
+          "relativeTimeMs": 2363.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            46
+          ],
+          "snippetId": 3,
+          "timestamp": 2363.541666666667
+        },
+        {
+          "timeMs": 2394.791666666667,
+          "relativeTimeMs": 2394.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            47
+          ],
+          "snippetId": 3,
+          "timestamp": 2394.791666666667
+        },
+        {
+          "timeMs": 2426.041666666667,
+          "relativeTimeMs": 2426.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            48
+          ],
+          "snippetId": 3,
+          "timestamp": 2426.041666666667
+        },
+        {
+          "timeMs": 2457.291666666667,
+          "relativeTimeMs": 2457.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            49
+          ],
+          "snippetId": 3,
+          "timestamp": 2457.291666666667
+        },
+        {
+          "timeMs": 2519.791666666667,
+          "relativeTimeMs": 2519.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            50
+          ],
+          "snippetId": 3,
+          "timestamp": 2519.791666666667
+        },
+        {
+          "timeMs": 2551.041666666667,
+          "relativeTimeMs": 2551.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            51
+          ],
+          "snippetId": 3,
+          "timestamp": 2551.041666666667
+        },
+        {
+          "timeMs": 2582.291666666667,
+          "relativeTimeMs": 2582.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            52
+          ],
+          "snippetId": 3,
+          "timestamp": 2582.291666666667
+        },
+        {
+          "timeMs": 2613.541666666667,
+          "relativeTimeMs": 2613.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            53
+          ],
+          "snippetId": 3,
+          "timestamp": 2613.541666666667
+        },
+        {
+          "timeMs": 2644.791666666667,
+          "relativeTimeMs": 2644.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            54
+          ],
+          "snippetId": 3,
+          "timestamp": 2644.791666666667
+        },
+        {
+          "timeMs": 2676.041666666667,
+          "relativeTimeMs": 2676.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            55
+          ],
+          "snippetId": 3,
+          "timestamp": 2676.041666666667
+        },
+        {
+          "timeMs": 2707.291666666667,
+          "relativeTimeMs": 2707.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            56
+          ],
+          "snippetId": 3,
+          "timestamp": 2707.291666666667
+        },
+        {
+          "timeMs": 2769.791666666667,
+          "relativeTimeMs": 2769.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            57
+          ],
+          "snippetId": 3,
+          "timestamp": 2769.791666666667
+        },
+        {
+          "timeMs": 2801.041666666667,
+          "relativeTimeMs": 2801.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            59
+          ],
+          "snippetId": 3,
+          "timestamp": 2801.041666666667
+        },
+        {
+          "timeMs": 2832.291666666667,
+          "relativeTimeMs": 2832.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            60
+          ],
+          "snippetId": 3,
+          "timestamp": 2832.291666666667
+        },
+        {
+          "timeMs": 2863.541666666667,
+          "relativeTimeMs": 2863.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            61
+          ],
+          "snippetId": 3,
+          "timestamp": 2863.541666666667
+        },
+        {
+          "timeMs": 2894.791666666667,
+          "relativeTimeMs": 2894.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            62
+          ],
+          "snippetId": 3,
+          "timestamp": 2894.791666666667
+        },
+        {
+          "timeMs": 2926.041666666667,
+          "relativeTimeMs": 2926.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            63
+          ],
+          "snippetId": 3,
+          "timestamp": 2926.041666666667
+        },
+        {
+          "timeMs": 2957.291666666667,
+          "relativeTimeMs": 2957.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            64
+          ],
+          "snippetId": 3,
+          "timestamp": 2957.291666666667
+        },
+        {
+          "timeMs": 2988.541666666667,
+          "relativeTimeMs": 2988.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            65
+          ],
+          "snippetId": 3,
+          "timestamp": 2988.541666666667
+        },
+        {
+          "timeMs": 3019.791666666667,
+          "relativeTimeMs": 3019.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            66
+          ],
+          "snippetId": 3,
+          "timestamp": 3019.791666666667
+        },
+        {
+          "timeMs": 3051.041666666667,
+          "relativeTimeMs": 3051.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            68
+          ],
+          "snippetId": 3,
+          "timestamp": 3051.041666666667
+        },
+        {
+          "timeMs": 3082.291666666667,
+          "relativeTimeMs": 3082.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            69
+          ],
+          "snippetId": 3,
+          "timestamp": 3082.291666666667
+        },
+        {
+          "timeMs": 3113.541666666667,
+          "relativeTimeMs": 3113.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            70
+          ],
+          "snippetId": 3,
+          "timestamp": 3113.541666666667
+        },
+        {
+          "timeMs": 3144.791666666667,
+          "relativeTimeMs": 3144.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            71
+          ],
+          "snippetId": 3,
+          "timestamp": 3144.791666666667
+        },
+        {
+          "timeMs": 3176.041666666667,
+          "relativeTimeMs": 3176.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            73
+          ],
+          "snippetId": 3,
+          "timestamp": 3176.041666666667
+        },
+        {
+          "timeMs": 3207.291666666667,
+          "relativeTimeMs": 3207.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            74
+          ],
+          "snippetId": 3,
+          "timestamp": 3207.291666666667
+        },
+        {
+          "timeMs": 3238.541666666667,
+          "relativeTimeMs": 3238.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            76
+          ],
+          "snippetId": 3,
+          "timestamp": 3238.541666666667
+        },
+        {
+          "timeMs": 3269.791666666667,
+          "relativeTimeMs": 3269.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            77
+          ],
+          "snippetId": 3,
+          "timestamp": 3269.791666666667
+        },
+        {
+          "timeMs": 3301.041666666667,
+          "relativeTimeMs": 3301.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            79
+          ],
+          "snippetId": 3,
+          "timestamp": 3301.041666666667
+        },
+        {
+          "timeMs": 3332.291666666667,
+          "relativeTimeMs": 3332.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            80
+          ],
+          "snippetId": 3,
+          "timestamp": 3332.291666666667
+        },
+        {
+          "timeMs": 3363.541666666667,
+          "relativeTimeMs": 3363.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            82
+          ],
+          "snippetId": 3,
+          "timestamp": 3363.541666666667
+        },
+        {
+          "timeMs": 3394.791666666667,
+          "relativeTimeMs": 3394.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            83
+          ],
+          "snippetId": 3,
+          "timestamp": 3394.791666666667
+        },
+        {
+          "timeMs": 3426.041666666667,
+          "relativeTimeMs": 3426.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            85
+          ],
+          "snippetId": 3,
+          "timestamp": 3426.041666666667
+        },
+        {
+          "timeMs": 3457.291666666667,
+          "relativeTimeMs": 3457.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            87
+          ],
+          "snippetId": 3,
+          "timestamp": 3457.291666666667
+        },
+        {
+          "timeMs": 3488.541666666667,
+          "relativeTimeMs": 3488.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            89
+          ],
+          "snippetId": 3,
+          "timestamp": 3488.541666666667
+        },
+        {
+          "timeMs": 3519.791666666667,
+          "relativeTimeMs": 3519.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            91
+          ],
+          "snippetId": 3,
+          "timestamp": 3519.791666666667
+        },
+        {
+          "timeMs": 3551.041666666667,
+          "relativeTimeMs": 3551.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            92
+          ],
+          "snippetId": 3,
+          "timestamp": 3551.041666666667
+        },
+        {
+          "timeMs": 3582.291666666667,
+          "relativeTimeMs": 3582.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            94
+          ],
+          "snippetId": 3,
+          "timestamp": 3582.291666666667
+        },
+        {
+          "timeMs": 3613.541666666667,
+          "relativeTimeMs": 3613.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            96
+          ],
+          "snippetId": 3,
+          "timestamp": 3613.541666666667
+        },
+        {
+          "timeMs": 3644.791666666667,
+          "relativeTimeMs": 3644.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            98
+          ],
+          "snippetId": 3,
+          "timestamp": 3644.791666666667
+        },
+        {
+          "timeMs": 3676.041666666667,
+          "relativeTimeMs": 3676.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            101
+          ],
+          "snippetId": 3,
+          "timestamp": 3676.041666666667
+        },
+        {
+          "timeMs": 3707.291666666667,
+          "relativeTimeMs": 3707.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            103
+          ],
+          "snippetId": 3,
+          "timestamp": 3707.291666666667
+        },
+        {
+          "timeMs": 3738.541666666667,
+          "relativeTimeMs": 3738.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            105
+          ],
+          "snippetId": 3,
+          "timestamp": 3738.541666666667
+        },
+        {
+          "timeMs": 3769.791666666667,
+          "relativeTimeMs": 3769.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            107
+          ],
+          "snippetId": 3,
+          "timestamp": 3769.791666666667
+        },
+        {
+          "timeMs": 3801.041666666667,
+          "relativeTimeMs": 3801.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            110
+          ],
+          "snippetId": 3,
+          "timestamp": 3801.041666666667
+        },
+        {
+          "timeMs": 3832.291666666667,
+          "relativeTimeMs": 3832.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            112
+          ],
+          "snippetId": 3,
+          "timestamp": 3832.291666666667
+        },
+        {
+          "timeMs": 3863.541666666667,
+          "relativeTimeMs": 3863.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            115
+          ],
+          "snippetId": 3,
+          "timestamp": 3863.541666666667
+        },
+        {
+          "timeMs": 3894.791666666667,
+          "relativeTimeMs": 3894.791666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            118
+          ],
+          "snippetId": 3,
+          "timestamp": 3894.791666666667
+        },
+        {
+          "timeMs": 3926.041666666667,
+          "relativeTimeMs": 3926.041666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            121
+          ],
+          "snippetId": 3,
+          "timestamp": 3926.041666666667
+        },
+        {
+          "timeMs": 3957.291666666667,
+          "relativeTimeMs": 3957.291666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            124
+          ],
+          "snippetId": 3,
+          "timestamp": 3957.291666666667
+        },
+        {
+          "timeMs": 3988.541666666667,
+          "relativeTimeMs": 3988.541666666667,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            127
+          ],
+          "snippetId": 3,
+          "timestamp": 3988.541666666667
+        },
+        {
+          "timeMs": 3992.7083333333335,
+          "relativeTimeMs": 3992.7083333333335,
+          "type": "controlChange",
+          "data": [
+            178,
+            7,
+            127
+          ],
+          "snippetId": 3,
+          "timestamp": 3992.7083333333335
+        },
+        {
+          "timeMs": 4000.0000000000005,
+          "relativeTimeMs": 4000.0000000000005,
+          "type": "noteOff",
+          "data": [
+            130,
+            51,
+            0
+          ],
+          "snippetId": 3,
+          "timestamp": 4000.0000000000005
+        }
+      ]
     },
     {
       "channel": 4,
@@ -8329,8 +9324,848 @@
       "nextId": 32
     },
     "midiSnippets": {
-      "snippets": [],
-      "nextId": 3
+      "snippets": [
+        {
+          "id": 3,
+          "name": "M1_violaCresc.mid",
+          "trackIndex": 2,
+          "startSeconds": 0,
+          "endSeconds": 4.000000000000001,
+          "events": [
+            {
+              "timeMs": 0,
+              "relativeTimeMs": 0,
+              "type": "controlChange",
+              "data": [
+                178,
+                0,
+                7
+              ]
+            },
+            {
+              "timeMs": 0,
+              "relativeTimeMs": 0,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                23
+              ]
+            },
+            {
+              "timeMs": 0,
+              "relativeTimeMs": 0,
+              "type": "controlChange",
+              "data": [
+                178,
+                32,
+                87
+              ]
+            },
+            {
+              "timeMs": 0,
+              "relativeTimeMs": 0,
+              "type": "programChange",
+              "data": [
+                194,
+                5
+              ]
+            },
+            {
+              "timeMs": 0,
+              "relativeTimeMs": 0,
+              "type": "controlChange",
+              "data": [
+                178,
+                0,
+                7
+              ]
+            },
+            {
+              "timeMs": 0,
+              "relativeTimeMs": 0,
+              "type": "controlChange",
+              "data": [
+                178,
+                32,
+                87
+              ]
+            },
+            {
+              "timeMs": 0,
+              "relativeTimeMs": 0,
+              "type": "programChange",
+              "data": [
+                194,
+                5
+              ]
+            },
+            {
+              "timeMs": 0,
+              "relativeTimeMs": 0,
+              "type": "noteOn",
+              "data": [
+                146,
+                51,
+                127
+              ]
+            },
+            {
+              "timeMs": 394.7916666666667,
+              "relativeTimeMs": 394.7916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                24
+              ]
+            },
+            {
+              "timeMs": 676.0416666666667,
+              "relativeTimeMs": 676.0416666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                25
+              ]
+            },
+            {
+              "timeMs": 863.5416666666667,
+              "relativeTimeMs": 863.5416666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                26
+              ]
+            },
+            {
+              "timeMs": 1019.7916666666667,
+              "relativeTimeMs": 1019.7916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                27
+              ]
+            },
+            {
+              "timeMs": 1144.7916666666667,
+              "relativeTimeMs": 1144.7916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                28
+              ]
+            },
+            {
+              "timeMs": 1269.7916666666667,
+              "relativeTimeMs": 1269.7916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                29
+              ]
+            },
+            {
+              "timeMs": 1363.5416666666667,
+              "relativeTimeMs": 1363.5416666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                30
+              ]
+            },
+            {
+              "timeMs": 1457.2916666666667,
+              "relativeTimeMs": 1457.2916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                31
+              ]
+            },
+            {
+              "timeMs": 1551.0416666666667,
+              "relativeTimeMs": 1551.0416666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                32
+              ]
+            },
+            {
+              "timeMs": 1613.5416666666667,
+              "relativeTimeMs": 1613.5416666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                33
+              ]
+            },
+            {
+              "timeMs": 1676.0416666666667,
+              "relativeTimeMs": 1676.0416666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                34
+              ]
+            },
+            {
+              "timeMs": 1769.7916666666667,
+              "relativeTimeMs": 1769.7916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                35
+              ]
+            },
+            {
+              "timeMs": 1832.2916666666667,
+              "relativeTimeMs": 1832.2916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                36
+              ]
+            },
+            {
+              "timeMs": 1894.7916666666667,
+              "relativeTimeMs": 1894.7916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                37
+              ]
+            },
+            {
+              "timeMs": 1957.2916666666667,
+              "relativeTimeMs": 1957.2916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                38
+              ]
+            },
+            {
+              "timeMs": 2019.7916666666667,
+              "relativeTimeMs": 2019.7916666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                39
+              ]
+            },
+            {
+              "timeMs": 2051.041666666667,
+              "relativeTimeMs": 2051.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                40
+              ]
+            },
+            {
+              "timeMs": 2113.541666666667,
+              "relativeTimeMs": 2113.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                41
+              ]
+            },
+            {
+              "timeMs": 2176.041666666667,
+              "relativeTimeMs": 2176.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                42
+              ]
+            },
+            {
+              "timeMs": 2207.291666666667,
+              "relativeTimeMs": 2207.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                43
+              ]
+            },
+            {
+              "timeMs": 2269.791666666667,
+              "relativeTimeMs": 2269.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                44
+              ]
+            },
+            {
+              "timeMs": 2301.041666666667,
+              "relativeTimeMs": 2301.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                45
+              ]
+            },
+            {
+              "timeMs": 2363.541666666667,
+              "relativeTimeMs": 2363.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                46
+              ]
+            },
+            {
+              "timeMs": 2394.791666666667,
+              "relativeTimeMs": 2394.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                47
+              ]
+            },
+            {
+              "timeMs": 2426.041666666667,
+              "relativeTimeMs": 2426.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                48
+              ]
+            },
+            {
+              "timeMs": 2457.291666666667,
+              "relativeTimeMs": 2457.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                49
+              ]
+            },
+            {
+              "timeMs": 2519.791666666667,
+              "relativeTimeMs": 2519.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                50
+              ]
+            },
+            {
+              "timeMs": 2551.041666666667,
+              "relativeTimeMs": 2551.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                51
+              ]
+            },
+            {
+              "timeMs": 2582.291666666667,
+              "relativeTimeMs": 2582.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                52
+              ]
+            },
+            {
+              "timeMs": 2613.541666666667,
+              "relativeTimeMs": 2613.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                53
+              ]
+            },
+            {
+              "timeMs": 2644.791666666667,
+              "relativeTimeMs": 2644.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                54
+              ]
+            },
+            {
+              "timeMs": 2676.041666666667,
+              "relativeTimeMs": 2676.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                55
+              ]
+            },
+            {
+              "timeMs": 2707.291666666667,
+              "relativeTimeMs": 2707.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                56
+              ]
+            },
+            {
+              "timeMs": 2769.791666666667,
+              "relativeTimeMs": 2769.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                57
+              ]
+            },
+            {
+              "timeMs": 2801.041666666667,
+              "relativeTimeMs": 2801.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                59
+              ]
+            },
+            {
+              "timeMs": 2832.291666666667,
+              "relativeTimeMs": 2832.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                60
+              ]
+            },
+            {
+              "timeMs": 2863.541666666667,
+              "relativeTimeMs": 2863.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                61
+              ]
+            },
+            {
+              "timeMs": 2894.791666666667,
+              "relativeTimeMs": 2894.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                62
+              ]
+            },
+            {
+              "timeMs": 2926.041666666667,
+              "relativeTimeMs": 2926.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                63
+              ]
+            },
+            {
+              "timeMs": 2957.291666666667,
+              "relativeTimeMs": 2957.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                64
+              ]
+            },
+            {
+              "timeMs": 2988.541666666667,
+              "relativeTimeMs": 2988.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                65
+              ]
+            },
+            {
+              "timeMs": 3019.791666666667,
+              "relativeTimeMs": 3019.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                66
+              ]
+            },
+            {
+              "timeMs": 3051.041666666667,
+              "relativeTimeMs": 3051.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                68
+              ]
+            },
+            {
+              "timeMs": 3082.291666666667,
+              "relativeTimeMs": 3082.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                69
+              ]
+            },
+            {
+              "timeMs": 3113.541666666667,
+              "relativeTimeMs": 3113.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                70
+              ]
+            },
+            {
+              "timeMs": 3144.791666666667,
+              "relativeTimeMs": 3144.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                71
+              ]
+            },
+            {
+              "timeMs": 3176.041666666667,
+              "relativeTimeMs": 3176.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                73
+              ]
+            },
+            {
+              "timeMs": 3207.291666666667,
+              "relativeTimeMs": 3207.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                74
+              ]
+            },
+            {
+              "timeMs": 3238.541666666667,
+              "relativeTimeMs": 3238.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                76
+              ]
+            },
+            {
+              "timeMs": 3269.791666666667,
+              "relativeTimeMs": 3269.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                77
+              ]
+            },
+            {
+              "timeMs": 3301.041666666667,
+              "relativeTimeMs": 3301.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                79
+              ]
+            },
+            {
+              "timeMs": 3332.291666666667,
+              "relativeTimeMs": 3332.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                80
+              ]
+            },
+            {
+              "timeMs": 3363.541666666667,
+              "relativeTimeMs": 3363.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                82
+              ]
+            },
+            {
+              "timeMs": 3394.791666666667,
+              "relativeTimeMs": 3394.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                83
+              ]
+            },
+            {
+              "timeMs": 3426.041666666667,
+              "relativeTimeMs": 3426.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                85
+              ]
+            },
+            {
+              "timeMs": 3457.291666666667,
+              "relativeTimeMs": 3457.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                87
+              ]
+            },
+            {
+              "timeMs": 3488.541666666667,
+              "relativeTimeMs": 3488.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                89
+              ]
+            },
+            {
+              "timeMs": 3519.791666666667,
+              "relativeTimeMs": 3519.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                91
+              ]
+            },
+            {
+              "timeMs": 3551.041666666667,
+              "relativeTimeMs": 3551.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                92
+              ]
+            },
+            {
+              "timeMs": 3582.291666666667,
+              "relativeTimeMs": 3582.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                94
+              ]
+            },
+            {
+              "timeMs": 3613.541666666667,
+              "relativeTimeMs": 3613.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                96
+              ]
+            },
+            {
+              "timeMs": 3644.791666666667,
+              "relativeTimeMs": 3644.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                98
+              ]
+            },
+            {
+              "timeMs": 3676.041666666667,
+              "relativeTimeMs": 3676.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                101
+              ]
+            },
+            {
+              "timeMs": 3707.291666666667,
+              "relativeTimeMs": 3707.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                103
+              ]
+            },
+            {
+              "timeMs": 3738.541666666667,
+              "relativeTimeMs": 3738.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                105
+              ]
+            },
+            {
+              "timeMs": 3769.791666666667,
+              "relativeTimeMs": 3769.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                107
+              ]
+            },
+            {
+              "timeMs": 3801.041666666667,
+              "relativeTimeMs": 3801.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                110
+              ]
+            },
+            {
+              "timeMs": 3832.291666666667,
+              "relativeTimeMs": 3832.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                112
+              ]
+            },
+            {
+              "timeMs": 3863.541666666667,
+              "relativeTimeMs": 3863.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                115
+              ]
+            },
+            {
+              "timeMs": 3894.791666666667,
+              "relativeTimeMs": 3894.791666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                118
+              ]
+            },
+            {
+              "timeMs": 3926.041666666667,
+              "relativeTimeMs": 3926.041666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                121
+              ]
+            },
+            {
+              "timeMs": 3957.291666666667,
+              "relativeTimeMs": 3957.291666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                124
+              ]
+            },
+            {
+              "timeMs": 3988.541666666667,
+              "relativeTimeMs": 3988.541666666667,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                127
+              ]
+            },
+            {
+              "timeMs": 3992.7083333333335,
+              "relativeTimeMs": 3992.7083333333335,
+              "type": "controlChange",
+              "data": [
+                178,
+                7,
+                127
+              ]
+            },
+            {
+              "timeMs": 4000.0000000000005,
+              "relativeTimeMs": 4000.0000000000005,
+              "type": "noteOff",
+              "data": [
+                130,
+                51,
+                0
+              ]
+            }
+          ],
+          "color": "#2196F3",
+          "createdAt": 1768441402004
+        }
+      ],
+      "nextId": 4
     },
     "notation": {
       "items": [],
