@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "2026-01-14d_work_score",
-    "created": "2026-01-15T05:23:50.104Z",
-    "modified": "2026-01-15T05:23:50.110Z",
+    "created": "2026-01-15T05:23:40.443Z",
+    "modified": "2026-01-15T05:23:40.504Z",
     "author": ""
   },
   "tempoHistory": [
@@ -4494,90 +4494,6 @@
           ],
           "snippetId": 25,
           "timestamp": 24417.708333333332
-        },
-        {
-          "timeMs": 26700,
-          "relativeTimeMs": 0,
-          "type": "controlChange",
-          "data": [
-            179,
-            0,
-            107
-          ],
-          "snippetId": 29,
-          "timestamp": 26700
-        },
-        {
-          "timeMs": 26716.666666666668,
-          "relativeTimeMs": 16.666666666666668,
-          "type": "controlChange",
-          "data": [
-            179,
-            0,
-            97
-          ],
-          "snippetId": 29,
-          "timestamp": 26716.666666666668
-        },
-        {
-          "timeMs": 26716.666666666668,
-          "relativeTimeMs": 16.666666666666668,
-          "type": "noteOn",
-          "data": [
-            147,
-            52,
-            91
-          ],
-          "snippetId": 29,
-          "timestamp": 26716.666666666668
-        },
-        {
-          "timeMs": 26951.041666666668,
-          "relativeTimeMs": 251.04166666666669,
-          "type": "noteOn",
-          "data": [
-            147,
-            52,
-            0
-          ],
-          "snippetId": 29,
-          "timestamp": 26951.041666666668
-        },
-        {
-          "timeMs": 27438.541666666668,
-          "relativeTimeMs": 738.5416666666667,
-          "type": "controlChange",
-          "data": [
-            179,
-            0,
-            107
-          ],
-          "snippetId": 29,
-          "timestamp": 27438.541666666668
-        },
-        {
-          "timeMs": 27438.541666666668,
-          "relativeTimeMs": 738.5416666666667,
-          "type": "noteOn",
-          "data": [
-            147,
-            40,
-            127
-          ],
-          "snippetId": 29,
-          "timestamp": 27438.541666666668
-        },
-        {
-          "timeMs": 27905.208333333332,
-          "relativeTimeMs": 1205.2083333333335,
-          "type": "noteOn",
-          "data": [
-            147,
-            40,
-            0
-          ],
-          "snippetId": 29,
-          "timestamp": 27905.208333333332
         }
       ]
     }
@@ -16905,90 +16821,9 @@
           ],
           "color": "#8BC34A",
           "createdAt": 1768454616716
-        },
-        {
-          "id": 29,
-          "name": "Twigs001_g_vc.mid",
-          "trackIndex": 3,
-          "startSeconds": 26.7,
-          "endSeconds": 27.905208333333334,
-          "events": [
-            {
-              "timeMs": 26700,
-              "relativeTimeMs": 0,
-              "type": "controlChange",
-              "data": [
-                179,
-                0,
-                107
-              ]
-            },
-            {
-              "timeMs": 26716.666666666668,
-              "relativeTimeMs": 16.666666666666668,
-              "type": "controlChange",
-              "data": [
-                179,
-                0,
-                97
-              ]
-            },
-            {
-              "timeMs": 26716.666666666668,
-              "relativeTimeMs": 16.666666666666668,
-              "type": "noteOn",
-              "data": [
-                147,
-                52,
-                91
-              ]
-            },
-            {
-              "timeMs": 26951.041666666668,
-              "relativeTimeMs": 251.04166666666669,
-              "type": "noteOn",
-              "data": [
-                147,
-                52,
-                0
-              ]
-            },
-            {
-              "timeMs": 27438.541666666668,
-              "relativeTimeMs": 738.5416666666667,
-              "type": "controlChange",
-              "data": [
-                179,
-                0,
-                107
-              ]
-            },
-            {
-              "timeMs": 27438.541666666668,
-              "relativeTimeMs": 738.5416666666667,
-              "type": "noteOn",
-              "data": [
-                147,
-                40,
-                127
-              ]
-            },
-            {
-              "timeMs": 27905.208333333332,
-              "relativeTimeMs": 1205.2083333333335,
-              "type": "noteOn",
-              "data": [
-                147,
-                40,
-                0
-              ]
-            }
-          ],
-          "color": "#FF5722",
-          "createdAt": 1768454627937
         }
       ],
-      "nextId": 30
+      "nextId": 29
     },
     "notation": {
       "items": [],

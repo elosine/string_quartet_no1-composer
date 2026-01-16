@@ -959,6 +959,48 @@
                 -->
                 
                 <div class="section-divider"></div>
+                <div class="section-label">GC (Bouncing Ball)</div>
+                
+                <div class="curve-input-row">
+                    <label>Impact</label>
+                    <input type="number" id="gcImpactInput" class="curve-input" value="3" step="0.1" style="width: 60px;">
+                    <label style="margin-left: 8px;">Track</label>
+                    <select id="gcTrackSelect" style="width: 40px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px;">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label>Float</label>
+                    <input type="range" id="gcStiffnessSlider" min="-30" max="1000" value="50" step="1" style="width: 120px;">
+                    <input type="number" id="gcStiffnessNum" min="-30" max="1000" value="50" step="1" style="width: 36px; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 1px 2px;">
+                </div>
+                <div class="curve-input-row">
+                    <label>Rebound</label>
+                    <input type="range" id="gcDampingSlider" min="10" max="100" value="70" step="1" style="width: 120px;">
+                    <input type="number" id="gcDampingNum" min="10" max="100" value="70" step="1" style="width: 36px; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 1px 2px;">
+                </div>
+                <div class="curve-input-row">
+                    <label>Ictus</label>
+                    <input type="range" id="gcIctusSlider" min="0" max="1000" value="50" step="1" style="width: 120px;">
+                    <input type="number" id="gcIctusNum" min="0" max="1000" value="50" step="1" style="width: 36px; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 1px 2px;">
+                </div>
+                <div class="curve-input-row">
+                    <label>Descent %</label>
+                    <input type="range" id="gcDescentSlider" min="20" max="80" value="40" step="1" style="width: 120px;">
+                    <input type="number" id="gcDescentNum" min="20" max="80" value="40" step="1" style="width: 36px; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 1px 2px;">
+                </div>
+                <div class="curve-input-row">
+                    <label>Duration</label>
+                    <input type="range" id="gcDurationSlider" min="0.2" max="5" value="1" step="0.1" style="width: 120px;">
+                    <input type="number" id="gcDurationNum" min="0.2" max="5" value="1" step="0.1" style="width: 36px; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 1px 2px;">
+                </div>
+                <button id="gcDrawBtn" class="curve-draw-btn" style="background: #4a2d5a; border-color: #5a3d6a;">Draw GC</button>
+                <button id="gcClearBtn" class="curve-draw-btn" style="margin-top: 5px; background: #4a2d5a; border-color: #5a3d6a;">Clear All</button>
+                
+                <div class="section-divider"></div>
                 <div class="section-label">SVG Elements</div>
                 
                 <div class="control-row">
@@ -10795,6 +10837,502 @@
         if (window.SVGElementManager) {
             SVGElementManager.bringToFront();
         }
+        
+        // ============================================
+        // GC MAKER - Gravitational Conductor (Bouncing Ball)
+        // Physics-based bouncing ball: drops from height, bounces up
+        // Adjustable gravity, mass, bounce coefficient, drop height
+        // Real-time curve updates as sliders change
+        // ============================================
+        const GCMaker = {
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            topGCGroup: null,
+            bottomGCGroup: null,
+            
+            // Array of GC objects
+            gcs: [],
+            nextId: 1,
+            
+            // The single test GC that updates in real-time
+            testGC: null,
+            
+            // Ball element (single ball that moves with cursor)
+            ballTop: null,
+            ballBottom: null,
+            
+            // UI elements
+            impactInput: null,
+            trackSelect: null,
+            stiffnessSlider: null,
+            dampingSlider: null,
+            ictusSlider: null,
+            descentSlider: null,
+            durationSlider: null,
+            drawBtn: null,
+            clearBtn: null,
+            
+            // Curve shape parameters
+            stiffness: 50,      // 1-100: Float - controls ascent easing (higher = more floaty)
+            damping: 70,        // 10-100: Rebound - controls bounce height percentage
+            ictus: 50,          // 0-1000: Sharpness of descent (higher = snappier)
+            descentRatio: 40,   // 20-80: Percentage of duration spent on descent
+            duration: 1.0,      // Total gesture duration in seconds
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                // Create GC container groups for arcs
+                this.topGCGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.bottomGCGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.topGCGroup.setAttribute('class', 'gc-container');
+                this.bottomGCGroup.setAttribute('class', 'gc-container');
+                this.scoreTopEl.appendChild(this.topGCGroup);
+                this.scoreBottomEl.appendChild(this.bottomGCGroup);
+                
+                // Create ball elements (circles that follow cursor)
+                this.ballTop = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                this.ballBottom = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                
+                [this.ballTop, this.ballBottom].forEach(ball => {
+                    ball.setAttribute('r', '8');
+                    ball.setAttribute('fill', 'rgb(255, 21, 160)');
+                    ball.setAttribute('stroke', '#000');
+                    ball.setAttribute('stroke-width', '1');
+                    ball.style.display = 'none';
+                });
+                
+                this.scoreTopEl.appendChild(this.ballTop);
+                this.scoreBottomEl.appendChild(this.ballBottom);
+                
+                // Get UI elements
+                this.impactInput = document.getElementById('gcImpactInput');
+                this.trackSelect = document.getElementById('gcTrackSelect');
+                this.stiffnessSlider = document.getElementById('gcStiffnessSlider');
+                this.dampingSlider = document.getElementById('gcDampingSlider');
+                this.ictusSlider = document.getElementById('gcIctusSlider');
+                this.descentSlider = document.getElementById('gcDescentSlider');
+                this.durationSlider = document.getElementById('gcDurationSlider');
+                this.drawBtn = document.getElementById('gcDrawBtn');
+                this.clearBtn = document.getElementById('gcClearBtn');
+                
+                // Setup slider value displays and real-time updates
+                this.setupSliderHandlers();
+                
+                // Draw button - disabled for now (prototype mode)
+                // if (this.drawBtn) {
+                //     this.drawBtn.addEventListener('click', () => this.commitPreviewGC());
+                // }
+                
+                // Clear button - disabled for now
+                // if (this.clearBtn) {
+                //     this.clearBtn.addEventListener('click', () => this.clearAllGCs());
+                // }
+                
+                // Impact input and track select also trigger real-time update
+                if (this.impactInput) {
+                    this.impactInput.addEventListener('input', () => this.updateTestGC());
+                }
+                if (this.trackSelect) {
+                    this.trackSelect.addEventListener('change', () => this.updateTestGC());
+                }
+                
+                // Create the single test GC at 3 seconds
+                this.updateTestGC();
+                
+                // Hook into animation loop via StaffCursors
+                const originalUpdate = StaffCursors.update.bind(StaffCursors);
+                StaffCursors.update = () => {
+                    originalUpdate();
+                    this.update();
+                };
+                
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    clearTimeout(this.resizeTimeout);
+                    this.resizeTimeout = setTimeout(() => {
+                        this.updateTestGC();
+                    }, 100);
+                });
+                
+                console.debug('GCMaker initialized with baton physics model');
+            },
+            
+            setupSliderHandlers() {
+                // Float slider - controls ascent easing (-30 to 1000)
+                const stiffnessNum = document.getElementById('gcStiffnessNum');
+                if (this.stiffnessSlider) {
+                    const updateStiffness = (val) => {
+                        this.stiffness = Math.max(-30, Math.min(1000, parseFloat(val)));
+                        this.stiffnessSlider.value = this.stiffness;
+                        if (stiffnessNum) stiffnessNum.value = this.stiffness;
+                        this.updateTestGC();
+                    };
+                    this.stiffnessSlider.addEventListener('input', () => updateStiffness(this.stiffnessSlider.value));
+                    if (stiffnessNum) stiffnessNum.addEventListener('input', () => updateStiffness(stiffnessNum.value));
+                }
+                
+                // Rebound slider (was Damping) - controls bounce height (10-100%)
+                const dampingNum = document.getElementById('gcDampingNum');
+                if (this.dampingSlider) {
+                    const updateDamping = (val) => {
+                        this.damping = Math.max(10, Math.min(100, parseFloat(val)));
+                        this.dampingSlider.value = this.damping;
+                        if (dampingNum) dampingNum.value = this.damping;
+                        this.updateTestGC();
+                    };
+                    this.dampingSlider.addEventListener('input', () => updateDamping(this.dampingSlider.value));
+                    if (dampingNum) dampingNum.addEventListener('input', () => updateDamping(dampingNum.value));
+                }
+                
+                // Ictus slider and number input (0-1000)
+                const ictusNum = document.getElementById('gcIctusNum');
+                if (this.ictusSlider) {
+                    const updateIctus = (val) => {
+                        this.ictus = Math.max(0, Math.min(1000, parseFloat(val)));
+                        this.ictusSlider.value = this.ictus;
+                        if (ictusNum) ictusNum.value = this.ictus;
+                        this.updateTestGC();
+                    };
+                    this.ictusSlider.addEventListener('input', () => updateIctus(this.ictusSlider.value));
+                    if (ictusNum) ictusNum.addEventListener('input', () => updateIctus(ictusNum.value));
+                }
+                
+                // Descent ratio slider and number input (20-80%)
+                const descentNum = document.getElementById('gcDescentNum');
+                if (this.descentSlider) {
+                    const updateDescent = (val) => {
+                        this.descentRatio = Math.max(20, Math.min(80, parseFloat(val)));
+                        this.descentSlider.value = this.descentRatio;
+                        if (descentNum) descentNum.value = this.descentRatio;
+                        this.updateTestGC();
+                    };
+                    this.descentSlider.addEventListener('input', () => updateDescent(this.descentSlider.value));
+                    if (descentNum) descentNum.addEventListener('input', () => updateDescent(descentNum.value));
+                }
+                
+                // Duration slider and number input (0.2-5s)
+                const durationNum = document.getElementById('gcDurationNum');
+                if (this.durationSlider) {
+                    const updateDuration = (val) => {
+                        this.duration = Math.max(0.2, Math.min(5, parseFloat(val)));
+                        this.durationSlider.value = this.duration;
+                        if (durationNum) durationNum.value = this.duration.toFixed(1);
+                        this.updateTestGC();
+                    };
+                    this.durationSlider.addEventListener('input', () => updateDuration(this.durationSlider.value));
+                    if (durationNum) durationNum.addEventListener('input', () => updateDuration(durationNum.value));
+                }
+            },
+            
+            // Conductor's Baton Trajectory using Easing Functions
+            // Parameters:
+            // - Ictus: Controls descent easing (how sharply it snaps to beat point)
+            // - Float (stiffness): Controls ascent easing (how floaty the rise is)
+            // - Rebound (damping): Controls bounce height (how high it rebounds)
+            // - Descent %: Time allocation between descent and ascent
+            calculateTrajectory(params) {
+                const { impactSeconds, stiffness, damping, ictus, descentRatio, duration, staffHeight } = params;
+                
+                // Visual height fills the track
+                const h = staffHeight - 10;
+                
+                // Ictus controls descent easing power (0-1000 → power 1-21)
+                // Higher ictus = higher power = steeper/whip-like descent
+                const descentPower = 1 + (ictus / 1000) * 20; // 1 to 21
+                
+                // Float (stiffness) controls ascent easing power (-30 to 1000 → power 0.4 to 21)
+                // Positive float = easeOut (slow at top, floaty)
+                // Negative float = easeIn (fast at top, inverted curve)
+                // Zero = linear
+                const ascentPower = 1 + (stiffness / 50); // -30→0.4, 0→1, 1000→21
+                
+                // Rebound (damping) controls bounce height (10-100 → 10%-100% of drop)
+                const reboundFraction = damping / 100; // 0.1 to 1.0
+                const reboundHeight = h * reboundFraction;
+                
+                // Time allocation from slider (20-80% for descent)
+                const descentFraction = descentRatio / 100;
+                const timeFall = duration * descentFraction;
+                const timeRise = duration * (1 - descentFraction);
+                
+                // Calculate start and end times
+                const startSeconds = impactSeconds - timeFall;
+                const endSeconds = impactSeconds + timeRise;
+                
+                // Generate trajectory points using easing functions
+                const numSamples = 100;
+                const trajectoryPoints = [];
+                
+                // DESCENT: from h to 0 using easeIn (slow start, fast finish)
+                for (let i = 0; i <= numSamples; i++) {
+                    const tNorm = i / numSamples; // 0 to 1
+                    const t = tNorm * timeFall;
+                    
+                    // EaseIn: y = h * (1 - t^power)
+                    const eased = Math.pow(tNorm, descentPower);
+                    const y = h * (1 - eased);
+                    
+                    trajectoryPoints.push({
+                        time: startSeconds + t,
+                        relY: y,
+                        phase: 'descend'
+                    });
+                }
+                
+                // ASCENT: from 0 to reboundHeight using easeOut (fast start, slow finish)
+                for (let i = 1; i <= numSamples; i++) {
+                    const tNorm = i / numSamples; // 0 to 1
+                    const t = tNorm * timeRise;
+                    
+                    // EaseOut: y = reboundHeight * (1 - (1-t)^power)
+                    const eased = 1 - Math.pow(1 - tNorm, ascentPower);
+                    const y = reboundHeight * eased;
+                    
+                    trajectoryPoints.push({
+                        time: impactSeconds + t,
+                        relY: y,
+                        phase: 'ascend'
+                    });
+                }
+                
+                console.debug(`GC: ictus=${ictus}(pow${descentPower.toFixed(1)}), float=${stiffness}(pow${ascentPower.toFixed(1)}), rebound=${damping}%(${reboundHeight.toFixed(0)}px)`);
+                
+                return {
+                    startSeconds,
+                    endSeconds,
+                    timeFall,
+                    timeRise,
+                    trajectoryPoints,
+                    dropHeightPixels: h,
+                    bounceHeightPixels: reboundHeight
+                };
+            },
+            
+            // Update the single test GC in real-time as sliders change
+            updateTestGC() {
+                const impactSeconds = parseFloat(this.impactInput?.value) || 3;
+                const gTrack = this.trackSelect?.value || '2';
+                
+                // Remove old test GC if exists
+                if (this.testGC && this.testGC.elements.group) {
+                    this.testGC.elements.group.remove();
+                }
+                
+                // Get track dimensions
+                const scoreEl = this.scoreTopEl;
+                const scoreHeight = scoreEl.clientHeight;
+                const timelineHeight = 8;
+                const availableHeight = scoreHeight - timelineHeight;
+                const staffHeight = availableHeight / 4;
+                
+                // Calculate trajectory from baton physics parameters
+                const trajectory = this.calculateTrajectory({
+                    impactSeconds,
+                    stiffness: this.stiffness,
+                    damping: this.damping,
+                    ictus: this.ictus,
+                    descentRatio: this.descentRatio,
+                    duration: this.duration,
+                    staffHeight
+                });
+                
+                // Create/update test GC object
+                this.testGC = {
+                    id: 'test',
+                    gTrack,
+                    impactSeconds,
+                    startSeconds: trajectory.startSeconds,
+                    endSeconds: trajectory.endSeconds,
+                    stiffness: this.stiffness,
+                    damping: this.damping,
+                    ictus: this.ictus,
+                    descentRatio: this.descentRatio,
+                    duration: this.duration,
+                    trajectory: trajectory.trajectoryPoints,
+                    dropHeightPx: trajectory.dropHeightPixels,
+                    bounceHeightPx: trajectory.bounceHeightPixels,
+                    timeFall: trajectory.timeFall,
+                    timeRise: trajectory.timeRise,
+                    color: 'neonMagenta',
+                    elements: {},
+                    isPreview: false
+                };
+                
+                this.renderGC(this.testGC);
+            },
+            
+            // Render a GC's trajectory path
+            renderGC(gc) {
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const impactActual = gc.impactSeconds + leadInSeconds;
+                
+                // Determine which page the impact is on
+                const impactPage = Math.floor(Math.max(0, impactActual) / secondsPerPage);
+                const section = impactPage % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const gcGroup = section === 'top' ? this.topGCGroup : this.bottomGCGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                const scoreHeight = scoreEl.clientHeight;
+                
+                // Get track dimensions
+                const timelineHeight = 8;
+                const availableHeight = scoreHeight - timelineHeight;
+                const staffHeight = availableHeight / 4;
+                const trackIndex = parseInt(gc.gTrack) - 1;
+                const trackY = timelineHeight + (trackIndex * staffHeight);
+                const trackBottom = trackY + staffHeight;
+                
+                // Calculate impact X position
+                const impactXPercent = ((impactActual / secondsPerPage) - impactPage) * 100;
+                const impactX = (impactXPercent / 100) * scoreWidth;
+                const impactY = trackBottom - 5;
+                
+                // Time scale: pixels per second
+                const timeScale = scoreWidth / secondsPerPage;
+                
+                // Create SVG group
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('data-gc-id', gc.id);
+                
+                const color = ColorMap[gc.color] || gc.color || '#ff15a0';
+                
+                // Build path from trajectory points
+                let pathD = '';
+                const pixelPoints = [];
+                
+                for (let i = 0; i < gc.trajectory.length; i++) {
+                    const pt = gc.trajectory[i];
+                    // X position based on time relative to impact
+                    const timeDelta = pt.time - gc.impactSeconds;
+                    const px = impactX + (timeDelta * timeScale);
+                    // Y position: impactY is at bottom, subtract height to go up
+                    const py = impactY - pt.relY;
+                    
+                    pixelPoints.push({ x: px, y: py, time: pt.time });
+                    
+                    if (i === 0) {
+                        pathD = `M ${px} ${py}`;
+                    } else {
+                        pathD += ` L ${px} ${py}`;
+                    }
+                }
+                
+                // Create trajectory path
+                const trajectoryPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                trajectoryPath.setAttribute('d', pathD);
+                trajectoryPath.setAttribute('stroke', color);
+                trajectoryPath.setAttribute('stroke-width', '3');
+                trajectoryPath.setAttribute('fill', 'none');
+                group.appendChild(trajectoryPath);
+                
+                // Create impact point marker
+                const impactMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                impactMarker.setAttribute('cx', impactX);
+                impactMarker.setAttribute('cy', impactY);
+                impactMarker.setAttribute('r', gc.isPreview ? '5' : '4');
+                impactMarker.setAttribute('fill', color);
+                impactMarker.setAttribute('stroke', '#000');
+                impactMarker.setAttribute('stroke-width', '1');
+                impactMarker.setAttribute('opacity', gc.isPreview ? '0.7' : '1');
+                group.appendChild(impactMarker);
+                
+                gcGroup.appendChild(group);
+                
+                // Store references
+                gc.elements = { group, trajectoryPath, impactMarker };
+                gc.pixelPoints = pixelPoints;
+                gc.section = section;
+                gc.page = impactPage;
+                gc.impactX = impactX;
+                gc.impactY = impactY;
+                gc.trackY = trackY;
+                gc.trackBottom = trackBottom;
+                gc.staffHeight = staffHeight;
+                gc.timeScale = timeScale;
+            },
+            
+            // Calculate ball position at current time using trajectory data
+            calculateBallPosition(gc, currentSeconds) {
+                const points = gc.pixelPoints;
+                if (!points || points.length < 2) return null;
+                
+                // Binary search for the right segment
+                let left = 0, right = points.length - 1;
+                while (left < right - 1) {
+                    const mid = Math.floor((left + right) / 2);
+                    if (points[mid].time <= currentSeconds) {
+                        left = mid;
+                    } else {
+                        right = mid;
+                    }
+                }
+                
+                // Interpolate between left and right points
+                const p1 = points[left];
+                const p2 = points[right];
+                
+                if (p1.time === p2.time) return { x: p1.x, y: p1.y };
+                
+                const t = (currentSeconds - p1.time) / (p2.time - p1.time);
+                return {
+                    x: p1.x + t * (p2.x - p1.x),
+                    y: p1.y + t * (p2.y - p1.y)
+                };
+            },
+            
+            // Update ball position each frame
+            update() {
+                const currentScoreTimeMs = ScoreTime.now();
+                const currentDisplayTimeSec = (currentScoreTimeMs / 1000) - leadInSeconds;
+                
+                // Get cursor section info
+                const totalPagesTraveled = StaffCursors.calculateTotalPages(currentScoreTimeMs);
+                const positionInCycle = totalPagesTraveled % 2;
+                const inTop = positionInCycle < 1;
+                
+                // Check if the test GC is active at current time
+                let activeGC = null;
+                if (this.testGC && currentDisplayTimeSec >= this.testGC.startSeconds && currentDisplayTimeSec <= this.testGC.endSeconds) {
+                    activeGC = this.testGC;
+                }
+                
+                // Show/hide balls based on section
+                const activeBall = inTop ? this.ballTop : this.ballBottom;
+                const inactiveBall = inTop ? this.ballBottom : this.ballTop;
+                inactiveBall.style.display = 'none';
+                
+                if (activeGC) {
+                    const ballPos = this.calculateBallPosition(activeGC, currentDisplayTimeSec);
+                    
+                    if (ballPos) {
+                        activeBall.setAttribute('cx', ballPos.x);
+                        activeBall.setAttribute('cy', ballPos.y);
+                        activeBall.setAttribute('fill', ColorMap[activeGC.color] || activeGC.color);
+                        activeBall.style.display = '';
+                    } else {
+                        activeBall.style.display = 'none';
+                    }
+                } else {
+                    activeBall.style.display = 'none';
+                }
+            },
+            
+            // Clear all GCs (disabled for prototype - just resets test GC)
+            clearAllGCs() {
+                this.topGCGroup.innerHTML = '';
+                this.bottomGCGroup.innerHTML = '';
+                this.gcs = [];
+                this.testGC = null;
+                this.updateTestGC(); // Recreate test GC
+                console.debug('GCMaker: Cleared all GCs');
+            }
+        };
+        
+        // Initialize GC Maker
+        GCMaker.init();
+        window.GCMaker = GCMaker;
         
         /* DISABLED: Full MotiveMaker - entire system commented out (code kept for future reference)
         // ============================================
