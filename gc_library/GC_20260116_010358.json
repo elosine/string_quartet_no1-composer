@@ -1,0 +1,13 @@
+{
+  "name": "GC_20260116_010358",
+  "description": "sharp ictus",
+  "gTrack": "1",
+  "impactSeconds": 8,
+  "stiffness": 61,
+  "damping": 95,
+  "ictus": 242,
+  "descentRatio": 52,
+  "duration": 1.1,
+  "color": "neonMagenta",
+  "savedAt": "2026-01-16T06:04:09.110Z"
+}

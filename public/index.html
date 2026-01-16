@@ -998,7 +998,31 @@
                     <input type="number" id="gcDurationNum" min="0.2" max="5" value="1" step="0.1" style="width: 36px; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 1px 2px;">
                 </div>
                 <button id="gcDrawBtn" class="curve-draw-btn" style="background: #4a2d5a; border-color: #5a3d6a;">Draw GC</button>
-                <button id="gcClearBtn" class="curve-draw-btn" style="margin-top: 5px; background: #4a2d5a; border-color: #5a3d6a;">Clear All</button>
+                <button id="gcDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: #4a2d5a; border-color: #5a3d6a;">Delete</button>
+                <button id="gcSaveBtn" class="curve-draw-btn" style="margin-top: 5px; background: #4a2d5a; border-color: #5a3d6a;">Save</button>
+                
+                <div class="curve-input-row" style="margin-top: 8px;">
+                    <label style="font-size: 10px;">Name</label>
+                    <input type="text" id="gcNameInput" class="curve-input" style="width: 120px; font-size: 9px;" readonly>
+                </div>
+                
+                <div class="curve-input-row" style="margin-top: 4px;">
+                    <label style="font-size: 10px;">Description</label>
+                </div>
+                <textarea id="gcDescriptionInput" class="curve-input" style="width: 100%; height: 40px; resize: vertical; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px;" placeholder="GC description..."></textarea>
+                
+                <div class="curve-input-row" style="margin-top: 8px;">
+                    <label style="font-size: 10px;">Recall GC</label>
+                </div>
+                <div id="gcRecallDropdown" class="custom-dropdown" style="width: 100%; position: relative;">
+                    <div id="gcRecallSelected" class="custom-dropdown-selected" style="font-size: 10px; padding: 4px 6px; background: rgba(40,40,50,0.9); border: 1px solid #555; border-radius: 3px; cursor: pointer; min-height: 20px;">
+                        -- Select Saved GC --
+                    </div>
+                    <div id="gcRecallOptions" class="custom-dropdown-options" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: rgba(30,30,40,0.98); border: 1px solid #555; border-top: none; border-radius: 0 0 3px 3px; z-index: 1000;">
+                    </div>
+                </div>
+                <input type="hidden" id="gcRecallSelect" value="">
+                <button id="gcInsertBtn" class="curve-draw-btn" style="margin-top: 5px; background: #4a2d5a; border-color: #5a3d6a;">Insert at Edit Line</button>
                 
                 <div class="section-divider"></div>
                 <div class="section-label">SVG Elements</div>
@@ -5061,6 +5085,7 @@
                 if (window.CurveMaker) CurveMaker.updateVisibility();
                 if (window.MotiveMaker) MotiveMaker.updateVisibility();
                 if (window.FlowchartConnector) FlowchartConnector.updateVisibility();
+                if (window.GCMaker) GCMaker.updateVisibility();
                 if (window.MidiController) MidiController.updateMidiDisplayVisibility();
                 
                 // Show staff headers only on page 0 (top) or page 1 (bottom)
@@ -10850,12 +10875,12 @@
             topGCGroup: null,
             bottomGCGroup: null,
             
-            // Array of GC objects
+            // List of all GCs
             gcs: [],
             nextId: 1,
             
-            // The single test GC that updates in real-time
-            testGC: null,
+            // Currently selected GC (for editing)
+            selectedGC: null,
             
             // Ball element (single ball that moves with cursor)
             ballTop: null,
@@ -10896,10 +10921,12 @@
                 this.ballBottom = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 
                 [this.ballTop, this.ballBottom].forEach(ball => {
-                    ball.setAttribute('r', '8');
+                    ball.setAttribute('r', '5');
                     ball.setAttribute('fill', 'rgb(255, 21, 160)');
-                    ball.setAttribute('stroke', '#000');
-                    ball.setAttribute('stroke-width', '1');
+                    ball.setAttribute('stroke', 'none');
+                    ball.setAttribute('stroke-width', '0');
+                    ball.setAttribute('cx', '-100');
+                    ball.setAttribute('cy', '-100');
                     ball.style.display = 'none';
                 });
                 
@@ -10915,31 +10942,89 @@
                 this.descentSlider = document.getElementById('gcDescentSlider');
                 this.durationSlider = document.getElementById('gcDurationSlider');
                 this.drawBtn = document.getElementById('gcDrawBtn');
-                this.clearBtn = document.getElementById('gcClearBtn');
+                this.deleteBtn = document.getElementById('gcDeleteBtn');
+                this.saveBtn = document.getElementById('gcSaveBtn');
+                this.nameInput = document.getElementById('gcNameInput');
+                this.descriptionInput = document.getElementById('gcDescriptionInput');
+                this.recallDropdown = document.getElementById('gcRecallDropdown');
+                this.recallSelected = document.getElementById('gcRecallSelected');
+                this.recallOptions = document.getElementById('gcRecallOptions');
+                this.recallSelect = document.getElementById('gcRecallSelect');
+                this.insertBtn = document.getElementById('gcInsertBtn');
                 
                 // Setup slider value displays and real-time updates
                 this.setupSliderHandlers();
                 
-                // Draw button - disabled for now (prototype mode)
-                // if (this.drawBtn) {
-                //     this.drawBtn.addEventListener('click', () => this.commitPreviewGC());
-                // }
+                // Draw button - creates a new GC at current settings
+                if (this.drawBtn) {
+                    this.drawBtn.addEventListener('click', () => this.createGC());
+                }
                 
-                // Clear button - disabled for now
-                // if (this.clearBtn) {
-                //     this.clearBtn.addEventListener('click', () => this.clearAllGCs());
-                // }
+                // Delete button - removes the selected GC
+                if (this.deleteBtn) {
+                    this.deleteBtn.addEventListener('click', () => this.deleteSelectedGC());
+                }
                 
-                // Impact input and track select also trigger real-time update
+                // Save button - saves selected GC to library
+                if (this.saveBtn) {
+                    this.saveBtn.addEventListener('click', () => this.saveGCToLibrary());
+                }
+                
+                // Insert button - inserts recalled GC at edit line
+                if (this.insertBtn) {
+                    this.insertBtn.addEventListener('click', () => this.insertRecalledGC());
+                }
+                
+                // Recall dropdown toggle
+                if (this.recallSelected) {
+                    this.recallSelected.addEventListener('click', () => {
+                        const isOpen = this.recallOptions.style.display !== 'none';
+                        this.recallOptions.style.display = isOpen ? 'none' : 'block';
+                    });
+                }
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (this.recallDropdown && !this.recallDropdown.contains(e.target)) {
+                        if (this.recallOptions) this.recallOptions.style.display = 'none';
+                    }
+                });
+                
+                // Load GC library on init
+                this.loadGCLibrary();
+                
+                // Description input updates the selected GC's description
+                if (this.descriptionInput) {
+                    this.descriptionInput.addEventListener('input', () => {
+                        if (this.selectedGC) {
+                            this.selectedGC.description = this.descriptionInput.value;
+                        }
+                    });
+                }
+                
+                // Impact input and track select update the selected GC
                 if (this.impactInput) {
-                    this.impactInput.addEventListener('input', () => this.updateTestGC());
+                    this.impactInput.addEventListener('input', () => this.updateSelectedGC());
                 }
                 if (this.trackSelect) {
-                    this.trackSelect.addEventListener('change', () => this.updateTestGC());
+                    this.trackSelect.addEventListener('change', () => this.updateSelectedGC());
                 }
                 
-                // Create the single test GC at 3 seconds
-                this.updateTestGC();
+                // Click on score to deselect
+                this.scoreTopEl.addEventListener('click', (e) => this.handleScoreClick(e));
+                this.scoreBottomEl.addEventListener('click', (e) => this.handleScoreClick(e));
+                
+                // Color swatch handler - use shared color swatches
+                document.querySelectorAll('.color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => {
+                        if (this.selectedGC) {
+                            const colorName = e.target.dataset.color;
+                            this.updateSelectedColor(colorName);
+                        }
+                    });
+                });
+                
+                // Nothing on init - GC created when user clicks Draw
                 
                 // Hook into animation loop via StaffCursors
                 const originalUpdate = StaffCursors.update.bind(StaffCursors);
@@ -10952,7 +11037,7 @@
                 window.addEventListener('resize', () => {
                     clearTimeout(this.resizeTimeout);
                     this.resizeTimeout = setTimeout(() => {
-                        this.updateTestGC();
+                        this.rerenderAllGCs();
                     }, 100);
                 });
                 
@@ -10960,6 +11045,11 @@
             },
             
             setupSliderHandlers() {
+                console.debug('GCMaker: Setting up slider handlers');
+                console.debug('  stiffnessSlider:', this.stiffnessSlider);
+                console.debug('  dampingSlider:', this.dampingSlider);
+                console.debug('  ictusSlider:', this.ictusSlider);
+                
                 // Float slider - controls ascent easing (-30 to 1000)
                 const stiffnessNum = document.getElementById('gcStiffnessNum');
                 if (this.stiffnessSlider) {
@@ -10967,10 +11057,13 @@
                         this.stiffness = Math.max(-30, Math.min(1000, parseFloat(val)));
                         this.stiffnessSlider.value = this.stiffness;
                         if (stiffnessNum) stiffnessNum.value = this.stiffness;
-                        this.updateTestGC();
+                        console.debug('GCMaker: Float changed to', this.stiffness);
+                        this.updateSelectedGC();
                     };
                     this.stiffnessSlider.addEventListener('input', () => updateStiffness(this.stiffnessSlider.value));
                     if (stiffnessNum) stiffnessNum.addEventListener('input', () => updateStiffness(stiffnessNum.value));
+                } else {
+                    console.warn('GCMaker: stiffnessSlider not found!');
                 }
                 
                 // Rebound slider (was Damping) - controls bounce height (10-100%)
@@ -10980,7 +11073,7 @@
                         this.damping = Math.max(10, Math.min(100, parseFloat(val)));
                         this.dampingSlider.value = this.damping;
                         if (dampingNum) dampingNum.value = this.damping;
-                        this.updateTestGC();
+                        this.updateSelectedGC();
                     };
                     this.dampingSlider.addEventListener('input', () => updateDamping(this.dampingSlider.value));
                     if (dampingNum) dampingNum.addEventListener('input', () => updateDamping(dampingNum.value));
@@ -10993,7 +11086,7 @@
                         this.ictus = Math.max(0, Math.min(1000, parseFloat(val)));
                         this.ictusSlider.value = this.ictus;
                         if (ictusNum) ictusNum.value = this.ictus;
-                        this.updateTestGC();
+                        this.updateSelectedGC();
                     };
                     this.ictusSlider.addEventListener('input', () => updateIctus(this.ictusSlider.value));
                     if (ictusNum) ictusNum.addEventListener('input', () => updateIctus(ictusNum.value));
@@ -11006,7 +11099,7 @@
                         this.descentRatio = Math.max(20, Math.min(80, parseFloat(val)));
                         this.descentSlider.value = this.descentRatio;
                         if (descentNum) descentNum.value = this.descentRatio;
-                        this.updateTestGC();
+                        this.updateSelectedGC();
                     };
                     this.descentSlider.addEventListener('input', () => updateDescent(this.descentSlider.value));
                     if (descentNum) descentNum.addEventListener('input', () => updateDescent(descentNum.value));
@@ -11019,7 +11112,7 @@
                         this.duration = Math.max(0.2, Math.min(5, parseFloat(val)));
                         this.durationSlider.value = this.duration;
                         if (durationNum) durationNum.value = this.duration.toFixed(1);
-                        this.updateTestGC();
+                        this.updateSelectedGC();
                     };
                     this.durationSlider.addEventListener('input', () => updateDuration(this.durationSlider.value));
                     if (durationNum) durationNum.addEventListener('input', () => updateDuration(durationNum.value));
@@ -11110,15 +11203,10 @@
                 };
             },
             
-            // Update the single test GC in real-time as sliders change
-            updateTestGC() {
+            // Create a new GC at current settings (called by Draw button)
+            createGC() {
                 const impactSeconds = parseFloat(this.impactInput?.value) || 3;
                 const gTrack = this.trackSelect?.value || '2';
-                
-                // Remove old test GC if exists
-                if (this.testGC && this.testGC.elements.group) {
-                    this.testGC.elements.group.remove();
-                }
                 
                 // Get track dimensions
                 const scoreEl = this.scoreTopEl;
@@ -11138,9 +11226,11 @@
                     staffHeight
                 });
                 
-                // Create/update test GC object
-                this.testGC = {
-                    id: 'test',
+                // Create the GC object
+                const gc = {
+                    id: this.nextId++,
+                    name: this.generateGCName(),
+                    description: '',
                     gTrack,
                     impactSeconds,
                     startSeconds: trajectory.startSeconds,
@@ -11156,11 +11246,230 @@
                     timeFall: trajectory.timeFall,
                     timeRise: trajectory.timeRise,
                     color: 'neonMagenta',
-                    elements: {},
-                    isPreview: false
+                    elements: {}
                 };
                 
-                this.renderGC(this.testGC);
+                // Add to list and render
+                this.gcs.push(gc);
+                this.renderGC(gc);
+                
+                // Update visibility to hide if on future page
+                this.updateVisibility();
+                
+                // Select the new GC
+                this.selectGC(gc);
+                
+                console.debug(`GC ${gc.id} created at ${impactSeconds}s on track ${gTrack}`);
+            },
+            
+            // Select a GC for editing
+            selectGC(gc) {
+                // Deselect previous
+                if (this.selectedGC && this.selectedGC !== gc) {
+                    this.deselectGC();
+                }
+                
+                this.selectedGC = gc;
+                
+                // Show bounding box
+                if (gc.elements && gc.elements.boundingBox) {
+                    gc.elements.boundingBox.style.display = 'block';
+                }
+                
+                // Update UI to reflect selected GC
+                this.updateInputsFromGC(gc);
+            },
+            
+            // Deselect the current GC
+            deselectGC() {
+                if (this.selectedGC && this.selectedGC.elements) {
+                    if (this.selectedGC.elements.boundingBox) {
+                        this.selectedGC.elements.boundingBox.style.display = 'none';
+                    }
+                }
+                this.selectedGC = null;
+                
+                // Clear name and description fields
+                if (this.nameInput) this.nameInput.value = '';
+                if (this.descriptionInput) this.descriptionInput.value = '';
+            },
+            
+            // Update UI inputs to reflect selected GC
+            updateInputsFromGC(gc) {
+                if (this.impactInput) this.impactInput.value = gc.impactSeconds.toFixed(1);
+                if (this.trackSelect) this.trackSelect.value = gc.gTrack;
+                
+                // Update slider values
+                this.stiffness = gc.stiffness;
+                this.damping = gc.damping;
+                this.ictus = gc.ictus;
+                this.descentRatio = gc.descentRatio;
+                this.duration = gc.duration;
+                
+                // Update slider UI
+                if (this.stiffnessSlider) this.stiffnessSlider.value = gc.stiffness;
+                if (this.dampingSlider) this.dampingSlider.value = gc.damping;
+                if (this.ictusSlider) this.ictusSlider.value = gc.ictus;
+                if (this.descentSlider) this.descentSlider.value = gc.descentRatio;
+                if (this.durationSlider) this.durationSlider.value = gc.duration;
+                
+                // Update number inputs
+                const stiffnessNum = document.getElementById('gcStiffnessNum');
+                const dampingNum = document.getElementById('gcDampingNum');
+                const ictusNum = document.getElementById('gcIctusNum');
+                const descentNum = document.getElementById('gcDescentNum');
+                const durationNum = document.getElementById('gcDurationNum');
+                
+                if (stiffnessNum) stiffnessNum.value = gc.stiffness;
+                if (dampingNum) dampingNum.value = gc.damping;
+                if (ictusNum) ictusNum.value = gc.ictus;
+                if (descentNum) descentNum.value = gc.descentRatio;
+                if (durationNum) durationNum.value = gc.duration.toFixed(1);
+                
+                // Update name and description fields
+                if (this.nameInput) this.nameInput.value = gc.name || '';
+                if (this.descriptionInput) this.descriptionInput.value = gc.description || '';
+            },
+            
+            // Handle click on score (deselect if clicking empty space)
+            handleScoreClick(e) {
+                // If click is on a GC element, don't deselect
+                if (e.target.closest('.gc-group')) return;
+                this.deselectGC();
+            },
+            
+            // Update the selected GC with new settings (called by sliders/inputs)
+            updateSelectedGC() {
+                // Only update if a GC is selected
+                if (!this.selectedGC) return;
+                
+                const gc = this.selectedGC;
+                
+                // Remove old rendering
+                if (gc.elements.group) {
+                    gc.elements.group.remove();
+                }
+                
+                const impactSeconds = parseFloat(this.impactInput?.value) || 3;
+                const gTrack = this.trackSelect?.value || '2';
+                
+                // Get track dimensions
+                const scoreEl = this.scoreTopEl;
+                const scoreHeight = scoreEl.clientHeight;
+                const timelineHeight = 8;
+                const availableHeight = scoreHeight - timelineHeight;
+                const staffHeight = availableHeight / 4;
+                
+                // Calculate trajectory from baton physics parameters
+                const trajectory = this.calculateTrajectory({
+                    impactSeconds,
+                    stiffness: this.stiffness,
+                    damping: this.damping,
+                    ictus: this.ictus,
+                    descentRatio: this.descentRatio,
+                    duration: this.duration,
+                    staffHeight
+                });
+                
+                // Update the GC object
+                gc.gTrack = gTrack;
+                gc.impactSeconds = impactSeconds;
+                gc.startSeconds = trajectory.startSeconds;
+                gc.endSeconds = trajectory.endSeconds;
+                gc.stiffness = this.stiffness;
+                gc.damping = this.damping;
+                gc.ictus = this.ictus;
+                gc.descentRatio = this.descentRatio;
+                gc.duration = this.duration;
+                gc.trajectory = trajectory.trajectoryPoints;
+                gc.dropHeightPx = trajectory.dropHeightPixels;
+                gc.bounceHeightPx = trajectory.bounceHeightPixels;
+                gc.timeFall = trajectory.timeFall;
+                gc.timeRise = trajectory.timeRise;
+                
+                // Remove old SVG elements including continuation groups
+                if (gc.elements.group) gc.elements.group.remove();
+                if (gc.elements.continuationGroupTop) gc.elements.continuationGroupTop.remove();
+                if (gc.elements.continuationGroupBottom) gc.elements.continuationGroupBottom.remove();
+                gc.elements = {};
+                
+                this.renderGC(gc);
+                
+                // Re-show bounding box since it's selected
+                if (gc.elements.boundingBox) {
+                    gc.elements.boundingBox.style.display = 'block';
+                }
+                
+                // Update visibility to show continuation segments for multi-page GCs
+                this.updateVisibility();
+            },
+            
+            // Delete the selected GC
+            deleteSelectedGC() {
+                if (!this.selectedGC) return;
+                
+                const gc = this.selectedGC;
+                
+                // Remove SVG elements including continuation groups
+                if (gc.elements.group) gc.elements.group.remove();
+                if (gc.elements.continuationGroupTop) gc.elements.continuationGroupTop.remove();
+                if (gc.elements.continuationGroupBottom) gc.elements.continuationGroupBottom.remove();
+                
+                // Remove from array
+                const index = this.gcs.indexOf(gc);
+                if (index > -1) {
+                    this.gcs.splice(index, 1);
+                }
+                
+                this.selectedGC = null;
+                console.debug(`GC ${gc.id} deleted`);
+            },
+            
+            // Re-render all GCs (e.g., after resize)
+            rerenderAllGCs() {
+                const wasSelected = this.selectedGC;
+                
+                for (const gc of this.gcs) {
+                    if (gc.elements.group) gc.elements.group.remove();
+                    if (gc.elements.continuationGroupTop) gc.elements.continuationGroupTop.remove();
+                    if (gc.elements.continuationGroupBottom) gc.elements.continuationGroupBottom.remove();
+                    gc.elements = {};
+                    
+                    // Recalculate trajectory with new dimensions
+                    const scoreEl = this.scoreTopEl;
+                    const scoreHeight = scoreEl.clientHeight;
+                    const timelineHeight = 8;
+                    const availableHeight = scoreHeight - timelineHeight;
+                    const staffHeight = availableHeight / 4;
+                    
+                    const trajectory = this.calculateTrajectory({
+                        impactSeconds: gc.impactSeconds,
+                        stiffness: gc.stiffness,
+                        damping: gc.damping,
+                        ictus: gc.ictus,
+                        descentRatio: gc.descentRatio,
+                        duration: gc.duration,
+                        staffHeight
+                    });
+                    
+                    gc.trajectory = trajectory.trajectoryPoints;
+                    gc.startSeconds = trajectory.startSeconds;
+                    gc.endSeconds = trajectory.endSeconds;
+                    gc.dropHeightPx = trajectory.dropHeightPixels;
+                    gc.bounceHeightPx = trajectory.bounceHeightPixels;
+                    gc.timeFall = trajectory.timeFall;
+                    gc.timeRise = trajectory.timeRise;
+                    
+                    this.renderGC(gc);
+                }
+                
+                // Update visibility for all GCs
+                this.updateVisibility();
+                
+                // Restore selection
+                if (wasSelected && this.gcs.includes(wasSelected)) {
+                    this.selectGC(wasSelected);
+                }
             },
             
             // Render a GC's trajectory path
@@ -11194,6 +11503,7 @@
                 
                 // Create SVG group
                 const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('class', 'gc-group');
                 group.setAttribute('data-gc-id', gc.id);
                 
                 const color = ColorMap[gc.color] || gc.color || '#ff15a0';
@@ -11223,7 +11533,7 @@
                 const trajectoryPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 trajectoryPath.setAttribute('d', pathD);
                 trajectoryPath.setAttribute('stroke', color);
-                trajectoryPath.setAttribute('stroke-width', '3');
+                trajectoryPath.setAttribute('stroke-width', '1.5');
                 trajectoryPath.setAttribute('fill', 'none');
                 group.appendChild(trajectoryPath);
                 
@@ -11231,17 +11541,64 @@
                 const impactMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                 impactMarker.setAttribute('cx', impactX);
                 impactMarker.setAttribute('cy', impactY);
-                impactMarker.setAttribute('r', gc.isPreview ? '5' : '4');
+                impactMarker.setAttribute('r', '4');
                 impactMarker.setAttribute('fill', color);
-                impactMarker.setAttribute('stroke', '#000');
-                impactMarker.setAttribute('stroke-width', '1');
-                impactMarker.setAttribute('opacity', gc.isPreview ? '0.7' : '1');
+                impactMarker.setAttribute('stroke', 'none');
+                impactMarker.setAttribute('stroke-width', '0');
                 group.appendChild(impactMarker);
+                
+                // Calculate bounding box from trajectory points
+                let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                for (const pt of pixelPoints) {
+                    minX = Math.min(minX, pt.x);
+                    maxX = Math.max(maxX, pt.x);
+                    minY = Math.min(minY, pt.y);
+                    maxY = Math.max(maxY, pt.y);
+                }
+                const padding = 8;
+                
+                // Create bounding box (hidden by default)
+                const boundingBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                boundingBox.setAttribute('class', 'gc-bounding-box');
+                boundingBox.setAttribute('x', minX - padding);
+                boundingBox.setAttribute('y', minY - padding);
+                boundingBox.setAttribute('width', maxX - minX + padding * 2);
+                boundingBox.setAttribute('height', maxY - minY + padding * 2);
+                boundingBox.setAttribute('stroke', color);
+                boundingBox.setAttribute('stroke-width', '1');
+                boundingBox.setAttribute('stroke-dasharray', '4,2');
+                boundingBox.setAttribute('fill', color);
+                boundingBox.setAttribute('fill-opacity', '0.1');
+                boundingBox.style.display = 'none';
+                group.appendChild(boundingBox);
+                
+                // Create invisible hit area for easier clicking
+                const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                hitPath.setAttribute('d', pathD);
+                hitPath.setAttribute('stroke', 'transparent');
+                hitPath.setAttribute('stroke-width', '15');
+                hitPath.setAttribute('fill', 'none');
+                hitPath.style.cursor = 'pointer';
+                group.appendChild(hitPath);
+                
+                // Add click handler for selection
+                hitPath.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectGC(gc);
+                });
+                trajectoryPath.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectGC(gc);
+                });
+                impactMarker.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectGC(gc);
+                });
                 
                 gcGroup.appendChild(group);
                 
                 // Store references
-                gc.elements = { group, trajectoryPath, impactMarker };
+                gc.elements = { group, trajectoryPath, impactMarker, boundingBox, hitPath };
                 gc.pixelPoints = pixelPoints;
                 gc.section = section;
                 gc.page = impactPage;
@@ -11291,11 +11648,15 @@
                 const totalPagesTraveled = StaffCursors.calculateTotalPages(currentScoreTimeMs);
                 const positionInCycle = totalPagesTraveled % 2;
                 const inTop = positionInCycle < 1;
+                const currentPage = Math.floor(totalPagesTraveled);
                 
-                // Check if the test GC is active at current time
+                // Check if any GC is active at current time
                 let activeGC = null;
-                if (this.testGC && currentDisplayTimeSec >= this.testGC.startSeconds && currentDisplayTimeSec <= this.testGC.endSeconds) {
-                    activeGC = this.testGC;
+                for (const gc of this.gcs) {
+                    if (currentDisplayTimeSec >= gc.startSeconds && currentDisplayTimeSec <= gc.endSeconds) {
+                        activeGC = gc;
+                        break;
+                    }
                 }
                 
                 // Show/hide balls based on section
@@ -11304,7 +11665,8 @@
                 inactiveBall.style.display = 'none';
                 
                 if (activeGC) {
-                    const ballPos = this.calculateBallPosition(activeGC, currentDisplayTimeSec);
+                    // Calculate ball position for current page (handles multi-page GCs)
+                    const ballPos = this.calculateBallPositionForPage(activeGC, currentDisplayTimeSec, currentPage, inTop);
                     
                     if (ballPos) {
                         activeBall.setAttribute('cx', ballPos.x);
@@ -11319,14 +11681,468 @@
                 }
             },
             
-            // Clear all GCs (disabled for prototype - just resets test GC)
-            clearAllGCs() {
-                this.topGCGroup.innerHTML = '';
-                this.bottomGCGroup.innerHTML = '';
-                this.gcs = [];
-                this.testGC = null;
-                this.updateTestGC(); // Recreate test GC
-                console.debug('GCMaker: Cleared all GCs');
+            // Calculate ball position for a specific page (handles multi-page GCs)
+            calculateBallPositionForPage(gc, currentSeconds, currentPage, inTop) {
+                if (!gc.trajectory || gc.trajectory.length < 2) return null;
+                
+                // Find the trajectory point for current time
+                let pt1 = null, pt2 = null;
+                for (let i = 0; i < gc.trajectory.length - 1; i++) {
+                    if (gc.trajectory[i].time <= currentSeconds && gc.trajectory[i + 1].time >= currentSeconds) {
+                        pt1 = gc.trajectory[i];
+                        pt2 = gc.trajectory[i + 1];
+                        break;
+                    }
+                }
+                
+                if (!pt1 || !pt2) return null;
+                
+                // Interpolate Y position
+                const t = (currentSeconds - pt1.time) / (pt2.time - pt1.time);
+                const relY = pt1.relY + t * (pt2.relY - pt1.relY);
+                
+                // Calculate X position relative to current page
+                const secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                const pageStartTime = currentPage * secondsPerPage - leadInSeconds;
+                const timeFromPageStart = currentSeconds - pageStartTime;
+                
+                const scoreEl = inTop ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const scoreHeight = scoreEl.clientHeight;
+                const timeScale = scoreWidth / secondsPerPage;
+                
+                const px = timeFromPageStart * timeScale;
+                
+                // Calculate Y position based on track
+                const timelineHeight = 8;
+                const availableHeight = scoreHeight - timelineHeight;
+                const staffHeight = availableHeight / 4;
+                const trackIndex = parseInt(gc.gTrack) - 1;
+                const trackBottom = timelineHeight + ((trackIndex + 1) * staffHeight);
+                const impactY = trackBottom - 5;
+                const py = impactY - relY;
+                
+                return { x: px, y: py };
+            },
+            
+            // Show/hide GCs based on current page (supports multi-page GCs)
+            updateVisibility() {
+                if (!window.GraphicTimeline) return;
+                
+                const topPage = GraphicTimeline.currentTopPage;
+                const bottomPage = GraphicTimeline.currentBottomPage;
+                const secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                const leadInSec = leadInSeconds;
+                
+                for (const gc of this.gcs) {
+                    if (!gc.elements || !gc.elements.group) continue;
+                    
+                    // Calculate which pages this GC spans
+                    const startActual = gc.startSeconds + leadInSec;
+                    const endActual = gc.endSeconds + leadInSec;
+                    const gcStartPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const gcEndPage = Math.floor(Math.max(0, endActual) / secondsPerPage);
+                    
+                    // Check if GC overlaps with EITHER visible page
+                    const overlapsTop = gcStartPage <= topPage && gcEndPage >= topPage;
+                    const overlapsBottom = gcStartPage <= bottomPage && gcEndPage >= bottomPage;
+                    const visible = overlapsTop || overlapsBottom;
+                    
+                    const isMultiPage = gcEndPage > gcStartPage;
+                    
+                    if (!isMultiPage) {
+                        // Single-page GC: simple show/hide
+                        gc.elements.group.style.display = visible ? '' : 'none';
+                        // Hide continuation segments if they exist
+                        if (gc.elements.continuationGroupTop) gc.elements.continuationGroupTop.style.display = 'none';
+                        if (gc.elements.continuationGroupBottom) gc.elements.continuationGroupBottom.style.display = 'none';
+                    } else {
+                        // Multi-page GC: show segments on each visible page
+                        // Original segment on original page
+                        if (overlapsTop && topPage === gcStartPage) {
+                            gc.elements.group.style.display = '';
+                            this.clipGCToPageEnd(gc, gcStartPage, secondsPerPage, leadInSec);
+                        } else if (overlapsBottom && bottomPage === gcStartPage) {
+                            gc.elements.group.style.display = '';
+                            this.clipGCToPageEnd(gc, gcStartPage, secondsPerPage, leadInSec);
+                        } else {
+                            gc.elements.group.style.display = 'none';
+                        }
+                        
+                        // Continuation segments on subsequent pages
+                        const showContinuationOnTop = overlapsTop && topPage > gcStartPage && topPage <= gcEndPage;
+                        const showContinuationOnBottom = overlapsBottom && bottomPage > gcStartPage && bottomPage <= gcEndPage;
+                        
+                        if (showContinuationOnTop) {
+                            this.showContinuationSegment(gc, topPage, secondsPerPage, leadInSec, 'top');
+                        } else if (gc.elements.continuationGroupTop) {
+                            gc.elements.continuationGroupTop.style.display = 'none';
+                        }
+                        
+                        if (showContinuationOnBottom) {
+                            this.showContinuationSegment(gc, bottomPage, secondsPerPage, leadInSec, 'bottom');
+                        } else if (gc.elements.continuationGroupBottom) {
+                            gc.elements.continuationGroupBottom.style.display = 'none';
+                        }
+                    }
+                }
+            },
+            
+            // Clip GC to page end for multi-page GCs
+            clipGCToPageEnd(gc, page, secondsPerPage, leadInSec) {
+                const pageEndTime = (page + 1) * secondsPerPage - leadInSec;
+                const scoreEl = gc.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                // Rebuild path clipped to page end
+                let pathD = '';
+                for (let i = 0; i < gc.trajectory.length; i++) {
+                    const pt = gc.trajectory[i];
+                    if (pt.time > pageEndTime) break;
+                    
+                    const timeDelta = pt.time - gc.impactSeconds;
+                    const px = gc.impactX + (timeDelta * gc.timeScale);
+                    const py = gc.impactY - pt.relY;
+                    
+                    // Clip to page width
+                    const clippedX = Math.min(px, scoreWidth);
+                    
+                    if (i === 0) {
+                        pathD = `M ${clippedX} ${py}`;
+                    } else {
+                        pathD += ` L ${clippedX} ${py}`;
+                    }
+                }
+                
+                if (gc.elements.trajectoryPath) {
+                    gc.elements.trajectoryPath.setAttribute('d', pathD);
+                }
+            },
+            
+            // Show continuation segment on a subsequent page
+            showContinuationSegment(gc, page, secondsPerPage, leadInSec, sectionHint) {
+                const startActual = gc.startSeconds + leadInSec;
+                const endActual = gc.endSeconds + leadInSec;
+                const pageStartTime = page * secondsPerPage;
+                const pageEndTime = (page + 1) * secondsPerPage;
+                
+                // Clip times to this page
+                const clippedStartActual = Math.max(startActual, pageStartTime);
+                const clippedEndActual = Math.min(endActual, pageEndTime);
+                const clippedStartSec = clippedStartActual - leadInSec;
+                const clippedEndSec = clippedEndActual - leadInSec;
+                
+                const section = sectionHint || (page % 2 === 0 ? 'top' : 'bottom');
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const targetContainer = section === 'top' ? this.topGCGroup : this.bottomGCGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                const scoreHeight = scoreEl.clientHeight;
+                
+                // Get track dimensions for this section
+                const timelineHeight = 8;
+                const availableHeight = scoreHeight - timelineHeight;
+                const staffHeight = availableHeight / 4;
+                const trackIndex = parseInt(gc.gTrack) - 1;
+                const trackY = timelineHeight + (trackIndex * staffHeight);
+                const trackBottom = trackY + staffHeight;
+                const impactY = trackBottom - 5;
+                
+                // Time scale for this page
+                const timeScale = scoreWidth / secondsPerPage;
+                
+                // Build path for this page segment
+                let pathD = '';
+                for (let i = 0; i < gc.trajectory.length; i++) {
+                    const pt = gc.trajectory[i];
+                    if (pt.time < clippedStartSec || pt.time > clippedEndSec) continue;
+                    
+                    // X position relative to page start
+                    const timeFromPageStart = pt.time + leadInSec - pageStartTime;
+                    const px = timeFromPageStart * timeScale;
+                    const py = impactY - pt.relY;
+                    
+                    if (pathD === '') {
+                        pathD = `M ${px} ${py}`;
+                    } else {
+                        pathD += ` L ${px} ${py}`;
+                    }
+                }
+                
+                const groupKey = section === 'top' ? 'continuationGroupTop' : 'continuationGroupBottom';
+                const pathKey = section === 'top' ? 'continuationPathTop' : 'continuationPathBottom';
+                
+                const color = ColorMap[gc.color] || gc.color || '#ff15a0';
+                
+                if (!gc.elements[groupKey]) {
+                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.classList.add('gc-continuation');
+                    group.classList.add('gc-group');
+                    group.setAttribute('data-gc-id', gc.id);
+                    
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', color);
+                    path.setAttribute('stroke-width', '1.5');
+                    path.setAttribute('opacity', '0.7');
+                    group.appendChild(path);
+                    
+                    // Hit path for click detection
+                    const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    hitPath.setAttribute('fill', 'none');
+                    hitPath.setAttribute('stroke', 'transparent');
+                    hitPath.setAttribute('stroke-width', '15');
+                    hitPath.style.cursor = 'pointer';
+                    group.appendChild(hitPath);
+                    
+                    // Click handler to select the GC
+                    hitPath.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectGC(gc);
+                    });
+                    
+                    gc.elements[groupKey] = group;
+                    gc.elements[pathKey] = path;
+                    gc.elements[groupKey + 'HitPath'] = hitPath;
+                    targetContainer.appendChild(group);
+                }
+                
+                if (pathD) {
+                    gc.elements[pathKey].setAttribute('d', pathD);
+                    gc.elements[pathKey].setAttribute('stroke', color);
+                    if (gc.elements[groupKey + 'HitPath']) {
+                        gc.elements[groupKey + 'HitPath'].setAttribute('d', pathD);
+                    }
+                }
+                gc.elements[groupKey].style.display = '';
+            },
+            
+            // Update GC color from color swatch
+            updateSelectedColor(colorName) {
+                if (!this.selectedGC) return;
+                
+                this.selectedGC.color = colorName;
+                const color = ColorMap[colorName] || colorName;
+                
+                // Update main trajectory
+                if (this.selectedGC.elements.trajectoryPath) {
+                    this.selectedGC.elements.trajectoryPath.setAttribute('stroke', color);
+                }
+                if (this.selectedGC.elements.impactMarker) {
+                    this.selectedGC.elements.impactMarker.setAttribute('fill', color);
+                }
+                if (this.selectedGC.elements.boundingBox) {
+                    this.selectedGC.elements.boundingBox.setAttribute('stroke', color);
+                    this.selectedGC.elements.boundingBox.setAttribute('fill', color);
+                }
+                
+                // Update continuation segments if they exist
+                if (this.selectedGC.elements.continuationPathTop) {
+                    this.selectedGC.elements.continuationPathTop.setAttribute('stroke', color);
+                }
+                if (this.selectedGC.elements.continuationPathBottom) {
+                    this.selectedGC.elements.continuationPathBottom.setAttribute('stroke', color);
+                }
+                
+                console.debug(`GC ${this.selectedGC.id} color changed to ${colorName}`);
+            },
+            
+            // Generate auto-name for GC (GC_YYYYMMDD_HHMMSS format)
+            generateGCName() {
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+                const h = String(now.getHours()).padStart(2, '0');
+                const min = String(now.getMinutes()).padStart(2, '0');
+                const s = String(now.getSeconds()).padStart(2, '0');
+                return `GC_${y}${m}${d}_${h}${min}${s}`;
+            },
+            
+            // Save selected GC to library
+            async saveGCToLibrary() {
+                console.log('saveGCToLibrary called');
+                if (!this.selectedGC) {
+                    console.warn('No GC selected to save');
+                    alert('Please select a GC first before saving');
+                    return;
+                }
+                
+                const gc = this.selectedGC;
+                const name = gc.name || this.generateGCName();
+                const description = this.descriptionInput?.value || '';
+                
+                console.log('Saving GC:', name);
+                
+                const gcData = {
+                    name,
+                    description,
+                    gTrack: gc.gTrack,
+                    impactSeconds: gc.impactSeconds,
+                    stiffness: gc.stiffness,
+                    damping: gc.damping,
+                    ictus: gc.ictus,
+                    descentRatio: gc.descentRatio,
+                    duration: gc.duration,
+                    color: gc.color
+                };
+                
+                try {
+                    const response = await fetch('/api/gc-library/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ gcData })
+                    });
+                    
+                    console.log('Save response status:', response.status);
+                    const result = await response.json();
+                    if (result.success) {
+                        gc.name = name;
+                        if (this.nameInput) this.nameInput.value = name;
+                        console.log(`GC saved to library: ${name}`);
+                        alert(`GC saved: ${name}`);
+                        this.loadGCLibrary();
+                    } else {
+                        console.error('Failed to save GC:', result.error);
+                        alert('Failed to save GC: ' + result.error);
+                    }
+                } catch (err) {
+                    console.error('Error saving GC:', err);
+                    alert('Error saving GC: ' + err.message);
+                }
+            },
+            
+            // Load GC library and populate dropdown
+            async loadGCLibrary() {
+                try {
+                    const response = await fetch('/api/gc-library/list');
+                    const result = await response.json();
+                    
+                    if (result.success && this.recallOptions) {
+                        this.recallOptions.innerHTML = '';
+                        
+                        for (const gc of result.gcs) {
+                            const option = document.createElement('div');
+                            option.className = 'custom-dropdown-option';
+                            option.style.cssText = 'padding: 4px 6px; cursor: pointer; font-size: 10px; border-bottom: 1px solid #444;';
+                            option.textContent = `${gc.name} (${gc.duration?.toFixed(1) || '?'}s)`;
+                            option.dataset.value = gc.name;
+                            
+                            option.addEventListener('mouseenter', () => {
+                                option.style.background = 'rgba(100,100,120,0.5)';
+                            });
+                            option.addEventListener('mouseleave', () => {
+                                option.style.background = '';
+                            });
+                            option.addEventListener('click', () => {
+                                this.selectRecallOption(gc.name, option.textContent);
+                            });
+                            
+                            this.recallOptions.appendChild(option);
+                        }
+                    }
+                } catch (err) {
+                    console.error('Error loading GC library:', err);
+                }
+            },
+            
+            // Select a recall option
+            selectRecallOption(value, displayText) {
+                if (this.recallSelect) this.recallSelect.value = value;
+                if (this.recallSelected) this.recallSelected.textContent = displayText;
+                if (this.recallOptions) this.recallOptions.style.display = 'none';
+            },
+            
+            // Insert recalled GC at edit line
+            async insertRecalledGC() {
+                const gcName = this.recallSelect?.value;
+                if (!gcName) {
+                    console.warn('No GC selected to insert');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/api/gc-library/load/${encodeURIComponent(gcName)}`);
+                    const result = await response.json();
+                    
+                    if (result.success && result.gcData) {
+                        const data = result.gcData;
+                        
+                        // Get edit cursor position for impact time (same as curve insert)
+                        let impactSeconds = 0;
+                        if (window.EditCursor && typeof EditCursor.getPositionSeconds === 'function') {
+                            impactSeconds = EditCursor.getPositionSeconds();
+                        } else if (window.EditCursor && EditCursor.positionSeconds !== undefined) {
+                            impactSeconds = EditCursor.positionSeconds;
+                        } else if (window.ScoreTime) {
+                            // Fallback: use current score time
+                            const scoreTimeMs = ScoreTime.now();
+                            impactSeconds = (scoreTimeMs / 1000) - leadInSeconds;
+                        } else if (this.impactInput) {
+                            impactSeconds = parseFloat(this.impactInput.value) || 0;
+                        }
+                        
+                        console.log('Inserting GC at edit line time:', impactSeconds);
+                        
+                        // Get track from recalled data or current selection
+                        const gTrack = data.gTrack || this.trackSelect?.value || '2';
+                        
+                        // Get track dimensions
+                        const scoreEl = this.scoreTopEl;
+                        const scoreHeight = scoreEl.clientHeight;
+                        const timelineHeight = 8;
+                        const availableHeight = scoreHeight - timelineHeight;
+                        const staffHeight = availableHeight / 4;
+                        
+                        // Calculate trajectory with recalled parameters
+                        const trajectory = this.calculateTrajectory({
+                            impactSeconds,
+                            stiffness: data.stiffness,
+                            damping: data.damping,
+                            ictus: data.ictus,
+                            descentRatio: data.descentRatio,
+                            duration: data.duration,
+                            staffHeight
+                        });
+                        
+                        // Create the GC object
+                        const gc = {
+                            id: this.nextId++,
+                            name: data.name,
+                            gTrack,
+                            impactSeconds,
+                            startSeconds: trajectory.startSeconds,
+                            endSeconds: trajectory.endSeconds,
+                            stiffness: data.stiffness,
+                            damping: data.damping,
+                            ictus: data.ictus,
+                            descentRatio: data.descentRatio,
+                            duration: data.duration,
+                            trajectory: trajectory.trajectoryPoints,
+                            dropHeightPx: trajectory.dropHeightPixels,
+                            bounceHeightPx: trajectory.bounceHeightPixels,
+                            timeFall: trajectory.timeFall,
+                            timeRise: trajectory.timeRise,
+                            color: data.color || 'neonMagenta',
+                            elements: {}
+                        };
+                        
+                        // Add to list and render
+                        this.gcs.push(gc);
+                        this.renderGC(gc);
+                        
+                        // Update visibility
+                        this.updateVisibility();
+                        
+                        // Select the new GC
+                        this.selectGC(gc);
+                        
+                        console.log(`GC inserted from library: ${data.name} at ${impactSeconds}s`);
+                    } else {
+                        console.error('Failed to load GC:', result.error);
+                    }
+                } catch (err) {
+                    console.error('Error inserting GC:', err);
+                }
             }
         };
         
