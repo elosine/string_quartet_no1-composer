@@ -997,9 +997,9 @@
                     <input type="range" id="gcDurationSlider" min="0.2" max="5" value="1" step="0.1" style="width: 120px;">
                     <input type="number" id="gcDurationNum" min="0.2" max="5" value="1" step="0.1" style="width: 36px; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 1px 2px;">
                 </div>
-                <button id="gcDrawBtn" class="curve-draw-btn" style="background: #4a2d5a; border-color: #5a3d6a;">Draw GC</button>
-                <button id="gcDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: #4a2d5a; border-color: #5a3d6a;">Delete</button>
-                <button id="gcSaveBtn" class="curve-draw-btn" style="margin-top: 5px; background: #4a2d5a; border-color: #5a3d6a;">Save</button>
+                <button id="gcDrawBtn" class="curve-draw-btn" style="background: rgb(255, 21, 160); border-color: rgb(255, 21, 160); color: #fff;">Draw GC</button>
+                <button id="gcDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: rgb(255, 21, 160); border-color: rgb(255, 21, 160); color: #fff;">Delete</button>
+                <button id="gcSaveBtn" class="curve-draw-btn" style="margin-top: 5px; background: rgb(255, 21, 160); border-color: rgb(255, 21, 160); color: #fff;">Save</button>
                 
                 <div class="curve-input-row" style="margin-top: 8px;">
                     <label style="font-size: 10px;">Name</label>
@@ -1022,7 +1022,7 @@
                     </div>
                 </div>
                 <input type="hidden" id="gcRecallSelect" value="">
-                <button id="gcInsertBtn" class="curve-draw-btn" style="margin-top: 5px; background: #4a2d5a; border-color: #5a3d6a;">Insert at Edit Line</button>
+                <button id="gcInsertBtn" class="curve-draw-btn" style="margin-top: 5px; background: rgb(255, 21, 160); border-color: rgb(255, 21, 160); color: #fff;">Insert at Edit Line</button>
                 
                 <div class="section-divider"></div>
                 <div class="section-label">SVG Elements</div>
@@ -1042,8 +1042,8 @@
                 </div>
                 <div class="curve-input-row">
                     <label>Scale</label>
-                    <input type="range" id="svgScaleSlider" min="0.1" max="5" step="0.05" value="1" style="width: 80px;">
-                    <span id="svgScaleValue" style="font-size: 10px;">1.00</span>
+                    <input type="range" id="svgScaleSlider" min="0.1" max="5" step="0.01" value="1" style="width: 150px;">
+                    <input type="number" id="svgScaleInput" class="curve-input" value="1" step="0.01" min="0.1" max="5" style="width: 38px; font-size: 9px; padding: 2px;">
                 </div>
                 <div class="curve-input-row">
                     <label>Track</label>
@@ -1070,7 +1070,7 @@
             <div class="menu-section">
                 <div class="section-label">Connectors</div>
                 <div class="control-row">
-                    <button id="connectorModeBtn" class="control-btn" style="font-size: 10px;">Connect Mode: OFF</button>
+                    <button id="connectorModeBtn" class="control-btn" style="font-size: 10px; background: rgba(162,126,198,255); color: #fff;">Connect Mode: OFF</button>
                 </div>
                 <div class="connector-list" id="connectorList"></div>
                 <div class="curve-input-row">
@@ -1093,18 +1093,18 @@
                 </div>
                 <div class="curve-input-row">
                     <label>Arrow Size</label>
-                    <input type="range" id="connectorArrowSizeSlider" min="3" max="12" value="6" style="width: 60px;">
-                    <span id="connectorArrowSizeValue" style="font-size: 10px;">6</span>
+                    <input type="range" id="connectorArrowSizeSlider" min="3" max="12" value="3" style="width: 60px;">
+                    <span id="connectorArrowSizeValue" style="font-size: 10px;">3</span>
                 </div>
                 <div class="curve-input-row">
                     <label>Line Color</label>
                     <select id="connectorLineColorSelect" style="font-size: 10px; padding: 2px;">
                         <option value="black">Black</option>
                         <option value="lightGrey">Grey</option>
+                        <option value="brightBlue" selected>Blue</option>
                         <option value="white">White</option>
                         <option value="limeGreen">Lime</option>
                         <option value="neonMagenta">Magenta</option>
-                        <option value="brightBlue">Blue</option>
                         <option value="brightOrange">Orange</option>
                         <option value="neonYellow">Yellow</option>
                     </select>
@@ -1114,10 +1114,10 @@
                     <select id="connectorArrowColorSelect" style="font-size: 10px; padding: 2px;">
                         <option value="black">Black</option>
                         <option value="lightGrey">Grey</option>
+                        <option value="brightBlue" selected>Blue</option>
                         <option value="white">White</option>
                         <option value="limeGreen">Lime</option>
                         <option value="neonMagenta">Magenta</option>
-                        <option value="brightBlue">Blue</option>
                         <option value="brightOrange">Orange</option>
                         <option value="neonYellow">Yellow</option>
                     </select>
@@ -1128,7 +1128,7 @@
                         <option value="auto">Auto</option>
                         <option value="horizontal-first">Horizontal First</option>
                         <option value="vertical-first">Vertical First</option>
-                        <option value="direct">Direct (diagonal)</option>
+                        <option value="direct" selected>Direct (diagonal)</option>
                     </select>
                 </div>
                 <div class="control-row" style="margin-top: 5px;">
@@ -1179,7 +1179,7 @@
                     <span id="midiEventCount" style="font-size: 11px; color: var(--clr-lightGrey);">Events: 0</span>
                 </div>
                 <div class="control-row" style="margin-top: 10px;">
-                    <button id="goStopBtn" class="control-btn" onclick="if(window.CursorControls) CursorControls.toggleGoStop();">Play</button>
+                    <button id="goStopBtn" class="control-btn" style="background: rgb(0,147,92); color: #fff;" onclick="if(window.CursorControls) CursorControls.toggleGoStop();">Play</button>
                 </div>
             </div>
             <div class="menu-section">
@@ -1232,14 +1232,14 @@
                     <label for="midiTrackT4">T4</label>
                 </div>
                 <div class="control-row" style="margin-top: 10px;">
-                    <button id="midiLoadBtn" class="control-btn">Load MIDI</button>
+                    <button id="midiLoadBtn" class="control-btn" style="background: rgb(153,255,0); color: #000;">Load MIDI</button>
                     <input type="file" id="midiFileInput" class="file-input-hidden" accept=".mid,.midi">
                 </div>
                 <div class="control-row">
                     <span id="midiFileName" class="midi-filename">No file loaded</span>
                 </div>
                 <div class="control-row" style="margin-top: 10px;">
-                    <button id="midiInsertBtn" class="control-btn">Insert</button>
+                    <button id="midiInsertBtn" class="control-btn" style="background: rgb(153,255,0); color: #000;">Insert</button>
                     <span id="midiInsertTime" class="timecode-display-small">0.000</span>
                 </div>
                 <div class="control-row" style="margin-top: 5px;">
@@ -1283,8 +1283,8 @@
                     <input type="text" id="scoreNameInput" value="untitled" style="width: 100px; font-size: 11px;">
                 </div>
                 <div class="control-row">
-                    <button id="scoreSaveBtn" class="control-btn">Save</button>
-                    <button id="scoreLoadBtn" class="control-btn">Load</button>
+                    <button id="scoreSaveBtn" class="control-btn" style="background: rgba(254,213,0,255); color: #000;">Save</button>
+                    <button id="scoreLoadBtn" class="control-btn" style="background: rgba(254,213,0,255); color: #000;">Load</button>
                 </div>
                 <div class="control-row">
                     <button id="scoreBroadcastLoadBtn" class="control-btn" style="font-size: 10px; background: var(--clr-plum);">Load & Sync All</button>
@@ -1300,7 +1300,7 @@
                     </select>
                 </div>
                 <div class="control-row">
-                    <button id="loadVersionBtn" class="control-btn" style="font-size: 10px;">Load Version</button>
+                    <button id="loadVersionBtn" class="control-btn" style="font-size: 10px; background: rgba(254,213,0,255); color: #000;">Load Version</button>
                 </div>
                 <div class="control-row">
                     <span id="scoreStatus" style="font-size: 10px; color: var(--clr-lightGrey);">Not saved</span>
@@ -1640,6 +1640,11 @@
                     if (e.key === 'Enter') this.gotoPosition();
                 });
                 
+                // Auto-select all text when clicking into the input
+                this.gotoSecondInput.addEventListener('focus', () => {
+                    this.gotoSecondInput.select();
+                });
+                
                 // Listen for score control events from server
                 ClockSync.socket.on('scoreGo', (data) => {
                     this.onScoreGo(data);
@@ -1697,6 +1702,8 @@
                 ScoreTime.scoreTimeOffset = data.scoreTimeOffset;
                 ScoreTime.currentScoreTimeMs = data.currentScoreTimeMs;
                 this.goStopBtn.textContent = 'Stop';
+                this.goStopBtn.style.background = '';
+                this.goStopBtn.style.color = '';
                 this.goStopBtn.classList.add('active');
                 console.log(`Score GO - playing from ${data.currentScoreTimeMs}ms`);
                 
@@ -1713,6 +1720,8 @@
                 ScoreTime.isPlaying = false;
                 ScoreTime.currentScoreTimeMs = data.currentScoreTimeMs;
                 this.goStopBtn.textContent = 'Play';
+                this.goStopBtn.style.background = 'rgb(0,147,92)';
+                this.goStopBtn.style.color = '#fff';
                 this.goStopBtn.classList.remove('active');
                 console.log(`Score STOP - frozen at ${data.currentScoreTimeMs}ms`);
             },
@@ -1722,6 +1731,8 @@
                 ScoreTime.currentScoreTimeMs = data.currentScoreTimeMs;
                 serverTempoHistory = data.tempoHistory;
                 this.goStopBtn.textContent = 'Play';
+                this.goStopBtn.style.background = 'rgb(0,147,92)';
+                this.goStopBtn.style.color = '#fff';
                 this.goStopBtn.classList.remove('active');
                 // Update input to reflect the new position (convert from actual to display time)
                 const displaySeconds = data.targetSeconds - leadInSeconds;
@@ -1769,7 +1780,7 @@
                 this.posXInput = document.getElementById('svgPosX');
                 this.posYInput = document.getElementById('svgPosY');
                 this.scaleSlider = document.getElementById('svgScaleSlider');
-                this.scaleValue = document.getElementById('svgScaleValue');
+                this.scaleInput = document.getElementById('svgScaleInput');
                 this.trackSelect = document.getElementById('svgTrackSelect');
                 this.sectionSelect = document.getElementById('svgSectionSelect');
                 this.deleteBtn = document.getElementById('svgDeleteBtn');
@@ -1793,7 +1804,8 @@
                 
                 this.posXInput.addEventListener('change', () => this.updateSelectedPosition());
                 this.posYInput.addEventListener('change', () => this.updateSelectedPosition());
-                this.scaleSlider.addEventListener('input', () => this.updateSelectedScale());
+                this.scaleSlider.addEventListener('input', () => this.updateSelectedScaleFromSlider());
+                this.scaleInput.addEventListener('change', () => this.updateSelectedScaleFromInput());
                 this.trackSelect.addEventListener('change', () => this.updateSelectedTrack());
                 this.sectionSelect.addEventListener('change', () => this.updateSelectedSection());
                 
@@ -2125,7 +2137,7 @@
                 this.posXInput.value = Math.round(this.selectedElement.x);
                 this.posYInput.value = Math.round(this.selectedElement.y);
                 this.scaleSlider.value = this.selectedElement.scale;
-                this.scaleValue.textContent = this.selectedElement.scale.toFixed(2);
+                this.scaleInput.value = this.selectedElement.scale.toFixed(2);
                 this.trackSelect.value = this.selectedElement.track;
                 this.sectionSelect.value = this.selectedElement.section || 'top';
             },
@@ -2137,10 +2149,20 @@
                 this.updateElementTransform(this.selectedElement);
             },
             
-            updateSelectedScale() {
+            updateSelectedScaleFromSlider() {
                 if (!this.selectedElement) return;
                 this.selectedElement.scale = parseFloat(this.scaleSlider.value) || 1;
-                this.scaleValue.textContent = this.selectedElement.scale.toFixed(2);
+                this.scaleInput.value = this.selectedElement.scale.toFixed(2);
+                this.updateElementTransform(this.selectedElement);
+            },
+            
+            updateSelectedScaleFromInput() {
+                if (!this.selectedElement) return;
+                let scale = parseFloat(this.scaleInput.value) || 1;
+                scale = Math.max(0.1, Math.min(5, scale)); // Clamp to valid range
+                this.selectedElement.scale = scale;
+                this.scaleSlider.value = scale;
+                this.scaleInput.value = scale.toFixed(2);
                 this.updateElementTransform(this.selectedElement);
             },
             
@@ -2591,8 +2613,8 @@
             toggleConnectMode() {
                 this.connectMode = !this.connectMode;
                 this.modeBtn.textContent = `Connect Mode: ${this.connectMode ? 'ON' : 'OFF'}`;
-                this.modeBtn.style.background = this.connectMode ? 'var(--clr-limeGreen)' : '';
-                this.modeBtn.style.color = this.connectMode ? '#000' : '';
+                this.modeBtn.style.background = this.connectMode ? 'var(--clr-limeGreen)' : 'rgba(162,126,198,255)';
+                this.modeBtn.style.color = this.connectMode ? '#000' : '#fff';
                 
                 // Show/hide connection nodes
                 this.updateConnectionNodes();
@@ -2610,6 +2632,20 @@
                 if (window.CurveMaker && CurveMaker.curves) {
                     CurveMaker.curves.forEach(curve => {
                         this.addNodesToCurve(curve);
+                    });
+                }
+                
+                // Add/remove connection nodes on GCs (impact points)
+                if (window.GCMaker && GCMaker.gcs) {
+                    GCMaker.gcs.forEach(gc => {
+                        this.addNodesToGC(gc);
+                    });
+                }
+                
+                // Add/remove connection nodes on motives (start, middle, end)
+                if (window.MotiveMaker && MotiveMaker.motives) {
+                    MotiveMaker.motives.forEach(motive => {
+                        this.addNodesToMotive(motive);
                     });
                 }
             },
@@ -2638,7 +2674,7 @@
                         const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                         node.setAttribute('cx', pos.x);
                         node.setAttribute('cy', pos.y);
-                        node.setAttribute('r', '6');
+                        node.setAttribute('r', '3');
                         node.setAttribute('class', 'flowchart-node');
                         node.setAttribute('data-side', pos.side);
                         node.setAttribute('data-element-id', el.id);
@@ -2653,6 +2689,214 @@
                         
                         el.wrapper.appendChild(node);
                     });
+                }
+            },
+            
+            addNodesToGC(gc) {
+                if (!gc.elements || !gc.elements.group) return;
+                
+                const existingNodes = gc.elements.group.querySelectorAll('.flowchart-node');
+                existingNodes.forEach(n => n.remove());
+                
+                if (this.connectMode && gc.pixelPoints && gc.pixelPoints.length > 0) {
+                    // Find key points on the trajectory
+                    const points = gc.pixelPoints;
+                    const impactIdx = points.findIndex(pt => pt.time >= gc.impactSeconds);
+                    
+                    // Node positions: start, descent-mid, before-impact, after-impact, ascent-mid, end
+                    const nodePositions = [];
+                    
+                    // 1. Start of descent (first point)
+                    const startPt = points[0];
+                    nodePositions.push({ x: startPt.x, y: startPt.y, side: 'start' });
+                    
+                    // 2. Middle of descent arc (halfway between start and impact)
+                    const descentMidIdx = Math.floor(impactIdx / 2);
+                    if (descentMidIdx > 0 && descentMidIdx < impactIdx) {
+                        const descentMidPt = points[descentMidIdx];
+                        nodePositions.push({ x: descentMidPt.x, y: descentMidPt.y, side: 'descent-mid' });
+                    }
+                    
+                    // 3. Just before impact (further up on descent curve)
+                    const beforeImpactIdx = Math.max(0, impactIdx - 10);
+                    if (beforeImpactIdx < impactIdx && beforeImpactIdx > 0) {
+                        const beforePt = points[beforeImpactIdx];
+                        nodePositions.push({ x: beforePt.x, y: beforePt.y, side: 'before-impact' });
+                    }
+                    
+                    // 4. Impact point itself
+                    nodePositions.push({ x: gc.impactX, y: gc.impactY, side: 'impact' });
+                    
+                    // 5. Just after impact (further up on ascent curve)
+                    const afterImpactIdx = Math.min(points.length - 1, impactIdx + 10);
+                    if (afterImpactIdx < points.length - 1) {
+                        const afterPt = points[afterImpactIdx];
+                        nodePositions.push({ x: afterPt.x, y: afterPt.y, side: 'after-impact' });
+                    }
+                    
+                    // 5. Middle of ascent arc (halfway between impact and end)
+                    const ascentMidIdx = impactIdx + Math.floor((points.length - 1 - impactIdx) / 2);
+                    if (ascentMidIdx > impactIdx && ascentMidIdx < points.length - 1) {
+                        const ascentMidPt = points[ascentMidIdx];
+                        nodePositions.push({ x: ascentMidPt.x, y: ascentMidPt.y, side: 'ascent-mid' });
+                    }
+                    
+                    // 6. End of ascent (last point)
+                    const endPt = points[points.length - 1];
+                    nodePositions.push({ x: endPt.x, y: endPt.y, side: 'end' });
+                    
+                    // Create nodes for each position
+                    nodePositions.forEach(pos => {
+                        const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        node.setAttribute('cx', pos.x);
+                        node.setAttribute('cy', pos.y);
+                        node.setAttribute('r', '3');
+                        node.setAttribute('class', 'flowchart-node');
+                        node.setAttribute('data-side', pos.side);
+                        node.setAttribute('data-gc-id', gc.id);
+                        node.setAttribute('data-object-type', 'gc');
+                        node.style.pointerEvents = 'all';
+                        
+                        node.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.startDrawingFromGC(gc, pos.side, e);
+                        });
+                        
+                        gc.elements.group.appendChild(node);
+                    });
+                }
+            },
+            
+            addNodesToMotive(motive) {
+                if (!motive.elements || !motive.elements.group) return;
+                
+                const existingNodes = motive.elements.group.querySelectorAll('.flowchart-node');
+                existingNodes.forEach(n => n.remove());
+                
+                if (this.connectMode) {
+                    const lineY = motive.elements.lineY || 10;
+                    const x1 = motive.x1;
+                    const x2 = motive.x2;
+                    const midX = (x1 + x2) / 2;
+                    
+                    // 3 nodes: start, middle, end
+                    const nodePositions = [
+                        { x: x1, y: lineY, side: 'start' },
+                        { x: midX, y: lineY, side: 'middle' },
+                        { x: x2, y: lineY, side: 'end' }
+                    ];
+                    
+                    nodePositions.forEach(pos => {
+                        const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        node.setAttribute('cx', pos.x);
+                        node.setAttribute('cy', pos.y);
+                        node.setAttribute('r', '3');
+                        node.setAttribute('class', 'flowchart-node');
+                        node.setAttribute('data-side', pos.side);
+                        node.setAttribute('data-motive-id', motive.id);
+                        node.setAttribute('data-object-type', 'motive');
+                        node.style.pointerEvents = 'all';
+                        
+                        node.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.startDrawingFromMotive(motive, pos.side, e);
+                        });
+                        
+                        motive.elements.group.appendChild(node);
+                    });
+                }
+            },
+            
+            startDrawingFromMotive(motive, side, e) {
+                const section = motive.section || 'top';
+                
+                this.isDrawing = true;
+                this.drawStartElement = motive;
+                this.drawStartSide = side;
+                this.drawStartObjectType = 'motive';
+                this.drawSection = section;
+                this.drawStartPoint = this.getMotiveNodePosition(motive, side);
+                
+                this.createTempLine(section);
+            },
+            
+            getMotiveNodePosition(motive, side) {
+                const lineY = motive.elements?.lineY || 10;
+                const x1 = motive.x1;
+                const x2 = motive.x2;
+                const midX = (x1 + x2) / 2;
+                
+                switch (side) {
+                    case 'start': return { x: x1, y: lineY };
+                    case 'middle': return { x: midX, y: lineY };
+                    case 'end': return { x: x2, y: lineY };
+                    default: return { x: midX, y: lineY };
+                }
+            },
+            
+            startDrawingFromGC(gc, side, e) {
+                const section = gc.section;
+                
+                this.isDrawing = true;
+                this.drawStartElement = gc;
+                this.drawStartSide = side;
+                this.drawStartObjectType = 'gc';
+                this.drawSection = section;
+                
+                const point = this.getGCNodePosition(gc, side);
+                this.drawStartPoint = point;
+                
+                // Create temporary line
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                this.tempLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                this.tempLine.setAttribute('stroke', '#aaa');
+                this.tempLine.setAttribute('stroke-width', '2');
+                this.tempLine.setAttribute('stroke-dasharray', '5,5');
+                this.tempLine.setAttribute('fill', 'none');
+                scoreEl.appendChild(this.tempLine);
+            },
+            
+            getGCNodePosition(gc, side) {
+                if (!gc.pixelPoints || gc.pixelPoints.length === 0) {
+                    return { x: gc.impactX, y: gc.impactY };
+                }
+                
+                const points = gc.pixelPoints;
+                const impactIdx = points.findIndex(pt => pt.time >= gc.impactSeconds);
+                
+                switch (side) {
+                    case 'start': {
+                        const pt = points[0];
+                        return { x: pt.x, y: pt.y };
+                    }
+                    case 'descent-mid': {
+                        const idx = Math.floor(impactIdx / 2);
+                        const pt = points[Math.max(0, idx)];
+                        return { x: pt.x, y: pt.y };
+                    }
+                    case 'before-impact': {
+                        const idx = Math.max(0, impactIdx - 10);
+                        const pt = points[idx];
+                        return { x: pt.x, y: pt.y };
+                    }
+                    case 'after-impact': {
+                        const idx = Math.min(points.length - 1, impactIdx + 10);
+                        const pt = points[idx];
+                        return { x: pt.x, y: pt.y };
+                    }
+                    case 'ascent-mid': {
+                        const idx = impactIdx + Math.floor((points.length - 1 - impactIdx) / 2);
+                        const pt = points[Math.min(points.length - 1, idx)];
+                        return { x: pt.x, y: pt.y };
+                    }
+                    case 'end': {
+                        const pt = points[points.length - 1];
+                        return { x: pt.x, y: pt.y };
+                    }
+                    default:
+                        return { x: gc.impactX, y: gc.impactY };
                 }
             },
             
@@ -2687,7 +2931,7 @@
                         const node = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                         node.setAttribute('cx', pos.x);
                         node.setAttribute('cy', pos.y);
-                        node.setAttribute('r', '6');
+                        node.setAttribute('r', '3');
                         node.setAttribute('class', 'flowchart-node');
                         node.setAttribute('data-side', pos.side);
                         node.setAttribute('data-curve-id', curve.id);
@@ -2781,6 +3025,32 @@
                                 );
                             }
                         }
+                    } else if (objectType === 'gc') {
+                        const gcId = parseInt(node.getAttribute('data-gc-id'));
+                        if (gcId !== this.drawStartElement.id || this.drawStartObjectType !== 'gc') {
+                            const endGC = window.GCMaker ? GCMaker.gcs.find(gc => gc.id === gcId) : null;
+                            const endSide = node.getAttribute('data-side');
+                            if (endGC) {
+                                this.createConnectorGeneric(
+                                    this.drawStartElement, this.drawStartSide, this.drawStartObjectType,
+                                    endGC, endSide, 'gc',
+                                    this.drawSection
+                                );
+                            }
+                        }
+                    } else if (objectType === 'motive') {
+                        const motiveId = parseInt(node.getAttribute('data-motive-id'));
+                        if (motiveId !== this.drawStartElement.id || this.drawStartObjectType !== 'motive') {
+                            const endMotive = window.MotiveMaker ? MotiveMaker.motives.find(m => m.id === motiveId) : null;
+                            const endSide = node.getAttribute('data-side');
+                            if (endMotive) {
+                                this.createConnectorGeneric(
+                                    this.drawStartElement, this.drawStartSide, this.drawStartObjectType,
+                                    endMotive, endSide, 'motive',
+                                    this.drawSection
+                                );
+                            }
+                        }
                     } else {
                         const elementId = parseInt(node.getAttribute('data-element-id'));
                         if (elementId !== this.drawStartElement.id || this.drawStartObjectType !== 'svg') {
@@ -2811,6 +3081,12 @@
             getNodePosition(element, side, objectType) {
                 if (objectType === 'curve') {
                     return this.getCurveNodePosition(element, side);
+                }
+                if (objectType === 'gc') {
+                    return this.getGCNodePosition(element, side);
+                }
+                if (objectType === 'motive') {
+                    return this.getMotiveNodePosition(element, side);
                 }
                 
                 const w = element.width * element.scale;
@@ -2961,6 +3237,10 @@
                     return SVGElementManager.elements.find(el => el.id === id);
                 } else if (type === 'curve') {
                     return CurveMaker.curves.find(c => c.id === id);
+                } else if (type === 'gc') {
+                    return window.GCMaker ? GCMaker.gcs.find(gc => gc.id === id) : null;
+                } else if (type === 'motive') {
+                    return window.MotiveMaker ? MotiveMaker.motives.find(m => m.id === id) : null;
                 }
                 return null;
             },
@@ -5379,7 +5659,9 @@
                         const event = trackEvents[this.currentEventIndices[trackIndex]];
                         
                         // Only send if we haven't already passed this event
-                        if (event.timeMs > this.lastPlaybackTimeMs[trackIndex]) {
+                        // Use >= to ensure events at exactly lastPlaybackTimeMs are sent
+                        // (the index advancement prevents duplicates)
+                        if (event.timeMs >= this.lastPlaybackTimeMs[trackIndex]) {
                             // Send to output if available
                             if (this.selectedOutput) {
                                 // Remap channel for channel voice messages (0x80-0xEF)
@@ -5558,8 +5840,20 @@
                     });
                 }
                 
-                // Sort events by time
-                this.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                // Sort events by time, preserving insertion order for same timestamps (stable sort)
+                // Use snippetId as secondary sort to keep snippet events together
+                this.tracks[trackIndex].midiEvents.sort((a, b) => {
+                    if (a.timeMs !== b.timeMs) return a.timeMs - b.timeMs;
+                    // For same timestamp, sort by snippetId to keep snippet events in order
+                    return (a.snippetId || 0) - (b.snippetId || 0);
+                });
+                
+                // Recalculate playback index for this track if playback is active
+                // This ensures newly inserted events before current position are accounted for
+                if (window.ScoreTime && ScoreTime.isPlaying) {
+                    const currentTimeMs = (ScoreTime.now() / 1000 - leadInSeconds) * 1000;
+                    this.resetPlaybackToTime(currentTimeMs);
+                }
                 
                 // Mark score as dirty (has unsaved changes)
                 if (window.ScoreManager) ScoreManager.markDirty();
@@ -5640,6 +5934,8 @@
                 
                 // Re-render MIDI display for the affected track to remove graphics
                 this.renderMidiDisplay(trackIndex);
+                // Re-render snippet overlays (renderMidiDisplay clears the track layer)
+                this.renderSnippetOverlays();
                 this.updateMidiDisplayVisibility();
                 
                 console.debug(`Deleted MIDI snippet: ${snippet.name} (ID: ${snippet.id})`);
@@ -5673,8 +5969,11 @@
                         });
                     }
                     
-                    // Sort events
-                    this.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                    // Sort events by time, preserving insertion order for same timestamps
+                    this.tracks[trackIndex].midiEvents.sort((a, b) => {
+                        if (a.timeMs !== b.timeMs) return a.timeMs - b.timeMs;
+                        return (a.snippetId || 0) - (b.snippetId || 0);
+                    });
                 }
                 
                 // Re-render displays
@@ -7245,6 +7544,17 @@
                         // Re-render MIDI display if MidiController exists
                         if (window.MidiController) {
                             MidiController.reloadFromDatabase();
+                        }
+                    }
+                );
+                
+                // GCMaker - gravitational conductor objects
+                this.registerSource('databases.gcs',
+                    () => window.GCMaker ? GCMaker.exportData() : { gcs: [], nextId: 1 },
+                    (data) => {
+                        if (window.GCMaker) {
+                            GCMaker.importData(data);
+                            GCMaker.reloadFromDatabase();
                         }
                     }
                 );
@@ -10620,6 +10930,14 @@
                 this.updateMotiveRendering(motive);
                 this.syncMotiveToDatabase(motive);
                 this.updateVisibility();
+                
+                // Update connectors attached to this motive
+                if (window.FlowchartConnector) {
+                    if (FlowchartConnector.connectMode) {
+                        FlowchartConnector.updateConnectionNodes();
+                    }
+                    FlowchartConnector.updateAllConnectors();
+                }
             },
             
             updateMotiveRendering(motive) {
@@ -10916,22 +11234,9 @@
                 this.scoreTopEl.appendChild(this.topGCGroup);
                 this.scoreBottomEl.appendChild(this.bottomGCGroup);
                 
-                // Create ball elements (circles that follow cursor)
-                this.ballTop = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                this.ballBottom = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                
-                [this.ballTop, this.ballBottom].forEach(ball => {
-                    ball.setAttribute('r', '5');
-                    ball.setAttribute('fill', 'rgb(255, 21, 160)');
-                    ball.setAttribute('stroke', 'none');
-                    ball.setAttribute('stroke-width', '0');
-                    ball.setAttribute('cx', '-100');
-                    ball.setAttribute('cy', '-100');
-                    ball.style.display = 'none';
-                });
-                
-                this.scoreTopEl.appendChild(this.ballTop);
-                this.scoreBottomEl.appendChild(this.ballBottom);
+                // Create ball containers for dynamic ball creation (one ball per active GC)
+                this.ballsTop = {};  // keyed by gc.id
+                this.ballsBottom = {};  // keyed by gc.id
                 
                 // Get UI elements
                 this.impactInput = document.getElementById('gcImpactInput');
@@ -11470,6 +11775,14 @@
                 if (wasSelected && this.gcs.includes(wasSelected)) {
                     this.selectGC(wasSelected);
                 }
+                
+                // Refresh connector nodes and update connectors attached to GCs
+                if (window.FlowchartConnector) {
+                    if (FlowchartConnector.connectMode) {
+                        FlowchartConnector.updateConnectionNodes();
+                    }
+                    FlowchartConnector.updateAllConnectors();
+                }
             },
             
             // Render a GC's trajectory path
@@ -11482,6 +11795,8 @@
                 const section = impactPage % 2 === 0 ? 'top' : 'bottom';
                 const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
                 const gcGroup = section === 'top' ? this.topGCGroup : this.bottomGCGroup;
+                
+                console.debug(`GCMaker.renderGC: id=${gc.id}, impactSeconds=${gc.impactSeconds}, impactActual=${impactActual}, secondsPerPage=${secondsPerPage}, impactPage=${impactPage}, section=${section}`);
                 const scoreWidth = scoreEl.clientWidth;
                 const scoreHeight = scoreEl.clientHeight;
                 
@@ -11639,7 +11954,7 @@
                 };
             },
             
-            // Update ball position each frame
+            // Update ball position each frame (supports multiple balls for overlapping GCs)
             update() {
                 const currentScoreTimeMs = ScoreTime.now();
                 const currentDisplayTimeSec = (currentScoreTimeMs / 1000) - leadInSeconds;
@@ -11650,34 +11965,57 @@
                 const inTop = positionInCycle < 1;
                 const currentPage = Math.floor(totalPagesTraveled);
                 
-                // Check if any GC is active at current time
-                let activeGC = null;
+                // Track which GCs are active this frame
+                const activeGCIds = new Set();
+                
+                // Find ALL active GCs at current time (not just the first one)
                 for (const gc of this.gcs) {
                     if (currentDisplayTimeSec >= gc.startSeconds && currentDisplayTimeSec <= gc.endSeconds) {
-                        activeGC = gc;
-                        break;
+                        activeGCIds.add(gc.id);
+                        
+                        // Calculate ball position for this GC
+                        const ballPos = this.calculateBallPositionForPage(gc, currentDisplayTimeSec, currentPage, inTop);
+                        
+                        if (ballPos) {
+                            // Get or create ball for this GC
+                            const ballContainer = inTop ? this.ballsTop : this.ballsBottom;
+                            let ball = ballContainer[gc.id];
+                            
+                            if (!ball) {
+                                // Create new ball for this GC
+                                ball = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                                ball.setAttribute('r', '5');
+                                ball.setAttribute('stroke', 'none');
+                                ball.setAttribute('stroke-width', '0');
+                                ballContainer[gc.id] = ball;
+                                const scoreEl = inTop ? this.scoreTopEl : this.scoreBottomEl;
+                                scoreEl.appendChild(ball);
+                            }
+                            
+                            ball.setAttribute('cx', ballPos.x);
+                            ball.setAttribute('cy', ballPos.y);
+                            ball.setAttribute('fill', ColorMap[gc.color] || gc.color);
+                            ball.style.display = '';
+                            
+                            // Hide ball in the other section
+                            const otherContainer = inTop ? this.ballsBottom : this.ballsTop;
+                            if (otherContainer[gc.id]) {
+                                otherContainer[gc.id].style.display = 'none';
+                            }
+                        }
                     }
                 }
                 
-                // Show/hide balls based on section
-                const activeBall = inTop ? this.ballTop : this.ballBottom;
-                const inactiveBall = inTop ? this.ballBottom : this.ballTop;
-                inactiveBall.style.display = 'none';
-                
-                if (activeGC) {
-                    // Calculate ball position for current page (handles multi-page GCs)
-                    const ballPos = this.calculateBallPositionForPage(activeGC, currentDisplayTimeSec, currentPage, inTop);
-                    
-                    if (ballPos) {
-                        activeBall.setAttribute('cx', ballPos.x);
-                        activeBall.setAttribute('cy', ballPos.y);
-                        activeBall.setAttribute('fill', ColorMap[activeGC.color] || activeGC.color);
-                        activeBall.style.display = '';
-                    } else {
-                        activeBall.style.display = 'none';
+                // Hide balls for GCs that are no longer active
+                for (const gcId in this.ballsTop) {
+                    if (!activeGCIds.has(parseInt(gcId))) {
+                        this.ballsTop[gcId].style.display = 'none';
                     }
-                } else {
-                    activeBall.style.display = 'none';
+                }
+                for (const gcId in this.ballsBottom) {
+                    if (!activeGCIds.has(parseInt(gcId))) {
+                        this.ballsBottom[gcId].style.display = 'none';
+                    }
                 }
             },
             
@@ -11737,6 +12075,8 @@
                 for (const gc of this.gcs) {
                     if (!gc.elements || !gc.elements.group) continue;
                     
+                    console.debug(`GCMaker.updateVisibility: gc.id=${gc.id}, gc.page=${gc.page}, gc.section=${gc.section}, topPage=${topPage}, bottomPage=${bottomPage}`);
+                    
                     // Calculate which pages this GC spans
                     const startActual = gc.startSeconds + leadInSec;
                     const endActual = gc.endSeconds + leadInSec;
@@ -11750,28 +12090,33 @@
                     
                     const isMultiPage = gcEndPage > gcStartPage;
                     
+                    // Get the page where the impact point is located (set during renderGC)
+                    const impactPage = gc.page;
+                    
+                    // Check if the impact page is currently visible
+                    const impactPageVisibleOnTop = impactPage === topPage;
+                    const impactPageVisibleOnBottom = impactPage === bottomPage;
+                    const impactPageVisible = impactPageVisibleOnTop || impactPageVisibleOnBottom;
+                    
                     if (!isMultiPage) {
-                        // Single-page GC: simple show/hide
-                        gc.elements.group.style.display = visible ? '' : 'none';
+                        // Single-page GC: simple show/hide based on whether impact page is visible
+                        gc.elements.group.style.display = impactPageVisible ? '' : 'none';
                         // Hide continuation segments if they exist
                         if (gc.elements.continuationGroupTop) gc.elements.continuationGroupTop.style.display = 'none';
                         if (gc.elements.continuationGroupBottom) gc.elements.continuationGroupBottom.style.display = 'none';
                     } else {
-                        // Multi-page GC: show segments on each visible page
-                        // Original segment on original page
-                        if (overlapsTop && topPage === gcStartPage) {
+                        // Multi-page GC: show original group when impact page is visible
+                        // The original group contains the impact marker which should always be visible on its page
+                        if (impactPageVisible) {
                             gc.elements.group.style.display = '';
-                            this.clipGCToPageEnd(gc, gcStartPage, secondsPerPage, leadInSec);
-                        } else if (overlapsBottom && bottomPage === gcStartPage) {
-                            gc.elements.group.style.display = '';
-                            this.clipGCToPageEnd(gc, gcStartPage, secondsPerPage, leadInSec);
+                            this.clipGCToPageEnd(gc, impactPage, secondsPerPage, leadInSec);
                         } else {
                             gc.elements.group.style.display = 'none';
                         }
                         
-                        // Continuation segments on subsequent pages
-                        const showContinuationOnTop = overlapsTop && topPage > gcStartPage && topPage <= gcEndPage;
-                        const showContinuationOnBottom = overlapsBottom && bottomPage > gcStartPage && bottomPage <= gcEndPage;
+                        // Continuation segments on subsequent pages (pages after the impact page)
+                        const showContinuationOnTop = overlapsTop && topPage > impactPage && topPage <= gcEndPage;
+                        const showContinuationOnBottom = overlapsBottom && bottomPage > impactPage && bottomPage <= gcEndPage;
                         
                         if (showContinuationOnTop) {
                             this.showContinuationSegment(gc, topPage, secondsPerPage, leadInSec, 'top');
@@ -12013,32 +12358,60 @@
             
             // Load GC library and populate dropdown
             async loadGCLibrary() {
+                if (!this.recallOptions) return;
+                
                 try {
                     const response = await fetch('/api/gc-library/list');
                     const result = await response.json();
                     
-                    if (result.success && this.recallOptions) {
+                    if (result.success) {
+                        // Clear existing options
                         this.recallOptions.innerHTML = '';
                         
+                        // Reset hidden input and selected display
+                        if (this.recallSelect) this.recallSelect.value = '';
+                        if (this.recallSelected) this.recallSelected.textContent = '-- Select Saved GC --';
+                        
+                        // Add placeholder option
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'custom-dropdown-option';
+                        placeholder.style.cssText = 'padding: 6px 8px; cursor: pointer; font-size: 10px; color: #888; border-bottom: 1px solid #444;';
+                        placeholder.textContent = '-- Select Saved GC --';
+                        placeholder.dataset.value = '';
+                        placeholder.addEventListener('click', () => this.selectRecallOption('', '-- Select Saved GC --'));
+                        placeholder.addEventListener('mouseenter', () => placeholder.style.background = 'rgba(60,60,80,0.8)');
+                        placeholder.addEventListener('mouseleave', () => placeholder.style.background = '');
+                        this.recallOptions.appendChild(placeholder);
+                        
+                        // Add GCs to dropdown with full descriptions
                         for (const gc of result.gcs) {
                             const option = document.createElement('div');
                             option.className = 'custom-dropdown-option';
-                            option.style.cssText = 'padding: 4px 6px; cursor: pointer; font-size: 10px; border-bottom: 1px solid #444;';
-                            option.textContent = `${gc.name} (${gc.duration?.toFixed(1) || '?'}s)`;
+                            option.style.cssText = 'padding: 6px 8px; cursor: pointer; border-bottom: 1px solid #333;';
                             option.dataset.value = gc.name;
                             
-                            option.addEventListener('mouseenter', () => {
-                                option.style.background = 'rgba(100,100,120,0.5)';
-                            });
-                            option.addEventListener('mouseleave', () => {
-                                option.style.background = '';
-                            });
-                            option.addEventListener('click', () => {
-                                this.selectRecallOption(gc.name, option.textContent);
-                            });
+                            // Name line
+                            const nameLine = document.createElement('div');
+                            nameLine.style.cssText = 'font-size: 10px; font-weight: bold; color: #ddd;';
+                            const dur = gc.duration ? ` (${gc.duration.toFixed(1)}s)` : '';
+                            nameLine.textContent = `${gc.name}${dur}`;
+                            option.appendChild(nameLine);
                             
+                            // Description line (full text, wrapped)
+                            if (gc.description) {
+                                const descLine = document.createElement('div');
+                                descLine.style.cssText = 'font-size: 9px; color: #999; margin-top: 2px; white-space: normal; word-wrap: break-word;';
+                                descLine.textContent = gc.description;
+                                option.appendChild(descLine);
+                            }
+                            
+                            option.addEventListener('click', () => this.selectRecallOption(gc.name, `${gc.name}${dur}`));
+                            option.addEventListener('mouseenter', () => option.style.background = 'rgba(60,60,80,0.8)');
+                            option.addEventListener('mouseleave', () => option.style.background = '');
                             this.recallOptions.appendChild(option);
                         }
+                        
+                        console.debug(`Loaded ${result.gcs.length} GCs from library`);
                     }
                 } catch (err) {
                     console.error('Error loading GC library:', err);
@@ -12081,10 +12454,13 @@
                             impactSeconds = parseFloat(this.impactInput.value) || 0;
                         }
                         
-                        console.log('Inserting GC at edit line time:', impactSeconds);
+                        // Get track from T1-T4 radio buttons (allows inserting same curve on different tracks)
+                        const gTrackRadio = document.querySelector('input[name="gtrack"]:checked');
+                        let gTrack = gTrackRadio ? gTrackRadio.value : '2';
+                        // If "All" (A) is selected, default to track 1
+                        if (gTrack === 'A') gTrack = '1';
                         
-                        // Get track from recalled data or current selection
-                        const gTrack = data.gTrack || this.trackSelect?.value || '2';
+                        console.log('Inserting GC at edit line time:', impactSeconds, 'on track:', gTrack);
                         
                         // Get track dimensions
                         const scoreEl = this.scoreTopEl;
@@ -12143,6 +12519,112 @@
                 } catch (err) {
                     console.error('Error inserting GC:', err);
                 }
+            },
+            
+            // Export data for saving (called by ScoreManager)
+            exportData() {
+                return {
+                    gcs: this.gcs.map(gc => ({
+                        id: gc.id,
+                        name: gc.name,
+                        description: gc.description,
+                        gTrack: gc.gTrack,
+                        impactSeconds: gc.impactSeconds,
+                        startSeconds: gc.startSeconds,
+                        endSeconds: gc.endSeconds,
+                        stiffness: gc.stiffness,
+                        damping: gc.damping,
+                        ictus: gc.ictus,
+                        descentRatio: gc.descentRatio,
+                        duration: gc.duration,
+                        color: gc.color
+                    })),
+                    nextId: this.nextId
+                };
+            },
+            
+            // Import data from saved score (called by ScoreManager)
+            importData(data) {
+                if (data && data.gcs) {
+                    // Store the raw data - reloadFromDatabase will recreate the GCs
+                    this._importedData = data;
+                    this.nextId = data.nextId || (data.gcs.length > 0 ? Math.max(...data.gcs.map(g => g.id)) + 1 : 1);
+                }
+            },
+            
+            // Reload GCs from imported data (called after importData)
+            reloadFromDatabase() {
+                // Clear existing GC elements
+                if (this.topGCGroup) this.topGCGroup.innerHTML = '';
+                if (this.bottomGCGroup) this.bottomGCGroup.innerHTML = '';
+                this.gcs = [];
+                this.selectedGC = null;
+                
+                // If no imported data, nothing to reload
+                if (!this._importedData || !this._importedData.gcs) {
+                    console.debug('GCMaker: No imported data to reload');
+                    return;
+                }
+                
+                const scoreEl = this.scoreTopEl;
+                const scoreHeight = scoreEl.clientHeight;
+                const timelineHeight = 8;
+                const availableHeight = scoreHeight - timelineHeight;
+                const staffHeight = availableHeight / 4;
+                
+                // Recreate each GC from saved data
+                for (const gcData of this._importedData.gcs) {
+                    console.log('Reloading GC:', gcData.name, 'gTrack:', gcData.gTrack);
+                    // Calculate trajectory with saved parameters
+                    const trajectory = this.calculateTrajectory({
+                        impactSeconds: gcData.impactSeconds,
+                        stiffness: gcData.stiffness,
+                        damping: gcData.damping,
+                        ictus: gcData.ictus,
+                        descentRatio: gcData.descentRatio,
+                        duration: gcData.duration,
+                        staffHeight
+                    });
+                    
+                    // Create the GC object
+                    const gc = {
+                        id: gcData.id,
+                        name: gcData.name,
+                        description: gcData.description,
+                        gTrack: gcData.gTrack,
+                        impactSeconds: gcData.impactSeconds,
+                        startSeconds: trajectory.startSeconds,
+                        endSeconds: trajectory.endSeconds,
+                        stiffness: gcData.stiffness,
+                        damping: gcData.damping,
+                        ictus: gcData.ictus,
+                        descentRatio: gcData.descentRatio,
+                        duration: gcData.duration,
+                        trajectory: trajectory.trajectoryPoints,
+                        dropHeightPx: trajectory.dropHeightPixels,
+                        bounceHeightPx: trajectory.bounceHeightPixels,
+                        timeFall: trajectory.timeFall,
+                        timeRise: trajectory.timeRise,
+                        color: gcData.color || 'neonMagenta',
+                        elements: {}
+                    };
+                    
+                    this.gcs.push(gc);
+                    this.renderGC(gc);
+                }
+                
+                // Update visibility for current page
+                this.updateVisibility();
+                
+                // Refresh connector nodes and update connectors attached to GCs
+                if (window.FlowchartConnector) {
+                    if (FlowchartConnector.connectMode) {
+                        FlowchartConnector.updateConnectionNodes();
+                    }
+                    FlowchartConnector.updateAllConnectors();
+                }
+                
+                console.debug(`GCMaker: Reloaded ${this.gcs.length} GCs from database`);
             }
         };
         

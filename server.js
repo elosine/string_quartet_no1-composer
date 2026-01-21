@@ -112,7 +112,8 @@ let scoreData = {
     ],
     databases: {
         curves: { curves: [], nextId: 1 },
-        notation: { items: [], nextId: 1 }
+        notation: { items: [], nextId: 1 },
+        gcs: { gcs: [], nextId: 1 }
     },
     svgGraphics: []
 };

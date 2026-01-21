@@ -1,0 +1,13 @@
+{
+  "name": "GC_20260119_120846",
+  "description": "longer even curve",
+  "gTrack": "1",
+  "impactSeconds": 33,
+  "stiffness": 76,
+  "damping": 87,
+  "ictus": 133,
+  "descentRatio": 50,
+  "duration": 1.4,
+  "color": "neonMagenta",
+  "savedAt": "2026-01-19T17:11:19.865Z"
+}

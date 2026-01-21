@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIDI Tempo Tool</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #00d4ff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .panel {
+            background: #252540;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel h2 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 8px;
+        }
+        
+        .row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .col {
+            flex: 1;
+        }
+        
+        .col-narrow {
+            flex: 0 0 300px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #aaa;
+            font-size: 12px;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background: #3a3a5c;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #4a4a6c;
+        }
+        
+        .btn-primary {
+            background: #00d4ff;
+            color: #000;
+            border-color: #00d4ff;
+        }
+        
+        .btn-primary:hover {
+            background: #00a8cc;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: #fff;
+            border-color: #4CAF50;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        input[type="number"], select {
+            background: #1a1a2e;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px 12px;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 14px;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-row {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        .control-row .control-group {
+            flex: 1;
+        }
+        
+        .file-info {
+            background: #1a1a2e;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .file-info.loaded {
+            color: #4CAF50;
+        }
+        
+        /* Timeline visualization */
+        .timeline-container {
+            position: relative;
+            height: 200px;
+            background: #1a1a2e;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .timeline-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .timeline-label {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 11px;
+            color: #888;
+        }
+        
+        /* Track list */
+        .track-list {
+            max-height: 150px;
+            overflow-y: auto;
+            background: #1a1a2e;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .track-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .track-item:last-child {
+            border-bottom: none;
+        }
+        
+        .track-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        
+        .track-item label {
+            margin: 0;
+            color: #ddd;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .track-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 8px;
+        }
+        
+        /* Region selection */
+        .region-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .region-inputs input {
+            width: 80px;
+        }
+        
+        .region-inputs span {
+            color: #888;
+        }
+        
+        /* Curve preview */
+        .curve-preview {
+            height: 100px;
+            background: #1a1a2e;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .curve-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .stat-box {
+            background: #1a1a2e;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            margin-top: 3px;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        .comparison-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .comparison-container .timeline-container {
+            flex: 1;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 MIDI Tempo Tool</h1>
+        
+        <div class="row">
+            <!-- Left column: File & Track selection -->
+            <div class="col-narrow">
+                <div class="panel">
+                    <h2>📁 Load MIDI File</h2>
+                    <input type="file" id="midiFileInput" accept=".mid,.midi">
+                    <button class="btn btn-primary" onclick="document.getElementById('midiFileInput').click()">
+                        Choose MIDI File
+                    </button>
+                    <div id="fileInfo" class="file-info" style="margin-top: 10px;">
+                        No file loaded
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h2>🎼 Tracks</h2>
+                    <div id="trackList" class="track-list">
+                        <div style="color: #666; font-style: italic;">Load a MIDI file to see tracks</div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn" onclick="selectAllTracks(true)">Select All</button>
+                        <button class="btn" onclick="selectAllTracks(false)">Deselect All</button>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h2>📊 Statistics</h2>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div id="statNotes" class="stat-value">-</div>
+                            <div class="stat-label">Notes</div>
+                        </div>
+                        <div class="stat-box">
+                            <div id="statDuration" class="stat-value">-</div>
+                            <div class="stat-label">Duration</div>
+                        </div>
+                        <div class="stat-box">
+                            <div id="statTempo" class="stat-value">-</div>
+                            <div class="stat-label">Tempo</div>
+                        </div>
+                        <div class="stat-box">
+                            <div id="statTracks" class="stat-value">-</div>
+                            <div class="stat-label">Tracks</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right column: Tempo controls & visualization -->
+            <div class="col">
+                <div class="panel">
+                    <h2>⏱️ Tempo Curve Settings</h2>
+                    
+                    <div class="control-row">
+                        <div class="control-group">
+                            <label>Region Start (seconds)</label>
+                            <input type="number" id="regionStart" value="0" min="0" step="0.1">
+                        </div>
+                        <div class="control-group">
+                            <label>Region End (seconds)</label>
+                            <input type="number" id="regionEnd" value="10" min="0" step="0.1">
+                        </div>
+                        <div class="control-group">
+                            <label>Apply To</label>
+                            <select id="applyTo">
+                                <option value="region">Selected Region Only</option>
+                                <option value="all">Entire File</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="control-row">
+                        <div class="control-group">
+                            <label>Start Tempo (BPM)</label>
+                            <input type="number" id="startTempo" value="120" min="20" max="300" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label>End Tempo (BPM)</label>
+                            <input type="number" id="endTempo" value="180" min="20" max="300" step="1">
+                        </div>
+                        <div class="control-group">
+                            <label>Curve Type</label>
+                            <select id="curveType">
+                                <option value="linear">Linear</option>
+                                <option value="exponential">Exponential</option>
+                                <option value="logarithmic">Logarithmic</option>
+                                <option value="easeIn">Ease In (slow start)</option>
+                                <option value="easeOut">Ease Out (slow end)</option>
+                                <option value="easeInOut">Ease In-Out</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>Curve Preview</label>
+                        <div class="curve-preview">
+                            <canvas id="curveCanvas" class="curve-canvas"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="applyTempoCurve()">Apply Tempo Curve</button>
+                        <button class="btn" onclick="resetTransform()">Reset</button>
+                        <button class="btn btn-success" onclick="exportMidi()">Export MIDI</button>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <h2>📈 Event Timeline</h2>
+                    <div class="comparison-container">
+                        <div class="timeline-container">
+                            <span class="timeline-label">Original</span>
+                            <canvas id="originalCanvas" class="timeline-canvas"></canvas>
+                        </div>
+                        <div class="timeline-container">
+                            <span class="timeline-label">Transformed</span>
+                            <canvas id="transformedCanvas" class="timeline-canvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #00d4ff;"></div>
+                            <span>Note Events</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ff6b6b;"></div>
+                            <span>Tempo Region</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // MIDI parsing and manipulation
+        let midiData = null;
+        let originalEvents = [];
+        let transformedEvents = [];
+        let tracks = [];
+        let fileDuration = 0;
+        let originalTempo = 120;
+        
+        // Track colors
+        const trackColors = [
+            '#00d4ff', '#ff6b6b', '#4CAF50', '#ffd700', 
+            '#9c27b0', '#ff9800', '#e91e63', '#00bcd4',
+            '#8bc34a', '#ff5722', '#673ab7', '#03a9f4'
+        ];
+        
+        // File input handler
+        document.getElementById('midiFileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                midiData = parseMidi(new Uint8Array(arrayBuffer));
+                
+                // Extract events and tracks
+                extractEvents();
+                updateUI();
+                
+                document.getElementById('fileInfo').textContent = `Loaded: ${file.name}`;
+                document.getElementById('fileInfo').classList.add('loaded');
+            } catch (err) {
+                console.error('Error loading MIDI:', err);
+                document.getElementById('fileInfo').textContent = `Error: ${err.message}`;
+            }
+        });
+        
+        // Simple MIDI parser
+        function parseMidi(data) {
+            let pos = 0;
+            
+            function readString(length) {
+                let str = '';
+                for (let i = 0; i < length; i++) {
+                    str += String.fromCharCode(data[pos++]);
+                }
+                return str;
+            }
+            
+            function readInt(length) {
+                let value = 0;
+                for (let i = 0; i < length; i++) {
+                    value = (value << 8) | data[pos++];
+                }
+                return value;
+            }
+            
+            function readVarInt() {
+                let value = 0;
+                let byte;
+                do {
+                    byte = data[pos++];
+                    value = (value << 7) | (byte & 0x7f);
+                } while (byte & 0x80);
+                return value;
+            }
+            
+            // Read header
+            const headerChunk = readString(4);
+            if (headerChunk !== 'MThd') throw new Error('Invalid MIDI file');
+            
+            const headerLength = readInt(4);
+            const format = readInt(2);
+            const numTracks = readInt(2);
+            const ticksPerBeat = readInt(2);
+            
+            // Read tracks
+            const tracks = [];
+            for (let t = 0; t < numTracks; t++) {
+                const trackChunk = readString(4);
+                if (trackChunk !== 'MTrk') throw new Error('Invalid track chunk');
+                
+                const trackLength = readInt(4);
+                const trackEnd = pos + trackLength;
+                const events = [];
+                let runningStatus = 0;
+                let absoluteTick = 0;
+                
+                while (pos < trackEnd) {
+                    const deltaTime = readVarInt();
+                    absoluteTick += deltaTime;
+                    
+                    let eventType = data[pos];
+                    
+                    if (eventType < 0x80) {
+                        // Running status
+                        eventType = runningStatus;
+                    } else {
+                        pos++;
+                        if (eventType < 0xf0) {
+                            runningStatus = eventType;
+                        }
+                    }
+                    
+                    const event = {
+                        deltaTime,
+                        absoluteTick,
+                        type: eventType
+                    };
+                    
+                    if (eventType === 0xff) {
+                        // Meta event
+                        event.metaType = data[pos++];
+                        const length = readVarInt();
+                        event.data = Array.from(data.slice(pos, pos + length));
+                        pos += length;
+                        
+                        // Parse tempo
+                        if (event.metaType === 0x51 && length === 3) {
+                            event.tempo = (event.data[0] << 16) | (event.data[1] << 8) | event.data[2];
+                            event.bpm = 60000000 / event.tempo;
+                        }
+                        
+                        // Parse track name
+                        if (event.metaType === 0x03) {
+                            event.trackName = String.fromCharCode(...event.data);
+                        }
+                    } else if (eventType === 0xf0 || eventType === 0xf7) {
+                        // SysEx
+                        const length = readVarInt();
+                        event.data = Array.from(data.slice(pos, pos + length));
+                        pos += length;
+                    } else {
+                        // Channel event
+                        const channel = eventType & 0x0f;
+                        const type = eventType & 0xf0;
+                        event.channel = channel;
+                        event.midiType = type;
+                        
+                        if (type === 0x80 || type === 0x90 || type === 0xa0 || type === 0xb0 || type === 0xe0) {
+                            event.data1 = data[pos++];
+                            event.data2 = data[pos++];
+                            
+                            if (type === 0x90 && event.data2 > 0) {
+                                event.isNoteOn = true;
+                                event.note = event.data1;
+                                event.velocity = event.data2;
+                            } else if (type === 0x80 || (type === 0x90 && event.data2 === 0)) {
+                                event.isNoteOff = true;
+                                event.note = event.data1;
+                            }
+                        } else if (type === 0xc0 || type === 0xd0) {
+                            event.data1 = data[pos++];
+                        }
+                    }
+                    
+                    events.push(event);
+                }
+                
+                tracks.push(events);
+            }
+            
+            return { format, numTracks, ticksPerBeat, tracks, rawData: data };
+        }
+        
+        function extractEvents() {
+            if (!midiData) return;
+            
+            originalEvents = [];
+            tracks = [];
+            let tempo = 500000; // Default 120 BPM
+            originalTempo = 120;
+            
+            // First pass: find tempo events and calculate time
+            const tempoMap = [];
+            midiData.tracks.forEach((track, trackIndex) => {
+                track.forEach(event => {
+                    if (event.metaType === 0x51) {
+                        tempoMap.push({ tick: event.absoluteTick, tempo: event.tempo, bpm: event.bpm });
+                        if (event.absoluteTick === 0) {
+                            originalTempo = event.bpm;
+                        }
+                    }
+                });
+            });
+            
+            if (tempoMap.length === 0) {
+                tempoMap.push({ tick: 0, tempo: 500000, bpm: 120 });
+            }
+            tempoMap.sort((a, b) => a.tick - b.tick);
+            
+            // Convert ticks to seconds
+            function tickToSeconds(tick) {
+                let seconds = 0;
+                let lastTick = 0;
+                let currentTempo = tempoMap[0].tempo;
+                
+                for (const tm of tempoMap) {
+                    if (tm.tick >= tick) break;
+                    seconds += (tm.tick - lastTick) * currentTempo / (midiData.ticksPerBeat * 1000000);
+                    lastTick = tm.tick;
+                    currentTempo = tm.tempo;
+                }
+                
+                seconds += (tick - lastTick) * currentTempo / (midiData.ticksPerBeat * 1000000);
+                return seconds;
+            }
+            
+            // Extract note events from all tracks
+            midiData.tracks.forEach((track, trackIndex) => {
+                let trackName = `Track ${trackIndex + 1}`;
+                let noteCount = 0;
+                
+                track.forEach(event => {
+                    if (event.trackName) {
+                        trackName = event.trackName;
+                    }
+                    
+                    if (event.isNoteOn) {
+                        noteCount++;
+                        const timeSeconds = tickToSeconds(event.absoluteTick);
+                        originalEvents.push({
+                            track: trackIndex,
+                            tick: event.absoluteTick,
+                            time: timeSeconds,
+                            note: event.note,
+                            velocity: event.velocity,
+                            channel: event.channel
+                        });
+                    }
+                });
+                
+                tracks.push({
+                    index: trackIndex,
+                    name: trackName,
+                    noteCount,
+                    color: trackColors[trackIndex % trackColors.length],
+                    selected: true
+                });
+            });
+            
+            // Sort by time
+            originalEvents.sort((a, b) => a.time - b.time);
+            
+            // Calculate duration
+            fileDuration = originalEvents.length > 0 ? 
+                Math.max(...originalEvents.map(e => e.time)) + 1 : 0;
+            
+            // Initialize transformed events as copy
+            transformedEvents = originalEvents.map(e => ({ ...e, transformedTime: e.time }));
+            
+            // Update region end to file duration
+            document.getElementById('regionEnd').value = fileDuration.toFixed(1);
+        }
+        
+        function updateUI() {
+            // Update track list
+            const trackListEl = document.getElementById('trackList');
+            if (tracks.length === 0) {
+                trackListEl.innerHTML = '<div style="color: #666; font-style: italic;">No tracks found</div>';
+            } else {
+                trackListEl.innerHTML = tracks.map(t => `
+                    <div class="track-item">
+                        <input type="checkbox" id="track${t.index}" ${t.selected ? 'checked' : ''} 
+                               onchange="toggleTrack(${t.index}, this.checked)">
+                        <div class="track-color" style="background: ${t.color};"></div>
+                        <label for="track${t.index}">${t.name} (${t.noteCount} notes)</label>
+                    </div>
+                `).join('');
+            }
+            
+            // Update stats
+            document.getElementById('statNotes').textContent = originalEvents.length;
+            document.getElementById('statDuration').textContent = fileDuration.toFixed(1) + 's';
+            document.getElementById('statTempo').textContent = Math.round(originalTempo);
+            document.getElementById('statTracks').textContent = tracks.filter(t => t.noteCount > 0).length;
+            
+            // Draw visualizations
+            drawCurvePreview();
+            drawTimelines();
+        }
+        
+        function toggleTrack(index, selected) {
+            tracks[index].selected = selected;
+            drawTimelines();
+        }
+        
+        function selectAllTracks(selected) {
+            tracks.forEach(t => t.selected = selected);
+            document.querySelectorAll('#trackList input[type="checkbox"]').forEach(cb => cb.checked = selected);
+            drawTimelines();
+        }
+        
+        // Curve functions
+        function getCurveValue(t, curveType) {
+            // t is 0-1, returns 0-1
+            switch (curveType) {
+                case 'linear':
+                    return t;
+                case 'exponential':
+                    return t * t;
+                case 'logarithmic':
+                    return Math.sqrt(t);
+                case 'easeIn':
+                    return t * t * t;
+                case 'easeOut':
+                    return 1 - Math.pow(1 - t, 3);
+                case 'easeInOut':
+                    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                default:
+                    return t;
+            }
+        }
+        
+        function drawCurvePreview() {
+            const canvas = document.getElementById('curveCanvas');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            const w = rect.width;
+            const h = rect.height;
+            const padding = 10;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            // Draw grid
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = padding + (h - 2 * padding) * i / 4;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(w - padding, y);
+                ctx.stroke();
+            }
+            
+            // Draw curve
+            const curveType = document.getElementById('curveType').value;
+            const startTempo = parseFloat(document.getElementById('startTempo').value);
+            const endTempo = parseFloat(document.getElementById('endTempo').value);
+            
+            ctx.strokeStyle = '#00d4ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            for (let x = 0; x <= 100; x++) {
+                const t = x / 100;
+                const curveVal = getCurveValue(t, curveType);
+                const tempo = startTempo + (endTempo - startTempo) * curveVal;
+                const normalizedTempo = (tempo - 20) / (300 - 20); // Normalize to 20-300 BPM range
+                
+                const px = padding + (w - 2 * padding) * t;
+                const py = h - padding - (h - 2 * padding) * normalizedTempo;
+                
+                if (x === 0) {
+                    ctx.moveTo(px, py);
+                } else {
+                    ctx.lineTo(px, py);
+                }
+            }
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#888';
+            ctx.font = '10px sans-serif';
+            ctx.fillText(`${startTempo} BPM`, padding, h - 2);
+            ctx.fillText(`${endTempo} BPM`, w - padding - 40, 12);
+        }
+        
+        function drawTimelines() {
+            drawTimeline('originalCanvas', originalEvents, false);
+            drawTimeline('transformedCanvas', transformedEvents, true);
+        }
+        
+        function drawTimeline(canvasId, events, useTransformed) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            const w = rect.width;
+            const h = rect.height;
+            const padding = 20;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            if (events.length === 0) {
+                ctx.fillStyle = '#666';
+                ctx.font = '14px sans-serif';
+                ctx.fillText('No events to display', w / 2 - 60, h / 2);
+                return;
+            }
+            
+            // Calculate time range
+            const maxTime = useTransformed ? 
+                Math.max(...events.map(e => e.transformedTime || e.time)) :
+                Math.max(...events.map(e => e.time));
+            const duration = maxTime + 1;
+            
+            // Draw time axis
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, h - padding);
+            ctx.lineTo(w - padding, h - padding);
+            ctx.stroke();
+            
+            // Time labels
+            ctx.fillStyle = '#888';
+            ctx.font = '10px sans-serif';
+            const numLabels = 5;
+            for (let i = 0; i <= numLabels; i++) {
+                const t = (duration * i / numLabels).toFixed(1);
+                const x = padding + (w - 2 * padding) * i / numLabels;
+                ctx.fillText(t + 's', x - 10, h - 5);
+            }
+            
+            // Draw region highlight
+            const regionStart = parseFloat(document.getElementById('regionStart').value);
+            const regionEnd = parseFloat(document.getElementById('regionEnd').value);
+            const applyTo = document.getElementById('applyTo').value;
+            
+            if (applyTo === 'region') {
+                const x1 = padding + (w - 2 * padding) * (regionStart / duration);
+                const x2 = padding + (w - 2 * padding) * (regionEnd / duration);
+                ctx.fillStyle = 'rgba(255, 107, 107, 0.1)';
+                ctx.fillRect(x1, padding, x2 - x1, h - 2 * padding);
+                ctx.strokeStyle = 'rgba(255, 107, 107, 0.5)';
+                ctx.strokeRect(x1, padding, x2 - x1, h - 2 * padding);
+            }
+            
+            // Draw note events
+            const noteRange = { min: 21, max: 108 }; // Piano range
+            
+            events.forEach(event => {
+                if (!tracks[event.track]?.selected) return;
+                
+                const time = useTransformed ? (event.transformedTime || event.time) : event.time;
+                const x = padding + (w - 2 * padding) * (time / duration);
+                const noteNorm = (event.note - noteRange.min) / (noteRange.max - noteRange.min);
+                const y = h - padding - (h - 2 * padding) * noteNorm;
+                
+                ctx.fillStyle = tracks[event.track]?.color || '#00d4ff';
+                ctx.globalAlpha = 0.7;
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            ctx.globalAlpha = 1;
+        }
+        
+        function applyTempoCurve() {
+            if (originalEvents.length === 0) {
+                alert('Please load a MIDI file first');
+                return;
+            }
+            
+            const regionStart = parseFloat(document.getElementById('regionStart').value);
+            const regionEnd = parseFloat(document.getElementById('regionEnd').value);
+            const startTempo = parseFloat(document.getElementById('startTempo').value);
+            const endTempo = parseFloat(document.getElementById('endTempo').value);
+            const curveType = document.getElementById('curveType').value;
+            const applyTo = document.getElementById('applyTo').value;
+            
+            const effectiveStart = applyTo === 'all' ? 0 : regionStart;
+            const effectiveEnd = applyTo === 'all' ? fileDuration : regionEnd;
+            const effectiveDuration = effectiveEnd - effectiveStart;
+            
+            // Core transformation function - integrates tempo curve to find new time
+            function transformTime(originalTime) {
+                if (originalTime < effectiveStart) {
+                    return originalTime;
+                } else if (originalTime <= effectiveEnd) {
+                    const t = (originalTime - effectiveStart) / effectiveDuration;
+                    
+                    // Integrate tempo curve: higher tempo = time compresses, lower = expands
+                    const numSteps = 500;
+                    let newTime = effectiveStart;
+                    
+                    for (let i = 0; i < numSteps; i++) {
+                        const stepStart = i / numSteps;
+                        const stepEnd = (i + 1) / numSteps;
+                        
+                        if (stepEnd <= t) {
+                            const midPos = (stepStart + stepEnd) / 2;
+                            const curveVal = getCurveValue(midPos, curveType);
+                            const tempo = startTempo + (endTempo - startTempo) * curveVal;
+                            const timeScale = originalTempo / tempo;
+                            newTime += (effectiveDuration / numSteps) * timeScale;
+                        } else if (stepStart < t) {
+                            const fraction = (t - stepStart) / (stepEnd - stepStart);
+                            const midPos = (stepStart + t) / 2;
+                            const curveVal = getCurveValue(midPos, curveType);
+                            const tempo = startTempo + (endTempo - startTempo) * curveVal;
+                            const timeScale = originalTempo / tempo;
+                            newTime += (effectiveDuration / numSteps) * fraction * timeScale;
+                        }
+                    }
+                    return newTime;
+                } else {
+                    // After region: shift by accumulated difference
+                    const regionNewEnd = transformTime(effectiveEnd);
+                    const timeShift = regionNewEnd - effectiveEnd;
+                    return originalTime + timeShift;
+                }
+            }
+            
+            // Transform all events
+            transformedEvents = originalEvents.map(event => ({
+                ...event,
+                transformedTime: transformTime(event.time)
+            }));
+            
+            drawTimelines();
+        }
+        
+        function resetTransform() {
+            transformedEvents = originalEvents.map(e => ({ ...e, transformedTime: e.time }));
+            drawTimelines();
+        }
+        
+        async function exportMidi() {
+            if (!midiData || transformedEvents.length === 0) {
+                alert('Please load and transform a MIDI file first');
+                return;
+            }
+            
+            // Build a new MIDI file with transformed timing
+            const newMidiData = buildTransformedMidi();
+            const blob = new Blob([newMidiData], { type: 'audio/midi' });
+            
+            // Use File System Access API if available (allows save dialog)
+            if ('showSaveFilePicker' in window) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: 'transformed.mid',
+                        types: [{
+                            description: 'MIDI File',
+                            accept: { 'audio/midi': ['.mid', '.midi'] }
+                        }]
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    console.log('MIDI file saved successfully');
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('Save failed:', err);
+                        alert('Failed to save file: ' + err.message);
+                    }
+                }
+            } else {
+                // Fallback for browsers without File System Access API
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'transformed.mid';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+        
+        function buildTransformedMidi() {
+            // Create a mapping from original time to transformed time
+            const timeMap = new Map();
+            transformedEvents.forEach(e => {
+                timeMap.set(e.time, e.transformedTime);
+            });
+            
+            // Helper functions for writing MIDI
+            function writeVarInt(value) {
+                const bytes = [];
+                bytes.push(value & 0x7f);
+                value >>= 7;
+                while (value > 0) {
+                    bytes.unshift((value & 0x7f) | 0x80);
+                    value >>= 7;
+                }
+                return bytes;
+            }
+            
+            function writeInt(value, length) {
+                const bytes = [];
+                for (let i = length - 1; i >= 0; i--) {
+                    bytes.push((value >> (i * 8)) & 0xff);
+                }
+                return bytes;
+            }
+            
+            // Build tempo map for the transformation
+            const regionStart = parseFloat(document.getElementById('regionStart').value);
+            const regionEnd = parseFloat(document.getElementById('regionEnd').value);
+            const startTempo = parseFloat(document.getElementById('startTempo').value);
+            const endTempo = parseFloat(document.getElementById('endTempo').value);
+            const curveType = document.getElementById('curveType').value;
+            const applyTo = document.getElementById('applyTo').value;
+            
+            // Convert seconds back to ticks using original tempo
+            function secondsToTicks(seconds) {
+                return Math.round(seconds * midiData.ticksPerBeat * originalTempo / 60);
+            }
+            
+            const effectiveStart = applyTo === 'all' ? 0 : regionStart;
+            const effectiveEnd = applyTo === 'all' ? fileDuration : regionEnd;
+            const effectiveDuration = effectiveEnd - effectiveStart;
+            
+            // Transform time in seconds - this is the core acceleration function
+            function transformTimeSeconds(originalTimeSeconds) {
+                if (originalTimeSeconds < effectiveStart) {
+                    return originalTimeSeconds;
+                } else if (originalTimeSeconds <= effectiveEnd) {
+                    // Inside region: apply tempo curve integration
+                    const t = (originalTimeSeconds - effectiveStart) / effectiveDuration;
+                    
+                    // Integrate tempo curve to find new time position
+                    // Higher tempo = events happen sooner (compressed time)
+                    // Lower tempo = events happen later (expanded time)
+                    const numSteps = 1000;
+                    let newTime = effectiveStart;
+                    
+                    for (let i = 0; i < numSteps; i++) {
+                        const stepStart = i / numSteps;
+                        const stepEnd = (i + 1) / numSteps;
+                        
+                        if (stepEnd <= t) {
+                            // Full step
+                            const midPos = (stepStart + stepEnd) / 2;
+                            const curveVal = getCurveValue(midPos, curveType);
+                            const tempo = startTempo + (endTempo - startTempo) * curveVal;
+                            const timeScale = originalTempo / tempo;
+                            newTime += (effectiveDuration / numSteps) * timeScale;
+                        } else if (stepStart < t) {
+                            // Partial step
+                            const fraction = (t - stepStart) / (stepEnd - stepStart);
+                            const midPos = (stepStart + t) / 2;
+                            const curveVal = getCurveValue(midPos, curveType);
+                            const tempo = startTempo + (endTempo - startTempo) * curveVal;
+                            const timeScale = originalTempo / tempo;
+                            newTime += (effectiveDuration / numSteps) * fraction * timeScale;
+                        }
+                    }
+                    
+                    return newTime;
+                } else {
+                    // After region: shift by accumulated time difference
+                    const regionNewDuration = transformTimeSeconds(effectiveEnd) - effectiveStart;
+                    const timeShift = regionNewDuration - effectiveDuration;
+                    return originalTimeSeconds + timeShift;
+                }
+            }
+            
+            // Rebuild each track with transformed timing
+            const newTracks = [];
+            
+            // Helper to get time in seconds for a tick
+            function tickToSeconds(tick) {
+                let seconds = 0;
+                let tempTempo = 500000;
+                let tempLastTick = 0;
+                
+                for (const t of midiData.tracks[0] || []) {
+                    if (t.absoluteTick > tick) break;
+                    if (t.metaType === 0x51) {
+                        seconds += (t.absoluteTick - tempLastTick) * tempTempo / (midiData.ticksPerBeat * 1000000);
+                        tempLastTick = t.absoluteTick;
+                        tempTempo = t.tempo;
+                    }
+                }
+                seconds += (tick - tempLastTick) * tempTempo / (midiData.ticksPerBeat * 1000000);
+                return seconds;
+            }
+            
+            // Use a fixed output tempo for simplicity - events are placed at absolute times
+            const outputTempo = originalTempo;
+            const outputMicrosecondsPerBeat = Math.round(60000000 / outputTempo);
+            
+            // Helper to convert seconds to ticks at output tempo
+            function secondsToOutputTicks(seconds) {
+                return Math.round(seconds * midiData.ticksPerBeat * outputTempo / 60);
+            }
+            
+            midiData.tracks.forEach((track, trackIndex) => {
+                // First pass: pair note-ons with note-offs to get original durations IN SECONDS
+                const activeNotes = new Map(); // key: channel-note, value: {onTimeSeconds, onEventIndex}
+                const noteDurations = new Map(); // key: event index, value: {durationSeconds, noteOnIndex}
+                
+                track.forEach((event, eventIndex) => {
+                    if (event.isNoteOn) {
+                        const key = `${event.channel}-${event.note}`;
+                        activeNotes.set(key, { 
+                            onTimeSeconds: tickToSeconds(event.absoluteTick),
+                            onEventIndex: eventIndex
+                        });
+                    } else if (event.isNoteOff) {
+                        const key = `${event.channel}-${event.note}`;
+                        const noteOn = activeNotes.get(key);
+                        if (noteOn) {
+                            // Store the original duration in SECONDS for this note-off
+                            const offTimeSeconds = tickToSeconds(event.absoluteTick);
+                            const durationSeconds = offTimeSeconds - noteOn.onTimeSeconds;
+                            noteDurations.set(eventIndex, { 
+                                durationSeconds,
+                                noteOnIndex: noteOn.onEventIndex
+                            });
+                            activeNotes.delete(key);
+                        }
+                    }
+                });
+                
+                // Second pass: build transformed events
+                const transformedTrackEvents = [];
+                const noteOnNewTimeSeconds = new Map(); // eventIndex -> new time in seconds
+                
+                track.forEach((event, eventIndex) => {
+                    const eventTimeSeconds = tickToSeconds(event.absoluteTick);
+                    let newTimeSeconds;
+                    
+                    if (event.isNoteOn) {
+                        // Transform note-on onset time
+                        newTimeSeconds = transformTimeSeconds(eventTimeSeconds);
+                        noteOnNewTimeSeconds.set(eventIndex, newTimeSeconds);
+                    } else if (event.isNoteOff && noteDurations.has(eventIndex)) {
+                        // Note-off: use transformed note-on time + original duration IN SECONDS
+                        const durInfo = noteDurations.get(eventIndex);
+                        const noteOnNewTime = noteOnNewTimeSeconds.get(durInfo.noteOnIndex);
+                        if (noteOnNewTime !== undefined) {
+                            newTimeSeconds = noteOnNewTime + durInfo.durationSeconds;
+                        } else {
+                            // Fallback if we couldn't find the note-on
+                            newTimeSeconds = transformTimeSeconds(eventTimeSeconds);
+                        }
+                    } else {
+                        // All other events: transform normally
+                        newTimeSeconds = transformTimeSeconds(eventTimeSeconds);
+                    }
+                    
+                    transformedTrackEvents.push({
+                        event,
+                        newTick: secondsToOutputTicks(newTimeSeconds),
+                        newTimeSeconds,
+                        eventIndex
+                    });
+                });
+                
+                // Sort by new tick position
+                transformedTrackEvents.sort((a, b) => {
+                    if (a.newTick !== b.newTick) return a.newTick - b.newTick;
+                    return a.eventIndex - b.eventIndex; // Preserve original order for same tick
+                });
+                
+                // Write the track
+                const newEvents = [];
+                let lastTick = 0;
+                
+                // For track 0, insert a single tempo event at the start
+                if (trackIndex === 0) {
+                    // Write tempo event at tick 0
+                    newEvents.push(...writeVarInt(0)); // delta time = 0
+                    newEvents.push(0xff, 0x51, 0x03);
+                    newEvents.push((outputMicrosecondsPerBeat >> 16) & 0xff);
+                    newEvents.push((outputMicrosecondsPerBeat >> 8) & 0xff);
+                    newEvents.push(outputMicrosecondsPerBeat & 0xff);
+                }
+                
+                transformedTrackEvents.forEach(({ event, newTick }) => {
+                    const deltaTick = Math.max(0, newTick - lastTick);
+                    
+                    // Write delta time
+                    newEvents.push(...writeVarInt(deltaTick));
+                    
+                    // Write event data
+                    if (event.type === 0xff) {
+                        // Skip original tempo events - we set our own at the start
+                        if (event.metaType === 0x51) {
+                            // Remove the delta we just added
+                            const varIntLen = writeVarInt(deltaTick).length;
+                            for (let i = 0; i < varIntLen; i++) newEvents.pop();
+                            return;
+                        }
+                        newEvents.push(0xff, event.metaType);
+                        newEvents.push(...writeVarInt(event.data.length));
+                        newEvents.push(...event.data);
+                    } else if (event.type === 0xf0 || event.type === 0xf7) {
+                        // SysEx
+                        newEvents.push(event.type);
+                        newEvents.push(...writeVarInt(event.data.length));
+                        newEvents.push(...event.data);
+                    } else {
+                        // Channel event
+                        newEvents.push(event.type);
+                        if (event.data1 !== undefined) newEvents.push(event.data1);
+                        if (event.data2 !== undefined) newEvents.push(event.data2);
+                    }
+                    
+                    lastTick = newTick;
+                });
+                
+                newTracks.push(new Uint8Array(newEvents));
+            });
+            
+            // Build final MIDI file
+            const chunks = [];
+            
+            // Header chunk
+            chunks.push(...[0x4d, 0x54, 0x68, 0x64]); // MThd
+            chunks.push(...writeInt(6, 4)); // Header length
+            chunks.push(...writeInt(midiData.format, 2));
+            chunks.push(...writeInt(newTracks.length, 2));
+            chunks.push(...writeInt(midiData.ticksPerBeat, 2));
+            
+            // Track chunks
+            newTracks.forEach(trackData => {
+                chunks.push(...[0x4d, 0x54, 0x72, 0x6b]); // MTrk
+                chunks.push(...writeInt(trackData.length, 4));
+                chunks.push(...trackData);
+            });
+            
+            return new Uint8Array(chunks);
+        }
+        
+        // Event listeners for controls
+        ['regionStart', 'regionEnd', 'startTempo', 'endTempo', 'curveType', 'applyTo'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                drawCurvePreview();
+                drawTimelines();
+            });
+            document.getElementById(id).addEventListener('input', () => {
+                drawCurvePreview();
+            });
+        });
+        
+        // Initial draw
+        window.addEventListener('load', () => {
+            drawCurvePreview();
+        });
+        
+        // Resize handler
+        window.addEventListener('resize', () => {
+            drawCurvePreview();
+            drawTimelines();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "GC_20260117_204645",
+  "description": "narrower curv",
+  "gTrack": "1",
+  "impactSeconds": 22.2,
+  "stiffness": 62,
+  "damping": 100,
+  "ictus": 90,
+  "descentRatio": 60,
+  "duration": 0.6,
+  "color": "neonMagenta",
+  "savedAt": "2026-01-18T01:52:10.645Z"
+}

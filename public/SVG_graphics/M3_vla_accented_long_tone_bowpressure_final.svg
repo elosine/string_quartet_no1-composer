@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="19.294743mm"
+   height="19.871325mm"
+   viewBox="0 0 10.979777 11.30788"
+   id="svg17"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs17" />
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <g
+     transform="matrix(0.48236881,0,0,1.0075649,0,8.0481762)"
+     id="g1">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0.050000001"
+       y1="0"
+       x2="22.7122"
+       y2="0"
+       id="line1" />
+  </g>
+  <g
+     transform="matrix(0.48236881,0,0,1.0075649,0,7.0406112)"
+     id="g2">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0.050000001"
+       y1="0"
+       x2="22.7122"
+       y2="0"
+       id="line2" />
+  </g>
+  <g
+     transform="matrix(0.48236881,0,0,1.0075649,0,6.0330462)"
+     id="g3">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0.050000001"
+       y1="0"
+       x2="22.7122"
+       y2="0"
+       id="line3" />
+  </g>
+  <g
+     transform="matrix(0.48236881,0,0,1.0075649,0,5.0254812)"
+     id="g4">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0.050000001"
+       y1="0"
+       x2="22.7122"
+       y2="0"
+       id="line4" />
+  </g>
+  <g
+     transform="matrix(0.48236881,0,0,1.0075649,0,4.0179162)"
+     id="g5">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0.050000001"
+       y1="0"
+       x2="22.7122"
+       y2="0"
+       id="line5" />
+  </g>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M3_vla_accented_long_tone_bowpressure_final.ly:75:4:5"
+     id="a6"
+     transform="translate(-2.1266621,-3.7946467)">
+    <g
+       transform="translate(10.8105,9.5097)"
+       id="g6">
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.0998px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text5"
+         x="0.49979803"
+         y="-4.9707551"><tspan
+           id="tspan5"
+           style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">ord.</tspan></text>
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M3_vla_accented_long_tone_bowpressure_final.ly:70:12:13"
+     id="a7"
+     transform="translate(-1.6892696,-3.5527798)">
+    <g
+       transform="translate(2.5691,6.0097)"
+       id="g7">
+      <polygon
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0"
+         fill="currentColor"
+         stroke="currentColor"
+         points="0,1.25 0,-1.25 9.1097,-0.05 9.1097,0.05 "
+         id="polygon6" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M3_vla_accented_long_tone_bowpressure_final.ly:70:4:5"
+     id="a10"
+     transform="translate(-1.8177825,-6.0266538)">
+    <g
+       transform="translate(2.5691,13.5597)"
+       id="g10">
+      <path
+         transform="scale(0.0032,-0.0032)"
+         d="m 310,63 c 0,23 -19,40 -40,40 -4,0 -8,-1 -12,-2 C 228,93 183,63 147,40 111,17 66,-12 46,-36 39,-44 36,-53 36,-63 c 0,-23 19,-40 40,-40 4,0 8,1 12,2 30,8 75,38 111,61 36,23 81,52 101,76 7,8 10,17 10,27 z m -54,75 c 50,0 90,-22 90,-77 0,-18 -5,-37 -10,-55 -11,-38 -30,-74 -63,-96 -53,-35 -111,-48 -183,-48 -50,0 -90,22 -90,77 0,18 5,37 10,55 11,38 30,74 63,96 53,36 111,48 183,48 z"
+         fill="currentColor"
+         id="path9" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M3_vla_accented_long_tone_bowpressure_final.ly:71:4:5"
+     id="a11"
+     transform="translate(-1.6892696,-3.5527798)">
+    <g
+       transform="translate(2.5691,4.3134)"
+       id="g11">
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.0998px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text10"><tspan
+           id="tspan10"
+           style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">max. pressure</tspan></text>
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M3_vla_accented_long_tone_bowpressure_final.ly:70:6:7"
+     id="a14"
+     transform="translate(-1.8177825,-6.0266538)">
+    <g
+       transform="translate(2.2988,16.934)"
+       id="g14">
+      <g
+         id="g13">
+        <path
+           transform="scale(0.002,-0.002)"
+           d="m 180,219 c 0,6 6,12 6,18 0,10 -8,19 -19,19 -21,0 -42,-11 -42,-30 0,-16 16,-26 31,-33 34,-17 69,-39 69,-76 C 225,51 170,0 103,0 60,0 26,36 26,80 c 0,21 12,42 31,42 18,0 32,-15 32,-33 C 89,76 67,73 67,60 67,47 82,41 96,41 c 35,0 69,17 69,48 0,55 -101,54 -101,109 0,51 40,94 90,94 60,0 85,-36 85,-64 0,-17 -10,-31 -27,-31 -18,0 -32,11 -32,22 z"
+           fill="currentColor"
+           id="path11" />
+        <path
+           transform="matrix(0.002,0,0,-0.002,0.4097,0)"
+           d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+           fill="currentColor"
+           id="path12" />
+        <path
+           transform="matrix(0.002,0,0,-0.002,1.0584,0)"
+           d="m 128,192 c -24,0 -50,-7 -71,-7 -9,0 -15,3 -15,12 0,30 28,70 57,70 34,0 60,-34 94,-34 13,0 24,6 33,15 5,4 9,7 14,7 11,0 21,-11 21,-22 0,-5 -2,-10 -7,-15 L 102,71 c 26,-5 47,-30 74,-30 33,0 59,23 59,49 0,7 -4,15 -4,22 0,12 10,20 21,20 25,0 34,-55 34,-77 0,-63 -70,-97 -140,-97 -35,0 -38,59 -73,59 C 59,17 45,15 35,6 30,2 26,0 21,0 10,0 0,10 0,21 0,26 1,31 6,36 l 161,156 h -3 z"
+           fill="currentColor"
+           id="path13" />
+      </g>
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/M3_vla_accented_long_tone_bowpressure_final.ly:70:26:27"
+     id="a15"
+     transform="translate(-1.8177825,-6.0266538)">
+    <g
+       transform="translate(3.1182,14.5597)"
+       id="g15">
+      <path
+         transform="scale(0.004,-0.004)"
+         d="m 112,0 c 9,0 16,-10 12,-18 L 11,-268 c -2,-4 -6,-7 -11,-7 -5,0 -9,3 -11,7 l -113,250 c -4,8 3,18 12,18 h 66 c 5,0 10,-3 12,-7 l 68,-150 67,150 c 2,4 6,7 11,7 z"
+         fill="currentColor"
+         id="path14" />
+    </g>
+  </a>
+</svg>
