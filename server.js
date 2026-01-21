@@ -8,8 +8,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Enable JSON body parsing
-app.use(express.json({ limit: '50mb' }));
+// Enable JSON body parsing (large limit for audio file migration)
+app.use(express.json({ limit: '200mb' }));
 
 const PORT = 5000;
 const SYNC_INTERVAL_MS = 1000; // Send sync every 1 second (typical for clock sync)
@@ -621,6 +621,64 @@ app.delete('/api/gc-library/delete/:name', (req, res) => {
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
+});
+
+// ============================================
+// AUDIO FILE SYSTEM
+// ============================================
+
+const AUDIO_FILES_DIR = path.join(__dirname, 'public', 'audio_files');
+
+// Ensure audio files directory exists
+if (!fs.existsSync(AUDIO_FILES_DIR)) {
+    fs.mkdirSync(AUDIO_FILES_DIR, { recursive: true });
+}
+
+// Save audio file from base64 data
+app.post('/api/audio/save', (req, res) => {
+    const { audioData, filename } = req.body;
+    if (!audioData || !filename) {
+        return res.status(400).json({ success: false, error: 'Audio data and filename required' });
+    }
+    
+    try {
+        // Extract base64 data from data URL (format: data:audio/xxx;base64,XXXXX)
+        const matches = audioData.match(/^data:audio\/([^;]+);base64,(.+)$/);
+        if (!matches) {
+            return res.status(400).json({ success: false, error: 'Invalid audio data format' });
+        }
+        
+        const extension = matches[1] === 'mpeg' ? 'mp3' : matches[1];
+        const base64Data = matches[2];
+        
+        // Generate unique filename with timestamp
+        const timestamp = Date.now();
+        const safeName = filename.replace(/\.[^/.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const savedFilename = `${safeName}_${timestamp}.${extension}`;
+        const filepath = path.join(AUDIO_FILES_DIR, savedFilename);
+        
+        // Write the file
+        const buffer = Buffer.from(base64Data, 'base64');
+        fs.writeFileSync(filepath, buffer);
+        
+        console.log(`Audio file saved: ${savedFilename} (${buffer.length} bytes)`);
+        res.json({ 
+            success: true, 
+            filename: savedFilename,
+            path: `/audio_files/${savedFilename}`,
+            size: buffer.length
+        });
+    } catch (err) {
+        console.error('Error saving audio file:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Check if audio file exists
+app.get('/api/audio/exists/:filename', (req, res) => {
+    const filepath = path.join(AUDIO_FILES_DIR, req.params.filename);
+    const exists = fs.existsSync(filepath);
+    res.json({ success: true, exists, filename: req.params.filename });
 });
 
 // ============================================

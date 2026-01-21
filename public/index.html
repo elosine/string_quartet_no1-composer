@@ -7044,7 +7044,7 @@
             },
             
             // Insert loaded audio file at edit cursor position
-            insertAtEditCursor() {
+            async insertAtEditCursor() {
                 if (!this.loadedAudioBuffer || !this.loadedAudioData) {
                     alert('No audio file loaded. Load an audio file first.');
                     return;
@@ -7058,14 +7058,41 @@
                 const color = this.clipColors[this.nextColorIndex % this.clipColors.length];
                 this.nextColorIndex++;
                 
-                // Create clip object and add to database
+                // Save audio file to disk and get the file path
+                let audioFilePath = null;
+                try {
+                    const response = await fetch('/api/audio/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            audioData: this.loadedAudioData,
+                            filename: this.loadedFileName || `Audio_${Date.now()}`
+                        })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        audioFilePath = result.path;
+                        console.debug(`Audio file saved to: ${audioFilePath}`);
+                    } else {
+                        console.error('Failed to save audio file:', result.error);
+                        alert('Failed to save audio file: ' + result.error);
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Error saving audio file:', err);
+                    alert('Error saving audio file: ' + err.message);
+                    return;
+                }
+                
+                // Create clip object with file path instead of base64 data
                 const clipData = {
                     name: this.loadedFileName || `Audio_${Date.now()}`,
                     trackIndex: trackIndex,
                     startSeconds: insertTimeSec,
                     endSeconds: insertTimeSec + durationSec,
                     durationSeconds: durationSec,
-                    audioData: this.loadedAudioData, // Base64 encoded audio
+                    audioFilePath: audioFilePath, // File path instead of base64 data
+                    audioBuffer: this.loadedAudioBuffer, // Keep buffer in memory for playback (not saved)
                     color: color
                 };
                 
@@ -7143,7 +7170,7 @@
             },
             
             // Reload clips from database (called after score load)
-            reloadFromDatabase() {
+            async reloadFromDatabase() {
                 // Clear existing clip elements
                 for (const clip of this.clips) {
                     if (clip.elements?.group) clip.elements.group.remove();
@@ -7153,9 +7180,111 @@
                 this.clips = [];
                 this.selectedClip = null;
                 
+                // Load audio buffers for all clips
+                const allClips = AudioClipDatabase.getAll();
+                for (const clip of allClips) {
+                    // Migrate legacy clips with embedded audioData to file-based storage
+                    if (clip.audioData && !clip.audioFilePath) {
+                        try {
+                            await this.migrateClipToFileBased(clip);
+                        } catch (err) {
+                            console.error(`Failed to migrate clip ${clip.id} to file-based:`, err);
+                        }
+                    }
+                    // Load audio buffer from file path
+                    else if (clip.audioFilePath && !clip.audioBuffer) {
+                        try {
+                            await this.loadAudioBufferFromPath(clip);
+                        } catch (err) {
+                            console.error(`Failed to load audio for clip ${clip.id}:`, err);
+                        }
+                    }
+                }
+                
                 // Re-render displays
                 this.renderAllAudioDisplays();
                 this.updateAudioDisplayVisibility();
+            },
+            
+            // Migrate a legacy clip with embedded audioData to file-based storage
+            async migrateClipToFileBased(clip) {
+                if (!clip.audioData) return;
+                
+                console.debug(`Migrating clip ${clip.id} (${clip.name}) to file-based storage...`);
+                
+                try {
+                    // Save audio data to file
+                    const response = await fetch('/api/audio/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            audioData: clip.audioData,
+                            filename: clip.name || `Audio_${clip.id}`
+                        })
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Update clip with file path
+                        clip.audioFilePath = result.path;
+                        
+                        // Decode the audio data to create the buffer
+                        if (this.audioContext) {
+                            if (this.audioContext.state === 'suspended') {
+                                await this.audioContext.resume();
+                            }
+                            const base64Data = clip.audioData.split(',')[1];
+                            const binaryString = atob(base64Data);
+                            const bytes = new Uint8Array(binaryString.length);
+                            for (let i = 0; i < binaryString.length; i++) {
+                                bytes[i] = binaryString.charCodeAt(i);
+                            }
+                            clip.audioBuffer = await this.audioContext.decodeAudioData(bytes.buffer.slice(0));
+                        }
+                        
+                        // Remove the embedded data from memory (will be stripped on next save)
+                        delete clip.audioData;
+                        
+                        // Update database
+                        AudioClipDatabase.update(clip.id, { audioFilePath: clip.audioFilePath });
+                        
+                        // Mark score as dirty so the migration is saved
+                        if (window.ScoreManager) ScoreManager.markDirty();
+                        
+                        console.debug(`Migrated clip ${clip.id} to ${clip.audioFilePath}`);
+                    } else {
+                        console.error('Failed to migrate clip:', result.error);
+                    }
+                } catch (err) {
+                    console.error('Error migrating clip to file-based:', err);
+                }
+            },
+            
+            // Load audio buffer from file path
+            async loadAudioBufferFromPath(clip) {
+                if (!clip.audioFilePath) return;
+                
+                try {
+                    // Ensure audio context is ready
+                    if (!this.audioContext) {
+                        this.initAudioContext();
+                    }
+                    if (this.audioContext.state === 'suspended') {
+                        await this.audioContext.resume();
+                    }
+                    
+                    // Fetch the audio file
+                    const response = await fetch(clip.audioFilePath);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const arrayBuffer = await response.arrayBuffer();
+                    clip.audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                    console.debug(`Loaded audio buffer for clip ${clip.id} from ${clip.audioFilePath}`);
+                } catch (err) {
+                    console.error(`Error loading audio from ${clip.audioFilePath}:`, err);
+                }
             },
             
             // Render audio display for all tracks
@@ -7545,23 +7674,27 @@
             
             // Play a clip starting at a given offset
             async playClip(clipData, offsetSeconds = 0) {
-                if (!this.audioContext || !clipData.audioData) return;
+                if (!this.audioContext) return;
+                
+                // Use cached audioBuffer if available, otherwise try to load from file path
+                let audioBuffer = clipData.audioBuffer;
+                
+                if (!audioBuffer && clipData.audioFilePath) {
+                    // Try to load from file path
+                    await this.loadAudioBufferFromPath(clipData);
+                    audioBuffer = clipData.audioBuffer;
+                }
+                
+                if (!audioBuffer) {
+                    console.error('No audio buffer available for clip:', clipData.name);
+                    return;
+                }
                 
                 try {
                     // Resume context if suspended
                     if (this.audioContext.state === 'suspended') {
                         await this.audioContext.resume();
                     }
-                    
-                    // Decode audio data from base64
-                    const base64Data = clipData.audioData.split(',')[1];
-                    const binaryString = atob(base64Data);
-                    const bytes = new Uint8Array(binaryString.length);
-                    for (let i = 0; i < binaryString.length; i++) {
-                        bytes[i] = binaryString.charCodeAt(i);
-                    }
-                    
-                    const audioBuffer = await this.audioContext.decodeAudioData(bytes.buffer);
                     
                     // Create source node
                     const source = this.audioContext.createBufferSource();
@@ -8238,14 +8371,20 @@
             },
             
             exportData() {
+                // Export clips without audioBuffer (not serializable) and without audioData (base64, too large)
+                const clipsForExport = this.clips.map(clip => {
+                    const { audioBuffer, audioData, elements, ...exportableClip } = clip;
+                    return exportableClip;
+                });
                 return {
-                    clips: this.clips,
+                    clips: clipsForExport,
                     nextId: this.nextId
                 };
             },
             
             importData(data) {
                 if (data && data.clips) {
+                    // Import clips - keep audioData for migration, it will be removed after migration
                     this.clips = data.clips;
                     this.nextId = data.nextId || (this.clips.length > 0 ? Math.max(...this.clips.map(c => c.id)) + 1 : 1);
                 }
