@@ -1248,6 +1248,47 @@
             </div>
             
             <div class="menu-section">
+                <h3>Audio File</h3>
+                <div class="track-radio-group">
+                    <input type="radio" id="audioTrackT1" name="audioTrack" value="1" checked>
+                    <label for="audioTrackT1">T1</label>
+                    <input type="radio" id="audioTrackT2" name="audioTrack" value="2">
+                    <label for="audioTrackT2">T2</label>
+                    <input type="radio" id="audioTrackT3" name="audioTrack" value="3">
+                    <label for="audioTrackT3">T3</label>
+                    <input type="radio" id="audioTrackT4" name="audioTrack" value="4">
+                    <label for="audioTrackT4">T4</label>
+                </div>
+                <div class="track-enable-group" style="margin-top: 8px;">
+                    <label class="track-enable-label">Enable Audio:</label>
+                    <div class="track-toggles">
+                        <input type="checkbox" id="audioEnableT1" checked>
+                        <label for="audioEnableT1">T1</label>
+                        <input type="checkbox" id="audioEnableT2" checked>
+                        <label for="audioEnableT2">T2</label>
+                        <input type="checkbox" id="audioEnableT3" checked>
+                        <label for="audioEnableT3">T3</label>
+                        <input type="checkbox" id="audioEnableT4" checked>
+                        <label for="audioEnableT4">T4</label>
+                    </div>
+                </div>
+                <div class="control-row" style="margin-top: 10px;">
+                    <button id="audioLoadBtn" class="control-btn" style="background: rgb(0,191,255); color: #000;">Load Audio</button>
+                    <input type="file" id="audioFileInput" class="file-input-hidden" accept=".mp3,.wav,.ogg,.m4a,.aac,.flac">
+                </div>
+                <div class="control-row">
+                    <span id="audioFileName" class="midi-filename">No file loaded</span>
+                </div>
+                <div class="control-row" style="margin-top: 10px;">
+                    <button id="audioInsertBtn" class="control-btn" style="background: rgb(0,191,255); color: #000;">Insert</button>
+                    <span id="audioInsertTime" class="timecode-display-small">0.000</span>
+                </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="audioDeleteClipBtn" class="control-btn" style="background: #E53935;">Delete Clip</button>
+                </div>
+            </div>
+            
+            <div class="menu-section">
                 <h3>Display</h3>
                 <div class="control-row">
                     <label style="font-size: 11px;">Zoom:</label>
@@ -1260,6 +1301,8 @@
                     <label for="showGraphicItems">Graphic Items</label>
                     <input type="checkbox" id="showMidiDisplay" checked>
                     <label for="showMidiDisplay">MIDI Display</label>
+                    <input type="checkbox" id="showAudioDisplay" checked>
+                    <label for="showAudioDisplay">Audio Display</label>
                 </div>
                 <div class="control-row" style="margin-top: 8px;">
                     <label for="ccDisplaySelect" style="font-size: 11px;">CC Display:</label>
@@ -1748,6 +1791,10 @@
                 // Reset MIDI playback indices to match new position
                 if (window.MidiController) {
                     MidiController.resetPlaybackToTime(displaySeconds * 1000);
+                }
+                // Reset Audio playback to match new position
+                if (window.AudioController) {
+                    AudioController.resetPlaybackToTime(displaySeconds * 1000);
                 }
                 console.log(`Score GOTO ${data.targetSeconds}s (display: ${displaySeconds}s) - frozen at ${data.currentScoreTimeMs}ms`);
             }
@@ -5367,6 +5414,7 @@
                 if (window.FlowchartConnector) FlowchartConnector.updateVisibility();
                 if (window.GCMaker) GCMaker.updateVisibility();
                 if (window.MidiController) MidiController.updateMidiDisplayVisibility();
+                if (window.AudioController) AudioController.updateAudioDisplayVisibility();
                 
                 // Show staff headers only on page 0 (top) or page 1 (bottom)
                 if (window.StaffCursors && StaffCursors.staffHeaderGroup) {
@@ -6789,6 +6837,788 @@
             window.MidiController = MidiController;
         }
         
+        // Audio Controller System - Multi-track audio file management and timeline-synced playback
+        const AudioController = {
+            // UI elements
+            loadBtn: null,
+            fileInput: null,
+            insertBtn: null,
+            insertTimeDisplay: null,
+            fileNameDisplay: null,
+            deleteBtn: null,
+            
+            // Display toggle
+            showAudioDisplayToggle: null,
+            
+            // Track enable checkboxes
+            trackEnables: [null, null, null, null],
+            
+            // Track selection (1-4)
+            selectedTrack: 1,
+            
+            // Web Audio API context
+            audioContext: null,
+            
+            // Loaded audio file data (temporary before insert)
+            loadedAudioBuffer: null,
+            loadedAudioData: null, // Base64 encoded audio data for saving
+            loadedFileName: '',
+            
+            // Audio clips with DOM elements
+            clips: [],
+            selectedClip: null,
+            
+            // Audio display SVG layers
+            audioDisplayLayers: { top: [], bottom: [] },
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            timelineHeight: 8,
+            
+            // Color palette for clips (cycles through)
+            clipColors: ['#00BCD4', '#9C27B0', '#FF5722', '#3F51B5', '#009688', '#E91E63', '#CDDC39', '#795548'],
+            nextColorIndex: 0,
+            
+            // Playback state
+            activeAudioSources: [], // Currently playing audio source nodes
+            lastPlaybackTimeMs: -1,
+            
+            // Dragging state
+            isDragging: false,
+            dragClip: null,
+            dragStartX: 0,
+            dragStartSeconds: 0,
+            
+            init() {
+                // Get SVG elements
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                // Get UI elements
+                this.loadBtn = document.getElementById('audioLoadBtn');
+                this.fileInput = document.getElementById('audioFileInput');
+                this.insertBtn = document.getElementById('audioInsertBtn');
+                this.insertTimeDisplay = document.getElementById('audioInsertTime');
+                this.fileNameDisplay = document.getElementById('audioFileName');
+                this.deleteBtn = document.getElementById('audioDeleteClipBtn');
+                
+                // Get display toggle
+                this.showAudioDisplayToggle = document.getElementById('showAudioDisplay');
+                
+                // Get track enable checkboxes
+                this.trackEnables = [
+                    document.getElementById('audioEnableT1'),
+                    document.getElementById('audioEnableT2'),
+                    document.getElementById('audioEnableT3'),
+                    document.getElementById('audioEnableT4')
+                ];
+                
+                // Set up track selection radio buttons
+                document.querySelectorAll('input[name="audioTrack"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        this.selectedTrack = parseInt(e.target.value);
+                    });
+                });
+                
+                // Set up event listeners
+                if (this.loadBtn) this.loadBtn.addEventListener('click', () => this.fileInput.click());
+                if (this.fileInput) this.fileInput.addEventListener('change', (e) => this.loadAudioFile(e));
+                if (this.insertBtn) this.insertBtn.addEventListener('click', () => this.insertAtEditCursor());
+                if (this.deleteBtn) this.deleteBtn.addEventListener('click', () => this.deleteSelectedClip());
+                
+                // Click on score to deselect clip
+                if (this.scoreTopEl) {
+                    this.scoreTopEl.addEventListener('click', (e) => {
+                        if (!e.target.closest('.audio-clip-hit')) {
+                            this.deselectClip();
+                        }
+                    });
+                }
+                if (this.scoreBottomEl) {
+                    this.scoreBottomEl.addEventListener('click', (e) => {
+                        if (!e.target.closest('.audio-clip-hit')) {
+                            this.deselectClip();
+                        }
+                    });
+                }
+                
+                // Create audio display layers
+                this.createAudioDisplayLayers();
+                
+                // Initialize Web Audio API
+                this.initAudioContext();
+                
+                // Hook into animation for insert time sync and playback
+                const originalOnDraw = AnimationEngine.onDraw;
+                AnimationEngine.onDraw = (frameNumber, elapsedMs) => {
+                    if (originalOnDraw) originalOnDraw(frameNumber, elapsedMs);
+                    this.updateInsertTime();
+                    this.processTimelineSyncedPlayback();
+                };
+                
+                // Add resize handler
+                window.addEventListener('resize', () => {
+                    this.renderAllAudioDisplays();
+                });
+                
+                // Mouse move/up for dragging
+                document.addEventListener('mousemove', (e) => this.handleDragMove(e));
+                document.addEventListener('mouseup', (e) => this.handleDragEnd(e));
+                
+                // Set up display toggle listener
+                if (this.showAudioDisplayToggle) {
+                    this.showAudioDisplayToggle.addEventListener('change', () => this.updateAudioDisplayVisibility());
+                }
+                
+                console.debug('AudioController initialized');
+            },
+            
+            // Initialize Web Audio API context
+            initAudioContext() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    console.debug('Web Audio API context created');
+                } catch (e) {
+                    console.error('Web Audio API not supported:', e);
+                }
+            },
+            
+            // Create SVG layers for audio display per track
+            createAudioDisplayLayers() {
+                if (!this.scoreTopEl || !this.scoreBottomEl) return;
+                
+                // Create groups for each track on top and bottom pages
+                for (let i = 0; i < 4; i++) {
+                    const topGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    topGroup.setAttribute('class', `audio-display-layer audio-track-${i}`);
+                    this.scoreTopEl.appendChild(topGroup);
+                    this.audioDisplayLayers.top.push(topGroup);
+                    
+                    const bottomGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    bottomGroup.setAttribute('class', `audio-display-layer audio-track-${i}`);
+                    this.scoreBottomEl.appendChild(bottomGroup);
+                    this.audioDisplayLayers.bottom.push(bottomGroup);
+                }
+            },
+            
+            // Load audio file from file input
+            async loadAudioFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                this.loadedFileName = file.name;
+                if (this.fileNameDisplay) {
+                    this.fileNameDisplay.textContent = file.name;
+                }
+                
+                try {
+                    // Read file as ArrayBuffer for Web Audio API
+                    const arrayBuffer = await file.arrayBuffer();
+                    
+                    // Also read as base64 for saving
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        this.loadedAudioData = e.target.result; // data:audio/...;base64,...
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Decode audio data
+                    if (this.audioContext) {
+                        // Resume context if suspended (browser autoplay policy)
+                        if (this.audioContext.state === 'suspended') {
+                            await this.audioContext.resume();
+                        }
+                        this.loadedAudioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
+                        console.debug(`Audio loaded: ${file.name}, duration: ${this.loadedAudioBuffer.duration.toFixed(2)}s`);
+                    }
+                } catch (e) {
+                    console.error('Error loading audio file:', e);
+                    alert('Error loading audio file: ' + e.message);
+                }
+            },
+            
+            // Update insert time display
+            updateInsertTime() {
+                if (!this.insertTimeDisplay) return;
+                const insertTimeSec = window.EditCursor ? EditCursor.positionSeconds : 0;
+                this.insertTimeDisplay.textContent = insertTimeSec.toFixed(3);
+            },
+            
+            // Insert loaded audio file at edit cursor position
+            insertAtEditCursor() {
+                if (!this.loadedAudioBuffer || !this.loadedAudioData) {
+                    alert('No audio file loaded. Load an audio file first.');
+                    return;
+                }
+                
+                const trackIndex = this.selectedTrack - 1;
+                const insertTimeSec = window.EditCursor ? EditCursor.positionSeconds : 0;
+                const durationSec = this.loadedAudioBuffer.duration;
+                
+                // Get next color from palette
+                const color = this.clipColors[this.nextColorIndex % this.clipColors.length];
+                this.nextColorIndex++;
+                
+                // Create clip object and add to database
+                const clipData = {
+                    name: this.loadedFileName || `Audio_${Date.now()}`,
+                    trackIndex: trackIndex,
+                    startSeconds: insertTimeSec,
+                    endSeconds: insertTimeSec + durationSec,
+                    durationSeconds: durationSec,
+                    audioData: this.loadedAudioData, // Base64 encoded audio
+                    color: color
+                };
+                
+                const clip = AudioClipDatabase.add(clipData);
+                
+                // Mark score as dirty
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                this.renderAllAudioDisplays();
+                this.updateAudioDisplayVisibility();
+                
+                console.debug(`Audio clip inserted: ${clip.name} (ID: ${clip.id}) at ${insertTimeSec.toFixed(2)}s on track ${trackIndex + 1}`);
+            },
+            
+            // Select a clip
+            selectClip(clip) {
+                // Deselect previous
+                if (this.selectedClip && this.selectedClip.elements?.highlight) {
+                    this.selectedClip.elements.highlight.style.display = 'none';
+                }
+                
+                this.selectedClip = clip;
+                
+                // Show highlight
+                if (clip.elements?.highlight) {
+                    clip.elements.highlight.style.display = '';
+                }
+                
+                console.debug(`Selected audio clip: ${clip.name} (ID: ${clip.id})`);
+            },
+            
+            // Deselect current clip
+            deselectClip() {
+                if (this.selectedClip && this.selectedClip.elements?.highlight) {
+                    this.selectedClip.elements.highlight.style.display = 'none';
+                }
+                this.selectedClip = null;
+            },
+            
+            // Delete the selected clip
+            deleteSelectedClip() {
+                if (!this.selectedClip) {
+                    alert('No audio clip selected. Click on a clip to select it first.');
+                    return;
+                }
+                
+                const clip = this.selectedClip;
+                
+                // Remove DOM elements
+                if (clip.elements?.group) {
+                    clip.elements.group.remove();
+                }
+                if (clip.elements?.continuationGroupTop) {
+                    clip.elements.continuationGroupTop.remove();
+                }
+                if (clip.elements?.continuationGroupBottom) {
+                    clip.elements.continuationGroupBottom.remove();
+                }
+                
+                // Remove from local clips array
+                const localIndex = this.clips.findIndex(c => c.id === clip.id);
+                if (localIndex !== -1) {
+                    this.clips.splice(localIndex, 1);
+                }
+                
+                // Remove from database
+                AudioClipDatabase.remove(clip.id);
+                
+                // Mark score as dirty
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                this.selectedClip = null;
+                
+                console.debug(`Deleted audio clip: ${clip.name} (ID: ${clip.id})`);
+            },
+            
+            // Reload clips from database (called after score load)
+            reloadFromDatabase() {
+                // Clear existing clip elements
+                for (const clip of this.clips) {
+                    if (clip.elements?.group) clip.elements.group.remove();
+                    if (clip.elements?.continuationGroupTop) clip.elements.continuationGroupTop.remove();
+                    if (clip.elements?.continuationGroupBottom) clip.elements.continuationGroupBottom.remove();
+                }
+                this.clips = [];
+                this.selectedClip = null;
+                
+                // Re-render displays
+                this.renderAllAudioDisplays();
+                this.updateAudioDisplayVisibility();
+            },
+            
+            // Render audio display for all tracks
+            renderAllAudioDisplays() {
+                this.renderClipOverlays();
+                this.updateAudioDisplayVisibility();
+            },
+            
+            // Render clip overlays with colored boundaries and selection highlights
+            renderClipOverlays() {
+                // Clear existing clip elements
+                for (const clip of this.clips) {
+                    if (clip.elements?.group) clip.elements.group.remove();
+                    if (clip.elements?.continuationGroupTop) clip.elements.continuationGroupTop.remove();
+                    if (clip.elements?.continuationGroupBottom) clip.elements.continuationGroupBottom.remove();
+                }
+                this.clips = [];
+                
+                const allClips = AudioClipDatabase.getAll();
+                if (allClips.length === 0) return;
+                
+                const scoreHeight = this.scoreTopEl.clientHeight;
+                const scoreWidth = this.scoreTopEl.clientWidth;
+                if (scoreWidth === 0 || scoreHeight === 0) return;
+                
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const trackHeight = availableHeight / 4;
+                
+                let secondsPerPage = 10;
+                if (window.GraphicTimeline && typeof GraphicTimeline.getSecondsPerPage === 'function') {
+                    secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                }
+                
+                for (const clipData of allClips) {
+                    const trackIndex = clipData.trackIndex;
+                    const trackY = this.timelineHeight + (trackIndex * trackHeight);
+                    
+                    // Calculate which page the clip starts on
+                    const startActualSec = clipData.startSeconds + leadInSeconds;
+                    const endActualSec = clipData.endSeconds + leadInSeconds;
+                    const startPage = Math.floor(startActualSec / secondsPerPage);
+                    const endPage = Math.floor(endActualSec / secondsPerPage);
+                    
+                    // Create clip object with elements reference
+                    const clip = {
+                        ...clipData,
+                        elements: {}
+                    };
+                    
+                    // Render on start page
+                    const isTopPage = startPage % 2 === 0;
+                    const group = isTopPage ? this.audioDisplayLayers.top[trackIndex] : this.audioDisplayLayers.bottom[trackIndex];
+                    
+                    // Calculate X positions
+                    const pageStartSec = startPage * secondsPerPage;
+                    const x1 = (startActualSec - pageStartSec) / secondsPerPage * scoreWidth;
+                    const pageEndSec = (startPage + 1) * secondsPerPage;
+                    const clipEndOnPage = Math.min(endActualSec, pageEndSec);
+                    const x2 = (clipEndOnPage - pageStartSec) / secondsPerPage * scoreWidth;
+                    
+                    // Create clip group
+                    const clipGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    clipGroup.setAttribute('class', 'audio-clip-group');
+                    clipGroup.setAttribute('data-clip-id', clip.id);
+                    clipGroup.setAttribute('data-page', startPage);
+                    
+                    // Background rectangle (semi-transparent with waveform placeholder)
+                    const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    bgRect.setAttribute('x', x1);
+                    bgRect.setAttribute('y', trackY);
+                    bgRect.setAttribute('width', Math.max(2, x2 - x1));
+                    bgRect.setAttribute('height', trackHeight);
+                    bgRect.setAttribute('fill', clip.color);
+                    bgRect.setAttribute('fill-opacity', '0.25');
+                    bgRect.setAttribute('data-page', startPage);
+                    clipGroup.appendChild(bgRect);
+                    
+                    // Waveform placeholder - horizontal lines to suggest waveform
+                    const waveformY = trackY + trackHeight / 2;
+                    const waveformHeight = trackHeight * 0.6;
+                    for (let i = 0; i < 3; i++) {
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        const yOffset = (i - 1) * (waveformHeight / 3);
+                        line.setAttribute('x1', x1 + 2);
+                        line.setAttribute('y1', waveformY + yOffset);
+                        line.setAttribute('x2', x2 - 2);
+                        line.setAttribute('y2', waveformY + yOffset);
+                        line.setAttribute('stroke', clip.color);
+                        line.setAttribute('stroke-width', '1');
+                        line.setAttribute('stroke-opacity', '0.5');
+                        line.setAttribute('data-page', startPage);
+                        clipGroup.appendChild(line);
+                    }
+                    
+                    // Left border line
+                    const leftLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    leftLine.setAttribute('x1', x1);
+                    leftLine.setAttribute('y1', trackY);
+                    leftLine.setAttribute('x2', x1);
+                    leftLine.setAttribute('y2', trackY + trackHeight);
+                    leftLine.setAttribute('stroke', clip.color);
+                    leftLine.setAttribute('stroke-width', '3');
+                    leftLine.setAttribute('data-page', startPage);
+                    clipGroup.appendChild(leftLine);
+                    
+                    // Right border line (only if clip ends on this page)
+                    if (endActualSec <= pageEndSec) {
+                        const rightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        rightLine.setAttribute('x1', x2);
+                        rightLine.setAttribute('y1', trackY);
+                        rightLine.setAttribute('x2', x2);
+                        rightLine.setAttribute('y2', trackY + trackHeight);
+                        rightLine.setAttribute('stroke', clip.color);
+                        rightLine.setAttribute('stroke-width', '3');
+                        rightLine.setAttribute('data-page', startPage);
+                        clipGroup.appendChild(rightLine);
+                    }
+                    
+                    // Clip name label
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.setAttribute('x', x1 + 4);
+                    label.setAttribute('y', trackY + 12);
+                    label.setAttribute('fill', clip.color);
+                    label.setAttribute('font-family', 'Lato, sans-serif');
+                    label.setAttribute('font-size', '10');
+                    label.setAttribute('font-weight', 'bold');
+                    label.setAttribute('data-page', startPage);
+                    label.textContent = clip.name.length > 20 ? clip.name.substring(0, 20) + '...' : clip.name;
+                    clipGroup.appendChild(label);
+                    
+                    // Selection highlight (hidden by default)
+                    const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    highlight.setAttribute('x', x1 - 2);
+                    highlight.setAttribute('y', trackY - 2);
+                    highlight.setAttribute('width', Math.max(6, x2 - x1 + 4));
+                    highlight.setAttribute('height', trackHeight + 4);
+                    highlight.setAttribute('fill', 'none');
+                    highlight.setAttribute('stroke', 'yellow');
+                    highlight.setAttribute('stroke-width', '3');
+                    highlight.setAttribute('data-page', startPage);
+                    highlight.style.display = 'none';
+                    clipGroup.appendChild(highlight);
+                    
+                    // Hit area for clicking and dragging (transparent)
+                    const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    hitArea.setAttribute('x', x1);
+                    hitArea.setAttribute('y', trackY);
+                    hitArea.setAttribute('width', Math.max(10, x2 - x1));
+                    hitArea.setAttribute('height', trackHeight);
+                    hitArea.setAttribute('fill', 'transparent');
+                    hitArea.setAttribute('class', 'audio-clip-hit');
+                    hitArea.setAttribute('data-page', startPage);
+                    hitArea.style.cursor = 'grab';
+                    hitArea.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectClip(clip);
+                    });
+                    hitArea.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        this.handleDragStart(e, clip);
+                    });
+                    clipGroup.appendChild(hitArea);
+                    
+                    group.appendChild(clipGroup);
+                    clip.elements.group = clipGroup;
+                    clip.elements.highlight = highlight;
+                    clip.elements.bgRect = bgRect;
+                    
+                    // Handle multi-page clips - render continuation segments
+                    if (endPage > startPage) {
+                        for (let page = startPage + 1; page <= endPage; page++) {
+                            this.renderClipContinuation(clip, page, trackIndex, trackY, trackHeight, scoreWidth, secondsPerPage, endActualSec);
+                        }
+                    }
+                    
+                    this.clips.push(clip);
+                }
+            },
+            
+            // Render continuation segment for multi-page clips
+            renderClipContinuation(clip, page, trackIndex, trackY, trackHeight, scoreWidth, secondsPerPage, endActualSec) {
+                const isTopPage = page % 2 === 0;
+                const group = isTopPage ? this.audioDisplayLayers.top[trackIndex] : this.audioDisplayLayers.bottom[trackIndex];
+                
+                const pageStartSec = page * secondsPerPage;
+                const pageEndSec = (page + 1) * secondsPerPage;
+                const clipEndOnPage = Math.min(endActualSec, pageEndSec);
+                
+                const x1 = 0;
+                const x2 = (clipEndOnPage - pageStartSec) / secondsPerPage * scoreWidth;
+                
+                const contGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                contGroup.setAttribute('class', 'audio-clip-continuation');
+                contGroup.setAttribute('data-clip-id', clip.id);
+                contGroup.setAttribute('data-page', page);
+                
+                // Background rectangle
+                const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                bgRect.setAttribute('x', x1);
+                bgRect.setAttribute('y', trackY);
+                bgRect.setAttribute('width', Math.max(2, x2 - x1));
+                bgRect.setAttribute('height', trackHeight);
+                bgRect.setAttribute('fill', clip.color);
+                bgRect.setAttribute('fill-opacity', '0.25');
+                bgRect.setAttribute('data-page', page);
+                contGroup.appendChild(bgRect);
+                
+                // Right border line (if clip ends on this page)
+                if (endActualSec <= pageEndSec) {
+                    const rightLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    rightLine.setAttribute('x1', x2);
+                    rightLine.setAttribute('y1', trackY);
+                    rightLine.setAttribute('x2', x2);
+                    rightLine.setAttribute('y2', trackY + trackHeight);
+                    rightLine.setAttribute('stroke', clip.color);
+                    rightLine.setAttribute('stroke-width', '3');
+                    rightLine.setAttribute('data-page', page);
+                    contGroup.appendChild(rightLine);
+                }
+                
+                // Hit area for clicking
+                const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                hitArea.setAttribute('x', x1);
+                hitArea.setAttribute('y', trackY);
+                hitArea.setAttribute('width', Math.max(10, x2 - x1));
+                hitArea.setAttribute('height', trackHeight);
+                hitArea.setAttribute('fill', 'transparent');
+                hitArea.setAttribute('class', 'audio-clip-hit');
+                hitArea.setAttribute('data-page', page);
+                hitArea.style.cursor = 'grab';
+                hitArea.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectClip(clip);
+                });
+                contGroup.appendChild(hitArea);
+                
+                group.appendChild(contGroup);
+                
+                // Store continuation reference
+                const groupKey = isTopPage ? 'continuationGroupTop' : 'continuationGroupBottom';
+                clip.elements[groupKey] = contGroup;
+            },
+            
+            // Update visibility of audio display elements based on toggle and current page
+            updateAudioDisplayVisibility() {
+                const showAudio = this.showAudioDisplayToggle?.checked ?? true;
+                
+                // If audio display is toggled off, hide all layers
+                if (!showAudio) {
+                    for (const topGroup of this.audioDisplayLayers.top) {
+                        topGroup.style.display = 'none';
+                    }
+                    for (const bottomGroup of this.audioDisplayLayers.bottom) {
+                        bottomGroup.style.display = 'none';
+                    }
+                    return;
+                }
+                
+                // Show layers
+                for (const topGroup of this.audioDisplayLayers.top) {
+                    topGroup.style.display = '';
+                }
+                for (const bottomGroup of this.audioDisplayLayers.bottom) {
+                    bottomGroup.style.display = '';
+                }
+                
+                if (!window.GraphicTimeline) return;
+                
+                const currentTopPage = GraphicTimeline.currentTopPage;
+                const currentBottomPage = GraphicTimeline.currentBottomPage;
+                
+                // Update top layers
+                for (const topGroup of this.audioDisplayLayers.top) {
+                    const elements = topGroup.querySelectorAll('[data-page]');
+                    elements.forEach(el => {
+                        const elPage = parseInt(el.getAttribute('data-page'), 10);
+                        el.style.display = (elPage === currentTopPage) ? '' : 'none';
+                    });
+                }
+                
+                // Update bottom layers
+                for (const bottomGroup of this.audioDisplayLayers.bottom) {
+                    const elements = bottomGroup.querySelectorAll('[data-page]');
+                    elements.forEach(el => {
+                        const elPage = parseInt(el.getAttribute('data-page'), 10);
+                        el.style.display = (elPage === currentBottomPage) ? '' : 'none';
+                    });
+                }
+            },
+            
+            // Handle drag start
+            handleDragStart(e, clip) {
+                this.isDragging = true;
+                this.dragClip = clip;
+                this.dragStartX = e.clientX;
+                this.dragStartSeconds = clip.startSeconds;
+                this.selectClip(clip);
+                e.preventDefault();
+            },
+            
+            // Handle drag move
+            handleDragMove(e) {
+                if (!this.isDragging || !this.dragClip) return;
+                
+                const scoreWidth = this.scoreTopEl.clientWidth;
+                let secondsPerPage = 10;
+                if (window.GraphicTimeline && typeof GraphicTimeline.getSecondsPerPage === 'function') {
+                    secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                }
+                
+                const pixelsPerSecond = scoreWidth / secondsPerPage;
+                const deltaX = e.clientX - this.dragStartX;
+                const deltaSeconds = deltaX / pixelsPerSecond;
+                
+                // Calculate new start time (don't go below 0)
+                const newStartSeconds = Math.max(0, this.dragStartSeconds + deltaSeconds);
+                const durationSeconds = this.dragClip.durationSeconds;
+                
+                // Update clip times
+                this.dragClip.startSeconds = newStartSeconds;
+                this.dragClip.endSeconds = newStartSeconds + durationSeconds;
+                
+                // Update database
+                AudioClipDatabase.update(this.dragClip.id, {
+                    startSeconds: newStartSeconds,
+                    endSeconds: newStartSeconds + durationSeconds
+                });
+                
+                // Re-render
+                this.renderAllAudioDisplays();
+            },
+            
+            // Handle drag end
+            handleDragEnd(e) {
+                if (!this.isDragging) return;
+                
+                this.isDragging = false;
+                
+                if (this.dragClip) {
+                    // Mark score as dirty
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    console.debug(`Moved audio clip: ${this.dragClip.name} to ${this.dragClip.startSeconds.toFixed(2)}s`);
+                }
+                
+                this.dragClip = null;
+            },
+            
+            // Process timeline-synced playback
+            processTimelineSyncedPlayback() {
+                if (!window.ScoreTime || !ScoreTime.isPlaying) {
+                    // Stop all audio if playback stopped
+                    if (this.activeAudioSources.length > 0) {
+                        this.stopAllAudio();
+                    }
+                    this.lastPlaybackTimeMs = -1;
+                    return;
+                }
+                
+                if (!this.audioContext) return;
+                
+                const currentScoreTimeMs = ScoreTime.now();
+                const displayTimeMs = currentScoreTimeMs - (leadInSeconds * 1000);
+                const displayTimeSec = displayTimeMs / 1000;
+                
+                // Check each clip to see if we need to start playback
+                const allClips = AudioClipDatabase.getAll();
+                for (const clipData of allClips) {
+                    const trackIndex = clipData.trackIndex;
+                    
+                    // Check if track is enabled
+                    if (this.trackEnables[trackIndex] && !this.trackEnables[trackIndex].checked) {
+                        continue;
+                    }
+                    
+                    // Check if we just crossed the clip start time
+                    const clipStartMs = clipData.startSeconds * 1000;
+                    const lastTimeMs = this.lastPlaybackTimeMs;
+                    
+                    if (lastTimeMs < clipStartMs && displayTimeMs >= clipStartMs) {
+                        // Start playing this clip
+                        this.playClip(clipData, displayTimeSec - clipData.startSeconds);
+                    }
+                }
+                
+                this.lastPlaybackTimeMs = displayTimeMs;
+            },
+            
+            // Play a clip starting at a given offset
+            async playClip(clipData, offsetSeconds = 0) {
+                if (!this.audioContext || !clipData.audioData) return;
+                
+                try {
+                    // Resume context if suspended
+                    if (this.audioContext.state === 'suspended') {
+                        await this.audioContext.resume();
+                    }
+                    
+                    // Decode audio data from base64
+                    const base64Data = clipData.audioData.split(',')[1];
+                    const binaryString = atob(base64Data);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    
+                    const audioBuffer = await this.audioContext.decodeAudioData(bytes.buffer);
+                    
+                    // Create source node
+                    const source = this.audioContext.createBufferSource();
+                    source.buffer = audioBuffer;
+                    source.connect(this.audioContext.destination);
+                    
+                    // Start playback at offset
+                    const startOffset = Math.max(0, offsetSeconds);
+                    source.start(0, startOffset);
+                    
+                    // Track active source
+                    this.activeAudioSources.push({ source, clipId: clipData.id });
+                    
+                    // Remove from active sources when done
+                    source.onended = () => {
+                        const index = this.activeAudioSources.findIndex(s => s.clipId === clipData.id);
+                        if (index !== -1) {
+                            this.activeAudioSources.splice(index, 1);
+                        }
+                    };
+                    
+                    console.debug(`Playing audio clip: ${clipData.name} at offset ${startOffset.toFixed(2)}s`);
+                } catch (e) {
+                    console.error('Error playing audio clip:', e);
+                }
+            },
+            
+            // Stop all playing audio
+            stopAllAudio() {
+                for (const { source } of this.activeAudioSources) {
+                    try {
+                        source.stop();
+                    } catch (e) {
+                        // Ignore errors from already stopped sources
+                    }
+                }
+                this.activeAudioSources = [];
+            },
+            
+            // Reset playback to a specific time
+            resetPlaybackToTime(timeMs) {
+                this.stopAllAudio();
+                this.lastPlaybackTimeMs = timeMs;
+            }
+        };
+        
+        // Initialize Audio controller after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                AudioController.init();
+                window.AudioController = AudioController;
+            });
+        } else {
+            AudioController.init();
+            window.AudioController = AudioController;
+        }
+        
         // Staff Y Positions - Named Y coordinates for each staff relative to page
         // These define the vertical layout of the 4 staff sections
         const StaffPositions = {
@@ -7363,6 +8193,66 @@
         };
         window.MidiSnippetDatabase = MidiSnippetDatabase;
         
+        // Audio Clip Database - stores audio file insertions as distinct objects
+        const AudioClipDatabase = {
+            clips: [],
+            nextId: 1,
+            
+            add(clipData) {
+                const clip = {
+                    id: this.nextId++,
+                    ...clipData,
+                    createdAt: Date.now()
+                };
+                this.clips.push(clip);
+                return clip;
+            },
+            
+            get(id) {
+                return this.clips.find(c => c.id === id);
+            },
+            
+            update(id, updates) {
+                const clip = this.get(id);
+                if (clip) {
+                    Object.assign(clip, updates);
+                }
+                return clip;
+            },
+            
+            remove(id) {
+                const index = this.clips.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    this.clips.splice(index, 1);
+                    return true;
+                }
+                return false;
+            },
+            
+            getAll() {
+                return this.clips;
+            },
+            
+            getByTrack(trackIndex) {
+                return this.clips.filter(c => c.trackIndex === trackIndex);
+            },
+            
+            exportData() {
+                return {
+                    clips: this.clips,
+                    nextId: this.nextId
+                };
+            },
+            
+            importData(data) {
+                if (data && data.clips) {
+                    this.clips = data.clips;
+                    this.nextId = data.nextId || (this.clips.length > 0 ? Math.max(...this.clips.map(c => c.id)) + 1 : 1);
+                }
+            }
+        };
+        window.AudioClipDatabase = AudioClipDatabase;
+        
         // ============================================
         // SCORE MANAGER - Client-side persistence
         // ============================================
@@ -7548,6 +8438,18 @@
                     }
                 );
                 
+                // AudioClipDatabase
+                this.registerSource('databases.audioClips',
+                    () => AudioClipDatabase.exportData(),
+                    (data) => {
+                        AudioClipDatabase.importData(data);
+                        // Re-render audio display if AudioController exists
+                        if (window.AudioController) {
+                            AudioController.reloadFromDatabase();
+                        }
+                    }
+                );
+                
                 // GCMaker - gravitational conductor objects
                 this.registerSource('databases.gcs',
                     () => window.GCMaker ? GCMaker.exportData() : { gcs: [], nextId: 1 },
@@ -7612,6 +8514,7 @@
                 data.graphicTracks = data.graphicTracks ?? [];
                 data.databases = data.databases ?? {};
                 data.databases.midiSnippets = data.databases.midiSnippets ?? { snippets: [], nextId: 1 };
+                data.databases.audioClips = data.databases.audioClips ?? { clips: [], nextId: 1 };
                 data.svgElements = data.svgElements ?? [];
                 data.connectors = data.connectors ?? [];
                 
