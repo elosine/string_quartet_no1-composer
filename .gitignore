@@ -1,8 +1,8 @@
 # Dependencies
 node_modules/
 
-# Audio files (stored locally, too large for git)
-public/audio_files/
+# Audio files are now tracked via Git LFS
+# (*.wav and *.flac configured in .gitattributes)
 
 # IDE
 .idea/
