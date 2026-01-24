@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "0994_2026-01-23_z_draft",
-    "created": "2026-01-23T15:54:00.445Z",
-    "modified": "2026-01-23T15:54:00.460Z",
+    "title": "0994_2026-01-23_y_draft",
+    "created": "2026-01-24T03:04:11.311Z",
+    "modified": "2026-01-24T03:04:11.323Z",
     "author": ""
   },
   "tempoHistory": [
@@ -40656,13 +40656,13 @@
         {
           "id": 37,
           "startSeconds": 89.5,
-          "endSeconds": 100,
+          "endSeconds": 104,
           "gTrack": "2",
           "color": "mustard",
           "section": "bottom",
           "page": 11,
-          "x1": 378.4375,
-          "x2": 1513.75,
+          "x1": 401.1875,
+          "x2": 2063.25,
           "trackDims": {
             "y": 85,
             "height": 77
@@ -40679,13 +40679,13 @@
         {
           "id": 38,
           "startSeconds": 89.5,
-          "endSeconds": 100,
+          "endSeconds": 109,
           "gTrack": "3",
           "color": "mustard",
           "section": "bottom",
           "page": 11,
-          "x1": 378.4375,
-          "x2": 1513.75,
+          "x1": 401.1875,
+          "x2": 2636.375,
           "trackDims": {
             "y": 162,
             "height": 77
@@ -40702,13 +40702,13 @@
         {
           "id": 39,
           "startSeconds": 89.5,
-          "endSeconds": 100,
+          "endSeconds": 115,
           "gTrack": "4",
           "color": "mustard",
           "section": "bottom",
           "page": 11,
-          "x1": 378.4375,
-          "x2": 1513.75,
+          "x1": 401.1875,
+          "x2": 3324.125,
           "trackDims": {
             "y": 239,
             "height": 77

@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "0994_2026-01-23_z_draft",
-    "created": "2026-01-23T15:54:00.445Z",
-    "modified": "2026-01-23T15:54:00.460Z",
+    "created": "2026-01-23T15:38:02.544Z",
+    "modified": "2026-01-23T15:38:02.558Z",
     "author": ""
   },
   "tempoHistory": [
@@ -49339,20 +49339,9 @@
           "audioFilePath": "/audio_files/CLB_clouds-vla-intro_1769182590122.wav",
           "color": "#FF5722",
           "createdAt": 1769182590124
-        },
-        {
-          "id": 12,
-          "name": "CLB_clouds-vln2-intro.wav",
-          "trackIndex": 1,
-          "startSeconds": 88.5366970628911,
-          "endSeconds": 89.66193515812918,
-          "durationSeconds": 1.1252380952380951,
-          "audioFilePath": "/audio_files/CLB_clouds-vln2-intro_1769183253427.wav",
-          "color": "#3F51B5",
-          "createdAt": 1769183253430
         }
       ],
-      "nextId": 13
+      "nextId": 12
     },
     "gcs": {
       "gcs": [

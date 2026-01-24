@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "0994_2026-01-23_z_draft",
-    "created": "2026-01-23T15:54:00.445Z",
-    "modified": "2026-01-23T15:54:00.460Z",
+    "title": "0994_2026-01-23_x_draft",
+    "created": "2026-01-24T05:03:55.178Z",
+    "modified": "2026-01-24T05:03:55.197Z",
     "author": ""
   },
   "tempoHistory": [
@@ -40656,13 +40656,13 @@
         {
           "id": 37,
           "startSeconds": 89.5,
-          "endSeconds": 100,
+          "endSeconds": 104,
           "gTrack": "2",
           "color": "mustard",
           "section": "bottom",
           "page": 11,
-          "x1": 378.4375,
-          "x2": 1513.75,
+          "x1": 401.1875,
+          "x2": 2063.25,
           "trackDims": {
             "y": 85,
             "height": 77
@@ -40679,13 +40679,13 @@
         {
           "id": 38,
           "startSeconds": 89.5,
-          "endSeconds": 100,
+          "endSeconds": 109,
           "gTrack": "3",
           "color": "mustard",
           "section": "bottom",
           "page": 11,
-          "x1": 378.4375,
-          "x2": 1513.75,
+          "x1": 401.1875,
+          "x2": 2636.375,
           "trackDims": {
             "y": 162,
             "height": 77
@@ -40702,13 +40702,13 @@
         {
           "id": 39,
           "startSeconds": 89.5,
-          "endSeconds": 100,
+          "endSeconds": 115,
           "gTrack": "4",
           "color": "mustard",
           "section": "bottom",
           "page": 11,
-          "x1": 378.4375,
-          "x2": 1513.75,
+          "x1": 401.1875,
+          "x2": 3324.125,
           "trackDims": {
             "y": 239,
             "height": 77
@@ -40744,9 +40744,36 @@
             "highlight": {},
             "lineY": 13
           }
+        },
+        {
+          "id": 41,
+          "startSeconds": 100.4,
+          "endSeconds": 125,
+          "gTrack": "1",
+          "color": "brightBlue",
+          "section": "top",
+          "page": 12,
+          "x1": 733.6000000000007,
+          "x2": 3553.375,
+          "trackDims": {
+            "y": 8,
+            "height": 82
+          },
+          "createdAt": 1769231011510,
+          "elements": {
+            "group": {},
+            "line": {},
+            "hitLine": {},
+            "highlight": {},
+            "lineY": 13,
+            "continuationGroupTop": {},
+            "continuationLineTop": {},
+            "continuationGroupBottom": {},
+            "continuationLineBottom": {}
+          }
         }
       ],
-      "nextId": 41
+      "nextId": 42
     },
     "midiSnippets": {
       "snippets": [
@@ -49350,9 +49377,53 @@
           "audioFilePath": "/audio_files/CLB_clouds-vln2-intro_1769183253427.wav",
           "color": "#3F51B5",
           "createdAt": 1769183253430
+        },
+        {
+          "id": 13,
+          "name": "CLB_clouds-vc-main.wav",
+          "trackIndex": 3,
+          "startSeconds": 89.16529120105437,
+          "endSeconds": 115.67302362735822,
+          "durationSeconds": 26.507732426303853,
+          "audioFilePath": "/audio_files/CLB_clouds-vc-main_1769230219245.wav",
+          "color": "#00BCD4",
+          "createdAt": 1769230219251
+        },
+        {
+          "id": 14,
+          "name": "CLB_clouds-vla-main.wav",
+          "trackIndex": 2,
+          "startSeconds": 89.15,
+          "endSeconds": 109.04467120181407,
+          "durationSeconds": 19.89467120181406,
+          "audioFilePath": "/audio_files/CLB_clouds-vla-main_1769230435020.wav",
+          "color": "#9C27B0",
+          "createdAt": 1769230435030
+        },
+        {
+          "id": 15,
+          "name": "CLB_clouds-vln2-main.wav",
+          "trackIndex": 1,
+          "startSeconds": 89.15,
+          "endSeconds": 103.66632653061225,
+          "durationSeconds": 14.516326530612245,
+          "audioFilePath": "/audio_files/CLB_clouds-vln2-main_1769230657059.wav",
+          "color": "#FF5722",
+          "createdAt": 1769230657063
+        },
+        {
+          "id": 16,
+          "name": "CLB_clouds-vln1-main.wav",
+          "trackIndex": 0,
+          "startSeconds": 89.15,
+          "endSeconds": 100.15600907029479,
+          "durationSeconds": 11.006009070294784,
+          "audioFilePath": "/audio_files/CLB_clouds-vln1-main_1769230687698.wav",
+          "color": "#3F51B5",
+          "createdAt": 1769230687706
         }
       ],
-      "nextId": 13
+      "nextId": 17
     },
     "gcs": {
       "gcs": [
@@ -49790,9 +49861,289 @@
           "descentRatio": 50,
           "duration": 1.4,
           "color": "neonMagenta"
+        },
+        {
+          "id": 38,
+          "name": "GC_20260116_151414",
+          "gTrack": "1",
+          "impactSeconds": 90.2,
+          "startSeconds": 89.595,
+          "endSeconds": 90.69500000000001,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 39,
+          "name": "GC_20260116_151414",
+          "gTrack": "2",
+          "impactSeconds": 90.2,
+          "startSeconds": 89.595,
+          "endSeconds": 90.69500000000001,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 40,
+          "name": "GC_20260116_151414",
+          "gTrack": "3",
+          "impactSeconds": 90.2,
+          "startSeconds": 89.595,
+          "endSeconds": 90.69500000000001,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 41,
+          "name": "GC_20260116_151414",
+          "gTrack": "4",
+          "impactSeconds": 90.2,
+          "startSeconds": 89.595,
+          "endSeconds": 90.69500000000001,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 42,
+          "name": "GC_20260116_151414",
+          "gTrack": "4",
+          "impactSeconds": 93.10180165739348,
+          "startSeconds": 92.49680165739348,
+          "endSeconds": 93.59680165739348,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 43,
+          "name": "GC_20260116_151414",
+          "gTrack": "3",
+          "impactSeconds": 93.10180165739348,
+          "startSeconds": 92.49680165739348,
+          "endSeconds": 93.59680165739348,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 44,
+          "name": "GC_20260116_151414",
+          "gTrack": "2",
+          "impactSeconds": 93.10180165739348,
+          "startSeconds": 92.49680165739348,
+          "endSeconds": 93.59680165739348,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 45,
+          "name": "GC_20260116_151414",
+          "gTrack": "1",
+          "impactSeconds": 93.10180165739348,
+          "startSeconds": 92.49680165739348,
+          "endSeconds": 93.59680165739348,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 46,
+          "name": "GC_20260116_151414",
+          "gTrack": "1",
+          "impactSeconds": 94.56401324193978,
+          "startSeconds": 93.95901324193977,
+          "endSeconds": 95.05901324193978,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 47,
+          "name": "GC_20260116_151414",
+          "gTrack": "2",
+          "impactSeconds": 94.56401324193978,
+          "startSeconds": 93.95901324193977,
+          "endSeconds": 95.05901324193978,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 48,
+          "name": "GC_20260116_151414",
+          "gTrack": "3",
+          "impactSeconds": 94.56401324193978,
+          "startSeconds": 93.95901324193977,
+          "endSeconds": 95.05901324193978,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 49,
+          "name": "GC_20260116_151414",
+          "gTrack": "4",
+          "impactSeconds": 94.56401324193978,
+          "startSeconds": 93.95901324193977,
+          "endSeconds": 95.05901324193978,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 50,
+          "name": "GC_20260116_151414",
+          "gTrack": "4",
+          "impactSeconds": 97.680155383885,
+          "startSeconds": 97.07515538388499,
+          "endSeconds": 98.175155383885,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 51,
+          "name": "GC_20260116_151414",
+          "gTrack": "3",
+          "impactSeconds": 97.680155383885,
+          "startSeconds": 97.07515538388499,
+          "endSeconds": 98.175155383885,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 52,
+          "name": "GC_20260116_151414",
+          "gTrack": "2",
+          "impactSeconds": 97.680155383885,
+          "startSeconds": 97.07515538388499,
+          "endSeconds": 98.175155383885,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 53,
+          "name": "GC_20260116_151414",
+          "gTrack": "1",
+          "impactSeconds": 97.680155383885,
+          "startSeconds": 97.07515538388499,
+          "endSeconds": 98.175155383885,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 55,
+          "name": "GC_20260116_151414",
+          "gTrack": "1",
+          "impactSeconds": 98.98945880487038,
+          "startSeconds": 98.38445880487038,
+          "endSeconds": 99.48445880487039,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 56,
+          "name": "GC_20260116_151414",
+          "gTrack": "2",
+          "impactSeconds": 98.98945880487038,
+          "startSeconds": 98.38445880487038,
+          "endSeconds": 99.48445880487039,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 57,
+          "name": "GC_20260116_151414",
+          "gTrack": "3",
+          "impactSeconds": 98.98945880487038,
+          "startSeconds": 98.38445880487038,
+          "endSeconds": 99.48445880487039,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
+        },
+        {
+          "id": 58,
+          "name": "GC_20260116_151414",
+          "gTrack": "4",
+          "impactSeconds": 98.98945880487038,
+          "startSeconds": 98.38445880487038,
+          "endSeconds": 99.48445880487039,
+          "stiffness": 50,
+          "damping": 80,
+          "ictus": 120,
+          "descentRatio": 55,
+          "duration": 1.1,
+          "color": "neonMagenta"
         }
       ],
-      "nextId": 38
+      "nextId": 59
     },
     "notation": {
       "items": [],
