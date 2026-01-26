@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feathered Beam Maker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: #16213e;
+            padding: 15px 30px;
+            border-bottom: 2px solid #0f3460;
+        }
+        
+        header h1 {
+            font-size: 1.5rem;
+            color: #e94560;
+        }
+        
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .controls {
+            width: 320px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 2px solid #0f3460;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #0f3460;
+        }
+        
+        .control-group:last-child {
+            border-bottom: none;
+        }
+        
+        .control-group h3 {
+            font-size: 0.9rem;
+            color: #e94560;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .control-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .control-row label {
+            width: 100px;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+        
+        .control-row input[type="range"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .control-row input[type="number"] {
+            width: 70px;
+            padding: 5px 8px;
+            background: #0f3460;
+            border: 1px solid #1a1a2e;
+            color: #eee;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .control-row select {
+            flex: 1;
+            padding: 8px;
+            background: #0f3460;
+            border: 1px solid #1a1a2e;
+            color: #eee;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            background: #1a1a2e;
+        }
+        
+        .preview-container {
+            background: white;
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            min-width: 400px;
+            min-height: 200px;
+            overflow: auto;
+        }
+        
+        #preview-svg {
+            display: block;
+        }
+        
+        .info-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: #16213e;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #aaa;
+            max-width: 600px;
+        }
+        
+        .info-panel h4 {
+            color: #e94560;
+            margin-bottom: 10px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .info-item {
+            background: #0f3460;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .info-item .label {
+            font-size: 0.7rem;
+            color: #888;
+        }
+        
+        .info-item .value {
+            font-size: 0.9rem;
+            color: #eee;
+            font-weight: bold;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #e94560;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #ff6b6b;
+        }
+        
+        button.secondary {
+            background: #0f3460;
+        }
+        
+        button.secondary:hover {
+            background: #1a4a7a;
+        }
+        
+        .algorithm-info {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 5px;
+            padding: 8px;
+            background: #0f3460;
+            border-radius: 4px;
+        }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: #0f3460;
+            height: 6px;
+            border-radius: 3px;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #e94560;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Feathered Beam Maker</h1>
+    </header>
+    
+    <div class="container">
+        <div class="controls">
+            <div class="control-group">
+                <h3>Partials</h3>
+                <div class="control-row">
+                    <label>Count</label>
+                    <input type="range" id="partials" min="2" max="16" value="7">
+                    <input type="number" id="partials-num" min="2" max="16" value="7">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Dimensions (mm)</h3>
+                <div class="control-row">
+                    <label>Width (mm)</label>
+                    <input type="range" id="width" min="5" max="100" value="17.25" step="0.25">
+                    <input type="number" id="width-num" min="5" max="100" value="17.25" step="0.25">
+                </div>
+                <div class="control-row">
+                    <label>Height (mm)</label>
+                    <input type="range" id="height" min="3" max="30" value="8" step="0.25">
+                    <input type="number" id="height-num" min="3" max="30" value="8" step="0.25">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Dimensions (Time)</h3>
+                <div class="control-row">
+                    <label>Pixels/Sec</label>
+                    <input type="range" id="pixels-per-sec" min="50" max="300" value="125" step="5">
+                    <input type="number" id="pixels-per-sec-num" min="50" max="300" value="125" step="5">
+                </div>
+                <div class="control-row">
+                    <label>Duration (s)</label>
+                    <input type="range" id="duration-sec" min="0.1" max="5" value="0.52" step="0.01">
+                    <input type="number" id="duration-sec-num" min="0.1" max="5" value="0.52" step="0.01">
+                </div>
+                <div class="algorithm-info">
+                    Width = Duration × Pixels/Sec ÷ 3.78 (mm)
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Spacing Algorithm</h3>
+                <div class="control-row">
+                    <select id="algorithm">
+                        <option value="sqrt2" selected>√2 Ratio (1.414)</option>
+                        <option value="golden">Golden Ratio (1.618)</option>
+                        <option value="exponential">Exponential (2.0)</option>
+                        <option value="linear">Linear (Equal)</option>
+                        <option value="cubic">Cubic Easing</option>
+                        <option value="custom">Custom Ratio</option>
+                    </select>
+                </div>
+                <div class="control-row" id="custom-ratio-row" style="display: none;">
+                    <label>Ratio</label>
+                    <input type="range" id="custom-ratio" min="1.1" max="3" value="1.5" step="0.05">
+                    <input type="number" id="custom-ratio-num" min="1.1" max="3" value="1.5" step="0.05">
+                </div>
+                <div class="algorithm-info" id="algorithm-info">
+                    Each gap is √2 (≈1.414) times the previous gap, creating a natural acceleration effect.
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Beam Settings</h3>
+                <div class="control-row">
+                    <label>Beam Count</label>
+                    <input type="range" id="beam-count" min="1" max="5" value="3">
+                    <input type="number" id="beam-count-num" min="1" max="5" value="3">
+                </div>
+                <div class="control-row">
+                    <label>Beam Gap (mm)</label>
+                    <input type="range" id="beam-gap" min="1" max="6" value="3" step="0.5">
+                    <input type="number" id="beam-gap-num" min="1" max="6" value="3" step="0.5">
+                </div>
+                <div class="control-row">
+                    <label>Beam Thickness</label>
+                    <input type="range" id="beam-thickness" min="0.2" max="1" value="0.4" step="0.05">
+                    <input type="number" id="beam-thickness-num" min="0.2" max="1" value="0.4" step="0.05">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>Direction</h3>
+                <div class="control-row">
+                    <select id="direction">
+                        <option value="accelerando" selected>Accelerando (→)</option>
+                        <option value="ritardando">Ritardando (←)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="button-row">
+                <button id="download-svg">Download SVG</button>
+                <button id="copy-svg" class="secondary">Copy SVG</button>
+            </div>
+        </div>
+        
+        <div class="preview-area">
+            <div class="preview-container">
+                <svg id="preview-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+            </div>
+            
+            <div class="info-panel">
+                <h4>Current Measurements</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="label">Total Width</div>
+                        <div class="value" id="info-width">17.25mm</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Total Height</div>
+                        <div class="value" id="info-height">8.00mm</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Min Gap</div>
+                        <div class="value" id="info-min-gap">0.55</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Max Gap</div>
+                        <div class="value" id="info-max-gap">3.11</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Stem Height</div>
+                        <div class="value" id="info-stem-height">4.26</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Partials</div>
+                        <div class="value" id="info-partials">7</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const FeatheredBeamMaker = {
+            // Constants from the reference SVG (FeatheredBeams_004.svg)
+            STEM_WIDTH: 0.13,
+            NOTEHEAD_WIDTH: 0.3936, // From reference path width
+            NOTEHEAD_HEIGHT: 0.454, // From reference path height
+            // Offset from stem right edge to notehead right edge (should be ~0)
+            // In reference: stem right = 0.5117, notehead right = 0.5152, diff = 0.0035
+            NOTEHEAD_STEM_OFFSET: 0.0633, // Distance from notehead path start to stem x
+            MIN_GAP: 0.55, // Minimum gap between last two noteheads (from reference)
+            MM_TO_UNITS: 0.5689, // Conversion factor from mm to SVG units
+            
+            // Conversion: 1mm ≈ 3.78 pixels at 96dpi
+            PX_PER_MM: 3.78,
+            
+            // Current state
+            state: {
+                partials: 7,
+                widthMm: 17.25,
+                heightMm: 8,
+                algorithm: 'sqrt2',
+                customRatio: 1.5,
+                beamCount: 3,
+                beamGapMm: 3,
+                beamThickness: 0.4,
+                direction: 'accelerando',
+                pixelsPerSec: 125,  // Default from score timeline (~125 px/s)
+                durationSec: 0.52   // Calculated from default width
+            },
+            
+            // Algorithm descriptions
+            algorithmInfo: {
+                sqrt2: 'Each gap is √2 (≈1.414) times the previous gap, creating a natural acceleration effect.',
+                golden: 'Each gap follows the Golden Ratio (≈1.618), creating an aesthetically pleasing progression.',
+                exponential: 'Each gap doubles (2x) the previous gap, creating a dramatic acceleration.',
+                linear: 'All gaps are equal, creating uniform spacing between notes.',
+                cubic: 'Gaps follow a cubic easing curve, creating a smooth acceleration.',
+                custom: 'Custom ratio between consecutive gaps.'
+            },
+            
+            // Get ratio for algorithm
+            getRatio(algorithm) {
+                switch (algorithm) {
+                    case 'sqrt2': return Math.SQRT2;
+                    case 'golden': return 1.618033988749895;
+                    case 'exponential': return 2.0;
+                    case 'linear': return 1.0;
+                    case 'cubic': return null; // Special handling
+                    case 'custom': return this.state.customRatio;
+                    default: return Math.SQRT2;
+                }
+            },
+            
+            // Calculate note positions based on algorithm
+            calculatePositions() {
+                const { partials, widthMm, algorithm, direction } = this.state;
+                const widthUnits = widthMm * this.MM_TO_UNITS;
+                const minGap = this.MIN_GAP;
+                const stemWidth = this.STEM_WIDTH;
+                
+                // Available width for spacing (excluding first and last stem)
+                const availableWidth = widthUnits - stemWidth;
+                
+                // Calculate gaps based on algorithm
+                let gaps = [];
+                const numGaps = partials - 1;
+                
+                if (algorithm === 'linear') {
+                    // Equal spacing
+                    const gap = availableWidth / numGaps;
+                    gaps = Array(numGaps).fill(Math.max(gap, minGap));
+                } else if (algorithm === 'cubic') {
+                    // Cubic easing - gaps follow t^3 curve
+                    let totalRatio = 0;
+                    for (let i = 0; i < numGaps; i++) {
+                        const t = (i + 1) / numGaps;
+                        const ratio = Math.pow(t, 3);
+                        gaps.push(ratio);
+                        totalRatio += ratio;
+                    }
+                    // Normalize and apply minimum
+                    const scale = availableWidth / totalRatio;
+                    gaps = gaps.map(g => Math.max(g * scale, minGap));
+                } else {
+                    // Ratio-based algorithms (sqrt2, golden, exponential, custom)
+                    const ratio = this.getRatio(algorithm);
+                    
+                    // Calculate gaps from right to left (smallest to largest)
+                    // gap[n-1] = minGap, gap[n-2] = minGap * ratio, etc.
+                    let totalGap = 0;
+                    for (let i = 0; i < numGaps; i++) {
+                        const gap = minGap * Math.pow(ratio, i);
+                        gaps.unshift(gap); // Add to front (largest first)
+                        totalGap += gap;
+                    }
+                    
+                    // Scale gaps to fit available width, but maintain minimum
+                    if (totalGap > availableWidth) {
+                        // Width too small - use minimum gaps
+                        gaps = gaps.map(() => minGap);
+                    } else if (totalGap < availableWidth) {
+                        // Scale up proportionally
+                        const scale = availableWidth / totalGap;
+                        gaps = gaps.map(g => g * scale);
+                    }
+                }
+                
+                // Calculate positions from gaps
+                let positions = [];
+                let x = 0;
+                
+                if (direction === 'accelerando') {
+                    // Left to right: large gaps → small gaps
+                    positions.push(x);
+                    for (let i = 0; i < gaps.length; i++) {
+                        x += gaps[i];
+                        positions.push(x);
+                    }
+                } else {
+                    // Ritardando: small gaps → large gaps
+                    positions.push(x);
+                    for (let i = gaps.length - 1; i >= 0; i--) {
+                        x += gaps[i];
+                        positions.push(x);
+                    }
+                }
+                
+                return { positions, gaps };
+            },
+            
+            // How far the notehead extends left of the stem
+            // From path: starts at startX, extends left by 0.168
+            // startX = stemX + STEM_WIDTH - 0.1968 = stemX - 0.0668
+            // Left edge of notehead = startX - 0.168 = stemX - 0.0668 - 0.168 = stemX - 0.2348
+            // Adding generous margin to ensure full visibility
+            NOTEHEAD_LEFT_EXTEND: 0.40,
+            
+            // Generate notehead path at given position
+            // Reference path from FeatheredBeams_004.svg:
+            // m 0.3184,4.1230104 c 0.1056,0 0.1968,0.0608 0.1968,0.1728 0,0.112 -0.0768,0.1872 -0.1504,0.232 -0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 -0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 0,-0.112 0.0768,-0.1872 0.1504,-0.232 0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z
+            // Notehead right edge should align with stem right edge
+            // stemX is the left edge of stem, so stem right = stemX + STEM_WIDTH
+            // Notehead path starts at (startX, y), extends right by ~0.1968, left by ~0.168
+            generateNoteheadPath(stemX, y, xOffset = 0) {
+                // Position notehead so its right edge aligns with stem right edge
+                // Stem right edge = stemX + STEM_WIDTH
+                // Notehead path: starts at startX, extends right by 0.1968
+                // So notehead right = startX + 0.1968
+                // We want: startX + 0.1968 = stemX + STEM_WIDTH
+                // Therefore: startX = stemX + STEM_WIDTH - 0.1968
+                const startX = stemX + this.STEM_WIDTH - 0.1968 + xOffset;
+                
+                // Use exact path from reference, just with adjusted x position
+                return `m ${startX.toFixed(4)},${y.toFixed(4)} ` +
+                       `c 0.1056,0 0.1968,0.0608 0.1968,0.1728 ` +
+                       `0,0.112 -0.0768,0.1872 -0.1504,0.232 ` +
+                       `-0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 ` +
+                       `-0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 ` +
+                       `0,-0.112 0.0768,-0.1872 0.1504,-0.232 ` +
+                       `0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z`;
+            },
+            
+            // Generate the complete SVG
+            generateSVG() {
+                const { partials, widthMm, heightMm, beamCount, beamGapMm, beamThickness, direction } = this.state;
+                const widthUnits = widthMm * this.MM_TO_UNITS;
+                const heightUnits = heightMm * this.MM_TO_UNITS;
+                const beamGapUnits = beamGapMm * this.MM_TO_UNITS;
+                
+                const { positions, gaps } = this.calculatePositions();
+                
+                // Calculate stem height based on total height and beam requirements
+                const totalBeamHeight = (beamCount - 1) * beamGapUnits + beamCount * beamThickness;
+                const noteheadY = heightUnits - this.NOTEHEAD_HEIGHT / 2;
+                const stemTop = 0;
+                const stemHeight = noteheadY - stemTop - this.NOTEHEAD_HEIGHT / 2;
+                
+                // Calculate the left margin needed for the first notehead
+                // First notehead extends left of first stem by NOTEHEAD_LEFT_EXTEND
+                const leftMargin = this.NOTEHEAD_LEFT_EXTEND;
+                
+                // Beam positions - align exactly with stem edges (offset by left margin)
+                // Left beam edge = left edge of first stem
+                // Right beam edge = right edge of last stem
+                const beamLeftX = positions[0] + leftMargin; // Left edge of first stem (with offset)
+                const beamRightX = positions[positions.length - 1] + this.STEM_WIDTH + leftMargin; // Right edge of last stem
+                
+                let svgContent = '';
+                
+                // Generate stems and noteheads
+                // Reference alignment: notehead top touches stem bottom, notehead right edge = stem right edge
+                for (let i = 0; i < partials; i++) {
+                    const stemX = positions[i] + leftMargin; // Apply left margin offset
+                    
+                    // Stem
+                    svgContent += `  <rect x="${stemX.toFixed(4)}" y="${stemTop.toFixed(4)}" ` +
+                                  `width="${this.STEM_WIDTH}" height="${stemHeight.toFixed(4)}" ` +
+                                  `ry="0.04" fill="currentColor" id="stem${i + 1}" />\n`;
+                    
+                    // Notehead - positioned so right edge aligns with stem right edge
+                    // and top of notehead touches bottom of stem
+                    // In reference: stem bottom = 4.2959, notehead top = 4.1230 (notehead overlaps slightly)
+                    // The notehead Y is the starting Y of the path (top of notehead)
+                    const noteheadTopY = stemTop + stemHeight - 0.173; // Slight overlap like reference
+                    svgContent += `  <path d="${this.generateNoteheadPath(stemX, noteheadTopY)}" ` +
+                                  `fill="currentColor" id="notehead${i + 1}" style="stroke-width:0.0016" />\n`;
+                }
+                
+                // Generate beams
+                const beamY1Left = stemTop; // Top of beam at left (all beams start here)
+                const beamY1Right = stemTop; // Top of first beam at right
+                
+                for (let b = 0; b < beamCount; b++) {
+                    // Left side: all beams converge at the same point
+                    const leftTop = beamY1Left;
+                    const leftBottom = beamY1Left + beamThickness;
+                    
+                    // Right side: beams are spaced 3mm apart
+                    const rightTop = beamY1Right + b * beamGapUnits;
+                    const rightBottom = rightTop + beamThickness;
+                    
+                    // Create polygon points
+                    let points;
+                    if (direction === 'accelerando') {
+                        // Beams fan out from left to right
+                        points = `${beamLeftX.toFixed(4)},${leftTop.toFixed(4)} ` +
+                                 `${beamRightX.toFixed(4)},${rightTop.toFixed(4)} ` +
+                                 `${beamRightX.toFixed(4)},${rightBottom.toFixed(4)} ` +
+                                 `${beamLeftX.toFixed(4)},${leftBottom.toFixed(4)}`;
+                    } else {
+                        // Ritardando: Beams fan out from right to left, meeting at a point on the right
+                        // Right side: all beams converge at the same point
+                        // Left side: beams are spaced apart
+                        const ritLeftTop = beamY1Left + b * beamGapUnits;
+                        const ritLeftBottom = ritLeftTop + beamThickness;
+                        const ritRightTop = beamY1Right; // All beams meet at same point on right
+                        const ritRightBottom = beamY1Right + beamThickness;
+                        
+                        points = `${beamLeftX.toFixed(4)},${ritLeftTop.toFixed(4)} ` +
+                                 `${beamRightX.toFixed(4)},${ritRightTop.toFixed(4)} ` +
+                                 `${beamRightX.toFixed(4)},${ritRightBottom.toFixed(4)} ` +
+                                 `${beamLeftX.toFixed(4)},${ritLeftBottom.toFixed(4)}`;
+                    }
+                    
+                    // No stroke to avoid jutting past edges
+                    svgContent += `  <polygon points="${points}" ` +
+                                  `fill="currentColor" id="beam${b + 1}" />\n`;
+                }
+                
+                // Calculate actual content bounds for proper document sizing
+                // Content width: includes left margin for first notehead + right edge of last stem
+                const contentWidth = beamRightX;
+                // Content height: from top of beams to bottom of noteheads
+                const contentHeight = noteheadY + this.NOTEHEAD_HEIGHT / 2;
+                
+                // Convert to mm for document size
+                const docWidthMm = contentWidth / this.MM_TO_UNITS;
+                const docHeightMm = contentHeight / this.MM_TO_UNITS;
+                
+                // Create full SVG with document sized to fit content
+                const svg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2"
+     width="${docWidthMm.toFixed(4)}mm" height="${docHeightMm.toFixed(4)}mm"
+     viewBox="0 0 ${contentWidth.toFixed(4)} ${contentHeight.toFixed(4)}">
+  <style type="text/css"><![CDATA[
+    svg { color: black; }
+  ]]></style>
+${svgContent}</svg>`;
+                
+                return { svg, positions, gaps, stemHeight, docWidthMm, docHeightMm };
+            },
+            
+            // Update the preview
+            updatePreview() {
+                const { svg, positions, gaps, stemHeight, docWidthMm, docHeightMm } = this.generateSVG();
+                const previewEl = document.getElementById('preview-svg');
+                const previewContainer = document.querySelector('.preview-container');
+                
+                // Parse and display
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(svg, 'image/svg+xml');
+                const svgEl = doc.documentElement;
+                
+                // Copy attributes and content to preview
+                previewEl.setAttribute('width', svgEl.getAttribute('width'));
+                previewEl.setAttribute('height', svgEl.getAttribute('height'));
+                previewEl.setAttribute('viewBox', svgEl.getAttribute('viewBox'));
+                previewEl.innerHTML = svgEl.innerHTML;
+                
+                // Scale the preview to 250% for good visibility
+                // Parse the mm values and convert to pixels (assuming 96dpi, 1mm ≈ 3.78px)
+                const pxPerMm = 3.78;
+                const baseWidth = docWidthMm * pxPerMm;
+                const baseHeight = docHeightMm * pxPerMm;
+                const scaledWidth = baseWidth * 2.5;
+                const scaledHeight = baseHeight * 2.5;
+                
+                // Set preview size to 250%
+                previewEl.style.width = `${scaledWidth}px`;
+                previewEl.style.height = `${scaledHeight}px`;
+                
+                // Update info panel
+                document.getElementById('info-width').textContent = `${docWidthMm.toFixed(2)}mm`;
+                document.getElementById('info-height').textContent = `${docHeightMm.toFixed(2)}mm`;
+                document.getElementById('info-min-gap').textContent = Math.min(...gaps).toFixed(2);
+                document.getElementById('info-max-gap').textContent = Math.max(...gaps).toFixed(2);
+                document.getElementById('info-stem-height').textContent = stemHeight.toFixed(2);
+                document.getElementById('info-partials').textContent = this.state.partials;
+            },
+            
+            // File handle for remembering save location
+            lastDirectoryHandle: null,
+            
+            // Download SVG file using File System Access API (with remembered location)
+            async downloadSVG() {
+                const { svg } = this.generateSVG();
+                const filename = `feathered-beam-${this.state.partials}p-${this.state.algorithm}.svg`;
+                
+                // Try to use File System Access API for native save dialog
+                if ('showSaveFilePicker' in window) {
+                    try {
+                        const options = {
+                            suggestedName: filename,
+                            types: [{
+                                description: 'SVG Image',
+                                accept: { 'image/svg+xml': ['.svg'] }
+                            }]
+                        };
+                        
+                        // Use last directory if available
+                        if (this.lastDirectoryHandle) {
+                            options.startIn = this.lastDirectoryHandle;
+                        }
+                        
+                        const handle = await window.showSaveFilePicker(options);
+                        
+                        // Remember the directory for next time
+                        // Note: We can't directly get parent directory, but the picker remembers
+                        
+                        const writable = await handle.createWritable();
+                        await writable.write(svg);
+                        await writable.close();
+                        
+                        // Store in localStorage for persistence across sessions
+                        try {
+                            localStorage.setItem('featheredBeamMaker_lastSaveDir', 'remembered');
+                        } catch (e) {
+                            // localStorage might not be available
+                        }
+                        
+                        return;
+                    } catch (err) {
+                        // User cancelled or API not supported, fall back to download
+                        if (err.name === 'AbortError') {
+                            return; // User cancelled
+                        }
+                        console.warn('File System Access API failed, falling back to download:', err);
+                    }
+                }
+                
+                // Fallback: traditional download
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            },
+            
+            // Copy SVG to clipboard
+            async copySVG() {
+                const { svg } = this.generateSVG();
+                try {
+                    await navigator.clipboard.writeText(svg);
+                    alert('SVG copied to clipboard!');
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+            },
+            
+            // Initialize controls
+            init() {
+                // Sync slider and number inputs
+                const syncInputs = (sliderId, numId, stateKey, isFloat = false) => {
+                    const slider = document.getElementById(sliderId);
+                    const num = document.getElementById(numId);
+                    
+                    const update = (value) => {
+                        const val = isFloat ? parseFloat(value) : parseInt(value);
+                        this.state[stateKey] = val;
+                        slider.value = val;
+                        num.value = val;
+                        this.updatePreview();
+                    };
+                    
+                    slider.addEventListener('input', (e) => update(e.target.value));
+                    num.addEventListener('change', (e) => update(e.target.value));
+                };
+                
+                syncInputs('partials', 'partials-num', 'partials');
+                syncInputs('height', 'height-num', 'heightMm', true);
+                syncInputs('custom-ratio', 'custom-ratio-num', 'customRatio', true);
+                syncInputs('beam-count', 'beam-count-num', 'beamCount');
+                syncInputs('beam-gap', 'beam-gap-num', 'beamGapMm', true);
+                syncInputs('beam-thickness', 'beam-thickness-num', 'beamThickness', true);
+                
+                // Width (mm) - syncs with time-based controls
+                const widthSlider = document.getElementById('width');
+                const widthNum = document.getElementById('width-num');
+                const pixelsPerSecSlider = document.getElementById('pixels-per-sec');
+                const pixelsPerSecNum = document.getElementById('pixels-per-sec-num');
+                const durationSlider = document.getElementById('duration-sec');
+                const durationNum = document.getElementById('duration-sec-num');
+                
+                const updateFromWidthMm = (widthMm) => {
+                    this.state.widthMm = widthMm;
+                    widthSlider.value = widthMm;
+                    widthNum.value = widthMm;
+                    // Update duration based on width and pixels/sec
+                    // widthPx = widthMm * PX_PER_MM
+                    // duration = widthPx / pixelsPerSec
+                    const widthPx = widthMm * this.PX_PER_MM;
+                    const duration = widthPx / this.state.pixelsPerSec;
+                    this.state.durationSec = duration;
+                    durationSlider.value = duration.toFixed(2);
+                    durationNum.value = duration.toFixed(2);
+                    this.updatePreview();
+                };
+                
+                const updateFromTimeBased = () => {
+                    // widthPx = duration * pixelsPerSec
+                    // widthMm = widthPx / PX_PER_MM
+                    const widthPx = this.state.durationSec * this.state.pixelsPerSec;
+                    const widthMm = widthPx / this.PX_PER_MM;
+                    this.state.widthMm = widthMm;
+                    widthSlider.value = widthMm.toFixed(2);
+                    widthNum.value = widthMm.toFixed(2);
+                    this.updatePreview();
+                };
+                
+                widthSlider.addEventListener('input', (e) => updateFromWidthMm(parseFloat(e.target.value)));
+                widthNum.addEventListener('change', (e) => updateFromWidthMm(parseFloat(e.target.value)));
+                
+                pixelsPerSecSlider.addEventListener('input', (e) => {
+                    this.state.pixelsPerSec = parseFloat(e.target.value);
+                    pixelsPerSecNum.value = e.target.value;
+                    updateFromTimeBased();
+                });
+                pixelsPerSecNum.addEventListener('change', (e) => {
+                    this.state.pixelsPerSec = parseFloat(e.target.value);
+                    pixelsPerSecSlider.value = e.target.value;
+                    updateFromTimeBased();
+                });
+                
+                durationSlider.addEventListener('input', (e) => {
+                    this.state.durationSec = parseFloat(e.target.value);
+                    durationNum.value = e.target.value;
+                    updateFromTimeBased();
+                });
+                durationNum.addEventListener('change', (e) => {
+                    this.state.durationSec = parseFloat(e.target.value);
+                    durationSlider.value = e.target.value;
+                    updateFromTimeBased();
+                });
+                
+                // Algorithm select
+                const algorithmSelect = document.getElementById('algorithm');
+                const customRatioRow = document.getElementById('custom-ratio-row');
+                const algorithmInfo = document.getElementById('algorithm-info');
+                
+                algorithmSelect.addEventListener('change', (e) => {
+                    this.state.algorithm = e.target.value;
+                    customRatioRow.style.display = e.target.value === 'custom' ? 'flex' : 'none';
+                    algorithmInfo.textContent = this.algorithmInfo[e.target.value];
+                    this.updatePreview();
+                });
+                
+                // Direction select
+                document.getElementById('direction').addEventListener('change', (e) => {
+                    this.state.direction = e.target.value;
+                    this.updatePreview();
+                });
+                
+                // Buttons
+                document.getElementById('download-svg').addEventListener('click', () => this.downloadSVG());
+                document.getElementById('copy-svg').addEventListener('click', () => this.copySVG());
+                
+                // Initial render
+                this.updatePreview();
+            }
+        };
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            FeatheredBeamMaker.init();
+        });
+    </script>
+</body>
+</html>

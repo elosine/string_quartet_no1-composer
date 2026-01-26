@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="17.248241mm"
+   height="8.0438795mm"
+   viewBox="0 0 9.815198 4.5774114"
+   id="svg17"
+   sodipodi:docname="FeatheredBeams_004.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs17" />
+  <sodipodi:namedview
+     id="namedview17"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showguides="true"
+     inkscape:zoom="29.650741"
+     inkscape:cx="34.012641"
+     inkscape:cy="13.793922"
+     inkscape:window-width="3440"
+     inkscape:window-height="1400"
+     inkscape:window-x="-12"
+     inkscape:window-y="-12"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg17">
+    <sodipodi:guide
+       position="-1.3262003,284.7343"
+       orientation="0,-1"
+       id="guide18"
+       inkscape:locked="false" />
+    <sodipodi:guide
+       position="13.272955,283.10935"
+       orientation="0,-1"
+       id="guide19"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <!-- √2 ratio with more space between last two notes (base gap 0.55) -->
+  <!-- Note 1: X = 6.69 -->
+  <!-- Note 2: X = 9.80 -->
+  <!-- Note 3: X = 12.00 -->
+  <!-- Note 4: X = 13.56 -->
+  <!-- Note 5: X = 14.66 -->
+  <!-- Note 6: X = 15.44 -->
+  <!-- Note 7 (rightmost): X = 15.99 -->
+  <!-- Note 1 stem -->
+  <!-- Note 1 head -->
+  <!-- Note 2 stem -->
+  <!-- Note 2 head -->
+  <!-- Note 3 stem -->
+  <!-- Note 3 head -->
+  <!-- Note 4 stem -->
+  <!-- Note 4 head -->
+  <!-- Note 5 stem -->
+  <!-- Note 5 head -->
+  <!-- Note 6 stem -->
+  <!-- Note 6 head -->
+  <!-- Note 7 stem (rightmost) -->
+  <!-- Note 7 head (rightmost) -->
+  <!-- Beams -->
+  <rect
+     x="0.3817001"
+     y="0.04021034"
+     width="0.13"
+     height="4.2557001"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect1" />
+  <path
+     d="m 0.3184,4.1230104 c 0.1056,0 0.1968,0.0608 0.1968,0.1728 0,0.112 -0.0768,0.1872 -0.1504,0.232 -0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 -0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 0,-0.112 0.0768,-0.1872 0.1504,-0.232 0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z"
+     fill="currentColor"
+     id="path1"
+     style="stroke-width:0.0016" />
+  <rect
+     x="3.4916997"
+     y="0.04021034"
+     width="0.13"
+     height="4.2557001"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect2" />
+  <path
+     d="m 3.4284,4.1230104 c 0.1056,0 0.1968,0.0608 0.1968,0.1728 0,0.112 -0.0768,0.1872 -0.1504,0.232 -0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 -0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 0,-0.112 0.0768,-0.1872 0.1504,-0.232 0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z"
+     fill="currentColor"
+     id="path3"
+     style="stroke-width:0.0016" />
+  <rect
+     x="5.6916995"
+     y="0.04021034"
+     width="0.13"
+     height="4.2557001"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect4" />
+  <path
+     d="m 5.6284,4.1230104 c 0.1056,0 0.1968,0.0608 0.1968,0.1728 0,0.112 -0.0768,0.1872 -0.1504,0.232 -0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 -0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 0,-0.112 0.0768,-0.1872 0.1504,-0.232 0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z"
+     fill="currentColor"
+     id="path5"
+     style="stroke-width:0.0016" />
+  <rect
+     x="7.2516999"
+     y="0.04021034"
+     width="0.13"
+     height="4.2557001"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect6" />
+  <path
+     d="m 7.1884,4.1230104 c 0.1056,0 0.1968,0.0608 0.1968,0.1728 0,0.112 -0.0768,0.1872 -0.1504,0.232 -0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 -0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 0,-0.112 0.0768,-0.1872 0.1504,-0.232 0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z"
+     fill="currentColor"
+     id="path7"
+     style="stroke-width:0.0016" />
+  <rect
+     x="8.3517008"
+     y="0.04021034"
+     width="0.13"
+     height="4.2557001"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect8" />
+  <path
+     d="m 8.2884,4.1230104 c 0.1056,0 0.1968,0.0608 0.1968,0.1728 0,0.112 -0.0768,0.1872 -0.1504,0.232 -0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 -0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 0,-0.112 0.0768,-0.1872 0.1504,-0.232 0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z"
+     fill="currentColor"
+     id="path9"
+     style="stroke-width:0.0016" />
+  <rect
+     x="9.1317005"
+     y="0.04021034"
+     width="0.13"
+     height="4.2557001"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect10" />
+  <path
+     d="m 9.0684,4.1230104 c 0.1056,0 0.1968,0.0608 0.1968,0.1728 0,0.112 -0.0768,0.1872 -0.1504,0.232 -0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 -0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 0,-0.112 0.0768,-0.1872 0.1504,-0.232 0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z"
+     fill="currentColor"
+     id="path11"
+     style="stroke-width:0.0016" />
+  <rect
+     x="9.6817007"
+     y="0.04021034"
+     width="0.13"
+     height="4.2557001"
+     ry="0.039999999"
+     fill="currentColor"
+     id="rect12" />
+  <path
+     d="m 9.6184,4.1230104 c 0.1056,0 0.1968,0.0608 0.1968,0.1728 0,0.112 -0.0768,0.1872 -0.1504,0.232 -0.0512,0.0304 -0.1088,0.0496 -0.168,0.0496 -0.1056,0 -0.1968,-0.0608 -0.1968,-0.1728 0,-0.112 0.0768,-0.1872 0.1504,-0.232 0.0512,-0.0304 0.1088,-0.0496 0.168,-0.0496 z"
+     fill="currentColor"
+     id="path13"
+     style="stroke-width:0.0016" />
+  <polygon
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.08"
+     fill="currentColor"
+     stroke="currentColor"
+     points="7.0717,4.4853 7.0717,4.0853 16.5017,4.0853 16.5017,4.4853 "
+     id="polygon14"
+     transform="matrix(0.99029752,0,0,1.0008768,-6.5815656,-4.0488469)" />
+  <polygon
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.08"
+     fill="currentColor"
+     stroke="currentColor"
+     points="16.5017,5.792 16.5017,6.192 7.0717,4.4853 7.0717,4.0853 "
+     id="polygon15"
+     transform="matrix(0.99029868,0,0,1.0001814,-6.5815858,-4.0460218)" />
+  <polygon
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     stroke-width="0.08"
+     fill="currentColor"
+     stroke="currentColor"
+     points="7.0717,4.0853 16.5017,7.4987 16.5017,7.8987 7.0717,4.4853 "
+     id="polygon16"
+     transform="matrix(0.99027018,0,0,1.0001012,-6.5813866,-4.0456963)" />
+</svg>
