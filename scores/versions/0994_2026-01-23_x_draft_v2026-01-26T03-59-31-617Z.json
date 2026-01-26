@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "0994_2026-01-23_x_draft",
-    "created": "2026-01-26T04:00:31.611Z",
-    "modified": "2026-01-26T04:00:31.623Z",
+    "created": "2026-01-26T03:58:31.605Z",
+    "modified": "2026-01-26T03:58:31.653Z",
     "author": ""
   },
   "tempoHistory": [
@@ -49325,6 +49325,50 @@
     },
     "audioClips": {
       "clips": [
+        {
+          "id": 5,
+          "name": "Mvt2-Pt1_fluttering-Vln1-56_791.wav",
+          "trackIndex": 0,
+          "startSeconds": 33,
+          "endSeconds": 89.79165532879819,
+          "durationSeconds": 56.791655328798186,
+          "audioFilePath": "/audio_files/Mvt2-Pt1_fluttering-Vln1-56_791_1769027785365.wav",
+          "color": "#00BCD4",
+          "createdAt": 1769027785374
+        },
+        {
+          "id": 6,
+          "name": "Mvt2-Pt1_fluttering-Vln2-54_681.wav",
+          "trackIndex": 1,
+          "startSeconds": 33,
+          "endSeconds": 87.68124716553288,
+          "durationSeconds": 54.68124716553288,
+          "audioFilePath": "/audio_files/Mvt2-Pt1_fluttering-Vln2-54_681_1769027901737.wav",
+          "color": "#00BCD4",
+          "createdAt": 1769027901746
+        },
+        {
+          "id": 7,
+          "name": "Mvt2-Pt1_fluttering-Vla-53_604.wav",
+          "trackIndex": 2,
+          "startSeconds": 33,
+          "endSeconds": 86.60414965986394,
+          "durationSeconds": 53.60414965986394,
+          "audioFilePath": "/audio_files/Mvt2-Pt1_fluttering-Vla-53_604_1769027923682.wav",
+          "color": "#9C27B0",
+          "createdAt": 1769027923689
+        },
+        {
+          "id": 8,
+          "name": "Mvt2-Pt1_fluttering-Vlc-51_791.wav",
+          "trackIndex": 3,
+          "startSeconds": 33,
+          "endSeconds": 84.79165532879819,
+          "durationSeconds": 51.791655328798186,
+          "audioFilePath": "/audio_files/Mvt2-Pt1_fluttering-Vlc-51_791_1769027946292.wav",
+          "color": "#FF5722",
+          "createdAt": 1769027946298
+        },
         {
           "id": 9,
           "name": "CLB_clouds-vc-intro.wav",

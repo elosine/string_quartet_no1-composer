@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "0994_2026-01-23_x_draft",
-    "created": "2026-01-26T04:00:31.611Z",
-    "modified": "2026-01-26T04:00:31.623Z",
+    "title": "0993_2026-01-25_z_draft",
+    "created": "2026-01-26T04:23:07.690Z",
+    "modified": "2026-01-26T04:23:07.729Z",
     "author": ""
   },
   "tempoHistory": [
@@ -49326,95 +49326,205 @@
     "audioClips": {
       "clips": [
         {
-          "id": 9,
-          "name": "CLB_clouds-vc-intro.wav",
-          "trackIndex": 3,
-          "startSeconds": 84.79629752583023,
-          "endSeconds": 89.53062859158986,
-          "durationSeconds": 4.734331065759637,
-          "audioFilePath": "/audio_files/CLB_clouds-vc-intro_1769181743909.wav",
-          "color": "#00BCD4",
-          "createdAt": 1769181743912
-        },
-        {
-          "id": 10,
-          "name": "CLB_clouds-vc-intro.wav",
-          "trackIndex": 3,
-          "startSeconds": 84.79629752583023,
-          "endSeconds": 89.53062859158986,
-          "durationSeconds": 4.734331065759637,
-          "audioFilePath": "/audio_files/CLB_clouds-vc-intro_1769181749689.wav",
-          "color": "#9C27B0",
-          "createdAt": 1769181749692
-        },
-        {
-          "id": 11,
-          "name": "CLB_clouds-vla-intro.wav",
-          "trackIndex": 2,
-          "startSeconds": 87.0091764050748,
-          "endSeconds": 89.67967527128795,
-          "durationSeconds": 2.670498866213152,
-          "audioFilePath": "/audio_files/CLB_clouds-vla-intro_1769182590122.wav",
-          "color": "#FF5722",
-          "createdAt": 1769182590124
-        },
-        {
-          "id": 12,
-          "name": "CLB_clouds-vln2-intro.wav",
-          "trackIndex": 1,
-          "startSeconds": 88.5366970628911,
-          "endSeconds": 89.66193515812918,
-          "durationSeconds": 1.1252380952380951,
-          "audioFilePath": "/audio_files/CLB_clouds-vln2-intro_1769183253427.wav",
-          "color": "#3F51B5",
-          "createdAt": 1769183253430
-        },
-        {
-          "id": 13,
-          "name": "CLB_clouds-vc-main.wav",
-          "trackIndex": 3,
-          "startSeconds": 89.16529120105437,
-          "endSeconds": 115.67302362735822,
-          "durationSeconds": 26.507732426303853,
-          "audioFilePath": "/audio_files/CLB_clouds-vc-main_1769230219245.wav",
-          "color": "#00BCD4",
-          "createdAt": 1769230219251
-        },
-        {
-          "id": 14,
-          "name": "CLB_clouds-vla-main.wav",
-          "trackIndex": 2,
-          "startSeconds": 89.15,
-          "endSeconds": 109.04467120181407,
-          "durationSeconds": 19.89467120181406,
-          "audioFilePath": "/audio_files/CLB_clouds-vla-main_1769230435020.wav",
-          "color": "#9C27B0",
-          "createdAt": 1769230435030
-        },
-        {
-          "id": 15,
-          "name": "CLB_clouds-vln2-main.wav",
-          "trackIndex": 1,
-          "startSeconds": 89.15,
-          "endSeconds": 103.66632653061225,
-          "durationSeconds": 14.516326530612245,
-          "audioFilePath": "/audio_files/CLB_clouds-vln2-main_1769230657059.wav",
-          "color": "#FF5722",
-          "createdAt": 1769230657063
-        },
-        {
-          "id": 16,
-          "name": "CLB_clouds-vln1-main.wav",
+          "id": 17,
+          "name": "T1_vln1_Mvt1_00_00_new.wav",
           "trackIndex": 0,
-          "startSeconds": 89.15,
-          "endSeconds": 100.15600907029479,
-          "durationSeconds": 11.006009070294784,
-          "audioFilePath": "/audio_files/CLB_clouds-vln1-main_1769230687698.wav",
+          "startSeconds": 0,
+          "endSeconds": 31.698752834467122,
+          "durationSeconds": 31.698752834467122,
+          "audioFilePath": "/audio_files/T1_vln1_Mvt1_00_00_new_1769400255295.wav",
+          "color": "#00BCD4",
+          "createdAt": 1769400255302
+        },
+        {
+          "id": 18,
+          "name": "T2_vln2_Mvt1_00_00_new.wav",
+          "trackIndex": 1,
+          "startSeconds": 0,
+          "endSeconds": 31.698752834467122,
+          "durationSeconds": 31.698752834467122,
+          "audioFilePath": "/audio_files/T2_vln2_Mvt1_00_00_new_1769400272946.wav",
+          "color": "#9C27B0",
+          "createdAt": 1769400272953
+        },
+        {
+          "id": 19,
+          "name": "T3_vla_Mvt1_00_00_new.wav",
+          "trackIndex": 2,
+          "startSeconds": 0,
+          "endSeconds": 31.698752834467122,
+          "durationSeconds": 31.698752834467122,
+          "audioFilePath": "/audio_files/T3_vla_Mvt1_00_00_new_1769400292912.wav",
+          "color": "#FF5722",
+          "createdAt": 1769400292919
+        },
+        {
+          "id": 20,
+          "name": "T4_vc_Mvt1_00_00_new.wav",
+          "trackIndex": 3,
+          "startSeconds": 0,
+          "endSeconds": 31.698752834467122,
+          "durationSeconds": 31.698752834467122,
+          "audioFilePath": "/audio_files/T4_vc_Mvt1_00_00_new_1769400308766.wav",
           "color": "#3F51B5",
-          "createdAt": 1769230687706
+          "createdAt": 1769400308773
+        },
+        {
+          "id": 22,
+          "name": "Mvt2-Pt1_fluttering-Vln1-56_791_new.wav",
+          "trackIndex": 0,
+          "startSeconds": 33,
+          "endSeconds": 89.79165532879819,
+          "durationSeconds": 56.791655328798186,
+          "audioFilePath": "/audio_files/Mvt2-Pt1_fluttering-Vln1-56_791_new_1769400444098.wav",
+          "color": "#E91E63",
+          "createdAt": 1769400444109
+        },
+        {
+          "id": 23,
+          "name": "Mvt2-Pt1_fluttering-Vln2-54_681_new.wav",
+          "trackIndex": 1,
+          "startSeconds": 33,
+          "endSeconds": 87.68124716553288,
+          "durationSeconds": 54.68124716553288,
+          "audioFilePath": "/audio_files/Mvt2-Pt1_fluttering-Vln2-54_681_new_1769400458925.wav",
+          "color": "#CDDC39",
+          "createdAt": 1769400458934
+        },
+        {
+          "id": 24,
+          "name": "Mvt2-Pt1_fluttering-Vla-53_604_new.wav",
+          "trackIndex": 2,
+          "startSeconds": 33,
+          "endSeconds": 86.60414965986394,
+          "durationSeconds": 53.60414965986394,
+          "audioFilePath": "/audio_files/Mvt2-Pt1_fluttering-Vla-53_604_new_1769400467976.wav",
+          "color": "#795548",
+          "createdAt": 1769400467986
+        },
+        {
+          "id": 25,
+          "name": "Mvt2-Pt1_fluttering-Vlc-51_791_new.wav",
+          "trackIndex": 3,
+          "startSeconds": 33,
+          "endSeconds": 84.79165532879819,
+          "durationSeconds": 51.791655328798186,
+          "audioFilePath": "/audio_files/Mvt2-Pt1_fluttering-Vlc-51_791_new_1769400477757.wav",
+          "color": "#00BCD4",
+          "createdAt": 1769400477767
+        },
+        {
+          "id": 26,
+          "name": "CLB_clouds-vc-intro_new.wav",
+          "trackIndex": 3,
+          "startSeconds": 84.70901063109787,
+          "endSeconds": 89.4433416968575,
+          "durationSeconds": 4.734331065759637,
+          "audioFilePath": "/audio_files/CLB_clouds-vc-intro_new_1769400627970.wav",
+          "color": "#9C27B0",
+          "createdAt": 1769400627973
+        },
+        {
+          "id": 27,
+          "name": "CLB_clouds-vla-intro_new.wav",
+          "trackIndex": 2,
+          "startSeconds": 86.93082769901852,
+          "endSeconds": 89.60132656523167,
+          "durationSeconds": 2.670498866213152,
+          "audioFilePath": "/audio_files/CLB_clouds-vla-intro_new_1769400754235.wav",
+          "color": "#FF5722",
+          "createdAt": 1769400754237
+        },
+        {
+          "id": 28,
+          "name": "CLB_clouds-vln2-intro_new.wav",
+          "trackIndex": 1,
+          "startSeconds": 88.48432492605167,
+          "endSeconds": 89.60956302128976,
+          "durationSeconds": 1.1252380952380951,
+          "audioFilePath": "/audio_files/CLB_clouds-vln2-intro_new_1769400858349.wav",
+          "color": "#3F51B5",
+          "createdAt": 1769400858351
+        },
+        {
+          "id": 31,
+          "name": "CLB_clouds-vc-main_new.wav",
+          "trackIndex": 3,
+          "startSeconds": 89.1,
+          "endSeconds": 115.60773242630384,
+          "durationSeconds": 26.507732426303853,
+          "audioFilePath": "/audio_files/CLB_clouds-vc-main_new_1769401071240.wav",
+          "color": "#CDDC39",
+          "createdAt": 1769401071246
+        },
+        {
+          "id": 32,
+          "name": "CLB_clouds-vla-main_new.wav",
+          "trackIndex": 2,
+          "startSeconds": 89.1,
+          "endSeconds": 108.99467120181406,
+          "durationSeconds": 19.89467120181406,
+          "audioFilePath": "/audio_files/CLB_clouds-vla-main_new_1769401120754.wav",
+          "color": "#795548",
+          "createdAt": 1769401120764
+        },
+        {
+          "id": 33,
+          "name": "CLB_clouds-vln2-main_new.wav",
+          "trackIndex": 1,
+          "startSeconds": 89.1,
+          "endSeconds": 103.61632653061224,
+          "durationSeconds": 14.516326530612245,
+          "audioFilePath": "/audio_files/CLB_clouds-vln2-main_new_1769401165258.wav",
+          "color": "#00BCD4",
+          "createdAt": 1769401165262
+        },
+        {
+          "id": 34,
+          "name": "CLB_clouds-vln1-main_new.wav",
+          "trackIndex": 0,
+          "startSeconds": 89.1,
+          "endSeconds": 100.10600907029477,
+          "durationSeconds": 11.006009070294784,
+          "audioFilePath": "/audio_files/CLB_clouds-vln1-main_new_1769401217704.wav",
+          "color": "#9C27B0",
+          "createdAt": 1769401217711
+        },
+        {
+          "id": 35,
+          "name": "Flutter_pt2_vln1.wav",
+          "trackIndex": 0,
+          "startSeconds": 100.4,
+          "endSeconds": 124.77319727891157,
+          "durationSeconds": 24.373197278911565,
+          "audioFilePath": "/audio_files/Flutter_pt2_vln1_1769401314182.wav",
+          "color": "#FF5722",
+          "createdAt": 1769401314187
+        },
+        {
+          "id": 36,
+          "name": "Flutter_pt2_vln2.wav",
+          "trackIndex": 1,
+          "startSeconds": 104.3,
+          "endSeconds": 124.83748299319728,
+          "durationSeconds": 20.53748299319728,
+          "audioFilePath": "/audio_files/Flutter_pt2_vln2_1769401356679.wav",
+          "color": "#3F51B5",
+          "createdAt": 1769401356685
+        },
+        {
+          "id": 37,
+          "name": "Flutter_pt2_vla.wav",
+          "trackIndex": 2,
+          "startSeconds": 109.4,
+          "endSeconds": 129.93748299319728,
+          "durationSeconds": 20.53748299319728,
+          "audioFilePath": "/audio_files/Flutter_pt2_vla_1769401383901.wav",
+          "color": "#009688",
+          "createdAt": 1769401383909
         }
       ],
-      "nextId": 17
+      "nextId": 38
     },
     "gcs": {
       "gcs": [
