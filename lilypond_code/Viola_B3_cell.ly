@@ -1,0 +1,172 @@
+\version "2.24.4"
+\language "english"
+% =====================================================================
+% PAPER SECTION
+% =====================================================================
+\paper {
+  paper-width = 130\mm
+  paper-height = 500\mm
+  top-margin = 5\mm
+  bottom-margin = 10\mm
+  left-margin = 1\mm
+  right-margin = 1\mm
+  system-system-spacing =
+  #'((basic-distance . 15)
+     (minimum-distance . 8)
+     (padding . 2)
+     (stretchability . 60))
+}
+% =====================================================================
+% SCORE BLOCK
+% =====================================================================
+\score {
+  \new Staff \with {
+    \omit TimeSignature
+    \omit BarLine
+    \clef alto
+    \omit Clef
+    \omit KeySignature
+    \override StaffSymbol.thickness = #1
+    % USER CHANGE: Custom shorter staff lines using Scheme stencil
+
+\override StaffSymbol.stencil = #(lambda (grob)
+                                       (let* ((staff-space (ly:staff-symbol-staff-space grob))
+                                              (line-count (ly:grob-property grob 'line-count 5))
+                                              (thickness (ly:grob-property grob 'thickness 1))
+                                              (line-thickness (* thickness (ly:staff-symbol-line-thickness grob)))
+                                              ;Adjust Staff Line  Width Here /////////
+                                              (width 0.8)  ; staff line width in mm
+                                              ;///////////////////////////////////////
+                                              (width-staff-spaces (/ (* width 2.8346) staff-space))  ; convert mm to staff spaces
+                                              (half-height (* (/ (- line-count 1) 2) staff-space)))
+                                         (apply ly:stencil-add
+                                                (map (lambda (i)
+                                                       (ly:make-stencil
+                                                        (list 'draw-line line-thickness 0 (* i staff-space) width-staff-spaces (* i staff-space))
+                                                        (cons 0 width-staff-spaces)
+                                                        (cons (- half-height) half-height)))
+                                                     (iota line-count (- (/ (- line-count 1) 2)))))))
+  }
+  {
+    % --- INITIAL SETTINGS ---
+    \override Score.BarNumber.break-visibility = ##(#f #f #f)
+    \time 4/4
+    \override TupletBracket.bracket-visibility = ##t
+    \override TupletNumber.stencil = ##f
+    \override NoteHead.font-size = #-2
+    \override DynamicText.font-size = #-6
+    \override Stem.details.beamed-lengths = #'(5.5)
+    \override Stem.details.lengths = #'(5.5)
+    \override Accidental.font-size = #-4
+    \override Stem.transparent = ##t
+    \override Hairpin.minimum-length = #0.1
+    \once \override DynamicText.extra-spacing-width = #'(+inf.0 . -inf.0)
+    \override Hairpin.bound-details.left.padding = #0
+    \override Glissando.style = #'zigzag
+    \override Glissando.bound-details.left.padding = #0.5
+
+    % --- THE MUSIC ---
+    \once \override NoteColumn.X-offset = #-1.6
+
+    % Harmonics: diamond-shaped noteheads, clustered as chord with independent X offsets
+    % X-OFFSET ADJUSTMENT: Change the #N value for each note to move it horizontally
+    %   - Positive values move RIGHT, negative values move LEFT
+    %   - Values are in staff spaces (~1.75mm each)
+    %   - Example: #0 = no offset, #2 = 2 spaces right, #-1 = 1 space left
+   % \override NoteHead.style = #'harmonic
+    % PARTIAL NUMBER LABELS: Attached to each note using \tweak self-alignment-X
+    % Adjust extra-offset #'(X . Y) to fine-tune position relative to notehead
+    <
+    % G5 = 4th partial
+    \tweak NoteHead.extra-offset #'(0 . 0) b
+    % F6 quarter-flat = 7th partial
+%     \tweak NoteHead.extra-offset #'(2 . 0) fqf'''
+    % D5 = 3rd partial
+%     \tweak NoteHead.extra-offset #'(4 . 0) d''
+    % A6 = 9th partial
+%     \tweak NoteHead.extra-offset #'(6 . 0) a'''
+    >4  % Close chord (<) with quarter note duration (4)
+    % BOX AROUND ENTIRE CHORD: Draws a rectangle encompassing all noteheads
+    % =====================================================================
+    % RECTANGLE EDGE ADJUSTMENTS:
+    %   The path draws a rectangle with these coordinates:
+    %     - LEFT edge X:   0 in (moveto 0 ...) and (lineto 0 ...)
+    %     - RIGHT edge X:  3.7 in (lineto 3.7 ...)
+    %     - BOTTOM edge Y: 2.7 in (moveto 0 2.7) and (lineto 3.7 2.7)
+    %     - TOP edge Y:    10 in (lineto 3.7 10) and (lineto 0 10)
+    %
+    %   To move edges:
+    %     - LEFT edge more left:  decrease the 0's (e.g., -1 moves left)
+    %     - LEFT edge more right: increase the 0's (e.g., 1 moves right)
+    %     - RIGHT edge more right: increase 3.7 (e.g., 5 moves right)
+    %     - RIGHT edge more left:  decrease 3.7 (e.g., 2 moves left)
+    %     - BOTTOM edge lower: decrease 2.7 (e.g., 1 moves down)
+    %     - BOTTOM edge higher: increase 2.7 (e.g., 4 moves up)
+    %     - TOP edge higher: increase 10 (e.g., 12 moves up)
+    %     - TOP edge lower: decrease 10 (e.g., 8 moves down)
+    %
+    %   \translate #'(X . Y) shifts the ENTIRE box:
+    %     - X: positive = right, negative = left (currently -0.6)
+    %     - Y: positive = up, negative = down (currently -5)
+    % =====================================================================
+    -\tweak outside-staff-priority ##f
+    -\tweak extra-offset #'(-0.5 . 0)
+    ^\markup {
+      \with-dimensions #'(0 . 0) #'(0 . 0)
+      \translate #'(-0.6 . -5)
+      \override #'(thickness . 0.8)
+      \path #0.15
+      #'((moveto 0.6 -0.5) ;moveto A B - Bottom change B&D; Left change A&G
+         (lineto 3 -0.5) ;lineto C D - Right C&E
+         (lineto 3 5.5) ;lineto E F - Top change F&H
+         (lineto 0.6 5.5) ;lineto G H
+         (closepath))
+    }
+    % PARTIAL NUMBER LABELS: Positioned using extra-offset to appear next to each notehead
+    % G5 label (4th partial)
+   %  -\tweak outside-staff-priority ##f
+%     -\tweak extra-offset #'(1.4 . -0.2)
+%     ^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "4th" }
+    % F6 label (7th partial)
+  %   -\tweak outside-staff-priority ##f
+%     -\tweak extra-offset #'(1.4 . 2)
+%     ^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "7th" }
+    % D5 label (3rd partial)
+   %  -\tweak outside-staff-priority ##f
+%     -\tweak extra-offset #'(1.4 . -2.9)
+%     ^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "3rd" }
+    % A6 label (9th partial)
+   %  -\tweak outside-staff-priority ##f
+%     -\tweak extra-offset #'(1.4 . 1.6)
+%     ^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "9th" }
+    % TEXT 1 POSITIONING: Use _ for below staff, negative Y moves further down
+   %  -\tweak outside-staff-priority ##f
+%     -\tweak extra-offset #'(-2 . -2.75)
+%     _\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-8 "ord. c.l. batt. →" }
+%     \revert NoteHead.style
+
+  
+
+
+   
+    % TEXT 2 POSITIONING: Use _ for below staff, negative Y moves further down
+    % extra-offset #'(X . Y) - positive X = right, positive Y = up (staff spaces)
+%     -\tweak outside-staff-priority ##f
+%     -\tweak extra-offset #'(-2.25 . -2.75)
+%     _\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-8 "molto premuto (jeté)" }
+% 
+%     s4\!
+  }
+
+  \layout {
+    \context {
+      \Score
+      proportionalNotationDuration = #(ly:make-moment 1/28)
+      \override Beam.breakable = ##t
+      \override Glissando.breakable = ##t
+      \override TextSpanner.breakable = ##t
+    }
+    indent = 0
+    line-width = 37\mm
+  }
+}

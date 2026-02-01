@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="9.00mm" height="21.00mm" viewBox="0.0000 -0.0000 5.1215 11.9502">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.5691, 7.4449)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="3.1181" y2="2.0000"/>
+</g>
+<g transform="translate(0.5691, 7.4449)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="3.1181" y2="1.0000"/>
+</g>
+<g transform="translate(0.5691, 7.4449)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="3.1181" y2="-0.0000"/>
+</g>
+<g transform="translate(0.5691, 7.4449)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="3.1181" y2="-1.0000"/>
+</g>
+<g transform="translate(0.5691, 7.4449)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="3.1181" y2="-2.0000"/>
+</g>
+<g transform="translate(0.5691, 2.4449)">
+<rect x="0.8250" y="-0.1000" width="1.4656" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 3.4449)">
+<rect x="0.7419" y="-0.1000" width="1.5487" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 4.4449)">
+<rect x="0.7419" y="-0.1000" width="1.5487" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5261, 1.9449)">
+<path transform="scale(0.0025, -0.0025)" d="M0 112c0 13 8 25 20 30l34 13v148c0 13 10 24 23 24s24 -11 24 -24v-129l73 29v148c0 13 11 24 24 24s23 -11 23 -24v-129l10 4c4 2 8 2 12 2c17 0 32 -14 32 -32v-46c0 -13 -8 -24 -20 -29l-34 -14v-148l10 4c4 2 8 3 12 3c17 0 32 -14 32 -32v-46c0 -13 -8 -25 -20 -30
+l-34 -13v-148c0 -13 -10 -24 -23 -24s-24 11 -24 24v129l-73 -29v-148c0 -13 -11 -24 -24 -24s-23 11 -23 24v129l-10 -4c-4 -2 -8 -2 -12 -2c-17 0 -32 14 -32 32v46c0 13 8 24 20 29l34 14v148l-10 -4c-4 -2 -8 -3 -12 -3c-17 0 -32 14 -32 32v46zM174 89l-73 -30v-148
+l73 30v148z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Violin1_Fs.6_cell.ly:87:4:5">
+<g transform="translate(0.4691, 9.8949)">
+<path stroke-width="0.1500" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="none" d="M-0.2000 1L3.5000 1L3.5000 -9.5000L-0.2000 -9.5000z"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Violin1_Fs.6_cell.ly:76:4:5">
+<g transform="translate(1.5691, 1.9449)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+</svg>
