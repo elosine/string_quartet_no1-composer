@@ -1047,6 +1047,10 @@
                                 Secco (abrupt cutoff)
                             </label>
                         </div>
+                        <div id="crescDecrescTailRow" class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Tail (ms)</label>
+                            <input type="number" id="crescDecrescTailMs" class="curve-input" value="500" min="0" max="5000" step="50" style="width: 60px; font-size: 10px;">
+                        </div>
                         <div id="crescDecrescCurveInfo" style="width: 100%; padding: 4px; background: rgba(30,40,50,0.5); border: 1px solid #456; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #8af;">
                             Select a curve in the score first
                         </div>
@@ -9028,10 +9032,13 @@
             crescDecrescSeccoCheckbox: null,
             crescDecrescCurveInfoDisplay: null,
             crescDecrescRegenerateBtn: null,
+            crescDecrescTailMsInput: null,
+            crescDecrescTailRow: null,
             crescDecrescEvents: null,
             crescDecrescStartVol: 20,
             crescDecrescEndVol: 100,
             crescDecrescSecco: false,
+            crescDecrescTailMs: 500,
             
             // MIDI output
             midiAccess: null,
@@ -9077,6 +9084,8 @@
                 this.crescDecrescSeccoCheckbox = document.getElementById('crescDecrescSecco');
                 this.crescDecrescCurveInfoDisplay = document.getElementById('crescDecrescCurveInfo');
                 this.crescDecrescRegenerateBtn = document.getElementById('crescDecrescRegenerateBtn');
+                this.crescDecrescTailMsInput = document.getElementById('crescDecrescTailMs');
+                this.crescDecrescTailRow = document.getElementById('crescDecrescTailRow');
                 
                 if (this.modelSelect) {
                     this.modelSelect.addEventListener('change', () => this.onModelSelect());
@@ -9162,6 +9171,16 @@
                 if (this.crescDecrescSeccoCheckbox) {
                     this.crescDecrescSeccoCheckbox.addEventListener('change', () => {
                         this.crescDecrescSecco = this.crescDecrescSeccoCheckbox.checked;
+                        // Show/hide tail time row based on secco state
+                        if (this.crescDecrescTailRow) {
+                            this.crescDecrescTailRow.style.display = this.crescDecrescSecco ? 'none' : 'flex';
+                        }
+                        this.generateCrescDecrescEvents();
+                    });
+                }
+                if (this.crescDecrescTailMsInput) {
+                    this.crescDecrescTailMsInput.addEventListener('input', () => {
+                        this.crescDecrescTailMs = Math.max(0, Math.min(5000, parseInt(this.crescDecrescTailMsInput.value) || 500));
                         this.generateCrescDecrescEvents();
                     });
                 }
@@ -9811,6 +9830,10 @@
             // Algorithm: Maps curve Y values to CC7 (volume) between start and end volume
             // - Single sustained note for the entire curve duration
             // - CC7 messages sent at regular intervals following curve shape
+            // 
+            // Two scenarios:
+            // 1. Secco ON: CC7→max → Note Off → All Notes Off → CC7→100 (unity reset)
+            // 2. Secco OFF: CC7→max → tail time delay → Note Off → All Notes Off → CC7→100
             generateCrescDecrescEvents() {
                 if (!this.sourceCurve) {
                     this.crescDecrescEvents = null;
@@ -9840,11 +9863,12 @@
                 const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 100));
                 const startVol = this.crescDecrescStartVol;
                 const endVol = this.crescDecrescEndVol;
+                const tailMs = this.crescDecrescTailMs;
                 
                 const samples = curveData.samples;
                 const startTime = curveData.startTime;
                 const endTime = curveData.endTime;
-                const durationMs = (endTime - startTime) * 1000;
+                const curveDurationMs = (endTime - startTime) * 1000;
                 
                 // Normalize curve samples to 0-1 range
                 const minY = Math.min(...samples);
@@ -9861,7 +9885,7 @@
                     data: [0xB0, 0x00, 89] // CC0 = 89 for Senza Vibrato
                 });
                 
-                // Set initial volume
+                // Set initial CC7 volume
                 events.push({
                     timeMs: 1,
                     relativeTimeMs: 1,
@@ -9903,11 +9927,11 @@
                 // Generate CC7 volume messages following curve shape
                 // Send CC7 every 20ms for smooth volume changes
                 const ccInterval = 20; // ms
-                const numCCMessages = Math.floor(durationMs / ccInterval);
+                const numCCMessages = Math.floor(curveDurationMs / ccInterval);
                 
                 for (let i = 0; i <= numCCMessages; i++) {
                     const t = i / numCCMessages; // 0 to 1
-                    const timeMs = t * durationMs;
+                    const timeMs = t * curveDurationMs;
                     
                     // Sample the curve at this point
                     const sampleIndex = Math.min(Math.floor(t * (samples.length - 1)), samples.length - 1);
@@ -9924,7 +9948,7 @@
                         timeMs: timeMs + 3,
                         relativeTimeMs: timeMs + 3,
                         type: 'cc',
-                        data: [0xB0, 0x07, clampedVol]
+                        data: [0xB0, 0x07, clampedVol] // CC7 = volume
                     });
                     
                     // For glissando, also update pitch bend
@@ -9947,38 +9971,57 @@
                     }
                 }
                 
-                // Note off at end - use velocity 127 for secco (signals abrupt release)
-                const noteOffVelocity = this.crescDecrescSecco ? 127 : 0;
+                // Calculate timing for end sequence
+                // Scenario 1 (Secco ON): Immediate cutoff after curve ends
+                // Scenario 2 (Secco OFF): Wait for tail time after curve ends
+                
+                let noteOffTime, allNotesOffTime, volumeResetTime, totalDurationMs;
+                
+                if (this.crescDecrescSecco) {
+                    // SECCO: Immediate cutoff
+                    // Timeline: curve ends → +5ms Note Off → +10ms All Notes Off → +50ms CC7=100
+                    noteOffTime = curveDurationMs + 5;
+                    allNotesOffTime = curveDurationMs + 15;
+                    volumeResetTime = curveDurationMs + 65;
+                    totalDurationMs = curveDurationMs + 100; // Extra buffer to ensure all messages sent
+                } else {
+                    // NON-SECCO: Let note ring for tail time
+                    // Timeline: curve ends → +tailMs Note Off → +10ms All Notes Off → +50ms CC7=100
+                    noteOffTime = curveDurationMs + tailMs;
+                    allNotesOffTime = noteOffTime + 10;
+                    volumeResetTime = allNotesOffTime + 50;
+                    totalDurationMs = volumeResetTime + 50; // Extra buffer to ensure all messages sent
+                }
+                
+                // Note off
                 events.push({
-                    timeMs: durationMs + 10,
-                    relativeTimeMs: durationMs + 10,
+                    timeMs: noteOffTime,
+                    relativeTimeMs: noteOffTime,
                     type: 'noteOff',
-                    data: [0x80, startPitch, noteOffVelocity]
+                    data: [0x80, startPitch, 0]
                 });
                 
-                // Secco: Add CC120 (All Sound Off) for immediate cutoff without release tail
-                // This simulates the effect of a string player muting the strings
-                if (this.crescDecrescSecco) {
-                    events.push({
-                        timeMs: durationMs + 11,
-                        relativeTimeMs: durationMs + 11,
-                        type: 'cc',
-                        data: [0xB0, 120, 0] // CC120 = All Sound Off
-                    });
-                    // Also send CC123 (All Notes Off) as a safety
-                    events.push({
-                        timeMs: durationMs + 12,
-                        relativeTimeMs: durationMs + 12,
-                        type: 'cc',
-                        data: [0xB0, 123, 0] // CC123 = All Notes Off
-                    });
-                }
+                // All Notes Off (CC123) - ensures sound stops
+                events.push({
+                    timeMs: allNotesOffTime,
+                    relativeTimeMs: allNotesOffTime,
+                    type: 'cc',
+                    data: [0xB0, 123, 0] // CC123 = All Notes Off
+                });
+                
+                // Reset CC7 to unity (100) so next notes play at normal volume
+                events.push({
+                    timeMs: volumeResetTime,
+                    relativeTimeMs: volumeResetTime,
+                    type: 'cc',
+                    data: [0xB0, 0x07, 100] // CC7 = volume back to unity
+                });
                 
                 // Reset pitch bend if used
                 if (useGlissando || startQuarterTone !== 0) {
                     events.push({
-                        timeMs: durationMs + (this.crescDecrescSecco ? 13 : 11),
-                        relativeTimeMs: durationMs + (this.crescDecrescSecco ? 13 : 11),
+                        timeMs: volumeResetTime + 5,
+                        relativeTimeMs: volumeResetTime + 5,
                         type: 'pitchBend',
                         data: [0xE0, 0x00, 0x40] // Reset to center
                     });
@@ -9989,11 +10032,13 @@
                 
                 this.crescDecrescEvents = {
                     events: events,
-                    durationMs: durationMs,
+                    durationMs: totalDurationMs, // Total duration including cleanup messages
+                    curveDurationMs: curveDurationMs, // Just the curve portion
                     startSeconds: startTime,
-                    endSeconds: endTime,
+                    endSeconds: startTime + (totalDurationMs / 1000), // Extended end time
                     startVol: startVol,
-                    endVol: endVol
+                    endVol: endVol,
+                    tailMs: this.crescDecrescSecco ? 0 : tailMs
                 };
                 
                 // Update info display
@@ -10022,12 +10067,13 @@
                 const volDirection = this.crescDecrescStartVol < this.crescDecrescEndVol ? 'Cresc ↗' : 
                                      this.crescDecrescStartVol > this.crescDecrescEndVol ? 'Decresc ↘' : 'Flat →';
                 
-                const seccoLabel = this.crescDecrescSecco ? ' | <span style="color: #f88;">Secco</span>' : '';
+                const seccoLabel = this.crescDecrescSecco ? ' | <span style="color: #f88;">Secco</span>' : ` | Tail: ${this.crescDecrescTailMs}ms`;
+                const curveDur = this.crescDecrescEvents.curveDurationMs || this.crescDecrescEvents.durationMs;
                 this.infoDisplay.innerHTML = `
                     <div style="color: #fad;"><strong>Crescendo/Decrescendo</strong></div>
                     <div>${pitchDisplay} | Vel: ${velocity}</div>
                     <div>Vol: ${this.crescDecrescStartVol}→${this.crescDecrescEndVol} | ${volDirection}${seccoLabel}</div>
-                    <div>Duration: ${this.crescDecrescEvents.durationMs.toFixed(0)}ms | Art: Senza Vibrato</div>
+                    <div>Curve: ${curveDur.toFixed(0)}ms | Total: ${this.crescDecrescEvents.durationMs.toFixed(0)}ms</div>
                 `;
             },
             
@@ -17283,9 +17329,9 @@
                     if (e.key === 'Escape') this.hideMenu();
                 });
                 
-                // Add Shift+Ctrl+Alt+Click handler to score elements
+                // Add Ctrl+Win+Alt+Click handler to score elements
                 const handler = (e, section) => {
-                    if (e.shiftKey && e.ctrlKey && e.altKey) {
+                    if (e.metaKey && e.ctrlKey && e.altKey) {
                         e.preventDefault();
                         e.stopPropagation();
                         this.showMenuAtPoint(e.clientX, e.clientY, section);
@@ -17299,7 +17345,7 @@
                     this.scoreBottomEl.addEventListener('click', (e) => handler(e, 'bottom'), true);
                 }
                 
-                console.debug('ObjectSelector initialized - use Shift+Ctrl+Alt+Click to select overlapping objects');
+                console.debug('ObjectSelector initialized - use Ctrl+Win+Alt+Click to select overlapping objects');
             },
             
             // Determine which track (1-4) a Y coordinate falls into
