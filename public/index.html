@@ -967,14 +967,36 @@
                         <option value="">-- Select Model --</option>
                         <option value="bartokPizz">Bartok Pizzicato</option>
                         <option value="accelDecel">Accel/Decel (Curve)</option>
+                        <option value="crescDecresc">Crescendo/Decrescendo</option>
                     </select>
                 </div>
                 
                 <div id="midiModelParams" style="display: none;">
-                    <div class="curve-input-row" style="margin-top: 6px;">
+                    <!-- Pitch Mode selector - shown for curve-based models -->
+                    <div id="pitchModeRow" class="curve-input-row" style="margin-top: 6px; display: none;">
+                        <label style="font-size: 10px;">Pitch Mode</label>
+                        <select id="accelDecelPitchMode" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="single">Single Note</option>
+                            <option value="glissando">Glissando</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Single pitch input - shown when pitch mode is 'single' -->
+                    <div id="singlePitchRow" class="curve-input-row" style="margin-top: 6px;">
                         <label>Pitch</label>
                         <input type="text" id="midiModelPitch" class="curve-input" value="C4" style="width: 50px;" placeholder="C4" title="e.g. C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat)">
                     </div>
+                    
+                    <!-- Glissando pitch inputs - shown when pitch mode is 'glissando' -->
+                    <div id="glissandoParams" style="display: none;">
+                        <div class="curve-input-row" style="margin-top: 4px;">
+                            <label style="font-size: 10px;">Start Pitch</label>
+                            <input type="text" id="glissandoStartPitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="+ = quarter sharp, d = quarter flat (e.g. C+4, Cd4)">
+                            <label style="font-size: 10px; margin-left: 8px;">End Pitch</label>
+                            <input type="text" id="glissandoEndPitch" class="curve-input" value="C5" style="width: 50px; font-size: 10px;" placeholder="C5" title="+ = quarter sharp, d = quarter flat (e.g. C+5, Cd5)">
+                        </div>
+                    </div>
+                    
                     <div class="curve-input-row">
                         <label>Velocity</label>
                         <input type="number" id="midiModelVelocity" class="curve-input" value="127" min="1" max="127" step="1" style="width: 50px;">
@@ -990,21 +1012,6 @@
                             </select>
                         </div>
                         <div class="curve-input-row" style="margin-top: 6px;">
-                            <label style="font-size: 10px;">Pitch Mode</label>
-                            <select id="accelDecelPitchMode" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
-                                <option value="single">Single Note</option>
-                                <option value="glissando">Glissando</option>
-                            </select>
-                        </div>
-                        <div id="glissandoParams" style="display: none;">
-                            <div class="curve-input-row" style="margin-top: 4px;">
-                                <label style="font-size: 10px;">Start Pitch</label>
-                                <input type="text" id="glissandoStartPitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="+ = quarter sharp, d = quarter flat (e.g. C+4, Cd4)">
-                                <label style="font-size: 10px; margin-left: 8px;">End Pitch</label>
-                                <input type="text" id="glissandoEndPitch" class="curve-input" value="C5" style="width: 50px; font-size: 10px;" placeholder="C5" title="+ = quarter sharp, d = quarter flat (e.g. C+5, Cd5)">
-                            </div>
-                        </div>
-                        <div class="curve-input-row" style="margin-top: 6px;">
                             <label style="font-size: 10px;">Density</label>
                             <input type="range" id="accelDecelDensity" min="0" max="100" value="50" style="flex: 1;">
                             <input type="number" id="accelDecelDensityNum" min="0" max="100" value="50" style="width: 40px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; text-align: center;">
@@ -1018,6 +1025,32 @@
                             Select a curve in the score first
                         </div>
                         <button id="accelDecelRegenerateBtn" class="curve-draw-btn" style="margin-top: 6px; background: #3a5a6a; border-color: #4a6a7a;">↻ Regenerate</button>
+                    </div>
+                    
+                    <!-- Crescendo/Decrescendo specific controls -->
+                    <div id="crescDecrescParams" style="display: none;">
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Articulation</label>
+                            <select id="crescDecrescArticulation" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                                <option value="senzaVibrato" selected>Senza Vibrato (CC0: 89)</option>
+                            </select>
+                        </div>
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Start Vol</label>
+                            <input type="number" id="crescDecrescStartVol" class="curve-input" value="20" min="0" max="127" step="1" style="width: 45px; font-size: 10px;">
+                            <label style="font-size: 10px; margin-left: 8px;">End Vol</label>
+                            <input type="number" id="crescDecrescEndVol" class="curve-input" value="100" min="0" max="127" step="1" style="width: 45px; font-size: 10px;">
+                        </div>
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                                <input type="checkbox" id="crescDecrescSecco" style="margin: 0;">
+                                Secco (abrupt cutoff)
+                            </label>
+                        </div>
+                        <div id="crescDecrescCurveInfo" style="width: 100%; padding: 4px; background: rgba(30,40,50,0.5); border: 1px solid #456; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #8af;">
+                            Select a curve in the score first
+                        </div>
+                        <button id="crescDecrescRegenerateBtn" class="curve-draw-btn" style="margin-top: 6px; background: #3a5a6a; border-color: #4a6a7a;">↻ Regenerate</button>
                     </div>
                     
                     <div id="midiModelInfo" style="width: 100%; padding: 4px; background: rgba(30,30,40,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #888;">
@@ -6671,12 +6704,6 @@
                     const startPage = Math.floor(startActualSec / secondsPerPage);
                     const endPage = Math.floor(endActualSec / secondsPerPage);
                     
-                    // Create snippet object with elements reference
-                    const snippet = {
-                        ...snippetData,
-                        elements: {}
-                    };
-                    
                     // Render on start page
                     const isTopPage = startPage % 2 === 0;
                     const group = isTopPage ? this.midiDisplayLayers.top[trackIndex] : this.midiDisplayLayers.bottom[trackIndex];
@@ -6687,6 +6714,17 @@
                     const pageEndSec = (startPage + 1) * secondsPerPage;
                     const snippetEndOnPage = Math.min(endActualSec, pageEndSec);
                     const x2 = (snippetEndOnPage - pageStartSec) / secondsPerPage * scoreWidth;
+                    
+                    // Create snippet object with elements reference and position data for ObjectSelector
+                    const snippet = {
+                        ...snippetData,
+                        elements: {},
+                        x1: x1,
+                        x2: x2,
+                        section: isTopPage ? 'top' : 'bottom',
+                        page: startPage,
+                        trackDims: { x: 0, y: trackY, width: scoreWidth, height: trackHeight }
+                    };
                     
                     // Create snippet group
                     const snippetGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -7404,12 +7442,6 @@
                     const startPage = Math.floor(startActualSec / secondsPerPage);
                     const endPage = Math.floor(endActualSec / secondsPerPage);
                     
-                    // Create clip object with elements reference
-                    const clip = {
-                        ...clipData,
-                        elements: {}
-                    };
-                    
                     // Render on start page
                     const isTopPage = startPage % 2 === 0;
                     const group = isTopPage ? this.audioDisplayLayers.top[trackIndex] : this.audioDisplayLayers.bottom[trackIndex];
@@ -7420,6 +7452,17 @@
                     const pageEndSec = (startPage + 1) * secondsPerPage;
                     const clipEndOnPage = Math.min(endActualSec, pageEndSec);
                     const x2 = (clipEndOnPage - pageStartSec) / secondsPerPage * scoreWidth;
+                    
+                    // Create clip object with elements reference and position data for ObjectSelector
+                    const clip = {
+                        ...clipData,
+                        elements: {},
+                        x1: x1,
+                        x2: x2,
+                        section: isTopPage ? 'top' : 'bottom',
+                        page: startPage,
+                        trackDims: { x: 0, y: trackY, width: scoreWidth, height: trackHeight }
+                    };
                     
                     // Create clip group
                     const clipGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -8918,6 +8961,12 @@
                     defaultVelocity: 100,       // Default velocity
                     noteDurationMs: 50,         // Duration of each re-articulation note
                     description: 'Acceleration/deceleration based on curve shape'
+                },
+                crescDecresc: {
+                    name: 'Crescendo/Decrescendo',
+                    type: 'curve',              // Curve-based volume control
+                    defaultVelocity: 100,       // Initial note velocity
+                    description: 'Crescendo/decrescendo using CC7 volume based on curve shape'
                 }
             },
             
@@ -8955,7 +9004,8 @@
             // Articulation definitions (CC0 values)
             articulations: {
                 '': null,                    // None - no CC0 message
-                'spiccato': { cc0: 91, name: 'Spiccato' }
+                'spiccato': { cc0: 91, name: 'Spiccato' },
+                'senzaVibrato': { cc0: 89, name: 'Senza Vibrato' }
             },
             selectedArticulation: '',
             
@@ -8964,9 +9014,24 @@
             glissandoStartPitch: null,
             glissandoEndPitch: null,
             pitchModeSelect: null,
+            pitchModeRow: null,
+            singlePitchRow: null,
             glissandoParamsDiv: null,
             glissandoStartInput: null,
             glissandoEndInput: null,
+            
+            // Crescendo/Decrescendo specific state
+            crescDecrescParamsDiv: null,
+            crescDecrescArticulationSelect: null,
+            crescDecrescStartVolInput: null,
+            crescDecrescEndVolInput: null,
+            crescDecrescSeccoCheckbox: null,
+            crescDecrescCurveInfoDisplay: null,
+            crescDecrescRegenerateBtn: null,
+            crescDecrescEvents: null,
+            crescDecrescStartVol: 20,
+            crescDecrescEndVol: 100,
+            crescDecrescSecco: false,
             
             // MIDI output
             midiAccess: null,
@@ -8998,9 +9063,20 @@
                 
                 // Pitch mode UI elements
                 this.pitchModeSelect = document.getElementById('accelDecelPitchMode');
+                this.pitchModeRow = document.getElementById('pitchModeRow');
+                this.singlePitchRow = document.getElementById('singlePitchRow');
                 this.glissandoParamsDiv = document.getElementById('glissandoParams');
                 this.glissandoStartInput = document.getElementById('glissandoStartPitch');
                 this.glissandoEndInput = document.getElementById('glissandoEndPitch');
+                
+                // Crescendo/Decrescendo UI elements
+                this.crescDecrescParamsDiv = document.getElementById('crescDecrescParams');
+                this.crescDecrescArticulationSelect = document.getElementById('crescDecrescArticulation');
+                this.crescDecrescStartVolInput = document.getElementById('crescDecrescStartVol');
+                this.crescDecrescEndVolInput = document.getElementById('crescDecrescEndVol');
+                this.crescDecrescSeccoCheckbox = document.getElementById('crescDecrescSecco');
+                this.crescDecrescCurveInfoDisplay = document.getElementById('crescDecrescCurveInfo');
+                this.crescDecrescRegenerateBtn = document.getElementById('crescDecrescRegenerateBtn');
                 
                 if (this.modelSelect) {
                     this.modelSelect.addEventListener('change', () => this.onModelSelect());
@@ -9059,17 +9135,38 @@
                 if (this.pitchModeSelect) {
                     this.pitchModeSelect.addEventListener('change', () => {
                         this.pitchMode = this.pitchModeSelect.value;
-                        if (this.glissandoParamsDiv) {
-                            this.glissandoParamsDiv.style.display = this.pitchMode === 'glissando' ? 'block' : 'none';
-                        }
-                        this.generateAccelDecelEvents();
+                        this.updatePitchModeUI();
+                        this.regenerateCurrentModel();
                     });
                 }
                 if (this.glissandoStartInput) {
-                    this.glissandoStartInput.addEventListener('input', () => this.generateAccelDecelEvents());
+                    this.glissandoStartInput.addEventListener('input', () => this.regenerateCurrentModel());
                 }
                 if (this.glissandoEndInput) {
-                    this.glissandoEndInput.addEventListener('input', () => this.generateAccelDecelEvents());
+                    this.glissandoEndInput.addEventListener('input', () => this.regenerateCurrentModel());
+                }
+                
+                // Crescendo/Decrescendo event listeners
+                if (this.crescDecrescStartVolInput) {
+                    this.crescDecrescStartVolInput.addEventListener('input', () => {
+                        this.crescDecrescStartVol = Math.max(0, Math.min(127, parseInt(this.crescDecrescStartVolInput.value) || 0));
+                        this.generateCrescDecrescEvents();
+                    });
+                }
+                if (this.crescDecrescEndVolInput) {
+                    this.crescDecrescEndVolInput.addEventListener('input', () => {
+                        this.crescDecrescEndVol = Math.max(0, Math.min(127, parseInt(this.crescDecrescEndVolInput.value) || 127));
+                        this.generateCrescDecrescEvents();
+                    });
+                }
+                if (this.crescDecrescSeccoCheckbox) {
+                    this.crescDecrescSeccoCheckbox.addEventListener('change', () => {
+                        this.crescDecrescSecco = this.crescDecrescSeccoCheckbox.checked;
+                        this.generateCrescDecrescEvents();
+                    });
+                }
+                if (this.crescDecrescRegenerateBtn) {
+                    this.crescDecrescRegenerateBtn.addEventListener('click', () => this.generateCrescDecrescEvents());
                 }
                 
                 // Initialize MIDI access
@@ -9133,9 +9230,13 @@
                 const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 127));
                 const model = this.selectedModel;
                 
-                // Handle Accel/Decel model differently
+                // Handle curve-based models differently
                 if (this.selectedModelKey === 'accelDecel') {
                     this.previewPlayAccelDecel();
+                    return;
+                }
+                if (this.selectedModelKey === 'crescDecresc') {
+                    this.previewPlayCrescDecresc();
                     return;
                 }
                 
@@ -9189,6 +9290,31 @@
                 }
             },
             
+            // Preview play for Crescendo/Decrescendo - plays all events omni
+            previewPlayCrescDecresc() {
+                if (!this.crescDecrescEvents || !this.crescDecrescEvents.events) {
+                    alert('No crescendo/decrescendo pattern generated. Select a curve first.');
+                    return;
+                }
+                
+                const events = this.crescDecrescEvents.events;
+                const output = this.selectedOutput;
+                
+                console.debug(`Preview Cresc/Decresc: ${events.length} events over ${this.crescDecrescEvents.durationMs.toFixed(0)}ms`);
+                
+                // Schedule all events with setTimeout, sending omni (all 16 channels)
+                for (const event of events) {
+                    setTimeout(() => {
+                        const statusByte = event.data[0] & 0xF0; // Get message type without channel
+                        for (let ch = 0; ch < 16; ch++) {
+                            const data = [...event.data];
+                            data[0] = statusByte | ch; // Set channel
+                            output.send(data);
+                        }
+                    }, event.timeMs);
+                }
+            },
+            
             onModelSelect() {
                 const modelKey = this.modelSelect.value;
                 if (!modelKey) {
@@ -9209,20 +9335,33 @@
                 
                 // Show/hide model-specific UI elements
                 const isAccelDecel = modelKey === 'accelDecel';
+                const isCrescDecresc = modelKey === 'crescDecresc';
                 const isBartokPizz = modelKey === 'bartokPizz';
+                const isCurveBased = isAccelDecel || isCrescDecresc;
+                
+                // Show pitch mode row for curve-based models
+                if (this.pitchModeRow) {
+                    this.pitchModeRow.style.display = isCurveBased ? 'flex' : 'none';
+                }
+                
+                // Update pitch mode UI (single vs glissando)
+                this.updatePitchModeUI();
                 
                 if (this.accelDecelParamsDiv) {
                     this.accelDecelParamsDiv.style.display = isAccelDecel ? 'block' : 'none';
+                }
+                if (this.crescDecrescParamsDiv) {
+                    this.crescDecrescParamsDiv.style.display = isCrescDecresc ? 'block' : 'none';
                 }
                 if (this.attachGCBtn) {
                     this.attachGCBtn.style.display = isBartokPizz ? 'block' : 'none';
                 }
                 if (this.attachCurveBtn) {
-                    this.attachCurveBtn.style.display = isAccelDecel ? 'block' : 'none';
+                    this.attachCurveBtn.style.display = isCurveBased ? 'block' : 'none';
                 }
                 
-                // For Accel/Decel, check if a curve is selected
-                if (isAccelDecel) {
+                // For curve-based models, check if a curve is selected
+                if (isCurveBased) {
                     this.checkForSelectedCurve();
                 }
                 
@@ -9237,21 +9376,50 @@
                     const duration = (curve.endSeconds - curve.startSeconds).toFixed(2);
                     const direction = this.getCurveDirection(curve);
                     
+                    const curveInfoHtml = `
+                        <div style="color: #8f8;">✓ Curve: ${curve.name}</div>
+                        <div>Duration: ${duration}s | Direction: ${direction}</div>
+                        <div>Track: G${curve.gTrack}</div>
+                    `;
+                    
                     if (this.curveInfoDisplay) {
-                        this.curveInfoDisplay.innerHTML = `
-                            <div style="color: #8f8;">✓ Curve: ${curve.name}</div>
-                            <div>Duration: ${duration}s | Direction: ${direction}</div>
-                            <div>Track: G${curve.gTrack}</div>
-                        `;
+                        this.curveInfoDisplay.innerHTML = curveInfoHtml;
+                    }
+                    if (this.crescDecrescCurveInfoDisplay) {
+                        this.crescDecrescCurveInfoDisplay.innerHTML = curveInfoHtml;
                     }
                     
-                    // Auto-generate events
-                    this.generateAccelDecelEvents();
+                    // Auto-generate events based on current model
+                    this.regenerateCurrentModel();
                 } else {
                     this.sourceCurve = null;
+                    const noCurveHtml = `<div style="color: #fa8;">Select a curve in the score first</div>`;
                     if (this.curveInfoDisplay) {
-                        this.curveInfoDisplay.innerHTML = `<div style="color: #fa8;">Select a curve in the score first</div>`;
+                        this.curveInfoDisplay.innerHTML = noCurveHtml;
                     }
+                    if (this.crescDecrescCurveInfoDisplay) {
+                        this.crescDecrescCurveInfoDisplay.innerHTML = noCurveHtml;
+                    }
+                }
+            },
+            
+            // Update pitch mode UI - show single pitch or glissando inputs
+            updatePitchModeUI() {
+                const isGlissando = this.pitchMode === 'glissando';
+                if (this.singlePitchRow) {
+                    this.singlePitchRow.style.display = isGlissando ? 'none' : 'flex';
+                }
+                if (this.glissandoParamsDiv) {
+                    this.glissandoParamsDiv.style.display = isGlissando ? 'block' : 'none';
+                }
+            },
+            
+            // Regenerate events for the current model
+            regenerateCurrentModel() {
+                if (this.selectedModelKey === 'accelDecel') {
+                    this.generateAccelDecelEvents();
+                } else if (this.selectedModelKey === 'crescDecresc') {
+                    this.generateCrescDecrescEvents();
                 }
             },
             
@@ -9639,6 +9807,230 @@
                 `;
             },
             
+            // Generate crescendo/decrescendo events based on curve
+            // Algorithm: Maps curve Y values to CC7 (volume) between start and end volume
+            // - Single sustained note for the entire curve duration
+            // - CC7 messages sent at regular intervals following curve shape
+            generateCrescDecrescEvents() {
+                if (!this.sourceCurve) {
+                    this.crescDecrescEvents = null;
+                    return;
+                }
+                
+                const curve = this.sourceCurve;
+                const curveData = curve.curveData;
+                if (!curveData || !curveData.samples || curveData.samples.length < 2) {
+                    this.crescDecrescEvents = null;
+                    return;
+                }
+                
+                // Handle pitch based on mode (single note vs glissando)
+                let startPitchData, endPitchData;
+                if (this.pitchMode === 'glissando') {
+                    startPitchData = this.noteNameToPitch(this.glissandoStartInput?.value || 'C4', true);
+                    endPitchData = this.noteNameToPitch(this.glissandoEndInput?.value || 'C5', true);
+                    if (!startPitchData || !endPitchData) return;
+                } else {
+                    const pitchData = this.noteNameToPitch(this.pitchInput?.value || 'C4', true);
+                    if (!pitchData) return;
+                    startPitchData = pitchData;
+                    endPitchData = pitchData;
+                }
+                
+                const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 100));
+                const startVol = this.crescDecrescStartVol;
+                const endVol = this.crescDecrescEndVol;
+                
+                const samples = curveData.samples;
+                const startTime = curveData.startTime;
+                const endTime = curveData.endTime;
+                const durationMs = (endTime - startTime) * 1000;
+                
+                // Normalize curve samples to 0-1 range
+                const minY = Math.min(...samples);
+                const maxY = Math.max(...samples);
+                const yRange = maxY - minY || 1;
+                
+                const events = [];
+                
+                // Send articulation CC0 at start (Senza Vibrato = CC0: 89)
+                events.push({
+                    timeMs: 0,
+                    relativeTimeMs: 0,
+                    type: 'cc',
+                    data: [0xB0, 0x00, 89] // CC0 = 89 for Senza Vibrato
+                });
+                
+                // Set initial volume
+                events.push({
+                    timeMs: 1,
+                    relativeTimeMs: 1,
+                    type: 'cc',
+                    data: [0xB0, 0x07, startVol] // CC7 = volume
+                });
+                
+                // For glissando, calculate pitch range
+                const startPitch = startPitchData.pitch;
+                const endPitch = endPitchData.pitch;
+                const startQuarterTone = startPitchData.quarterTone || 0;
+                const endQuarterTone = endPitchData.quarterTone || 0;
+                const pitchRange = endPitch - startPitch;
+                const quarterToneRange = endQuarterTone - startQuarterTone;
+                const totalPitchRange = pitchRange + quarterToneRange;
+                const useGlissando = this.pitchMode === 'glissando' && Math.abs(totalPitchRange) > 0;
+                
+                // Note on at start
+                events.push({
+                    timeMs: 2,
+                    relativeTimeMs: 2,
+                    type: 'noteOn',
+                    data: [0x90, startPitch, velocity]
+                });
+                
+                // If using quarter tones for start pitch, send initial pitch bend
+                if (startQuarterTone !== 0) {
+                    const bendValue = Math.round(8192 + (startQuarterTone * 4096)); // 4096 = 1 semitone
+                    const lsb = bendValue & 0x7F;
+                    const msb = (bendValue >> 7) & 0x7F;
+                    events.push({
+                        timeMs: 2,
+                        relativeTimeMs: 2,
+                        type: 'pitchBend',
+                        data: [0xE0, lsb, msb]
+                    });
+                }
+                
+                // Generate CC7 volume messages following curve shape
+                // Send CC7 every 20ms for smooth volume changes
+                const ccInterval = 20; // ms
+                const numCCMessages = Math.floor(durationMs / ccInterval);
+                
+                for (let i = 0; i <= numCCMessages; i++) {
+                    const t = i / numCCMessages; // 0 to 1
+                    const timeMs = t * durationMs;
+                    
+                    // Sample the curve at this point
+                    const sampleIndex = Math.min(Math.floor(t * (samples.length - 1)), samples.length - 1);
+                    const curveY = samples[sampleIndex];
+                    
+                    // Normalize curve value to 0-1
+                    const normalizedY = (curveY - minY) / yRange;
+                    
+                    // Map to volume range
+                    const volume = Math.round(startVol + normalizedY * (endVol - startVol));
+                    const clampedVol = Math.max(0, Math.min(127, volume));
+                    
+                    events.push({
+                        timeMs: timeMs + 3,
+                        relativeTimeMs: timeMs + 3,
+                        type: 'cc',
+                        data: [0xB0, 0x07, clampedVol]
+                    });
+                    
+                    // For glissando, also update pitch bend
+                    if (useGlissando) {
+                        // Calculate target pitch at this point
+                        const targetPitchOffset = t * totalPitchRange;
+                        // Pitch bend range is typically ±2 semitones = ±8192
+                        // For larger ranges, we need to handle note changes
+                        const bendSemitones = targetPitchOffset % 2; // Keep within ±2 range
+                        const bendValue = Math.round(8192 + (bendSemitones * 4096));
+                        const lsb = bendValue & 0x7F;
+                        const msb = (bendValue >> 7) & 0x7F;
+                        
+                        events.push({
+                            timeMs: timeMs + 3,
+                            relativeTimeMs: timeMs + 3,
+                            type: 'pitchBend',
+                            data: [0xE0, lsb, msb]
+                        });
+                    }
+                }
+                
+                // Note off at end - use velocity 127 for secco (signals abrupt release)
+                const noteOffVelocity = this.crescDecrescSecco ? 127 : 0;
+                events.push({
+                    timeMs: durationMs + 10,
+                    relativeTimeMs: durationMs + 10,
+                    type: 'noteOff',
+                    data: [0x80, startPitch, noteOffVelocity]
+                });
+                
+                // Secco: Add CC120 (All Sound Off) for immediate cutoff without release tail
+                // This simulates the effect of a string player muting the strings
+                if (this.crescDecrescSecco) {
+                    events.push({
+                        timeMs: durationMs + 11,
+                        relativeTimeMs: durationMs + 11,
+                        type: 'cc',
+                        data: [0xB0, 120, 0] // CC120 = All Sound Off
+                    });
+                    // Also send CC123 (All Notes Off) as a safety
+                    events.push({
+                        timeMs: durationMs + 12,
+                        relativeTimeMs: durationMs + 12,
+                        type: 'cc',
+                        data: [0xB0, 123, 0] // CC123 = All Notes Off
+                    });
+                }
+                
+                // Reset pitch bend if used
+                if (useGlissando || startQuarterTone !== 0) {
+                    events.push({
+                        timeMs: durationMs + (this.crescDecrescSecco ? 13 : 11),
+                        relativeTimeMs: durationMs + (this.crescDecrescSecco ? 13 : 11),
+                        type: 'pitchBend',
+                        data: [0xE0, 0x00, 0x40] // Reset to center
+                    });
+                }
+                
+                // Sort by time
+                events.sort((a, b) => a.timeMs - b.timeMs);
+                
+                this.crescDecrescEvents = {
+                    events: events,
+                    durationMs: durationMs,
+                    startSeconds: startTime,
+                    endSeconds: endTime,
+                    startVol: startVol,
+                    endVol: endVol
+                };
+                
+                // Update info display
+                this.updateCrescDecrescInfo();
+            },
+            
+            updateCrescDecrescInfo() {
+                if (!this.infoDisplay || !this.crescDecrescEvents) return;
+                
+                const velocity = parseInt(this.velocityInput?.value) || 100;
+                const direction = this.sourceCurve ? this.getCurveDirection(this.sourceCurve) : 'N/A';
+                
+                // Build pitch display based on mode
+                let pitchDisplay;
+                if (this.pitchMode === 'glissando') {
+                    const startData = this.noteNameToPitch(this.glissandoStartInput?.value || 'C4', true);
+                    const endData = this.noteNameToPitch(this.glissandoEndInput?.value || 'C5', true);
+                    const startDisplay = startData ? this.pitchToNoteNameWithQuarter(startData.pitch, startData.quarterTone) : '?';
+                    const endDisplay = endData ? this.pitchToNoteNameWithQuarter(endData.pitch, endData.quarterTone) : '?';
+                    pitchDisplay = `Gliss: ${startDisplay}→${endDisplay}`;
+                } else {
+                    const pitchData = this.noteNameToPitch(this.pitchInput?.value || 'C4', true);
+                    pitchDisplay = pitchData ? this.pitchToNoteNameWithQuarter(pitchData.pitch, pitchData.quarterTone) : '(invalid)';
+                }
+                
+                const volDirection = this.crescDecrescStartVol < this.crescDecrescEndVol ? 'Cresc ↗' : 
+                                     this.crescDecrescStartVol > this.crescDecrescEndVol ? 'Decresc ↘' : 'Flat →';
+                
+                const seccoLabel = this.crescDecrescSecco ? ' | <span style="color: #f88;">Secco</span>' : '';
+                this.infoDisplay.innerHTML = `
+                    <div style="color: #fad;"><strong>Crescendo/Decrescendo</strong></div>
+                    <div>${pitchDisplay} | Vel: ${velocity}</div>
+                    <div>Vol: ${this.crescDecrescStartVol}→${this.crescDecrescEndVol} | ${volDirection}${seccoLabel}</div>
+                    <div>Duration: ${this.crescDecrescEvents.durationMs.toFixed(0)}ms | Art: Senza Vibrato</div>
+                `;
+            },
+            
             // Parse note name to MIDI pitch and quarter-tone offset
             // Supports: C4, C#4, Bb4, and quarter tones:
             //   + = quarter sharp (e.g., C+4, C#+4)
@@ -9919,15 +10311,29 @@
                 }
             },
             
-            // Attach Accel/Decel MIDI snippet to the selected curve
+            // Attach curve-based MIDI snippet to the selected curve
             attachToSelectedCurve() {
-                if (!this.selectedModel || this.selectedModelKey !== 'accelDecel') {
-                    alert('Please select the Accel/Decel model first.');
+                const isAccelDecel = this.selectedModelKey === 'accelDecel';
+                const isCrescDecresc = this.selectedModelKey === 'crescDecresc';
+                
+                if (!this.selectedModel || (!isAccelDecel && !isCrescDecresc)) {
+                    alert('Please select a curve-based model (Accel/Decel or Crescendo/Decrescendo) first.');
                     return;
                 }
                 
-                if (!this.accelDecelEvents || !this.accelDecelEvents.events) {
-                    alert('No accel/decel pattern generated. Select a curve and adjust parameters first.');
+                // Always use the currently selected curve from CurveMaker
+                if (window.CurveMaker && CurveMaker.selectedCurve) {
+                    this.sourceCurve = CurveMaker.selectedCurve;
+                    // Regenerate events for the new curve
+                    this.regenerateCurrentModel();
+                }
+                
+                // Get the appropriate events based on model type
+                const events = isAccelDecel ? this.accelDecelEvents : this.crescDecrescEvents;
+                
+                if (!events || !events.events) {
+                    const modelName = isAccelDecel ? 'accel/decel' : 'crescendo/decrescendo';
+                    alert(`No ${modelName} pattern generated. Select a curve and adjust parameters first.`);
                     return;
                 }
                 
@@ -9951,12 +10357,12 @@
                 }
                 const channel = trackIndex; // MIDI channel 0-3 for tracks 1-4
                 
-                const startSeconds = this.accelDecelEvents.startSeconds;
-                const endSeconds = this.accelDecelEvents.endSeconds;
+                const startSeconds = events.startSeconds;
+                const endSeconds = events.endSeconds;
                 const startMs = startSeconds * 1000;
                 
                 // Create snippet events with absolute times and proper channel
-                const snippetEvents = this.accelDecelEvents.events.map(event => {
+                const snippetEvents = events.events.map(event => {
                     const statusByte = event.data[0] & 0xF0;
                     return {
                         timeMs: startMs + event.timeMs,
@@ -9981,15 +10387,16 @@
                 const color = curve.color || 'brightBlue';
                 
                 // Create snippet data for MidiSnippetDatabase (for visualization)
+                const modelDisplayName = isAccelDecel ? 'Accel/Decel' : 'Cresc/Decresc';
                 const snippetData = {
-                    name: `Accel/Decel @ ${curve.name}`,
+                    name: `${modelDisplayName} @ ${curve.name}`,
                     trackIndex: trackIndex,
                     startSeconds: startSeconds,
                     endSeconds: endSeconds,
                     events: snippetEvents,
                     color: color,
                     sourceCurve: curve.id,
-                    noteCount: this.accelDecelEvents.noteCount
+                    noteCount: isAccelDecel ? events.noteCount : 1
                 };
                 
                 // Add to MidiSnippetDatabase for visualization
@@ -10025,28 +10432,49 @@
                 
                 // Store the MIDI snippet info on the curve object for persistence
                 const articulationInfo = this.articulations[this.selectedArticulation];
-                curve.midiSnippet = {
-                    modelName: 'Accel/Decel',
-                    pitch: pitch,
-                    pitchName: this.pitchToNoteName(pitch),
-                    velocity: velocity,
-                    density: this.density,
-                    humanize: this.humanize,
-                    articulation: this.selectedArticulation,
-                    articulationName: articulationInfo ? articulationInfo.name : 'None',
-                    noteCount: this.accelDecelEvents.noteCount,
-                    durationMs: this.accelDecelEvents.durationMs
-                };
+                if (isAccelDecel) {
+                    curve.midiSnippet = {
+                        modelName: 'Accel/Decel',
+                        pitch: pitch,
+                        pitchName: this.pitchToNoteName(pitch),
+                        velocity: velocity,
+                        density: this.density,
+                        humanize: this.humanize,
+                        articulation: this.selectedArticulation,
+                        articulationName: articulationInfo ? articulationInfo.name : 'None',
+                        noteCount: events.noteCount,
+                        durationMs: events.durationMs
+                    };
+                } else {
+                    curve.midiSnippet = {
+                        modelName: 'Cresc/Decresc',
+                        pitch: pitch,
+                        pitchName: this.pitchToNoteName(pitch),
+                        velocity: velocity,
+                        startVol: this.crescDecrescStartVol,
+                        endVol: this.crescDecrescEndVol,
+                        secco: this.crescDecrescSecco,
+                        durationMs: events.durationMs
+                    };
+                }
                 
-                console.debug(`Accel/Decel attached to curve "${curve.name}" (${startSeconds.toFixed(2)}s - ${endSeconds.toFixed(2)}s) on track ${trackIndex + 1}:`, curve.midiSnippet);
+                console.debug(`${modelDisplayName} attached to curve "${curve.name}" (${startSeconds.toFixed(2)}s - ${endSeconds.toFixed(2)}s) on track ${trackIndex + 1}:`, curve.midiSnippet);
                 
                 // Update info display
                 if (this.infoDisplay) {
-                    this.infoDisplay.innerHTML = `
-                        <div style="color: #adf;"><strong>Accel/Decel</strong></div>
-                        <div>Notes: ${this.accelDecelEvents.noteCount} | Track: ${trackIndex + 1}</div>
-                        <div style="color: #8f8; margin-top: 4px;">✓ Attached to curve "${curve.name}"</div>
-                    `;
+                    if (isAccelDecel) {
+                        this.infoDisplay.innerHTML = `
+                            <div style="color: #adf;"><strong>Accel/Decel</strong></div>
+                            <div>Notes: ${events.noteCount} | Track: ${trackIndex + 1}</div>
+                            <div style="color: #8f8; margin-top: 4px;">✓ Attached to curve "${curve.name}"</div>
+                        `;
+                    } else {
+                        this.infoDisplay.innerHTML = `
+                            <div style="color: #fad;"><strong>Cresc/Decresc</strong></div>
+                            <div>Vol: ${this.crescDecrescStartVol}→${this.crescDecrescEndVol} | Track: ${trackIndex + 1}</div>
+                            <div style="color: #8f8; margin-top: 4px;">✓ Attached to curve "${curve.name}"</div>
+                        `;
+                    }
                 }
                 
                 // Mark score as dirty
@@ -16811,6 +17239,369 @@
         // DISABLED: Test motives removed
         // MotiveMaker.createTestMotives();
         /* END OF DISABLED MotiveMaker */
+        
+        
+        // ========================================
+        // ObjectSelector - Shift+Ctrl+Alt+Click to select overlapping objects
+        // ========================================
+        const ObjectSelector = {
+            menuEl: null,
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                // Create context menu element
+                this.menuEl = document.createElement('div');
+                this.menuEl.id = 'objectSelectorMenu';
+                this.menuEl.style.cssText = `
+                    position: fixed;
+                    display: none;
+                    background: rgba(30, 35, 45, 0.98);
+                    border: 1px solid #567;
+                    border-radius: 4px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+                    z-index: 10000;
+                    min-width: 180px;
+                    max-width: 280px;
+                    font-family: Arial, sans-serif;
+                    font-size: 12px;
+                `;
+                document.body.appendChild(this.menuEl);
+                
+                // Close menu on click outside
+                document.addEventListener('click', (e) => {
+                    if (!this.menuEl.contains(e.target)) {
+                        this.hideMenu();
+                    }
+                });
+                
+                // Close menu on Escape
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') this.hideMenu();
+                });
+                
+                // Add Shift+Ctrl+Alt+Click handler to score elements
+                const handler = (e, section) => {
+                    if (e.shiftKey && e.ctrlKey && e.altKey) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.showMenuAtPoint(e.clientX, e.clientY, section);
+                    }
+                };
+                
+                if (this.scoreTopEl) {
+                    this.scoreTopEl.addEventListener('click', (e) => handler(e, 'top'), true);
+                }
+                if (this.scoreBottomEl) {
+                    this.scoreBottomEl.addEventListener('click', (e) => handler(e, 'bottom'), true);
+                }
+                
+                console.debug('ObjectSelector initialized - use Shift+Ctrl+Alt+Click to select overlapping objects');
+            },
+            
+            // Determine which track (1-4) a Y coordinate falls into
+            getTrackFromY(svgY, scoreEl) {
+                if (!window.StaffPositions) return null;
+                const positions = StaffPositions.getPositions(scoreEl);
+                const staffHeight = positions.staffHeight;
+                
+                if (svgY < positions.Staff1Y) return null; // Above tracks (in timeline)
+                if (svgY < positions.Staff2Y) return '1';
+                if (svgY < positions.Staff3Y) return '2';
+                if (svgY < positions.Staff4Y) return '3';
+                return '4';
+            },
+            
+            // Get all objects at a given screen point, filtered by track
+            getObjectsAtPoint(clientX, clientY, section) {
+                const objects = [];
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                if (!scoreEl) return objects;
+                
+                const rect = scoreEl.getBoundingClientRect();
+                const svgX = clientX - rect.left;
+                const svgY = clientY - rect.top;
+                
+                // Determine which track was clicked
+                const clickedTrack = this.getTrackFromY(svgY, scoreEl);
+                
+                // Get current page number for this section
+                let currentPage = 0;
+                if (window.GraphicTimeline) {
+                    currentPage = section === 'top' ? GraphicTimeline.currentTopPage : GraphicTimeline.currentBottomPage;
+                }
+                
+                // Check Curves
+                if (window.CurveMaker && CurveMaker.curves) {
+                    for (const curve of CurveMaker.curves) {
+                        // Convert gTrack to string for comparison (in case it's stored as number)
+                        const curveTrack = String(curve.gTrack);
+                        
+                        // Check section first
+                        if (curve.section !== section) continue;
+                        
+                        // Check page - curve must be on current page or span to it
+                        const curveStartPage = curve.page || 0;
+                        const curveEndPage = curve.endPage !== undefined ? curve.endPage : curveStartPage;
+                        if (currentPage < curveStartPage || currentPage > curveEndPage) continue;
+                        
+                        // Filter by track (gTrack can be '1'-'4' or 'A' for all)
+                        if (clickedTrack && curveTrack !== 'A' && curveTrack !== clickedTrack) continue;
+                        
+                        if (this.isPointInCurve(svgX, svgY, curve)) {
+                            objects.push({
+                                type: 'Curve',
+                                name: curve.name || `Curve ${curve.id}`,
+                                color: curve.color,
+                                obj: curve,
+                                select: () => CurveMaker.selectCurve(curve)
+                            });
+                        }
+                    }
+                }
+                
+                // Check GCs
+                if (window.GCMaker && GCMaker.gcs) {
+                    for (const gc of GCMaker.gcs) {
+                        if (gc.section !== section) continue;
+                        // Check page
+                        const gcStartPage = gc.page || 0;
+                        const gcEndPage = gc.endPage !== undefined ? gc.endPage : gcStartPage;
+                        if (currentPage < gcStartPage || currentPage > gcEndPage) continue;
+                        // Check track
+                        if (clickedTrack && gc.gTrack !== 'A' && gc.gTrack !== clickedTrack) continue;
+                        if (this.isPointInGC(svgX, svgY, gc)) {
+                            objects.push({
+                                type: 'GC',
+                                name: gc.name || `GC ${gc.id}`,
+                                color: gc.color,
+                                obj: gc,
+                                select: () => GCMaker.selectGC(gc)
+                            });
+                        }
+                    }
+                }
+                
+                // Check Motives
+                if (window.MotiveMaker && MotiveMaker.motives) {
+                    for (const motive of MotiveMaker.motives) {
+                        if (motive.section !== section) continue;
+                        // Check page
+                        const motiveStartPage = motive.page || 0;
+                        const motiveEndPage = motive.endPage !== undefined ? motive.endPage : motiveStartPage;
+                        if (currentPage < motiveStartPage || currentPage > motiveEndPage) continue;
+                        // Check track
+                        if (clickedTrack && motive.gTrack !== 'A' && motive.gTrack !== clickedTrack) continue;
+                        if (this.isPointInMotive(svgX, svgY, motive)) {
+                            objects.push({
+                                type: 'Motive',
+                                name: motive.name || `Motive ${motive.id}`,
+                                color: motive.color,
+                                obj: motive,
+                                select: () => MotiveMaker.selectMotive(motive)
+                            });
+                        }
+                    }
+                }
+                
+                // Check MIDI Snippets (stored in MidiController.snippets)
+                if (window.MidiController && MidiController.snippets) {
+                    for (const snippet of MidiController.snippets) {
+                        if (snippet.section !== section) continue;
+                        // Check page
+                        if (snippet.page !== undefined && snippet.page !== currentPage) continue;
+                        // MIDI snippets use trackIndex (0-3), convert clickedTrack ('1'-'4') to match
+                        const snippetTrack = snippet.trackIndex !== undefined ? String(snippet.trackIndex + 1) : null;
+                        if (clickedTrack && snippetTrack && snippetTrack !== clickedTrack) continue;
+                        if (this.isPointInSnippet(svgX, svgY, snippet)) {
+                            objects.push({
+                                type: 'MIDI',
+                                name: snippet.name || `MIDI ${snippet.id}`,
+                                color: snippet.color,
+                                obj: snippet,
+                                select: () => MidiController.selectSnippet(snippet)
+                            });
+                        }
+                    }
+                }
+                
+                // Check Audio Clips
+                if (window.AudioController && AudioController.clips) {
+                    for (const clip of AudioController.clips) {
+                        if (clip.section !== section) continue;
+                        // Check page
+                        if (clip.page !== undefined && clip.page !== currentPage) continue;
+                        // Audio clips use trackIndex (0-3), convert clickedTrack ('1'-'4') to match
+                        const clipTrack = clip.trackIndex !== undefined ? String(clip.trackIndex + 1) : null;
+                        if (clickedTrack && clipTrack && clipTrack !== clickedTrack) continue;
+                        if (this.isPointInClip(svgX, svgY, clip)) {
+                            objects.push({
+                                type: 'Audio',
+                                name: clip.name || `Audio ${clip.id}`,
+                                color: clip.color || 'cyan',
+                                obj: clip,
+                                select: () => AudioController.selectClip(clip)
+                            });
+                        }
+                    }
+                }
+                
+                // Check SVG Elements
+                if (window.SVGElementManager && SVGElementManager.elements) {
+                    for (const el of SVGElementManager.elements) {
+                        if (el.section !== section) continue;
+                        // SVG elements use track (1-4), convert to string for comparison
+                        const elTrack = el.track ? String(el.track) : null;
+                        if (clickedTrack && elTrack && elTrack !== clickedTrack) continue;
+                        if (this.isPointInSVGElement(svgX, svgY, el)) {
+                            objects.push({
+                                type: 'SVG',
+                                name: el.name || `SVG ${el.id}`,
+                                color: '#888888',
+                                obj: el,
+                                select: () => SVGElementManager.selectElement(el)
+                            });
+                        }
+                    }
+                }
+                
+                return objects;
+            },
+            
+            // Hit test helpers - check if point is within object bounds
+            isPointInCurve(x, y, curve) {
+                if (!curve.x1 || !curve.x2 || !curve.trackDims) return false;
+                const margin = 10;
+                return x >= curve.x1 - margin && x <= curve.x2 + margin &&
+                       y >= curve.trackDims.y - margin && y <= curve.trackDims.y + curve.trackDims.height + margin;
+            },
+            
+            isPointInGC(x, y, gc) {
+                if (!gc.x1 || !gc.x2 || !gc.trackDims) return false;
+                const margin = 10;
+                return x >= gc.x1 - margin && x <= gc.x2 + margin &&
+                       y >= gc.trackDims.y - margin && y <= gc.trackDims.y + gc.trackDims.height + margin;
+            },
+            
+            isPointInMotive(x, y, motive) {
+                if (!motive.x1 || !motive.x2 || !motive.trackDims) return false;
+                const margin = 10;
+                return x >= motive.x1 - margin && x <= motive.x2 + margin &&
+                       y >= motive.trackDims.y - margin && y <= motive.trackDims.y + motive.trackDims.height + margin;
+            },
+            
+            isPointInSnippet(x, y, snippet) {
+                if (!snippet.x1 || !snippet.x2 || !snippet.trackDims) return false;
+                const margin = 10;
+                return x >= snippet.x1 - margin && x <= snippet.x2 + margin &&
+                       y >= snippet.trackDims.y - margin && y <= snippet.trackDims.y + snippet.trackDims.height + margin;
+            },
+            
+            isPointInClip(x, y, clip) {
+                if (!clip.x1 || !clip.x2 || !clip.trackDims) return false;
+                const margin = 10;
+                return x >= clip.x1 - margin && x <= clip.x2 + margin &&
+                       y >= clip.trackDims.y - margin && y <= clip.trackDims.y + clip.trackDims.height + margin;
+            },
+            
+            isPointInSVGElement(x, y, el) {
+                if (el.x === undefined || el.y === undefined) return false;
+                const margin = 5;
+                const scaledWidth = (el.width || 50) * (el.scale || 1);
+                const scaledHeight = (el.height || 50) * (el.scale || 1);
+                return x >= el.x - margin && x <= el.x + scaledWidth + margin &&
+                       y >= el.y - margin && y <= el.y + scaledHeight + margin;
+            },
+            
+            // Show context menu at position
+            showMenuAtPoint(clientX, clientY, section) {
+                const objects = this.getObjectsAtPoint(clientX, clientY, section);
+                
+                if (objects.length === 0) {
+                    this.hideMenu();
+                    return;
+                }
+                
+                // Build menu HTML
+                let html = `<div style="padding: 6px 10px; color: #8af; border-bottom: 1px solid #456; font-weight: bold;">
+                    Select Object (${objects.length})
+                </div>`;
+                
+                const colorMap = window.ColorMap || {};
+                
+                for (let i = 0; i < objects.length; i++) {
+                    const obj = objects[i];
+                    const colorHex = colorMap[obj.color] || obj.color || '#888';
+                    html += `
+                        <div class="obj-selector-item" data-index="${i}" style="
+                            padding: 8px 12px;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            border-bottom: 1px solid #333;
+                        ">
+                            <span style="
+                                display: inline-block;
+                                width: 12px;
+                                height: 12px;
+                                background: ${colorHex};
+                                border-radius: 2px;
+                                flex-shrink: 0;
+                            "></span>
+                            <span style="color: #aaa; min-width: 45px;">${obj.type}</span>
+                            <span style="color: #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${obj.name}</span>
+                        </div>
+                    `;
+                }
+                
+                this.menuEl.innerHTML = html;
+                
+                // Add click handlers
+                this.menuEl.querySelectorAll('.obj-selector-item').forEach((item, idx) => {
+                    item.addEventListener('click', () => {
+                        objects[idx].select();
+                        this.hideMenu();
+                    });
+                    item.addEventListener('mouseenter', () => {
+                        item.style.background = 'rgba(80, 120, 160, 0.4)';
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.style.background = 'transparent';
+                    });
+                });
+                
+                // Position menu
+                this.menuEl.style.display = 'block';
+                
+                // Adjust position to stay on screen
+                const menuRect = this.menuEl.getBoundingClientRect();
+                let left = clientX;
+                let top = clientY;
+                
+                if (left + menuRect.width > window.innerWidth) {
+                    left = window.innerWidth - menuRect.width - 10;
+                }
+                if (top + menuRect.height > window.innerHeight) {
+                    top = window.innerHeight - menuRect.height - 10;
+                }
+                
+                this.menuEl.style.left = left + 'px';
+                this.menuEl.style.top = top + 'px';
+            },
+            
+            hideMenu() {
+                if (this.menuEl) {
+                    this.menuEl.style.display = 'none';
+                }
+            }
+        };
+        
+        ObjectSelector.init();
+        window.ObjectSelector = ObjectSelector;
         
         
         // Initialize Score Manager (after all other systems)
