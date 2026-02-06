@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="12.130638mm"
+   height="7.2049274mm"
+   viewBox="0 0 6.9029715 4.1"
+   id="svg10"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs10" />
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <g
+     transform="translate(0.04997793,2.05)"
+     id="g1">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="2"
+       x2="6.803"
+       y2="2"
+       id="line1" />
+  </g>
+  <g
+     transform="translate(0.04997793,2.05)"
+     id="g2">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="1"
+       x2="6.803"
+       y2="1"
+       id="line2" />
+  </g>
+  <g
+     transform="translate(0.04997793,2.05)"
+     id="g3">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="0"
+       x2="6.803"
+       y2="0"
+       id="line3" />
+  </g>
+  <g
+     transform="translate(0.04997793,2.05)"
+     id="g4">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-1"
+       x2="6.803"
+       y2="-1"
+       id="line4" />
+  </g>
+  <g
+     transform="translate(0.04997793,2.05)"
+     id="g5">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-2"
+       x2="6.803"
+       y2="-2"
+       id="line5" />
+  </g>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Glissando-Viola-Cs4-C4.ly:60:4:5"
+     id="a6"
+     transform="translate(-0.00692207,-1)">
+    <g
+       transform="translate(0.5691,2.75)"
+       id="g6">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="2.2203"
+         y1="0"
+         x2="4.0953999"
+         y2="0"
+         id="line6" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Glissando-Viola-Cs4-C4.ly:68:4:5"
+     id="a7"
+     transform="translate(-0.00692207,-1)">
+    <g
+       transform="translate(5.2845,3.05)"
+       id="g7">
+      <path
+         transform="scale(0.0032,-0.0032)"
+         d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
+         fill="currentColor"
+         id="path6" />
+    </g>
+  </a>
+  <g
+     transform="translate(4.8755779,2.05)"
+     id="g8">
+    <path
+       transform="scale(0.002,-0.002)"
+       d="m -9,375 c 9,5 20,8 30,8 10,0 20,-3 29,-8 l -3,-207 93,27 c 2,1 4,0 6,0 11,0 21,-9 21,-20 l 9,-550 c -9,-5 -20,-8 -30,-8 -10,0 -21,3 -30,8 l 4,207 -94,-27 c -2,-1 -3,0 -5,0 -11,0 -21,9 -21,20 z M 124,106 46,83 l -3,-189 78,23 z"
+       fill="currentColor"
+       id="path7" />
+  </g>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Glissando-Viola-Cs4-C4.ly:57:4:5"
+     id="a9"
+     transform="translate(-0.00692207,-1)">
+    <g
+       transform="translate(1.5569,3.05)"
+       id="g9">
+      <path
+         transform="scale(0.0032,-0.0032)"
+         d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
+         fill="currentColor"
+         id="path8" />
+    </g>
+  </a>
+  <g
+     transform="translate(0.64997793,2.05)"
+     id="g10">
+    <path
+       transform="scale(0.002,-0.002)"
+       d="M 52,37 C 47,35 42,33 36,33 17,33 0,49 0,69 v 41 c 0,14 9,28 22,33 l 30,13 v 144 c 0,14 11,26 25,26 14,0 26,-12 26,-26 V 176 l 69,29 v 145 c 0,14 12,25 26,25 14,0 25,-11 25,-25 V 226 c 5,2 10,4 16,4 19,0 36,-16 36,-36 v -42 c 0,-14 -9,-28 -22,-33 L 223,107 V -37 c 5,2 10,4 16,4 19,0 36,-16 36,-36 v -41 c 0,-14 -9,-28 -22,-33 l -30,-13 v -144 c 0,-14 -11,-26 -25,-26 -14,0 -26,12 -26,26 v 124 l -69,-29 v -145 c 0,-14 -12,-25 -26,-25 -14,0 -25,11 -25,25 v 124 c -5,-2 -10,-4 -16,-4 -19,0 -36,16 -36,36 v 42 c 0,14 9,28 22,33 l 30,12 z M 172,86 103,58 V -86 l 69,28 z"
+       fill="currentColor"
+       id="path9" />
+  </g>
+</svg>

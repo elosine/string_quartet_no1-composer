@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="19.00mm" height="20.00mm" viewBox="0.0000 -0.0000 10.8120 11.3811">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0569, 3.0500)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="6.8030" y2="2.0000"/>
+</g>
+<g transform="translate(0.0569, 3.0500)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="6.8030" y2="1.0000"/>
+</g>
+<g transform="translate(0.0569, 3.0500)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="6.8030" y2="-0.0000"/>
+</g>
+<g transform="translate(0.0569, 3.0500)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="6.8030" y2="-1.0000"/>
+</g>
+<g transform="translate(0.0569, 3.0500)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="6.8030" y2="-2.0000"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Glissando-Viola-Es4-E4.ly:60:4:5">
+<g transform="translate(0.5691, 2.7500)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="2.0203" y1="-1.0000" x2="3.9954" y2="-1.0000"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Glissando-Viola-Es4-E4.ly:68:4:5">
+<g transform="translate(5.1845, 2.0500)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(4.7825, 2.0500)">
+<path transform="scale(0.0020, -0.0020)" d="M-9 375c9 5 20 8 30 8s20 -3 29 -8l-3 -207l93 27c2 1 4 0 6 0c11 0 21 -9 21 -20l9 -550c-9 -5 -20 -8 -30 -8s-21 3 -30 8l4 207l-94 -27c-2 -1 -3 0 -5 0c-11 0 -21 9 -21 20zM124 106l-78 -23l-3 -189l78 23z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Glissando-Viola-Es4-E4.ly:57:4:5">
+<g transform="translate(1.3569, 2.0500)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(0.4569, 2.0500)">
+<path transform="scale(0.0020, -0.0020)" d="M52 37c-5 -2 -10 -4 -16 -4c-19 0 -36 16 -36 36v41c0 14 9 28 22 33l30 13v144c0 14 11 26 25 26s26 -12 26 -26v-124l69 29v145c0 14 12 25 26 25s25 -11 25 -25v-124c5 2 10 4 16 4c19 0 36 -16 36 -36v-42c0 -14 -9 -28 -22 -33l-30 -12v-144c5 2 10 4 16 4
+c19 0 36 -16 36 -36v-41c0 -14 -9 -28 -22 -33l-30 -13v-144c0 -14 -11 -26 -25 -26s-26 12 -26 26v124l-69 -29v-145c0 -14 -12 -25 -26 -25s-25 11 -25 25v124c-5 -2 -10 -4 -16 -4c-19 0 -36 16 -36 36v42c0 14 9 28 22 33l30 12v144zM172 86l-69 -28v-144l69 28v144z
+" fill="currentColor"/>
+</g>
+</svg>
