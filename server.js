@@ -529,6 +529,102 @@ app.delete('/api/motive-library/delete/:name', (req, res) => {
 });
 
 // ============================================
+// MIDI MOTIVE LIBRARY SYSTEM
+// ============================================
+
+const MIDI_MOTIVE_LIBRARY_DIR = path.join(__dirname, 'midi_motive_library');
+
+// Ensure MIDI motive library directory exists
+if (!fs.existsSync(MIDI_MOTIVE_LIBRARY_DIR)) {
+    fs.mkdirSync(MIDI_MOTIVE_LIBRARY_DIR, { recursive: true });
+}
+
+// Save MIDI motive to library
+app.post('/api/midi-motive-library/save', (req, res) => {
+    const { motiveData } = req.body;
+    if (!motiveData || !motiveData.name) {
+        return res.status(400).json({ success: false, error: 'MIDI motive data with name required' });
+    }
+    
+    const filename = `${motiveData.name}.json`;
+    const filepath = path.join(MIDI_MOTIVE_LIBRARY_DIR, filename);
+    
+    try {
+        motiveData.savedAt = new Date().toISOString();
+        fs.writeFileSync(filepath, JSON.stringify(motiveData, null, 2));
+        console.log(`MIDI motive saved to library: ${filename}`);
+        res.json({ success: true, filename, name: motiveData.name });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// List all MIDI motives in library
+app.get('/api/midi-motive-library/list', (req, res) => {
+    try {
+        const files = fs.readdirSync(MIDI_MOTIVE_LIBRARY_DIR)
+            .filter(f => f.endsWith('.json'))
+            .map(f => {
+                const filepath = path.join(MIDI_MOTIVE_LIBRARY_DIR, f);
+                try {
+                    const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+                    return {
+                        name: data.name,
+                        filename: f,
+                        description: data.description || '',
+                        savedAt: data.savedAt || '',
+                        noteCount: data.notes ? data.notes.length : 0,
+                        durationMs: data.durationMs || 0,
+                        durationBeats: data.durationBeats || 0
+                    };
+                } catch {
+                    return null;
+                }
+            })
+            .filter(f => f !== null)
+            .sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+        res.json({ success: true, motives: files });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Load MIDI motive from library
+app.get('/api/midi-motive-library/load/:name', (req, res) => {
+    const filename = `${req.params.name}.json`;
+    const filepath = path.join(MIDI_MOTIVE_LIBRARY_DIR, filename);
+    
+    if (!fs.existsSync(filepath)) {
+        return res.status(404).json({ success: false, error: 'MIDI motive not found' });
+    }
+    
+    try {
+        const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
+        res.json({ success: true, motiveData: data });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Delete MIDI motive from library
+app.delete('/api/midi-motive-library/delete/:name', (req, res) => {
+    const filename = `${req.params.name}.json`;
+    const filepath = path.join(MIDI_MOTIVE_LIBRARY_DIR, filename);
+    
+    if (!fs.existsSync(filepath)) {
+        return res.status(404).json({ success: false, error: 'MIDI motive not found' });
+    }
+    
+    try {
+        fs.unlinkSync(filepath);
+        console.log(`MIDI motive deleted from library: ${filename}`);
+        res.json({ success: true, name: req.params.name });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// ============================================
 // GC (GRAVITATIONAL CONDUCTOR) LIBRARY SYSTEM
 // ============================================
 

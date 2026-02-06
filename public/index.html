@@ -959,6 +959,82 @@
                 -->
                 
                 <div class="section-divider"></div>
+                <div class="section-label">MIDI Model</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 10px;">Model</label>
+                    <select id="midiModelSelect" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                        <option value="">-- Select Model --</option>
+                        <option value="bartokPizz">Bartok Pizzicato</option>
+                        <option value="accelDecel">Accel/Decel (Curve)</option>
+                    </select>
+                </div>
+                
+                <div id="midiModelParams" style="display: none;">
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label>Pitch</label>
+                        <input type="text" id="midiModelPitch" class="curve-input" value="C4" style="width: 50px;" placeholder="C4" title="e.g. C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat)">
+                    </div>
+                    <div class="curve-input-row">
+                        <label>Velocity</label>
+                        <input type="number" id="midiModelVelocity" class="curve-input" value="127" min="1" max="127" step="1" style="width: 50px;">
+                    </div>
+                    
+                    <!-- Accel/Decel specific controls -->
+                    <div id="accelDecelParams" style="display: none;">
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Articulation</label>
+                            <select id="accelDecelArticulation" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                                <option value="">-- None --</option>
+                                <option value="spiccato">Spiccato (CC0: 91)</option>
+                            </select>
+                        </div>
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Pitch Mode</label>
+                            <select id="accelDecelPitchMode" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                                <option value="single">Single Note</option>
+                                <option value="glissando">Glissando</option>
+                            </select>
+                        </div>
+                        <div id="glissandoParams" style="display: none;">
+                            <div class="curve-input-row" style="margin-top: 4px;">
+                                <label style="font-size: 10px;">Start Pitch</label>
+                                <input type="text" id="glissandoStartPitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="+ = quarter sharp, d = quarter flat (e.g. C+4, Cd4)">
+                                <label style="font-size: 10px; margin-left: 8px;">End Pitch</label>
+                                <input type="text" id="glissandoEndPitch" class="curve-input" value="C5" style="width: 50px; font-size: 10px;" placeholder="C5" title="+ = quarter sharp, d = quarter flat (e.g. C+5, Cd5)">
+                            </div>
+                        </div>
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Density</label>
+                            <input type="range" id="accelDecelDensity" min="0" max="100" value="50" style="flex: 1;">
+                            <input type="number" id="accelDecelDensityNum" min="0" max="100" value="50" style="width: 40px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; text-align: center;">
+                        </div>
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Humanize</label>
+                            <input type="range" id="accelDecelHumanize" min="0" max="100" value="20" style="flex: 1;">
+                            <input type="number" id="accelDecelHumanizeNum" min="0" max="100" value="20" style="width: 40px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; text-align: center;">
+                        </div>
+                        <div id="accelDecelCurveInfo" style="width: 100%; padding: 4px; background: rgba(30,40,50,0.5); border: 1px solid #456; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #8af;">
+                            Select a curve in the score first
+                        </div>
+                        <button id="accelDecelRegenerateBtn" class="curve-draw-btn" style="margin-top: 6px; background: #3a5a6a; border-color: #4a6a7a;">↻ Regenerate</button>
+                    </div>
+                    
+                    <div id="midiModelInfo" style="width: 100%; padding: 4px; background: rgba(30,30,40,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #888;">
+                    </div>
+                    
+                    <div class="curve-input-row" style="margin-top: 8px;">
+                        <label style="font-size: 10px;">Output</label>
+                        <select id="midiModelOutputSelect" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="">-- Select Output --</option>
+                        </select>
+                    </div>
+                    <button id="midiModelPlayBtn" class="curve-draw-btn" style="margin-top: 6px; background: #4a6a3a; border-color: #5a7a4a;">▶ Preview</button>
+                    <button id="midiModelAttachGCBtn" class="curve-draw-btn" style="margin-top: 6px; background: #6a4a3a; border-color: #7a5a4a; display: none;">Attach to Selected GC</button>
+                    <button id="midiModelAttachCurveBtn" class="curve-draw-btn" style="margin-top: 6px; background: #6a4a5a; border-color: #7a5a6a; display: none;">Attach to Selected Curve</button>
+                </div>
+                
+                <div class="section-divider"></div>
                 <div class="section-label">GC (Bouncing Ball)</div>
                 
                 <div class="curve-input-row">
@@ -8325,6 +8401,1668 @@
             }
         };
         window.MidiSnippetDatabase = MidiSnippetDatabase;
+        
+        // MIDI Motive Parser - Parses MIDI files into note-level data for manipulation
+        const MidiMotiveParser = {
+            // Parse a MIDI file ArrayBuffer into a motive model
+            parse(arrayBuffer, fileName = 'Untitled') {
+                const data = new Uint8Array(arrayBuffer);
+                let pos = 0;
+                
+                // Read header chunk
+                const headerChunk = this.readChunk(data, pos);
+                if (headerChunk.type !== 'MThd') {
+                    throw new Error('Invalid MIDI file: missing MThd header');
+                }
+                pos += 8 + headerChunk.length;
+                
+                const format = (headerChunk.data[0] << 8) | headerChunk.data[1];
+                const numTracks = (headerChunk.data[2] << 8) | headerChunk.data[3];
+                const ticksPerQuarterNote = (headerChunk.data[4] << 8) | headerChunk.data[5];
+                
+                // Parse all tracks
+                const tracks = [];
+                let tempo = 500000; // Default 120 BPM (500000 microseconds per quarter)
+                let timeSignature = { numerator: 4, denominator: 4 };
+                let trackName = fileName.replace(/\.mid$/i, '');
+                
+                for (let t = 0; t < numTracks && pos < data.length; t++) {
+                    const trackChunk = this.readChunk(data, pos);
+                    if (trackChunk.type !== 'MTrk') {
+                        console.warn('Expected MTrk, got', trackChunk.type);
+                        pos += 8 + trackChunk.length;
+                        continue;
+                    }
+                    pos += 8 + trackChunk.length;
+                    
+                    const trackData = this.parseTrack(trackChunk.data);
+                    tracks.push(trackData);
+                    
+                    // Extract meta info from first track (or any track)
+                    if (trackData.tempo) tempo = trackData.tempo;
+                    if (trackData.timeSignature) timeSignature = trackData.timeSignature;
+                    if (trackData.name) trackName = trackData.name;
+                }
+                
+                // Merge all notes from all tracks
+                const allNotes = [];
+                for (const track of tracks) {
+                    allNotes.push(...track.notes);
+                }
+                
+                // Sort notes by start time
+                allNotes.sort((a, b) => a.startTick - b.startTick);
+                
+                // Calculate duration (end of last note)
+                let durationTicks = 0;
+                for (const note of allNotes) {
+                    const noteEnd = note.startTick + note.durationTicks;
+                    if (noteEnd > durationTicks) durationTicks = noteEnd;
+                }
+                
+                // Convert to beats
+                const durationBeats = durationTicks / ticksPerQuarterNote;
+                const tempoMsPerBeat = tempo / 1000;
+                const durationMs = durationBeats * tempoMsPerBeat;
+                
+                return {
+                    name: trackName,
+                    fileName: fileName,
+                    ticksPerQuarterNote,
+                    tempo,
+                    timeSignature,
+                    notes: allNotes,
+                    durationTicks,
+                    durationBeats,
+                    durationMs
+                };
+            },
+            
+            // Read a chunk (MThd or MTrk)
+            readChunk(data, pos) {
+                const type = String.fromCharCode(data[pos], data[pos+1], data[pos+2], data[pos+3]);
+                const length = (data[pos+4] << 24) | (data[pos+5] << 16) | (data[pos+6] << 8) | data[pos+7];
+                const chunkData = data.slice(pos + 8, pos + 8 + length);
+                return { type, length, data: chunkData };
+            },
+            
+            // Parse a track's data into notes and meta events
+            parseTrack(trackData) {
+                let pos = 0;
+                let currentTick = 0;
+                let runningStatus = 0;
+                const notes = [];
+                const activeNotes = {}; // pitch -> {startTick, velocity}
+                let tempo = null;
+                let timeSignature = null;
+                let name = null;
+                
+                while (pos < trackData.length) {
+                    // Read delta time (variable length)
+                    const deltaResult = this.readVariableLength(trackData, pos);
+                    currentTick += deltaResult.value;
+                    pos = deltaResult.newPos;
+                    
+                    if (pos >= trackData.length) break;
+                    
+                    let statusByte = trackData[pos];
+                    
+                    // Handle running status
+                    if (statusByte < 0x80) {
+                        statusByte = runningStatus;
+                    } else {
+                        pos++;
+                        if (statusByte < 0xF0) {
+                            runningStatus = statusByte;
+                        }
+                    }
+                    
+                    const messageType = statusByte & 0xF0;
+                    const channel = statusByte & 0x0F;
+                    
+                    if (messageType === 0x90) {
+                        // Note On
+                        const pitch = trackData[pos++];
+                        const velocity = trackData[pos++];
+                        
+                        if (velocity > 0) {
+                            activeNotes[pitch] = { startTick: currentTick, velocity, channel };
+                        } else {
+                            // Note On with velocity 0 = Note Off
+                            if (activeNotes[pitch]) {
+                                notes.push({
+                                    pitch,
+                                    velocity: activeNotes[pitch].velocity,
+                                    channel: activeNotes[pitch].channel,
+                                    startTick: activeNotes[pitch].startTick,
+                                    durationTicks: currentTick - activeNotes[pitch].startTick
+                                });
+                                delete activeNotes[pitch];
+                            }
+                        }
+                    } else if (messageType === 0x80) {
+                        // Note Off
+                        const pitch = trackData[pos++];
+                        pos++; // velocity (ignored)
+                        
+                        if (activeNotes[pitch]) {
+                            notes.push({
+                                pitch,
+                                velocity: activeNotes[pitch].velocity,
+                                channel: activeNotes[pitch].channel,
+                                startTick: activeNotes[pitch].startTick,
+                                durationTicks: currentTick - activeNotes[pitch].startTick
+                            });
+                            delete activeNotes[pitch];
+                        }
+                    } else if (messageType === 0xA0) {
+                        // Aftertouch
+                        pos += 2;
+                    } else if (messageType === 0xB0) {
+                        // Control Change
+                        pos += 2;
+                    } else if (messageType === 0xC0) {
+                        // Program Change
+                        pos += 1;
+                    } else if (messageType === 0xD0) {
+                        // Channel Pressure
+                        pos += 1;
+                    } else if (messageType === 0xE0) {
+                        // Pitch Bend
+                        pos += 2;
+                    } else if (statusByte === 0xFF) {
+                        // Meta event
+                        const metaType = trackData[pos++];
+                        const lengthResult = this.readVariableLength(trackData, pos);
+                        const metaLength = lengthResult.value;
+                        pos = lengthResult.newPos;
+                        
+                        if (metaType === 0x03) {
+                            // Track name
+                            name = '';
+                            for (let i = 0; i < metaLength; i++) {
+                                name += String.fromCharCode(trackData[pos + i]);
+                            }
+                        } else if (metaType === 0x51) {
+                            // Tempo
+                            tempo = (trackData[pos] << 16) | (trackData[pos+1] << 8) | trackData[pos+2];
+                        } else if (metaType === 0x58) {
+                            // Time signature
+                            timeSignature = {
+                                numerator: trackData[pos],
+                                denominator: Math.pow(2, trackData[pos+1])
+                            };
+                        }
+                        
+                        pos += metaLength;
+                    } else if (statusByte === 0xF0 || statusByte === 0xF7) {
+                        // SysEx
+                        const lengthResult = this.readVariableLength(trackData, pos);
+                        pos = lengthResult.newPos + lengthResult.value;
+                    }
+                }
+                
+                return { notes, tempo, timeSignature, name };
+            },
+            
+            // Read variable-length quantity
+            readVariableLength(data, pos) {
+                let value = 0;
+                let byte;
+                do {
+                    byte = data[pos++];
+                    value = (value << 7) | (byte & 0x7F);
+                } while (byte & 0x80 && pos < data.length);
+                return { value, newPos: pos };
+            }
+        };
+        window.MidiMotiveParser = MidiMotiveParser;
+        
+        // MIDI Motive Database - Stores parsed MIDI motives with manipulation support
+        const MidiMotiveDatabase = {
+            motives: [],
+            nextId: 1,
+            
+            add(motiveData) {
+                const motive = {
+                    id: this.nextId++,
+                    ...motiveData,
+                    createdAt: Date.now()
+                };
+                this.motives.push(motive);
+                return motive;
+            },
+            
+            get(id) {
+                return this.motives.find(m => m.id === id);
+            },
+            
+            update(id, updates) {
+                const motive = this.get(id);
+                if (motive) {
+                    Object.assign(motive, updates);
+                }
+                return motive;
+            },
+            
+            remove(id) {
+                const index = this.motives.findIndex(m => m.id === id);
+                if (index !== -1) {
+                    this.motives.splice(index, 1);
+                    return true;
+                }
+                return false;
+            },
+            
+            getAll() {
+                return this.motives;
+            },
+            
+            exportData() {
+                return {
+                    motives: this.motives,
+                    nextId: this.nextId
+                };
+            },
+            
+            importData(data) {
+                if (data && data.motives) {
+                    this.motives = data.motives;
+                    this.nextId = data.nextId || (this.motives.length > 0 ? Math.max(...this.motives.map(m => m.id)) + 1 : 1);
+                }
+            },
+            
+            // === MANIPULATION FUNCTIONS ===
+            
+            // Clip motive to just the note content (remove silence before/after)
+            clipToNotes(motive) {
+                if (!motive.notes || motive.notes.length === 0) return motive;
+                
+                // Find earliest note start and latest note end
+                let minStart = Infinity;
+                let maxEnd = 0;
+                for (const note of motive.notes) {
+                    if (note.startTick < minStart) minStart = note.startTick;
+                    const noteEnd = note.startTick + note.durationTicks;
+                    if (noteEnd > maxEnd) maxEnd = noteEnd;
+                }
+                
+                // Shift all notes so first note starts at tick 0
+                const clippedNotes = motive.notes.map(note => ({
+                    ...note,
+                    startTick: note.startTick - minStart
+                }));
+                
+                const newDurationTicks = maxEnd - minStart;
+                const newDurationBeats = newDurationTicks / motive.ticksPerQuarterNote;
+                const tempoMsPerBeat = motive.tempo / 1000;
+                const newDurationMs = newDurationBeats * tempoMsPerBeat;
+                
+                return {
+                    ...motive,
+                    notes: clippedNotes,
+                    durationTicks: newDurationTicks,
+                    durationBeats: newDurationBeats,
+                    durationMs: newDurationMs
+                };
+            },
+            
+            // Transpose all notes by semitones (positive = up, negative = down)
+            transpose(motive, semitones) {
+                const transposedNotes = motive.notes.map(note => ({
+                    ...note,
+                    pitch: Math.max(0, Math.min(127, note.pitch + semitones))
+                }));
+                
+                return {
+                    ...motive,
+                    notes: transposedNotes
+                };
+            },
+            
+            // Scale velocity by a factor (0.5 = half, 2.0 = double)
+            scaleVelocity(motive, factor) {
+                const scaledNotes = motive.notes.map(note => ({
+                    ...note,
+                    velocity: Math.max(1, Math.min(127, Math.round(note.velocity * factor)))
+                }));
+                
+                return {
+                    ...motive,
+                    notes: scaledNotes
+                };
+            },
+            
+            // Stretch time by a factor (0.5 = half duration, 2.0 = double)
+            stretchTime(motive, factor) {
+                const stretchedNotes = motive.notes.map(note => ({
+                    ...note,
+                    startTick: Math.round(note.startTick * factor),
+                    durationTicks: Math.round(note.durationTicks * factor)
+                }));
+                
+                return {
+                    ...motive,
+                    notes: stretchedNotes,
+                    durationTicks: Math.round(motive.durationTicks * factor),
+                    durationBeats: motive.durationBeats * factor,
+                    durationMs: motive.durationMs * factor
+                };
+            },
+            
+            // Apply multiple transformations and return a new motive
+            transform(motive, options = {}) {
+                let result = { ...motive, notes: [...motive.notes.map(n => ({...n}))] };
+                
+                if (options.clipToNotes) {
+                    result = this.clipToNotes(result);
+                }
+                if (options.transpose !== undefined && options.transpose !== 0) {
+                    result = this.transpose(result, options.transpose);
+                }
+                if (options.velocityScale !== undefined && options.velocityScale !== 1) {
+                    result = this.scaleVelocity(result, options.velocityScale);
+                }
+                if (options.timeStretch !== undefined && options.timeStretch !== 1) {
+                    result = this.stretchTime(result, options.timeStretch);
+                }
+                
+                return result;
+            },
+            
+            // Convert motive to raw MIDI events for playback (at a given start time in ms)
+            toMidiEvents(motive, startTimeMs = 0, channel = 0) {
+                const events = [];
+                const msPerTick = (motive.tempo / 1000) / motive.ticksPerQuarterNote;
+                
+                for (const note of motive.notes) {
+                    const noteStartMs = startTimeMs + (note.startTick * msPerTick);
+                    const noteEndMs = noteStartMs + (note.durationTicks * msPerTick);
+                    
+                    // Note On
+                    events.push({
+                        timeMs: noteStartMs,
+                        type: 'noteOn',
+                        data: [0x90 | channel, note.pitch, note.velocity]
+                    });
+                    
+                    // Note Off
+                    events.push({
+                        timeMs: noteEndMs,
+                        type: 'noteOff',
+                        data: [0x80 | channel, note.pitch, 0]
+                    });
+                }
+                
+                // Sort by time
+                events.sort((a, b) => a.timeMs - b.timeMs);
+                
+                return events;
+            },
+            
+            // Get duration in milliseconds
+            getDurationMs(motive) {
+                const msPerTick = (motive.tempo / 1000) / motive.ticksPerQuarterNote;
+                return motive.durationTicks * msPerTick;
+            },
+            
+            // Get note name from MIDI pitch
+            pitchToNoteName(pitch) {
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(pitch / 12) - 1;
+                const noteName = noteNames[pitch % 12];
+                return noteName + octave;
+            },
+            
+            // Load a MIDI file from URL, parse it, and optionally add to database
+            async loadFromUrl(url, addToDatabase = false) {
+                try {
+                    const response = await fetch(url);
+                    const arrayBuffer = await response.arrayBuffer();
+                    const fileName = url.split('/').pop();
+                    const motive = MidiMotiveParser.parse(arrayBuffer, fileName);
+                    
+                    console.debug('=== MIDI Motive Loaded ===');
+                    console.debug('Name:', motive.name);
+                    console.debug('Ticks/Quarter:', motive.ticksPerQuarterNote);
+                    console.debug('Tempo:', motive.tempo, 'µs/quarter =', Math.round(60000000 / motive.tempo), 'BPM');
+                    console.debug('Notes:', motive.notes.length);
+                    for (const note of motive.notes) {
+                        console.debug(`  - ${this.pitchToNoteName(note.pitch)} (${note.pitch}), vel=${note.velocity}, start=${note.startTick}, dur=${note.durationTicks} ticks`);
+                    }
+                    console.debug('Duration:', motive.durationTicks, 'ticks =', motive.durationBeats.toFixed(3), 'beats =', motive.durationMs.toFixed(1), 'ms');
+                    
+                    if (addToDatabase) {
+                        return this.add(motive);
+                    }
+                    return motive;
+                } catch (err) {
+                    console.error('Failed to load MIDI motive:', err);
+                    return null;
+                }
+            },
+            
+            // Save motive to server library
+            async saveToLibrary(motive, description = '') {
+                const motiveData = {
+                    ...motive,
+                    description
+                };
+                
+                try {
+                    const response = await fetch('/api/midi-motive-library/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ motiveData })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        console.debug('MIDI motive saved to library:', result.name);
+                    }
+                    return result;
+                } catch (err) {
+                    console.error('Failed to save MIDI motive:', err);
+                    return { success: false, error: err.message };
+                }
+            },
+            
+            // Load library list from server
+            async loadLibraryList() {
+                try {
+                    const response = await fetch('/api/midi-motive-library/list');
+                    const result = await response.json();
+                    return result.success ? result.motives : [];
+                } catch (err) {
+                    console.error('Failed to load MIDI motive library:', err);
+                    return [];
+                }
+            },
+            
+            // Load motive from library by name
+            async loadFromLibrary(name) {
+                try {
+                    const response = await fetch(`/api/midi-motive-library/load/${encodeURIComponent(name)}`);
+                    const result = await response.json();
+                    if (result.success) {
+                        console.debug('MIDI motive loaded from library:', name);
+                        return result.motiveData;
+                    }
+                    return null;
+                } catch (err) {
+                    console.error('Failed to load MIDI motive from library:', err);
+                    return null;
+                }
+            }
+        };
+        window.MidiMotiveDatabase = MidiMotiveDatabase;
+        
+        // MIDI Model System - Pre-defined MIDI articulation models
+        // Models are templates extracted from MIDI files, storing CC, velocity, duration
+        // User selects model, sets pitch and velocity, then generates snippet for attachment
+        const MidiModelSystem = {
+            // Pre-defined models (extracted from MIDI files, clipped to note duration)
+            models: {
+                bartokPizz: {
+                    name: 'Bartok Pizzicato',
+                    type: 'single',             // Single note articulation
+                    cc0: 97,                    // Bank select value for this articulation
+                    defaultVelocity: 127,       // Original velocity from file
+                    durationTicks: 240,         // Note duration in ticks (clipped)
+                    ticksPerQuarter: 1920,      // From original file
+                    tempo: 763307,              // Microseconds per quarter note (~78.6 BPM)
+                    description: 'Bartok pizzicato snap articulation'
+                },
+                accelDecel: {
+                    name: 'Accel/Decel (Curve)',
+                    type: 'curve',              // Curve-based articulation pattern
+                    defaultVelocity: 100,       // Default velocity
+                    noteDurationMs: 50,         // Duration of each re-articulation note
+                    description: 'Acceleration/deceleration based on curve shape'
+                }
+            },
+            
+            // Currently selected model
+            selectedModel: null,
+            selectedModelKey: null,
+            
+            // Accel/Decel specific state
+            sourceCurve: null,                  // The curve used to generate the pattern
+            accelDecelEvents: null,             // Generated events for accel/decel
+            density: 50,                        // 0-100 density value
+            humanize: 20,                       // 0-100 humanization amount
+            
+            // UI elements
+            modelSelect: null,
+            paramsDiv: null,
+            pitchInput: null,
+            velocityInput: null,
+            infoDisplay: null,
+            outputSelect: null,
+            playBtn: null,
+            attachGCBtn: null,
+            attachCurveBtn: null,
+            
+            // Accel/Decel UI elements
+            accelDecelParamsDiv: null,
+            articulationSelect: null,
+            densitySlider: null,
+            densityNum: null,
+            humanizeSlider: null,
+            humanizeNum: null,
+            curveInfoDisplay: null,
+            regenerateBtn: null,
+            
+            // Articulation definitions (CC0 values)
+            articulations: {
+                '': null,                    // None - no CC0 message
+                'spiccato': { cc0: 91, name: 'Spiccato' }
+            },
+            selectedArticulation: '',
+            
+            // Pitch mode state
+            pitchMode: 'single',            // 'single' or 'glissando'
+            glissandoStartPitch: null,
+            glissandoEndPitch: null,
+            pitchModeSelect: null,
+            glissandoParamsDiv: null,
+            glissandoStartInput: null,
+            glissandoEndInput: null,
+            
+            // MIDI output
+            midiAccess: null,
+            selectedOutput: null,
+            
+            // Generated snippet (ready for attachment)
+            generatedSnippet: null,
+            
+            async init() {
+                this.modelSelect = document.getElementById('midiModelSelect');
+                this.paramsDiv = document.getElementById('midiModelParams');
+                this.pitchInput = document.getElementById('midiModelPitch');
+                this.velocityInput = document.getElementById('midiModelVelocity');
+                this.infoDisplay = document.getElementById('midiModelInfo');
+                this.outputSelect = document.getElementById('midiModelOutputSelect');
+                this.playBtn = document.getElementById('midiModelPlayBtn');
+                this.attachGCBtn = document.getElementById('midiModelAttachGCBtn');
+                this.attachCurveBtn = document.getElementById('midiModelAttachCurveBtn');
+                
+                // Accel/Decel specific UI elements
+                this.accelDecelParamsDiv = document.getElementById('accelDecelParams');
+                this.articulationSelect = document.getElementById('accelDecelArticulation');
+                this.densitySlider = document.getElementById('accelDecelDensity');
+                this.densityNum = document.getElementById('accelDecelDensityNum');
+                this.humanizeSlider = document.getElementById('accelDecelHumanize');
+                this.humanizeNum = document.getElementById('accelDecelHumanizeNum');
+                this.curveInfoDisplay = document.getElementById('accelDecelCurveInfo');
+                this.regenerateBtn = document.getElementById('accelDecelRegenerateBtn');
+                
+                // Pitch mode UI elements
+                this.pitchModeSelect = document.getElementById('accelDecelPitchMode');
+                this.glissandoParamsDiv = document.getElementById('glissandoParams');
+                this.glissandoStartInput = document.getElementById('glissandoStartPitch');
+                this.glissandoEndInput = document.getElementById('glissandoEndPitch');
+                
+                if (this.modelSelect) {
+                    this.modelSelect.addEventListener('change', () => this.onModelSelect());
+                }
+                if (this.pitchInput) {
+                    this.pitchInput.addEventListener('input', () => this.updateInfo());
+                }
+                if (this.velocityInput) {
+                    this.velocityInput.addEventListener('input', () => this.updateInfo());
+                }
+                if (this.outputSelect) {
+                    this.outputSelect.addEventListener('change', () => this.selectOutput());
+                }
+                if (this.playBtn) {
+                    this.playBtn.addEventListener('click', () => this.previewPlay());
+                }
+                if (this.attachGCBtn) {
+                    this.attachGCBtn.addEventListener('click', () => this.attachToSelectedGC());
+                }
+                if (this.attachCurveBtn) {
+                    this.attachCurveBtn.addEventListener('click', () => this.attachToSelectedCurve());
+                }
+                
+                // Accel/Decel slider sync
+                if (this.densitySlider && this.densityNum) {
+                    const updateDensity = (val) => {
+                        this.density = Math.max(0, Math.min(100, parseInt(val) || 50));
+                        this.densitySlider.value = this.density;
+                        this.densityNum.value = this.density;
+                        this.generateAccelDecelEvents();
+                    };
+                    this.densitySlider.addEventListener('input', () => updateDensity(this.densitySlider.value));
+                    this.densityNum.addEventListener('input', () => updateDensity(this.densityNum.value));
+                }
+                if (this.humanizeSlider && this.humanizeNum) {
+                    const updateHumanize = (val) => {
+                        this.humanize = Math.max(0, Math.min(100, parseInt(val) || 20));
+                        this.humanizeSlider.value = this.humanize;
+                        this.humanizeNum.value = this.humanize;
+                        this.generateAccelDecelEvents();
+                    };
+                    this.humanizeSlider.addEventListener('input', () => updateHumanize(this.humanizeSlider.value));
+                    this.humanizeNum.addEventListener('input', () => updateHumanize(this.humanizeNum.value));
+                }
+                if (this.regenerateBtn) {
+                    this.regenerateBtn.addEventListener('click', () => this.generateAccelDecelEvents());
+                }
+                if (this.articulationSelect) {
+                    this.articulationSelect.addEventListener('change', () => {
+                        this.selectedArticulation = this.articulationSelect.value;
+                        this.generateAccelDecelEvents();
+                    });
+                }
+                
+                // Pitch mode event listeners
+                if (this.pitchModeSelect) {
+                    this.pitchModeSelect.addEventListener('change', () => {
+                        this.pitchMode = this.pitchModeSelect.value;
+                        if (this.glissandoParamsDiv) {
+                            this.glissandoParamsDiv.style.display = this.pitchMode === 'glissando' ? 'block' : 'none';
+                        }
+                        this.generateAccelDecelEvents();
+                    });
+                }
+                if (this.glissandoStartInput) {
+                    this.glissandoStartInput.addEventListener('input', () => this.generateAccelDecelEvents());
+                }
+                if (this.glissandoEndInput) {
+                    this.glissandoEndInput.addEventListener('input', () => this.generateAccelDecelEvents());
+                }
+                
+                // Initialize MIDI access
+                await this.initMidi();
+                
+                console.debug('MidiModelSystem initialized');
+            },
+            
+            async initMidi() {
+                try {
+                    this.midiAccess = await navigator.requestMIDIAccess();
+                    this.refreshOutputs();
+                } catch (err) {
+                    console.error('Web MIDI API not available:', err);
+                    if (this.outputSelect) {
+                        this.outputSelect.innerHTML = '<option value="">MIDI not available</option>';
+                    }
+                }
+            },
+            
+            refreshOutputs() {
+                if (!this.midiAccess || !this.outputSelect) return;
+                
+                this.outputSelect.innerHTML = '<option value="">-- Select Output --</option>';
+                for (const output of this.midiAccess.outputs.values()) {
+                    const option = document.createElement('option');
+                    option.value = output.id;
+                    option.textContent = output.name;
+                    this.outputSelect.appendChild(option);
+                }
+            },
+            
+            selectOutput() {
+                if (!this.outputSelect || !this.midiAccess) return;
+                
+                const outputId = this.outputSelect.value;
+                if (outputId) {
+                    this.selectedOutput = this.midiAccess.outputs.get(outputId);
+                    console.debug('MIDI Model output selected:', this.selectedOutput?.name);
+                } else {
+                    this.selectedOutput = null;
+                }
+            },
+            
+            previewPlay() {
+                if (!this.selectedOutput) {
+                    alert('Please select a MIDI output device first.');
+                    return;
+                }
+                if (!this.selectedModel) {
+                    alert('Please select a model first.');
+                    return;
+                }
+                
+                const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
+                if (pitch === null) {
+                    alert('Invalid pitch. Use format like C4, C#3, Bb5');
+                    return;
+                }
+                
+                const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 127));
+                const model = this.selectedModel;
+                
+                // Handle Accel/Decel model differently
+                if (this.selectedModelKey === 'accelDecel') {
+                    this.previewPlayAccelDecel();
+                    return;
+                }
+                
+                // Single note models (Bartok Pizz, etc.)
+                // Calculate duration
+                const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
+                const durationMs = model.durationTicks * msPerTick;
+                
+                // Send CC0 (Bank Select) on all channels (omni)
+                for (let ch = 0; ch < 16; ch++) {
+                    this.selectedOutput.send([0xB0 | ch, 0x00, model.cc0]);
+                }
+                
+                // Send Note On on all channels
+                for (let ch = 0; ch < 16; ch++) {
+                    this.selectedOutput.send([0x90 | ch, pitch, velocity]);
+                }
+                
+                // Schedule Note Off after duration
+                setTimeout(() => {
+                    for (let ch = 0; ch < 16; ch++) {
+                        this.selectedOutput.send([0x80 | ch, pitch, 0]);
+                    }
+                }, durationMs);
+                
+                console.debug(`Preview: ${this.pitchToNoteName(pitch)} vel=${velocity} dur=${durationMs.toFixed(0)}ms`);
+            },
+            
+            // Preview play for Accel/Decel - plays all events omni
+            previewPlayAccelDecel() {
+                if (!this.accelDecelEvents || !this.accelDecelEvents.events) {
+                    alert('No accel/decel pattern generated. Select a curve first.');
+                    return;
+                }
+                
+                const events = this.accelDecelEvents.events;
+                const output = this.selectedOutput;
+                
+                console.debug(`Preview Accel/Decel: ${this.accelDecelEvents.noteCount} notes`);
+                
+                // Schedule all events with setTimeout, sending omni (all 16 channels)
+                for (const event of events) {
+                    setTimeout(() => {
+                        const statusByte = event.data[0] & 0xF0; // Get message type without channel
+                        for (let ch = 0; ch < 16; ch++) {
+                            const data = [...event.data];
+                            data[0] = statusByte | ch; // Set channel
+                            output.send(data);
+                        }
+                    }, event.timeMs);
+                }
+            },
+            
+            onModelSelect() {
+                const modelKey = this.modelSelect.value;
+                if (!modelKey) {
+                    this.selectedModel = null;
+                    this.selectedModelKey = null;
+                    this.paramsDiv.style.display = 'none';
+                    return;
+                }
+                
+                this.selectedModel = this.models[modelKey];
+                this.selectedModelKey = modelKey;
+                this.paramsDiv.style.display = 'block';
+                
+                // Set default velocity from model
+                if (this.velocityInput) {
+                    this.velocityInput.value = this.selectedModel.defaultVelocity;
+                }
+                
+                // Show/hide model-specific UI elements
+                const isAccelDecel = modelKey === 'accelDecel';
+                const isBartokPizz = modelKey === 'bartokPizz';
+                
+                if (this.accelDecelParamsDiv) {
+                    this.accelDecelParamsDiv.style.display = isAccelDecel ? 'block' : 'none';
+                }
+                if (this.attachGCBtn) {
+                    this.attachGCBtn.style.display = isBartokPizz ? 'block' : 'none';
+                }
+                if (this.attachCurveBtn) {
+                    this.attachCurveBtn.style.display = isAccelDecel ? 'block' : 'none';
+                }
+                
+                // For Accel/Decel, check if a curve is selected
+                if (isAccelDecel) {
+                    this.checkForSelectedCurve();
+                }
+                
+                this.updateInfo();
+            },
+            
+            // Check if CurveMaker has a selected curve and update UI
+            checkForSelectedCurve() {
+                if (window.CurveMaker && CurveMaker.selectedCurve) {
+                    this.sourceCurve = CurveMaker.selectedCurve;
+                    const curve = this.sourceCurve;
+                    const duration = (curve.endSeconds - curve.startSeconds).toFixed(2);
+                    const direction = this.getCurveDirection(curve);
+                    
+                    if (this.curveInfoDisplay) {
+                        this.curveInfoDisplay.innerHTML = `
+                            <div style="color: #8f8;">✓ Curve: ${curve.name}</div>
+                            <div>Duration: ${duration}s | Direction: ${direction}</div>
+                            <div>Track: G${curve.gTrack}</div>
+                        `;
+                    }
+                    
+                    // Auto-generate events
+                    this.generateAccelDecelEvents();
+                } else {
+                    this.sourceCurve = null;
+                    if (this.curveInfoDisplay) {
+                        this.curveInfoDisplay.innerHTML = `<div style="color: #fa8;">Select a curve in the score first</div>`;
+                    }
+                }
+            },
+            
+            // Determine if curve is ascending (accel) or descending (decel)
+            getCurveDirection(curve) {
+                if (!curve.curveData || !curve.curveData.samples || curve.curveData.samples.length < 2) {
+                    return 'Unknown';
+                }
+                const samples = curve.curveData.samples;
+                const startY = samples[0];
+                const endY = samples[samples.length - 1];
+                if (endY > startY + 0.1) return 'Accel ↗';
+                if (endY < startY - 0.1) return 'Decel ↘';
+                return 'Flat →';
+            },
+            
+            // Gaussian random number generator (Box-Muller transform)
+            gaussianRandom(mean = 0, stdDev = 1) {
+                const u1 = Math.random();
+                const u2 = Math.random();
+                const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                return z0 * stdDev + mean;
+            },
+            
+            // Generate acceleration/deceleration events based on curve
+            // Algorithm: Inverse Interval Mapping with Gaussian humanization
+            // - Higher curve Y = shorter interval between notes (faster)
+            // - Density controls total number of articulations
+            // - Humanize adds Gaussian jitter to timing
+            generateAccelDecelEvents() {
+                if (!this.sourceCurve) {
+                    this.accelDecelEvents = null;
+                    return;
+                }
+                
+                const curve = this.sourceCurve;
+                const curveData = curve.curveData;
+                if (!curveData || !curveData.samples || curveData.samples.length < 2) {
+                    this.accelDecelEvents = null;
+                    return;
+                }
+                
+                // Handle pitch based on mode (single note vs glissando)
+                // Now supports quarter tones: + = quarter sharp, d = quarter flat
+                let startPitchData, endPitchData;
+                if (this.pitchMode === 'glissando') {
+                    startPitchData = this.noteNameToPitch(this.glissandoStartInput?.value || 'C4', true);
+                    endPitchData = this.noteNameToPitch(this.glissandoEndInput?.value || 'C5', true);
+                    if (!startPitchData || !endPitchData) return;
+                } else {
+                    startPitchData = this.noteNameToPitch(this.pitchInput?.value || 'C4', true);
+                    endPitchData = startPitchData; // Same pitch for all notes
+                    if (!startPitchData) return;
+                }
+                
+                // Extract pitch and quarter tone info
+                const startPitch = startPitchData.pitch;
+                const endPitch = endPitchData.pitch;
+                const startQuarterTone = startPitchData.quarterTone;
+                const endQuarterTone = endPitchData.quarterTone;
+                
+                const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 100));
+                const model = this.selectedModel;
+                const noteDurationMs = model.noteDurationMs || 50;
+                
+                const startTime = curveData.startTime;
+                const endTime = curveData.endTime;
+                const durationSec = endTime - startTime;
+                const durationMs = durationSec * 1000;
+                const samples = curveData.samples;
+                const sampleInterval = curveData.sampleInterval; // 0.01 = 10ms
+                
+                // Density maps to number of articulations
+                // density 0 = ~2 notes (sparse), density 50+ = ~32 notes (max)
+                // Density above 50 is clamped to max
+                const minNotes = 2;
+                const maxNotes = 32;
+                const normalizedDensity = Math.min(this.density, 50) / 50; // 0-50 maps to 0-1, 50+ caps at 1
+                const targetNotes = Math.round(minNotes + normalizedDensity * (maxNotes - minNotes));
+                
+                // Calculate note times using inverse interval mapping
+                // We integrate the curve to find where to place notes
+                const noteTimes = [];
+                
+                // Method: Walk through time, accumulating "speed" from curve
+                // Place a note when accumulated speed crosses threshold
+                const totalIntegral = samples.reduce((sum, y) => sum + Math.max(0.1, y), 0);
+                const threshold = totalIntegral / targetNotes;
+                
+                let accumulator = 0;
+                let noteCount = 0;
+                
+                // Always start with a note at time 0
+                noteTimes.push(0);
+                noteCount++;
+                
+                for (let i = 0; i < samples.length && noteCount < targetNotes; i++) {
+                    const y = Math.max(0.1, samples[i]); // Minimum 0.1 to avoid division issues
+                    accumulator += y;
+                    
+                    if (accumulator >= threshold) {
+                        const timeSec = i * sampleInterval;
+                        const timeMs = timeSec * 1000;
+                        noteTimes.push(timeMs);
+                        accumulator -= threshold;
+                        noteCount++;
+                    }
+                }
+                
+                // Ensure we end with a note near the end (if not already there)
+                if (noteTimes.length > 0 && noteTimes[noteTimes.length - 1] < durationMs - 100) {
+                    noteTimes.push(durationMs - noteDurationMs);
+                }
+                
+                // Apply humanization (Gaussian jitter)
+                // Research: performers typically have ±5-15ms timing deviation for tight playing
+                // humanize 0 = no jitter, humanize 100 = up to ±8ms max jitter (reduced)
+                // Use smaller of: percentage-based or absolute cap
+                const avgInterval = durationMs / Math.max(1, noteTimes.length - 1);
+                const percentageJitter = avgInterval * 0.03 * (this.humanize / 100); // 3% max (was 5%)
+                const absoluteMaxJitter = 8 * (this.humanize / 100); // Cap at ±8ms (was 12ms)
+                const maxJitterMs = Math.min(percentageJitter, absoluteMaxJitter);
+                
+                // Calculate intervals between notes to identify fast sections
+                const intervals = [];
+                for (let i = 1; i < noteTimes.length; i++) {
+                    intervals.push(noteTimes[i] - noteTimes[i - 1]);
+                }
+                const minInterval = Math.min(...intervals);
+                
+                const humanizedTimes = noteTimes.map((t, i) => {
+                    if (i === 0) return t; // Keep first note at exact start
+                    if (i === noteTimes.length - 1) return t; // Keep last note position
+                    
+                    // Reduce jitter for fast sections (small intervals)
+                    // If interval is less than 100ms, scale down jitter proportionally
+                    const prevInterval = i > 0 ? noteTimes[i] - noteTimes[i - 1] : avgInterval;
+                    const nextInterval = i < noteTimes.length - 1 ? noteTimes[i + 1] - noteTimes[i] : avgInterval;
+                    const localInterval = Math.min(prevInterval, nextInterval);
+                    const speedFactor = Math.min(0.7, localInterval / 150); // Cap at 0.7 for slow notes too
+                    const adjustedJitter = maxJitterMs * speedFactor;
+                    
+                    const jitter = this.gaussianRandom(0, adjustedJitter / 2);
+                    return Math.max(0, Math.min(durationMs - noteDurationMs, t + jitter));
+                });
+                
+                // Sort times (jitter might have reordered some)
+                humanizedTimes.sort((a, b) => a - b);
+                
+                // Generate MIDI events (relative times from curve start)
+                const events = [];
+                
+                // CC0 at start - only if articulation is selected
+                const articulation = this.articulations[this.selectedArticulation];
+                if (articulation && articulation.cc0 !== undefined) {
+                    events.push({
+                        timeMs: 0,
+                        relativeTimeMs: 0,
+                        type: 'cc',
+                        data: [0xB0, 0x00, articulation.cc0]
+                    });
+                }
+                
+                // Note On/Off pairs for each articulation
+                // Spiccato duration research: 30-80ms for fast passages, up to 100-150ms slower
+                // Add slight duration variation for natural feel (reduced: ±10% of base duration)
+                const baseDurationMs = noteDurationMs; // 50ms default
+                const minDuration = Math.max(35, baseDurationMs * 0.85);  // 42ms min (tighter range)
+                const maxDuration = Math.min(80, baseDurationMs * 1.15);  // 57ms max (tighter range)
+                const durationRange = maxDuration - minDuration;
+                
+                // Calculate pitch for each note
+                // Hybrid glissando strategy:
+                // - ≤2 semitones: Pure pitch bend (single note with bend)
+                // - >2 semitones: Chromatic steps with pitch bend slides between
+                // Quarter tones are handled via pitch bend offset
+                const totalNotes = humanizedTimes.length;
+                const pitchRange = endPitch - startPitch;
+                const quarterToneRange = endQuarterTone - startQuarterTone;
+                // Total range in semitones including quarter tones
+                const totalPitchRange = pitchRange + quarterToneRange;
+                const absPitchRange = Math.abs(totalPitchRange);
+                const pitchBendRange = 2; // Standard ±2 semitones pitch bend range
+                const useHybridGliss = this.pitchMode === 'glissando' && absPitchRange > 0;
+                const usePurePitchBend = useHybridGliss && absPitchRange <= pitchBendRange;
+                // Check if we need quarter tone pitch bend (for single note mode or any quarter tone usage)
+                const hasQuarterTones = startQuarterTone !== 0 || endQuarterTone !== 0;
+                
+                // For hybrid glissando with >2 semitones, calculate chromatic steps
+                // Each note will bend toward the next note's pitch
+                // notePitchData stores { pitch, quarterToneOffset } for each note
+                let notePitchData = [];
+                if (useHybridGliss && !usePurePitchBend) {
+                    // Distribute pitches chromatically across notes
+                    for (let idx = 0; idx < totalNotes; idx++) {
+                        const t = totalNotes > 1 ? idx / (totalNotes - 1) : 0;
+                        // Interpolate the full pitch including quarter tones
+                        const exactPitch = startPitch + startQuarterTone + t * totalPitchRange;
+                        // Round to nearest semitone for MIDI note, keep fractional part as quarter tone offset
+                        const midiPitch = Math.round(exactPitch);
+                        const quarterOffset = exactPitch - midiPitch;
+                        notePitchData.push({ pitch: midiPitch, quarterToneOffset: quarterOffset });
+                    }
+                } else if (usePurePitchBend) {
+                    // All notes use start pitch, pitch bend handles the gliss (including quarter tones)
+                    for (let idx = 0; idx < totalNotes; idx++) {
+                        notePitchData.push({ pitch: startPitch, quarterToneOffset: startQuarterTone });
+                    }
+                } else {
+                    // Single note mode - all same pitch (may have quarter tone)
+                    for (let idx = 0; idx < totalNotes; idx++) {
+                        notePitchData.push({ pitch: startPitch, quarterToneOffset: startQuarterTone });
+                    }
+                }
+                
+                for (let idx = 0; idx < humanizedTimes.length; idx++) {
+                    const timeMs = humanizedTimes[idx];
+                    const nextTimeMs = idx < humanizedTimes.length - 1 ? humanizedTimes[idx + 1] : timeMs + baseDurationMs;
+                    
+                    // Calculate local speed factor for this note (reduce variation for fast sections)
+                    const prevInterval = idx > 0 ? humanizedTimes[idx] - humanizedTimes[idx - 1] : avgInterval;
+                    const nextInterval = idx < humanizedTimes.length - 1 ? humanizedTimes[idx + 1] - humanizedTimes[idx] : avgInterval;
+                    const localInterval = Math.min(prevInterval, nextInterval);
+                    const speedFactor = Math.min(0.6, localInterval / 150); // Cap at 0.6 for all notes
+                    
+                    // Vary note duration slightly using Gaussian distribution
+                    const adjustedDurationRange = durationRange * speedFactor;
+                    const durationVariation = this.gaussianRandom(0, adjustedDurationRange * 0.10);
+                    const noteDur = Math.max(minDuration, Math.min(maxDuration, baseDurationMs + durationVariation));
+                    
+                    const currentPitchData = notePitchData[idx];
+                    const nextPitchData = idx < notePitchData.length - 1 ? notePitchData[idx + 1] : currentPitchData;
+                    const notePitch = currentPitchData.pitch;
+                    const noteQuarterOffset = currentPitchData.quarterToneOffset;
+                    
+                    // Calculate pitch bend for glissando and/or quarter tones
+                    // Pitch bend: 0x2000 = center (no bend), 0x0000 = -2 semitones, 0x3FFF = +2 semitones
+                    // Each semitone = 0x1000 (4096) from center
+                    const needsPitchBend = useHybridGliss || hasQuarterTones;
+                    
+                    if (needsPitchBend) {
+                        // Calculate the base pitch bend for this note's quarter tone offset
+                        const baseBendSemitones = noteQuarterOffset;
+                        
+                        if (useHybridGliss) {
+                            // For pure pitch bend mode, calculate bend from start to end pitch
+                            if (usePurePitchBend) {
+                                const t = totalNotes > 1 ? idx / (totalNotes - 1) : 0;
+                                // Include both the glissando progress and quarter tone offset
+                                const targetBendSemitones = t * totalPitchRange + startQuarterTone;
+                                const bendValue = Math.round(0x2000 + (targetBendSemitones / pitchBendRange) * 0x2000);
+                                const clampedBend = Math.max(0, Math.min(0x3FFF, bendValue));
+                                const lsb = clampedBend & 0x7F;
+                                const msb = (clampedBend >> 7) & 0x7F;
+                                
+                                events.push({
+                                    timeMs: timeMs,
+                                    relativeTimeMs: timeMs,
+                                    type: 'pitchBend',
+                                    data: [0xE0, lsb, msb]
+                                });
+                            } else {
+                                // Hybrid mode: start at this note's quarter tone offset
+                                const startBendValue = Math.round(0x2000 + (baseBendSemitones / pitchBendRange) * 0x2000);
+                                const startClampedBend = Math.max(0, Math.min(0x3FFF, startBendValue));
+                                events.push({
+                                    timeMs: timeMs,
+                                    relativeTimeMs: timeMs,
+                                    type: 'pitchBend',
+                                    data: [0xE0, startClampedBend & 0x7F, (startClampedBend >> 7) & 0x7F]
+                                });
+                                
+                                // Calculate pitch difference to next note (including quarter tones)
+                                const nextFullPitch = nextPitchData.pitch + nextPitchData.quarterToneOffset;
+                                const currentFullPitch = notePitch + noteQuarterOffset;
+                                const pitchDiff = nextFullPitch - currentFullPitch;
+                                
+                                if (Math.abs(pitchDiff) > 0.01 && idx < humanizedTimes.length - 1) {
+                                    // Bend toward next note during this note
+                                    const bendSteps = 4;
+                                    const intervalToNext = nextTimeMs - timeMs;
+                                    const bendStartTime = timeMs + noteDur * 0.3;
+                                    const bendDuration = Math.min(noteDur * 0.6, intervalToNext * 0.8);
+                                    
+                                    for (let b = 1; b <= bendSteps; b++) {
+                                        const bendT = b / bendSteps;
+                                        const bendTimeMs = bendStartTime + bendT * bendDuration;
+                                        // Bend from current quarter offset toward next pitch
+                                        const targetBendSemitones = baseBendSemitones + Math.max(-pitchBendRange, Math.min(pitchBendRange, pitchDiff * bendT));
+                                        const bendValue = Math.round(0x2000 + (targetBendSemitones / pitchBendRange) * 0x2000);
+                                        const clampedBend = Math.max(0, Math.min(0x3FFF, bendValue));
+                                        
+                                        events.push({
+                                            timeMs: bendTimeMs,
+                                            relativeTimeMs: bendTimeMs,
+                                            type: 'pitchBend',
+                                            data: [0xE0, clampedBend & 0x7F, (clampedBend >> 7) & 0x7F]
+                                        });
+                                    }
+                                }
+                            }
+                        } else if (hasQuarterTones) {
+                            // Single note mode with quarter tone - just apply the quarter tone bend
+                            const bendValue = Math.round(0x2000 + (baseBendSemitones / pitchBendRange) * 0x2000);
+                            const clampedBend = Math.max(0, Math.min(0x3FFF, bendValue));
+                            events.push({
+                                timeMs: timeMs,
+                                relativeTimeMs: timeMs,
+                                type: 'pitchBend',
+                                data: [0xE0, clampedBend & 0x7F, (clampedBend >> 7) & 0x7F]
+                            });
+                        }
+                    }
+                    
+                    events.push({
+                        timeMs: timeMs,
+                        relativeTimeMs: timeMs,
+                        type: 'noteOn',
+                        data: [0x90, notePitch, velocity]
+                    });
+                    events.push({
+                        timeMs: timeMs + noteDur,
+                        relativeTimeMs: timeMs + noteDur,
+                        type: 'noteOff',
+                        data: [0x80, notePitch, 0]
+                    });
+                }
+                
+                // Reset pitch bend at end if glissando was used
+                if (useHybridGliss) {
+                    events.push({
+                        timeMs: durationMs + 10,
+                        relativeTimeMs: durationMs + 10,
+                        type: 'pitchBend',
+                        data: [0xE0, 0x00, 0x40] // Reset to center
+                    });
+                }
+                
+                // Sort by time
+                events.sort((a, b) => a.timeMs - b.timeMs);
+                
+                this.accelDecelEvents = {
+                    events: events,
+                    noteCount: humanizedTimes.length,
+                    durationMs: durationMs,
+                    startSeconds: startTime,
+                    endSeconds: endTime
+                };
+                
+                // Update info display
+                this.updateAccelDecelInfo();
+                
+                console.debug(`Accel/Decel generated: ${humanizedTimes.length} notes over ${durationMs.toFixed(0)}ms`);
+            },
+            
+            updateAccelDecelInfo() {
+                if (!this.infoDisplay || !this.accelDecelEvents) return;
+                
+                const velocity = parseInt(this.velocityInput?.value) || 100;
+                const direction = this.sourceCurve ? this.getCurveDirection(this.sourceCurve) : 'N/A';
+                const articulation = this.articulations[this.selectedArticulation];
+                const articulationDisplay = articulation ? articulation.name : 'None';
+                
+                // Build pitch display based on mode (with quarter tone support)
+                let pitchDisplay;
+                if (this.pitchMode === 'glissando') {
+                    const startData = this.noteNameToPitch(this.glissandoStartInput?.value || 'C4', true);
+                    const endData = this.noteNameToPitch(this.glissandoEndInput?.value || 'C5', true);
+                    const startDisplay = startData ? this.pitchToNoteNameWithQuarter(startData.pitch, startData.quarterTone) : '?';
+                    const endDisplay = endData ? this.pitchToNoteNameWithQuarter(endData.pitch, endData.quarterTone) : '?';
+                    const totalRange = (startData && endData) ? 
+                        Math.abs((endData.pitch + endData.quarterTone) - (startData.pitch + startData.quarterTone)) : 0;
+                    const glissMode = totalRange <= 2 ? 'bend' : 'hybrid';
+                    pitchDisplay = `Gliss: ${startDisplay}→${endDisplay} (${totalRange.toFixed(1)}st, ${glissMode})`;
+                } else {
+                    const pitchData = this.noteNameToPitch(this.pitchInput?.value || 'C4', true);
+                    pitchDisplay = pitchData ? this.pitchToNoteNameWithQuarter(pitchData.pitch, pitchData.quarterTone) : '(invalid)';
+                }
+                
+                this.infoDisplay.innerHTML = `
+                    <div style="color: #adf;"><strong>Accel/Decel</strong></div>
+                    <div>${pitchDisplay} | Vel: ${velocity} | Art: ${articulationDisplay}</div>
+                    <div>Notes: ${this.accelDecelEvents.noteCount} | Duration: ${this.accelDecelEvents.durationMs.toFixed(0)}ms</div>
+                    <div>Density: ${this.density} | Humanize: ${this.humanize} | ${direction}</div>
+                `;
+            },
+            
+            // Parse note name to MIDI pitch and quarter-tone offset
+            // Supports: C4, C#4, Bb4, and quarter tones:
+            //   + = quarter sharp (e.g., C+4, C#+4)
+            //   d = quarter flat (e.g., Cd4, Dbd4)
+            // Returns { pitch: number, quarterTone: number } where quarterTone is -0.5, 0, or +0.5
+            noteNameToPitch(noteName, returnObject = false) {
+                const noteMap = {
+                    'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11
+                };
+                
+                // Match: note, optional accidental (#/b), optional quarter tone (+/d), octave
+                const match = noteName.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+                if (!match) return returnObject ? null : null;
+                
+                let [, note, accidental, quarterTone, octave] = match;
+                let pitch = noteMap[note];
+                if (pitch === undefined) return returnObject ? null : null;
+                
+                if (accidental === '#') pitch += 1;
+                else if (accidental === 'B') pitch -= 1;
+                
+                pitch += (parseInt(octave) + 1) * 12;
+                pitch = Math.max(0, Math.min(127, pitch));
+                
+                // Quarter tone offset: + = quarter sharp (+0.5), D = quarter flat (-0.5)
+                let quarterToneOffset = 0;
+                if (quarterTone === '+') quarterToneOffset = 0.5;
+                else if (quarterTone === 'D') quarterToneOffset = -0.5;
+                
+                if (returnObject) {
+                    return { pitch, quarterTone: quarterToneOffset };
+                }
+                return pitch;
+            },
+            
+            // Convert MIDI pitch to note name
+            pitchToNoteName(pitch) {
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(pitch / 12) - 1;
+                const noteName = noteNames[pitch % 12];
+                return noteName + octave;
+            },
+            
+            // Convert MIDI pitch + quarter tone offset to display name
+            // quarterTone: -0.5 = quarter flat (d), +0.5 = quarter sharp (+)
+            pitchToNoteNameWithQuarter(pitch, quarterTone = 0) {
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(pitch / 12) - 1;
+                const noteName = noteNames[pitch % 12];
+                let suffix = '';
+                if (quarterTone > 0.25) suffix = '+';      // Quarter sharp
+                else if (quarterTone < -0.25) suffix = 'd'; // Quarter flat
+                return noteName + suffix + octave;
+            },
+            
+            updateInfo() {
+                if (!this.selectedModel || !this.infoDisplay) return;
+                
+                const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
+                const velocity = parseInt(this.velocityInput?.value) || 127;
+                const model = this.selectedModel;
+                
+                // Calculate duration in ms
+                const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
+                const durationMs = model.durationTicks * msPerTick;
+                
+                const pitchDisplay = pitch !== null ? this.pitchToNoteName(pitch) : '(invalid)';
+                
+                this.infoDisplay.innerHTML = `
+                    <div style="color: #adf;"><strong>${model.name}</strong></div>
+                    <div>CC0: ${model.cc0} | Pitch: ${pitchDisplay} | Vel: ${velocity}</div>
+                    <div>Duration: ${durationMs.toFixed(0)}ms</div>
+                `;
+            },
+            
+            // Generate MIDI events from model + user parameters
+            generateSnippet() {
+                if (!this.selectedModel) {
+                    alert('Please select a model first.');
+                    return null;
+                }
+                
+                const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
+                if (pitch === null) {
+                    alert('Invalid pitch. Use format like C4, C#3, Bb5');
+                    return null;
+                }
+                
+                const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 127));
+                const model = this.selectedModel;
+                
+                // Calculate timing
+                const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
+                const durationMs = model.durationTicks * msPerTick;
+                
+                // Generate MIDI events array (relative times in ms)
+                // Format matches MidiController's expected event structure
+                const events = [
+                    // CC0 (Bank Select) at time 0
+                    { timeMs: 0, type: 'cc', data: [0xB0, 0x00, model.cc0] },
+                    // Note On at time 0
+                    { timeMs: 0, type: 'noteOn', data: [0x90, pitch, velocity] },
+                    // Note Off at end of duration
+                    { timeMs: durationMs, type: 'noteOff', data: [0x80, pitch, 0] }
+                ];
+                
+                this.generatedSnippet = {
+                    modelName: model.name,
+                    pitch: pitch,
+                    pitchName: this.pitchToNoteName(pitch),
+                    velocity: velocity,
+                    cc0: model.cc0,
+                    durationMs: durationMs,
+                    events: events
+                };
+                
+                console.debug('Generated MIDI snippet:', this.generatedSnippet);
+                
+                // Update info to show it's ready
+                if (this.infoDisplay) {
+                    this.infoDisplay.innerHTML += `<div style="color: #8f8; margin-top: 4px;">✓ Snippet ready for attachment</div>`;
+                }
+                
+                return this.generatedSnippet;
+            },
+            
+            // Get the current generated snippet (for attachment to graphic objects)
+            getSnippet() {
+                return this.generatedSnippet;
+            },
+            
+            // Clear the generated snippet
+            clearSnippet() {
+                this.generatedSnippet = null;
+                this.updateInfo();
+            },
+            
+            // Attach MIDI snippet to the currently selected GC
+            attachToSelectedGC() {
+                if (!this.selectedModel) {
+                    alert('Please select a model first.');
+                    return;
+                }
+                
+                // Check if GCMaker has a selected GC
+                if (!window.GCMaker || !GCMaker.selectedGC) {
+                    alert('Please select a GC first (click on a GC in the score).');
+                    return;
+                }
+                
+                const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
+                if (pitch === null) {
+                    alert('Invalid pitch. Use format like C4, C#3, Bb5');
+                    return;
+                }
+                
+                const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 127));
+                const model = this.selectedModel;
+                const gc = GCMaker.selectedGC;
+                
+                // Calculate duration
+                const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
+                const durationMs = model.durationTicks * msPerTick;
+                const durationSec = durationMs / 1000;
+                
+                // The impact point time in seconds
+                const impactSeconds = gc.impactSeconds;
+                const impactMs = impactSeconds * 1000;
+                
+                // Get the track index from GC's gTrack (1-4 -> 0-3)
+                const trackIndex = parseInt(gc.gTrack) - 1;
+                const channel = trackIndex; // MIDI channel 0-3 for tracks 1-4
+                
+                // Create MIDI events with absolute times and proper channel
+                // Channel is embedded in the status byte (lower 4 bits)
+                const snippetEvents = [
+                    { 
+                        timeMs: impactMs, 
+                        relativeTimeMs: 0,
+                        type: 'cc', 
+                        data: [0xB0 | channel, 0x00, model.cc0] 
+                    },
+                    { 
+                        timeMs: impactMs, 
+                        relativeTimeMs: 0,
+                        type: 'noteOn', 
+                        data: [0x90 | channel, pitch, velocity] 
+                    },
+                    { 
+                        timeMs: impactMs + durationMs, 
+                        relativeTimeMs: durationMs,
+                        type: 'noteOff', 
+                        data: [0x80 | channel, pitch, 0] 
+                    }
+                ];
+                
+                // Remove any previous snippet from MidiSnippetDatabase for this GC
+                if (gc.midiSnippetId && window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.remove(gc.midiSnippetId);
+                }
+                
+                // Remove previous events from MidiController track
+                if (gc.midiEventIds && window.MidiController && MidiController.tracks[trackIndex]) {
+                    MidiController.tracks[trackIndex].midiEvents = 
+                        MidiController.tracks[trackIndex].midiEvents.filter(e => !gc.midiEventIds.includes(e.id));
+                }
+                
+                // Get color from GC or use default
+                const color = gc.color || 'brightOrange';
+                
+                // Create snippet data for MidiSnippetDatabase (for visualization)
+                const snippetData = {
+                    name: `${model.name} @ ${gc.name}`,
+                    trackIndex: trackIndex,
+                    startSeconds: impactSeconds,
+                    endSeconds: impactSeconds + durationSec,
+                    events: snippetEvents,
+                    color: color,
+                    sourceGC: gc.id
+                };
+                
+                // Add to MidiSnippetDatabase for visualization
+                if (window.MidiSnippetDatabase) {
+                    const snippet = MidiSnippetDatabase.add(snippetData);
+                    gc.midiSnippetId = snippet.id;
+                }
+                
+                // Add events to MidiController's track for playback
+                if (window.MidiController && MidiController.tracks && MidiController.tracks[trackIndex]) {
+                    gc.midiEventIds = [];
+                    for (const event of snippetEvents) {
+                        const eventId = `gc_${gc.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                        const midiEvent = {
+                            id: eventId,
+                            timeMs: event.timeMs,
+                            type: event.type,
+                            data: [...event.data],
+                            sourceGC: gc.id,
+                            snippetId: gc.midiSnippetId
+                        };
+                        MidiController.tracks[trackIndex].midiEvents.push(midiEvent);
+                        gc.midiEventIds.push(eventId);
+                    }
+                    
+                    // Sort events by time
+                    MidiController.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                    
+                    // Re-render MIDI displays to show the new snippet
+                    MidiController.renderAllMidiDisplays();
+                    MidiController.updateMidiDisplayVisibility();
+                }
+                
+                // Store the MIDI snippet info on the GC object for persistence
+                gc.midiSnippet = {
+                    modelName: model.name,
+                    pitch: pitch,
+                    pitchName: this.pitchToNoteName(pitch),
+                    velocity: velocity,
+                    cc0: model.cc0,
+                    durationMs: durationMs,
+                    impactSeconds: impactSeconds
+                };
+                
+                console.debug(`MIDI snippet attached to GC "${gc.name}" at impact ${impactSeconds}s on track ${trackIndex + 1}:`, gc.midiSnippet);
+                
+                // Update info display
+                if (this.infoDisplay) {
+                    this.infoDisplay.innerHTML = `
+                        <div style="color: #adf;"><strong>${model.name}</strong></div>
+                        <div>Pitch: ${this.pitchToNoteName(pitch)} | Vel: ${velocity} | Track: ${trackIndex + 1}</div>
+                        <div style="color: #8f8; margin-top: 4px;">✓ Attached to GC "${gc.name}" at ${impactSeconds.toFixed(2)}s</div>
+                    `;
+                }
+                
+                // Mark score as dirty
+                if (window.ScoreManager) {
+                    ScoreManager.markDirty();
+                }
+            },
+            
+            // Attach Accel/Decel MIDI snippet to the selected curve
+            attachToSelectedCurve() {
+                if (!this.selectedModel || this.selectedModelKey !== 'accelDecel') {
+                    alert('Please select the Accel/Decel model first.');
+                    return;
+                }
+                
+                if (!this.accelDecelEvents || !this.accelDecelEvents.events) {
+                    alert('No accel/decel pattern generated. Select a curve and adjust parameters first.');
+                    return;
+                }
+                
+                // Use the source curve for attachment
+                if (!this.sourceCurve) {
+                    alert('No curve selected. Click on a curve in the score first.');
+                    return;
+                }
+                
+                const curve = this.sourceCurve;
+                const model = this.selectedModel;
+                const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
+                const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 100));
+                
+                // Get the track index from curve's gTrack (1-4 -> 0-3)
+                // Handle 'A' (all tracks) by defaulting to track 1
+                let trackIndex = parseInt(curve.gTrack) - 1;
+                if (isNaN(trackIndex) || trackIndex < 0 || trackIndex > 3) {
+                    console.warn(`Invalid gTrack "${curve.gTrack}" for curve, defaulting to track 1`);
+                    trackIndex = 0; // Default to track 1 (index 0)
+                }
+                const channel = trackIndex; // MIDI channel 0-3 for tracks 1-4
+                
+                const startSeconds = this.accelDecelEvents.startSeconds;
+                const endSeconds = this.accelDecelEvents.endSeconds;
+                const startMs = startSeconds * 1000;
+                
+                // Create snippet events with absolute times and proper channel
+                const snippetEvents = this.accelDecelEvents.events.map(event => {
+                    const statusByte = event.data[0] & 0xF0;
+                    return {
+                        timeMs: startMs + event.timeMs,
+                        relativeTimeMs: event.timeMs,
+                        type: event.type,
+                        data: [statusByte | channel, event.data[1], event.data[2]]
+                    };
+                });
+                
+                // Remove any previous snippet from MidiSnippetDatabase for this curve
+                if (curve.midiSnippetId && window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.remove(curve.midiSnippetId);
+                }
+                
+                // Remove previous events from MidiController track
+                if (curve.midiEventIds && window.MidiController && MidiController.tracks[trackIndex]) {
+                    MidiController.tracks[trackIndex].midiEvents = 
+                        MidiController.tracks[trackIndex].midiEvents.filter(e => !curve.midiEventIds.includes(e.id));
+                }
+                
+                // Get color from curve
+                const color = curve.color || 'brightBlue';
+                
+                // Create snippet data for MidiSnippetDatabase (for visualization)
+                const snippetData = {
+                    name: `Accel/Decel @ ${curve.name}`,
+                    trackIndex: trackIndex,
+                    startSeconds: startSeconds,
+                    endSeconds: endSeconds,
+                    events: snippetEvents,
+                    color: color,
+                    sourceCurve: curve.id,
+                    noteCount: this.accelDecelEvents.noteCount
+                };
+                
+                // Add to MidiSnippetDatabase for visualization
+                if (window.MidiSnippetDatabase) {
+                    const snippet = MidiSnippetDatabase.add(snippetData);
+                    curve.midiSnippetId = snippet.id;
+                }
+                
+                // Add events to MidiController's track for playback
+                if (window.MidiController && MidiController.tracks && MidiController.tracks[trackIndex]) {
+                    curve.midiEventIds = [];
+                    for (const event of snippetEvents) {
+                        const eventId = `curve_${curve.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                        const midiEvent = {
+                            id: eventId,
+                            timeMs: event.timeMs,
+                            type: event.type,
+                            data: [...event.data],
+                            sourceCurve: curve.id,
+                            snippetId: curve.midiSnippetId
+                        };
+                        MidiController.tracks[trackIndex].midiEvents.push(midiEvent);
+                        curve.midiEventIds.push(eventId);
+                    }
+                    
+                    // Sort events by time
+                    MidiController.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                    
+                    // Re-render MIDI displays to show the new snippet
+                    MidiController.renderAllMidiDisplays();
+                    MidiController.updateMidiDisplayVisibility();
+                }
+                
+                // Store the MIDI snippet info on the curve object for persistence
+                const articulationInfo = this.articulations[this.selectedArticulation];
+                curve.midiSnippet = {
+                    modelName: 'Accel/Decel',
+                    pitch: pitch,
+                    pitchName: this.pitchToNoteName(pitch),
+                    velocity: velocity,
+                    density: this.density,
+                    humanize: this.humanize,
+                    articulation: this.selectedArticulation,
+                    articulationName: articulationInfo ? articulationInfo.name : 'None',
+                    noteCount: this.accelDecelEvents.noteCount,
+                    durationMs: this.accelDecelEvents.durationMs
+                };
+                
+                console.debug(`Accel/Decel attached to curve "${curve.name}" (${startSeconds.toFixed(2)}s - ${endSeconds.toFixed(2)}s) on track ${trackIndex + 1}:`, curve.midiSnippet);
+                
+                // Update info display
+                if (this.infoDisplay) {
+                    this.infoDisplay.innerHTML = `
+                        <div style="color: #adf;"><strong>Accel/Decel</strong></div>
+                        <div>Notes: ${this.accelDecelEvents.noteCount} | Track: ${trackIndex + 1}</div>
+                        <div style="color: #8f8; margin-top: 4px;">✓ Attached to curve "${curve.name}"</div>
+                    `;
+                }
+                
+                // Mark score as dirty
+                if (window.ScoreManager) {
+                    ScoreManager.markDirty();
+                }
+            }
+        };
+        window.MidiModelSystem = MidiModelSystem;
+        
+        // Initialize MidiModelSystem after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => MidiModelSystem.init());
+        } else {
+            MidiModelSystem.init();
+        }
         
         // Audio Clip Database - stores audio file insertions as distinct objects
         const AudioClipDatabase = {
