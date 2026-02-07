@@ -9269,6 +9269,11 @@
                     this.selectedOutput.send([0xB0 | ch, 0x00, model.cc0]);
                 }
                 
+                // Reset CC7 (Volume) to 100 (unity) on all channels - ensures volume is restored after secco
+                for (let ch = 0; ch < 16; ch++) {
+                    this.selectedOutput.send([0xB0 | ch, 0x07, 100]);
+                }
+                
                 // Send Note On on all channels
                 for (let ch = 0; ch < 16; ch++) {
                     this.selectedOutput.send([0x90 | ch, pitch, velocity]);
@@ -9293,6 +9298,11 @@
                 
                 const events = this.accelDecelEvents.events;
                 const output = this.selectedOutput;
+                
+                // Reset CC7 (Volume) to 100 (unity) on all channels - ensures volume is restored after secco
+                for (let ch = 0; ch < 16; ch++) {
+                    output.send([0xB0 | ch, 0x07, 100]);
+                }
                 
                 console.debug(`Preview Accel/Decel: ${this.accelDecelEvents.noteCount} notes`);
                 
@@ -9424,7 +9434,9 @@
             
             // Update pitch mode UI - show single pitch or glissando inputs
             updatePitchModeUI() {
-                const isGlissando = this.pitchMode === 'glissando';
+                const isCurveBased = this.selectedModelKey === 'accelDecel' || this.selectedModelKey === 'crescDecresc';
+                // For non-curve-based models (like Bartok Pizz), always show single pitch
+                const isGlissando = isCurveBased && this.pitchMode === 'glissando';
                 if (this.singlePitchRow) {
                     this.singlePitchRow.style.display = isGlissando ? 'none' : 'flex';
                 }
@@ -9971,57 +9983,54 @@
                     }
                 }
                 
-                // Calculate timing for end sequence
-                // Scenario 1 (Secco ON): Immediate cutoff after curve ends
-                // Scenario 2 (Secco OFF): Wait for tail time after curve ends
-                
-                let noteOffTime, allNotesOffTime, volumeResetTime, totalDurationMs;
-                
+                // Secco: Kill sound immediately before note-off
+                // Send multiple CC messages to ensure synth cuts sound without release tail
+                // BASELINE STATE: CC7=0 at +7ms, CC120 at +8ms, CC123 at +9ms, noteOff at +10ms
                 if (this.crescDecrescSecco) {
-                    // SECCO: Immediate cutoff
-                    // Timeline: curve ends → +5ms Note Off → +10ms All Notes Off → +50ms CC7=100
-                    noteOffTime = curveDurationMs + 5;
-                    allNotesOffTime = curveDurationMs + 15;
-                    volumeResetTime = curveDurationMs + 65;
-                    totalDurationMs = curveDurationMs + 100; // Extra buffer to ensure all messages sent
-                } else {
-                    // NON-SECCO: Let note ring for tail time
-                    // Timeline: curve ends → +tailMs Note Off → +10ms All Notes Off → +50ms CC7=100
-                    noteOffTime = curveDurationMs + tailMs;
-                    allNotesOffTime = noteOffTime + 10;
-                    volumeResetTime = allNotesOffTime + 50;
-                    totalDurationMs = volumeResetTime + 50; // Extra buffer to ensure all messages sent
+                    // REMOVED: CC11 (Expression) to 0 - uncomment if needed for immediate volume cut
+                    // events.push({
+                    //     timeMs: curveDurationMs + 6,
+                    //     relativeTimeMs: curveDurationMs + 6,
+                    //     type: 'cc',
+                    //     data: [0xB0, 11, 0] // CC11 = Expression to 0
+                    // });
+                    // CC7 (Volume) to 0 - cuts sound immediately
+                    events.push({
+                        timeMs: curveDurationMs + 7,
+                        relativeTimeMs: curveDurationMs + 7,
+                        type: 'cc',
+                        data: [0xB0, 7, 0] // CC7 = Volume to 0
+                    });
+                    // REMOVED: CC120 (All Sound Off) - synth doesn't respond to this
+                    // events.push({
+                    //     timeMs: curveDurationMs + 8,
+                    //     relativeTimeMs: curveDurationMs + 8,
+                    //     type: 'cc',
+                    //     data: [0xB0, 120, 0] // CC120 = All Sound Off
+                    // });
+                    // REMOVED: CC123 (All Notes Off) - synth doesn't respond to this
+                    // events.push({
+                    //     timeMs: curveDurationMs + 9,
+                    //     relativeTimeMs: curveDurationMs + 9,
+                    //     type: 'cc',
+                    //     data: [0xB0, 123, 0] // CC123 = All Notes Off
+                    // });
                 }
                 
-                // Note off
+                // Note off at end - use velocity 127 for secco (signals abrupt release)
+                const noteOffVelocity = this.crescDecrescSecco ? 127 : 0;
                 events.push({
-                    timeMs: noteOffTime,
-                    relativeTimeMs: noteOffTime,
+                    timeMs: curveDurationMs + 10,
+                    relativeTimeMs: curveDurationMs + 10,
                     type: 'noteOff',
-                    data: [0x80, startPitch, 0]
-                });
-                
-                // All Notes Off (CC123) - ensures sound stops
-                events.push({
-                    timeMs: allNotesOffTime,
-                    relativeTimeMs: allNotesOffTime,
-                    type: 'cc',
-                    data: [0xB0, 123, 0] // CC123 = All Notes Off
-                });
-                
-                // Reset CC7 to unity (100) so next notes play at normal volume
-                events.push({
-                    timeMs: volumeResetTime,
-                    relativeTimeMs: volumeResetTime,
-                    type: 'cc',
-                    data: [0xB0, 0x07, 100] // CC7 = volume back to unity
+                    data: [0x80, startPitch, noteOffVelocity]
                 });
                 
                 // Reset pitch bend if used
                 if (useGlissando || startQuarterTone !== 0) {
                     events.push({
-                        timeMs: volumeResetTime + 5,
-                        relativeTimeMs: volumeResetTime + 5,
+                        timeMs: curveDurationMs + (this.crescDecrescSecco ? 13 : 11),
+                        relativeTimeMs: curveDurationMs + (this.crescDecrescSecco ? 13 : 11),
                         type: 'pitchBend',
                         data: [0xE0, 0x00, 0x40] // Reset to center
                     });
@@ -10032,10 +10041,9 @@
                 
                 this.crescDecrescEvents = {
                     events: events,
-                    durationMs: totalDurationMs, // Total duration including cleanup messages
-                    curveDurationMs: curveDurationMs, // Just the curve portion
+                    durationMs: curveDurationMs,
                     startSeconds: startTime,
-                    endSeconds: startTime + (totalDurationMs / 1000), // Extended end time
+                    endSeconds: endTime,
                     startVol: startVol,
                     endVol: endVol,
                     tailMs: this.crescDecrescSecco ? 0 : tailMs

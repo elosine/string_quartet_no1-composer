@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "0985_2026-02-06_w_draft",
-    "created": "2026-02-06T19:44:23.743Z",
-    "modified": "2026-02-06T19:44:23.766Z",
+    "created": "2026-02-06T19:33:54.423Z",
+    "modified": "2026-02-06T19:33:54.458Z",
     "author": ""
   },
   "tempoHistory": [
@@ -10772,45 +10772,6 @@
           ],
           "snippetId": 130,
           "timestamp": 162029.95451651994
-        },
-        {
-          "id": "gc_66_1770406606701_dzscr661c",
-          "timeMs": 163100,
-          "type": "cc",
-          "data": [
-            178,
-            0,
-            97
-          ],
-          "sourceGC": 66,
-          "snippetId": 144,
-          "timestamp": 163100
-        },
-        {
-          "id": "gc_66_1770406606701_538pmgf4s",
-          "timeMs": 163100,
-          "type": "noteOn",
-          "data": [
-            146,
-            60,
-            127
-          ],
-          "sourceGC": 66,
-          "snippetId": 144,
-          "timestamp": 163100
-        },
-        {
-          "id": "gc_66_1770406606701_a79nz7nvw",
-          "timeMs": 163195.413375,
-          "type": "noteOff",
-          "data": [
-            130,
-            60,
-            0
-          ],
-          "sourceGC": 66,
-          "snippetId": 144,
-          "timestamp": 163195.413375
         },
         {
           "timeMs": 164080,
@@ -72399,51 +72360,9 @@
           "color": "neonMagenta",
           "sourceGC": 63,
           "createdAt": 1770392388951
-        },
-        {
-          "id": 144,
-          "name": "Bartok Pizzicato @ GC_20260117_204645",
-          "trackIndex": 2,
-          "startSeconds": 163.1,
-          "endSeconds": 163.195413375,
-          "events": [
-            {
-              "timeMs": 163100,
-              "relativeTimeMs": 0,
-              "type": "cc",
-              "data": [
-                178,
-                0,
-                97
-              ]
-            },
-            {
-              "timeMs": 163100,
-              "relativeTimeMs": 0,
-              "type": "noteOn",
-              "data": [
-                146,
-                60,
-                127
-              ]
-            },
-            {
-              "timeMs": 163195.413375,
-              "relativeTimeMs": 95.413375,
-              "type": "noteOff",
-              "data": [
-                130,
-                60,
-                0
-              ]
-            }
-          ],
-          "color": "neonMagenta",
-          "sourceGC": 66,
-          "createdAt": 1770406606701
         }
       ],
-      "nextId": 145
+      "nextId": 142
     },
     "audioClips": {
       "clips": [
