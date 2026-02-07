@@ -19,6 +19,12 @@ tspan { white-space: pre; }
 <g transform="translate(0.5691, 10.7840)">
 <line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="5.6692" y2="-2.0000"/>
 </g>
+<g transform="translate(0.5691, 13.7840)">
+<rect x="6.6659" y="-0.1000" width="1.6476" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 14.7840)">
+<rect x="6.6659" y="-0.1000" width="1.6476" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
 <g transform="translate(0.5691, 4.7840)">
 <rect x="0.2419" y="-0.1000" width="1.5487" height="0.2000" ry="0.1000" fill="currentColor"/>
 </g>
@@ -31,22 +37,18 @@ tspan { white-space: pre; }
 <g transform="translate(0.5691, 7.7840)">
 <rect x="0.2419" y="-0.1000" width="1.5487" height="0.2000" ry="0.1000" fill="currentColor"/>
 </g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:149:0:1">
+<g transform="translate(7.5096, 14.7840)">
+<path transform="scale(0.0032, -0.0032)" d="M310 63c0 23 -19 40 -40 40c-4 0 -8 -1 -12 -2c-30 -8 -75 -38 -111 -61s-81 -52 -101 -76c-7 -8 -10 -17 -10 -27c0 -23 19 -40 40 -40c4 0 8 1 12 2c30 8 75 38 111 61s81 52 101 76c7 8 10 17 10 27zM256 138c50 0 90 -22 90 -77c0 -18 -5 -37 -10 -55
+c-11 -38 -30 -74 -63 -96c-53 -35 -111 -48 -183 -48c-50 0 -90 22 -90 77c0 18 5 37 10 55c11 38 30 74 63 96c53 36 111 48 183 48z" fill="currentColor"/>
+</g>
+</a>
 <g transform="translate(0.2378, 5.2840)">
 <path transform="scale(0.0025, -0.0025)" d="M124 33c-1 34 -18 67 -49 67c-27 0 -39 -32 -39 -63c0 -56 44 -98 85 -136c3 21 5 43 5 64c0 3 -1 7 -1 10zM176 -142c0 -18 -12 -35 -29 -35c-28 0 -36 34 -55 52c-55 52 -134 93 -134 169c0 54 30 106 79 106c37 0 72 -15 97 -42l-8 333c10 6 21 9 32 9s23 -3 33 -9
 c-5 -194 -10 -389 -15 -583z" fill="currentColor"/>
 </g>
-<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:113:4:5">
-<g transform="translate(-0.0309, 13.2340)">
-<path stroke-width="0.1500" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="none" d="M0.6000 0.5000L3 0.5000L3 -5.5000L0.6000 -5.5000z"/>
-</g>
-</a>
-<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:88:4:5">
-<g transform="translate(7.0691, 4.2840)">
-<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
-</g>
-</a>
-<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:86:4:5">
-<g transform="translate(5.0691, 9.7840)">
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:82:4:5">
+<g transform="translate(1.0691, 8.2840)">
 <path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
 </g>
 </a>
@@ -55,9 +57,19 @@ c-5 -194 -10 -389 -15 -583z" fill="currentColor"/>
 <path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
 </g>
 </a>
-<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:82:4:5">
-<g transform="translate(1.0691, 8.2840)">
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:86:4:5">
+<g transform="translate(5.0691, 9.7840)">
 <path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:88:4:5">
+<g transform="translate(7.0691, 4.2840)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PitchCell_final.ly:113:4:5">
+<g transform="translate(-0.0309, 13.2340)">
+<path stroke-width="0.1500" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="none" d="M0.6000 0.5000L3 0.5000L3 -5.5000L0.6000 -5.5000z"/>
 </g>
 </a>
 <g transform="translate(11.8079, 278.3622)">
