@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="4.6129127mm"
+   height="13.952963mm"
+   viewBox="0 0 2.6249989 7.9400033"
+   id="svg10"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs10" />
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <g
+     transform="translate(0.3073,5.89)"
+     id="g1">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="2"
+       x2="2.2677"
+       y2="2"
+       id="line1" />
+  </g>
+  <g
+     transform="translate(0.3073,5.89)"
+     id="g2">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="1"
+       x2="2.2677"
+       y2="1"
+       id="line2" />
+  </g>
+  <g
+     transform="translate(0.3073,5.89)"
+     id="g3">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="0"
+       x2="2.2677"
+       y2="0"
+       id="line3" />
+  </g>
+  <g
+     transform="translate(0.3073,5.89)"
+     id="g4">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-1"
+       x2="2.2677"
+       y2="-1"
+       id="line4" />
+  </g>
+  <g
+     transform="translate(0.3073,5.89)"
+     id="g5">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-2"
+       x2="2.2677"
+       y2="-2"
+       id="line5" />
+  </g>
+  <g
+     transform="translate(0.8195,0.89)"
+     id="g6">
+    <rect
+       x="-0.1708"
+       y="-0.050000001"
+       width="1.4492"
+       height="0.1"
+       ry="0.050000001"
+       fill="currentColor"
+       id="rect5" />
+  </g>
+  <g
+     transform="translate(0.8195,1.89)"
+     id="g7">
+    <rect
+       x="-0.2703"
+       y="-0.050000001"
+       width="1.5487"
+       height="0.1"
+       ry="0.050000001"
+       fill="currentColor"
+       id="rect6" />
+  </g>
+  <g
+     transform="translate(0.8195,2.89)"
+     id="g8">
+    <rect
+       x="-0.2703"
+       y="-0.050000001"
+       width="1.5487"
+       height="0.1"
+       ry="0.050000001"
+       fill="currentColor"
+       id="rect7" />
+  </g>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/pitches/treble/EQF6.ly:53:4:5"
+     id="a9"
+     transform="translate(0.2504,-1)">
+    <g
+       transform="translate(0.5569,1.89)"
+       id="g9">
+      <path
+         transform="scale(0.0032,-0.0032)"
+         d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
+         fill="currentColor"
+         id="path8" />
+    </g>
+  </a>
+  <g
+     transform="translate(0.09,0.89)"
+     id="g10">
+    <path
+       transform="scale(0.002,-0.002)"
+       d="M 118,30 C 117,64 101,98 70,98 44,98 32,67 32,37 c 0,-55 42,-96 82,-134 3,20 5,41 5,62 v 10 z m 55,-174 c 0,-20 -12,-38 -31,-38 -30,0 -39,37 -59,57 -54,52 -128,94 -128,169 0,54 26,108 75,108 38,0 74,-17 99,-46 l -10,330 c 11,6 24,9 36,9 12,0 24,-3 35,-9 z"
+       fill="currentColor"
+       id="path9" />
+  </g>
+</svg>

@@ -72,6 +72,7 @@
             aspect-ratio: 4 / 3;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         .score-row {
             flex: 1;
@@ -869,6 +870,32 @@
                     <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
                     <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
                 </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label">Glissando</div>
+                
+                <div class="curve-input-row">
+                    <label>Clef</label>
+                    <select id="glissandoClefSelect" class="curve-input" style="width: 80px;">
+                        <option value="treble">Treble</option>
+                        <option value="alto">Alto</option>
+                        <option value="bass">Bass</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label>Start</label>
+                    <select id="glissandoStartPitch" class="curve-input" style="width: 80px;">
+                        <option value="">--</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label>End</label>
+                    <select id="glissandoEndPitch" class="curve-input" style="width: 80px;">
+                        <option value="">--</option>
+                    </select>
+                </div>
+                <button id="glissandoAttachBtn" class="curve-draw-btn" style="margin-top: 5px;">Attach to Curve</button>
+                <button id="glissandoRemoveBtn" class="curve-draw-btn" style="margin-top: 5px;">Remove Glissando</button>
                 
                 <div class="section-divider"></div>
                 <div class="section-label">Motive Maker</div>
@@ -4752,6 +4779,10 @@
                     follower.style.display = 'none';
                     meterOutline.style.display = 'none';
                     cursor.currentCurveValue = null;
+                    // Hide glissando pitch display when no curve
+                    if (window.GlissandoSystem) {
+                        GlissandoSystem.hidePitchDisplay(staffIndex);
+                    }
                     return;
                 }
                 
@@ -4797,6 +4828,14 @@
                 
                 // Store current curve value for external use
                 cursor.currentCurveValue = normalizedY;
+                
+                // Update glissando pitch display if curve has glissando attached
+                if (window.GlissandoSystem && foundCurve.glissando) {
+                    const trackDims = { y: yPosition, height: staffHeight };
+                    GlissandoSystem.updatePitchDisplay(staffIndex, section, foundCurve, normalizedY, xPercent, trackDims);
+                } else if (window.GlissandoSystem) {
+                    GlissandoSystem.hidePitchDisplay(staffIndex);
+                }
             },
             
             // Get current position info for a specific staff (returns percentage)
@@ -5528,6 +5567,9 @@
                 if (window.GCMaker) GCMaker.updateVisibility();
                 if (window.MidiController) MidiController.updateMidiDisplayVisibility();
                 if (window.AudioController) AudioController.updateAudioDisplayVisibility();
+                
+                // Update static pitch markers for glissando curves (page-dependent)
+                if (window.GlissandoSystem) GlissandoSystem.updateAllStaticPitchMarkers();
                 
                 // Show staff headers only on page 0 (top) or page 1 (bottom)
                 if (window.StaffCursors && StaffCursors.staffHeaderGroup) {
@@ -13054,7 +13096,8 @@
                     y1Pixel: curve.y1Pixel,
                     x2: curve.x2,
                     y2Pixel: curve.y2Pixel,
-                    curveData: curveDataArray
+                    curveData: curveDataArray,
+                    glissando: curve.glissando  // Save glissando data if attached
                 });
                 
                 // Update in G Track if applicable
@@ -13069,6 +13112,7 @@
                             item.curveData = curveDataArray;
                             item.color = curve.color;
                             item.fillMode = curve.fillMode;
+                            item.glissando = curve.glissando;  // Sync glissando data
                         }
                     }
                 }
@@ -13300,6 +13344,11 @@
                 
                 // Update visibility to show all visible segments immediately
                 this.updateVisibility();
+                
+                // Render static pitch markers for curves with glissandos
+                if (window.GlissandoSystem) {
+                    GlissandoSystem.updateAllStaticPitchMarkers();
+                }
             },
             
             // Re-render all curves on window resize
@@ -13873,6 +13922,606 @@
         // Initialize Curve Maker
         CurveMaker.init();
         window.CurveMaker = CurveMaker;
+        
+        // ============================================
+        // GLISSANDO SYSTEM
+        // Attaches pitch glissandos to curves, displays pitch SVGs during playback
+        // ============================================
+        const GlissandoSystem = {
+            // UI elements
+            clefSelect: null,
+            startPitchSelect: null,
+            endPitchSelect: null,
+            attachBtn: null,
+            removeBtn: null,
+            
+            // Pitch data - all quarter tones from low to high
+            // Format: { name: 'C4', index: 0 } where index is quarter-tone position
+            pitchList: [],
+            
+            // Pitch SVG cache
+            svgCache: {},
+            
+            // Current pitch display elements (one per cursor/track)
+            pitchDisplays: [],
+            
+            init() {
+                this.clefSelect = document.getElementById('glissandoClefSelect');
+                this.startPitchSelect = document.getElementById('glissandoStartPitch');
+                this.endPitchSelect = document.getElementById('glissandoEndPitch');
+                this.attachBtn = document.getElementById('glissandoAttachBtn');
+                this.removeBtn = document.getElementById('glissandoRemoveBtn');
+                
+                // Build pitch list (quarter tones)
+                this.buildPitchList();
+                
+                // Populate dropdowns
+                this.populatePitchDropdowns();
+                
+                // Event handlers
+                this.clefSelect.addEventListener('change', () => this.populatePitchDropdowns());
+                this.attachBtn.addEventListener('click', () => this.attachGlissandoToCurve());
+                this.removeBtn.addEventListener('click', () => this.removeGlissandoFromCurve());
+                
+                // Create pitch display elements for each staff cursor
+                this.createPitchDisplays();
+                
+                console.debug('GlissandoSystem initialized');
+            },
+            
+            buildPitchList() {
+                // Build complete list of quarter-tone pitches in chromatic order
+                // Each octave has 24 quarter-tone steps (12 semitones * 2)
+                // This matches the actual SVG file naming convention
+                
+                this.pitchList = [];
+                
+                // Chromatic order within octave using sharps (24 quarter-tone steps)
+                // SVG files exist for all these variants
+                // QS = quarter-sharp, S = sharp, TQS = three-quarter-sharp
+                const chromaticOrder = [
+                    'C', 'CQS', 'CS', 'CTQS',
+                    'D', 'DQS', 'DS', 'DTQS',
+                    'E', 'EQS', 'ES', 'ETQS',
+                    'F', 'FQS', 'FS', 'FTQS',
+                    'G', 'GQS', 'GS', 'GTQS',
+                    'A', 'AQS', 'AS', 'ATQS',
+                    'B', 'BQS', 'BS', 'BTQS'
+                ];
+                
+                // Build pitch list for octaves 1-7
+                for (let octave = 1; octave <= 7; octave++) {
+                    for (const pitch of chromaticOrder) {
+                        this.pitchList.push({
+                            name: `${pitch}${octave}`,
+                            displayName: this.formatPitchDisplay(pitch, octave),
+                            index: this.pitchList.length
+                        });
+                    }
+                }
+            },
+            
+            formatPitchDisplay(pitch, octave) {
+                // Convert internal name to display name
+                // CQS -> C quarter-sharp, CS -> C#, CTQS -> C three-quarter-sharp
+                // QF -> quarter-flat, F -> flat, TQF -> three-quarter-flat
+                let note = pitch.charAt(0);
+                let accidental = pitch.substring(1);
+                
+                const accMap = {
+                    '': '',
+                    'QS': '↑',      // quarter sharp
+                    'S': '♯',       // sharp
+                    'TQS': '♯↑',    // three-quarter sharp
+                    'QF': '↓',      // quarter flat
+                    'F': '♭',       // flat
+                    'TQF': '♭↓'     // three-quarter flat
+                };
+                
+                return `${note}${accMap[accidental] || accidental}${octave}`;
+            },
+            
+            populatePitchDropdowns() {
+                const clef = this.clefSelect.value;
+                
+                // Clear existing options
+                this.startPitchSelect.innerHTML = '<option value="">--</option>';
+                this.endPitchSelect.innerHTML = '<option value="">--</option>';
+                
+                // Get pitch range for this clef based on our SVG files
+                let pitchRange;
+                switch (clef) {
+                    case 'treble':
+                        pitchRange = this.getPitchRange('F3', 'E6');
+                        break;
+                    case 'alto':
+                        pitchRange = this.getPitchRange('G2', 'F5');
+                        break;
+                    case 'bass':
+                        pitchRange = this.getPitchRange('A1', 'G4');
+                        break;
+                }
+                
+                // Add options
+                for (const pitch of pitchRange) {
+                    const option1 = document.createElement('option');
+                    option1.value = pitch.name;
+                    option1.textContent = pitch.displayName;
+                    this.startPitchSelect.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = pitch.name;
+                    option2.textContent = pitch.displayName;
+                    this.endPitchSelect.appendChild(option2);
+                }
+            },
+            
+            getPitchRange(startName, endName) {
+                // Get all pitches between start and end (inclusive)
+                const startIdx = this.pitchList.findIndex(p => p.name === startName);
+                const endIdx = this.pitchList.findIndex(p => p.name === endName);
+                
+                if (startIdx === -1 || endIdx === -1) {
+                    console.debug('GlissandoSystem: Could not find pitch range', startName, endName);
+                    return this.pitchList;
+                }
+                
+                return this.pitchList.slice(startIdx, endIdx + 1);
+            },
+            
+            attachGlissandoToCurve() {
+                const selectedCurve = window.CurveMaker?.selectedCurve;
+                if (!selectedCurve) {
+                    console.debug('GlissandoSystem: No curve selected');
+                    return;
+                }
+                
+                const clef = this.clefSelect.value;
+                const startPitch = this.startPitchSelect.value;
+                const endPitch = this.endPitchSelect.value;
+                
+                if (!startPitch || !endPitch) {
+                    console.debug('GlissandoSystem: Start and end pitch required');
+                    return;
+                }
+                
+                // Attach glissando data to the curve
+                selectedCurve.glissando = {
+                    clef,
+                    startPitch,
+                    endPitch,
+                    startIndex: this.pitchList.findIndex(p => p.name === startPitch),
+                    endIndex: this.pitchList.findIndex(p => p.name === endPitch)
+                };
+                
+                // Sync to database
+                if (window.CurveMaker) {
+                    CurveMaker.syncCurveToDatabase(selectedCurve);
+                }
+                
+                // Update GTrackSystem if curve is registered there
+                this.updateGTrackGlissando(selectedCurve);
+                
+                // Render static pitch markers along the curve
+                this.renderStaticPitchMarkers(selectedCurve);
+                
+                console.debug('GlissandoSystem: Attached glissando to curve', selectedCurve.name, selectedCurve.glissando);
+            },
+            
+            removeGlissandoFromCurve() {
+                const selectedCurve = window.CurveMaker?.selectedCurve;
+                if (!selectedCurve) {
+                    console.debug('GlissandoSystem: No curve selected');
+                    return;
+                }
+                
+                // Remove static pitch markers first
+                this.removeStaticPitchMarkers(selectedCurve);
+                
+                delete selectedCurve.glissando;
+                
+                // Sync to database
+                if (window.CurveMaker) {
+                    CurveMaker.syncCurveToDatabase(selectedCurve);
+                }
+                
+                // Update GTrackSystem
+                this.updateGTrackGlissando(selectedCurve);
+                
+                console.debug('GlissandoSystem: Removed glissando from curve', selectedCurve.name);
+            },
+            
+            updateGTrackGlissando(curve) {
+                // Update the glissando data in GTrackSystem
+                if (!window.GTrackSystem || curve.gTrack === 'A') return;
+                
+                const trackIndex = parseInt(curve.gTrack) - 1;
+                const gTrack = GTrackSystem.getGTrack(trackIndex);
+                if (!gTrack) return;
+                
+                // Find the curve item and update its glissando
+                for (const item of gTrack.graphicItems) {
+                    if (item.type === 'curve' && item.curveId === curve.id) {
+                        item.glissando = curve.glissando;
+                        break;
+                    }
+                }
+            },
+            
+            createPitchDisplays() {
+                // Create pitch display elements for each staff cursor
+                // These will show the current pitch SVG during playback
+                if (!window.StaffCursors) return;
+                
+                const scoreTopEl = document.getElementById('ScoreTop');
+                const scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                for (let i = 0; i < 4; i++) {
+                    // Create image elements for top and bottom sections
+                    const imgTop = document.createElement('img');
+                    const imgBottom = document.createElement('img');
+                    
+                    [imgTop, imgBottom].forEach(img => {
+                        img.style.position = 'absolute';
+                        img.style.display = 'none';
+                        img.style.pointerEvents = 'none';
+                        img.className = 'glissando-pitch-display';
+                        img.dataset.staffIndex = i;
+                    });
+                    
+                    // Append to score container (not SVG, since these are HTML img elements)
+                    const scoreContainer = document.getElementById('ScoreContainer');
+                    if (scoreContainer) {
+                        scoreContainer.appendChild(imgTop);
+                        scoreContainer.appendChild(imgBottom);
+                    }
+                    
+                    this.pitchDisplays.push({
+                        staffIndex: i,
+                        top: imgTop,
+                        bottom: imgBottom
+                    });
+                }
+            },
+            
+            // Called from StaffCursors.updateCurveFollower to update pitch display
+            updatePitchDisplay(staffIndex, section, curveItem, normalizedY, xPercent, trackDims) {
+                if (!curveItem?.glissando || staffIndex >= this.pitchDisplays.length) {
+                    this.hidePitchDisplay(staffIndex);
+                    return;
+                }
+                
+                const display = this.pitchDisplays[staffIndex];
+                const imgEl = section === 'top' ? display.top : display.bottom;
+                const otherImgEl = section === 'top' ? display.bottom : display.top;
+                
+                // Hide the other section's display
+                otherImgEl.style.display = 'none';
+                
+                const { clef, startIndex, endIndex } = curveItem.glissando;
+                
+                // Calculate current pitch based on normalized Y value
+                // normalizedY: 0 = bottom of track, 1 = top of track
+                // Higher Y = higher pitch, regardless of start/end order
+                // This makes the pitch follow the curve direction naturally
+                const lowIndex = Math.min(startIndex, endIndex);
+                const highIndex = Math.max(startIndex, endIndex);
+                const pitchRange = highIndex - lowIndex;
+                
+                // Map Y to pitch: Y=0 -> lowest pitch, Y=1 -> highest pitch
+                const currentPitchIndex = lowIndex + Math.round(normalizedY * pitchRange);
+                
+                // Clamp to valid range
+                const clampedIndex = Math.max(0, Math.min(this.pitchList.length - 1, currentPitchIndex));
+                const currentPitch = this.pitchList[clampedIndex];
+                
+                if (!currentPitch) {
+                    this.hidePitchDisplay(staffIndex);
+                    return;
+                }
+                
+                // Get SVG path for this pitch and clef
+                const svgPath = `pitchesSVGs/${clef}/${currentPitch.name}-cropped.svg`;
+                
+                // Update image source if changed
+                if (imgEl.dataset.currentPitch !== currentPitch.name) {
+                    imgEl.src = svgPath;
+                    imgEl.dataset.currentPitch = currentPitch.name;
+                }
+                
+                // Position the image just to the left of the curve follower meter
+                // Use fixed positioning relative to viewport for accuracy
+                const scoreEl = section === 'top' ? document.getElementById('ScoreTop') : document.getElementById('ScoreBottom');
+                const scoreRect = scoreEl.getBoundingClientRect();
+                
+                const pitchDisplayHeight = trackDims.height * 0.5; // 50% of track height
+                const gap = 2; // Small gap
+                
+                imgEl.style.position = 'fixed'; // Use fixed positioning
+                imgEl.style.display = 'block';
+                imgEl.style.height = `${pitchDisplayHeight}px`;
+                imgEl.style.width = 'auto';
+                imgEl.style.zIndex = '1000';
+                
+                // Get actual width - need to wait for image to load first time
+                let actualWidth = imgEl.offsetWidth;
+                if (!actualWidth || actualWidth < 5) {
+                    actualWidth = pitchDisplayHeight * 0.4; // Fallback estimate
+                }
+                
+                // Calculate meter position in viewport coordinates
+                // The meter is at xPercent% of score width, offset by -11px
+                const meterLeftInViewport = scoreRect.left + (xPercent / 100) * scoreRect.width - 11;
+                
+                // Position just to the left of the meter
+                imgEl.style.left = `${meterLeftInViewport - actualWidth - gap}px`;
+                
+                // Center vertically in track (trackDims.y is relative to score top)
+                const verticalOffset = (trackDims.height - pitchDisplayHeight) / 2;
+                imgEl.style.top = `${scoreRect.top + trackDims.y + verticalOffset}px`;
+            },
+            
+            hidePitchDisplay(staffIndex) {
+                if (staffIndex >= this.pitchDisplays.length) return;
+                const display = this.pitchDisplays[staffIndex];
+                display.top.style.display = 'none';
+                display.bottom.style.display = 'none';
+            },
+            
+            // Get current pitch for a curve at a given normalized Y value
+            getPitchAtNormalizedY(glissando, normalizedY) {
+                if (!glissando) return null;
+                
+                const { startIndex, endIndex } = glissando;
+                const pitchRange = Math.abs(endIndex - startIndex);
+                const direction = endIndex > startIndex ? 1 : -1;
+                
+                const pitchOffset = Math.round(normalizedY * pitchRange);
+                const currentPitchIndex = startIndex + (pitchOffset * direction);
+                
+                const clampedIndex = Math.max(0, Math.min(this.pitchList.length - 1, currentPitchIndex));
+                return this.pitchList[clampedIndex];
+            },
+            
+            // Calculate pitch change points along a curve
+            // Returns array of {time, xPercent, pitch, pitchIndex} for each pitch change
+            calculatePitchChangePoints(curve) {
+                if (!curve?.glissando || !curve?.curveData) return [];
+                
+                const { clef, startIndex, endIndex } = curve.glissando;
+                const { startTime, endTime, samples, sampleInterval } = curve.curveData;
+                
+                const lowIndex = Math.min(startIndex, endIndex);
+                const highIndex = Math.max(startIndex, endIndex);
+                const pitchRange = highIndex - lowIndex;
+                
+                if (pitchRange === 0) return [];
+                
+                const changePoints = [];
+                let lastPitchIndex = -1;
+                
+                // Walk through the curve samples and find where pitch changes
+                for (let i = 0; i < samples.length; i++) {
+                    const normalizedY = samples[i];
+                    const currentPitchIndex = lowIndex + Math.round(normalizedY * pitchRange);
+                    const clampedIndex = Math.max(0, Math.min(this.pitchList.length - 1, currentPitchIndex));
+                    
+                    if (clampedIndex !== lastPitchIndex) {
+                        const time = startTime + (i * sampleInterval);
+                        const progress = (time - startTime) / (endTime - startTime);
+                        
+                        changePoints.push({
+                            time,
+                            progress,
+                            normalizedY,
+                            pitch: this.pitchList[clampedIndex],
+                            pitchIndex: clampedIndex
+                        });
+                        
+                        lastPitchIndex = clampedIndex;
+                    }
+                }
+                
+                return changePoints;
+            },
+            
+            // Render static pitch markers along a curve (supports multi-page curves)
+            renderStaticPitchMarkers(curve) {
+                // Remove existing markers for this curve
+                this.removeStaticPitchMarkers(curve);
+                
+                // Validate glissando data
+                if (!curve?.glissando) return;
+                if (!curve.glissando.clef || 
+                    curve.glissando.startIndex === undefined || 
+                    curve.glissando.endIndex === undefined) {
+                    return;
+                }
+                
+                const changePoints = this.calculatePitchChangePoints(curve);
+                if (changePoints.length === 0) return;
+                
+                const { clef } = curve.glissando;
+                
+                // Get timeline info for multi-page support
+                if (!window.GraphicTimeline) return;
+                const topPage = GraphicTimeline.currentTopPage;
+                const bottomPage = GraphicTimeline.currentBottomPage;
+                const secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                const leadInSec = leadInSeconds;
+                
+                const scoreTopEl = document.getElementById('ScoreTop');
+                const scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                if (!scoreTopEl || !scoreBottomEl) return;
+                
+                // Get track dimensions for both sections
+                const trackDimsTop = curve.gTrack && window.CompositionPanel 
+                    ? CompositionPanel.getTrackDimensions(curve.gTrack, scoreTopEl) 
+                    : null;
+                const trackDimsBottom = curve.gTrack && window.CompositionPanel 
+                    ? CompositionPanel.getTrackDimensions(curve.gTrack, scoreBottomEl) 
+                    : null;
+                
+                if (!trackDimsTop && !trackDimsBottom) return;
+                
+                // Create marker groups for top and bottom pages
+                const markerGroupTop = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                markerGroupTop.setAttribute('class', 'glissando-pitch-markers');
+                markerGroupTop.setAttribute('data-curve-id', curve.id);
+                markerGroupTop.setAttribute('data-section', 'top');
+                
+                const markerGroupBottom = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                markerGroupBottom.setAttribute('class', 'glissando-pitch-markers');
+                markerGroupBottom.setAttribute('data-curve-id', curve.id);
+                markerGroupBottom.setAttribute('data-section', 'bottom');
+                
+                const scoreWidth = scoreTopEl.clientWidth;
+                
+                // Add markers for each pitch change point to the correct page
+                for (const point of changePoints) {
+                    if (!point.pitch) continue;
+                    
+                    // Calculate which page this pitch change falls on
+                    const pointTimeActual = point.time + leadInSec;
+                    const pointPage = Math.floor(Math.max(0, pointTimeActual) / secondsPerPage);
+                    
+                    // Determine if this point is on a currently visible page
+                    let targetSection = null;
+                    let targetScoreEl = null;
+                    let targetTrackDims = null;
+                    
+                    if (pointPage === topPage) {
+                        targetSection = 'top';
+                        targetScoreEl = scoreTopEl;
+                        targetTrackDims = trackDimsTop;
+                    } else if (pointPage === bottomPage) {
+                        targetSection = 'bottom';
+                        targetScoreEl = scoreBottomEl;
+                        targetTrackDims = trackDimsBottom;
+                    } else {
+                        // Point is on a page that's not currently visible
+                        continue;
+                    }
+                    
+                    if (!targetTrackDims) continue;
+                    
+                    // Calculate X position relative to this page
+                    const pageStartTime = pointPage * secondsPerPage;
+                    const timeOnPage = pointTimeActual - pageStartTime;
+                    const xPercent = (timeOnPage / secondsPerPage) * 100;
+                    const xPos = (xPercent / 100) * scoreWidth;
+                    
+                    // Calculate marker size (25% of track height)
+                    const markerHeight = targetTrackDims.height * 0.25;
+                    
+                    // Center vertically in track
+                    const yPos = targetTrackDims.y + (targetTrackDims.height - markerHeight) / 2;
+                    
+                    // Create SVG image element
+                    const imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    const svgPath = `pitchesSVGs/${clef}/${point.pitch.name}-cropped.svg`;
+                    
+                    imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', svgPath);
+                    imgEl.setAttribute('height', markerHeight);
+                    imgEl.setAttribute('x', xPos);
+                    imgEl.setAttribute('y', yPos);
+                    imgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                    imgEl.setAttribute('class', 'pitch-marker');
+                    imgEl.setAttribute('data-pitch', point.pitch.name);
+                    imgEl.style.pointerEvents = 'none';
+                    
+                    // Add to appropriate group
+                    if (targetSection === 'top') {
+                        markerGroupTop.appendChild(imgEl);
+                    } else {
+                        markerGroupBottom.appendChild(imgEl);
+                    }
+                }
+                
+                // Add marker groups to score SVGs (only if they have children)
+                if (markerGroupTop.children.length > 0) {
+                    scoreTopEl.appendChild(markerGroupTop);
+                }
+                if (markerGroupBottom.children.length > 0) {
+                    scoreBottomEl.appendChild(markerGroupBottom);
+                }
+                
+                // Store references on curve for cleanup
+                curve.pitchMarkerGroupTop = markerGroupTop;
+                curve.pitchMarkerGroupBottom = markerGroupBottom;
+            },
+            
+            // Remove static pitch markers for a curve
+            removeStaticPitchMarkers(curve) {
+                // Remove old single group reference
+                if (curve?.pitchMarkerGroup) {
+                    curve.pitchMarkerGroup.remove();
+                    delete curve.pitchMarkerGroup;
+                }
+                
+                // Remove new top/bottom group references
+                if (curve?.pitchMarkerGroupTop) {
+                    curve.pitchMarkerGroupTop.remove();
+                    delete curve.pitchMarkerGroupTop;
+                }
+                if (curve?.pitchMarkerGroupBottom) {
+                    curve.pitchMarkerGroupBottom.remove();
+                    delete curve.pitchMarkerGroupBottom;
+                }
+                
+                // Also try to find by data attribute in both score sections
+                if (curve?.id) {
+                    const scoreTop = document.getElementById('ScoreTop');
+                    const scoreBottom = document.getElementById('ScoreBottom');
+                    
+                    [scoreTop, scoreBottom].forEach(scoreEl => {
+                        if (scoreEl) {
+                            const markers = scoreEl.querySelectorAll(`.glissando-pitch-markers[data-curve-id="${curve.id}"]`);
+                            markers.forEach(m => m.remove());
+                        }
+                    });
+                    
+                    // Also check document-wide as fallback
+                    const markers = document.querySelectorAll(`.glissando-pitch-markers[data-curve-id="${curve.id}"]`);
+                    markers.forEach(m => m.remove());
+                }
+            },
+            
+            // Update all static pitch markers (called on resize, page change, etc.)
+            updateAllStaticPitchMarkers() {
+                if (!window.CurveMaker) return;
+                
+                // First, remove all existing markers
+                document.querySelectorAll('.glissando-pitch-markers').forEach(m => m.remove());
+                
+                for (const curve of CurveMaker.curves) {
+                    // Only render if curve has valid glissando with all required fields
+                    if (curve.glissando && 
+                        curve.glissando.clef && 
+                        curve.glissando.startIndex !== undefined && 
+                        curve.glissando.endIndex !== undefined &&
+                        curve.curveData) {
+                        this.renderStaticPitchMarkers(curve);
+                    }
+                }
+            },
+            
+            // Clear all static pitch markers
+            clearAllStaticPitchMarkers() {
+                document.querySelectorAll('.glissando-pitch-markers').forEach(m => m.remove());
+                
+                if (window.CurveMaker) {
+                    for (const curve of CurveMaker.curves) {
+                        delete curve.pitchMarkerGroup;
+                    }
+                }
+            }
+        };
+        
+        // Initialize Glissando System
+        GlissandoSystem.init();
+        window.GlissandoSystem = GlissandoSystem;
         
         // Bring SVG elements containers to front (after curves are initialized)
         // This ensures inserted SVGs appear on top of curves for selection

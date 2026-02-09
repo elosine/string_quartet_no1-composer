@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="4.9907322mm"
+   height="7.2049303mm"
+   viewBox="0 0 2.8399988 4.1000016"
+   id="svg7"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs7" />
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <g
+     transform="translate(0.05,2.05)"
+     id="g1">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="2"
+       x2="2.2677"
+       y2="2"
+       id="line1" />
+  </g>
+  <g
+     transform="translate(0.05,2.05)"
+     id="g2">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="1"
+       x2="2.2677"
+       y2="1"
+       id="line2" />
+  </g>
+  <g
+     transform="translate(0.05,2.05)"
+     id="g3">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="0"
+       x2="2.2677"
+       y2="0"
+       id="line3" />
+  </g>
+  <g
+     transform="translate(0.05,2.05)"
+     id="g4">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-1"
+       x2="2.2677"
+       y2="-1"
+       id="line4" />
+  </g>
+  <g
+     transform="translate(0.05,2.05)"
+     id="g5">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-2"
+       x2="2.2677"
+       y2="-2"
+       id="line5" />
+  </g>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/pitches/treble/ATQS4.ly:53:4:5"
+     id="a6"
+     transform="translate(-0.0069,-4.45)">
+    <g
+       transform="translate(1.8069,7)"
+       id="g6">
+      <path
+         transform="scale(0.0032,-0.0032)"
+         d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
+         fill="currentColor"
+         id="path5" />
+    </g>
+  </a>
+  <g
+     transform="translate(0.65,2.55)"
+     id="g7">
+    <path
+       transform="scale(0.002,-0.002)"
+       d="m 200,-343 c -14,0 -25,11 -25,25 v 122 l -62,-18 v -136 c 0,-14 -11,-25 -25,-25 -14,0 -26,11 -26,25 v 122 l -17,-5 c -3,-1 -6,-1 -9,-1 -19,0 -36,16 -36,36 v 41 c 0,16 11,30 26,34 l 36,11 V 35 L 45,30 C 42,29 39,28 36,28 17,28 0,44 0,64 v 42 c 0,16 11,30 26,34 l 36,10 v 136 c 0,14 12,26 26,26 14,0 25,-12 25,-26 V 164 l 62,18 v 136 c 0,14 11,25 25,25 14,0 25,-11 25,-25 V 196 l 62,18 v 136 c 0,14 12,25 26,25 14,0 25,-11 25,-25 V 228 l 17,5 c 3,1 6,1 9,1 19,0 36,-16 36,-36 v -41 c 0,-16 -11,-30 -26,-34 L 338,112 V -35 l 17,5 c 3,1 6,2 9,2 19,0 36,-16 36,-36 v -42 c 0,-16 -11,-30 -26,-34 l -36,-10 v -136 c 0,-14 -11,-26 -25,-26 -14,0 -26,12 -26,26 v 122 l -62,-18 v -136 c 0,-14 -11,-25 -25,-25 z M 113,49 V -98 l 62,17 V 66 Z M 287,98 225,81 V -66 l 62,17 z"
+       fill="currentColor"
+       id="path6" />
+  </g>
+</svg>
