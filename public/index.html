@@ -995,7 +995,70 @@
                         <option value="bartokPizz">Bartok Pizzicato</option>
                         <option value="accelDecel">Accel/Decel (Curve)</option>
                         <option value="crescDecresc">Crescendo/Decrescendo</option>
+                        <option value="longTone">Long Tone</option>
                     </select>
+                </div>
+                
+                <!-- Long Tone curve indicator (outside midiModelParams) -->
+                <div id="longToneCurveIndicator" style="display: none; width: 100%; padding: 8px; background: rgba(30,40,50,0.5); border: 1px solid #456; border-radius: 3px; margin-top: 6px; font-size: 11px; color: #fa8;">
+                    Select a curve
+                </div>
+                
+                <!-- Long Tone pitch controls (outside midiModelParams) -->
+                <div id="longToneParams" style="display: none;">
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Pitch Mode</label>
+                        <select id="longTonePitchMode" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="glissando">Glissando</option>
+                            <option value="single">Single Note</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Long Tone single pitch input -->
+                    <div id="longToneSinglePitchRow" class="curve-input-row" style="margin-top: 6px; display: none;">
+                        <label style="font-size: 10px;">Pitch</label>
+                        <input type="text" id="longTonePitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="e.g. C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat)">
+                    </div>
+                    
+                    <!-- Long Tone glissando pitch inputs -->
+                    <div id="longToneGlissandoParams" class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Low Pitch</label>
+                        <input type="text" id="longToneLowPitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="Lower pitch of glissando range">
+                        <label style="font-size: 10px; margin-left: 8px;">High Pitch</label>
+                        <input type="text" id="longToneHighPitch" class="curve-input" value="C5" style="width: 50px; font-size: 10px;" placeholder="C5" title="Higher pitch of glissando range">
+                    </div>
+                    
+                    <!-- Articulation selector -->
+                    <div class="curve-input-row" style="margin-top: 8px;">
+                        <label style="font-size: 10px;">Articulation</label>
+                        <select id="longToneArticulation" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="89" selected>Senza Vibrato (CC0: 89)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Dynamics selector -->
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Dynamic</label>
+                        <select id="longToneDynamic" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="8">pppp</option>
+                            <option value="22">ppp</option>
+                            <option value="36">pp</option>
+                            <option value="50">p</option>
+                            <option value="64" selected>mp</option>
+                            <option value="78">mf</option>
+                            <option value="92">f</option>
+                            <option value="106">ff</option>
+                            <option value="120">fff</option>
+                            <option value="127">ffff</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Generate segments button and info display -->
+                    <button id="longToneGenerateBtn" class="curve-draw-btn" style="margin-top: 8px; background: #3a5a6a; border-color: #4a6a7a;">Generate Segments</button>
+                    <button id="longToneExportMidiBtn" class="curve-draw-btn" style="margin-top: 4px; background: #5a4a6a; border-color: #6a5a7a;">Export MIDI Files</button>
+                    <div id="longToneSegmentInfo" style="width: 100%; padding: 6px; background: rgba(30,40,50,0.5); border: 1px solid #456; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #8af; max-height: 150px; overflow-y: auto;">
+                        Click "Generate Segments" to calculate pitch segments
+                    </div>
                 </div>
                 
                 <div id="midiModelParams" style="display: none;">
@@ -9013,6 +9076,12 @@
                     type: 'curve',              // Curve-based volume control
                     defaultVelocity: 100,       // Initial note velocity
                     description: 'Crescendo/decrescendo using CC7 volume based on curve shape'
+                },
+                longTone: {
+                    name: 'Long Tone',
+                    type: 'curve',              // Curve-based pitch control
+                    defaultVelocity: 100,       // Default velocity
+                    description: 'Long tone with pitch following curve shape'
                 }
             },
             
@@ -9129,6 +9198,21 @@
                 this.crescDecrescTailMsInput = document.getElementById('crescDecrescTailMs');
                 this.crescDecrescTailRow = document.getElementById('crescDecrescTailRow');
                 
+                // Long Tone UI elements
+                this.longToneCurveIndicator = document.getElementById('longToneCurveIndicator');
+                this.longToneParamsDiv = document.getElementById('longToneParams');
+                this.longTonePitchModeSelect = document.getElementById('longTonePitchMode');
+                this.longToneSinglePitchRow = document.getElementById('longToneSinglePitchRow');
+                this.longToneGlissandoParams = document.getElementById('longToneGlissandoParams');
+                this.longTonePitchInput = document.getElementById('longTonePitch');
+                this.longToneLowPitchInput = document.getElementById('longToneLowPitch');
+                this.longToneHighPitchInput = document.getElementById('longToneHighPitch');
+                this.longToneGenerateBtn = document.getElementById('longToneGenerateBtn');
+                this.longToneExportMidiBtn = document.getElementById('longToneExportMidiBtn');
+                this.longToneSegmentInfo = document.getElementById('longToneSegmentInfo');
+                this.longToneArticulationSelect = document.getElementById('longToneArticulation');
+                this.longToneDynamicSelect = document.getElementById('longToneDynamic');
+                
                 if (this.modelSelect) {
                     this.modelSelect.addEventListener('change', () => this.onModelSelect());
                 }
@@ -9225,6 +9309,19 @@
                         this.crescDecrescTailMs = Math.max(0, Math.min(5000, parseInt(this.crescDecrescTailMsInput.value) || 500));
                         this.generateCrescDecrescEvents();
                     });
+                }
+                
+                // Long Tone event listeners
+                if (this.longTonePitchModeSelect) {
+                    this.longTonePitchModeSelect.addEventListener('change', () => {
+                        this.updateLongTonePitchModeUI();
+                    });
+                }
+                if (this.longToneGenerateBtn) {
+                    this.longToneGenerateBtn.addEventListener('click', () => this.generateLongToneSegments());
+                }
+                if (this.longToneExportMidiBtn) {
+                    this.longToneExportMidiBtn.addEventListener('click', () => this.exportLongToneMidiFiles());
                 }
                 if (this.crescDecrescRegenerateBtn) {
                     this.crescDecrescRegenerateBtn.addEventListener('click', () => this.generateCrescDecrescEvents());
@@ -9408,7 +9505,29 @@
                 const isAccelDecel = modelKey === 'accelDecel';
                 const isCrescDecresc = modelKey === 'crescDecresc';
                 const isBartokPizz = modelKey === 'bartokPizz';
+                const isLongTone = modelKey === 'longTone';
                 const isCurveBased = isAccelDecel || isCrescDecresc;
+                
+                // Long Tone: hide shared params, show Long Tone specific UI
+                if (isLongTone) {
+                    this.paramsDiv.style.display = 'none';
+                    if (this.longToneCurveIndicator) {
+                        this.longToneCurveIndicator.style.display = 'block';
+                        this.updateLongToneCurveIndicator();
+                    }
+                    if (this.longToneParamsDiv) {
+                        this.longToneParamsDiv.style.display = 'block';
+                        this.updateLongTonePitchModeUI();
+                    }
+                    return;
+                } else {
+                    if (this.longToneCurveIndicator) {
+                        this.longToneCurveIndicator.style.display = 'none';
+                    }
+                    if (this.longToneParamsDiv) {
+                        this.longToneParamsDiv.style.display = 'none';
+                    }
+                }
                 
                 // Show pitch mode row for curve-based models
                 if (this.pitchModeRow) {
@@ -9437,6 +9556,429 @@
                 }
                 
                 this.updateInfo();
+            },
+            
+            // Update Long Tone curve indicator based on curve selection
+            updateLongToneCurveIndicator() {
+                if (!this.longToneCurveIndicator) return;
+                
+                if (window.CurveMaker && CurveMaker.selectedCurve) {
+                    const curve = CurveMaker.selectedCurve;
+                    this.longToneCurveIndicator.innerHTML = `<span style="color: #8f8;">✓ Curve selected: ${curve.name}</span>`;
+                    this.sourceCurve = curve;
+                } else {
+                    this.longToneCurveIndicator.innerHTML = `<span style="color: #fa8;">Select a curve</span>`;
+                    this.sourceCurve = null;
+                }
+            },
+            
+            // Update Long Tone pitch mode UI (show single pitch or glissando inputs)
+            updateLongTonePitchModeUI() {
+                if (!this.longTonePitchModeSelect) return;
+                
+                const mode = this.longTonePitchModeSelect.value;
+                const isGlissando = mode === 'glissando';
+                
+                if (this.longToneSinglePitchRow) {
+                    this.longToneSinglePitchRow.style.display = isGlissando ? 'none' : 'flex';
+                }
+                if (this.longToneGlissandoParams) {
+                    this.longToneGlissandoParams.style.display = isGlissando ? 'flex' : 'none';
+                }
+            },
+            
+            // Generate Long Tone segments based on curve and pitch parameters
+            generateLongToneSegments() {
+                const PITCH_BEND_RANGE = 2; // semitones - max deviation before new segment (configurable)
+                const PITCH_BEND_SAMPLE_INTERVAL = 50; // ms between pitch bend messages (50ms = 20/sec)
+                const PITCH_BEND_CENTER = 8192;
+                const PITCH_BEND_MAX = 16383;
+                const PITCH_BEND_MIN = 0;
+                
+                // Validate curve selection
+                if (!window.CurveMaker || !CurveMaker.selectedCurve) {
+                    if (this.longToneSegmentInfo) {
+                        this.longToneSegmentInfo.innerHTML = '<span style="color: #f88;">No curve selected</span>';
+                    }
+                    return null;
+                }
+                
+                const curve = CurveMaker.selectedCurve;
+                const curveData = curve.curveData;
+                if (!curveData || !curveData.samples || curveData.samples.length === 0) {
+                    if (this.longToneSegmentInfo) {
+                        this.longToneSegmentInfo.innerHTML = '<span style="color: #f88;">Curve has no sample data</span>';
+                    }
+                    return null;
+                }
+                
+                // Get pitch range from UI
+                const lowPitchStr = this.longToneLowPitchInput ? this.longToneLowPitchInput.value : 'C4';
+                const highPitchStr = this.longToneHighPitchInput ? this.longToneHighPitchInput.value : 'C5';
+                const lowPitchMidi = this.noteNameToPitch(lowPitchStr);
+                const highPitchMidi = this.noteNameToPitch(highPitchStr);
+                
+                if (lowPitchMidi === null || highPitchMidi === null) {
+                    if (this.longToneSegmentInfo) {
+                        this.longToneSegmentInfo.innerHTML = '<span style="color: #f88;">Invalid pitch format</span>';
+                    }
+                    return null;
+                }
+                
+                // Ensure low < high
+                const actualLowPitch = Math.min(lowPitchMidi, highPitchMidi);
+                const actualHighPitch = Math.max(lowPitchMidi, highPitchMidi);
+                const pitchRange = actualHighPitch - actualLowPitch;
+                
+                // Build pitch lookup: for each sample, calculate the pitch in semitones
+                // normalizedY (0-1) maps to pitch range: 0 = low pitch, 1 = high pitch
+                const samples = curveData.samples;
+                const sampleInterval = curveData.sampleInterval;
+                const startTime = curveData.startTime;
+                
+                // Calculate pitch at each sample point
+                const pitchAtSample = samples.map(normalizedY => 
+                    actualLowPitch + normalizedY * pitchRange
+                );
+                
+                // Get articulation value from dropdown (CC0 value)
+                const articulationValue = this.longToneArticulationSelect ? 
+                    parseInt(this.longToneArticulationSelect.value) : 89;
+                
+                // Get velocity from dynamics dropdown
+                const velocity = this.longToneDynamicSelect ? 
+                    parseInt(this.longToneDynamicSelect.value) : 64;
+                
+                // Determine glissando direction from curve shape
+                const firstY = samples[0];
+                const lastY = samples[samples.length - 1];
+                const isGlissandoDown = firstY > lastY; // high Y to low Y = gliss down
+                
+                // Walk through samples, creating segments when pitch deviates > PITCH_BEND_RANGE
+                const segments = [];
+                let segmentStartIndex = 0;
+                let segmentBasePitch = pitchAtSample[0];
+                
+                // Helper function to create a segment with pitch bend data
+                const createSegment = (segIndex, segStartIndex, segEndIndex, segStartPitch, segEndPitch) => {
+                    const segStartTime = startTime + segStartIndex * sampleInterval;
+                    const segEndTime = startTime + segEndIndex * sampleInterval;
+                    const segDuration = segEndTime - segStartTime;
+                    
+                    // Calculate pitch bend direction for this segment
+                    const segIsDown = segEndPitch < segStartPitch;
+                    
+                    // MIDI note is offset by 1 semitone based on direction
+                    // Gliss down: note = startPitch - 1, bend starts at max (sounds at startPitch)
+                    // Gliss up: note = startPitch + 1, bend starts at min (sounds at startPitch)
+                    const midiNote = segIsDown ? 
+                        Math.round(segStartPitch) - 1 : 
+                        Math.round(segStartPitch) + 1;
+                    
+                    // Calculate start and end pitch bend values
+                    // For gliss down: start at max (16383), end at min (0) for full 2 semitones
+                    // For gliss up: start at min (0), end at max (16383) for full 2 semitones
+                    const pitchChangeInSegment = Math.abs(segEndPitch - segStartPitch);
+                    const bendRangeUsed = pitchChangeInSegment / PITCH_BEND_RANGE; // 0-1 for how much of bend range used
+                    
+                    let startBend, endBend;
+                    if (segIsDown) {
+                        startBend = PITCH_BEND_MAX; // +1 semitone from MIDI note
+                        // End bend: if full 2 semitones, goes to 0. Otherwise proportional.
+                        endBend = Math.round(PITCH_BEND_MAX - (bendRangeUsed * (PITCH_BEND_MAX - PITCH_BEND_MIN)));
+                    } else {
+                        startBend = PITCH_BEND_MIN; // -1 semitone from MIDI note
+                        // End bend: if full 2 semitones, goes to max. Otherwise proportional.
+                        endBend = Math.round(PITCH_BEND_MIN + (bendRangeUsed * (PITCH_BEND_MAX - PITCH_BEND_MIN)));
+                    }
+                    
+                    // Generate pitch bend samples at PITCH_BEND_SAMPLE_INTERVAL
+                    const pitchBendSamples = [];
+                    const numPbSamples = Math.max(2, Math.ceil(segDuration * 1000 / PITCH_BEND_SAMPLE_INTERVAL));
+                    
+                    for (let pbIdx = 0; pbIdx < numPbSamples; pbIdx++) {
+                        const pbTime = segStartTime + (pbIdx / (numPbSamples - 1)) * segDuration;
+                        
+                        // Find the curve sample index closest to this time
+                        const curveIdx = Math.round((pbTime - startTime) / sampleInterval);
+                        const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
+                        const pitchAtTime = pitchAtSample[clampedIdx];
+                        
+                        // Calculate pitch bend value based on pitch position within segment
+                        const pitchProgress = (pitchAtTime - segStartPitch) / (segEndPitch - segStartPitch);
+                        const clampedProgress = Math.max(0, Math.min(1, pitchProgress));
+                        const bendValue = Math.round(startBend + clampedProgress * (endBend - startBend));
+                        
+                        pitchBendSamples.push({
+                            time: pbTime,
+                            value: bendValue
+                        });
+                    }
+                    
+                    return {
+                        index: segIndex,
+                        startTime: segStartTime,
+                        endTime: segEndTime,
+                        duration: segDuration,
+                        startPitch: segStartPitch,
+                        endPitch: segEndPitch,
+                        midiNote: midiNote,
+                        startBend: startBend,
+                        endBend: endBend,
+                        pitchBendSamples: pitchBendSamples,
+                        cc0Value: (segIndex < 2) ? articulationValue : null,
+                        velocity: velocity,
+                        isGlissDown: segIsDown
+                    };
+                };
+                
+                for (let i = 1; i < pitchAtSample.length; i++) {
+                    const currentPitch = pitchAtSample[i];
+                    const deviation = currentPitch - segmentBasePitch;
+                    
+                    if (Math.abs(deviation) > PITCH_BEND_RANGE) {
+                        // End current segment
+                        const segmentEndPitch = pitchAtSample[i - 1];
+                        const segIndex = segments.length;
+                        segments.push(createSegment(segIndex, segmentStartIndex, i - 1, segmentBasePitch, segmentEndPitch));
+                        
+                        // Start new segment
+                        segmentStartIndex = i;
+                        segmentBasePitch = currentPitch;
+                    }
+                }
+                
+                // Add final segment
+                const finalSegIndex = segments.length;
+                segments.push(createSegment(
+                    finalSegIndex, 
+                    segmentStartIndex, 
+                    samples.length - 1, 
+                    segmentBasePitch, 
+                    pitchAtSample[pitchAtSample.length - 1]
+                ));
+                
+                // Store segments for later use
+                this.longToneSegments = segments;
+                
+                // Display results
+                this.displayLongToneSegments(segments, curve, actualLowPitch, actualHighPitch);
+                
+                return segments;
+            },
+            
+            // Display Long Tone segment data in the info panel
+            displayLongToneSegments(segments, curve, lowPitch, highPitch) {
+                if (!this.longToneSegmentInfo) return;
+                
+                const duration = (curve.endSeconds - curve.startSeconds).toFixed(2);
+                const pitchRange = highPitch - lowPitch;
+                
+                // Get dynamic label from velocity
+                const dynamicLabels = {8:'pppp', 22:'ppp', 36:'pp', 50:'p', 64:'mp', 78:'mf', 92:'f', 106:'ff', 120:'fff', 127:'ffff'};
+                
+                let html = `<div style="color: #8f8; margin-bottom: 4px;">✓ ${segments.length} segment(s) generated</div>`;
+                html += `<div style="margin-bottom: 4px;">Curve: ${curve.name} | Duration: ${duration}s</div>`;
+                html += `<div style="margin-bottom: 6px;">Pitch range: ${this.midiToPitchName(lowPitch)} → ${this.midiToPitchName(highPitch)} (${pitchRange.toFixed(1)} st)</div>`;
+                html += `<div style="border-top: 1px solid #456; padding-top: 4px;">`;
+                
+                segments.forEach((seg, i) => {
+                    const dynamicLabel = dynamicLabels[seg.velocity] || `vel:${seg.velocity}`;
+                    const direction = seg.isGlissDown ? '↓' : '↑';
+                    const pbSampleCount = seg.pitchBendSamples ? seg.pitchBendSamples.length : 0;
+                    
+                    html += `<div style="margin: 4px 0; padding: 4px; background: rgba(50,60,70,0.5); border-left: 2px solid #6af;">`;
+                    html += `<div><b>Seg ${i + 1}:</b> ${seg.duration.toFixed(3)}s | vel: ${seg.velocity} (${dynamicLabel})</div>`;
+                    html += `<div style="margin-left: 8px; font-size: 8px; color: #aaa;">`;
+                    html += `MIDI note: ${this.midiToPitchName(seg.midiNote)} (${seg.midiNote}) | `;
+                    html += `Sounding: ${this.midiToPitchName(seg.startPitch)}→${this.midiToPitchName(seg.endPitch)} ${direction}</div>`;
+                    html += `<div style="margin-left: 8px; font-size: 8px; color: #8cf;">`;
+                    html += `Bend: ${seg.startBend}→${seg.endBend} (${pbSampleCount} samples @ 50ms)</div>`;
+                    if (seg.cc0Value !== null) {
+                        html += `<div style="margin-left: 8px; font-size: 8px; color: #fa8;">[CC0: ${seg.cc0Value}]</div>`;
+                    }
+                    html += `</div>`;
+                });
+                
+                html += `</div>`;
+                this.longToneSegmentInfo.innerHTML = html;
+            },
+            
+            // Export Long Tone segments as individual MIDI files
+            async exportLongToneMidiFiles() {
+                if (!this.longToneSegments || this.longToneSegments.length === 0) {
+                    alert('No segments generated. Click "Generate Segments" first.');
+                    return;
+                }
+                
+                // Check for File System Access API
+                if (!('showDirectoryPicker' in window)) {
+                    alert('Your browser does not support folder selection. Please use Chrome or Edge.');
+                    return;
+                }
+                
+                // Get curve name for file naming
+                const curveName = (window.CurveMaker && CurveMaker.selectedCurve) ? 
+                    CurveMaker.selectedCurve.name.replace(/[^a-zA-Z0-9_-]/g, '_') : 'longtone';
+                
+                try {
+                    // Let user pick a folder
+                    const dirHandle = await window.showDirectoryPicker({
+                        mode: 'readwrite',
+                        startIn: 'documents'
+                    });
+                    
+                    const TICKS_PER_BEAT = 480;
+                    const TEMPO_BPM = 120;
+                    const MICROSECONDS_PER_BEAT = Math.round(60000000 / TEMPO_BPM);
+                    
+                    // Helper functions for MIDI file building
+                    const writeVarInt = (value) => {
+                        const bytes = [];
+                        bytes.push(value & 0x7f);
+                        value >>= 7;
+                        while (value > 0) {
+                            bytes.unshift((value & 0x7f) | 0x80);
+                            value >>= 7;
+                        }
+                        return bytes;
+                    };
+                    
+                    const writeInt = (value, length) => {
+                        const bytes = [];
+                        for (let i = length - 1; i >= 0; i--) {
+                            bytes.push((value >> (i * 8)) & 0xff);
+                        }
+                        return bytes;
+                    };
+                    
+                    const secondsToTicks = (seconds) => {
+                        return Math.round(seconds * TICKS_PER_BEAT * TEMPO_BPM / 60);
+                    };
+                    
+                    // Export each segment as a separate MIDI file
+                    for (let i = 0; i < this.longToneSegments.length; i++) {
+                        const seg = this.longToneSegments[i];
+                        const segNum = String(i + 1).padStart(2, '0');
+                        const pitchName = this.midiToPitchName(seg.midiNote).replace('#', 's').replace(/[^a-zA-Z0-9]/g, '');
+                        const direction = seg.isGlissDown ? 'dn' : 'up';
+                        
+                        // Naming convention: curveName_seg01_C4_dn.mid
+                        const fileName = `${curveName}_seg${segNum}_${pitchName}_${direction}.mid`;
+                        
+                        // Build track events
+                        const trackEvents = [];
+                        let lastTick = 0;
+                        
+                        // CC0 (Bank Select) if applicable - at tick 0
+                        if (seg.cc0Value !== null) {
+                            trackEvents.push(...writeVarInt(0)); // delta = 0
+                            trackEvents.push(0xB0, 0x00, seg.cc0Value); // CC0 on channel 0
+                        }
+                        
+                        // Initial pitch bend - at tick 0
+                        const pbLSB = seg.startBend & 0x7F;
+                        const pbMSB = (seg.startBend >> 7) & 0x7F;
+                        trackEvents.push(...writeVarInt(0)); // delta = 0
+                        trackEvents.push(0xE0, pbLSB, pbMSB); // Pitch bend on channel 0
+                        
+                        // Note On - at tick 0
+                        trackEvents.push(...writeVarInt(0)); // delta = 0
+                        trackEvents.push(0x90, seg.midiNote, seg.velocity); // Note on channel 0
+                        
+                        // Pitch bend samples (skip first one since we already sent initial)
+                        if (seg.pitchBendSamples && seg.pitchBendSamples.length > 1) {
+                            let prevTick = 0;
+                            for (let pbIdx = 1; pbIdx < seg.pitchBendSamples.length; pbIdx++) {
+                                const pbSample = seg.pitchBendSamples[pbIdx];
+                                const pbTimeRelative = pbSample.time - seg.startTime;
+                                const pbTick = secondsToTicks(pbTimeRelative);
+                                const deltaTick = Math.max(0, pbTick - prevTick);
+                                
+                                const lsb = pbSample.value & 0x7F;
+                                const msb = (pbSample.value >> 7) & 0x7F;
+                                
+                                trackEvents.push(...writeVarInt(deltaTick));
+                                trackEvents.push(0xE0, lsb, msb);
+                                
+                                prevTick = pbTick;
+                            }
+                            lastTick = prevTick;
+                        }
+                        
+                        // Note Off - at end of segment
+                        const endTick = secondsToTicks(seg.duration);
+                        const noteOffDelta = Math.max(0, endTick - lastTick);
+                        trackEvents.push(...writeVarInt(noteOffDelta));
+                        trackEvents.push(0x80, seg.midiNote, 0); // Note off channel 0
+                        
+                        // End of track
+                        trackEvents.push(...writeVarInt(0));
+                        trackEvents.push(0xFF, 0x2F, 0x00);
+                        
+                        // Build tempo track (track 0)
+                        const tempoTrack = [];
+                        tempoTrack.push(...writeVarInt(0)); // delta = 0
+                        tempoTrack.push(0xFF, 0x51, 0x03); // Tempo meta event
+                        tempoTrack.push((MICROSECONDS_PER_BEAT >> 16) & 0xFF);
+                        tempoTrack.push((MICROSECONDS_PER_BEAT >> 8) & 0xFF);
+                        tempoTrack.push(MICROSECONDS_PER_BEAT & 0xFF);
+                        tempoTrack.push(...writeVarInt(0));
+                        tempoTrack.push(0xFF, 0x2F, 0x00); // End of track
+                        
+                        // Build MIDI file
+                        const midiFile = [];
+                        
+                        // Header chunk: MThd
+                        midiFile.push(0x4D, 0x54, 0x68, 0x64); // "MThd"
+                        midiFile.push(...writeInt(6, 4)); // Header length
+                        midiFile.push(...writeInt(1, 2)); // Format 1
+                        midiFile.push(...writeInt(2, 2)); // 2 tracks
+                        midiFile.push(...writeInt(TICKS_PER_BEAT, 2)); // Ticks per beat
+                        
+                        // Tempo track chunk
+                        midiFile.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+                        midiFile.push(...writeInt(tempoTrack.length, 4));
+                        midiFile.push(...tempoTrack);
+                        
+                        // Data track chunk
+                        midiFile.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+                        midiFile.push(...writeInt(trackEvents.length, 4));
+                        midiFile.push(...trackEvents);
+                        
+                        // Write file
+                        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(new Uint8Array(midiFile));
+                        await writable.close();
+                        
+                        console.log(`Exported: ${fileName}`);
+                    }
+                    
+                    // Update UI to show success
+                    if (this.longToneSegmentInfo) {
+                        const currentHtml = this.longToneSegmentInfo.innerHTML;
+                        this.longToneSegmentInfo.innerHTML = `<div style="color: #8f8; margin-bottom: 6px;">✓ Exported ${this.longToneSegments.length} MIDI files</div>` + currentHtml;
+                    }
+                    
+                    alert(`Successfully exported ${this.longToneSegments.length} MIDI files.`);
+                    
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('Export failed:', err);
+                        alert('Export failed: ' + err.message);
+                    }
+                }
+            },
+            
+            // Convert MIDI pitch number to pitch name (helper for display)
+            midiToPitchName(midiPitch) {
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(midiPitch / 12) - 1;
+                const noteIndex = Math.round(midiPitch) % 12;
+                const cents = Math.round((midiPitch - Math.round(midiPitch)) * 100);
+                const centsStr = cents !== 0 ? (cents > 0 ? `+${cents}¢` : `${cents}¢`) : '';
+                return `${noteNames[noteIndex]}${octave}${centsStr}`;
             },
             
             // Check if CurveMaker has a selected curve and update UI
@@ -12337,6 +12879,11 @@
                 
                 // Update fill mode selection
                 document.querySelector(`input[name="curveFill"][value="${curve.fillMode}"]`).checked = true;
+                
+                // Notify MidiModelSystem of curve selection (for Long Tone)
+                if (window.MidiModelSystem && MidiModelSystem.selectedModelKey === 'longTone') {
+                    MidiModelSystem.updateLongToneCurveIndicator();
+                }
             },
             
             deselectCurve() {
@@ -12351,6 +12898,11 @@
                 }
                 this.selectedCurve = null;
                 this.nameDisplay.value = '';
+                
+                // Notify MidiModelSystem of curve deselection (for Long Tone)
+                if (window.MidiModelSystem && MidiModelSystem.selectedModelKey === 'longTone') {
+                    MidiModelSystem.updateLongToneCurveIndicator();
+                }
             },
             
             // Create/update preview curve showing entire curve shape within the first segment
