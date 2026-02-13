@@ -831,6 +831,8 @@
                     <label for="curveModelSigmoid">S-Curve</label>
                     <input type="radio" id="curveModelExp" name="curveModel" value="exponential">
                     <label for="curveModelExp">Exp</label>
+                    <input type="radio" id="curveModelLog" name="curveModel" value="logarithmic">
+                    <label for="curveModelLog">Log</label>
                 </div>
                 
                 <button id="curveDrawBtn" class="curve-draw-btn">Draw</button>
@@ -12538,6 +12540,30 @@
                         return y1Norm + (y2Norm - y1Norm) * shaped;
                     }
                     
+                    case 'logarithmic': {
+                        // Logarithmic decay: steep initial change then very long gradual tail
+                        // Uses tanh shaping: tanh(k*t)/tanh(k)
+                        // slope controls how front-loaded the curve is:
+                        //   0 = linear
+                        //   negative = steep start, long tail (drag left)
+                        //     slope -1: ~46% of transition in first 10%
+                        //     slope -2: ~76% of transition in first 10%
+                        //     slope -3: ~91% of transition in first 10%
+                        //   positive = long lead-in, steep end (drag right)
+                        const absK = Math.abs(slope) * 5;
+                        let shaped;
+                        if (absK < 0.01) {
+                            shaped = t; // Linear when slope ≈ 0
+                        } else if (slope < 0) {
+                            // Steep start, long gradual tail
+                            shaped = Math.tanh(absK * t) / Math.tanh(absK);
+                        } else {
+                            // Long lead-in, steep end
+                            shaped = 1 - Math.tanh(absK * (1 - t)) / Math.tanh(absK);
+                        }
+                        return y1Norm + (y2Norm - y1Norm) * shaped;
+                    }
+                    
                     case 'bezier':
                     default: {
                         // Quadratic bezier (original model, extended range)
@@ -12756,7 +12782,7 @@
                     origY2Pixel: y2Pixel,
                     tension,  // DAW-style: vertical drag changes depth
                     slope: 0,  // DAW-style: horizontal drag shifts apex position
-                    model: this.getCurveModel(),  // Curve model: bezier, power, sigmoid, exponential
+                    model: this.getCurveModel(),  // Curve model: bezier, power, sigmoid, exponential, logarithmic
                     trackDims
                 };
                 

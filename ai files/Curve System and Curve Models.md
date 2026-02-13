@@ -99,9 +99,9 @@ const normalizedY = curve.curveData.samples[Math.min(i, samples.length - 1)];
 
 ### Overview
 
-The curve model system provides 4 different mathematical interpolation functions that control the shape of the curve between its start point (y1) and end point (y2). All models are controlled by the **slope** parameter, which shifts the curve's inflection point along the horizontal axis.
+The curve model system provides 5 different mathematical interpolation functions that control the shape of the curve between its start point (y1) and end point (y2). All models are controlled by the **slope** parameter, which shifts the curve's inflection point along the horizontal axis.
 
-The model is selected via a radio group in the Composition Panel UI (Bezier, Power, S-Curve, Exp) and is stored per-curve as `curve.model`.
+The model is selected via a radio group in the Composition Panel UI (Bezier, Power, S-Curve, Exp, Log) and is stored per-curve as `curve.model`.
 
 ### Model Descriptions
 
@@ -142,15 +142,33 @@ The model is selected via a radio group in the Composition Panel UI (Bezier, Pow
 - Normalized to map [0,1] → [0,1] then scaled to [y1, y2]
 
 #### 4. Exponential (`"exponential"`)
-**Peaking curve** — creates a hump or valley between the endpoints.
+**Exponential growth/decay curve** — true exponential interpolation.
 
-- `slope = 0`: Symmetric peak at midpoint
-- `slope > 0`: Taller peak (up to 1.5× the y-range)
-- `slope < 0`: Valley/dip below the endpoints
+- `slope = 0`: Linear
+- `slope > 0`: Flat start, steep end (exponential growth feel)
+- `slope < 0`: Steep start, flat end (exponential decay feel)
 
-**Math:** Uses `sin(π·t)` envelope:
-- `peakHeight = slope * 0.5 * |y2 - y1|` (or minimum 0.1 for flat curves)
-- `y = lerp(y1, y2, t) + sin(π·t) · peakHeight`
+**Math:** `shaped = (e^(k·t) - 1) / (e^k - 1)` where `k = slope * 4`
+
+#### 5. Logarithmic (`"logarithmic"`)
+**Logarithmic decay** — steep initial change then very long gradual tail.
+
+Designed for curves that need most of the transition concentrated at one end with a long, smooth tail. Uses hyperbolic tangent (`tanh`) shaping which provides a smooth, non-cliff-like steep section that naturally relaxes into a gradual tail.
+
+- `slope = 0`: Linear
+- `slope < 0` (drag left): Steep start, long tail
+  - slope -1: ~46% of transition in first 10% of curve
+  - slope -2: ~76% of transition in first 10% of curve
+  - slope -3: ~91% of transition in first 10% of curve
+- `slope > 0` (drag right): Long lead-in, steep end
+  - slope +3: ~91% of transition in last 10% of curve
+
+**Math:** `shaped = tanh(k·t) / tanh(k)` where `k = |slope| * 5`
+- For negative slope (steep start): `tanh(k·t) / tanh(k)`
+- For positive slope (steep end): `1 - tanh(k·(1-t)) / tanh(k)`
+- As slope approaches 0, reduces to linear (t)
+
+**Key difference from Power model:** Power uses `t^n` which at extreme settings becomes a near-vertical step function. Logarithmic uses `tanh` which keeps the steep section smooth and finite-sloped, producing a natural decay shape rather than a cliff.
 
 ### Slope Parameter
 
