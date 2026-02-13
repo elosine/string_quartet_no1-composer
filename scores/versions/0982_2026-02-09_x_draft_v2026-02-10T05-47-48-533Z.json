@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "0982_2026-02-09_x_draft",
-    "created": "2026-02-10T05:47:49.267Z",
-    "modified": "2026-02-10T05:47:51.073Z",
+    "created": "2026-02-10T00:22:31.471Z",
+    "modified": "2026-02-10T00:22:31.500Z",
     "author": ""
   },
   "tempoHistory": [
@@ -127037,20 +127037,9 @@
           "audioFilePath": "/audio_files/PizzStorm-Cello-Mastered_1770575854839.wav",
           "color": "#CDDC39",
           "createdAt": 1770575854848
-        },
-        {
-          "id": 69,
-          "name": "Viola-LongTone-215_mastered.wav",
-          "trackIndex": 2,
-          "startSeconds": 215,
-          "endSeconds": 337.782358276644,
-          "durationSeconds": 122.78235827664399,
-          "audioFilePath": "/audio_files/Viola-LongTone-215_mastered_1770702462039.wav",
-          "color": "#00BCD4",
-          "createdAt": 1770702462234
         }
       ],
-      "nextId": 70
+      "nextId": 69
     },
     "gcs": {
       "gcs": [

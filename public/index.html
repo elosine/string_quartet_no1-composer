@@ -835,6 +835,30 @@
                     <label for="curveModelLog">Log</label>
                 </div>
                 
+                <div class="color-swatches" id="colorSwatches">
+                    <div class="color-swatch selected" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
+                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
+                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
+                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
+                    <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
+                    <div class="color-swatch" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
+                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
+                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
+                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
+                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
+                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
+                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                </div>
+                
+                <div class="curve-fill-toggle">
+                    <input type="radio" id="curveFillLine" name="curveFill" value="line" checked>
+                    <label for="curveFillLine">Line</label>
+                    <input type="radio" id="curveFillBottom" name="curveFill" value="bottom">
+                    <label for="curveFillBottom">Fill ↓</label>
+                    <input type="radio" id="curveFillTop" name="curveFill" value="top">
+                    <label for="curveFillTop">Fill ↑</label>
+                </div>
+                
                 <button id="curveDrawBtn" class="curve-draw-btn">Draw</button>
                 <button id="curveDeleteBtn" class="curve-draw-btn" style="margin-top: 5px;">Delete</button>
                 <button id="curveSaveBtn" class="curve-draw-btn" style="margin-top: 5px;">Save</button>
@@ -857,15 +881,6 @@
                 <input type="hidden" id="curveRecallSelect" value="">
                 <button id="curveInsertBtn" class="curve-draw-btn" style="margin-top: 5px;">Insert at Edit Line</button>
                 
-                <div class="curve-fill-toggle">
-                    <input type="radio" id="curveFillLine" name="curveFill" value="line" checked>
-                    <label for="curveFillLine">Line</label>
-                    <input type="radio" id="curveFillBottom" name="curveFill" value="bottom">
-                    <label for="curveFillBottom">Fill ↓</label>
-                    <input type="radio" id="curveFillTop" name="curveFill" value="top">
-                    <label for="curveFillTop">Fill ↑</label>
-                </div>
-                
                 <div class="gtrack-radio-group">
                     <input type="radio" id="gtrackG1" name="gtrack" value="1">
                     <label for="gtrackG1">T1</label>
@@ -877,22 +892,6 @@
                     <label for="gtrackG4">T4</label>
                     <input type="radio" id="gtrackGA" name="gtrack" value="A" checked>
                     <label for="gtrackGA">TA</label>
-                </div>
-                
-                <div class="section-label" style="margin-top: 10px;">Color</div>
-                <div class="color-swatches" id="colorSwatches">
-                    <div class="color-swatch selected" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
-                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
-                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
-                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
-                    <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
-                    <div class="color-swatch" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
-                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
-                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
-                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
-                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
-                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
-                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1041,15 +1040,15 @@
                     <!-- Long Tone single pitch input -->
                     <div id="longToneSinglePitchRow" class="curve-input-row" style="margin-top: 6px; display: none;">
                         <label style="font-size: 10px;">Pitch</label>
-                        <input type="text" id="longTonePitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="e.g. C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat)">
+                        <input type="text" id="longTonePitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                     </div>
                     
                     <!-- Long Tone glissando pitch inputs -->
                     <div id="longToneGlissandoParams" class="curve-input-row" style="margin-top: 6px;">
                         <label style="font-size: 10px;">Low Pitch</label>
-                        <input type="text" id="longToneLowPitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="Lower pitch of glissando range">
+                        <input type="text" id="longToneLowPitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                         <label style="font-size: 10px; margin-left: 8px;">High Pitch</label>
-                        <input type="text" id="longToneHighPitch" class="curve-input" value="C5" style="width: 50px; font-size: 10px;" placeholder="C5" title="Higher pitch of glissando range">
+                        <input type="text" id="longToneHighPitch" class="curve-input" value="C5" style="width: 50px; font-size: 10px;" placeholder="C5" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                     </div>
                     
                     <!-- Articulation selector -->
@@ -1098,16 +1097,16 @@
                     <!-- Single pitch input - shown when pitch mode is 'single' -->
                     <div id="singlePitchRow" class="curve-input-row" style="margin-top: 6px;">
                         <label>Pitch</label>
-                        <input type="text" id="midiModelPitch" class="curve-input" value="C4" style="width: 50px;" placeholder="C4" title="e.g. C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat)">
+                        <input type="text" id="midiModelPitch" class="curve-input" value="C4" style="width: 50px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                     </div>
                     
                     <!-- Glissando pitch inputs - shown when pitch mode is 'glissando' -->
                     <div id="glissandoParams" style="display: none;">
                         <div class="curve-input-row" style="margin-top: 4px;">
                             <label style="font-size: 10px;">Start Pitch</label>
-                            <input type="text" id="glissandoStartPitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="+ = quarter sharp, d = quarter flat (e.g. C+4, Cd4)">
+                            <input type="text" id="glissandoStartPitch" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                             <label style="font-size: 10px; margin-left: 8px;">End Pitch</label>
-                            <input type="text" id="glissandoEndPitch" class="curve-input" value="C5" style="width: 50px; font-size: 10px;" placeholder="C5" title="+ = quarter sharp, d = quarter flat (e.g. C+5, Cd5)">
+                            <input type="text" id="glissandoEndPitch" class="curve-input" value="C5" style="width: 50px; font-size: 10px;" placeholder="C5" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                         </div>
                     </div>
                     
@@ -9405,7 +9404,7 @@
                 
                 const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
                 if (pitch === null) {
-                    alert('Invalid pitch. Use format like C4, C#3, Bb5');
+                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
                     return;
                 }
                 
@@ -9639,15 +9638,19 @@
                 // Get pitch range from UI
                 const lowPitchStr = this.longToneLowPitchInput ? this.longToneLowPitchInput.value : 'C4';
                 const highPitchStr = this.longToneHighPitchInput ? this.longToneHighPitchInput.value : 'C5';
-                const lowPitchMidi = this.noteNameToPitch(lowPitchStr);
-                const highPitchMidi = this.noteNameToPitch(highPitchStr);
+                const lowPitchObj = this.noteNameToPitch(lowPitchStr, true);
+                const highPitchObj = this.noteNameToPitch(highPitchStr, true);
                 
-                if (lowPitchMidi === null || highPitchMidi === null) {
+                if (lowPitchObj === null || highPitchObj === null) {
                     if (this.longToneSegmentInfo) {
-                        this.longToneSegmentInfo.innerHTML = '<span style="color: #f88;">Invalid pitch format</span>';
+                        this.longToneSegmentInfo.innerHTML = '<span style="color: #f88;">Invalid pitch. Format: C4, C#4, Bb3, C+4 (¼ sharp), Cd4 (¼ flat)</span>';
                     }
                     return null;
                 }
+                
+                // Compute effective pitch including quarter tone offset (e.g. Cd4 = 59.5)
+                const lowPitchMidi = lowPitchObj.pitch + lowPitchObj.quarterTone;
+                const highPitchMidi = highPitchObj.pitch + highPitchObj.quarterTone;
                 
                 // Ensure low < high
                 const actualLowPitch = Math.min(lowPitchMidi, highPitchMidi);
@@ -9853,7 +9856,7 @@
                     });
                     
                     const TICKS_PER_BEAT = 480;
-                    const TEMPO_BPM = 120;
+                    const TEMPO_BPM = beatsPerMinute; // Use composition tempo
                     const MICROSECONDS_PER_BEAT = Math.round(60000000 / TEMPO_BPM);
                     
                     // Helper functions for MIDI file building
@@ -9998,11 +10001,30 @@
             // Convert MIDI pitch number to pitch name (helper for display)
             midiToPitchName(midiPitch) {
                 const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-                const octave = Math.floor(midiPitch / 12) - 1;
-                const noteIndex = Math.round(midiPitch) % 12;
-                const cents = Math.round((midiPitch - Math.round(midiPitch)) * 100);
-                const centsStr = cents !== 0 ? (cents > 0 ? `+${cents}¢` : `${cents}¢`) : '';
-                return `${noteNames[noteIndex]}${octave}${centsStr}`;
+                const frac = midiPitch - Math.floor(midiPitch);
+                
+                // Quarter tone (.5): pick cleaner representation (prefer no # in base note)
+                if (Math.abs(frac - 0.5) < 0.01) {
+                    const low = Math.floor(midiPitch);
+                    const high = Math.ceil(midiPitch);
+                    const lowNote = noteNames[((low % 12) + 12) % 12];
+                    const highNote = noteNames[((high % 12) + 12) % 12];
+                    if (!lowNote.includes('#')) {
+                        return `${lowNote}+${Math.floor(low / 12) - 1}`;  // quarter sharp
+                    } else {
+                        return `${highNote}d${Math.floor(high / 12) - 1}`;  // quarter flat
+                    }
+                }
+                
+                const rounded = Math.round(midiPitch);
+                const octave = Math.floor(rounded / 12) - 1;
+                const noteIndex = ((rounded % 12) + 12) % 12;
+                const cents = Math.round((midiPitch - rounded) * 100);
+                let suffix = '';
+                if (cents !== 0) {
+                    suffix = cents > 0 ? `+${cents}¢` : `${cents}¢`;
+                }
+                return `${noteNames[noteIndex]}${suffix}${octave}`;
             },
             
             // Check if CurveMaker has a selected curve and update UI
@@ -10777,7 +10799,7 @@
                 
                 const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
                 if (pitch === null) {
-                    alert('Invalid pitch. Use format like C4, C#3, Bb5');
+                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
                     return null;
                 }
                 
@@ -10845,7 +10867,7 @@
                 
                 const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
                 if (pitch === null) {
-                    alert('Invalid pitch. Use format like C4, C#3, Bb5');
+                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
                     return;
                 }
                 
@@ -14097,7 +14119,7 @@
                     if (curve.trackDims && curve.gTrack) {
                         // Get fresh track dimensions
                         const trackDims = window.CompositionPanel ? 
-                            CompositionPanel.getTrackDimensions(scoreEl, curve.gTrack) : curve.trackDims;
+                            CompositionPanel.getTrackDimensions(curve.gTrack, scoreEl) : curve.trackDims;
                         
                         if (trackDims) {
                             curve.trackDims = trackDims;
