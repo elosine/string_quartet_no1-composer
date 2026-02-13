@@ -811,6 +811,28 @@
                     <input type="text" id="curveY2Input" class="curve-input" value="10.0">
                 </div>
                 
+                <div class="gtrack-radio-group" id="curveGTrackGroup">
+                    <input type="radio" id="curveGTrackG1" name="curveGTrack" value="1" checked>
+                    <label for="curveGTrackG1">T1</label>
+                    <input type="radio" id="curveGTrackG2" name="curveGTrack" value="2">
+                    <label for="curveGTrackG2">T2</label>
+                    <input type="radio" id="curveGTrackG3" name="curveGTrack" value="3">
+                    <label for="curveGTrackG3">T3</label>
+                    <input type="radio" id="curveGTrackG4" name="curveGTrack" value="4">
+                    <label for="curveGTrackG4">T4</label>
+                </div>
+                
+                <div class="gtrack-radio-group" id="curveModelGroup" style="margin-top: 4px;">
+                    <input type="radio" id="curveModelBezier" name="curveModel" value="bezier" checked>
+                    <label for="curveModelBezier">Bezier</label>
+                    <input type="radio" id="curveModelPower" name="curveModel" value="power">
+                    <label for="curveModelPower">Power</label>
+                    <input type="radio" id="curveModelSigmoid" name="curveModel" value="sigmoid">
+                    <label for="curveModelSigmoid">S-Curve</label>
+                    <input type="radio" id="curveModelExp" name="curveModel" value="exponential">
+                    <label for="curveModelExp">Exp</label>
+                </div>
+                
                 <button id="curveDrawBtn" class="curve-draw-btn">Draw</button>
                 <button id="curveDeleteBtn" class="curve-draw-btn" style="margin-top: 5px;">Delete</button>
                 <button id="curveSaveBtn" class="curve-draw-btn" style="margin-top: 5px;">Save</button>
@@ -12277,6 +12299,7 @@
                 this.y1Input = document.getElementById('curveY1Input');
                 this.y2Input = document.getElementById('curveY2Input');
                 this.drawBtn = document.getElementById('curveDrawBtn');
+                this.curveGTrackGroup = document.getElementById('curveGTrackGroup');
                 this.saveBtn = document.getElementById('curveSaveBtn');
                 this.descriptionInput = document.getElementById('curveDescriptionInput');
                 this.recallSelect = document.getElementById('curveRecallSelect');
@@ -12379,6 +12402,40 @@
                     });
                 });
                 
+                // Curve model radio handlers - dynamic for selected curve
+                document.querySelectorAll('input[name="curveModel"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        const newModel = e.target.value;
+                        if (this.selectedCurve) {
+                            this.selectedCurve.model = newModel;
+                            this.updateCurveRendering(this.selectedCurve);
+                            this.syncCurveToDatabase(this.selectedCurve);
+                            this.updateVisibility();
+                        }
+                    });
+                });
+                
+                // Curve-specific track radio handlers
+                document.querySelectorAll('input[name="curveGTrack"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        if (this.selectedCurve) {
+                            const newGTrack = e.target.value;
+                            this.selectedCurve.gTrack = newGTrack;
+                            const trackDims = CompositionPanel.getTrackDimensions(newGTrack, this.scoreTopEl);
+                            const trackBottom = trackDims.y + trackDims.height;
+                            this.selectedCurve.trackDims = trackDims;
+                            this.selectedCurve.y1Pixel = trackBottom - (this.selectedCurve.y1 / 10) * trackDims.height;
+                            this.selectedCurve.y2Pixel = trackBottom - (this.selectedCurve.y2 / 10) * trackDims.height;
+                            this.selectedCurve.origY1Pixel = this.selectedCurve.y1Pixel;
+                            this.selectedCurve.origY2Pixel = this.selectedCurve.y2Pixel;
+                            this.updateCurveRendering(this.selectedCurve);
+                            this.updateBoundingBox(this.selectedCurve);
+                            this.syncCurveToDatabase(this.selectedCurve);
+                            this.updateVisibility();
+                        }
+                    });
+                });
+                
                 // Input field handlers - dynamic for selected curve
                 this.startInput.addEventListener('change', () => this.updateSelectedFromInputs());
                 this.endInput.addEventListener('change', () => this.updateSelectedFromInputs());
@@ -12405,6 +12462,168 @@
                 });
                 
                 console.log('CurveMaker initialized');
+            },
+            
+            getCurveGTrack() {
+                const radio = document.querySelector('input[name="curveGTrack"]:checked');
+                return radio ? radio.value : '1';
+            },
+            
+            setCurveGTrack(gTrack) {
+                const radio = document.querySelector(`input[name="curveGTrack"][value="${gTrack}"]`);
+                if (radio) radio.checked = true;
+            },
+            
+            getCurveModel() {
+                const radio = document.querySelector('input[name="curveModel"]:checked');
+                return radio ? radio.value : 'bezier';
+            },
+            
+            setCurveModel(model) {
+                const radio = document.querySelector(`input[name="curveModel"][value="${model}"]`);
+                if (radio) radio.checked = true;
+            },
+            
+            // Unified curve Y computation for all models
+            // t: normalized position 0-1 along curve (time-based)
+            // slope: shape parameter (range depends on model, typically -3 to +3)
+            // y1Norm, y2Norm: normalized Y endpoints (0-1)
+            // model: 'bezier', 'power', 'sigmoid', 'exponential'
+            // Returns: normalized Y value (0-1)
+            computeYAtT(model, slope, y1Norm, y2Norm, t) {
+                t = Math.max(0, Math.min(1, t));
+                
+                switch (model) {
+                    case 'power': {
+                        // Power curve: y = t^n mapped between endpoints
+                        // slope controls exponent: 0 = linear (n=1)
+                        // negative slope = steep start (n < 1), positive = steep end (n > 1)
+                        // Range: slope -3 gives n≈0.05, slope +3 gives n≈20
+                        const exponent = Math.pow(4, slope);
+                        const shaped = Math.pow(t, exponent);
+                        return y1Norm + (y2Norm - y1Norm) * shaped;
+                    }
+                    
+                    case 'sigmoid': {
+                        // S-curve (logistic sigmoid)
+                        // slope controls steepness: 0 = gentle S, ±3 = sharp step
+                        // Positive slope = normal S, negative = reversed S
+                        const steepness = slope * 4;
+                        let shaped;
+                        if (Math.abs(steepness) < 0.01) {
+                            shaped = t; // Linear when steepness ≈ 0
+                        } else {
+                            // Sigmoid: 1 / (1 + e^(-k*(t-0.5)))
+                            // Normalized so f(0)=0, f(1)=1
+                            const raw = 1 / (1 + Math.exp(-steepness * (t - 0.5)));
+                            const atZero = 1 / (1 + Math.exp(-steepness * -0.5));
+                            const atOne = 1 / (1 + Math.exp(-steepness * 0.5));
+                            shaped = (raw - atZero) / (atOne - atZero);
+                        }
+                        return y1Norm + (y2Norm - y1Norm) * shaped;
+                    }
+                    
+                    case 'exponential': {
+                        // Exponential curve: (e^(kt) - 1) / (e^k - 1)
+                        // slope controls intensity: 0 = linear
+                        // positive = flat start, steep end (exponential growth)
+                        // negative = steep start, flat end (logarithmic)
+                        const k = slope * 4;
+                        let shaped;
+                        if (Math.abs(k) < 0.01) {
+                            shaped = t; // Linear when k ≈ 0
+                        } else {
+                            shaped = (Math.exp(k * t) - 1) / (Math.exp(k) - 1);
+                        }
+                        return y1Norm + (y2Norm - y1Norm) * shaped;
+                    }
+                    
+                    case 'bezier':
+                    default: {
+                        // Quadratic bezier (original model, extended range)
+                        const ctrlYNorm = slope >= 0 
+                            ? y1Norm + (y2Norm - y1Norm) * (1 - Math.abs(slope)) * 0.5
+                            : y2Norm - (y2Norm - y1Norm) * (1 - Math.abs(slope)) * 0.5;
+                        const ctrlXNorm = 0.5 + Math.max(-1, Math.min(1, slope)) * 0.49;
+                        
+                        // Solve for bezier parameter from t (normalized X)
+                        const a = 1 - 2 * ctrlXNorm;
+                        const b = 2 * ctrlXNorm;
+                        const c = -t;
+                        
+                        let bT;
+                        if (Math.abs(a) < 0.0001) {
+                            bT = t;
+                        } else {
+                            const discriminant = b * b - 4 * a * c;
+                            if (discriminant < 0) {
+                                bT = t;
+                            } else {
+                                const sqrtD = Math.sqrt(discriminant);
+                                const t1 = (-b + sqrtD) / (2 * a);
+                                const t2 = (-b - sqrtD) / (2 * a);
+                                bT = (t1 >= 0 && t1 <= 1) ? t1 : t2;
+                                bT = Math.max(0, Math.min(1, bT));
+                            }
+                        }
+                        
+                        const oneMinusT = 1 - bT;
+                        return oneMinusT * oneMinusT * y1Norm 
+                             + 2 * oneMinusT * bT * ctrlYNorm 
+                             + bT * bT * y2Norm;
+                    }
+                }
+            },
+            
+            // Generate SVG path string from curve model (polyline from samples)
+            // Used by renderCurve and updateCurveRendering for all models
+            generatePathFromModel(curve) {
+                const model = curve.model || 'bezier';
+                const slope = curve.slope || 0;
+                const y1Norm = curve.y1 / 10;
+                const y2Norm = curve.y2 / 10;
+                const trackDims = curve.trackDims;
+                const trackBottom = trackDims.y + trackDims.height;
+                const trackHeight = trackDims.height;
+                
+                // Generate points along the curve (every 2 pixels for smoothness)
+                const curveWidth = Math.abs(curve.x2 - curve.x1);
+                const step = Math.max(1, Math.min(2, curveWidth / 200));
+                const points = [];
+                
+                for (let x = curve.x1; x <= curve.x2; x += step) {
+                    const t = curveWidth > 0 ? (x - curve.x1) / curveWidth : 0;
+                    const yNorm = this.computeYAtT(model, slope, y1Norm, y2Norm, t);
+                    const yPixel = trackBottom - yNorm * trackHeight;
+                    points.push({ x, y: yPixel });
+                }
+                // Ensure last point is exact
+                const lastYNorm = this.computeYAtT(model, slope, y1Norm, y2Norm, 1);
+                const lastYPixel = trackBottom - lastYNorm * trackHeight;
+                if (points.length === 0 || points[points.length - 1].x < curve.x2) {
+                    points.push({ x: curve.x2, y: lastYPixel });
+                }
+                
+                if (points.length < 2) return '';
+                
+                // Build line-only path (the curve line itself)
+                let lineD = `M ${points[0].x} ${points[0].y}`;
+                for (let i = 1; i < points.length; i++) {
+                    lineD += ` L ${points[i].x} ${points[i].y}`;
+                }
+                
+                // Build filled path if needed
+                if (curve.fillMode !== 'line' && trackDims) {
+                    const fillY = curve.fillMode === 'bottom' ? trackBottom : trackDims.y;
+                    let filledD = `M ${points[0].x} ${fillY} L ${points[0].x} ${points[0].y}`;
+                    for (let i = 1; i < points.length; i++) {
+                        filledD += ` L ${points[i].x} ${points[i].y}`;
+                    }
+                    filledD += ` L ${points[points.length - 1].x} ${fillY} Z`;
+                    return { lineD, filledD };
+                }
+                
+                return { lineD, filledD: null };
             },
             
             generateCurveName() {
@@ -12435,62 +12654,22 @@
                 const sampleCount = Math.ceil(duration / SAMPLE_INTERVAL) + 1;
                 const samples = [];
                 const slope = curve.slope || 0;
+                const model = curve.model || 'bezier';
                 
                 // Use normalized Y values (0-10 scale) for consistent curve data
                 // These are the authoritative values, not the pixel values which can change
                 const y1Norm = curve.y1 / 10;  // 0 to 1
                 const y2Norm = curve.y2 / 10;  // 0 to 1
                 
-                // Calculate control point Y in normalized space (same logic as rendering)
-                const ctrlYNorm = slope >= 0 
-                    ? y1Norm + (y2Norm - y1Norm) * (1 - Math.abs(slope)) * 0.5
-                    : y2Norm - (y2Norm - y1Norm) * (1 - Math.abs(slope)) * 0.5;
-                
-                // Calculate control point X position in normalized space (0 to 1)
-                // ctrlX is at 0.5 + slope * 0.45 of the curve width
-                const ctrlXNorm = 0.5 + slope * 0.45;
-                
-                // Generate samples at fixed time intervals
+                // Generate samples at fixed time intervals using the unified model
                 for (let i = 0; i < sampleCount; i++) {
                     const time = startTime + (i * SAMPLE_INTERVAL);
                     
                     // Calculate normalized position (0 to 1) based on time
                     const timeT = Math.min(1, (time - startTime) / duration);
                     
-                    // For a quadratic bezier in normalized X space (0 to 1):
-                    // X(t) = (1-t)²*0 + 2(1-t)t*ctrlXNorm + t²*1
-                    // We need to find t such that X(t) = timeT
-                    // Solve: 2(1-t)t*ctrlXNorm + t² = timeT
-                    // Rearranging: t²(1 - 2*ctrlXNorm) + t*2*ctrlXNorm - timeT = 0
-                    const a = 1 - 2 * ctrlXNorm;
-                    const b = 2 * ctrlXNorm;
-                    const c = -timeT;
-                    
-                    let t;
-                    if (Math.abs(a) < 0.0001) {
-                        // Linear case (ctrlXNorm is at 0.5)
-                        t = timeT;
-                    } else {
-                        // Quadratic formula: t = (-b + sqrt(b² - 4ac)) / 2a
-                        const discriminant = b * b - 4 * a * c;
-                        if (discriminant < 0) {
-                            t = timeT; // Fallback
-                        } else {
-                            const sqrtD = Math.sqrt(discriminant);
-                            const t1 = (-b + sqrtD) / (2 * a);
-                            const t2 = (-b - sqrtD) / (2 * a);
-                            // Choose t in range [0, 1]
-                            t = (t1 >= 0 && t1 <= 1) ? t1 : t2;
-                            t = Math.max(0, Math.min(1, t));
-                        }
-                    }
-                    
-                    // Now calculate Y using the correct t value in normalized space
-                    // Quadratic bezier: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
-                    const oneMinusT = 1 - t;
-                    const normalizedY = oneMinusT * oneMinusT * y1Norm 
-                                      + 2 * oneMinusT * t * ctrlYNorm 
-                                      + t * t * y2Norm;
+                    // Use unified model computation
+                    const normalizedY = this.computeYAtT(model, slope, y1Norm, y2Norm, timeT);
                     
                     // Clamp to valid range
                     samples.push(Math.max(0, Math.min(1, normalizedY)));
@@ -12509,7 +12688,7 @@
                 const endSeconds = parseFloat(this.endInput.value) || 1;
                 const y1 = parseFloat(this.y1Input.value) || 0;
                 const y2 = parseFloat(this.y2Input.value) || 10;
-                const gTrack = CompositionPanel.getSelectedGTrack();
+                const gTrack = this.getCurveGTrack();
                 
                 // Get current fill mode and color from UI
                 const fillMode = document.querySelector('input[name="curveFill"]:checked').value;
@@ -12518,9 +12697,9 @@
                 
                 // Get track dimensions - use the section where the curve starts
                 // Note: Both top and bottom sections have the same coordinate system
-                const trackDims = CompositionPanel.getSelectedTrackDimensions(this.scoreTopEl);
+                const trackDims = CompositionPanel.getTrackDimensions(gTrack, this.scoreTopEl);
                 // Store gTrack for later use in multi-page rendering
-                const gTrackForDims = CompositionPanel.getSelectedGTrack();
+                const gTrackForDims = gTrack;
                 
                 // Calculate pixel positions
                 const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
@@ -12577,6 +12756,7 @@
                     origY2Pixel: y2Pixel,
                     tension,  // DAW-style: vertical drag changes depth
                     slope: 0,  // DAW-style: horizontal drag shifts apex position
+                    model: this.getCurveModel(),  // Curve model: bezier, power, sigmoid, exponential
                     trackDims
                 };
                 
@@ -12630,40 +12810,17 @@
                 group.setAttribute('data-curve-id', curve.id);
                 group.setAttribute('class', 'curve-element');
                 
-                // DAW-style curve shaping:
-                // slope controls where the "knee" is (-1 = left edge, +1 = right edge)
-                // Drag right = flat at start, steep rise at end
-                // Drag left = steep rise at start, flat at end
-                // Curve stays within Y bounds of endpoints (no protrusion)
-                const slope = curve.slope || 0;
-                const curveWidth = curve.x2 - curve.x1;
-                
-                // Control point X: slope moves it from left edge to right edge
-                // slope -1 = control at x1, slope +1 = control at x2, slope 0 = middle
-                const ctrlX = curve.x1 + (curveWidth * (0.5 + slope * 0.45));
-                
-                // Control point Y: stays at the Y value of the opposite endpoint
-                // This creates the "flat then steep" or "steep then flat" effect
-                // When slope > 0 (dragging right): ctrl Y near y1 (start), curve flat then rises
-                // When slope < 0 (dragging left): ctrl Y near y2 (end), curve rises then flat
-                const ctrlY = slope >= 0 
-                    ? curve.y1Pixel + (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5
-                    : curve.y2Pixel - (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5;
-                
-                // Create the quadratic bezier path
+                // Generate path using the unified model system
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                const d = `M ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel}`;
+                const { lineD, filledD } = this.generatePathFromModel(curve);
                 
-                if (curve.fillMode === 'line' || !curve.trackDims) {
-                    // Line mode or missing trackDims - just draw the curve
-                    path.setAttribute('d', d);
+                if (curve.fillMode === 'line' || !curve.trackDims || !filledD) {
+                    path.setAttribute('d', lineD);
                     path.setAttribute('fill', 'none');
                     path.setAttribute('stroke', color);
                     path.setAttribute('stroke-width', '2');
                     path.setAttribute('opacity', '0.3');
                 } else {
-                    const fillY = curve.fillMode === 'bottom' ? curve.trackDims.y + curve.trackDims.height : curve.trackDims.y;
-                    const filledD = `M ${curve.x1} ${fillY} L ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel} L ${curve.x2} ${fillY} Z`;
                     path.setAttribute('d', filledD);
                     path.setAttribute('fill', color);
                     path.setAttribute('fill-opacity', '0.3');
@@ -12677,7 +12834,7 @@
                 
                 // Create invisible wider hit area for easier clicking on the curve
                 const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                hitPath.setAttribute('d', d);
+                hitPath.setAttribute('d', lineD);
                 hitPath.setAttribute('fill', 'none');
                 hitPath.setAttribute('stroke', 'transparent');
                 hitPath.setAttribute('stroke-width', '20');
@@ -12794,21 +12951,22 @@
                         case 'curve':
                         case 'preview':
                             // DAW-style curve shaping - horizontal drag only
-                            // Maps mouse X position within first segment bounds to slope (-1 to +1)
-                            // For multi-page curves, use first segment (curve.x1 to page edge)
-                            // Drag right = flat start, steep end (slope +1)
-                            // Drag left = steep start, flat end (slope -1)
+                            // Maps mouse X position to slope (-3 to +3)
+                            // Mouse can extend beyond curve bounds for extreme values
+                            // Drag right = flat start, steep end (positive slope)
+                            // Drag left = steep start, flat end (negative slope)
                             
                             // Use first segment bounds for slope calculation
                             const segmentLeft = curve.x1;
-                            const segmentRight = scoreEl.clientWidth; // Page edge for multi-page, or curve.x2 for single
+                            const segmentRight = scoreEl.clientWidth;
                             const isMultiPageCurve = curve.x2 > scoreEl.clientWidth;
                             const segmentWidth = (isMultiPageCurve ? segmentRight : curve.x2) - segmentLeft;
                             
                             if (segmentWidth > 0) {
-                                // Map mouse X to slope: left edge = -1, right edge = +1
+                                // Map mouse X to slope: center = 0, edges = ±3
+                                // Allow dragging beyond curve bounds for extreme values
                                 const relativeX = (x - segmentLeft) / segmentWidth;
-                                curve.slope = Math.max(-1, Math.min(1, (relativeX - 0.5) * 2));
+                                curve.slope = Math.max(-3, Math.min(3, (relativeX - 0.5) * 6));
                             }
                             break;
                     }
@@ -12879,6 +13037,12 @@
                 
                 // Update fill mode selection
                 document.querySelector(`input[name="curveFill"][value="${curve.fillMode}"]`).checked = true;
+                
+                // Update curve-specific track radio
+                if (curve.gTrack) this.setCurveGTrack(curve.gTrack);
+                
+                // Update curve model radio
+                this.setCurveModel(curve.model || 'bezier');
                 
                 // Notify MidiModelSystem of curve selection (for Long Tone)
                 if (window.MidiModelSystem && MidiModelSystem.selectedModelKey === 'longTone') {
@@ -12983,18 +13147,16 @@
                 const previewY1 = trackBottom - (curve.y1 / 10) * trackHeight;
                 const previewY2 = trackBottom - (curve.y2 / 10) * trackHeight;
                 
-                // Calculate control point for preview using the curve's slope
-                const slope = curve.slope || 0;
-                const previewWidth = previewX2 - previewX1;
-                const ctrlXOffset = previewWidth * 0.5 * (1 + slope);
-                const ctrlX = previewX1 + ctrlXOffset;
-                
-                // Control point Y based on slope direction
-                const ctrlY = slope >= 0 
-                    ? previewY1 + (previewY2 - previewY1) * (1 - Math.abs(slope)) * 0.5
-                    : previewY2 - (previewY2 - previewY1) * (1 - Math.abs(slope)) * 0.5;
-                
-                const pathD = `M ${previewX1} ${previewY1} Q ${ctrlX} ${ctrlY} ${previewX2} ${previewY2}`;
+                // Generate preview path using the unified model system
+                const previewCurve = {
+                    x1: previewX1, y1Pixel: previewY1,
+                    x2: previewX2, y2Pixel: previewY2,
+                    slope: curve.slope || 0,
+                    model: curve.model || 'bezier',
+                    fillMode: 'line',
+                    trackDims: curve.trackDims
+                };
+                const { lineD: pathD } = this.generatePathFromModel(previewCurve);
                 previewPath.setAttribute('d', pathD);
                 if (previewHitPath) previewHitPath.setAttribute('d', pathD);
                 
@@ -13644,6 +13806,7 @@
                     fillMode: curve.fillMode,
                     tension: curve.tension,
                     slope: curve.slope,
+                    model: curve.model || 'bezier',
                     x1: curve.x1,
                     y1Pixel: curve.y1Pixel,
                     x2: curve.x2,
@@ -13676,38 +13839,15 @@
                 const { path, hitPath, startPoint, endPoint, boundingBox } = curve.elements;
                 const color = ColorMap[curve.color] || curve.color;
                 
-                // DAW-style curve shaping:
-                // slope controls where the "knee" is (-1 = left edge, +1 = right edge)
-                // Drag right = flat at start, steep rise at end
-                // Drag left = steep rise at start, flat at end
-                // Curve stays within Y bounds of endpoints (no protrusion)
-                const slope = curve.slope || 0;
-                const curveWidth = Math.abs(curve.x2 - curve.x1);
+                // Generate path using the unified model system
+                const { lineD, filledD } = this.generatePathFromModel(curve);
                 
-                // Control point X: slope moves it from left edge to right edge
-                // slope -1 = control at x1, slope +1 = control at x2, slope 0 = middle
-                const ctrlX = curve.x1 + (curveWidth * (0.5 + slope * 0.45));
-                
-                // Control point Y: stays at the Y value of the opposite endpoint
-                // This creates the "flat then steep" or "steep then flat" effect
-                // When slope > 0 (dragging right): ctrl Y near y1 (start), curve flat then rises
-                // When slope < 0 (dragging left): ctrl Y near y2 (end), curve rises then flat
-                const ctrlY = slope >= 0 
-                    ? curve.y1Pixel + (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5
-                    : curve.y2Pixel - (curve.y2Pixel - curve.y1Pixel) * (1 - Math.abs(slope)) * 0.5;
-                
-                // Update path
-                const d = `M ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel}`;
-                
-                if (curve.fillMode === 'line' || !curve.trackDims) {
-                    // Line mode or missing trackDims - just draw the curve
-                    path.setAttribute('d', d);
+                if (curve.fillMode === 'line' || !curve.trackDims || !filledD) {
+                    path.setAttribute('d', lineD);
                     path.setAttribute('fill', 'none');
                     path.setAttribute('stroke', color);
                     path.setAttribute('opacity', '0.3');
                 } else {
-                    const fillY = curve.fillMode === 'bottom' ? curve.trackDims.y + curve.trackDims.height : curve.trackDims.y;
-                    const filledD = `M ${curve.x1} ${fillY} L ${curve.x1} ${curve.y1Pixel} Q ${ctrlX} ${ctrlY}, ${curve.x2} ${curve.y2Pixel} L ${curve.x2} ${fillY} Z`;
                     path.setAttribute('d', filledD);
                     path.setAttribute('fill', color);
                     path.setAttribute('fill-opacity', '0.3');
@@ -13717,7 +13857,7 @@
                 
                 // Update hit path for easier clicking
                 if (hitPath) {
-                    hitPath.setAttribute('d', d);
+                    hitPath.setAttribute('d', lineD);
                 }
                 
                 // Update endpoint colors
@@ -13886,7 +14026,8 @@
                                 fillMode: curve.fillMode,
                                 scoreTimeMs: curve.startSeconds * 1000,
                                 duration: (curve.endSeconds - curve.startSeconds) * 1000,
-                                curveData: curveDataArray
+                                curveData: curveDataArray,
+                                glissando: curve.glissando
                             });
                         }
                     }
@@ -13978,6 +14119,7 @@
                     fillMode: curve.fillMode,
                     tension: curve.tension || 0,
                     slope: curve.slope || 0,
+                    model: curve.model || 'bezier',
                     // Curve data array for playback
                     curveData: curve.curveData,
                     // Duration for easy reference
@@ -14095,8 +14237,8 @@
                     insertionSeconds = (scoreTimeMs / 1000) - leadInSeconds;
                 }
                 
-                // Get target track from CompositionPanel G track selection
-                const targetGTrack = window.CompositionPanel ? CompositionPanel.getSelectedGTrack() : '1';
+                // Get target track from curve-specific track radio group
+                const targetGTrack = this.getCurveGTrack();
                 
                 try {
                     const response = await fetch(`/api/curve-library/load/${encodeURIComponent(selectedName)}`);
@@ -14116,7 +14258,7 @@
                     
                     // Get track dimensions for the target track
                     const trackDims = window.CompositionPanel ? 
-                        CompositionPanel.getSelectedTrackDimensions(this.scoreTopEl) : null;
+                        CompositionPanel.getTrackDimensions(targetGTrack, this.scoreTopEl) : null;
                     
                     // Determine which page(s) the curve spans
                     const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
@@ -14167,6 +14309,7 @@
                         origY2Pixel: y2Pixel,
                         tension: savedCurve.tension || 0,
                         slope: savedCurve.slope || 0,
+                        model: savedCurve.model || 'bezier',
                         trackDims
                     };
                     
@@ -14440,6 +14583,7 @@
                     fillMode: curve.fillMode,
                     tension: curve.tension || 0,
                     slope: curve.slope || 0,
+                    model: curve.model || 'bezier',
                     curveData: segmentCurveData,
                     duration: duration
                 };
@@ -15007,17 +15151,17 @@
             // Remove static pitch markers for a curve
             removeStaticPitchMarkers(curve) {
                 // Remove old single group reference
-                if (curve?.pitchMarkerGroup) {
+                if (curve?.pitchMarkerGroup && typeof curve.pitchMarkerGroup.remove === 'function') {
                     curve.pitchMarkerGroup.remove();
                     delete curve.pitchMarkerGroup;
                 }
                 
                 // Remove new top/bottom group references
-                if (curve?.pitchMarkerGroupTop) {
+                if (curve?.pitchMarkerGroupTop && typeof curve.pitchMarkerGroupTop.remove === 'function') {
                     curve.pitchMarkerGroupTop.remove();
                     delete curve.pitchMarkerGroupTop;
                 }
-                if (curve?.pitchMarkerGroupBottom) {
+                if (curve?.pitchMarkerGroupBottom && typeof curve.pitchMarkerGroupBottom.remove === 'function') {
                     curve.pitchMarkerGroupBottom.remove();
                     delete curve.pitchMarkerGroupBottom;
                 }
@@ -15958,7 +16102,6 @@
                     });
                 }
                 
-                console.debug(`GC: ictus=${ictus}(pow${descentPower.toFixed(1)}), float=${stiffness}(pow${ascentPower.toFixed(1)}), rebound=${damping}%(${reboundHeight.toFixed(0)}px)`);
                 
                 return {
                     startSeconds,
@@ -16259,7 +16402,6 @@
                 const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
                 const gcGroup = section === 'top' ? this.topGCGroup : this.bottomGCGroup;
                 
-                console.debug(`GCMaker.renderGC: id=${gc.id}, impactSeconds=${gc.impactSeconds}, impactActual=${impactActual}, secondsPerPage=${secondsPerPage}, impactPage=${impactPage}, section=${section}`);
                 const scoreWidth = scoreEl.clientWidth;
                 const scoreHeight = scoreEl.clientHeight;
                 
@@ -16538,7 +16680,6 @@
                 for (const gc of this.gcs) {
                     if (!gc.elements || !gc.elements.group) continue;
                     
-                    console.debug(`GCMaker.updateVisibility: gc.id=${gc.id}, gc.page=${gc.page}, gc.section=${gc.section}, topPage=${topPage}, bottomPage=${bottomPage}`);
                     
                     // Calculate which pages this GC spans
                     const startActual = gc.startSeconds + leadInSec;
@@ -17037,7 +17178,6 @@
                 
                 // Recreate each GC from saved data
                 for (const gcData of this._importedData.gcs) {
-                    console.log('Reloading GC:', gcData.name, 'gTrack:', gcData.gTrack);
                     // Calculate trajectory with saved parameters
                     const trajectory = this.calculateTrajectory({
                         impactSeconds: gcData.impactSeconds,
