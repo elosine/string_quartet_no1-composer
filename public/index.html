@@ -835,6 +835,8 @@
                     <label for="curveModelLog">Log</label>
                 </div>
                 
+                <div id="curveCoeffDisplay" style="font-size: 9px; color: #aaa; padding: 2px 4px; margin-top: 2px; font-family: monospace; min-height: 14px;"></div>
+                
                 <div class="color-swatches" id="colorSwatches">
                     <div class="color-swatch selected" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
                     <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
@@ -3785,6 +3787,7 @@
                 });
                 
                 this.updateConnectorList();
+                this.updateVisibility();
                 console.log(`FlowchartConnector: Imported ${this.connectors.length} connectors`);
             }
         };
@@ -11329,6 +11332,16 @@
                 // Start auto-save
                 this.startAutoSave();
                 
+                // Auto-load last saved score
+                try {
+                    const lastScore = localStorage.getItem('lastScoreName');
+                    if (lastScore) {
+                        console.log(`ScoreManager: Auto-loading last score '${lastScore}'`);
+                        // Small delay to let all systems finish initializing
+                        setTimeout(() => this.loadScore(lastScore), 300);
+                    }
+                } catch(e) {}
+                
                 console.log('ScoreManager initialized');
             },
             
@@ -11466,6 +11479,38 @@
                     (data) => {
                         if (window.FlowchartConnector) {
                             FlowchartConnector.importData(data);
+                        }
+                    }
+                );
+                
+                // Cursor state - edit cursor position, score time, lead-in
+                // Registered last so it restores after all other data sources
+                this.registerSource('cursorState',
+                    () => ({
+                        editCursorSeconds: window.EditCursor ? EditCursor.positionSeconds : 0,
+                        gotoDisplaySeconds: window.CursorControls ? parseFloat(CursorControls.gotoSecondInput.value) || 0 : 0,
+                        leadInSeconds: leadInSeconds
+                    }),
+                    (data) => {
+                        if (!data) return;
+                        // Restore lead-in
+                        if (data.leadInSeconds !== undefined) {
+                            leadInSeconds = data.leadInSeconds;
+                            if (window.CursorControls && CursorControls.leadInSecondsInput) {
+                                CursorControls.leadInSecondsInput.value = leadInSeconds;
+                            }
+                        }
+                        // Restore edit cursor position
+                        if (data.editCursorSeconds !== undefined && window.EditCursor) {
+                            EditCursor.setPositionSeconds(data.editCursorSeconds);
+                        }
+                        // Restore score time by emitting scoreGoto
+                        if (data.gotoDisplaySeconds !== undefined && window.CursorControls) {
+                            CursorControls.gotoSecondInput.value = data.gotoDisplaySeconds.toFixed(2);
+                            // Small delay to let other systems finish initializing
+                            setTimeout(() => {
+                                CursorControls.gotoPosition();
+                            }, 100);
                         }
                     }
                 );
@@ -11618,6 +11663,7 @@
                         this.isDirty = false;
                         this.updateStatus(`Saved: ${name}`);
                         this.refreshScoreList();
+                        try { localStorage.setItem('lastScoreName', name); } catch(e) {}
                         console.log(`Score saved: ${name}`);
                     } else {
                         this.updateStatus(`Error: ${result.error}`);
@@ -11684,6 +11730,7 @@
                         this.isDirty = false;
                         this.updateStatus(`Loaded: ${name}`);
                         this.loadVersionList(name);
+                        try { localStorage.setItem('lastScoreName', name); } catch(e) {}
                         console.log(`Score loaded: ${name}`);
                     } else {
                         this.updateStatus(`Error: ${result.error}`);
@@ -12318,6 +12365,7 @@
                 
                 // Get UI elements
                 this.nameDisplay = document.getElementById('curveNameDisplay');
+                this.coeffDisplay = document.getElementById('curveCoeffDisplay');
                 this.startInput = document.getElementById('curveStartInput');
                 this.endInput = document.getElementById('curveEndInput');
                 this.y1Input = document.getElementById('curveY1Input');
@@ -13110,6 +13158,7 @@
                 }
                 this.selectedCurve = null;
                 this.nameDisplay.value = '';
+                this.updateCoefficientDisplay(null);
                 
                 // Notify MidiModelSystem of curve deselection (for Long Tone)
                 if (window.MidiModelSystem && MidiModelSystem.selectedModelKey === 'longTone') {
@@ -13794,6 +13843,59 @@
                 curve.endSeconds = endSeconds;
                 curve.y1 = y1;
                 curve.y2 = y2;
+                
+                this.updateCoefficientDisplay(curve);
+            },
+            
+            updateCoefficientDisplay(curve) {
+                if (!this.coeffDisplay) return;
+                if (!curve) {
+                    this.coeffDisplay.textContent = '';
+                    return;
+                }
+                
+                const model = curve.model || 'bezier';
+                const slope = curve.slope || 0;
+                const y1Norm = (curve.y1 || 0) / 10;
+                const y2Norm = (curve.y2 || 10) / 10;
+                
+                let text = `slope: ${slope.toFixed(2)}`;
+                
+                switch (model) {
+                    case 'power': {
+                        const exponent = Math.pow(4, slope);
+                        text += `  exp: ${exponent.toFixed(3)}`;
+                        break;
+                    }
+                    case 'sigmoid': {
+                        const steepness = slope * 4;
+                        text += `  k: ${steepness.toFixed(2)}`;
+                        break;
+                    }
+                    case 'exponential': {
+                        const k = slope * 4;
+                        text += `  k: ${k.toFixed(2)}`;
+                        break;
+                    }
+                    case 'logarithmic': {
+                        const k = Math.abs(slope) * 5;
+                        text += `  k: ${k.toFixed(2)}`;
+                        if (slope < 0) text += ' (steep start)';
+                        else if (slope > 0) text += ' (steep end)';
+                        break;
+                    }
+                    case 'bezier':
+                    default: {
+                        const ctrlX = 0.5 + Math.max(-1, Math.min(1, slope)) * 0.49;
+                        const ctrlY = slope >= 0
+                            ? y1Norm + (y2Norm - y1Norm) * (1 - Math.abs(slope)) * 0.5
+                            : y2Norm - (y2Norm - y1Norm) * (1 - Math.abs(slope)) * 0.5;
+                        text += `  ctrlX: ${ctrlX.toFixed(3)}  ctrlY: ${ctrlY.toFixed(3)}`;
+                        break;
+                    }
+                }
+                
+                this.coeffDisplay.textContent = text;
             },
             
             updateSelectedFromInputs() {
@@ -13980,7 +14082,8 @@
                     
                     // Create SVG elements for the curve
                     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                    group.setAttribute('class', 'curve-group');
+                    group.setAttribute('class', 'curve-element');
+                    group.setAttribute('data-curve-id', curve.id);
                     
                     // Create path
                     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -14020,10 +14123,10 @@
                     endPoint.setAttribute('fill', curve.color || '#4CAF50');
                     endPoint.style.display = 'none';
                     
-                    // Assemble group
+                    // Assemble group (bounding box behind path/hitPath so curve drag works)
+                    group.appendChild(boundingBox);
                     group.appendChild(hitPath);
                     group.appendChild(path);
-                    group.appendChild(boundingBox);
                     group.appendChild(startPoint);
                     group.appendChild(endPoint);
                     container.appendChild(group);
@@ -14038,11 +14141,9 @@
                     this.updateCurveRendering(curve);
                     this.updateBoundingBox(curve);
                     
-                    // Add click handler for selection
-                    hitPath.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.selectCurve(curve);
-                    });
+                    // Add mousedown handlers for curve/slope dragging
+                    hitPath.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'curve'));
+                    path.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'curve'));
                     
                     // Add drag handlers for endpoints (makes curves editable)
                     startPoint.style.cursor = 'ns-resize';
@@ -14051,9 +14152,8 @@
                     endPoint.style.cursor = 'ns-resize';
                     endPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'end'));
                     
-                    // Add drag handler for bounding box (move entire curve)
-                    boundingBox.style.cursor = 'move';
-                    boundingBox.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'move'));
+                    // Add handler for bounding box (select only, no drag)
+                    boundingBox.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'bbox'));
                     
                     // Re-add to GTrackSystem for curve follower functionality
                     if (curve.gTrack && curve.gTrack !== 'A' && window.GTrackSystem) {
