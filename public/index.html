@@ -769,6 +769,47 @@
                 <div class="control-row">
                     <input type="text" id="editCursorSecondsInput" class="edit-cursor-input" value="0.000">
                 </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label">Long Tone Workflow</div>
+                
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Start</label>
+                    <input type="number" id="ltStartInput" class="curve-input" value="0" step="1" style="width: 50px;">
+                    <label style="width: 25px; margin-left: 5px;">End</label>
+                    <input type="number" id="ltEndInput" class="curve-input" value="10" step="1" style="width: 50px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Y1</label>
+                    <input type="number" id="ltY1Input" class="curve-input" value="10" step="0.5" min="0" max="10" style="width: 50px;">
+                    <label style="width: 25px; margin-left: 5px;">Y2</label>
+                    <input type="number" id="ltY2Input" class="curve-input" value="0" step="0.5" min="0" max="10" style="width: 50px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Track</label>
+                    <select id="ltTrackSelect" style="width: 40px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                    <label style="width: 35px; margin-left: 5px;">Slope</label>
+                    <input type="number" id="ltSlopeInput" class="curve-input" value="-1" step="0.5" min="-3" max="3" style="width: 50px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Model</label>
+                    <select id="ltModelSelect" style="width: 80px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="logarithmic" selected>Log</option>
+                        <option value="exponential">Exp</option>
+                        <option value="power">Power</option>
+                        <option value="sigmoid">S-Curve</option>
+                        <option value="bezier">Bezier</option>
+                    </select>
+                </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="ltCreateCurveBtn" class="control-btn" style="font-size: 10px; background: var(--clr-limeGreen); color: #000;">Create Curve</button>
+                </div>
+                
                 <div class="section-divider"></div>
                 <div class="section-label">Curve Segments</div>
                 
@@ -1688,7 +1729,7 @@
                 // Average the samples for stability
                 this.clockOffset = this.syncSamples.reduce((a, b) => a + b, 0) / this.syncSamples.length;
                 
-                console.log(`Clock sync - Offset: ${this.clockOffset.toFixed(2)}ms, RTT: ${this.roundTripTime}ms`);
+                // console.log(`Clock sync - Offset: ${this.clockOffset.toFixed(2)}ms, RTT: ${this.roundTripTime}ms`);
             },
             
             // Simple offset update from broadcast (less accurate but frequent)
@@ -1793,7 +1834,7 @@
                     const framesToProcess = this.currentFrame - this.lastProcessedFrame;
                     
                     if (framesToProcess > 1) {
-                        console.log(`Skipped ${framesToProcess - 1} frames`);
+                        // console.log(`Skipped ${framesToProcess - 1} frames`);
                     }
                     
                     // Calculate delta time
@@ -12779,17 +12820,25 @@
                 };
             },
             
-            createCurve() {
-                const startSeconds = parseFloat(this.startInput.value) || 0;
-                const endSeconds = parseFloat(this.endInput.value) || 1;
-                const y1 = parseFloat(this.y1Input.value) || 0;
-                const y2 = parseFloat(this.y2Input.value) || 10;
-                const gTrack = this.getCurveGTrack();
+            createCurve(params = null) {
+                // If params provided, use them; otherwise read from UI
+                const startSeconds = params?.startSeconds ?? (parseFloat(this.startInput.value) || 0);
+                const endSeconds = params?.endSeconds ?? (parseFloat(this.endInput.value) || 1);
+                const y1Raw = parseFloat(this.y1Input.value);
+                const y2Raw = parseFloat(this.y2Input.value);
+                const y1 = params?.y1 ?? (isNaN(y1Raw) ? 0 : y1Raw);
+                const y2 = params?.y2 ?? (isNaN(y2Raw) ? 10 : y2Raw);
+                const gTrack = params?.gTrack ?? this.getCurveGTrack();
                 
-                // Get current fill mode and color from UI
-                const fillMode = document.querySelector('input[name="curveFill"]:checked').value;
+                // Get current fill mode and color from UI or params
+                const fillMode = params?.fillMode ?? document.querySelector('input[name="curveFill"]:checked').value;
                 const colorSwatch = document.querySelector('.color-swatch.selected');
-                const color = colorSwatch ? colorSwatch.dataset.color : 'brightOrange';
+                const color = params?.color ?? (colorSwatch ? colorSwatch.dataset.color : 'limeGreen');
+                
+                // Get model and slope from params or UI (default model: logarithmic)
+                const model = params?.model ?? this.getCurveModel() ?? 'logarithmic';
+                const slopeRaw = params?.slope;
+                const slope = slopeRaw !== undefined ? slopeRaw : 0;
                 
                 // Get track dimensions - use the section where the curve starts
                 // Note: Both top and bottom sections have the same coordinate system
@@ -12851,8 +12900,8 @@
                     origY1Pixel: y1Pixel,
                     origY2Pixel: y2Pixel,
                     tension,  // DAW-style: vertical drag changes depth
-                    slope: 0,  // DAW-style: horizontal drag shifts apex position
-                    model: this.getCurveModel(),  // Curve model: bezier, power, sigmoid, exponential, logarithmic
+                    slope,  // Curve coefficient: controls shape intensity
+                    model,  // Curve model: bezier, power, sigmoid, exponential, logarithmic
                     trackDims
                 };
                 
@@ -12895,7 +12944,27 @@
                 // Auto-select the new curve
                 this.selectCurve(curve);
                 
-                console.log(`Curve created: ${curve.name} (ID: ${curve.id})`);
+                // Log for automation visibility
+                const curveParams = {
+                    id: curve.id,
+                    name: curve.name,
+                    startSeconds,
+                    endSeconds,
+                    duration: endSeconds - startSeconds,
+                    y1,
+                    y2,
+                    gTrack,
+                    model,
+                    slope,
+                    color,
+                    fillMode,
+                    page: curve.page,
+                    section: curve.section
+                };
+                console.log('CurveMaker.createCurve:', JSON.stringify(curveParams, null, 2));
+                
+                // Return the curve for programmatic use
+                return curve;
             },
             
             renderCurve(curve, curveGroup, scoreEl) {
@@ -14913,24 +14982,26 @@
                 return this.pitchList.slice(startIdx, endIdx + 1);
             },
             
-            attachGlissandoToCurve() {
-                const selectedCurve = window.CurveMaker?.selectedCurve;
-                if (!selectedCurve) {
-                    console.debug('GlissandoSystem: No curve selected');
-                    return;
+            attachGlissandoToCurve(params = null) {
+                // If params provided with curve, use that; otherwise use selected curve
+                const targetCurve = params?.curve ?? window.CurveMaker?.selectedCurve;
+                if (!targetCurve) {
+                    console.debug('GlissandoSystem: No curve selected or provided');
+                    return null;
                 }
                 
-                const clef = this.clefSelect.value;
-                const startPitch = this.startPitchSelect.value;
-                const endPitch = this.endPitchSelect.value;
+                // Get parameters from params object or UI
+                const clef = params?.clef ?? this.clefSelect.value;
+                const startPitch = params?.startPitch ?? this.startPitchSelect.value;
+                const endPitch = params?.endPitch ?? this.endPitchSelect.value;
                 
                 if (!startPitch || !endPitch) {
                     console.debug('GlissandoSystem: Start and end pitch required');
-                    return;
+                    return null;
                 }
                 
                 // Attach glissando data to the curve
-                selectedCurve.glissando = {
+                targetCurve.glissando = {
                     clef,
                     startPitch,
                     endPitch,
@@ -14940,16 +15011,26 @@
                 
                 // Sync to database
                 if (window.CurveMaker) {
-                    CurveMaker.syncCurveToDatabase(selectedCurve);
+                    CurveMaker.syncCurveToDatabase(targetCurve);
                 }
                 
                 // Update GTrackSystem if curve is registered there
-                this.updateGTrackGlissando(selectedCurve);
+                this.updateGTrackGlissando(targetCurve);
                 
                 // Render static pitch markers along the curve
-                this.renderStaticPitchMarkers(selectedCurve);
+                this.renderStaticPitchMarkers(targetCurve);
                 
-                console.debug('GlissandoSystem: Attached glissando to curve', selectedCurve.name, selectedCurve.glissando);
+                console.debug('GlissandoSystem.attachGlissandoToCurve:', {
+                    curveName: targetCurve.name,
+                    curveId: targetCurve.id,
+                    clef,
+                    startPitch,
+                    endPitch,
+                    startIndex: targetCurve.glissando.startIndex,
+                    endIndex: targetCurve.glissando.endIndex
+                });
+                
+                return targetCurve;
             },
             
             removeGlissandoFromCurve() {
@@ -15366,6 +15447,145 @@
         // Initialize Glissando System
         GlissandoSystem.init();
         window.GlissandoSystem = GlissandoSystem;
+        
+        // ============================================
+        // SCORE AUTOMATION
+        // Central hub for AI-prompted multi-step workflows
+        // ============================================
+        const ScoreAutomation = {
+            // Track workflow execution
+            lastWorkflow: null,
+            workflowLog: [],
+            
+            // Create a glissando gesture (curve + glissando + optional MIDI)
+            createGlissandoGesture(params) {
+                const {
+                    time,           // Start time in seconds
+                    duration = 3,   // Duration in seconds
+                    track,          // G-track (1-4)
+                    startPitch,     // e.g., 'C4'
+                    endPitch,       // e.g., 'G5'
+                    clef = 'treble',
+                    y1 = 2,         // Curve start Y (0-10)
+                    y2 = 8,         // Curve end Y (0-10)
+                    color = 'brightOrange',
+                    fillMode = 'bottom',
+                    generateMidi = false,
+                    insertMidi = false
+                } = params;
+                
+                console.debug('ScoreAutomation.createGlissandoGesture: Starting', params);
+                
+                // Step 1: Create the curve
+                const curve = CurveMaker.createCurve({
+                    startSeconds: time,
+                    endSeconds: time + duration,
+                    y1,
+                    y2,
+                    gTrack: String(track),
+                    color,
+                    fillMode
+                });
+                
+                if (!curve) {
+                    console.debug('ScoreAutomation: Failed to create curve');
+                    return null;
+                }
+                
+                // Step 2: Attach glissando
+                const result = GlissandoSystem.attachGlissandoToCurve({
+                    curve,
+                    clef,
+                    startPitch,
+                    endPitch
+                });
+                
+                if (!result) {
+                    console.debug('ScoreAutomation: Failed to attach glissando');
+                    return { curve, glissando: null };
+                }
+                
+                // Step 3: Generate MIDI if requested
+                let midiSegments = null;
+                if (generateMidi && window.MidiModelPanel) {
+                    // TODO: Implement MIDI generation integration
+                    console.debug('ScoreAutomation: MIDI generation not yet implemented');
+                }
+                
+                // Log the workflow
+                const workflowResult = {
+                    type: 'glissandoGesture',
+                    params,
+                    curve,
+                    timestamp: Date.now()
+                };
+                this.lastWorkflow = workflowResult;
+                this.workflowLog.push(workflowResult);
+                
+                console.debug('ScoreAutomation.createGlissandoGesture: Complete', {
+                    curveId: curve.id,
+                    curveName: curve.name,
+                    glissando: curve.glissando
+                });
+                
+                return workflowResult;
+            },
+            
+            // Get workflow history
+            getWorkflowLog() {
+                return this.workflowLog;
+            },
+            
+            // Clear workflow history
+            clearWorkflowLog() {
+                this.workflowLog = [];
+                this.lastWorkflow = null;
+            }
+        };
+        window.ScoreAutomation = ScoreAutomation;
+        
+        // Long Tone Workflow UI Handler
+        const LongToneUI = {
+            init() {
+                const createBtn = document.getElementById('ltCreateCurveBtn');
+                if (createBtn) {
+                    createBtn.addEventListener('click', () => this.createCurve());
+                }
+                console.log('LongToneUI initialized');
+            },
+            
+            createCurve() {
+                const startSeconds = parseFloat(document.getElementById('ltStartInput').value) || 0;
+                const endSeconds = parseFloat(document.getElementById('ltEndInput').value) || 10;
+                const y1 = parseFloat(document.getElementById('ltY1Input').value);
+                const y2 = parseFloat(document.getElementById('ltY2Input').value);
+                const gTrack = document.getElementById('ltTrackSelect').value;
+                const slope = parseFloat(document.getElementById('ltSlopeInput').value) || 0;
+                const model = document.getElementById('ltModelSelect').value;
+                
+                // Handle y1/y2 being 0 (falsy but valid)
+                const y1Val = isNaN(y1) ? 10 : y1;
+                const y2Val = isNaN(y2) ? 0 : y2;
+                
+                const curve = CurveMaker.createCurve({
+                    startSeconds,
+                    endSeconds,
+                    y1: y1Val,
+                    y2: y2Val,
+                    gTrack,
+                    model,
+                    slope
+                });
+                
+                if (curve) {
+                    console.log('LongToneUI: Curve created', curve.name);
+                }
+                
+                return curve;
+            }
+        };
+        LongToneUI.init();
+        window.LongToneUI = LongToneUI;
         
         // Bring SVG elements containers to front (after curves are initialized)
         // This ensures inserted SVGs appear on top of curves for selection

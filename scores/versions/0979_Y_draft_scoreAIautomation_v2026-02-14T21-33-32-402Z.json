@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "0979_Y_draft_scoreAIautomation",
-    "created": "2026-02-14T21:34:32.570Z",
-    "modified": "2026-02-14T21:34:32.958Z",
+    "created": "2026-02-14T21:28:06.135Z",
+    "modified": "2026-02-14T21:28:06.220Z",
     "author": ""
   },
   "tempoHistory": [
@@ -96776,8 +96776,8 @@
           }
         },
         {
-          "id": 169,
-          "name": "CRV_20260214_163325",
+          "id": 168,
+          "name": "CRV_20260214_162716",
           "startSeconds": 219,
           "endSeconds": 229,
           "y1": 10,
@@ -97808,7 +97808,7 @@
               0.040000000000000036
             ]
           },
-          "createdAt": 1771104805884,
+          "createdAt": 1771104436427,
           "elements": {
             "group": {},
             "path": {},
@@ -97829,7 +97829,7 @@
           }
         }
       ],
-      "nextId": 170
+      "nextId": 169
     },
     "motives": {
       "motives": [
