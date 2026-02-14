@@ -921,6 +921,171 @@ app.get('/api/lilypond/source/:name', (req, res) => {
     res.json({ success: true, code });
 });
 
+// Check if LilyPond file exists
+app.get('/api/lilypond/exists/:filename', (req, res) => {
+    const lyFile = path.join(LILYPOND_DIR, req.params.filename);
+    const exists = fs.existsSync(lyFile);
+    res.json({ exists, filename: req.params.filename, path: lyFile });
+});
+
+// Create glissando LilyPond file from template
+app.post('/api/lilypond/create-glissando', (req, res) => {
+    const { filename, clef, startPitch, endPitch, glissOffset } = req.body;
+    
+    if (!filename || !clef || !startPitch || !endPitch) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters' });
+    }
+    
+    const templatePath = path.join(LILYPOND_DIR, 'GlissandoNotationTemplate.ly');
+    const outputPath = path.join(LILYPOND_DIR, filename);
+    
+    // Check if template exists
+    if (!fs.existsSync(templatePath)) {
+        return res.status(404).json({ success: false, error: 'Template file not found' });
+    }
+    
+    // Check if output file already exists
+    if (fs.existsSync(outputPath)) {
+        return res.json({ success: true, created: false, message: 'File already exists', filename });
+    }
+    
+    try {
+        // Read template
+        let template = fs.readFileSync(templatePath, 'utf8');
+        
+        // Substitute variables
+        // Clef: replace "\clef alto" with appropriate clef
+        template = template.replace(/\\clef alto/g, `\\clef ${clef}`);
+        
+        // Start pitch: replace "a4" on the line with START_PITCH comment
+        template = template.replace(/^(\s*)(a4)(\s*$)/m, `$1${startPitch}$3`);
+        
+        // End pitch: replace "af4" on the line after END_PITCH comment  
+        template = template.replace(/^(\s*)(af4)(\s*$)/m, `$1${endPitch}$3`);
+        
+        // Gliss offset: replace "#'(0 . 0)" with the offset value
+        const offsetValue = glissOffset || '0';
+        template = template.replace(/#'\(0 \. 0\)/g, `#'(0 . ${offsetValue})`);
+        
+        // Write new file
+        fs.writeFileSync(outputPath, template);
+        
+        console.log(`Created glissando LilyPond file: ${filename}`);
+        res.json({ success: true, created: true, filename, path: outputPath });
+    } catch (err) {
+        console.error('Error creating glissando file:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Render glissando LilyPond file to cropped SVG using PowerShell script
+app.post('/api/lilypond/render-glissando', (req, res) => {
+    const { filename } = req.body;
+    
+    if (!filename) {
+        return res.status(400).json({ success: false, error: 'Filename required' });
+    }
+    
+    const scriptPath = path.join(LILYPOND_DIR, 'render_glissando.ps1');
+    const svgOutputDir = path.join(__dirname, 'public', 'SVG_graphics');
+    
+    // Check if script exists
+    if (!fs.existsSync(scriptPath)) {
+        return res.status(404).json({ success: false, error: 'Render script not found' });
+    }
+    
+    // Check if LilyPond file exists
+    const lyFile = path.join(LILYPOND_DIR, filename);
+    if (!fs.existsSync(lyFile)) {
+        return res.status(404).json({ success: false, error: 'LilyPond file not found' });
+    }
+    
+    // Check if SVG already exists (skip rendering)
+    const baseName = path.basename(filename, '.ly');
+    const svgPath = path.join(svgOutputDir, `${baseName}.svg`);
+    if (fs.existsSync(svgPath)) {
+        console.log(`Glissando SVG already exists: ${baseName}.svg`);
+        return res.json({ 
+            success: true, 
+            rendered: false, 
+            message: 'SVG already exists',
+            svgPath: `/SVG_graphics/${baseName}.svg`
+        });
+    }
+    
+    // Execute PowerShell script
+    const command = `powershell -ExecutionPolicy Bypass -File "${scriptPath}" -Filename "${filename}"`;
+    
+    exec(command, { timeout: 60000 }, (err, stdout, stderr) => {
+        if (err) {
+            console.error('Render glissando error:', stderr || err.message);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Rendering failed',
+                details: stderr || err.message
+            });
+        }
+        
+        // Parse output for SVG path
+        const outputMatch = stdout.match(/OUTPUT:(.+)/);
+        const outputPath = outputMatch ? outputMatch[1].trim() : svgPath;
+        
+        if (fs.existsSync(svgPath)) {
+            console.log(`Rendered glissando SVG: ${baseName}.svg`);
+            res.json({ 
+                success: true, 
+                rendered: true,
+                svgPath: `/SVG_graphics/${baseName}.svg`,
+                fullPath: outputPath
+            });
+        } else {
+            res.status(500).json({ 
+                success: false, 
+                error: 'SVG not created',
+                stdout: stdout,
+                stderr: stderr
+            });
+        }
+    });
+});
+
+// ============================================
+// MIDI FILE SAVING
+// ============================================
+
+const MIDI_FILES_DIR = path.join(__dirname, 'public', 'midi_files');
+
+// Ensure MIDI files directory exists
+if (!fs.existsSync(MIDI_FILES_DIR)) {
+    fs.mkdirSync(MIDI_FILES_DIR, { recursive: true });
+}
+
+// Save MIDI file (receives base64-encoded MIDI data)
+app.post('/api/midi/save', (req, res) => {
+    const { filename, midiData } = req.body;
+    
+    if (!filename || !midiData) {
+        return res.status(400).json({ success: false, error: 'Filename and midiData required' });
+    }
+    
+    try {
+        const filepath = path.join(MIDI_FILES_DIR, filename);
+        const buffer = Buffer.from(midiData, 'base64');
+        fs.writeFileSync(filepath, buffer);
+        console.log(`MIDI file saved: ${filename}`);
+        res.json({ success: true, filename, path: `/midi_files/${filename}` });
+    } catch (err) {
+        console.error('Error saving MIDI file:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Check if MIDI file exists
+app.get('/api/midi/exists/:filename', (req, res) => {
+    const filepath = path.join(MIDI_FILES_DIR, req.params.filename);
+    res.json({ exists: fs.existsSync(filepath), filename: req.params.filename });
+});
+
 // Delete a notation file
 app.delete('/api/lilypond/:filename', (req, res) => {
     const svgFile = path.join(NOTATION_OUTPUT_DIR, req.params.filename);

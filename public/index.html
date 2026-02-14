@@ -806,8 +806,23 @@
                         <option value="bezier">Bezier</option>
                     </select>
                 </div>
+                <div class="section-divider" style="margin: 4px 0;"></div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Clef</label>
+                    <select id="ltClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="treble">Treble</option>
+                        <option value="cClef" selected>C Clef</option>
+                        <option value="bass">Bass</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Start</label>
+                    <input type="text" id="ltStartPitch" class="curve-input" value="C4" style="width: 45px; font-size: 10px;" title="C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                    <label style="width: 25px; margin-left: 5px;">End</label>
+                    <input type="text" id="ltEndPitch" class="curve-input" value="G4" style="width: 45px; font-size: 10px;" title="C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                </div>
                 <div class="control-row" style="margin-top: 5px;">
-                    <button id="ltCreateCurveBtn" class="control-btn" style="font-size: 10px; background: var(--clr-limeGreen); color: #000;">Create Curve</button>
+                    <button id="ltGoBtn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 12px;">GO</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -15547,21 +15562,112 @@
         // Long Tone Workflow UI Handler
         const LongToneUI = {
             init() {
-                const createBtn = document.getElementById('ltCreateCurveBtn');
-                if (createBtn) {
-                    createBtn.addEventListener('click', () => this.createCurve());
+                const goBtn = document.getElementById('ltGoBtn');
+                if (goBtn) {
+                    goBtn.addEventListener('click', () => this.go());
                 }
                 console.log('LongToneUI initialized');
             },
             
-            createCurve() {
-                const startSeconds = parseFloat(document.getElementById('ltStartInput').value) || 0;
-                const endSeconds = parseFloat(document.getElementById('ltEndInput').value) || 10;
-                const y1 = parseFloat(document.getElementById('ltY1Input').value);
-                const y2 = parseFloat(document.getElementById('ltY2Input').value);
-                const gTrack = document.getElementById('ltTrackSelect').value;
-                const slope = parseFloat(document.getElementById('ltSlopeInput').value) || 0;
-                const model = document.getElementById('ltModelSelect').value;
+            // Main workflow entry point - executes entire Long Tone Glissando workflow
+            // Can be called from UI (no params) or programmatically/AI prompt (with params)
+            // AI Prompt Example:
+            // LongToneUI.go({
+            //     startSeconds: 220, endSeconds: 230,
+            //     y1: 10, y2: 0, gTrack: '1',
+            //     model: 'logarithmic', slope: -1,
+            //     clef: 'cClef', startPitch: 'C4', endPitch: 'G4'
+            // })
+            async go(params = null) {
+                console.log('LongToneUI.go: Starting Long Tone Glissando workflow...', params ? '(programmatic)' : '(UI)');
+                
+                // Step 1: Create curve
+                const curve = this.createCurve(params);
+                if (!curve) {
+                    console.error('LongToneUI.go: Failed to create curve');
+                    return null;
+                }
+                
+                // Step 2a: Generate notation parameters
+                const notationParams = await this.generateNotation(params);
+                if (!notationParams) {
+                    console.error('LongToneUI.go: Failed to generate notation parameters');
+                    return { curve };
+                }
+                
+                // Step 2b: Render LilyPond to SVG (skip if file already existed)
+                let svgResult = null;
+                if (!notationParams.fileExists) {
+                    svgResult = await this.renderGlissandoSvg(notationParams.filename);
+                    if (svgResult && svgResult.success) {
+                        console.log('LongToneUI.go: SVG rendered:', svgResult.svgPath);
+                    }
+                } else {
+                    // File existed, check if SVG also exists
+                    const baseName = notationParams.filename.replace('.ly', '');
+                    svgResult = { success: true, svgPath: `/SVG_graphics/${baseName}.svg`, skipped: true };
+                    console.log('LongToneUI.go: Using existing SVG:', svgResult.svgPath);
+                }
+                
+                // Step 2c: Insert SVG into score at curve position
+                let insertedSvg = null;
+                if (svgResult && svgResult.success && svgResult.svgPath) {
+                    insertedSvg = await this.insertGlissandoSvg(svgResult.svgPath, curve);
+                    if (insertedSvg) {
+                        console.log('LongToneUI.go: SVG inserted into score');
+                    }
+                }
+                
+                // Step 3: Generate MIDI files
+                const startPitch = params?.startPitch ?? document.getElementById('ltStartPitch').value.trim();
+                const endPitch = params?.endPitch ?? document.getElementById('ltEndPitch').value.trim();
+                const midiResult = await this.generateGlissandoMidi(curve, startPitch, endPitch, {
+                    velocity: params?.velocity ?? 64,
+                    articulation: params?.articulation ?? 89
+                });
+                
+                if (midiResult) {
+                    console.log(`LongToneUI.go: Generated ${midiResult.segments} MIDI segments`);
+                }
+                
+                // Step 4: Insert MIDI into score
+                let midiInsertResult = null;
+                if (midiResult && midiResult.files && midiResult.files.length > 0) {
+                    midiInsertResult = await this.insertGlissandoMidi(midiResult, curve);
+                    if (midiInsertResult) {
+                        console.log(`LongToneUI.go: Inserted ${midiInsertResult.inserted} MIDI segments on track ${midiInsertResult.trackIndex + 1}`);
+                    }
+                }
+                
+                // Log complete workflow result
+                const result = {
+                    curve: {
+                        id: curve.id,
+                        name: curve.name,
+                        startSeconds: curve.startSeconds,
+                        endSeconds: curve.endSeconds,
+                        gTrack: curve.gTrack
+                    },
+                    notation: notationParams,
+                    svg: svgResult,
+                    insertedElement: insertedSvg ? { id: insertedSvg.id, name: insertedSvg.name } : null,
+                    midi: midiResult,
+                    midiInserted: midiInsertResult
+                };
+                
+                console.log('LongToneUI.go: Workflow complete', JSON.stringify(result, null, 2));
+                
+                return result;
+            },
+            
+            createCurve(params = null) {
+                const startSeconds = params?.startSeconds ?? (parseFloat(document.getElementById('ltStartInput').value) || 0);
+                const endSeconds = params?.endSeconds ?? (parseFloat(document.getElementById('ltEndInput').value) || 10);
+                const y1 = params?.y1 ?? parseFloat(document.getElementById('ltY1Input').value);
+                const y2 = params?.y2 ?? parseFloat(document.getElementById('ltY2Input').value);
+                const gTrack = params?.gTrack ?? document.getElementById('ltTrackSelect').value;
+                const slope = params?.slope ?? (parseFloat(document.getElementById('ltSlopeInput').value) || 0);
+                const model = params?.model ?? document.getElementById('ltModelSelect').value;
                 
                 // Handle y1/y2 being 0 (falsy but valid)
                 const y1Val = isNaN(y1) ? 10 : y1;
@@ -15582,6 +15688,892 @@
                 }
                 
                 return curve;
+            },
+            
+            // Convert user pitch notation to LilyPond format
+            // User: C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)
+            // LilyPond: c4, cs4, bf3, cih4, ceh4, cisih4, ceseh4
+            pitchToLilyPond(pitch) {
+                if (!pitch) return 'c4';
+                
+                // Parse pitch: note + accidentals + octave
+                const match = pitch.match(/^([A-Ga-g])([#b+d]*)?(\d)$/);
+                if (!match) {
+                    console.warn('LongToneUI: Invalid pitch format:', pitch);
+                    return 'c4';
+                }
+                
+                let [, note, accidentals, octave] = match;
+                note = note.toLowerCase();
+                accidentals = accidentals || '';
+                
+                // Convert accidentals to LilyPond
+                let lpAccidental = '';
+                if (accidentals === '#') lpAccidental = 's';           // sharp
+                else if (accidentals === 'b') lpAccidental = 'f';      // flat
+                else if (accidentals === '+') lpAccidental = 'ih';     // quarter sharp
+                else if (accidentals === 'd') lpAccidental = 'eh';     // quarter flat
+                else if (accidentals === '#+') lpAccidental = 'sih';   // 3/4 sharp
+                else if (accidentals === 'bd') lpAccidental = 'feh';   // 3/4 flat (flat + quarter flat)
+                
+                // LilyPond octave: c' = C4, c'' = C5, c = C3, c, = C2
+                // We'll use absolute octave notation
+                const lpOctave = parseInt(octave);
+                
+                return note + lpAccidental + lpOctave;
+            },
+            
+            // Convert clef to LilyPond format
+            clefToLilyPond(clef) {
+                if (clef === 'cClef') return 'alto';
+                return clef; // treble, bass already match
+            },
+            
+            // Generate standardized filename for glissando LilyPond file
+            // Format: Gliss-{clef}-{startPitch}-{endPitch}.ly
+            // Example: Gliss-alto-A4-Ab4.ly
+            generateGlissFilename(clef, startPitch, endPitch) {
+                // Normalize pitch for filename (replace # with s, + with q, d with qf)
+                const normalizePitch = (p) => {
+                    return p.replace('#', 's').replace('+', 'q').replace('d', 'qf');
+                };
+                const clefName = clef === 'cClef' ? 'alto' : clef;
+                return `Gliss-${clefName}-${normalizePitch(startPitch)}-${normalizePitch(endPitch)}.ly`;
+            },
+            
+            // Check if two pitches are on the same staff line (for gliss offset)
+            // This is a simplified check - same letter name regardless of accidental
+            sameStaffLine(startPitch, endPitch) {
+                const getNoteName = (p) => p.charAt(0).toUpperCase();
+                return getNoteName(startPitch) === getNoteName(endPitch);
+            },
+            
+            // Insert glissando SVG into score at curve position
+            // Scales to fit track height, positions just before curve start
+            async insertGlissandoSvg(svgPath, curve) {
+                if (!svgPath || !curve) {
+                    console.error('LongToneUI.insertGlissandoSvg: Missing svgPath or curve');
+                    return null;
+                }
+                
+                try {
+                    // Fetch the SVG content
+                    const response = await fetch(svgPath);
+                    const svgContent = await response.text();
+                    
+                    // Parse SVG to get dimensions
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const svgEl = svgDoc.documentElement;
+                    
+                    // Get original dimensions (handle mm units)
+                    let svgWidth = parseFloat(svgEl.getAttribute('width')) || 100;
+                    let svgHeight = parseFloat(svgEl.getAttribute('height')) || 100;
+                    const widthStr = svgEl.getAttribute('width') || '';
+                    const heightStr = svgEl.getAttribute('height') || '';
+                    if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
+                    if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
+                    
+                    // Calculate track dimensions
+                    const scoreEl = document.getElementById('ScoreTop');
+                    const scoreHeight = scoreEl.clientHeight;
+                    const scoreWidth = scoreEl.clientWidth;
+                    const timelineHeight = 16;
+                    const availableHeight = scoreHeight - timelineHeight;
+                    const trackHeight = availableHeight / 4;
+                    
+                    // Calculate scale to fit notation within track height (with small margin)
+                    const targetHeight = trackHeight * 0.9; // 90% of track height
+                    const scale = targetHeight / svgHeight;
+                    const scaledWidth = svgWidth * scale;
+                    
+                    // Calculate X position: just before curve start
+                    // Convert curve.startSeconds to X position, then offset left by scaled SVG width + small gap
+                    const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
+                    const leadIn = window.leadInSeconds || 0;
+                    const curveDisplayTime = curve.startSeconds + leadIn;
+                    const curvePageIndex = Math.floor(curveDisplayTime / secondsPerPage);
+                    const curveXPercent = ((curveDisplayTime % secondsPerPage) / secondsPerPage) * 100;
+                    const curveXPx = (curveXPercent / 100) * scoreWidth;
+                    
+                    // Position SVG so its right edge is a few pixels before curve start
+                    const gap = 5; // pixels between SVG right edge and curve start
+                    const svgX = curveXPx - scaledWidth - gap;
+                    
+                    // Calculate Y position: center in track
+                    const track = parseInt(curve.gTrack) || 1;
+                    const trackTopY = timelineHeight + ((track - 1) * trackHeight);
+                    const svgY = trackTopY + (trackHeight - (svgHeight * scale)) / 2;
+                    
+                    // Determine section based on page
+                    const section = curvePageIndex % 2 === 0 ? 'top' : 'bottom';
+                    
+                    // Calculate startSeconds for the SVG element (for persistence)
+                    const svgXPercent = (svgX / scoreWidth) * 100;
+                    const svgStartSeconds = (curvePageIndex * secondsPerPage) + (svgXPercent / 100 * secondsPerPage) - leadIn;
+                    
+                    // Create element data structure matching SVGElementManager format
+                    const id = SVGElementManager.nextId++;
+                    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    wrapper.setAttribute('id', `svg-element-${id}`);
+                    wrapper.setAttribute('class', 'svg-element-wrapper');
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    let svgString = new XMLSerializer().serializeToString(svgEl);
+                    svgString = svgString.replace(/currentColor/g, '#000000');
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                    image.setAttribute('href', dataUrl);
+                    image.setAttribute('width', svgWidth);
+                    image.setAttribute('height', svgHeight);
+                    wrapper.appendChild(image);
+                    
+                    const elementData = {
+                        id: id,
+                        name: svgPath.split('/').pop().replace('.svg', ''),
+                        wrapper: wrapper,
+                        image: image,
+                        x: svgX,
+                        y: svgY,
+                        startSeconds: svgStartSeconds,
+                        yPercent: (svgY / scoreHeight) * 100,
+                        xPercent: svgXPercent,
+                        width: svgWidth,
+                        height: svgHeight,
+                        scale: scale,
+                        baseScale: scale,
+                        baseScoreWidth: scoreWidth,
+                        track: track,
+                        page: curvePageIndex,
+                        section: section
+                    };
+                    
+                    // Add to SVGElementManager
+                    SVGElementManager.elements.push(elementData);
+                    SVGElementManager.updateElementTransform(elementData);
+                    
+                    const targetContainer = section === 'top' 
+                        ? SVGElementManager.containerTop 
+                        : SVGElementManager.containerBottom;
+                    targetContainer.appendChild(wrapper);
+                    
+                    // Add drag handlers
+                    wrapper.addEventListener('mousedown', (e) => 
+                        SVGElementManager.handleElementMouseDown(e, elementData));
+                    
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                    
+                    console.log('LongToneUI.insertGlissandoSvg: Inserted', elementData.name, 
+                        'scale:', scale.toFixed(3), 'x:', svgX.toFixed(1), 'y:', svgY.toFixed(1));
+                    
+                    return elementData;
+                } catch (err) {
+                    console.error('LongToneUI.insertGlissandoSvg: Error:', err);
+                    return null;
+                }
+            },
+            
+            // Generate MIDI files for glissando segments
+            // Follows the same algorithm as MidiModelSystem.generateLongToneSegments()
+            // but uses provided curve and pitch parameters instead of UI selections
+            async generateGlissandoMidi(curve, startPitchStr, endPitchStr, params = {}) {
+                const PITCH_BEND_RANGE = 2; // semitones - max deviation before new segment
+                const PITCH_BEND_SAMPLE_INTERVAL = 50; // ms between pitch bend messages
+                const PITCH_BEND_MAX = 16383;
+                const PITCH_BEND_MIN = 0;
+                const TICKS_PER_BEAT = 480;
+                
+                // Default parameters (placeholders for future expansion)
+                const velocity = params.velocity ?? 64; // mp default
+                const articulationValue = params.articulation ?? 89; // senza vibrato CC0 value
+                // TODO: Future - additional dynamics (crescendo, etc.)
+                // TODO: Future - additional articulations
+                
+                if (!curve || !curve.curveData || !curve.curveData.samples) {
+                    console.error('LongToneUI.generateGlissandoMidi: Invalid curve data');
+                    return null;
+                }
+                
+                // Convert pitch strings to MIDI (reuse MidiModelSystem's function)
+                const noteNameToPitch = (noteName) => {
+                    const noteMap = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+                    const match = noteName.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+                    if (!match) return null;
+                    let [, note, accidental, quarterTone, octave] = match;
+                    let pitch = noteMap[note];
+                    if (pitch === undefined) return null;
+                    if (accidental === '#') pitch += 1;
+                    else if (accidental === 'B') pitch -= 1;
+                    pitch += (parseInt(octave) + 1) * 12;
+                    pitch = Math.max(0, Math.min(127, pitch));
+                    let quarterToneOffset = 0;
+                    if (quarterTone === '+') quarterToneOffset = 0.5;
+                    else if (quarterTone === 'D') quarterToneOffset = -0.5;
+                    return { pitch, quarterTone: quarterToneOffset };
+                };
+                
+                const midiToPitchName = (pitch) => {
+                    const noteNames = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
+                    const octave = Math.floor(pitch / 12) - 1;
+                    return noteNames[pitch % 12] + octave;
+                };
+                
+                const startPitchObj = noteNameToPitch(startPitchStr);
+                const endPitchObj = noteNameToPitch(endPitchStr);
+                
+                if (!startPitchObj || !endPitchObj) {
+                    console.error('LongToneUI.generateGlissandoMidi: Invalid pitch format');
+                    return null;
+                }
+                
+                // Compute effective pitch including quarter tone offset
+                const startPitchMidi = startPitchObj.pitch + startPitchObj.quarterTone;
+                const endPitchMidi = endPitchObj.pitch + endPitchObj.quarterTone;
+                
+                // Determine low/high based on curve direction
+                // Curve Y: 0 = bottom, 1 = top (after normalization)
+                // If curve goes high→low (y1 > y2), pitch goes high→low
+                const curveData = curve.curveData;
+                const samples = curveData.samples;
+                const sampleInterval = curveData.sampleInterval;
+                const startTime = curveData.startTime;
+                
+                const firstY = samples[0];
+                const lastY = samples[samples.length - 1];
+                const isDescending = firstY > lastY; // high Y to low Y
+                
+                // Map Y values to pitch: high Y = high pitch, low Y = low pitch
+                const highPitch = Math.max(startPitchMidi, endPitchMidi);
+                const lowPitch = Math.min(startPitchMidi, endPitchMidi);
+                const pitchRange = highPitch - lowPitch;
+                
+                // Calculate pitch at each sample point
+                // normalizedY (0-1) maps: 0 = low pitch, 1 = high pitch
+                const pitchAtSample = samples.map(normalizedY => 
+                    lowPitch + normalizedY * pitchRange
+                );
+                
+                // Create segments when pitch deviates > PITCH_BEND_RANGE
+                const segments = [];
+                let segmentStartIndex = 0;
+                let segmentBasePitch = pitchAtSample[0];
+                
+                const createSegment = (segIndex, segStartIndex, segEndIndex, segStartPitch, segEndPitch) => {
+                    const segStartTime = startTime + segStartIndex * sampleInterval;
+                    const segEndTime = startTime + segEndIndex * sampleInterval;
+                    const segDuration = segEndTime - segStartTime;
+                    const segIsDown = segEndPitch < segStartPitch;
+                    
+                    // MIDI note offset by 1 semitone based on direction
+                    // Gliss down: note = startPitch - 1, bend starts at max
+                    // Gliss up: note = startPitch + 1, bend starts at min
+                    const midiNote = segIsDown ? 
+                        Math.round(segStartPitch) - 1 : 
+                        Math.round(segStartPitch) + 1;
+                    
+                    const pitchChangeInSegment = Math.abs(segEndPitch - segStartPitch);
+                    const bendRangeUsed = pitchChangeInSegment / PITCH_BEND_RANGE;
+                    
+                    let startBend, endBend;
+                    if (segIsDown) {
+                        startBend = PITCH_BEND_MAX;
+                        endBend = Math.round(PITCH_BEND_MAX - (bendRangeUsed * (PITCH_BEND_MAX - PITCH_BEND_MIN)));
+                    } else {
+                        startBend = PITCH_BEND_MIN;
+                        endBend = Math.round(PITCH_BEND_MIN + (bendRangeUsed * (PITCH_BEND_MAX - PITCH_BEND_MIN)));
+                    }
+                    
+                    // Generate pitch bend samples
+                    const pitchBendSamples = [];
+                    const numPbSamples = Math.max(2, Math.ceil(segDuration * 1000 / PITCH_BEND_SAMPLE_INTERVAL));
+                    
+                    for (let pbIdx = 0; pbIdx < numPbSamples; pbIdx++) {
+                        const pbTime = segStartTime + (pbIdx / (numPbSamples - 1)) * segDuration;
+                        const curveIdx = Math.round((pbTime - startTime) / sampleInterval);
+                        const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
+                        const pitchAtTime = pitchAtSample[clampedIdx];
+                        const pitchProgress = (segEndPitch !== segStartPitch) ? 
+                            (pitchAtTime - segStartPitch) / (segEndPitch - segStartPitch) : 0;
+                        const clampedProgress = Math.max(0, Math.min(1, pitchProgress));
+                        const bendValue = Math.round(startBend + clampedProgress * (endBend - startBend));
+                        pitchBendSamples.push({ time: pbTime, value: bendValue });
+                    }
+                    
+                    return {
+                        index: segIndex,
+                        startTime: segStartTime,
+                        endTime: segEndTime,
+                        duration: segDuration,
+                        startPitch: segStartPitch,
+                        endPitch: segEndPitch,
+                        midiNote: midiNote,
+                        startBend: startBend,
+                        endBend: endBend,
+                        pitchBendSamples: pitchBendSamples,
+                        cc0Value: (segIndex < 2) ? articulationValue : null, // CC0 only for first 2 segments
+                        velocity: velocity,
+                        isGlissDown: segIsDown
+                    };
+                };
+                
+                // Walk through samples creating segments
+                for (let i = 1; i < pitchAtSample.length; i++) {
+                    const currentPitch = pitchAtSample[i];
+                    const deviation = currentPitch - segmentBasePitch;
+                    
+                    if (Math.abs(deviation) > PITCH_BEND_RANGE) {
+                        const segmentEndPitch = pitchAtSample[i - 1];
+                        segments.push(createSegment(segments.length, segmentStartIndex, i - 1, segmentBasePitch, segmentEndPitch));
+                        segmentStartIndex = i;
+                        segmentBasePitch = currentPitch;
+                    }
+                }
+                
+                // Add final segment
+                segments.push(createSegment(
+                    segments.length, 
+                    segmentStartIndex, 
+                    samples.length - 1, 
+                    segmentBasePitch, 
+                    pitchAtSample[pitchAtSample.length - 1]
+                ));
+                
+                console.log(`LongToneUI.generateGlissandoMidi: Generated ${segments.length} segments`);
+                
+                // Export each segment as MIDI file via server
+                const TEMPO_BPM = window.beatsPerMinute || 60;
+                const MICROSECONDS_PER_BEAT = Math.round(60000000 / TEMPO_BPM);
+                
+                const writeVarInt = (value) => {
+                    const bytes = [];
+                    bytes.push(value & 0x7f);
+                    value >>= 7;
+                    while (value > 0) {
+                        bytes.unshift((value & 0x7f) | 0x80);
+                        value >>= 7;
+                    }
+                    return bytes;
+                };
+                
+                const writeInt = (value, length) => {
+                    const bytes = [];
+                    for (let i = length - 1; i >= 0; i--) {
+                        bytes.push((value >> (i * 8)) & 0xff);
+                    }
+                    return bytes;
+                };
+                
+                const secondsToTicks = (seconds) => {
+                    return Math.round(seconds * TICKS_PER_BEAT * TEMPO_BPM / 60);
+                };
+                
+                const curveName = curve.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+                const savedFiles = [];
+                
+                for (let i = 0; i < segments.length; i++) {
+                    const seg = segments[i];
+                    const segNum = String(i + 1).padStart(2, '0');
+                    const pitchName = midiToPitchName(seg.midiNote);
+                    const direction = seg.isGlissDown ? 'dn' : 'up';
+                    const fileName = `${curveName}_seg${segNum}_${pitchName}_${direction}.mid`;
+                    
+                    // Build track events
+                    const trackEvents = [];
+                    let lastTick = 0;
+                    
+                    // CC0 (Bank Select) if applicable
+                    if (seg.cc0Value !== null) {
+                        trackEvents.push(...writeVarInt(0));
+                        trackEvents.push(0xB0, 0x00, seg.cc0Value);
+                    }
+                    
+                    // Initial pitch bend
+                    const pbLSB = seg.startBend & 0x7F;
+                    const pbMSB = (seg.startBend >> 7) & 0x7F;
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0xE0, pbLSB, pbMSB);
+                    
+                    // Note On
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0x90, seg.midiNote, seg.velocity);
+                    
+                    // Pitch bend samples
+                    if (seg.pitchBendSamples && seg.pitchBendSamples.length > 1) {
+                        let prevTick = 0;
+                        for (let pbIdx = 1; pbIdx < seg.pitchBendSamples.length; pbIdx++) {
+                            const pbSample = seg.pitchBendSamples[pbIdx];
+                            const pbTimeRelative = pbSample.time - seg.startTime;
+                            const pbTick = secondsToTicks(pbTimeRelative);
+                            const deltaTick = Math.max(0, pbTick - prevTick);
+                            const lsb = pbSample.value & 0x7F;
+                            const msb = (pbSample.value >> 7) & 0x7F;
+                            trackEvents.push(...writeVarInt(deltaTick));
+                            trackEvents.push(0xE0, lsb, msb);
+                            prevTick = pbTick;
+                        }
+                        lastTick = prevTick;
+                    }
+                    
+                    // Note Off
+                    const endTick = secondsToTicks(seg.duration);
+                    const noteOffDelta = Math.max(0, endTick - lastTick);
+                    trackEvents.push(...writeVarInt(noteOffDelta));
+                    trackEvents.push(0x80, seg.midiNote, 0);
+                    
+                    // End of track
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0xFF, 0x2F, 0x00);
+                    
+                    // Build tempo track
+                    const tempoTrack = [];
+                    tempoTrack.push(...writeVarInt(0));
+                    tempoTrack.push(0xFF, 0x51, 0x03);
+                    tempoTrack.push((MICROSECONDS_PER_BEAT >> 16) & 0xFF);
+                    tempoTrack.push((MICROSECONDS_PER_BEAT >> 8) & 0xFF);
+                    tempoTrack.push(MICROSECONDS_PER_BEAT & 0xFF);
+                    tempoTrack.push(...writeVarInt(0));
+                    tempoTrack.push(0xFF, 0x2F, 0x00);
+                    
+                    // Build MIDI file
+                    const midiFile = [];
+                    midiFile.push(0x4D, 0x54, 0x68, 0x64); // "MThd"
+                    midiFile.push(...writeInt(6, 4));
+                    midiFile.push(...writeInt(1, 2)); // Format 1
+                    midiFile.push(...writeInt(2, 2)); // 2 tracks
+                    midiFile.push(...writeInt(TICKS_PER_BEAT, 2));
+                    
+                    // Tempo track
+                    midiFile.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+                    midiFile.push(...writeInt(tempoTrack.length, 4));
+                    midiFile.push(...tempoTrack);
+                    
+                    // Data track
+                    midiFile.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+                    midiFile.push(...writeInt(trackEvents.length, 4));
+                    midiFile.push(...trackEvents);
+                    
+                    // Convert to base64 and save via server
+                    const uint8Array = new Uint8Array(midiFile);
+                    const base64 = btoa(String.fromCharCode(...uint8Array));
+                    
+                    try {
+                        const response = await fetch('/api/midi/save', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ filename: fileName, midiData: base64 })
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            savedFiles.push({ filename: fileName, path: result.path, segment: i + 1 });
+                            console.log(`LongToneUI.generateGlissandoMidi: Saved ${fileName}`);
+                        } else {
+                            console.error(`LongToneUI.generateGlissandoMidi: Failed to save ${fileName}:`, result.error);
+                        }
+                    } catch (err) {
+                        console.error(`LongToneUI.generateGlissandoMidi: Error saving ${fileName}:`, err);
+                    }
+                }
+                
+                return {
+                    segments: segments.length,
+                    segmentData: segments.map(seg => ({
+                        index: seg.index,
+                        startTime: seg.startTime,
+                        duration: seg.duration,
+                        midiNote: seg.midiNote,
+                        isGlissDown: seg.isGlissDown,
+                        cc0Value: seg.cc0Value,
+                        velocity: seg.velocity
+                    })),
+                    files: savedFiles,
+                    pitchRange: { start: startPitchStr, end: endPitchStr },
+                    velocity: velocity,
+                    articulation: articulationValue
+                };
+            },
+            
+            // Insert generated MIDI segments into the score
+            // First segment at curve start, subsequent segments overlap by 5ms before previous note end
+            async insertGlissandoMidi(midiResult, curve) {
+                const OVERLAP_MS = 5; // milliseconds overlap between segments
+                
+                if (!midiResult || !midiResult.files || midiResult.files.length === 0) {
+                    console.error('LongToneUI.insertGlissandoMidi: No MIDI files to insert');
+                    return null;
+                }
+                
+                if (!curve) {
+                    console.error('LongToneUI.insertGlissandoMidi: No curve provided');
+                    return null;
+                }
+                
+                const trackIndex = (parseInt(curve.gTrack) || 1) - 1; // 0-indexed
+                const curveStartMs = curve.startSeconds * 1000;
+                const color = curve.color || 'limeGreen';
+                
+                const insertedSnippets = [];
+                let currentInsertTimeMs = curveStartMs;
+                
+                for (let i = 0; i < midiResult.files.length; i++) {
+                    const fileInfo = midiResult.files[i];
+                    const segmentData = midiResult.segmentData[i];
+                    
+                    // Fetch the MIDI file to parse events
+                    try {
+                        const response = await fetch(fileInfo.path);
+                        const arrayBuffer = await response.arrayBuffer();
+                        const midiData = new Uint8Array(arrayBuffer);
+                        
+                        // Parse MIDI file to extract events
+                        const events = this.parseMidiFileToEvents(midiData, currentInsertTimeMs);
+                        
+                        if (!events || events.length === 0) {
+                            console.warn(`LongToneUI.insertGlissandoMidi: No events parsed from ${fileInfo.filename}`);
+                            continue;
+                        }
+                        
+                        // Create snippet data for MidiSnippetDatabase
+                        const snippetData = {
+                            name: `Gliss seg${i + 1} @ ${curve.name}`,
+                            trackIndex: trackIndex,
+                            startTimeMs: currentInsertTimeMs,
+                            durationMs: segmentData.duration * 1000,
+                            events: events,
+                            color: color,
+                            sourceCurve: curve.id,
+                            sourceFile: fileInfo.filename
+                        };
+                        
+                        // Add to MidiSnippetDatabase for visualization
+                        let snippetId = null;
+                        if (window.MidiSnippetDatabase) {
+                            const snippet = MidiSnippetDatabase.add(snippetData);
+                            snippetId = snippet.id;
+                        }
+                        
+                        // Add events to MidiController's track for playback
+                        const eventIds = [];
+                        if (window.MidiController && MidiController.tracks && MidiController.tracks[trackIndex]) {
+                            for (const event of events) {
+                                const eventId = `gliss_${curve.id}_seg${i}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                                const midiEvent = {
+                                    id: eventId,
+                                    timeMs: event.timeMs,
+                                    type: event.type,
+                                    data: [...event.data],
+                                    sourceCurve: curve.id,
+                                    snippetId: snippetId
+                                };
+                                MidiController.tracks[trackIndex].midiEvents.push(midiEvent);
+                                eventIds.push(eventId);
+                            }
+                        }
+                        
+                        insertedSnippets.push({
+                            segment: i + 1,
+                            snippetId: snippetId,
+                            eventIds: eventIds,
+                            startTimeMs: currentInsertTimeMs,
+                            durationMs: segmentData.duration * 1000
+                        });
+                        
+                        console.log(`LongToneUI.insertGlissandoMidi: Inserted segment ${i + 1} at ${(currentInsertTimeMs / 1000).toFixed(3)}s`);
+                        
+                        // Calculate next segment start time: end of this note minus overlap
+                        // Note duration is in seconds, convert to ms
+                        const noteDurationMs = segmentData.duration * 1000;
+                        currentInsertTimeMs = currentInsertTimeMs + noteDurationMs - OVERLAP_MS;
+                        
+                    } catch (err) {
+                        console.error(`LongToneUI.insertGlissandoMidi: Error inserting ${fileInfo.filename}:`, err);
+                    }
+                }
+                
+                // Sort events by time and re-render
+                if (window.MidiController && MidiController.tracks && MidiController.tracks[trackIndex]) {
+                    MidiController.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                    MidiController.renderAllMidiDisplays();
+                    MidiController.updateMidiDisplayVisibility();
+                }
+                
+                // Store snippet IDs on curve for cleanup/persistence
+                if (!curve.glissandoMidiSnippets) {
+                    curve.glissandoMidiSnippets = [];
+                }
+                curve.glissandoMidiSnippets.push(...insertedSnippets);
+                
+                return {
+                    inserted: insertedSnippets.length,
+                    snippets: insertedSnippets,
+                    trackIndex: trackIndex
+                };
+            },
+            
+            // Parse MIDI file bytes to event array with absolute times
+            parseMidiFileToEvents(midiData, baseTimeMs) {
+                const events = [];
+                
+                try {
+                    // Simple MIDI parser - assumes Format 1 with 2 tracks
+                    // Skip header (14 bytes) and tempo track, find data track
+                    let pos = 0;
+                    
+                    // Check MThd header
+                    if (midiData[0] !== 0x4D || midiData[1] !== 0x54 || 
+                        midiData[2] !== 0x68 || midiData[3] !== 0x64) {
+                        console.error('Invalid MIDI file header');
+                        return null;
+                    }
+                    
+                    // Get ticks per beat from header
+                    const ticksPerBeat = (midiData[12] << 8) | midiData[13];
+                    pos = 14; // After header
+                    
+                    // Skip tempo track (track 0)
+                    if (midiData[pos] === 0x4D && midiData[pos + 1] === 0x54 &&
+                        midiData[pos + 2] === 0x72 && midiData[pos + 3] === 0x6B) {
+                        const tempoTrackLen = (midiData[pos + 4] << 24) | (midiData[pos + 5] << 16) |
+                                              (midiData[pos + 6] << 8) | midiData[pos + 7];
+                        pos += 8 + tempoTrackLen;
+                    }
+                    
+                    // Parse data track (track 1)
+                    if (midiData[pos] !== 0x4D || midiData[pos + 1] !== 0x54 ||
+                        midiData[pos + 2] !== 0x72 || midiData[pos + 3] !== 0x6B) {
+                        console.error('Data track not found');
+                        return null;
+                    }
+                    
+                    const dataTrackLen = (midiData[pos + 4] << 24) | (midiData[pos + 5] << 16) |
+                                         (midiData[pos + 6] << 8) | midiData[pos + 7];
+                    pos += 8;
+                    const trackEnd = pos + dataTrackLen;
+                    
+                    // Get tempo (assume 60 BPM default, or use composition tempo)
+                    const tempoBPM = window.beatsPerMinute || 60;
+                    const msPerTick = 60000 / (tempoBPM * ticksPerBeat);
+                    
+                    let currentTick = 0;
+                    let runningStatus = 0;
+                    
+                    while (pos < trackEnd) {
+                        // Read delta time (variable length)
+                        let deltaTime = 0;
+                        let byte;
+                        do {
+                            byte = midiData[pos++];
+                            deltaTime = (deltaTime << 7) | (byte & 0x7F);
+                        } while (byte & 0x80);
+                        
+                        currentTick += deltaTime;
+                        const timeMs = baseTimeMs + (currentTick * msPerTick);
+                        
+                        // Read event
+                        let status = midiData[pos];
+                        if (status < 0x80) {
+                            // Running status
+                            status = runningStatus;
+                        } else {
+                            pos++;
+                            if (status < 0xF0) {
+                                runningStatus = status;
+                            }
+                        }
+                        
+                        const eventType = status & 0xF0;
+                        
+                        if (eventType === 0x90) {
+                            // Note On
+                            const note = midiData[pos++];
+                            const velocity = midiData[pos++];
+                            events.push({
+                                timeMs: timeMs,
+                                type: velocity > 0 ? 'noteOn' : 'noteOff',
+                                data: [status, note, velocity]
+                            });
+                        } else if (eventType === 0x80) {
+                            // Note Off
+                            const note = midiData[pos++];
+                            const velocity = midiData[pos++];
+                            events.push({
+                                timeMs: timeMs,
+                                type: 'noteOff',
+                                data: [status, note, velocity]
+                            });
+                        } else if (eventType === 0xB0) {
+                            // Control Change
+                            const cc = midiData[pos++];
+                            const value = midiData[pos++];
+                            events.push({
+                                timeMs: timeMs,
+                                type: 'cc',
+                                data: [status, cc, value]
+                            });
+                        } else if (eventType === 0xE0) {
+                            // Pitch Bend
+                            const lsb = midiData[pos++];
+                            const msb = midiData[pos++];
+                            events.push({
+                                timeMs: timeMs,
+                                type: 'pitchBend',
+                                data: [status, lsb, msb]
+                            });
+                        } else if (status === 0xFF) {
+                            // Meta event
+                            const metaType = midiData[pos++];
+                            let metaLen = 0;
+                            do {
+                                byte = midiData[pos++];
+                                metaLen = (metaLen << 7) | (byte & 0x7F);
+                            } while (byte & 0x80);
+                            pos += metaLen; // Skip meta data
+                        } else if (status === 0xF0 || status === 0xF7) {
+                            // SysEx
+                            let sysexLen = 0;
+                            do {
+                                byte = midiData[pos++];
+                                sysexLen = (sysexLen << 7) | (byte & 0x7F);
+                            } while (byte & 0x80);
+                            pos += sysexLen;
+                        }
+                    }
+                    
+                } catch (err) {
+                    console.error('Error parsing MIDI file:', err);
+                    return null;
+                }
+                
+                return events;
+            },
+            
+            // Render LilyPond file to cropped SVG via server
+            async renderGlissandoSvg(filename) {
+                try {
+                    const response = await fetch('/api/lilypond/render-glissando', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename })
+                    });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        if (result.rendered) {
+                            console.log('LongToneUI.renderGlissandoSvg: Rendered new SVG:', result.svgPath);
+                        } else {
+                            console.log('LongToneUI.renderGlissandoSvg: SVG already exists:', result.svgPath);
+                        }
+                    } else {
+                        console.error('LongToneUI.renderGlissandoSvg: Failed:', result.error);
+                    }
+                    
+                    return result;
+                } catch (err) {
+                    console.error('LongToneUI.renderGlissandoSvg: Error:', err);
+                    return { success: false, error: err.message };
+                }
+            },
+            
+            // Check if LilyPond file already exists
+            async checkLilyPondFileExists(filename) {
+                try {
+                    const response = await fetch(`/api/lilypond/exists/${encodeURIComponent(filename)}`);
+                    const data = await response.json();
+                    return data.exists;
+                } catch (err) {
+                    console.warn('LongToneUI: Error checking file existence:', err);
+                    return false;
+                }
+            },
+            
+            // Generate LilyPond notation file
+            async generateNotation(params = null) {
+                const clef = params?.clef ?? document.getElementById('ltClefSelect').value;
+                const startPitch = params?.startPitch ?? document.getElementById('ltStartPitch').value.trim();
+                const endPitch = params?.endPitch ?? document.getElementById('ltEndPitch').value.trim();
+                
+                if (!startPitch || !endPitch) {
+                    console.error('LongToneUI.generateNotation: Missing start or end pitch');
+                    return null;
+                }
+                
+                const filename = this.generateGlissFilename(clef, startPitch, endPitch);
+                const lpClef = this.clefToLilyPond(clef);
+                const lpStartPitch = this.pitchToLilyPond(startPitch);
+                const lpEndPitch = this.pitchToLilyPond(endPitch);
+                const glissOffset = this.sameStaffLine(startPitch, endPitch) ? '0.3' : '0';
+                
+                // Check if file already exists
+                const fileExists = await this.checkLilyPondFileExists(filename);
+                
+                if (fileExists) {
+                    console.log('LongToneUI.generateNotation: File already exists, skipping creation:', filename);
+                    return {
+                        filename,
+                        clef: lpClef,
+                        startPitch: lpStartPitch,
+                        endPitch: lpEndPitch,
+                        glissOffset,
+                        fileExists: true,
+                        created: false
+                    };
+                }
+                
+                // Log the generation parameters
+                console.log('LongToneUI.generateNotation: Creating new file:', JSON.stringify({
+                    filename,
+                    clef: lpClef,
+                    startPitch: lpStartPitch,
+                    endPitch: lpEndPitch,
+                    glissOffset,
+                    sameStaffLine: this.sameStaffLine(startPitch, endPitch)
+                }, null, 2));
+                
+                // Create the file from template
+                try {
+                    const response = await fetch('/api/lilypond/create-glissando', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename,
+                            clef: lpClef,
+                            startPitch: lpStartPitch,
+                            endPitch: lpEndPitch,
+                            glissOffset
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success && result.created) {
+                        console.log('LongToneUI.generateNotation: File created successfully:', filename);
+                    } else if (result.success && !result.created) {
+                        console.log('LongToneUI.generateNotation: File already existed:', filename);
+                    } else {
+                        console.error('LongToneUI.generateNotation: Failed to create file:', result.error);
+                    }
+                    
+                    return {
+                        filename,
+                        clef: lpClef,
+                        startPitch: lpStartPitch,
+                        endPitch: lpEndPitch,
+                        glissOffset,
+                        fileExists: false,
+                        created: result.created
+                    };
+                } catch (err) {
+                    console.error('LongToneUI.generateNotation: Error creating file:', err);
+                    return {
+                        filename,
+                        clef: lpClef,
+                        startPitch: lpStartPitch,
+                        endPitch: lpEndPitch,
+                        glissOffset,
+                        fileExists: false,
+                        created: false,
+                        error: err.message
+                    };
+                }
             }
         };
         LongToneUI.init();

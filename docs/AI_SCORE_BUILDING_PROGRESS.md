@@ -10,7 +10,7 @@
 
 **Date:** Feb 14, 2026  
 **Focus:** Score automation infrastructure  
-**Tier 1 Count This Session:** 4  
+**Tier 1 Count This Session:** 1  
 **Tier 2 Threshold:** 4 increments (will suggest commit)
 
 ### Session Log
@@ -20,6 +20,7 @@
 - ASB-002: Created LONG_TONE_GLISSANDO_WORKFLOW.md with step-by-step tracking
 - ASB-003: Step 1 real-time testing, y2=0 bug fix, default color to limeGreen
 - ASB-004: Long Tone Workflow UI + model/slope parameters
+- ASB-005: Step 2a - Glissando notation template + single GO button
 
 ---
 
@@ -40,6 +41,7 @@
 | ASB-002 | Long Tone Glissando Workflow document created | Complete |
 | ASB-003 | Step 1 parameter discovery, y2=0 bug fix, default color change | Complete |
 | ASB-004 | Long Tone Workflow UI + model/slope parameters | Complete |
+| ASB-005 | Step 2a - Glissando notation template + single GO button | Complete |
 
 ---
 
@@ -47,7 +49,7 @@
 
 | Date | Commit Hash | Summary |
 |------|-------------|---------|
-| *(none yet)* | | |
+| Feb 14, 2026 | 78ba06f | Long Tone Workflow Step 1 - UI + model/slope + ASB-001 to ASB-004 |
 
 ---
 
