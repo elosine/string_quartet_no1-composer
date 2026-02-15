@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "0979_Y_draft_scoreAIautomation",
-    "created": "2026-02-15T01:03:53.239Z",
-    "modified": "2026-02-15T01:03:53.285Z",
+    "title": "0979_x_draft_1stTest",
+    "created": "2026-02-15T01:17:53.239Z",
+    "modified": "2026-02-15T01:17:53.287Z",
     "author": ""
   },
   "tempoHistory": [
@@ -139392,9 +139392,20 @@
           "audioFilePath": "/audio_files/PizzStorm-Cello-Mastered_1770575854839.wav",
           "color": "#CDDC39",
           "createdAt": 1770575854848
+        },
+        {
+          "id": 85,
+          "name": "Viola-LongTone-215_mastered-loweredVolume.wav",
+          "trackIndex": 2,
+          "startSeconds": 215,
+          "endSeconds": 337.782358276644,
+          "durationSeconds": 122.78235827664399,
+          "audioFilePath": "/audio_files/Viola-LongTone-215_mastered-loweredVolume_1771118248646.wav",
+          "color": "#9C27B0",
+          "createdAt": 1771118248715
         }
       ],
-      "nextId": 84
+      "nextId": 86
     },
     "gcs": {
       "gcs": [
@@ -144244,7 +144255,7 @@
     }
   ],
   "cursorState": {
-    "editCursorSeconds": 0,
+    "editCursorSeconds": 215,
     "gotoDisplaySeconds": 215,
     "leadInSeconds": 2
   }

@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "0979_Y_draft_scoreAIautomation",
-    "created": "2026-02-15T01:03:53.239Z",
-    "modified": "2026-02-15T01:03:53.285Z",
+    "title": "0979_x_draft_1stTest",
+    "created": "2026-02-15T01:27:09.930Z",
+    "modified": "2026-02-15T01:27:09.983Z",
     "author": ""
   },
   "tempoHistory": [
@@ -8103,7 +8103,6 @@
           "timestamp": 171785.01543602775
         },
         {
-          "id": "gliss_170_seg0_1771117409278_1wnnsey0f",
           "timeMs": 219000,
           "type": "cc",
           "data": [
@@ -8111,12 +8110,10 @@
             0,
             89
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219000
         },
         {
-          "id": "gliss_170_seg0_1771117409278_scgk5jd3w",
           "timeMs": 219000,
           "type": "pitchBend",
           "data": [
@@ -8124,12 +8121,10 @@
             127,
             127
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219000
         },
         {
-          "id": "gliss_170_seg0_1771117409278_wi9kvlkyi",
           "timeMs": 219000,
           "type": "noteOn",
           "data": [
@@ -8137,12 +8132,10 @@
             63,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219000
         },
         {
-          "id": "gliss_170_seg0_1771117409278_e3jk1scz3",
           "timeMs": 219050,
           "type": "pitchBend",
           "data": [
@@ -8150,12 +8143,10 @@
             98,
             124
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219050
         },
         {
-          "id": "gliss_170_seg0_1771117409278_axorav93c",
           "timeMs": 219102.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8163,12 +8154,10 @@
             69,
             121
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219102.08333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_6d9rrvrds",
           "timeMs": 219152.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8176,12 +8165,10 @@
             41,
             118
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219152.08333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_6v9jzxxqm",
           "timeMs": 219204.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8189,12 +8176,10 @@
             13,
             115
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219204.16666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_vigaje1nc",
           "timeMs": 219254.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8202,12 +8187,10 @@
             114,
             111
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219254.16666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_wtbp6im5b",
           "timeMs": 219304.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8215,12 +8198,10 @@
             7,
             108
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219304.16666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_q79ap5xlw",
           "timeMs": 219356.25,
           "type": "pitchBend",
           "data": [
@@ -8228,12 +8209,10 @@
             111,
             104
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219356.25
         },
         {
-          "id": "gliss_170_seg0_1771117409278_0xbt9iy4e",
           "timeMs": 219406.25,
           "type": "pitchBend",
           "data": [
@@ -8241,12 +8220,10 @@
             88,
             101
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219406.25
         },
         {
-          "id": "gliss_170_seg0_1771117409278_4asvx2qn4",
           "timeMs": 219458.33333333334,
           "type": "pitchBend",
           "data": [
@@ -8254,12 +8231,10 @@
             68,
             98
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219458.33333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_12vi6rbgf",
           "timeMs": 219508.33333333334,
           "type": "pitchBend",
           "data": [
@@ -8267,12 +8242,10 @@
             50,
             95
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219508.33333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_eolt6g8u1",
           "timeMs": 219558.33333333334,
           "type": "pitchBend",
           "data": [
@@ -8280,12 +8253,10 @@
             33,
             92
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219558.33333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_fwpdy85f3",
           "timeMs": 219610.41666666666,
           "type": "pitchBend",
           "data": [
@@ -8293,12 +8264,10 @@
             20,
             89
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219610.41666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_ki16bi97s",
           "timeMs": 219660.41666666666,
           "type": "pitchBend",
           "data": [
@@ -8306,12 +8275,10 @@
             9,
             86
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219660.41666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_18x4i6ikh",
           "timeMs": 219712.5,
           "type": "pitchBend",
           "data": [
@@ -8319,12 +8286,10 @@
             1,
             83
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219712.5
         },
         {
-          "id": "gliss_170_seg0_1771117409278_4lgabumd2",
           "timeMs": 219762.5,
           "type": "pitchBend",
           "data": [
@@ -8332,12 +8297,10 @@
             124,
             79
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219762.5
         },
         {
-          "id": "gliss_170_seg0_1771117409278_86vqkagm0",
           "timeMs": 219814.58333333334,
           "type": "pitchBend",
           "data": [
@@ -8345,12 +8308,10 @@
             122,
             76
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219814.58333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_nruxqvwqa",
           "timeMs": 219864.58333333334,
           "type": "pitchBend",
           "data": [
@@ -8358,12 +8319,10 @@
             124,
             73
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219864.58333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_rg1eqmsmy",
           "timeMs": 219914.58333333334,
           "type": "pitchBend",
           "data": [
@@ -8371,12 +8330,10 @@
             54,
             70
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219914.58333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_75n2w8pgg",
           "timeMs": 219966.66666666666,
           "type": "pitchBend",
           "data": [
@@ -8384,12 +8341,10 @@
             63,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 219966.66666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_jl46cyzcz",
           "timeMs": 220016.66666666666,
           "type": "pitchBend",
           "data": [
@@ -8397,12 +8352,10 @@
             77,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220016.66666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_yo9myaqfq",
           "timeMs": 220068.75,
           "type": "pitchBend",
           "data": [
@@ -8410,12 +8363,10 @@
             95,
             61
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220068.75
         },
         {
-          "id": "gliss_170_seg0_1771117409278_iuqqxhkj9",
           "timeMs": 220118.75,
           "type": "pitchBend",
           "data": [
@@ -8423,12 +8374,10 @@
             117,
             58
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220118.75
         },
         {
-          "id": "gliss_170_seg0_1771117409278_q2d06qubm",
           "timeMs": 220168.75,
           "type": "pitchBend",
           "data": [
@@ -8436,12 +8385,10 @@
             15,
             56
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220168.75
         },
         {
-          "id": "gliss_170_seg0_1771117409278_0c3tuw0bo",
           "timeMs": 220220.83333333334,
           "type": "pitchBend",
           "data": [
@@ -8449,12 +8396,10 @@
             46,
             53
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220220.83333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_vj0xe2isk",
           "timeMs": 220270.83333333334,
           "type": "pitchBend",
           "data": [
@@ -8462,12 +8407,10 @@
             81,
             50
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220270.83333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_ms73yakys",
           "timeMs": 220322.91666666666,
           "type": "pitchBend",
           "data": [
@@ -8475,12 +8418,10 @@
             121,
             47
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220322.91666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_tcv3165xu",
           "timeMs": 220372.91666666666,
           "type": "pitchBend",
           "data": [
@@ -8488,12 +8429,10 @@
             38,
             45
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220372.91666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_n9efc0qe6",
           "timeMs": 220422.91666666666,
           "type": "pitchBend",
           "data": [
@@ -8501,12 +8440,10 @@
             87,
             42
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220422.91666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_uvgb19lub",
           "timeMs": 220475,
           "type": "pitchBend",
           "data": [
@@ -8514,12 +8451,10 @@
             14,
             40
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220475
         },
         {
-          "id": "gliss_170_seg0_1771117409278_64xdq4pb2",
           "timeMs": 220525,
           "type": "pitchBend",
           "data": [
@@ -8527,12 +8462,10 @@
             9,
             37
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220525
         },
         {
-          "id": "gliss_170_seg0_1771117409278_jgy65xmph",
           "timeMs": 220577.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8540,12 +8473,10 @@
             75,
             34
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220577.08333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_gn7625fx6",
           "timeMs": 220627.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8553,12 +8484,10 @@
             17,
             32
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220627.08333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_92gld0tap",
           "timeMs": 220677.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8566,12 +8495,10 @@
             93,
             29
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220677.08333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_st4rsyyrh",
           "timeMs": 220729.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8579,12 +8506,10 @@
             46,
             27
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220729.16666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_hkj9l04t1",
           "timeMs": 220779.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8592,12 +8517,10 @@
             5,
             25
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220779.16666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_gjkym2037",
           "timeMs": 220831.25,
           "type": "pitchBend",
           "data": [
@@ -8605,12 +8528,10 @@
             97,
             22
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220831.25
         },
         {
-          "id": "gliss_170_seg0_1771117409278_bwpxsdz8r",
           "timeMs": 220881.25,
           "type": "pitchBend",
           "data": [
@@ -8618,12 +8539,10 @@
             66,
             20
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220881.25
         },
         {
-          "id": "gliss_170_seg0_1771117409278_4q5zl01vp",
           "timeMs": 220933.33333333334,
           "type": "pitchBend",
           "data": [
@@ -8631,12 +8550,10 @@
             40,
             18
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220933.33333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_jfxykr9c1",
           "timeMs": 220983.33333333334,
           "type": "pitchBend",
           "data": [
@@ -8644,12 +8561,10 @@
             20,
             16
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 220983.33333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_vsjf3ngkg",
           "timeMs": 221033.33333333334,
           "type": "pitchBend",
           "data": [
@@ -8657,12 +8572,10 @@
             5,
             14
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221033.33333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_y9rdwovac",
           "timeMs": 221085.41666666666,
           "type": "pitchBend",
           "data": [
@@ -8670,12 +8583,10 @@
             123,
             11
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221085.41666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_2h8v1xkra",
           "timeMs": 221135.41666666666,
           "type": "pitchBend",
           "data": [
@@ -8683,12 +8594,10 @@
             67,
             9
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221135.41666666666
         },
         {
-          "id": "gliss_170_seg0_1771117409278_4jlcithmo",
           "timeMs": 221187.5,
           "type": "pitchBend",
           "data": [
@@ -8696,12 +8605,10 @@
             69,
             7
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221187.5
         },
         {
-          "id": "gliss_170_seg0_1771117409278_ni5kiywwv",
           "timeMs": 221237.5,
           "type": "pitchBend",
           "data": [
@@ -8709,12 +8616,10 @@
             77,
             5
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221237.5
         },
         {
-          "id": "gliss_170_seg0_1771117409278_79yf81hh4",
           "timeMs": 221287.5,
           "type": "pitchBend",
           "data": [
@@ -8722,12 +8627,10 @@
             89,
             3
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221287.5
         },
         {
-          "id": "gliss_170_seg0_1771117409278_ssftjjl9f",
           "timeMs": 221339.58333333334,
           "type": "pitchBend",
           "data": [
@@ -8735,12 +8638,10 @@
             107,
             1
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221339.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_beusrs32d",
           "timeMs": 221385,
           "type": "cc",
           "data": [
@@ -8748,12 +8649,10 @@
             0,
             89
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221385
         },
         {
-          "id": "gliss_170_seg1_1771117409281_lkr91om9e",
           "timeMs": 221385,
           "type": "pitchBend",
           "data": [
@@ -8761,12 +8660,10 @@
             127,
             127
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221385
         },
         {
-          "id": "gliss_170_seg1_1771117409281_13dz0vkzf",
           "timeMs": 221385,
           "type": "noteOn",
           "data": [
@@ -8774,12 +8671,10 @@
             61,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221385
         },
         {
-          "id": "gliss_170_seg0_1771117409278_epesf0z01",
           "timeMs": 221389.58333333334,
           "type": "pitchBend",
           "data": [
@@ -8787,12 +8682,10 @@
             2,
             0
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221389.58333333334
         },
         {
-          "id": "gliss_170_seg0_1771117409278_nv2fc5do4",
           "timeMs": 221389.58333333334,
           "type": "noteOff",
           "data": [
@@ -8800,12 +8693,10 @@
             63,
             0
           ],
-          "sourceCurve": 170,
           "snippetId": 203,
           "timestamp": 221389.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_4tnuwnmbh",
           "timeMs": 221435,
           "type": "pitchBend",
           "data": [
@@ -8813,12 +8704,10 @@
             28,
             126
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221435
         },
         {
-          "id": "gliss_170_seg1_1771117409281_gyido9ndc",
           "timeMs": 221485,
           "type": "pitchBend",
           "data": [
@@ -8826,12 +8715,10 @@
             62,
             124
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221485
         },
         {
-          "id": "gliss_170_seg1_1771117409281_xsyskehjn",
           "timeMs": 221535,
           "type": "pitchBend",
           "data": [
@@ -8839,12 +8726,10 @@
             102,
             122
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221535
         },
         {
-          "id": "gliss_170_seg1_1771117409281_x5oj67ift",
           "timeMs": 221587.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8852,12 +8737,10 @@
             18,
             121
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221587.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_csvjcmrte",
           "timeMs": 221637.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8865,12 +8748,10 @@
             67,
             119
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221637.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_4izfotjqn",
           "timeMs": 221687.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8878,12 +8759,10 @@
             121,
             117
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221687.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_4uhb5tvpi",
           "timeMs": 221737.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8891,12 +8770,10 @@
             52,
             116
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221737.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_hcnye3mic",
           "timeMs": 221787.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8904,12 +8781,10 @@
             115,
             114
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221787.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_yda290mdd",
           "timeMs": 221837.08333333334,
           "type": "pitchBend",
           "data": [
@@ -8917,12 +8792,10 @@
             56,
             113
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221837.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_ekp3yi074",
           "timeMs": 221889.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8930,12 +8803,10 @@
             1,
             112
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221889.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_rnqojvg7c",
           "timeMs": 221939.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8943,12 +8814,10 @@
             78,
             110
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221939.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_f7zn00gby",
           "timeMs": 221989.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8956,12 +8825,10 @@
             32,
             109
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 221989.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_spqh21fg9",
           "timeMs": 222039.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8969,12 +8836,10 @@
             118,
             107
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222039.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_ui7s0x8xi",
           "timeMs": 222089.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8982,12 +8847,10 @@
             81,
             106
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222089.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_rfxpfvjbu",
           "timeMs": 222139.16666666666,
           "type": "pitchBend",
           "data": [
@@ -8995,12 +8858,10 @@
             48,
             105
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222139.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_thi9cr8jp",
           "timeMs": 222191.25,
           "type": "pitchBend",
           "data": [
@@ -9008,12 +8869,10 @@
             116,
             103
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222191.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_8zegrgf77",
           "timeMs": 222241.25,
           "type": "pitchBend",
           "data": [
@@ -9021,12 +8880,10 @@
             92,
             102
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222241.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_7dm5ehn4z",
           "timeMs": 222291.25,
           "type": "pitchBend",
           "data": [
@@ -9034,12 +8891,10 @@
             72,
             101
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222291.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_24fb3ytef",
           "timeMs": 222341.25,
           "type": "pitchBend",
           "data": [
@@ -9047,12 +8902,10 @@
             56,
             100
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222341.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_k5myy2806",
           "timeMs": 222391.25,
           "type": "pitchBend",
           "data": [
@@ -9060,12 +8913,10 @@
             44,
             99
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222391.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_63ofr31n6",
           "timeMs": 222441.25,
           "type": "pitchBend",
           "data": [
@@ -9073,12 +8924,10 @@
             35,
             98
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222441.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_qotkfte4d",
           "timeMs": 222491.25,
           "type": "pitchBend",
           "data": [
@@ -9086,12 +8935,10 @@
             31,
             97
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222491.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_lgaww8zjc",
           "timeMs": 222543.33333333334,
           "type": "pitchBend",
           "data": [
@@ -9099,12 +8946,10 @@
             30,
             96
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222543.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_6epvy2qbk",
           "timeMs": 222593.33333333334,
           "type": "pitchBend",
           "data": [
@@ -9112,12 +8957,10 @@
             32,
             95
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222593.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_7hjvor9q5",
           "timeMs": 222643.33333333334,
           "type": "pitchBend",
           "data": [
@@ -9125,12 +8968,10 @@
             38,
             94
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222643.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_2bvrkiojn",
           "timeMs": 222693.33333333334,
           "type": "pitchBend",
           "data": [
@@ -9138,12 +8979,10 @@
             48,
             93
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222693.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_48yaitbp1",
           "timeMs": 222743.33333333334,
           "type": "pitchBend",
           "data": [
@@ -9151,12 +8990,10 @@
             60,
             92
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222743.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_xiwznsstq",
           "timeMs": 222793.33333333334,
           "type": "pitchBend",
           "data": [
@@ -9164,12 +9001,10 @@
             76,
             91
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222793.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_du9y979ti",
           "timeMs": 222845.41666666666,
           "type": "pitchBend",
           "data": [
@@ -9177,12 +9012,10 @@
             95,
             90
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222845.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_5p6j859ma",
           "timeMs": 222895.41666666666,
           "type": "pitchBend",
           "data": [
@@ -9190,12 +9023,10 @@
             117,
             89
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222895.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_2t2egurvo",
           "timeMs": 222945.41666666666,
           "type": "pitchBend",
           "data": [
@@ -9203,12 +9034,10 @@
             15,
             89
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222945.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_7qftr0jkp",
           "timeMs": 222995.41666666666,
           "type": "pitchBend",
           "data": [
@@ -9216,12 +9045,10 @@
             43,
             88
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 222995.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_1yxo9c5n3",
           "timeMs": 223045.41666666666,
           "type": "pitchBend",
           "data": [
@@ -9229,12 +9056,10 @@
             74,
             87
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223045.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_sansmbdry",
           "timeMs": 223095.41666666666,
           "type": "pitchBend",
           "data": [
@@ -9242,12 +9067,10 @@
             108,
             86
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223095.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_o12optm4o",
           "timeMs": 223147.5,
           "type": "pitchBend",
           "data": [
@@ -9255,12 +9078,10 @@
             16,
             86
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223147.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_1ggziokxo",
           "timeMs": 223197.5,
           "type": "pitchBend",
           "data": [
@@ -9268,12 +9089,10 @@
             56,
             85
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223197.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_dfcsj8fjf",
           "timeMs": 223247.5,
           "type": "pitchBend",
           "data": [
@@ -9281,12 +9100,10 @@
             98,
             84
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223247.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_zqauqiuzm",
           "timeMs": 223297.5,
           "type": "pitchBend",
           "data": [
@@ -9294,12 +9111,10 @@
             14,
             84
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223297.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_o2ar31g2k",
           "timeMs": 223347.5,
           "type": "pitchBend",
           "data": [
@@ -9307,12 +9122,10 @@
             61,
             83
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223347.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_jkox8uatp",
           "timeMs": 223397.5,
           "type": "pitchBend",
           "data": [
@@ -9320,12 +9133,10 @@
             110,
             82
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223397.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_gjxp05hi2",
           "timeMs": 223449.58333333334,
           "type": "pitchBend",
           "data": [
@@ -9333,12 +9144,10 @@
             34,
             82
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223449.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_sw16fi24c",
           "timeMs": 223499.58333333334,
           "type": "pitchBend",
           "data": [
@@ -9346,12 +9155,10 @@
             88,
             81
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223499.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_q7hs5kizb",
           "timeMs": 223549.58333333334,
           "type": "pitchBend",
           "data": [
@@ -9359,12 +9166,10 @@
             16,
             81
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223549.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_0ylfr6i2z",
           "timeMs": 223599.58333333334,
           "type": "pitchBend",
           "data": [
@@ -9372,12 +9177,10 @@
             74,
             80
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223599.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_47ntifiaw",
           "timeMs": 223649.58333333334,
           "type": "pitchBend",
           "data": [
@@ -9385,12 +9188,10 @@
             7,
             80
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223649.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_5zdx9s87n",
           "timeMs": 223699.58333333334,
           "type": "pitchBend",
           "data": [
@@ -9398,12 +9199,10 @@
             56,
             79
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223699.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_jtvrehd7x",
           "timeMs": 223749.58333333334,
           "type": "pitchBend",
           "data": [
@@ -9411,12 +9210,10 @@
             121,
             78
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223749.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_gehmv7hx6",
           "timeMs": 223801.66666666666,
           "type": "pitchBend",
           "data": [
@@ -9424,12 +9221,10 @@
             60,
             78
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223801.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_nz9pbl11x",
           "timeMs": 223851.66666666666,
           "type": "pitchBend",
           "data": [
@@ -9437,12 +9232,10 @@
             0,
             78
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223851.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_ftcwazpp0",
           "timeMs": 223901.66666666666,
           "type": "pitchBend",
           "data": [
@@ -9450,12 +9243,10 @@
             71,
             77
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223901.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_r4sf062q4",
           "timeMs": 223951.66666666666,
           "type": "pitchBend",
           "data": [
@@ -9463,12 +9254,10 @@
             15,
             77
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 223951.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_cqrl6mkz0",
           "timeMs": 224001.66666666666,
           "type": "pitchBend",
           "data": [
@@ -9476,12 +9265,10 @@
             89,
             76
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224001.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_ap65j1vci",
           "timeMs": 224051.66666666666,
           "type": "pitchBend",
           "data": [
@@ -9489,12 +9276,10 @@
             36,
             76
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224051.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_md6iotb21",
           "timeMs": 224103.75,
           "type": "pitchBend",
           "data": [
@@ -9502,12 +9287,10 @@
             114,
             75
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224103.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_gaxfqrxic",
           "timeMs": 224153.75,
           "type": "pitchBend",
           "data": [
@@ -9515,12 +9298,10 @@
             64,
             75
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224153.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_wix9yj3wp",
           "timeMs": 224203.75,
           "type": "pitchBend",
           "data": [
@@ -9528,12 +9309,10 @@
             17,
             75
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224203.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_azuqecb6x",
           "timeMs": 224253.75,
           "type": "pitchBend",
           "data": [
@@ -9541,12 +9320,10 @@
             99,
             74
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224253.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_8u73u4m6p",
           "timeMs": 224303.75,
           "type": "pitchBend",
           "data": [
@@ -9554,12 +9331,10 @@
             54,
             74
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224303.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_cjfivivtt",
           "timeMs": 224353.75,
           "type": "pitchBend",
           "data": [
@@ -9567,12 +9342,10 @@
             10,
             74
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224353.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_ggjq7mrgw",
           "timeMs": 224405.83333333334,
           "type": "pitchBend",
           "data": [
@@ -9580,12 +9353,10 @@
             96,
             73
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224405.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_9z4mwjx36",
           "timeMs": 224455.83333333334,
           "type": "pitchBend",
           "data": [
@@ -9593,12 +9364,10 @@
             56,
             73
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224455.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_oq9tt6nhr",
           "timeMs": 224505.83333333334,
           "type": "pitchBend",
           "data": [
@@ -9606,12 +9375,10 @@
             16,
             73
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224505.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_lu92bmcyl",
           "timeMs": 224555.83333333334,
           "type": "pitchBend",
           "data": [
@@ -9619,12 +9386,10 @@
             106,
             72
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224555.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_ogkhlor3x",
           "timeMs": 224605.83333333334,
           "type": "pitchBend",
           "data": [
@@ -9632,12 +9397,10 @@
             69,
             72
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224605.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_bk0xv8dap",
           "timeMs": 224655.83333333334,
           "type": "pitchBend",
           "data": [
@@ -9645,12 +9408,10 @@
             33,
             72
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224655.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_jn0d6b3pm",
           "timeMs": 224705.83333333334,
           "type": "pitchBend",
           "data": [
@@ -9658,12 +9419,10 @@
             127,
             71
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224705.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_ab2nmdi17",
           "timeMs": 224757.91666666666,
           "type": "pitchBend",
           "data": [
@@ -9671,12 +9430,10 @@
             93,
             71
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224757.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_fqrhfzcfc",
           "timeMs": 224807.91666666666,
           "type": "pitchBend",
           "data": [
@@ -9684,12 +9441,10 @@
             60,
             71
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224807.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_biwrbrm0c",
           "timeMs": 224857.91666666666,
           "type": "pitchBend",
           "data": [
@@ -9697,12 +9452,10 @@
             29,
             71
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224857.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_hkuhvus2n",
           "timeMs": 224907.91666666666,
           "type": "pitchBend",
           "data": [
@@ -9710,12 +9463,10 @@
             126,
             70
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224907.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_4oru98g0y",
           "timeMs": 224957.91666666666,
           "type": "pitchBend",
           "data": [
@@ -9723,12 +9474,10 @@
             97,
             70
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 224957.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_qsweusbmm",
           "timeMs": 225007.91666666666,
           "type": "pitchBend",
           "data": [
@@ -9736,12 +9485,10 @@
             68,
             70
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225007.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_c3sck62de",
           "timeMs": 225060,
           "type": "pitchBend",
           "data": [
@@ -9749,12 +9496,10 @@
             41,
             70
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225060
         },
         {
-          "id": "gliss_170_seg1_1771117409281_dxys2m8n2",
           "timeMs": 225110,
           "type": "pitchBend",
           "data": [
@@ -9762,12 +9507,10 @@
             14,
             70
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225110
         },
         {
-          "id": "gliss_170_seg1_1771117409281_8weayx5mi",
           "timeMs": 225160,
           "type": "pitchBend",
           "data": [
@@ -9775,12 +9518,10 @@
             116,
             69
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225160
         },
         {
-          "id": "gliss_170_seg1_1771117409281_piulu7c5a",
           "timeMs": 225210,
           "type": "pitchBend",
           "data": [
@@ -9788,12 +9529,10 @@
             86,
             69
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225210
         },
         {
-          "id": "gliss_170_seg1_1771117409281_1x6rexg3y",
           "timeMs": 225260,
           "type": "pitchBend",
           "data": [
@@ -9801,12 +9540,10 @@
             62,
             69
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225260
         },
         {
-          "id": "gliss_170_seg1_1771117409281_i60epvgwi",
           "timeMs": 225310,
           "type": "pitchBend",
           "data": [
@@ -9814,12 +9551,10 @@
             38,
             69
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225310
         },
         {
-          "id": "gliss_170_seg1_1771117409281_wylnle9qp",
           "timeMs": 225362.08333333334,
           "type": "pitchBend",
           "data": [
@@ -9827,12 +9562,10 @@
             16,
             69
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225362.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_s1fri8jme",
           "timeMs": 225412.08333333334,
           "type": "pitchBend",
           "data": [
@@ -9840,12 +9573,10 @@
             122,
             68
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225412.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_eytsj6zdr",
           "timeMs": 225462.08333333334,
           "type": "pitchBend",
           "data": [
@@ -9853,12 +9584,10 @@
             101,
             68
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225462.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_jkgyq5vke",
           "timeMs": 225512.08333333334,
           "type": "pitchBend",
           "data": [
@@ -9866,12 +9595,10 @@
             80,
             68
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225512.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_m3uo7lt5m",
           "timeMs": 225562.08333333334,
           "type": "pitchBend",
           "data": [
@@ -9879,12 +9606,10 @@
             60,
             68
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225562.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_x26c30bvg",
           "timeMs": 225612.08333333334,
           "type": "pitchBend",
           "data": [
@@ -9892,12 +9617,10 @@
             41,
             68
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225612.08333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_7b9j1u7or",
           "timeMs": 225664.16666666666,
           "type": "pitchBend",
           "data": [
@@ -9905,12 +9628,10 @@
             22,
             68
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225664.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_38kjlwtbk",
           "timeMs": 225714.16666666666,
           "type": "pitchBend",
           "data": [
@@ -9918,12 +9639,10 @@
             4,
             68
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225714.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_9be8c0uot",
           "timeMs": 225764.16666666666,
           "type": "pitchBend",
           "data": [
@@ -9931,12 +9650,10 @@
             115,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225764.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_jhpnfsfso",
           "timeMs": 225814.16666666666,
           "type": "pitchBend",
           "data": [
@@ -9944,12 +9661,10 @@
             98,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225814.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_m4bnpo8b6",
           "timeMs": 225864.16666666666,
           "type": "pitchBend",
           "data": [
@@ -9957,12 +9672,10 @@
             82,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225864.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_c7lofbhef",
           "timeMs": 225914.16666666666,
           "type": "pitchBend",
           "data": [
@@ -9970,12 +9683,10 @@
             66,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225914.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_m5j3yhcwb",
           "timeMs": 225964.16666666666,
           "type": "pitchBend",
           "data": [
@@ -9983,12 +9694,10 @@
             51,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 225964.16666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_i0moz8p5v",
           "timeMs": 226016.25,
           "type": "pitchBend",
           "data": [
@@ -9996,12 +9705,10 @@
             36,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226016.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_rnr1jh2dv",
           "timeMs": 226066.25,
           "type": "pitchBend",
           "data": [
@@ -10009,12 +9716,10 @@
             22,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226066.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_958xv9sk3",
           "timeMs": 226116.25,
           "type": "pitchBend",
           "data": [
@@ -10022,12 +9727,10 @@
             8,
             67
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226116.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_yg33z5zk7",
           "timeMs": 226166.25,
           "type": "pitchBend",
           "data": [
@@ -10035,12 +9738,10 @@
             123,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226166.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_2zv4lby23",
           "timeMs": 226216.25,
           "type": "pitchBend",
           "data": [
@@ -10048,12 +9749,10 @@
             110,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226216.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_jevqgemr6",
           "timeMs": 226266.25,
           "type": "pitchBend",
           "data": [
@@ -10061,12 +9760,10 @@
             97,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226266.25
         },
         {
-          "id": "gliss_170_seg1_1771117409281_zolv1vxju",
           "timeMs": 226318.33333333334,
           "type": "pitchBend",
           "data": [
@@ -10074,12 +9771,10 @@
             85,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226318.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_8a2aue3zx",
           "timeMs": 226368.33333333334,
           "type": "pitchBend",
           "data": [
@@ -10087,12 +9782,10 @@
             73,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226368.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_yq4xpdg3z",
           "timeMs": 226418.33333333334,
           "type": "pitchBend",
           "data": [
@@ -10100,12 +9793,10 @@
             62,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226418.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_topbyzx9y",
           "timeMs": 226468.33333333334,
           "type": "pitchBend",
           "data": [
@@ -10113,12 +9804,10 @@
             51,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226468.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_zr1ihd6yl",
           "timeMs": 226518.33333333334,
           "type": "pitchBend",
           "data": [
@@ -10126,12 +9815,10 @@
             40,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226518.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_l2qtsk3et",
           "timeMs": 226568.33333333334,
           "type": "pitchBend",
           "data": [
@@ -10139,12 +9826,10 @@
             30,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226568.33333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_nlng5atwy",
           "timeMs": 226620.41666666666,
           "type": "pitchBend",
           "data": [
@@ -10152,12 +9837,10 @@
             20,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226620.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_07o3zxp6h",
           "timeMs": 226670.41666666666,
           "type": "pitchBend",
           "data": [
@@ -10165,12 +9848,10 @@
             10,
             66
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226670.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_zwzbur0po",
           "timeMs": 226720.41666666666,
           "type": "pitchBend",
           "data": [
@@ -10178,12 +9859,10 @@
             127,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226720.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_mlset8zdr",
           "timeMs": 226770.41666666666,
           "type": "pitchBend",
           "data": [
@@ -10191,12 +9870,10 @@
             118,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226770.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_navzmhk2m",
           "timeMs": 226820.41666666666,
           "type": "pitchBend",
           "data": [
@@ -10204,12 +9881,10 @@
             110,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226820.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_0pa6ygfx4",
           "timeMs": 226870.41666666666,
           "type": "pitchBend",
           "data": [
@@ -10217,12 +9892,10 @@
             101,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226870.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_dkzvzbn6r",
           "timeMs": 226920.41666666666,
           "type": "pitchBend",
           "data": [
@@ -10230,12 +9903,10 @@
             93,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226920.41666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_kkmy7vmaq",
           "timeMs": 226972.5,
           "type": "pitchBend",
           "data": [
@@ -10243,12 +9914,10 @@
             85,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 226972.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_z06dh7cen",
           "timeMs": 227022.5,
           "type": "pitchBend",
           "data": [
@@ -10256,12 +9925,10 @@
             78,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227022.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_2cubjnqnf",
           "timeMs": 227072.5,
           "type": "pitchBend",
           "data": [
@@ -10269,12 +9936,10 @@
             71,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227072.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_m4o0enqow",
           "timeMs": 227122.5,
           "type": "pitchBend",
           "data": [
@@ -10282,12 +9947,10 @@
             64,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227122.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_zuhu0mtgv",
           "timeMs": 227172.5,
           "type": "pitchBend",
           "data": [
@@ -10295,12 +9958,10 @@
             57,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227172.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_qpfmolj5d",
           "timeMs": 227222.5,
           "type": "pitchBend",
           "data": [
@@ -10308,12 +9969,10 @@
             50,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227222.5
         },
         {
-          "id": "gliss_170_seg1_1771117409281_gqcquhfal",
           "timeMs": 227274.58333333334,
           "type": "pitchBend",
           "data": [
@@ -10321,12 +9980,10 @@
             44,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227274.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_rmu97in5e",
           "timeMs": 227324.58333333334,
           "type": "pitchBend",
           "data": [
@@ -10334,12 +9991,10 @@
             37,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227324.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_myv66xodt",
           "timeMs": 227374.58333333334,
           "type": "pitchBend",
           "data": [
@@ -10347,12 +10002,10 @@
             31,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227374.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_gqsjun6xb",
           "timeMs": 227424.58333333334,
           "type": "pitchBend",
           "data": [
@@ -10360,12 +10013,10 @@
             26,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227424.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_duv247amd",
           "timeMs": 227474.58333333334,
           "type": "pitchBend",
           "data": [
@@ -10373,12 +10024,10 @@
             20,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227474.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_a4bwng9we",
           "timeMs": 227524.58333333334,
           "type": "pitchBend",
           "data": [
@@ -10386,12 +10035,10 @@
             15,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227524.58333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_kjn9brm1d",
           "timeMs": 227576.66666666666,
           "type": "pitchBend",
           "data": [
@@ -10399,12 +10046,10 @@
             9,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227576.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_wqr3je9j1",
           "timeMs": 227626.66666666666,
           "type": "pitchBend",
           "data": [
@@ -10412,12 +10057,10 @@
             4,
             65
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227626.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_tnz1rzxwk",
           "timeMs": 227676.66666666666,
           "type": "pitchBend",
           "data": [
@@ -10425,12 +10068,10 @@
             127,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227676.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_ej63mnbfv",
           "timeMs": 227726.66666666666,
           "type": "pitchBend",
           "data": [
@@ -10438,12 +10079,10 @@
             123,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227726.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_01gu8y4hu",
           "timeMs": 227776.66666666666,
           "type": "pitchBend",
           "data": [
@@ -10451,12 +10090,10 @@
             118,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227776.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_f4zcng8ut",
           "timeMs": 227826.66666666666,
           "type": "pitchBend",
           "data": [
@@ -10464,12 +10101,10 @@
             114,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227826.66666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_6qv723vv4",
           "timeMs": 227878.75,
           "type": "pitchBend",
           "data": [
@@ -10477,12 +10112,10 @@
             109,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227878.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_06h9q2a49",
           "timeMs": 227928.75,
           "type": "pitchBend",
           "data": [
@@ -10490,12 +10123,10 @@
             105,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227928.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_c5nq157le",
           "timeMs": 227978.75,
           "type": "pitchBend",
           "data": [
@@ -10503,12 +10134,10 @@
             101,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 227978.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_0t5dyzkpy",
           "timeMs": 228028.75,
           "type": "pitchBend",
           "data": [
@@ -10516,12 +10145,10 @@
             97,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228028.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_edhsvprzm",
           "timeMs": 228078.75,
           "type": "pitchBend",
           "data": [
@@ -10529,12 +10156,10 @@
             93,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228078.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_41gs55439",
           "timeMs": 228128.75,
           "type": "pitchBend",
           "data": [
@@ -10542,12 +10167,10 @@
             90,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228128.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_9badmm68s",
           "timeMs": 228178.75,
           "type": "pitchBend",
           "data": [
@@ -10555,12 +10178,10 @@
             86,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228178.75
         },
         {
-          "id": "gliss_170_seg1_1771117409281_7y0hnyonq",
           "timeMs": 228230.83333333334,
           "type": "pitchBend",
           "data": [
@@ -10568,12 +10189,10 @@
             82,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228230.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_nuir2k0js",
           "timeMs": 228280.83333333334,
           "type": "pitchBend",
           "data": [
@@ -10581,12 +10200,10 @@
             79,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228280.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_q1ovwmlyb",
           "timeMs": 228330.83333333334,
           "type": "pitchBend",
           "data": [
@@ -10594,12 +10211,10 @@
             76,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228330.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_mxay2x1la",
           "timeMs": 228380.83333333334,
           "type": "pitchBend",
           "data": [
@@ -10607,12 +10222,10 @@
             73,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228380.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_diomi3l0k",
           "timeMs": 228430.83333333334,
           "type": "pitchBend",
           "data": [
@@ -10620,12 +10233,10 @@
             70,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228430.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_gkaos25pv",
           "timeMs": 228480.83333333334,
           "type": "pitchBend",
           "data": [
@@ -10633,12 +10244,10 @@
             67,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228480.83333333334
         },
         {
-          "id": "gliss_170_seg1_1771117409281_9haguzc80",
           "timeMs": 228532.91666666666,
           "type": "pitchBend",
           "data": [
@@ -10646,12 +10255,10 @@
             64,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228532.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_4yr44koqa",
           "timeMs": 228582.91666666666,
           "type": "pitchBend",
           "data": [
@@ -10659,12 +10266,10 @@
             61,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228582.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_atwi1dppx",
           "timeMs": 228632.91666666666,
           "type": "pitchBend",
           "data": [
@@ -10672,12 +10277,10 @@
             59,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228632.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_53gs67q15",
           "timeMs": 228682.91666666666,
           "type": "pitchBend",
           "data": [
@@ -10685,12 +10288,10 @@
             56,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228682.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_wbgbm64yn",
           "timeMs": 228732.91666666666,
           "type": "pitchBend",
           "data": [
@@ -10698,12 +10299,10 @@
             54,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228732.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_uuc0djp8y",
           "timeMs": 228782.91666666666,
           "type": "pitchBend",
           "data": [
@@ -10711,12 +10310,10 @@
             52,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228782.91666666666
         },
         {
-          "id": "gliss_170_seg1_1771117409281_jccizjii4",
           "timeMs": 228835,
           "type": "pitchBend",
           "data": [
@@ -10724,12 +10321,10 @@
             49,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228835
         },
         {
-          "id": "gliss_170_seg1_1771117409281_dtlksf9ra",
           "timeMs": 228885,
           "type": "pitchBend",
           "data": [
@@ -10737,12 +10332,10 @@
             47,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228885
         },
         {
-          "id": "gliss_170_seg1_1771117409281_76lzlmpkt",
           "timeMs": 228935,
           "type": "pitchBend",
           "data": [
@@ -10750,12 +10343,10 @@
             45,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228935
         },
         {
-          "id": "gliss_170_seg1_1771117409281_4kdsqvae8",
           "timeMs": 228985,
           "type": "pitchBend",
           "data": [
@@ -10763,12 +10354,10 @@
             43,
             64
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228985
         },
         {
-          "id": "gliss_170_seg1_1771117409281_j4kqjhaqh",
           "timeMs": 228985,
           "type": "noteOff",
           "data": [
@@ -10776,7 +10365,6 @@
             61,
             0
           ],
-          "sourceCurve": 170,
           "snippetId": 204,
           "timestamp": 228985
         }
@@ -97915,659 +97503,6 @@
           }
         },
         {
-          "id": 163,
-          "name": "CRV_20260213_163217",
-          "startSeconds": 221,
-          "endSeconds": 227,
-          "y1": 10,
-          "y2": 0.40000000000000013,
-          "gTrack": "2",
-          "color": "limeGreen",
-          "fillMode": "bottom",
-          "section": "bottom",
-          "page": 27,
-          "x1": 802.375,
-          "y1Pixel": 90,
-          "x2": 1490.125,
-          "y2Pixel": 168.72,
-          "origY1Pixel": 90,
-          "origY2Pixel": 168.72,
-          "tension": 0,
-          "slope": -1.6787684449972735,
-          "model": "logarithmic",
-          "trackDims": {
-            "y": 90,
-            "height": 82
-          },
-          "curveData": {
-            "startTime": 221,
-            "endTime": 227,
-            "sampleInterval": 0.01,
-            "samples": [
-              1,
-              0.9865707271468469,
-              0.9731467091392149,
-              0.9597331926011172,
-              0.9463354077405288,
-              0.9329585602096816,
-              0.9196078230466969,
-              0.9062883287246054,
-              0.8930051613342226,
-              0.8797633489255652,
-              0.866567856031616,
-              0.853423576398244,
-              0.8403353259419268,
-              0.8273078359556909,
-              0.8143457465833744,
-              0.8014536005795825,
-              0.7886358373722282,
-              0.7758967874419477,
-              0.7632406670323262,
-              0.7506715732021743,
-              0.7381934792294015,
-              0.725810230375293,
-              0.7135255400152936,
-              0.7013429861407103,
-              0.689266008235006,
-              0.6772979045257244,
-              0.6654418296115066,
-              0.653700792462992,
-              0.6420776547939686,
-              0.6305751297977062,
-              0.6191957812429404,
-              0.6079420229217726,
-              0.5968161184405814,
-              0.5858201813447896,
-              0.574956175566433,
-              0.5642259161825891,
-              0.5536310704727262,
-              0.5431731592614671,
-              0.5328535585326561,
-              0.5226735013009289,
-              0.5126340797255019,
-              0.5027362474513907,
-              0.4929808221622207,
-              0.48336848832962853,
-              0.47389980014338273,
-              0.4645751846063757,
-              0.4553949447794726,
-              0.4463592631605868,
-              0.43746820518262486,
-              0.4287217228159108,
-              0.4201196582603216,
-              0.41166174771279296,
-              0.40334762519694023,
-              0.395176826441337,
-              0.38714879279352676,
-              0.37926287515801205,
-              0.3715183379463689,
-              0.3639143630282574,
-              0.35645005367327576,
-              0.34912443847360153,
-              0.34193647523800785,
-              0.3348850548490111,
-              0.32796900507494575,
-              0.32118709432939474,
-              0.3145380353715572,
-              0.30802048894103007,
-              0.3016330673216079,
-              0.29537433782874256,
-              0.2892428262165059,
-              0.2832370199998968,
-              0.2773553716888766,
-              0.2715963019314662,
-              0.26595820256323144,
-              0.26043943956095195,
-              0.25503835589913626,
-              0.2497532743079841,
-              0.24458249993181447,
-              0.23952432288772463,
-              0.2345770207241693,
-              0.2297388607794706,
-              0.2250081024409405,
-              0.22038299930516925,
-              0.21586180124028997,
-              0.2114427563516177,
-              0.20712411285187993,
-              0.2029041208374719,
-              0.19878103397265234,
-              0.1947531110834052,
-              0.19081861766283148,
-              0.18697582729037343,
-              0.18322302296685844,
-              0.17955849836774984,
-              0.17598055901675713,
-              0.1724875233823846,
-              0.16907772389973608,
-              0.16574950791993914,
-              0.16250123858984122,
-              0.1593312956643591,
-              0.15623807625389063,
-              0.15321999550943022,
-              0.15027548724776163,
-              0.1474030045191016,
-              0.14460102011976217,
-              0.14186802705213686,
-              0.13920253893428924,
-              0.1366030903615958,
-              0.13406823722262673,
-              0.1315965569714187,
-              0.12918664885843067,
-              0.12683713412222486,
-              0.12454665614386662,
-              0.12231388056616133,
-              0.12013749537960161,
-              0.118016210976848,
-              0.11594876017768196,
-              0.11393389822608302,
-              0.11197040276120418,
-              0.11005707376378082,
-              0.1081927334796643,
-              0.10637622632193333,
-              0.10460641875299725,
-              0.10288219914817998,
-              0.10120247764207202,
-              0.09956618595889033,
-              0.09797227722815882,
-              0.09641972578683189,
-              0.09490752696894089,
-              0.09343469688390615,
-              0.09200027218448914,
-              0.09060330982530895,
-              0.0892428868129177,
-              0.08791809994826105,
-              0.08662806556231917,
-              0.08537191924577447,
-              0.08414881557341014,
-              0.08295792782390721,
-              0.08179844769576028,
-              0.0806695850199024,
-              0.07957056746959346,
-              0.07850064026818493,
-              0.07745906589522422,
-              0.07644512379142276,
-              0.07545811006288872,
-              0.07449733718511198,
-              0.07356213370706244,
-              0.07265184395575341,
-              0.07176582774165885,
-              0.07090346006528014,
-              0.0700641308251374,
-              0.06924724452750197,
-              0.06845221999810203,
-              0.06767849009601301,
-              0.0669255014299891,
-              0.06619271407740923,
-              0.06547960130599917,
-              0.06478564929852992,
-              0.06411035688062072,
-              0.06345323525176272,
-              0.0628138077197169,
-              0.06219160943837765,
-              0.06158618714917552,
-              0.06099709892614136,
-              0.06042391392468227,
-              0.059866212134118246,
-              0.05932358413406691,
-              0.05879563085468964,
-              0.05828196334085545,
-              0.057782202520229364,
-              0.057295978975327344,
-              0.056822932719545416,
-              0.05636271297715301,
-              0.05591497796727962,
-              0.05547939469187757,
-              0.05505563872764052,
-              0.054643394021888,
-              0.05424235269238464,
-              0.05385221483106417,
-              0.05347268831165175,
-              0.053103488601146,
-              0.05274433857511862,
-              0.05239496833681645,
-              0.05205511504001925,
-              0.05172452271560235,
-              0.05140294210178398,
-              0.05109013047800015,
-              0.05078585150235726,
-              0.050489875052628586,
-              0.05020197707074181,
-              0.04992193941069589,
-              0.049649549689878,
-              0.04938460114371057,
-              0.049126892483591034,
-              0.04887622775805445,
-              0.048632416217124774,
-              0.048395272179790005,
-              0.048164614904545044,
-              0.04794026846295674,
-              0.04772206161619563,
-              0.04750982769446843,
-              0.047303404479314914,
-              0.04710263408870452,
-              0.04690736286487651,
-              0.04671744126488009,
-              0.0465327237537545,
-              0.04635306870029432,
-              0.04617833827535467,
-              0.04600839835264103,
-              0.045843118411926786,
-              0.0456823714446567,
-              0.0455260338618827,
-              0.04537398540447679,
-              0.04522610905557889,
-              0.0450822909552302,
-              0.044942420317138465,
-              0.044806389347535114,
-              0.04467409316607296,
-              0.044545429728721775,
-              0.04442029975261208,
-              0.044298606642788285,
-              0.04418025642082524,
-              0.04406515765526153,
-              0.04395322139381386,
-              0.04384436109732792,
-              0.04373849257542106,
-              0.043635533923785386,
-              0.04353540546310497,
-              0.04343802967955024,
-              0.04334333116681366,
-              0.04325123656964969,
-              0.043161674528877536,
-              0.04307457562781947,
-              0.04298987234013396,
-              0.04290749897900903,
-              0.04282739164768723,
-              0.04274948819128632,
-              0.042673728149880796,
-              0.04260005271282019,
-              0.04252840467424723,
-              0.042458728389787814,
-              0.04239096973438383,
-              0.04232507606124036,
-              0.042260996161858744,
-              0.042198680227126584,
-              0.042138079809440954,
-              0.04207914778583688,
-              0.04202183832209394,
-              0.04196610683780011,
-              0.04191190997234395,
-              0.04185920555181433,
-              0.041807952556782824,
-              0.04175811109094707,
-              0.04170964235061214,
-              0.04166250859498799,
-              0.04161667311728401,
-              0.04157210021657565,
-              0.04152875517042809,
-              0.04148660420825445,
-              0.041445614485388416,
-              0.041405754057855515,
-              0.04136699185782278,
-              0.04132929766970883,
-              0.041292642106938726,
-              0.04125699658932469,
-              0.04122233332105796,
-              0.0411886252692939,
-              0.04115584614331602,
-              0.04112397037426396,
-              0.041092973095407825,
-              0.04106283012295875,
-              0.04103351793739707,
-              0.04100501366530762,
-              0.04097729506170611,
-              0.040950340492846515,
-              0.04092412891949293,
-              0.04089863988064679,
-              0.040873853477716326,
-              0.040849750359114534,
-              0.04082631170527706,
-              0.040803519214087536,
-              0.040781355086698556,
-              0.040759802013738966,
-              0.04073884316189691,
-              0.0407184621608675,
-              0.040698643090657405,
-              0.040679370469233755,
-              0.04066062924051128,
-              0.04064240476266612,
-              0.040624682796768896,
-              0.04060744949572792,
-              0.040590691393533995,
-              0.04057439539479912,
-              0.040558548764581426,
-              0.040543139118486504,
-              0.04052815441304147,
-              0.04051358293633045,
-              0.040499413298887066,
-              0.040485634424835104,
-              0.04047223554327284,
-              0.04045920617989196,
-              0.04044653614882665,
-              0.04043421554472526,
-              0.04042223473503925,
-              0.04041058435252398,
-              0.0403992552879433,
-              0.04038823868297603,
-              0.04037752592331567,
-              0.040367108631958915,
-              0.04035697866267951,
-              0.040347128093679685,
-              0.0403375492214163,
-              0.04032823455459633,
-              0.04031917680833763,
-              0.04031036889848816,
-              0.040301803936103386,
-              0.04029347522207316,
-              0.040285376241897985,
-              0.04027750066060731,
-              0.040269842317817495,
-              0.04026239522292674,
-              0.04025515355044018,
-              0.04024811163542463,
-              0.040241263969088004,
-              0.040234605194479856,
-              0.04022813010231041,
-              0.04022183362688403,
-              0.040215710842144925,
-              0.0402097569578318,
-              0.040203967315736944,
-              0.04019833738606993,
-              0.040192862763919535,
-              0.040187539165814634,
-              0.040182362426378404,
-              0.04017732849507516,
-              0.040172433433045884,
-              0.04016767341003291,
-              0.0401630447013861,
-              0.04015854368515426,
-              0.040154166839254435,
-              0.04014991073872087,
-              0.04014577205302805,
-              0.04014174754348887,
-              0.040137834060723354,
-              0.040134028542197164,
-              0.040130328009829186,
-              0.04012672956766272,
-              0.04012323039960286,
-              0.040119827767214455,
-              0.04011651900758262,
-              0.04011330153123038,
-              0.0401101728200941,
-              0.040107130425555804,
-              0.04010417196652838,
-              0.04010129512759364,
-              0.04009849765719231,
-              0.040095777365864005,
-              0.040093132124534026,
-              0.04009055986284993,
-              0.040088058567561036,
-              0.04008562628094592,
-              0.04008326109927951,
-              0.04008096117134574,
-              0.04007872469698903,
-              0.04007654992570642,
-              0.040074435155278976,
-              0.04007237873043956,
-              0.04007037904157895,
-              0.04006843452348652,
-              0.04006654365412565,
-              0.04006470495344372,
-              0.04006291698221376,
-              0.040061178340909276,
-              0.040059487668608784,
-              0.040057843641931545,
-              0.040056244974002064,
-              0.04005469041344334,
-              0.04005317874339853,
-              0.04005170878057762,
-              0.04005027937433281,
-              0.040048889405757904,
-              0.04004753778681236,
-              0.04004622345947095,
-              0.040044945394895226,
-              0.04004370259262857,
-              0.04004249407981364,
-              0.04004131891043128,
-              0.04004017616455946,
-              0.040039064947654524,
-              0.04003798438985051,
-              0.040036933645278494,
-              0.04003591189140521,
-              0.04003491832838846,
-              0.04003395217845229,
-              0.04003301268527759,
-              0.040032099113410324,
-              0.04003121074768634,
-              0.040030346892671376,
-              0.040029506872116594,
-              0.040028690028430014,
-              0.04002789572216159,
-              0.04002712333150227,
-              0.04002637225179828,
-              0.04002564189507685,
-              0.040024931689587095,
-              0.04002424107935154,
-              0.04002356952373198,
-              0.04002291649700551,
-              0.040022281487953504,
-              0.04002166399946139,
-              0.04002106354812929,
-              0.040020479663894326,
-              0.04001991188966236,
-              0.040019359780949615,
-              0.040018822905536044,
-              0.04001830084312563,
-              0.040017793185018746,
-              0.040017299533791295,
-              0.04001681950298419,
-              0.040016352716800374,
-              0.040015898809810935,
-              0.04001545742666923,
-              0.04001502822183256,
-              0.04001461085929181,
-              0.040014205012308235,
-              0.04001381036315754,
-              0.040013426602881985,
-              0.04001305343104766,
-              0.04001269055550982,
-              0.04001233769218393,
-              0.040011994564823294,
-              0.04001166090480335,
-              0.040011336450910595,
-              0.040011020949138776,
-              0.04001071415248936,
-              0.04001041582077913,
-              0.04001012572045115,
-              0.04000984362439275,
-              0.040009569311757254,
-              0.04000930256779145,
-              0.04000904318366705,
-              0.040008790956317486,
-              0.04000854568827916,
-              0.04000830718753656,
-              0.04000807526737171,
-              0.04000784974621885,
-              0.04000763044752109,
-              0.040007417199593553,
-              0.04000720983548767,
-              0.04000700819286185,
-              0.04000681211385293,
-              0.040006621444953594,
-              0.04000643603689191,
-              0.04000625574451466,
-              0.04000608042667353,
-              0.040005909946114415,
-              0.040005744169370194,
-              0.04000558296665635,
-              0.04000542621176928,
-              0.04000527378198737,
-              0.040005125557975085,
-              0.040004981423689356,
-              0.040004841266289226,
-              0.04000470497604669,
-              0.04000457244626143,
-              0.04000444357317745,
-              0.040004318255900784,
-              0.04000419639632191,
-              0.040004077899037926,
-              0.04000396267127826,
-              0.04000385062283229,
-              0.040003741665977754,
-              0.04000363571541343,
-              0.040003532688191346,
-              0.040003432503652125,
-              0.04000333508336207,
-              0.040003240351051295,
-              0.040003148232554575,
-              0.04000305865575293,
-              0.04000297155051724,
-              0.04000288684865305,
-              0.040002804483848076,
-              0.040002724391619116,
-              0.04000264650926233,
-              0.04000257077580427,
-              0.04000249713195314,
-              0.04000242552005373,
-              0.04000235588404133,
-              0.04000228816939844,
-              0.040002222323111125,
-              0.04000215829362885,
-              0.04000209603082294,
-              0.040002035485948384,
-              0.04000197661160454,
-              0.040001919361698945,
-              0.040001863691410566,
-              0.04000180955715582,
-              0.04000175691655272,
-              0.040001705728389236,
-              0.0400016559525902,
-              0.040001607550186336,
-              0.040001560483283405,
-              0.04000151471503299,
-              0.040001470209603096,
-              0.040001426932150475,
-              0.04000138484879345,
-              0.04000134392658472,
-              0.04000130413348679,
-              0.04000126543834537,
-              0.040001227810866014,
-              0.040001191221590626,
-              0.04000115564187312,
-              0.040001121043858334,
-              0.04000108740045949,
-              0.04000105468533721,
-              0.04000102287287888,
-              0.04000099193817841,
-              0.04000096185701718,
-              0.0400009326058447,
-              0.040000904161760165,
-              0.04000087650249473,
-              0.04000084960639394,
-              0.04000082345240086,
-              0.04000079802003953,
-              0.040000773289398994,
-              0.04000074924111763,
-              0.040000725856367936,
-              0.04000070311684212,
-              0.040000681004737415,
-              0.04000065950274223,
-              0.040000638594022475,
-              0.04000061826220902,
-              0.04000059849138382,
-              0.04000057926606848,
-              0.04000056057121126,
-              0.04000054239217621,
-              0.04000052471473081,
-              0.04000050752503548,
-              0.04000049080963208,
-              0.04000047455543465,
-              0.04000045874971736,
-              0.040000443380106,
-              0.04000042843456775,
-              0.04000041390140163,
-              0.040000399769229644,
-              0.040000386026987744,
-              0.040000372663917094,
-              0.04000035966955595,
-              0.04000034703373068,
-              0.04000033474654885,
-              0.04000032279839072,
-              0.040000311179902104,
-              0.040000299881987056,
-              0.040000288895800096,
-              0.040000278212740326,
-              0.04000026782444399,
-              0.04000025772277804,
-              0.04000024789983392,
-              0.0400002383479211,
-              0.040000229059561465,
-              0.04000022002748305,
-              0.040000211244614836,
-              0.040000202704080556,
-              0.04000019439919389,
-              0.0400001863234527,
-              0.04000017847053472,
-              0.04000017083429197,
-              0.04000016340874579,
-              0.040000156188082725,
-              0.040000149166649845,
-              0.040000142338950107,
-              0.040000135699637895,
-              0.04000012924351537,
-              0.04000012296552802,
-              0.04000011686076088,
-              0.04000011092443445,
-              0.04000010515190111,
-              0.04000009953864159,
-              0.04000009408026117,
-              0.04000008877248673,
-              0.040000083611162585,
-              0.04000007859224797,
-              0.04000007371181369,
-              0.04000006896603858,
-              0.04000006435120751,
-              0.04000005986370725,
-              0.0400000555000245,
-              0.04000005125674311,
-              0.04000004713054084,
-              0.04000004311818761,
-              0.04000003921654183,
-              0.04000003542254893,
-              0.04000003173323863,
-              0.040000028145722566,
-              0.0400000246571921,
-              0.040000021264915975,
-              0.04000001796623831,
-              0.04000001475857684,
-              0.04000001163942002,
-              0.04000000860632602,
-              0.04000000565692008,
-              0.04000000278889326,
-              0.040000000000000036
-            ]
-          },
-          "createdAt": 1771018337853,
-          "elements": {
-            "group": {},
-            "path": {},
-            "hitPath": {},
-            "startPoint": {},
-            "endPoint": {},
-            "boundingBox": {},
-            "continuationGroupTop": {},
-            "continuationPathTop": {},
-            "continuationHitPathTop": {},
-            "previewPath": {},
-            "previewHitPath": {}
-          },
-          "continuationSegment": {
-            "page": 28,
-            "x1": 0,
-            "x2": 573.125
-          }
-        },
-        {
           "id": 164,
           "name": "CRV_20260213_164651",
           "startSeconds": 227.3,
@@ -100729,9 +99664,662 @@
               "durationMs": 7599.9999999999945
             }
           ]
+        },
+        {
+          "id": 171,
+          "name": "CRV_20260214_202653",
+          "startSeconds": 221,
+          "endSeconds": 227,
+          "y1": 10,
+          "y2": 0.19999999999999835,
+          "gTrack": "2",
+          "color": "limeGreen",
+          "fillMode": "bottom",
+          "section": "bottom",
+          "page": 27,
+          "x1": 802.375,
+          "y1Pixel": 90,
+          "x2": 1490.125,
+          "y2Pixel": 170.36,
+          "origY1Pixel": 90,
+          "origY2Pixel": 170.36,
+          "tension": 0,
+          "slope": -0.42249799788713194,
+          "model": "logarithmic",
+          "trackDims": {
+            "y": 90,
+            "height": 82
+          },
+          "curveData": {
+            "startTime": 221,
+            "endTime": 227,
+            "sampleInterval": 0.01,
+            "samples": [
+              1,
+              0.9964471877714214,
+              0.9928944636233986,
+              0.9893419156277834,
+              0.98578963183893,
+              0.9822377002849967,
+              0.9786862089592522,
+              0.9751352458112997,
+              0.9715848987383997,
+              0.9680352555768047,
+              0.9644864040930153,
+              0.9609384319751425,
+              0.9573914268242858,
+              0.9538454761458393,
+              0.9503006673409182,
+              0.9467570876977476,
+              0.9432148243831345,
+              0.9396739644338652,
+              0.9361345947482197,
+              0.9325968020775164,
+              0.9290606730175963,
+              0.9255262940004294,
+              0.921993751285757,
+              0.9184631309526782,
+              0.9149345188913649,
+              0.911408000794816,
+              0.9078836621505625,
+              0.9043615882325056,
+              0.9008418640927981,
+              0.8973245745536836,
+              0.8938098041994712,
+              0.8902976373685605,
+              0.8867881581454276,
+              0.8832814503527523,
+              0.8797775975436,
+              0.8762766829935691,
+              0.8727787896930842,
+              0.8692840003397487,
+              0.8657923973306673,
+              0.8623040627549284,
+              0.8588190783860913,
+              0.855337525674795,
+              0.851859485741335,
+              0.8483850393683949,
+              0.8449142669938478,
+              0.8414472487035352,
+              0.8379840642242091,
+              0.834524792916544,
+              0.8310695137681332,
+              0.8276183053866498,
+              0.8241712459930821,
+              0.8207284134149577,
+              0.817289885079734,
+              0.8138557380082678,
+              0.810426048808277,
+              0.8070008936679709,
+              0.8035803483497641,
+              0.800164488183984,
+              0.7967533880627524,
+              0.7933471224339503,
+              0.7899457652951822,
+              0.7865493901879153,
+              0.7831580701917052,
+              0.7797718779184251,
+              0.7763908855066786,
+              0.7730151646162478,
+              0.7696447864226876,
+              0.7662798216119179,
+              0.7629203403749922,
+              0.7595664124029622,
+              0.7562181068817474,
+              0.7528754924871867,
+              0.7495386373801843,
+              0.7462076092018658,
+              0.7428824750689155,
+              0.7395633015690096,
+              0.7362501547562634,
+              0.732943100146858,
+              0.7296422027147674,
+              0.7263475268874968,
+              0.723059136542006,
+              0.7197770950007306,
+              0.7165014650276178,
+              0.7132323088243464,
+              0.7099696880266466,
+              0.7067136637006348,
+              0.7034642963393327,
+              0.7002216458592868,
+              0.6969857715972043,
+              0.6937567323067821,
+              0.6905345861555805,
+              0.6873193907220534,
+              0.684111202992586,
+              0.6809100793587157,
+              0.6777160756144549,
+              0.6745292469536295,
+              0.671349647967401,
+              0.6681773326418894,
+              0.6650123543558123,
+              0.6618547658783073,
+              0.6587046193668527,
+              0.6555619663652068,
+              0.6524268578015275,
+              0.64929934398659,
+              0.6461794746120227,
+              0.6430672987487229,
+              0.6399628648453677,
+              0.6368662207269447,
+              0.6337774135934582,
+              0.6306964900187335,
+              0.6276234959492354,
+              0.6245584767030649,
+              0.621501476969048,
+              0.6184525408058429,
+              0.6154117116412279,
+              0.6123790322714291,
+              0.6093545448605964,
+              0.6063382909402829,
+              0.6033303114090951,
+              0.6003306465324338,
+              0.5973393359422484,
+              0.5943564186369595,
+              0.591381932981469,
+              0.5884159167071823,
+              0.5854584069121966,
+              0.5825094400615748,
+              0.5795690519876298,
+              0.576637277890371,
+              0.5737141523380356,
+              0.5707997092676274,
+              0.5678939819856161,
+              0.5649970031687167,
+              0.5621088048646781,
+              0.5592294184932254,
+              0.5563588748470826,
+              0.553497204093,
+              0.5506444357729345,
+              0.5478005988053066,
+              0.5449657214862592,
+              0.5421398314910759,
+              0.5393229558756223,
+              0.5365151210779112,
+              0.5337163529196587,
+              0.5309266766079861,
+              0.5281461167371899,
+              0.5253746972905118,
+              0.5226124416420483,
+              0.519859372558728,
+              0.5171155122022848,
+              0.5143808821313676,
+              0.5116555033037151,
+              0.5089393960783228,
+              0.5062325802177458,
+              0.5035350748904586,
+              0.5008468986732113,
+              0.4981680695535107,
+              0.49549860493216225,
+              0.4928385216257999,
+              0.4901878358695413,
+              0.4875465633196988,
+              0.4849147190564761,
+              0.48229231758678726,
+              0.47967937284712714,
+              0.4770758982064256,
+              0.4744819064690283,
+              0.47189740987768003,
+              0.4693224201166021,
+              0.4667569483145412,
+              0.46420100504793427,
+              0.4616546003441133,
+              0.4591177436844932,
+              0.4565904440078643,
+              0.4540727097137298,
+              0.45156454866561613,
+              0.4490659681944904,
+              0.4465769751022153,
+              0.44409757566497776,
+              0.4416277756368183,
+              0.4391675802531956,
+              0.43671699423452326,
+              0.43427602178980285,
+              0.4318446666202883,
+              0.42942293192312253,
+              0.4270108203950629,
+              0.42460833423623967,
+              0.4222154751538796,
+              0.41983224436611766,
+              0.4174586426058394,
+              0.4150946701244823,
+              0.41274032669593386,
+              0.4103956116204114,
+              0.40806052372840396,
+              0.4057350613845706,
+              0.403419222491719,
+              0.401113004494803,
+              0.3988164043848824,
+              0.39652941870315517,
+              0.39425204354501286,
+              0.3919842745640483,
+              0.3897261069761402,
+              0.3874775355635508,
+              0.3852385546789797,
+              0.38300915824968773,
+              0.3807893397816332,
+              0.3785790923635607,
+              0.3763784086711589,
+              0.3741872809712252,
+              0.372005701125785,
+              0.3698336605962719,
+              0.3676711504477178,
+              0.36551816135289084,
+              0.36337468359649505,
+              0.3612407070793743,
+              0.3591162213226652,
+              0.3570012154720136,
+              0.3548956783017557,
+              0.3527995982191391,
+              0.35071296326848256,
+              0.3486357611353902,
+              0.34656797915096405,
+              0.34450960429596433,
+              0.34246062320501747,
+              0.34042102217082304,
+              0.3383907871483045,
+              0.3363699037588075,
+              0.33435835729429386,
+              0.3323561327214779,
+              0.33036321468600915,
+              0.328379587516647,
+              0.32640523522937603,
+              0.32444014153156886,
+              0.3224842898261352,
+              0.32053766321561306,
+              0.3186002445063031,
+              0.3166720162123885,
+              0.31475296055999724,
+              0.31284305949130187,
+              0.3109422946686068,
+              0.30905064747837463,
+              0.3071680990352945,
+              0.30529463018630343,
+              0.30343022151462673,
+              0.30157485334375034,
+              0.2997285057414272,
+              0.29789115852366654,
+              0.29606279125866186,
+              0.2942433832707495,
+              0.29243291364434865,
+              0.29063136122784183,
+              0.2888387046374803,
+              0.2870549222612738,
+              0.28527999226281586,
+              0.2835138925851365,
+              0.28175660095453536,
+              0.2800080948843505,
+              0.2782683516787534,
+              0.27653734843652233,
+              0.2748150620547535,
+              0.2731014692325928,
+              0.2713965464749497,
+              0.2697002700961434,
+              0.26801261622357253,
+              0.2663335608013635,
+              0.2646630795939525,
+              0.2630011481896939,
+              0.2613477420044149,
+              0.2597028362849817,
+              0.2580664061127881,
+              0.25643842640726877,
+              0.25481887192938524,
+              0.25320771728504987,
+              0.25160493692856356,
+              0.2500105051660326,
+              0.24842439615871803,
+              0.24684658392640269,
+              0.24527704235073267,
+              0.24371574517849404,
+              0.242162666024904,
+              0.2406177783768788,
+              0.23908105559623327,
+              0.23755247092289844,
+              0.2360319974781102,
+              0.23451960826753526,
+              0.23301527618440954,
+              0.23151897401264965,
+              0.23003067442990288,
+              0.22855035001060497,
+              0.2270779732290159,
+              0.22561351646218875,
+              0.2241569519929556,
+              0.22270825201286126,
+              0.22126738862509565,
+              0.2198343338473585,
+              0.2184090596147339,
+              0.2169915377825391,
+              0.21558174012911036,
+              0.21417963835859577,
+              0.2127852041037256,
+              0.21139840892851647,
+              0.21001922433098585,
+              0.2086476217458405,
+              0.20728357254710128,
+              0.20592704805073792,
+              0.2045780195172756,
+              0.20323645815434155,
+              0.20190233511921785,
+              0.20057562152136865,
+              0.19925628842490717,
+              0.197944306851068,
+              0.19663964778065435,
+              0.19534228215642513,
+              0.19405218088548837,
+              0.19276931484166815,
+              0.19149365486781267,
+              0.19022517177811193,
+              0.18896383636036773,
+              0.18770961937825859,
+              0.1864624915735431,
+              0.18522242366826935,
+              0.18398938636695816,
+              0.18276335035872815,
+              0.1815442863194271,
+              0.18033216491373838,
+              0.17912695679722812,
+              0.17792863261840064,
+              0.17673716302072595,
+              0.17555251864461363,
+              0.1743746701293888,
+              0.17320358811524683,
+              0.17203924324514897,
+              0.17088160616672565,
+              0.16973064753415423,
+              0.1685863380099818,
+              0.16744864826695327,
+              0.1663175489898151,
+              0.16519301087706573,
+              0.1640750046427104,
+              0.16296350101799095,
+              0.16185847075306514,
+              0.16075988461869262,
+              0.15966771340787667,
+              0.15858192793750514,
+              0.15750249904993263,
+              0.15642939761456942,
+              0.15536259452944767,
+              0.15430206072273533,
+              0.15324776715425592,
+              0.15219968481698543,
+              0.1511577847384984,
+              0.15012203798242052,
+              0.14909241564985753,
+              0.1480688888807753,
+              0.1470514288553849,
+              0.14604000679550644,
+              0.14503459396588336,
+              0.14403516167550323,
+              0.14304168127889583,
+              0.1420541241773845,
+              0.1410724618203426,
+              0.1400966657064291,
+              0.13912670738477728,
+              0.13816255845618874,
+              0.137204190574307,
+              0.13625157544674582,
+              0.13530468483622504,
+              0.1343634905616704,
+              0.13342796449930905,
+              0.13249807858371943,
+              0.13157380480888548,
+              0.1306551152292319,
+              0.12974198196061548,
+              0.1288343771813233,
+              0.12793227313304967,
+              0.12703564212183283,
+              0.1261444565189963,
+              0.12525868876207158,
+              0.12437831135567912,
+              0.1235032968724159,
+              0.12263361795372452,
+              0.12176924731072136,
+              0.12091015772503078,
+              0.12005632204960204,
+              0.11920771320948564,
+              0.11836430420261723,
+              0.11752606810058275,
+              0.11669297804934564,
+              0.11586500726997995,
+              0.1150421290593866,
+              0.11422431679097211,
+              0.11341154391533614,
+              0.11260378396092752,
+              0.11180101053469993,
+              0.11100319732272823,
+              0.11021031809083137,
+              0.10942234668517936,
+              0.10863925703286348,
+              0.10786102314247581,
+              0.10708761910467068,
+              0.10631901909269248,
+              0.10555519736291075,
+              0.10479612825533835,
+              0.10404178619411864,
+              0.10329214568801715,
+              0.10254718133089924,
+              0.10180686780217563,
+              0.10107117986725389,
+              0.10034009237797659,
+              0.09961358027302658,
+              0.09889161857833995,
+              0.09817418240750464,
+              0.0974612469621291,
+              0.09675278753221628,
+              0.09604877949652568,
+              0.09534919832290523,
+              0.09465401956862995,
+              0.09396321888071979,
+              0.09327677199625439,
+              0.09259465474265849,
+              0.09191684303799375,
+              0.09124331289123777,
+              0.0905740404025368,
+              0.08990900176346261,
+              0.08924817325726009,
+              0.08859153125906716,
+              0.08793905223613963,
+              0.08729071274806732,
+              0.0866464894469623,
+              0.08600635907765408,
+              0.0853702984778747,
+              0.08473828457841737,
+              0.08411029440330209,
+              0.08348630506993171,
+              0.08286629378922206,
+              0.08225023786573882,
+              0.08163811469782634,
+              0.08102990177770941,
+              0.08042557669160455,
+              0.07982511711982032,
+              0.07922850083683419,
+              0.07863570571137879,
+              0.07804670970650829,
+              0.0774614908796677,
+              0.07688002738273636,
+              0.07630229746207906,
+              0.07572827945858918,
+              0.07515795180770846,
+              0.07459129303945544,
+              0.07402828177844423,
+              0.07346889674388313,
+              0.07291311674958001,
+              0.07236092070393896,
+              0.07181228760993796,
+              0.07126719656511171,
+              0.07072562676152938,
+              0.07018755748574934,
+              0.06965296811878385,
+              0.0691218381360551,
+              0.06859414710733192,
+              0.0680698746966738,
+              0.06754900066236857,
+              0.06703150485685094,
+              0.06651736722662716,
+              0.06600656781219516,
+              0.06549908674794536,
+              0.06499490426206977,
+              0.06449400067645739,
+              0.06399635640659151,
+              0.06350195196142983,
+              0.06301076794329008,
+              0.06252278504772923,
+              0.0620379840634091,
+              0.06155634587196501,
+              0.061077851447872034,
+              0.06060248185829342,
+              0.06013021826293685,
+              0.059661041913904866,
+              0.05919493415552979,
+              0.05873187642421662,
+              0.05827185024827941,
+              0.05781483724776315,
+              0.05736081913427338,
+              0.05690977771080097,
+              0.056461694871529966,
+              0.05601655260165628,
+              0.05557433297719894,
+              0.05513501816479849,
+              0.05469859042152203,
+              0.0542650320946646,
+              0.05383432562153567,
+              0.053406453529254994,
+              0.0529813984345372,
+              0.05255914304348064,
+              0.05213967015134002,
+              0.05172296264230791,
+              0.05130900348929224,
+              0.050897775753680485,
+              0.050489262585110106,
+              0.050083447221238475,
+              0.04968031298749753,
+              0.049279843296856085,
+              0.04888202164958155,
+              0.04848683163298462,
+              0.048094256921176304,
+              0.047704281274818405,
+              0.047316888540864355,
+              0.04693206265230587,
+              0.04654978762791784,
+              0.04617004757199061,
+              0.04579282667407103,
+              0.04541810920870004,
+              0.04504587953513872,
+              0.0446761220971027,
+              0.04430882142249348,
+              0.043943962123118796,
+              0.043581528894421906,
+              0.043221506515201735,
+              0.0428638798473393,
+              0.04250863383550996,
+              0.04215575350690448,
+              0.04180522397094821,
+              0.04145703041900972,
+              0.04111115812411659,
+              0.04076759244066985,
+              0.040426318804148154,
+              0.04008732273081983,
+              0.0397505898174525,
+              0.03941610574101373,
+              0.03908385625837907,
+              0.038753827206037705,
+              0.038426004499789834,
+              0.03810037413445122,
+              0.03777692218355522,
+              0.03745563479904779,
+              0.03713649821098752,
+              0.036819498727246436,
+              0.036504622733200875,
+              0.03619185669142966,
+              0.03588118714141164,
+              0.03557260069921475,
+              0.03526608405719234,
+              0.03496162398367442,
+              0.03465920732266303,
+              0.03435882099351828,
+              0.03406045199065166,
+              0.03376408738321901,
+              0.03346971431480461,
+              0.033177320003113464,
+              0.03288689173966253,
+              0.03259841688946352,
+              0.03231188289071374,
+              0.03202727725448595,
+              0.03174458756441112,
+              0.031463801476367736,
+              0.03118490671816987,
+              0.030907891089251294,
+              0.030632742460351525,
+              0.030359448773205955,
+              0.030087998040226882,
+              0.029818378344191765,
+              0.02955057783793047,
+              0.02928458474400819,
+              0.029020387354411703,
+              0.02875797403023872,
+              0.028497333201378594,
+              0.02823845336620079,
+              0.027981323091239574,
+              0.02772593101088383,
+              0.027472265827057196,
+              0.027220316308907866,
+              0.026970071292496622,
+              0.02672151968047931,
+              0.026474650441795533,
+              0.02622945261135856,
+              0.025985915289737926,
+              0.02574402764284922,
+              0.02550377890164468,
+              0.025265158361796325,
+              0.025028155383387984,
+              0.02479275939060488,
+              0.024558959871420316,
+              0.02432674637728649,
+              0.024096108522827397,
+              0.023867035985524643,
+              0.023639518505411572,
+              0.023413545884766185,
+              0.023189107987799384,
+              0.022966194740349888,
+              0.02274479612957836,
+              0.022524902203658215,
+              0.022306503071472306,
+              0.0220895889023055,
+              0.021874149925543707,
+              0.021660176430365552,
+              0.021447658765440747,
+              0.021236587338629653,
+              0.021026952616676864,
+              0.02081874512491233,
+              0.020611955446951824,
+              0.02040657422439307,
+              0.020202592156518873,
+              0.019999999999999796
+            ]
+          },
+          "createdAt": 1771118813528,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "startPoint": {},
+            "endPoint": {},
+            "boundingBox": {},
+            "continuationGroupTop": {},
+            "continuationPathTop": {},
+            "continuationHitPathTop": {},
+            "previewPath": {},
+            "previewHitPath": {}
+          },
+          "continuationSegment": {
+            "page": 28,
+            "x1": 0,
+            "x2": 573.125
+          }
         }
       ],
-      "nextId": 171
+      "nextId": 172
     },
     "motives": {
       "motives": [
@@ -139392,9 +138980,20 @@
           "audioFilePath": "/audio_files/PizzStorm-Cello-Mastered_1770575854839.wav",
           "color": "#CDDC39",
           "createdAt": 1770575854848
+        },
+        {
+          "id": 85,
+          "name": "Viola-LongTone-215_mastered-loweredVolume.wav",
+          "trackIndex": 2,
+          "startSeconds": 215,
+          "endSeconds": 337.782358276644,
+          "durationSeconds": 122.78235827664399,
+          "audioFilePath": "/audio_files/Viola-LongTone-215_mastered-loweredVolume_1771118248646.wav",
+          "color": "#9C27B0",
+          "createdAt": 1771118248715
         }
       ],
-      "nextId": 84
+      "nextId": 86
     },
     "gcs": {
       "gcs": [
@@ -144244,7 +143843,7 @@
     }
   ],
   "cursorState": {
-    "editCursorSeconds": 0,
+    "editCursorSeconds": 215,
     "gotoDisplaySeconds": 215,
     "leadInSeconds": 2
   }

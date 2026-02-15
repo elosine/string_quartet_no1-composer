@@ -817,12 +817,20 @@
                 </div>
                 <div class="curve-input-row">
                     <label style="width: 35px;">Start</label>
-                    <input type="text" id="ltStartPitch" class="curve-input" value="C4" style="width: 45px; font-size: 10px;" title="C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                    <input type="text" id="ltStartPitch" class="curve-input" value="C4" style="width: 45px; font-size: 10px;" placeholder="C#4" title="C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                     <label style="width: 25px; margin-left: 5px;">End</label>
-                    <input type="text" id="ltEndPitch" class="curve-input" value="G4" style="width: 45px; font-size: 10px;" title="C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                    <input type="text" id="ltEndPitch" class="curve-input" value="G4" style="width: 45px; font-size: 10px;" placeholder="Cd4" title="C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                 </div>
-                <div class="control-row" style="margin-top: 5px;">
-                    <button id="ltGoBtn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 12px;">GO</button>
+                <div class="curve-input-row" style="font-size: 9px; color: #888; margin-top: 2px;">
+                    <span># sharp, b flat, + ¼↑, d ¼↓, #+ ¾↑, bd ¾↓</span>
+                </div>
+                <div class="curve-input-row" style="margin-top: 3px;">
+                    <label style="width: 35px;">Coef</label>
+                    <input type="text" id="ltCurveCoef" class="curve-input" value="--" style="width: 50px; font-size: 10px; background: #222; color: #0f0;" readonly title="Current curve slope coefficient (read-only)">
+                </div>
+                <div class="control-row" style="margin-top: 5px; gap: 5px;">
+                    <button id="ltStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
+                    <button id="ltStep2Btn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 8px;">2: Generate</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -6890,8 +6898,12 @@
                     const trackY = this.timelineHeight + (trackIndex * trackHeight);
                     
                     // Calculate which page the snippet starts on
-                    const startActualSec = snippetData.startSeconds + leadInSeconds;
-                    const endActualSec = snippetData.endSeconds + leadInSeconds;
+                    // Fallback: compute from startTimeMs/durationMs if startSeconds/endSeconds missing
+                    const startSec = snippetData.startSeconds ?? (snippetData.startTimeMs !== undefined ? snippetData.startTimeMs / 1000 : null);
+                    const endSec = snippetData.endSeconds ?? (startSec !== null && snippetData.durationMs !== undefined ? startSec + snippetData.durationMs / 1000 : null);
+                    if (startSec === null || endSec === null) continue; // skip if no timing data
+                    const startActualSec = startSec + leadInSeconds;
+                    const endActualSec = endSec + leadInSeconds;
                     const startPage = Math.floor(startActualSec / secondsPerPage);
                     const endPage = Math.floor(endActualSec / secondsPerPage);
                     
@@ -7485,7 +7497,13 @@
                 this.clips = [];
                 this.selectedClip = null;
                 
-                // Load audio buffers for all clips
+                // Render overlays FIRST (doesn't need audio buffers)
+                // This must happen before the async audio buffer loading below,
+                // because audioContext.resume() can hang until a user gesture
+                this.renderAllAudioDisplays();
+                this.updateAudioDisplayVisibility();
+                
+                // Then load audio buffers asynchronously for playback
                 const allClips = AudioClipDatabase.getAll();
                 for (const clip of allClips) {
                     // Migrate legacy clips with embedded audioData to file-based storage
@@ -7505,10 +7523,6 @@
                         }
                     }
                 }
-                
-                // Re-render displays
-                this.renderAllAudioDisplays();
-                this.updateAudioDisplayVisibility();
             },
             
             // Migrate a legacy clip with embedded audioData to file-based storage
@@ -13980,6 +13994,12 @@
                 }
                 
                 this.coeffDisplay.textContent = text;
+                
+                // Also update Long Tone UI coefficient display
+                const ltCoefInput = document.getElementById('ltCurveCoef');
+                if (ltCoefInput) {
+                    ltCoefInput.value = slope.toFixed(2);
+                }
             },
             
             updateSelectedFromInputs() {
@@ -15561,52 +15581,109 @@
         
         // Long Tone Workflow UI Handler
         const LongToneUI = {
+            pendingCurve: null, // Stores curve from Step 1 for use in Step 2
+            
             init() {
-                const goBtn = document.getElementById('ltGoBtn');
-                if (goBtn) {
-                    goBtn.addEventListener('click', () => this.go());
+                const step1Btn = document.getElementById('ltStep1Btn');
+                const step2Btn = document.getElementById('ltStep2Btn');
+                
+                if (step1Btn) {
+                    step1Btn.addEventListener('click', () => this.step1());
                 }
-                console.log('LongToneUI initialized');
+                if (step2Btn) {
+                    step2Btn.addEventListener('click', () => this.step2());
+                }
+                console.log('LongToneUI initialized (two-phase workflow)');
             },
             
-            // Main workflow entry point - executes entire Long Tone Glissando workflow
-            // Can be called from UI (no params) or programmatically/AI prompt (with params)
-            // AI Prompt Example:
-            // LongToneUI.go({
-            //     startSeconds: 220, endSeconds: 230,
-            //     y1: 10, y2: 0, gTrack: '1',
-            //     model: 'logarithmic', slope: -1,
-            //     clef: 'cClef', startPitch: 'C4', endPitch: 'G4'
-            // })
-            async go(params = null) {
-                console.log('LongToneUI.go: Starting Long Tone Glissando workflow...', params ? '(programmatic)' : '(UI)');
+            // Step 1: Create curve only - allows user to adjust curve shape before generating
+            step1(params = null) {
+                console.log('LongToneUI.step1: Creating curve...', params ? '(programmatic)' : '(UI)');
                 
-                // Step 1: Create curve
                 const curve = this.createCurve(params);
                 if (!curve) {
-                    console.error('LongToneUI.go: Failed to create curve');
+                    console.error('LongToneUI.step1: Failed to create curve');
                     return null;
                 }
                 
+                // Store curve for Step 2
+                this.pendingCurve = curve;
+                
+                console.log('LongToneUI.step1: Curve created. Adjust shape as needed, then click "2: Generate"');
+                console.log('LongToneUI.step1: Curve ID:', curve.id, 'Name:', curve.name);
+                
+                return curve;
+            },
+            
+            // Step 2: Generate notation, SVG, MIDI using the pending curve
+            async step2(params = null) {
+                const btn = document.getElementById('ltStep2Btn');
+                const originalText = btn ? btn.textContent : '';
+                const originalBg = btn ? btn.style.background : '';
+                
+                // Use pending curve from Step 1, or find selected curve
+                let curve = this.pendingCurve;
+                
+                if (!curve) {
+                    // Try to use currently selected curve
+                    if (window.CurveMaker && CurveMaker.selectedCurve) {
+                        curve = CurveMaker.selectedCurve;
+                        console.log('LongToneUI.step2: Using selected curve:', curve.name);
+                    } else {
+                        console.error('LongToneUI.step2: No pending curve. Run Step 1 first or select a curve.');
+                        return null;
+                    }
+                }
+                
+                // Set button to generating state
+                if (btn) {
+                    btn.textContent = 'Generating...';
+                    btn.style.background = '#888';
+                    btn.disabled = true;
+                }
+                
+                console.log('LongToneUI.step2: Generating notation, SVG, and MIDI for curve:', curve.name);
+                
+                let result = null;
+                try {
+                    // Execute Steps 2a through 4
+                    result = await this.generateAll(curve, params);
+                } finally {
+                    // Restore button state (with brief "Done" indication)
+                    if (btn) {
+                        btn.textContent = '✓ Done';
+                        btn.style.background = '#4a4';
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                            btn.style.background = originalBg;
+                            btn.disabled = false;
+                        }, 1500);
+                    }
+                }
+                
+                // Clear pending curve after successful generation
+                if (result) {
+                    this.pendingCurve = null;
+                }
+                
+                return result;
+            },
+            
+            // Generate all artifacts for a given curve (Steps 2a-4)
+            async generateAll(curve, params = null) {
                 // Step 2a: Generate notation parameters
                 const notationParams = await this.generateNotation(params);
                 if (!notationParams) {
-                    console.error('LongToneUI.go: Failed to generate notation parameters');
+                    console.error('LongToneUI.generateAll: Failed to generate notation parameters');
                     return { curve };
                 }
                 
-                // Step 2b: Render LilyPond to SVG (skip if file already existed)
-                let svgResult = null;
-                if (!notationParams.fileExists) {
-                    svgResult = await this.renderGlissandoSvg(notationParams.filename);
-                    if (svgResult && svgResult.success) {
-                        console.log('LongToneUI.go: SVG rendered:', svgResult.svgPath);
-                    }
+                // Step 2b: Render LilyPond to SVG (always try - server will skip if SVG exists)
+                let svgResult = await this.renderGlissandoSvg(notationParams.filename);
+                if (svgResult && svgResult.success) {
+                    console.log('LongToneUI.generateAll: SVG ready:', svgResult.svgPath, svgResult.rendered ? '(new)' : '(existing)');
                 } else {
-                    // File existed, check if SVG also exists
-                    const baseName = notationParams.filename.replace('.ly', '');
-                    svgResult = { success: true, svgPath: `/SVG_graphics/${baseName}.svg`, skipped: true };
-                    console.log('LongToneUI.go: Using existing SVG:', svgResult.svgPath);
+                    console.error('LongToneUI.generateAll: SVG rendering failed:', svgResult?.error);
                 }
                 
                 // Step 2c: Insert SVG into score at curve position
@@ -15614,7 +15691,7 @@
                 if (svgResult && svgResult.success && svgResult.svgPath) {
                     insertedSvg = await this.insertGlissandoSvg(svgResult.svgPath, curve);
                     if (insertedSvg) {
-                        console.log('LongToneUI.go: SVG inserted into score');
+                        console.log('LongToneUI.generateAll: SVG inserted into score');
                     }
                 }
                 
@@ -15627,7 +15704,7 @@
                 });
                 
                 if (midiResult) {
-                    console.log(`LongToneUI.go: Generated ${midiResult.segments} MIDI segments`);
+                    console.log(`LongToneUI.generateAll: Generated ${midiResult.segments} MIDI segments`);
                 }
                 
                 // Step 4: Insert MIDI into score
@@ -15635,7 +15712,7 @@
                 if (midiResult && midiResult.files && midiResult.files.length > 0) {
                     midiInsertResult = await this.insertGlissandoMidi(midiResult, curve);
                     if (midiInsertResult) {
-                        console.log(`LongToneUI.go: Inserted ${midiInsertResult.inserted} MIDI segments on track ${midiInsertResult.trackIndex + 1}`);
+                        console.log(`LongToneUI.generateAll: Inserted ${midiInsertResult.inserted} MIDI segments on track ${midiInsertResult.trackIndex + 1}`);
                     }
                 }
                 
@@ -15655,7 +15732,27 @@
                     midiInserted: midiInsertResult
                 };
                 
-                console.log('LongToneUI.go: Workflow complete', JSON.stringify(result, null, 2));
+                console.log('LongToneUI.generateAll: Complete', JSON.stringify(result, null, 2));
+                
+                return result;
+            },
+            
+            // Convenience method: Run entire workflow in one call (for AI prompts)
+            // LongToneUI.go({ startSeconds: 10, endSeconds: 15, y1: 10, y2: 0, gTrack: '2', ... })
+            async go(params = null) {
+                console.log('LongToneUI.go: Running full workflow...', params ? '(programmatic)' : '(UI)');
+                
+                // Step 1: Create curve
+                const curve = this.step1(params);
+                if (!curve) {
+                    return null;
+                }
+                
+                // Steps 2-4: Generate all
+                const result = await this.generateAll(curve, params);
+                
+                // Clear pending curve
+                this.pendingCurve = null;
                 
                 return result;
             },
@@ -15694,13 +15791,13 @@
             // User: C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)
             // LilyPond: c4, cs4, bf3, cih4, ceh4, cisih4, ceseh4
             pitchToLilyPond(pitch) {
-                if (!pitch) return 'c4';
+                if (!pitch) return "c'4";
                 
                 // Parse pitch: note + accidentals + octave
                 const match = pitch.match(/^([A-Ga-g])([#b+d]*)?(\d)$/);
                 if (!match) {
                     console.warn('LongToneUI: Invalid pitch format:', pitch);
-                    return 'c4';
+                    return "c'4";
                 }
                 
                 let [, note, accidentals, octave] = match;
@@ -15716,11 +15813,18 @@
                 else if (accidentals === '#+') lpAccidental = 'sih';   // 3/4 sharp
                 else if (accidentals === 'bd') lpAccidental = 'feh';   // 3/4 flat (flat + quarter flat)
                 
-                // LilyPond octave: c' = C4, c'' = C5, c = C3, c, = C2
-                // We'll use absolute octave notation
-                const lpOctave = parseInt(octave);
+                // LilyPond octave marks: c = C3, c' = C4, c'' = C5, c, = C2, c,, = C1
+                // Base octave (no mark) = 3. Each ' raises one octave, each , lowers one.
+                const oct = parseInt(octave);
+                let lpOctave = '';
+                if (oct > 3) {
+                    lpOctave = "'".repeat(oct - 3);
+                } else if (oct < 3) {
+                    lpOctave = ','.repeat(3 - oct);
+                }
                 
-                return note + lpAccidental + lpOctave;
+                // Append '4' for quarter note duration (matches template)
+                return note + lpAccidental + lpOctave + '4';
             },
             
             // Convert clef to LilyPond format
@@ -15774,6 +15878,34 @@
                     if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
                     if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
                     
+                    // Measure actual content bounds within SVG (LilyPond SVGs have whitespace)
+                    const viewBox = svgEl.getAttribute('viewBox');
+                    let contentRightRatio = 1; // ratio of content right edge to viewBox width
+                    if (viewBox) {
+                        const vb = viewBox.split(/\s+/).map(Number);
+                        const vbWidth = vb[2]; // viewBox width
+                        // Find rightmost content edge from staff lines and note elements
+                        let maxX = 0;
+                        svgEl.querySelectorAll('line, rect, path').forEach(el => {
+                            const parent = el.parentElement;
+                            let tx = 0;
+                            if (parent && parent.tagName === 'g') {
+                                const t = parent.getAttribute('transform');
+                                if (t) {
+                                    const m = t.match(/translate\(\s*([\d.]+)/);
+                                    if (m) tx = parseFloat(m[1]);
+                                }
+                            }
+                            const x2 = parseFloat(el.getAttribute('x2') || 0);
+                            const x = parseFloat(el.getAttribute('x') || 0);
+                            const w = parseFloat(el.getAttribute('width') || 0);
+                            maxX = Math.max(maxX, tx + x2, tx + x + w);
+                        });
+                        if (maxX > 0 && vbWidth > 0) {
+                            contentRightRatio = maxX / vbWidth;
+                        }
+                    }
+                    
                     // Calculate track dimensions
                     const scoreEl = document.getElementById('ScoreTop');
                     const scoreHeight = scoreEl.clientHeight;
@@ -15787,30 +15919,40 @@
                     const scale = targetHeight / svgHeight;
                     const scaledWidth = svgWidth * scale;
                     
+                    // Calculate the visible content width (excluding SVG whitespace on right)
+                    const scaledContentWidth = scaledWidth * contentRightRatio;
+                    
                     // Calculate X position: just before curve start
-                    // Convert curve.startSeconds to X position, then offset left by scaled SVG width + small gap
+                    // Convert curve.startSeconds to X position, then offset left by scaled content width + gap
                     const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
-                    const leadIn = window.leadInSeconds || 0;
+                    const leadIn = leadInSeconds;
                     const curveDisplayTime = curve.startSeconds + leadIn;
                     const curvePageIndex = Math.floor(curveDisplayTime / secondsPerPage);
                     const curveXPercent = ((curveDisplayTime % secondsPerPage) / secondsPerPage) * 100;
                     const curveXPx = (curveXPercent / 100) * scoreWidth;
                     
-                    // Position SVG so its right edge is a few pixels before curve start
-                    const gap = 5; // pixels between SVG right edge and curve start
-                    const svgX = curveXPx - scaledWidth - gap;
+                    // Position SVG so the visible content right edge is 5px left of curve start
+                    // svgX + scaledContentWidth = curveXPx - gap
+                    const gap = 5;
+                    const svgX = curveXPx - gap - scaledContentWidth;
                     
                     // Calculate Y position: center in track
                     const track = parseInt(curve.gTrack) || 1;
                     const trackTopY = timelineHeight + ((track - 1) * trackHeight);
                     const svgY = trackTopY + (trackHeight - (svgHeight * scale)) / 2;
                     
-                    // Determine section based on page
-                    const section = curvePageIndex % 2 === 0 ? 'top' : 'bottom';
-                    
                     // Calculate startSeconds for the SVG element (for persistence)
-                    const svgXPercent = (svgX / scoreWidth) * 100;
-                    const svgStartSeconds = (curvePageIndex * secondsPerPage) + (svgXPercent / 100 * secondsPerPage) - leadIn;
+                    const svgXPercentRaw = (svgX / scoreWidth) * 100;
+                    const svgStartSeconds = (curvePageIndex * secondsPerPage) + (svgXPercentRaw / 100 * secondsPerPage) - leadIn;
+                    
+                    // Re-derive position from startSeconds (same logic as reRenderAllElements)
+                    // This ensures initial render matches what resize produces,
+                    // and correctly handles page boundaries when svgX is negative
+                    const startActual = svgStartSeconds + leadIn;
+                    const actualPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const actualSection = actualPage % 2 === 0 ? 'top' : 'bottom';
+                    const actualXPercent = ((startActual / secondsPerPage) - actualPage) * 100;
+                    const actualX = (actualXPercent / 100) * scoreWidth;
                     
                     // Create element data structure matching SVGElementManager format
                     const id = SVGElementManager.nextId++;
@@ -15832,26 +15974,26 @@
                         name: svgPath.split('/').pop().replace('.svg', ''),
                         wrapper: wrapper,
                         image: image,
-                        x: svgX,
+                        x: actualX,
                         y: svgY,
                         startSeconds: svgStartSeconds,
                         yPercent: (svgY / scoreHeight) * 100,
-                        xPercent: svgXPercent,
+                        xPercent: actualXPercent,
                         width: svgWidth,
                         height: svgHeight,
                         scale: scale,
                         baseScale: scale,
                         baseScoreWidth: scoreWidth,
                         track: track,
-                        page: curvePageIndex,
-                        section: section
+                        page: actualPage,
+                        section: actualSection
                     };
                     
                     // Add to SVGElementManager
                     SVGElementManager.elements.push(elementData);
                     SVGElementManager.updateElementTransform(elementData);
                     
-                    const targetContainer = section === 'top' 
+                    const targetContainer = actualSection === 'top' 
                         ? SVGElementManager.containerTop 
                         : SVGElementManager.containerBottom;
                     targetContainer.appendChild(wrapper);
@@ -15864,7 +16006,11 @@
                     SVGElementManager.updateVisibility();
                     
                     console.log('LongToneUI.insertGlissandoSvg: Inserted', elementData.name, 
-                        'scale:', scale.toFixed(3), 'x:', svgX.toFixed(1), 'y:', svgY.toFixed(1));
+                        'scale:', scale.toFixed(3), 'rawX:', svgX.toFixed(1), 'actualX:', actualX.toFixed(1),
+                        'curveXPx:', curveXPx.toFixed(1), 'scaledContentW:', scaledContentWidth.toFixed(1),
+                        'contentRatio:', contentRightRatio.toFixed(3),
+                        'curvePage:', curvePageIndex, 'svgPage:', actualPage, 'section:', actualSection,
+                        'curveStartSec:', curve.startSeconds, 'leadIn:', leadIn);
                     
                     return elementData;
                 } catch (err) {
@@ -16233,11 +16379,15 @@
                         }
                         
                         // Create snippet data for MidiSnippetDatabase
+                        const startSeconds = currentInsertTimeMs / 1000;
+                        const durationSeconds = segmentData.duration;
                         const snippetData = {
                             name: `Gliss seg${i + 1} @ ${curve.name}`,
                             trackIndex: trackIndex,
                             startTimeMs: currentInsertTimeMs,
-                            durationMs: segmentData.duration * 1000,
+                            durationMs: durationSeconds * 1000,
+                            startSeconds: startSeconds,
+                            endSeconds: startSeconds + durationSeconds,
                             events: events,
                             color: color,
                             sourceCurve: curve.id,

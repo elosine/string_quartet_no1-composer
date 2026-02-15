@@ -2,7 +2,13 @@
 
 **Status:** Active  
 **Last Updated:** Feb 14, 2026  
-**Current ASB Number:** ASB-000 (ready to start ASB-001)
+**Current ASB Number:** ASB-012
+
+---
+
+## Last Session Summary
+
+> Full glissando automation workflow is feature-complete (Steps 1-4: curve → notation → SVG → MIDI → insertion). All major bugs fixed: LilyPond octave notation, SVG positioning (leadInSeconds closure bug), audio display rendering (async blocking). Next: consider Tier 3 milestone + end-to-end playback test. Tier 2 commit pending (7 increments since last commit).
 
 ---
 
@@ -10,8 +16,8 @@
 
 **Date:** Feb 14, 2026  
 **Focus:** Score automation infrastructure  
-**Tier 1 Count This Session:** 1  
-**Tier 2 Threshold:** 4 increments (will suggest commit)
+**Tier 1 Count This Session:** 7 (ASB-006 through ASB-012)  
+**Tier 2 Threshold:** 4 increments → **THRESHOLD MET** (suggest Tier 2 commit)
 
 ### Session Log
 - Set up workflow methodology and documentation system
@@ -21,6 +27,13 @@
 - ASB-003: Step 1 real-time testing, y2=0 bug fix, default color to limeGreen
 - ASB-004: Long Tone Workflow UI + model/slope parameters
 - ASB-005: Step 2a - Glissando notation template + single GO button
+- ASB-006: Steps 2b-4 complete (SVG rendering, MIDI generation, score insertion)
+- ASB-007: Split GO into Step 1 (Curve) + Step 2 (Generate) buttons
+- ASB-008: Fix SVG rendering PowerShell script (Inkscape canvas-fit)
+- ASB-009: Fix MIDI snippet backward compat + startSeconds/endSeconds
+- ASB-010: Fix LilyPond octave notation (' and , marks)
+- ASB-011: Fix SVG positioning (content bounds + leadInSeconds closure bug)
+- ASB-012: Fix audio display not rendering on score load
 
 ---
 
@@ -28,8 +41,9 @@
 
 *(Items to pick up next session)*
 
-- [ ] Begin actual score building work
-- [ ] First ASB-001 increment
+- [ ] Full end-to-end test of glissando workflow (Step 1 → Step 2 → playback)
+- [ ] Update LONG_TONE_IMPLEMENTATION.md with new workflow architecture
+- [ ] Consider Tier 3 milestone: full glissando automation is feature-complete
 
 ---
 
@@ -42,6 +56,13 @@
 | ASB-003 | Step 1 parameter discovery, y2=0 bug fix, default color change | Complete |
 | ASB-004 | Long Tone Workflow UI + model/slope parameters | Complete |
 | ASB-005 | Step 2a - Glissando notation template + single GO button | Complete |
+| ASB-006 | Steps 2b-4: SVG rendering, MIDI generation, score insertion | Complete |
+| ASB-007 | Split GO into Step 1 (Curve) + Step 2 (Generate) buttons | Complete |
+| ASB-008 | Fix SVG rendering PowerShell script (Inkscape canvas-fit) | Complete |
+| ASB-009 | Fix MIDI snippet backward compat + startSeconds/endSeconds | Complete |
+| ASB-010 | Fix LilyPond octave notation (' and , marks vs numbers) | Complete |
+| ASB-011 | Fix SVG positioning (content bounds + leadInSeconds bug) | Complete |
+| ASB-012 | Fix audio display not rendering on score load | Complete |
 
 ---
 

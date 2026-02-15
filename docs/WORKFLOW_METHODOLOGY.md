@@ -71,6 +71,12 @@ Always check if new properties need to be:
 ### Console Debugging
 Use `console.debug()` instead of `console.log()` - browser extensions can interfere with console.log.
 
+### let vs var and window Access
+Variables declared with `let` are NOT accessible via `window.varName` (unlike `var`). If a function needs a module-level `let` variable, use the closure variable directly—not `window.varName || fallback`. This caused the glissando notation positioning bug (ASB-011) where `window.leadInSeconds` was always `undefined`, falling back to 0 instead of the actual 2-second lead-in.
+
+### Async Operations Blocking Visual Rendering
+Never gate visual rendering on async audio operations that depend on user gestures. Chrome's autoplay policy causes `audioContext.resume()` to hang indefinitely without a user gesture, blocking any code after `await`. Render visual elements synchronously first, then load audio data in background. (ASB-012)
+
 ---
 
 ## Ideas to Explore

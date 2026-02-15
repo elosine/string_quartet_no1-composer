@@ -190,8 +190,7 @@ Start with ASB-001 for new AI Score Building work.
 **I do:**
 1. Summarize what was accomplished
 2. Suggest Tier 2 commit if threshold met
-3. Update progress file with pending work
-4. Update "Last Updated" date
+3. Update progress file: pending work, "Last Updated" date, and **"Last Session Summary"** (2-3 line blockquote at top of progress file for instant context recovery next session)
 
 ### Workflow Insight Trigger
 **When:** A reusable pattern or lesson emerges during development

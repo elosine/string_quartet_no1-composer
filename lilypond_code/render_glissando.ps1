@@ -43,16 +43,13 @@ if (-not (Test-Path $renderedSvg)) {
 
 Write-Host "  LilyPond output: $renderedSvg"
 
-# Step 2: Crop with Inkscape and save to output directory
+# Step 2: Crop with Inkscape (fit canvas to drawing) and save to output directory
 Write-Host "  Cropping with Inkscape..."
-$croppedTemp = Join-Path $inputDir "$baseName-cropped.svg"
 
-& $inkscapePath $renderedSvg --actions="select-all;fit-canvas-to-selection;export-filename:$croppedTemp;export-plain-svg;export-do" 2>$null
+# Use Inkscape actions to fit canvas to drawing bounds, then export as plain SVG
+& $inkscapePath $renderedSvg --batch-process --actions="select-all;fit-canvas-to-drawing;export-filename:$outputSvg;export-plain-svg;export-do" 2>$null
 
-if (Test-Path $croppedTemp) {
-    # Move cropped file to output directory
-    Move-Item $croppedTemp -Destination $outputSvg -Force
-    
+if (Test-Path $outputSvg) {
     # Clean up the uncropped SVG from lilypond_code
     Remove-Item $renderedSvg -Force
     
@@ -60,8 +57,28 @@ if (Test-Path $croppedTemp) {
     Write-Host "OUTPUT:$outputSvg"  # Machine-readable output for server parsing
     exit 0
 } else {
-    Write-Host "  Error: Inkscape cropping failed"
-    # Clean up
-    if (Test-Path $renderedSvg) { Remove-Item $renderedSvg -Force }
-    exit 1
+    # Fallback: try older Inkscape CLI syntax
+    Write-Host "  Actions method failed, trying legacy..."
+    & $inkscapePath $renderedSvg --export-area-drawing --export-plain-svg --export-filename="$outputSvg" 2>$null
+    
+    if (Test-Path $outputSvg) {
+        Remove-Item $renderedSvg -Force
+        Write-Host "  Success (legacy): $outputSvg"
+        Write-Host "OUTPUT:$outputSvg"
+        exit 0
+    } else {
+        # Last resort: copy uncropped
+        Write-Host "  Inkscape crop failed, copying uncropped..."
+        Copy-Item $renderedSvg -Destination $outputSvg -Force
+        Remove-Item $renderedSvg -Force
+        
+        if (Test-Path $outputSvg) {
+            Write-Host "  Success (uncropped): $outputSvg"
+            Write-Host "OUTPUT:$outputSvg"
+            exit 0
+        } else {
+            Write-Host "  Error: Failed to create SVG"
+            exit 1
+        }
+    }
 }
