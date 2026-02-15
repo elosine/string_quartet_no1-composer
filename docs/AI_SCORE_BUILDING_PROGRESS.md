@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Feb 15, 2026  
-**Current ASB Number:** ASB-023
+**Current ASB Number:** ASB-029
 
 ---
 
@@ -15,9 +15,9 @@
 ## Current Session
 
 **Date:** Feb 15, 2026  
-**Focus:** Manual glissando SVG positioning fix (fresh approach)  
-**Tier 1 Count This Session:** 4  
-**Tier 2 Threshold:** 4 increments
+**Focus:** Glissando pitch tracking fix + SVG positioning clamp + score composition  
+**Tier 1 Count This Session:** 0 (reset after Tier 2)  
+**Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -79,6 +79,10 @@
 | ASB-023 | Add 10px Y offset to SVG positioning + update comment. Commit: ae60266 | Complete |
 | ASB-024 | Add retry logic to renderGlissandoSvg for OneDrive file locks. Commit: 60ab457 | Complete |
 | ASB-025 | Pre-step1 validation checklist in AI Glissando Prompt Guide. Commit: b0bcfb0 | Complete |
+| ASB-026 | Prompt guide copy-paste workflow + validation + AI test artifacts. Commit: 1c2c404 | Complete |
+| ASB-027 | Fix SVG reposition persistence — update trackYFraction on drag/manual input. Commit: 19eeaf5 | Complete |
+| ASB-028 | Fix glissando pitch tracking half-step logic (E-F, B-C) + re-index + UI relabel. Commit: a3d7e66 | Complete |
+| ASB-029 | Clamp glissando SVG X to page left edge (prevent off-page notation). | Complete |
 
 ---
 
@@ -99,6 +103,7 @@
 |------|-----|-------------|
 | Feb 14, 2026 | `milestone-asb-glissando-complete` | Full glissando automation: UI + AI prompt, notation, SVG, MIDI, all bugs fixed |
 | Feb 15, 2026 | `milestone-glissando-ui-prompt-good` | Glissando System UI Prompt Good. Caveat: SVG notation manual reposition may vary with different size SVGs |
+| Feb 15, 2026 | `milestone-ai-prompt-validated-copy-paste` | AI prompt tested with validation checklist + copy-paste workflow clarified |
 
 ---
 

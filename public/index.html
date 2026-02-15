@@ -16046,8 +16046,9 @@
                     const curveXPx = (curveXPercent / 100) * scoreWidth;
                     
                     // Position SVG right edge 5px left of curve start
+                    // Clamp to left edge of page so notation stays visible
                     const gap = 5;
-                    const svgX = curveXPx - gap - scaledContentWidth;
+                    const svgX = Math.max(0, curveXPx - gap - scaledContentWidth);
                     
                     // Track-relative Y positioning (survives resize correctly)
                     // trackYFraction: 0 = top of track, 0.5 = centered, 1 = bottom
