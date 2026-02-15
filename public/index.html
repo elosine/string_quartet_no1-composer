@@ -2479,6 +2479,18 @@
                 const currentPage = this.selectedElement.page || 0;
                 this.selectedElement.startSeconds = (currentPage * secondsPerPage) + (this.selectedElement.xPercent / 100 * secondsPerPage) - leadInSeconds;
                 
+                // Update trackYFraction so repositioned Y survives save/reload
+                if (this.selectedElement.track !== undefined) {
+                    const elSection = this.selectedElement.section || 'top';
+                    const elScoreEl = elSection === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(this.selectedElement.track), elScoreEl);
+                    const scaledH = this.selectedElement.height * this.selectedElement.scale;
+                    const denom = trackDims.height - scaledH;
+                    if (denom !== 0) {
+                        this.selectedElement.trackYFraction = (this.selectedElement.y - trackDims.y) / denom;
+                    }
+                }
+                
                 this.updateElementTransform(this.selectedElement);
                 this.updateUIFromSelected();
                 // Update connectors when element is moved
@@ -2527,6 +2539,19 @@
                 if (!this.selectedElement) return;
                 this.selectedElement.x = parseFloat(this.posXInput.value) || 0;
                 this.selectedElement.y = parseFloat(this.posYInput.value) || 0;
+                
+                // Update trackYFraction so repositioned Y survives save/reload
+                if (this.selectedElement.track !== undefined) {
+                    const elSection = this.selectedElement.section || 'top';
+                    const elScoreEl = elSection === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(this.selectedElement.track), elScoreEl);
+                    const scaledH = this.selectedElement.height * this.selectedElement.scale;
+                    const denom = trackDims.height - scaledH;
+                    if (denom !== 0) {
+                        this.selectedElement.trackYFraction = (this.selectedElement.y - trackDims.y) / denom;
+                    }
+                }
+                
                 this.updateElementTransform(this.selectedElement);
             },
             
