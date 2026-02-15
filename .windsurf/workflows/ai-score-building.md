@@ -192,6 +192,17 @@ Start with ASB-001 for new AI Score Building work.
 2. Suggest Tier 2 commit if threshold met
 3. Update progress file: pending work, "Last Updated" date, and **"Last Session Summary"** (2-3 line blockquote at top of progress file for instant context recovery next session)
 
+### Stalled Debugging Trigger
+**When:** Debugging becomes unproductive (>3 fix→new-problem iterations, diagnostics pass but visual mismatch, user signals reset)
+
+**I do:**
+1. Stop immediately — don't try "one more thing"
+2. Remove ALL diagnostic/test code (clean codebase)
+3. Git commit with INCONCLUSIVE note documenting what was tried, confirmed, unresolved
+4. Create ASB-XXX memory tagged `inconclusive` with: what was tried, what was confirmed ✅, possible causes not investigated, decision to abort
+5. Add entry to progress file with `Inconclusive` status
+6. See `docs/WORKFLOW_METHODOLOGY.md` → "Debugging Session Management" for full Abort + Fresh Start protocols
+
 ### Workflow Insight Trigger
 **When:** A reusable pattern or lesson emerges during development
 

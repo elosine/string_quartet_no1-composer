@@ -91,6 +91,44 @@ Variables declared with `let` are NOT accessible via `window.varName` (unlike `v
 ### Async Operations Blocking Visual Rendering
 Never gate visual rendering on async audio operations that depend on user gestures. Chrome's autoplay policy causes `audioContext.resume()` to hang indefinitely without a user gesture, blocking any code after `await`. Render visual elements synchronously first, then load audio data in background. (ASB-012)
 
+### Debugging Session Management
+When a debugging session becomes unproductive — fixes create new problems, diagnostics are inconclusive, or the root cause remains elusive — follow this protocol:
+
+**Recognizing a Stalled Debug Session:**
+- More than 3 iterations of "fix → new problem" without convergence
+- Diagnostic tests pass but visual reality still doesn't match
+- Each fix is addressing symptoms rather than root cause
+- User signals frustration or requests a reset
+
+**Abort Protocol:**
+1. **Stop immediately** — don't try "one more thing"
+2. **Clean up** — remove ALL diagnostic/test code so the codebase is in a clean, working state
+3. **Commit** with clear note: mark what was tried, what was confirmed, what remains unknown
+4. **Create memory** documenting:
+   - What was tried (numbered list)
+   - What was confirmed working (✅)
+   - What remains unresolved
+   - Possible causes NOT yet investigated
+   - Decision to abort and why
+5. **Tag as INCONCLUSIVE** — not "failed." The diagnostics may have ruled out entire categories of causes, which is valuable.
+
+**Fresh Start Protocol:**
+1. Do NOT re-read the old diagnostic session in detail — start with fresh eyes
+2. State the problem simply: "SVG appears at wrong Y position"
+3. Take the simplest possible approach first (e.g., hardcode a known-good value and verify)
+4. Test ONE thing at a time with immediate visual feedback
+5. Ensure the test element is VISIBLE (correct page, correct panel, correct time position)
+
+**What to Preserve from a Stalled Session:**
+- Infrastructure code that was confirmed working (e.g., `trackYFraction` resize system)
+- Confirmed facts about the coordinate system
+- Ruled-out causes (saves time in the next attempt)
+
+**What NOT to Preserve:**
+- Diagnostic logging / debug markers
+- Temporary test functions
+- Workarounds that mask the real issue
+
 ---
 
 ## Ideas to Explore

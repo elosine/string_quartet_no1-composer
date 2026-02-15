@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Feb 15, 2026  
-**Current ASB Number:** ASB-020
+**Current ASB Number:** ASB-021
 
 ---
 
@@ -15,8 +15,8 @@
 ## Current Session
 
 **Date:** Feb 15, 2026  
-**Focus:** Fix glissando SVG cropping, scaling, and positioning  
-**Tier 1 Count This Session:** 2  
+**Focus:** Fix glissando SVG cropping, scaling, and positioning (positioning INCONCLUSIVE — fresh approach needed)  
+**Tier 1 Count This Session:** 3  
 **Tier 2 Threshold:** 4 increments
 
 ### Session Log (prior sessions)
@@ -72,6 +72,7 @@
 | ASB-018 | Fix quarter-tone pitches + always overwrite .ly/SVG (no caching) | Complete |
 | ASB-019 | Replace Inkscape crop with server-side Node.js SVG cropper | Complete |
 | ASB-020 | Fix SVG scale (30% track height) + remove redundant client crop | Complete |
+| ASB-021 | SVG positioning investigation — INCONCLUSIVE (coordinate system verified correct, visual mismatch unresolved) | Inconclusive |
 
 ---
 
@@ -82,6 +83,7 @@
 | Feb 14, 2026 | 78ba06f | Long Tone Workflow Step 1 - UI + model/slope + ASB-001 to ASB-004 |
 | Feb 14, 2026 | ac68bf5 | Long Tone Glissando workflow complete + bug fixes - ASB-005 to ASB-012 |
 | Feb 15, 2026 | af30931 | addendum: glissando - dynamic notation, velocity input, UI polish (ASB-014 to ASB-017) |
+| Feb 15, 2026 | 7c7ee71 | addendum: glissando - SVG positioning investigation (ASB-019 to ASB-021) |
 
 ---
 
@@ -154,5 +156,8 @@ When a workflow insight emerges during development, append it here AND to `docs/
 
 ### Post-Milestone Addendums (Feb 15, 2026)
 After finalizing a Tier 3 milestone, the next session often reveals refinements that extend the feature — new sub-features, default adjustments, UI polish. These are "addendums," not new features. Protocol: keep original tag intact, continue ASB numbering, group under `### Addendum:` heading, use `addendum:` prefix in Tier 2 commits. See WORKFLOW_METHODOLOGY.md for full pattern.
+
+### Debugging Session Management (Feb 15, 2026)
+When debugging becomes unproductive (>3 iterations without convergence, diagnostics pass but visual reality mismatches, fixes create new problems), follow the Abort Protocol: stop immediately, clean up all diagnostic code, commit with clear INCONCLUSIVE note, create memory documenting what was tried/confirmed/unresolved. Tag as INCONCLUSIVE not "failed" — ruled-out causes are valuable. Fresh start: don't re-read old session, state problem simply, test ONE thing at a time, ensure test element is VISIBLE. See WORKFLOW_METHODOLOGY.md → "Debugging Session Management" for full protocol.
 
 ---
