@@ -15980,7 +15980,7 @@
                     const trackDims = CompositionPanel.getTrackDimensions(String(track), scoreEl);
                     const trackHeight = trackDims.height;
                     
-                    // Scale cropped content to fit ~30% of track height
+                    // Scale cropped content to fit ~42% of track height (~0.8 scale)
                     const targetHeight = trackHeight * 0.42;
                     const scale = targetHeight / svgHeight;
                     const scaledWidth = svgWidth * scale;
@@ -15998,7 +15998,7 @@
                     // trackYFraction: 0 = top of track, 0.5 = centered, 1 = bottom
                     const trackYFraction = 0;
                     const scaledHeight = svgHeight * scale;
-                    const svgY = trackDims.y + trackYFraction * (trackHeight - scaledHeight);
+                    const svgY = trackDims.y + trackYFraction * (trackHeight - scaledHeight) + 10;
                     
                     // Calculate startSeconds for the SVG element (for persistence)
                     const svgXPercentRaw = (svgX / scoreWidth) * 100;
