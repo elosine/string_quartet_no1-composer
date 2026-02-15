@@ -43,42 +43,14 @@ if (-not (Test-Path $renderedSvg)) {
 
 Write-Host "  LilyPond output: $renderedSvg"
 
-# Step 2: Crop with Inkscape (fit canvas to drawing) and save to output directory
-Write-Host "  Cropping with Inkscape..."
-
-# Use Inkscape actions to fit canvas to drawing bounds, then export as plain SVG
-& $inkscapePath $renderedSvg --batch-process --actions="select-all;fit-canvas-to-drawing;export-filename:$outputSvg;export-plain-svg;export-do" 2>$null
+# Step 2: Move uncropped SVG to output directory (cropping handled by server-side Node.js)
+Move-Item $renderedSvg -Destination $outputSvg -Force
 
 if (Test-Path $outputSvg) {
-    # Clean up the uncropped SVG from lilypond_code
-    Remove-Item $renderedSvg -Force
-    
     Write-Host "  Success: $outputSvg"
-    Write-Host "OUTPUT:$outputSvg"  # Machine-readable output for server parsing
+    Write-Host "OUTPUT:$outputSvg"
     exit 0
 } else {
-    # Fallback: try older Inkscape CLI syntax
-    Write-Host "  Actions method failed, trying legacy..."
-    & $inkscapePath $renderedSvg --export-area-drawing --export-plain-svg --export-filename="$outputSvg" 2>$null
-    
-    if (Test-Path $outputSvg) {
-        Remove-Item $renderedSvg -Force
-        Write-Host "  Success (legacy): $outputSvg"
-        Write-Host "OUTPUT:$outputSvg"
-        exit 0
-    } else {
-        # Last resort: copy uncropped
-        Write-Host "  Inkscape crop failed, copying uncropped..."
-        Copy-Item $renderedSvg -Destination $outputSvg -Force
-        Remove-Item $renderedSvg -Force
-        
-        if (Test-Path $outputSvg) {
-            Write-Host "  Success (uncropped): $outputSvg"
-            Write-Host "OUTPUT:$outputSvg"
-            exit 0
-        } else {
-            Write-Host "  Error: Failed to create SVG"
-            exit 1
-        }
-    }
+    Write-Host "  Error: Failed to move SVG to output"
+    exit 1
 }

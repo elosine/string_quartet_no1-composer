@@ -2679,7 +2679,8 @@
                     scale: el.scale,
                     baseScale: el.baseScale || el.scale,
                     baseScoreWidth: el.baseScoreWidth || scoreWidth,
-                    track: this.getTrackFromY(el.y),
+                    track: el.track || this.getTrackFromY(el.y),
+                    trackYFraction: el.trackYFraction,
                     page: el.page || 0,
                     section: el.section || 'top',
                     svgDataUrl: el.image.getAttribute('href')
@@ -2738,16 +2739,26 @@
                     // Calculate Y position from yPercent
                     const y = elData.yPercent !== undefined ? (elData.yPercent / 100) * scoreHeight : elData.y;
                     
+                    // Calculate Y: use track-relative if available, else yPercent
+                    let yFinal = y;
+                    if (elData.trackYFraction !== undefined && elData.track !== undefined) {
+                        const elScoreEl = section === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
+                        const trackDims = CompositionPanel.getTrackDimensions(String(elData.track), elScoreEl);
+                        const scaledH = elData.height * elData.scale;
+                        yFinal = trackDims.y + elData.trackYFraction * (trackDims.height - scaledH);
+                    }
+                    
                     const elementData = {
                         id: elData.id,
                         name: elData.name,
                         wrapper: wrapper,
                         image: image,
                         x: x,
-                        y: y,
+                        y: yFinal,
                         startSeconds: startSeconds,  // Time-based X position
                         xPercent: startXPercent,     // Calculated from startSeconds
                         yPercent: elData.yPercent || (elData.y / scoreHeight) * 100,
+                        trackYFraction: elData.trackYFraction,
                         width: elData.width,
                         height: elData.height,
                         scale: elData.scale,
@@ -2810,8 +2821,14 @@
                         el.x = (el.xPercent / 100) * scoreWidth;
                     }
                     
-                    // Y position from yPercent
-                    if (el.yPercent !== undefined) {
+                    // Y position: track-relative (preferred) or yPercent (legacy)
+                    if (el.trackYFraction !== undefined && el.track !== undefined) {
+                        // Track-relative positioning: survives resize correctly
+                        const elScoreEl = el.section === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
+                        const trackDims = CompositionPanel.getTrackDimensions(String(el.track), elScoreEl);
+                        const scaledH = el.height * el.scale;
+                        el.y = trackDims.y + el.trackYFraction * (trackDims.height - scaledH);
+                    } else if (el.yPercent !== undefined) {
                         el.y = (el.yPercent / 100) * scoreHeight;
                     }
                     
@@ -15872,10 +15889,10 @@
                 let lpAccidental = '';
                 if (accidentals === '#') lpAccidental = 's';           // sharp
                 else if (accidentals === 'b') lpAccidental = 'f';      // flat
-                else if (accidentals === '+') lpAccidental = 'ih';     // quarter sharp
-                else if (accidentals === 'd') lpAccidental = 'eh';     // quarter flat
-                else if (accidentals === '#+') lpAccidental = 'sih';   // 3/4 sharp
-                else if (accidentals === 'bd') lpAccidental = 'feh';   // 3/4 flat (flat + quarter flat)
+                else if (accidentals === '+') lpAccidental = 'qs';     // quarter sharp (English: qs)
+                else if (accidentals === 'd') lpAccidental = 'qf';     // quarter flat (English: qf)
+                else if (accidentals === '#+') lpAccidental = 'tqs';   // 3/4 sharp (English: tqs)
+                else if (accidentals === 'bd') lpAccidental = 'tqf';   // 3/4 flat (English: tqf)
                 
                 // LilyPond octave marks: c = C3, c' = C4, c'' = C5, c, = C2, c,, = C1
                 // Base octave (no mark) = 3. Each ' raises one octave, each , lowers one.
@@ -15943,68 +15960,45 @@
                     if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
                     if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
                     
-                    // Measure actual content bounds within SVG (LilyPond SVGs have whitespace)
-                    const viewBox = svgEl.getAttribute('viewBox');
-                    let contentRightRatio = 1; // ratio of content right edge to viewBox width
-                    if (viewBox) {
-                        const vb = viewBox.split(/\s+/).map(Number);
-                        const vbWidth = vb[2]; // viewBox width
-                        // Find rightmost content edge from staff lines and note elements
-                        let maxX = 0;
-                        svgEl.querySelectorAll('line, rect, path').forEach(el => {
-                            const parent = el.parentElement;
-                            let tx = 0;
-                            if (parent && parent.tagName === 'g') {
-                                const t = parent.getAttribute('transform');
-                                if (t) {
-                                    const m = t.match(/translate\(\s*([\d.]+)/);
-                                    if (m) tx = parseFloat(m[1]);
-                                }
-                            }
-                            const x2 = parseFloat(el.getAttribute('x2') || 0);
-                            const x = parseFloat(el.getAttribute('x') || 0);
-                            const w = parseFloat(el.getAttribute('width') || 0);
-                            maxX = Math.max(maxX, tx + x2, tx + x + w);
-                        });
-                        if (maxX > 0 && vbWidth > 0) {
-                            contentRightRatio = maxX / vbWidth;
-                        }
-                    }
+                    // SVG is already tightly cropped server-side by cropSvgToContent()
+                    // Set pixel dimensions on SVG element for correct rendering
+                    svgEl.setAttribute('width', String(svgWidth));
+                    svgEl.setAttribute('height', String(svgHeight));
                     
-                    // Calculate track dimensions
-                    const scoreEl = document.getElementById('ScoreTop');
-                    const scoreHeight = scoreEl.clientHeight;
-                    const scoreWidth = scoreEl.clientWidth;
-                    const timelineHeight = 16;
-                    const availableHeight = scoreHeight - timelineHeight;
-                    const trackHeight = availableHeight / 4;
-                    
-                    // Calculate scale to fit notation within track height (with small margin)
-                    const targetHeight = trackHeight * 0.9; // 90% of track height
-                    const scale = targetHeight / svgHeight;
-                    const scaledWidth = svgWidth * scale;
-                    
-                    // Calculate the visible content width (excluding SVG whitespace on right)
-                    const scaledContentWidth = scaledWidth * contentRightRatio;
-                    
-                    // Calculate X position: just before curve start
-                    // Convert curve.startSeconds to X position, then offset left by scaled content width + gap
+                    // Determine which page/section the curve is on
                     const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
                     const leadIn = leadInSeconds;
                     const curveDisplayTime = curve.startSeconds + leadIn;
                     const curvePageIndex = Math.floor(curveDisplayTime / secondsPerPage);
+                    const curveSection = curvePageIndex % 2 === 0 ? 'top' : 'bottom';
+                    
+                    // Use the correct score panel for dimension calculations
+                    const scoreEl = document.getElementById(curveSection === 'top' ? 'ScoreTop' : 'ScoreBottom');
+                    const scoreHeight = scoreEl.clientHeight;
+                    const scoreWidth = scoreEl.clientWidth;
+                    const track = parseInt(curve.gTrack) || 1;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(track), scoreEl);
+                    const trackHeight = trackDims.height;
+                    
+                    // Scale cropped content to fit ~30% of track height
+                    const targetHeight = trackHeight * 0.30;
+                    const scale = targetHeight / svgHeight;
+                    const scaledWidth = svgWidth * scale;
+                    const scaledContentWidth = scaledWidth;
+                    
+                    // Calculate X position: just before curve start
                     const curveXPercent = ((curveDisplayTime % secondsPerPage) / secondsPerPage) * 100;
                     const curveXPx = (curveXPercent / 100) * scoreWidth;
                     
-                    // Position SVG so the visible content right edge is 5px left of curve start
-                    // svgX + scaledContentWidth = curveXPx - gap
+                    // Position SVG right edge 5px left of curve start
                     const gap = 5;
                     const svgX = curveXPx - gap - scaledContentWidth;
                     
-                    // Calculate Y position: center in track
-                    const track = parseInt(curve.gTrack) || 1;
-                    const trackTopY = timelineHeight + ((track - 1) * trackHeight);
-                    const svgY = trackTopY + (trackHeight - (svgHeight * scale)) / 2;
+                    // Track-relative Y positioning (survives resize correctly)
+                    // trackYFraction: 0 = top of track, 0.5 = centered, 1 = bottom
+                    const trackYFraction = 0;
+                    const scaledHeight = svgHeight * scale;
+                    const svgY = trackDims.y + trackYFraction * (trackHeight - scaledHeight);
                     
                     // Calculate startSeconds for the SVG element (for persistence)
                     const svgXPercentRaw = (svgX / scoreWidth) * 100;
@@ -16043,6 +16037,7 @@
                         y: svgY,
                         startSeconds: svgStartSeconds,
                         yPercent: (svgY / scoreHeight) * 100,
+                        trackYFraction: trackYFraction,
                         xPercent: actualXPercent,
                         width: svgWidth,
                         height: svgHeight,
@@ -16073,7 +16068,6 @@
                     console.log('LongToneUI.insertGlissandoSvg: Inserted', elementData.name, 
                         'scale:', scale.toFixed(3), 'rawX:', svgX.toFixed(1), 'actualX:', actualX.toFixed(1),
                         'curveXPx:', curveXPx.toFixed(1), 'scaledContentW:', scaledContentWidth.toFixed(1),
-                        'contentRatio:', contentRightRatio.toFixed(3),
                         'curvePage:', curvePageIndex, 'svgPage:', actualPage, 'section:', actualSection,
                         'curveStartSec:', curve.startSeconds, 'leadIn:', leadIn);
                     
@@ -16718,22 +16712,7 @@
                 const lpEndPitch = this.pitchToLilyPond(endPitch);
                 const glissOffset = this.sameStaffLine(startPitch, endPitch) ? '0.3' : '0';
                 
-                // Check if file already exists
-                const fileExists = await this.checkLilyPondFileExists(filename);
-                
-                if (fileExists) {
-                    console.log('LongToneUI.generateNotation: File already exists, skipping creation:', filename);
-                    return {
-                        filename,
-                        clef: lpClef,
-                        startPitch: lpStartPitch,
-                        endPitch: lpEndPitch,
-                        glissOffset,
-                        fileExists: true,
-                        created: false
-                    };
-                }
-                
+                // Always create fresh - no file-exists check
                 // Log the generation parameters
                 console.log('LongToneUI.generateNotation: Creating new file:', JSON.stringify({
                     filename,

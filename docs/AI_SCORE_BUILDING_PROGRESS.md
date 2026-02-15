@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 14, 2026  
-**Current ASB Number:** ASB-017
+**Last Updated:** Feb 15, 2026  
+**Current ASB Number:** ASB-020
 
 ---
 
@@ -15,8 +15,8 @@
 ## Current Session
 
 **Date:** Feb 15, 2026  
-**Focus:** Post-milestone addendum — glissando UI & notation enhancements  
-**Tier 1 Count This Session:** 4  
+**Focus:** Fix glissando SVG cropping, scaling, and positioning  
+**Tier 1 Count This Session:** 2  
 **Tier 2 Threshold:** 4 increments
 
 ### Session Log (prior sessions)
@@ -31,6 +31,7 @@
 - Bug fix: SVG resize handle (blue square) persisting after element deletion
 - Bug fix: CurveMaker swatch selectors were unscoped — stripping LT palette defaults
 - ASB-017: Post-Milestone Addendum Protocol — documented in WORKFLOW_METHODOLOGY.md + progress file
+- ASB-018: Fix quarter-tone pitch notation (Dutch→English) + always overwrite .ly/SVG (no caching)
 
 ---
 
@@ -68,6 +69,9 @@
 | ASB-015 | UI: default clef treble, velocity input (0-127), Dynamic label | Complete |
 | ASB-016 | Color swatches + fill mode in Long Tone UI (default: limeGreen, Fill↓) | Complete |
 | ASB-017 | Post-Milestone Addendum Protocol (workflow methodology) | Complete |
+| ASB-018 | Fix quarter-tone pitches + always overwrite .ly/SVG (no caching) | Complete |
+| ASB-019 | Replace Inkscape crop with server-side Node.js SVG cropper | Complete |
+| ASB-020 | Fix SVG scale (30% track height) + remove redundant client crop | Complete |
 
 ---
 
@@ -77,6 +81,7 @@
 |------|-------------|---------|
 | Feb 14, 2026 | 78ba06f | Long Tone Workflow Step 1 - UI + model/slope + ASB-001 to ASB-004 |
 | Feb 14, 2026 | ac68bf5 | Long Tone Glissando workflow complete + bug fixes - ASB-005 to ASB-012 |
+| Feb 15, 2026 | af30931 | addendum: glissando - dynamic notation, velocity input, UI polish (ASB-014 to ASB-017) |
 
 ---
 

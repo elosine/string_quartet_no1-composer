@@ -944,11 +944,7 @@ app.post('/api/lilypond/create-glissando', (req, res) => {
         return res.status(404).json({ success: false, error: 'Template file not found' });
     }
     
-    // Check if output file already exists
-    if (fs.existsSync(outputPath)) {
-        return res.json({ success: true, created: false, message: 'File already exists', filename });
-    }
-    
+    // Always overwrite - each prompt creates fresh notation
     try {
         // Read template
         let template = fs.readFileSync(templatePath, 'utf8');
@@ -980,6 +976,143 @@ app.post('/api/lilypond/create-glissando', (req, res) => {
     }
 });
 
+// Crop SVG to content bounds (replaces Inkscape cropping)
+// Parses LilyPond SVG structure: <g transform="translate(tx,ty)"> containing <line>, <rect>, <path>
+function cropSvgToContent(svgFilePath) {
+    let content = fs.readFileSync(svgFilePath, 'utf-8');
+    
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    
+    function expandBounds(x1, y1, x2, y2) {
+        minX = Math.min(minX, x1, x2);
+        minY = Math.min(minY, y1, y2);
+        maxX = Math.max(maxX, x1, x2);
+        maxY = Math.max(maxY, y1, y2);
+    }
+    
+    // Parse SVG path d attribute and compute bounding box in path coordinates
+    function getPathBounds(d) {
+        const tokens = d.match(/[MmCcLlHhVvSsZz]|[-+]?\d*\.?\d+/g) || [];
+        let cx = 0, cy = 0;
+        let pMinX = Infinity, pMinY = Infinity, pMaxX = -Infinity, pMaxY = -Infinity;
+        function addPt(x, y) {
+            pMinX = Math.min(pMinX, x); pMinY = Math.min(pMinY, y);
+            pMaxX = Math.max(pMaxX, x); pMaxY = Math.max(pMaxY, y);
+        }
+        let i = 0;
+        while (i < tokens.length) {
+            const cmd = tokens[i];
+            if (!/[A-Za-z]/.test(cmd)) { i++; continue; }
+            i++;
+            const nums = [];
+            while (i < tokens.length && !/[A-Za-z]/.test(tokens[i])) {
+                nums.push(parseFloat(tokens[i])); i++;
+            }
+            if (cmd === 'M') { cx = nums[0]; cy = nums[1]; addPt(cx, cy); }
+            else if (cmd === 'm') { cx += nums[0]; cy += nums[1]; addPt(cx, cy); }
+            else if (cmd === 'c') {
+                for (let j = 0; j < nums.length; j += 6) {
+                    addPt(cx + nums[j], cy + nums[j+1]);
+                    addPt(cx + nums[j+2], cy + nums[j+3]);
+                    cx += nums[j+4]; cy += nums[j+5]; addPt(cx, cy);
+                }
+            } else if (cmd === 'C') {
+                for (let j = 0; j < nums.length; j += 6) {
+                    addPt(nums[j], nums[j+1]); addPt(nums[j+2], nums[j+3]);
+                    cx = nums[j+4]; cy = nums[j+5]; addPt(cx, cy);
+                }
+            } else if (cmd === 'l') {
+                for (let j = 0; j < nums.length; j += 2) { cx += nums[j]; cy += nums[j+1]; addPt(cx, cy); }
+            } else if (cmd === 'L') {
+                for (let j = 0; j < nums.length; j += 2) { cx = nums[j]; cy = nums[j+1]; addPt(cx, cy); }
+            } else if (cmd === 'h') { for (const n of nums) { cx += n; addPt(cx, cy); } }
+            else if (cmd === 'H') { for (const n of nums) { cx = n; addPt(cx, cy); } }
+            else if (cmd === 'v') { for (const n of nums) { cy += n; addPt(cx, cy); } }
+            else if (cmd === 'V') { for (const n of nums) { cy = n; addPt(cx, cy); } }
+            else if (cmd === 's') {
+                for (let j = 0; j < nums.length; j += 4) {
+                    addPt(cx + nums[j], cy + nums[j+1]);
+                    cx += nums[j+2]; cy += nums[j+3]; addPt(cx, cy);
+                }
+            }
+        }
+        return { minX: pMinX, minY: pMinY, maxX: pMaxX, maxY: pMaxY };
+    }
+    
+    // Match each <g transform="translate(tx, ty)"> and its child element
+    const groupRegex = /<g\s+transform="translate\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)">\s*\n?\s*<(line|rect|path)\s+([^>]*?)\/>/g;
+    let match;
+    
+    while ((match = groupRegex.exec(content)) !== null) {
+        const tx = parseFloat(match[1]);
+        const ty = parseFloat(match[2]);
+        const tag = match[3];
+        const attrs = match[4];
+        
+        if (tag === 'line') {
+            const x1 = parseFloat((attrs.match(/x1="([^"]+)"/) || [])[1] || 0);
+            const y1 = parseFloat((attrs.match(/y1="([^"]+)"/) || [])[1] || 0);
+            const x2 = parseFloat((attrs.match(/x2="([^"]+)"/) || [])[1] || 0);
+            const y2 = parseFloat((attrs.match(/y2="([^"]+)"/) || [])[1] || 0);
+            const sw = parseFloat((attrs.match(/stroke-width="([^"]+)"/) || [])[1] || 0);
+            expandBounds(tx + x1, ty + y1 - sw/2, tx + x2, ty + y2 + sw/2);
+        } else if (tag === 'rect') {
+            const x = parseFloat((attrs.match(/\bx="([^"]+)"/) || [])[1] || 0);
+            const y = parseFloat((attrs.match(/\by="([^"]+)"/) || [])[1] || 0);
+            const w = parseFloat((attrs.match(/width="([^"]+)"/) || [])[1] || 0);
+            const h = parseFloat((attrs.match(/height="([^"]+)"/) || [])[1] || 0);
+            expandBounds(tx + x, ty + y, tx + x + w, ty + y + h);
+        } else if (tag === 'path') {
+            const scaleMatch = attrs.match(/transform="scale\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)"/);
+            const dMatch = attrs.match(/d="([^"]+)"/);
+            if (scaleMatch && dMatch) {
+                const sx = parseFloat(scaleMatch[1]);
+                const sy = parseFloat(scaleMatch[2]);
+                const pb = getPathBounds(dMatch[1]);
+                // Apply scale (negative scale flips coordinates)
+                const x1 = pb.minX * sx, x2 = pb.maxX * sx;
+                const y1 = pb.minY * sy, y2 = pb.maxY * sy;
+                expandBounds(tx + Math.min(x1,x2), ty + Math.min(y1,y2),
+                             tx + Math.max(x1,x2), ty + Math.max(y1,y2));
+            } else {
+                expandBounds(tx - 0.5, ty - 0.5, tx + 0.5, ty + 0.5);
+            }
+        }
+    }
+    
+    if (minX === Infinity) {
+        throw new Error('No visual elements found in SVG');
+    }
+    
+    // Add small padding
+    const pad = 0.1;
+    minX -= pad;
+    minY -= pad;
+    maxX += pad;
+    maxY += pad;
+    
+    const cropW = maxX - minX;
+    const cropH = maxY - minY;
+    
+    // Convert viewBox units to mm (LilyPond uses ~1.7573mm per viewBox unit)
+    const mmPerUnit = 1.7573;
+    const widthMm = (cropW * mmPerUnit).toFixed(2);
+    const heightMm = (cropH * mmPerUnit).toFixed(2);
+    
+    // Replace viewBox
+    content = content.replace(
+        /viewBox="[^"]+"/,
+        `viewBox="${minX.toFixed(4)} ${minY.toFixed(4)} ${cropW.toFixed(4)} ${cropH.toFixed(4)}"`
+    );
+    
+    // Replace width and height
+    content = content.replace(/width="[^"]+"/, `width="${widthMm}mm"`);
+    content = content.replace(/height="[^"]+"/, `height="${heightMm}mm"`);
+    
+    fs.writeFileSync(svgFilePath, content, 'utf-8');
+    console.log(`  Cropped SVG: viewBox ${minX.toFixed(2)},${minY.toFixed(2)} ${cropW.toFixed(2)}x${cropH.toFixed(2)} → ${widthMm}x${heightMm}mm`);
+}
+
 // Render glissando LilyPond file to cropped SVG using PowerShell script
 app.post('/api/lilypond/render-glissando', (req, res) => {
     const { filename } = req.body;
@@ -1002,18 +1135,9 @@ app.post('/api/lilypond/render-glissando', (req, res) => {
         return res.status(404).json({ success: false, error: 'LilyPond file not found' });
     }
     
-    // Check if SVG already exists (skip rendering)
+    // Always re-render - each prompt creates fresh SVG
     const baseName = path.basename(filename, '.ly');
     const svgPath = path.join(svgOutputDir, `${baseName}.svg`);
-    if (fs.existsSync(svgPath)) {
-        console.log(`Glissando SVG already exists: ${baseName}.svg`);
-        return res.json({ 
-            success: true, 
-            rendered: false, 
-            message: 'SVG already exists',
-            svgPath: `/SVG_graphics/${baseName}.svg`
-        });
-    }
     
     // Execute PowerShell script
     const command = `powershell -ExecutionPolicy Bypass -File "${scriptPath}" -Filename "${filename}"`;
@@ -1033,7 +1157,13 @@ app.post('/api/lilypond/render-glissando', (req, res) => {
         const outputPath = outputMatch ? outputMatch[1].trim() : svgPath;
         
         if (fs.existsSync(svgPath)) {
-            console.log(`Rendered glissando SVG: ${baseName}.svg`);
+            // Crop SVG to content bounds (replaces Inkscape cropping)
+            try {
+                cropSvgToContent(svgPath);
+                console.log(`Rendered + cropped glissando SVG: ${baseName}.svg`);
+            } catch (cropErr) {
+                console.warn(`SVG crop warning (using uncropped): ${cropErr.message}`);
+            }
             res.json({ 
                 success: true, 
                 rendered: true,

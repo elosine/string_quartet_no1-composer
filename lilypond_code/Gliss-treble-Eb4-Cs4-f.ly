@@ -56,10 +56,12 @@
     \override NoteHead.font-size = #-2
     \override Accidental.font-size = -6
     \override Stem.transparent = ##t
+    \override DynamicText.font-size = #-7
     
     % === START PITCH ===
     \once \override NoteColumn.X-offset = #-0.7
-    ef'4
+    % === DYNAMIC MARKING ===
+    ef'4\f
     
     % === GLISSANDO LINE ===
     % GLISS_Y_OFFSET: Use 0.3 when both notes on same staff line, else 0
@@ -71,7 +73,7 @@
     % === END PITCH ===
     \once \override Accidental.extra-offset = #'(0.3 . 0)
     \once \override NoteColumn.X-offset = #-1.8
-    ctqs'4
+    cs'4
   }
   
   \layout{
