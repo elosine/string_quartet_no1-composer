@@ -38,11 +38,16 @@ Cascade will ask you each parameter in turn. Say "default" to skip any question.
 
 ### What Happens
 
-- Cascade parses your parameters, shows a summary for confirmation
-- Runs `LongToneUI.step1(params)`: curve appears on the score
+- Cascade parses your parameters, runs validation checklist (see below), shows a summary
+- Cascade provides a **copy-paste JS command** for `LongToneUI.step1(params)`
+- **User pastes it in the browser console** (F12 → Console) — curve appears on the score
 - **You can now adjust the slope/model in the UI** — drag, change model, etc.
 - All manual adjustments are tracked in real time (curve data regenerates on every edit)
 - Pitch/clef/track/dynamic/velocity data is remembered for Stage 2
+
+> **Important:** Cascade cannot execute browser JavaScript directly. All commands are
+> copy-paste — Cascade composes them, the user runs them in the browser console.
+> Cascade must NEVER attempt to check, start, or interact with the dev server.
 
 ---
 
@@ -52,7 +57,7 @@ When you're happy with the curve shape, say:
 
 > **"Generate"**
 
-That's it. Cascade will run `LongToneUI.step2(params)` — Steps 2-4 automatically using the data from Stage 1 **plus any manual slope/model adjustments you made**:
+That's it. Cascade will provide a **copy-paste JS command** for `LongToneUI.step2(params)`. User pastes it in the browser console. Steps 2-4 run automatically using the data from Stage 1 **plus any manual slope/model adjustments you made**:
 - Generate LilyPond notation
 - Render and insert SVG
 - Generate and insert MIDI segments

@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Feb 15, 2026  
-**Current ASB Number:** ASB-021
+**Current ASB Number:** ASB-023
 
 ---
 
@@ -15,8 +15,8 @@
 ## Current Session
 
 **Date:** Feb 15, 2026  
-**Focus:** Fix glissando SVG cropping, scaling, and positioning (positioning INCONCLUSIVE — fresh approach needed)  
-**Tier 1 Count This Session:** 3  
+**Focus:** Manual glissando SVG positioning fix (fresh approach)  
+**Tier 1 Count This Session:** 4  
 **Tier 2 Threshold:** 4 increments
 
 ### Session Log (prior sessions)
@@ -36,6 +36,8 @@
 ---
 
 ## Pending Work
+
+**Rollback point:** `git checkout milestone-glissando-ui-prompt-good` — scale 0.42 + Y offset 10px, confirmed working.
 
 *(Items to pick up next session)*
 
@@ -73,6 +75,10 @@
 | ASB-019 | Replace Inkscape crop with server-side Node.js SVG cropper | Complete |
 | ASB-020 | Fix SVG scale (30% track height) + remove redundant client crop | Complete |
 | ASB-021 | SVG positioning investigation — INCONCLUSIVE (coordinate system verified correct, visual mismatch unresolved) | Inconclusive |
+| ASB-022 | Increase SVG scale multiplier 0.30→0.42 (~0.8 scale). Commit: 677f173 | Complete |
+| ASB-023 | Add 10px Y offset to SVG positioning + update comment. Commit: ae60266 | Complete |
+| ASB-024 | Add retry logic to renderGlissandoSvg for OneDrive file locks. Commit: 60ab457 | Complete |
+| ASB-025 | Pre-step1 validation checklist in AI Glissando Prompt Guide. Commit: b0bcfb0 | Complete |
 
 ---
 
@@ -92,6 +98,7 @@
 | Date | Tag | Description |
 |------|-----|-------------|
 | Feb 14, 2026 | `milestone-asb-glissando-complete` | Full glissando automation: UI + AI prompt, notation, SVG, MIDI, all bugs fixed |
+| Feb 15, 2026 | `milestone-glissando-ui-prompt-good` | Glissando System UI Prompt Good. Caveat: SVG notation manual reposition may vary with different size SVGs |
 
 ---
 
