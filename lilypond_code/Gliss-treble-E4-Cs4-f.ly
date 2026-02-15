@@ -26,8 +26,8 @@
     \omit TimeSignature
     \omit BarLine
     % === CLEF VARIABLE ===
-    % Options: \clef treble, \clef alto, \clef bass
-    \clef alto
+    % Options: \clef treble, \clef treble, \clef bass
+    \clef treble
     \omit Clef
     \omit KeySignature
     \override StaffSymbol.thickness = #1
@@ -61,7 +61,7 @@
     % === START PITCH ===
     \once \override NoteColumn.X-offset = #-0.7
     % === DYNAMIC MARKING ===
-    a4\p
+    e'4\f
     
     % === GLISSANDO LINE ===
     % GLISS_Y_OFFSET: Use 0.3 when both notes on same staff line, else 0
@@ -73,7 +73,7 @@
     % === END PITCH ===
     \once \override Accidental.extra-offset = #'(0.3 . 0)
     \once \override NoteColumn.X-offset = #-1.8
-    af4
+    cs'4
   }
   
   \layout{

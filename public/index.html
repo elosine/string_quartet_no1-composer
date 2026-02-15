@@ -810,10 +810,30 @@
                 <div class="curve-input-row">
                     <label style="width: 35px;">Clef</label>
                     <select id="ltClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
-                        <option value="treble">Treble</option>
-                        <option value="cClef" selected>C Clef</option>
+                        <option value="treble" selected>Treble</option>
+                        <option value="cClef">C Clef</option>
                         <option value="bass">Bass</option>
                     </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Dynamic</label>
+                    <select id="ltDynamicSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;" title="Dynamic marking for notation (independent from MIDI velocity)">
+                        <option value="">None</option>
+                        <option value="pppp">pppp</option>
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p" selected>p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f">f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff">fff</option>
+                        <option value="ffff">ffff</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Vel</label>
+                    <input type="number" id="ltVelocityInput" class="curve-input" value="64" min="0" max="127" style="width: 45px; font-size: 10px;" title="MIDI velocity (0-127). Independent from dynamic notation marking.">
                 </div>
                 <div class="curve-input-row">
                     <label style="width: 35px;">Start</label>
@@ -827,6 +847,28 @@
                 <div class="curve-input-row" style="margin-top: 3px;">
                     <label style="width: 35px;">Coef</label>
                     <input type="text" id="ltCurveCoef" class="curve-input" value="--" style="width: 50px; font-size: 10px; background: #222; color: #0f0;" readonly title="Current curve slope coefficient (read-only)">
+                </div>
+                <div class="color-swatches" id="ltColorSwatches" style="margin-top: 4px;">
+                    <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
+                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
+                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
+                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
+                    <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
+                    <div class="color-swatch selected" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
+                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
+                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
+                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
+                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
+                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
+                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                </div>
+                <div class="curve-fill-toggle" style="margin-top: 3px;">
+                    <input type="radio" id="ltFillLine" name="ltFill" value="line">
+                    <label for="ltFillLine">Line</label>
+                    <input type="radio" id="ltFillBottom" name="ltFill" value="bottom" checked>
+                    <label for="ltFillBottom">Fill ↓</label>
+                    <input type="radio" id="ltFillTop" name="ltFill" value="top">
+                    <label for="ltFillTop">Fill ↑</label>
                 </div>
                 <div class="control-row" style="margin-top: 5px; gap: 5px;">
                     <button id="ltStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
@@ -902,12 +944,12 @@
                 <div id="curveCoeffDisplay" style="font-size: 9px; color: #aaa; padding: 2px 4px; margin-top: 2px; font-family: monospace; min-height: 14px;"></div>
                 
                 <div class="color-swatches" id="colorSwatches">
-                    <div class="color-swatch selected" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
+                    <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
                     <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
                     <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
                     <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
                     <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
-                    <div class="color-swatch" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
+                    <div class="color-swatch selected" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
                     <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
                     <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
                     <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
@@ -2543,6 +2585,9 @@
             
             deleteSelected() {
                 if (!this.selectedElement) return;
+                
+                // Remove resize handles first
+                this.removeResizeHandles();
                 
                 // Remove from DOM
                 this.selectedElement.wrapper.remove();
@@ -12514,10 +12559,10 @@
                     this.segmentClearBtn.addEventListener('click', () => this.clearSegmentLines());
                 }
                 
-                // Color swatch handlers - dynamic for selected curve
-                document.querySelectorAll('.color-swatch').forEach(swatch => {
+                // Color swatch handlers - dynamic for selected curve (scoped to CurveMaker palette)
+                document.querySelectorAll('#colorSwatches .color-swatch').forEach(swatch => {
                     swatch.addEventListener('click', (e) => {
-                        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                        document.querySelectorAll('#colorSwatches .color-swatch').forEach(s => s.classList.remove('selected'));
                         e.target.classList.add('selected');
                         const newColor = e.target.dataset.color;
                         if (this.selectedCurve) {
@@ -12861,7 +12906,7 @@
                 
                 // Get current fill mode and color from UI or params
                 const fillMode = params?.fillMode ?? document.querySelector('input[name="curveFill"]:checked').value;
-                const colorSwatch = document.querySelector('.color-swatch.selected');
+                const colorSwatch = document.querySelector('#colorSwatches .color-swatch.selected');
                 const color = params?.color ?? (colorSwatch ? colorSwatch.dataset.color : 'limeGreen');
                 
                 // Get model and slope from params or UI (default model: logarithmic)
@@ -13225,8 +13270,8 @@
                 this.updateInputsFromCurve(curve);
                 
                 // Update color swatch selection
-                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
-                const matchingSwatch = document.querySelector(`.color-swatch[data-color="${curve.color}"]`);
+                document.querySelectorAll('#colorSwatches .color-swatch').forEach(s => s.classList.remove('selected'));
+                const matchingSwatch = document.querySelector(`#colorSwatches .color-swatch[data-color="${curve.color}"]`);
                 if (matchingSwatch) matchingSwatch.classList.add('selected');
                 
                 // Update fill mode selection
@@ -15593,6 +15638,15 @@
                 if (step2Btn) {
                     step2Btn.addEventListener('click', () => this.step2());
                 }
+                
+                // LT-specific color swatch handlers (independent from CurveMaker swatches)
+                document.querySelectorAll('#ltColorSwatches .color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => {
+                        document.querySelectorAll('#ltColorSwatches .color-swatch').forEach(s => s.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                    });
+                });
+                
                 console.log('LongToneUI initialized (two-phase workflow)');
             },
             
@@ -15699,7 +15753,7 @@
                 const startPitch = params?.startPitch ?? document.getElementById('ltStartPitch').value.trim();
                 const endPitch = params?.endPitch ?? document.getElementById('ltEndPitch').value.trim();
                 const midiResult = await this.generateGlissandoMidi(curve, startPitch, endPitch, {
-                    velocity: params?.velocity ?? 64,
+                    velocity: params?.velocity ?? (parseInt(document.getElementById('ltVelocityInput').value) || 64),
                     articulation: params?.articulation ?? 89
                 });
                 
@@ -15770,6 +15824,14 @@
                 const y1Val = isNaN(y1) ? 10 : y1;
                 const y2Val = isNaN(y2) ? 0 : y2;
                 
+                // Read color from LT swatches (default limeGreen)
+                const ltSwatch = document.querySelector('#ltColorSwatches .color-swatch.selected');
+                const color = params?.color ?? (ltSwatch ? ltSwatch.dataset.color : 'limeGreen');
+                
+                // Read fill mode from LT radio (default bottom/Fill Down)
+                const ltFill = document.querySelector('input[name="ltFill"]:checked');
+                const fillMode = params?.fillMode ?? (ltFill ? ltFill.value : 'bottom');
+                
                 const curve = CurveMaker.createCurve({
                     startSeconds,
                     endSeconds,
@@ -15777,7 +15839,9 @@
                     y2: y2Val,
                     gTrack,
                     model,
-                    slope
+                    slope,
+                    color,
+                    fillMode
                 });
                 
                 if (curve) {
@@ -15834,15 +15898,16 @@
             },
             
             // Generate standardized filename for glissando LilyPond file
-            // Format: Gliss-{clef}-{startPitch}-{endPitch}.ly
-            // Example: Gliss-alto-A4-Ab4.ly
-            generateGlissFilename(clef, startPitch, endPitch) {
+            // Format: Gliss-{clef}-{startPitch}-{endPitch}[-{dynamic}].ly
+            // Example: Gliss-alto-A4-Ab4-p.ly
+            generateGlissFilename(clef, startPitch, endPitch, dynamic) {
                 // Normalize pitch for filename (replace # with s, + with q, d with qf)
                 const normalizePitch = (p) => {
                     return p.replace('#', 's').replace('+', 'q').replace('d', 'qf');
                 };
                 const clefName = clef === 'cClef' ? 'alto' : clef;
-                return `Gliss-${clefName}-${normalizePitch(startPitch)}-${normalizePitch(endPitch)}.ly`;
+                const dynSuffix = dynamic ? `-${dynamic}` : '';
+                return `Gliss-${clefName}-${normalizePitch(startPitch)}-${normalizePitch(endPitch)}${dynSuffix}.ly`;
             },
             
             // Check if two pitches are on the same staff line (for gliss offset)
@@ -16640,13 +16705,14 @@
                 const clef = params?.clef ?? document.getElementById('ltClefSelect').value;
                 const startPitch = params?.startPitch ?? document.getElementById('ltStartPitch').value.trim();
                 const endPitch = params?.endPitch ?? document.getElementById('ltEndPitch').value.trim();
+                const dynamic = params?.dynamic ?? document.getElementById('ltDynamicSelect').value;
                 
                 if (!startPitch || !endPitch) {
                     console.error('LongToneUI.generateNotation: Missing start or end pitch');
                     return null;
                 }
                 
-                const filename = this.generateGlissFilename(clef, startPitch, endPitch);
+                const filename = this.generateGlissFilename(clef, startPitch, endPitch, dynamic);
                 const lpClef = this.clefToLilyPond(clef);
                 const lpStartPitch = this.pitchToLilyPond(startPitch);
                 const lpEndPitch = this.pitchToLilyPond(endPitch);
@@ -16688,7 +16754,8 @@
                             clef: lpClef,
                             startPitch: lpStartPitch,
                             endPitch: lpEndPitch,
-                            glissOffset
+                            glissOffset,
+                            dynamic
                         })
                     });
                     

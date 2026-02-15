@@ -19,6 +19,7 @@ Create a glissando:
 - Start pitch: ___ (e.g., E4, C#3)
 - End pitch: ___ (e.g., C3, G#4)
 - Clef: ___ (treble / cClef / bass)
+- Dynamic: ___ (p, mp, mf, f, ff, etc. — notation only, not MIDI velocity)
 - Y1: ___, Y2: ___ (0-10, curve intensity)
 - Model: ___ (logarithmic / exponential / power / sigmoid / bezier)
 - Slope: ___ (-3 to +3)
@@ -26,7 +27,7 @@ Create a glissando:
 
 ### Option B: Natural Language
 
-> "Glissando on track 3, 120s to 128s, alto clef, A3 down to F3, logarithmic steep slope"
+> "Glissando on track 3, 120s to 128s, alto clef, A3 down to F3, mp, logarithmic steep slope"
 
 ### Option C: Trigger Phrase (Guided)
 
@@ -64,6 +65,7 @@ That's it. Cascade will run Steps 2-4 automatically using the data you provided 
 | Y2 | 0 |
 | Model | logarithmic |
 | Slope | 0 (linear) |
+| Dynamic | p (notation only) |
 | Velocity | 64 (mp) |
 | Articulation | 89 (senza vibrato) |
 
@@ -129,7 +131,7 @@ That's it. Cascade will run Steps 2-4 automatically using the data you provided 
 ## Full Example
 
 **You say:**
-> Create a glissando: Start 120s, End 128s, Track 3, E4 to C3, cClef, Y1=10 Y2=0, logarithmic slope -1
+> Create a glissando: Start 120s, End 128s, Track 3, E4 to C3, cClef, mp, Y1=10 Y2=0, logarithmic slope -1
 
 **Cascade responds:**
 > Created curve on track 3 (120s–128s), E4→C3, logarithmic slope -1. Adjust the curve shape if needed, then say "Generate".

@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "0979_v_testsSuccessfulSystemWorking",
-    "created": "2026-02-15T15:34:37.383Z",
-    "modified": "2026-02-15T15:34:37.423Z",
+    "created": "2026-02-15T03:11:49.953Z",
+    "modified": "2026-02-15T03:11:50.000Z",
     "author": ""
   },
   "tempoHistory": [
@@ -17845,6 +17845,1605 @@
           ],
           "snippetId": 179,
           "timestamp": 171419.9182551853
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_8zkmqrwrv",
+          "timeMs": 221000,
+          "type": "cc",
+          "data": [
+            176,
+            0,
+            89
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221000
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_6egqgcnuk",
+          "timeMs": 221000,
+          "type": "pitchBend",
+          "data": [
+            224,
+            127,
+            127
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221000
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_yx7445eb9",
+          "timeMs": 221000,
+          "type": "noteOn",
+          "data": [
+            144,
+            62,
+            64
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221000
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_318xg2bcp",
+          "timeMs": 221050,
+          "type": "pitchBend",
+          "data": [
+            224,
+            32,
+            126
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221050
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_u1fesqoyk",
+          "timeMs": 221100,
+          "type": "pitchBend",
+          "data": [
+            224,
+            66,
+            124
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221100
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_tpuqgg2ul",
+          "timeMs": 221152.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            99,
+            122
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221152.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_fz74h1uhd",
+          "timeMs": 221202.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            6,
+            121
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221202.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_zkypjm80y",
+          "timeMs": 221252.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            40,
+            119
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221252.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_d3fkqqg9l",
+          "timeMs": 221302.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            76,
+            117
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221302.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_toxp7kqj6",
+          "timeMs": 221352.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            112,
+            115
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221352.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_g2u33yvm4",
+          "timeMs": 221404.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            21,
+            114
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221404.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_kfjqyhwx0",
+          "timeMs": 221454.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            59,
+            112
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221454.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_bz8kzfey5",
+          "timeMs": 221504.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            99,
+            110
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221504.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_84v1ksb3y",
+          "timeMs": 221554.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            11,
+            109
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221554.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_5y4tv873l",
+          "timeMs": 221604.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            11,
+            107
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221604.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_6j19wut5z",
+          "timeMs": 221656.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            55,
+            105
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221656.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_c8jjptt38",
+          "timeMs": 221706.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            101,
+            103
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221706.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ofur7lwcc",
+          "timeMs": 221756.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            20,
+            102
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221756.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_4b7f1cwl1",
+          "timeMs": 221806.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            70,
+            100
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221806.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_5q5a348rm",
+          "timeMs": 221856.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            121,
+            98
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221856.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_uq0017nb4",
+          "timeMs": 221908.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            47,
+            97
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221908.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_3nmn9ikq1",
+          "timeMs": 221958.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            102,
+            95
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 221958.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ijm54hog5",
+          "timeMs": 222008.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            33,
+            94
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222008.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_w3lovy616",
+          "timeMs": 222058.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            93,
+            92
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222058.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_62dok5gxn",
+          "timeMs": 222108.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            28,
+            91
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222108.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_oyw8irevo",
+          "timeMs": 222160.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            93,
+            89
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222160.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_9p0m0lvu5",
+          "timeMs": 222210.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            33,
+            88
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222210.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_6iklcpqmu",
+          "timeMs": 222260.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            104,
+            86
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222260.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_q1fhty0bn",
+          "timeMs": 222310.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            49,
+            85
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222310.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_4u2jmx43d",
+          "timeMs": 222360.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            125,
+            83
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222360.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_qr4cp9aj6",
+          "timeMs": 222412.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            76,
+            82
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222412.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_nusrx2k2b",
+          "timeMs": 222462.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            30,
+            81
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222462.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_vlvjnogvu",
+          "timeMs": 222512.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            114,
+            79
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222512.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_fgua7gq6n",
+          "timeMs": 222562.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            74,
+            78
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222562.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_7klyrgkee",
+          "timeMs": 222612.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            36,
+            77
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222612.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_p7n0wzzpo",
+          "timeMs": 222664.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            1,
+            76
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222664.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_e7g4zpepa",
+          "timeMs": 222714.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            98,
+            74
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222714.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_pqmjogtfd",
+          "timeMs": 222764.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            69,
+            73
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222764.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_70zl0wt61",
+          "timeMs": 222814.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            13,
+            72
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222814.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_7yvuhuvew",
+          "timeMs": 222864.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            119,
+            70
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222864.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_nffjsk8d3",
+          "timeMs": 222916.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            100,
+            69
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222916.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_r2u7l03x1",
+          "timeMs": 222966.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            84,
+            68
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 222966.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_myxjmz8sb",
+          "timeMs": 223016.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            71,
+            67
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223016.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_f5jzcgqef",
+          "timeMs": 223066.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            61,
+            66
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223066.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_nmoo1o58h",
+          "timeMs": 223116.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            54,
+            65
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223116.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_kwn4co7s2",
+          "timeMs": 223168.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            50,
+            64
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223168.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_kl85ljd4z",
+          "timeMs": 223218.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            49,
+            63
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223218.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_qkcrdnqhh",
+          "timeMs": 223268.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            51,
+            62
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223268.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_aa78i5ubh",
+          "timeMs": 223318.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            56,
+            61
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223318.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_uehzgport",
+          "timeMs": 223368.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            64,
+            60
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223368.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_yikg5k6op",
+          "timeMs": 223420.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            74,
+            59
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223420.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_i5jl7oldr",
+          "timeMs": 223470.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            88,
+            58
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223470.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_wrk1pq987",
+          "timeMs": 223520.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            104,
+            57
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223520.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_7rn44ee1i",
+          "timeMs": 223570.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            123,
+            56
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223570.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_iwbk6rlc5",
+          "timeMs": 223620.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            16,
+            56
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223620.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_wxft9gk28",
+          "timeMs": 223672.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            41,
+            55
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223672.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_12yw1892x",
+          "timeMs": 223722.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            68,
+            54
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223722.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ndjxxfjer",
+          "timeMs": 223772.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            97,
+            53
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223772.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_cpdbpc4t6",
+          "timeMs": 223822.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            2,
+            53
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223822.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_v705o8au8",
+          "timeMs": 223872.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            36,
+            52
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223872.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_xxsup81p8",
+          "timeMs": 223925,
+          "type": "pitchBend",
+          "data": [
+            224,
+            73,
+            51
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223925
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ccsic0v9z",
+          "timeMs": 223975,
+          "type": "pitchBend",
+          "data": [
+            224,
+            113,
+            50
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 223975
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_xxu1w74bu",
+          "timeMs": 224025,
+          "type": "pitchBend",
+          "data": [
+            224,
+            10,
+            50
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224025
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_fg4tp12dz",
+          "timeMs": 224075,
+          "type": "pitchBend",
+          "data": [
+            224,
+            55,
+            49
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224075
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_z7tji9xp6",
+          "timeMs": 224127.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            102,
+            48
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224127.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_nv1agl7cp",
+          "timeMs": 224177.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            24,
+            48
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224177.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_tv7ydz1s1",
+          "timeMs": 224227.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            75,
+            47
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224227.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_kyr9ja8i5",
+          "timeMs": 224277.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            1,
+            47
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224277.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_phstj8c0p",
+          "timeMs": 224327.08333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            57,
+            46
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224327.08333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_8vwiooxl3",
+          "timeMs": 224379.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            115,
+            45
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224379.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_sk03epcjt",
+          "timeMs": 224429.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            47,
+            45
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224429.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_nae8qq821",
+          "timeMs": 224479.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            108,
+            44
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224479.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ovwqss0aw",
+          "timeMs": 224529.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            44,
+            44
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224529.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_dh68bpkhx",
+          "timeMs": 224579.16666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            110,
+            43
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224579.16666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_z12iqjmkg",
+          "timeMs": 224631.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            50,
+            43
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224631.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_u98ebbrj7",
+          "timeMs": 224681.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            119,
+            42
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224681.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ert0fnc0y",
+          "timeMs": 224731.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            62,
+            42
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224731.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_yqzihc513",
+          "timeMs": 224781.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            7,
+            42
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224781.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_goo2f3od0",
+          "timeMs": 224831.25,
+          "type": "pitchBend",
+          "data": [
+            224,
+            81,
+            41
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224831.25
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ohr3mv6di",
+          "timeMs": 224883.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            29,
+            41
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224883.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_mfst2d3oo",
+          "timeMs": 224933.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            107,
+            40
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224933.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_g5kjlkwj4",
+          "timeMs": 224983.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            58,
+            40
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 224983.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_znrnwziuq",
+          "timeMs": 225033.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            11,
+            40
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225033.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_sbfcaa6lt",
+          "timeMs": 225083.33333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            93,
+            39
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225083.33333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_s8abxtmau",
+          "timeMs": 225135.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            49,
+            39
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225135.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_16egzjgo4",
+          "timeMs": 225185.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            6,
+            39
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225185.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ctyd0mgdb",
+          "timeMs": 225235.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            84,
+            38
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225235.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_88kp61x6d",
+          "timeMs": 225285.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            44,
+            38
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225285.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_bs0xj0hp5",
+          "timeMs": 225335.41666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            5,
+            38
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225335.41666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_nwsllyexp",
+          "timeMs": 225387.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            95,
+            37
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225387.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_z58s5u1w6",
+          "timeMs": 225437.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            59,
+            37
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225437.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_6tirwp0wz",
+          "timeMs": 225487.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            23,
+            37
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225487.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_d5ecnf6tv",
+          "timeMs": 225537.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            117,
+            36
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225537.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ebbitbgqa",
+          "timeMs": 225587.5,
+          "type": "pitchBend",
+          "data": [
+            224,
+            84,
+            36
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225587.5
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_pqa517rz2",
+          "timeMs": 225639.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            52,
+            36
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225639.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_kxu1yk4g2",
+          "timeMs": 225689.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            21,
+            36
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225689.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_bqccg4iwh",
+          "timeMs": 225739.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            119,
+            35
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225739.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_sky7gij20",
+          "timeMs": 225789.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            90,
+            35
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225789.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ds8fcfdtc",
+          "timeMs": 225839.58333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            62,
+            35
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225839.58333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ei8pdynmw",
+          "timeMs": 225891.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            35,
+            35
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225891.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_9hwn4f13b",
+          "timeMs": 225941.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            9,
+            35
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225941.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ka000ikw5",
+          "timeMs": 225991.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            111,
+            34
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 225991.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_1v8jj5ybz",
+          "timeMs": 226041.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            86,
+            34
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226041.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_my0p6lehp",
+          "timeMs": 226091.66666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            63,
+            34
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226091.66666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_9ztpod3mp",
+          "timeMs": 226143.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            40,
+            34
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226143.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ykfhgbhrv",
+          "timeMs": 226193.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            17,
+            34
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226193.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ax37b9x7p",
+          "timeMs": 226243.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            124,
+            33
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226243.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_4d9on17z0",
+          "timeMs": 226293.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            103,
+            33
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226293.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_aer0w114u",
+          "timeMs": 226343.75,
+          "type": "pitchBend",
+          "data": [
+            224,
+            83,
+            33
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226343.75
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_4lgq98u8z",
+          "timeMs": 226395.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            63,
+            33
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226395.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_e7k5atcbb",
+          "timeMs": 226445.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            41,
+            33
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226445.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_ip7wevwr7",
+          "timeMs": 226495.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            23,
+            33
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226495.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_r02a5zct7",
+          "timeMs": 226545.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            5,
+            33
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226545.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_wt3xmhqy5",
+          "timeMs": 226595.83333333334,
+          "type": "pitchBend",
+          "data": [
+            224,
+            116,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226595.83333333334
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_8obcja1tz",
+          "timeMs": 226647.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            100,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226647.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_4e9yzvaid",
+          "timeMs": 226697.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            84,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226697.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_8msul2sks",
+          "timeMs": 226747.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            69,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226747.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_eubp31eml",
+          "timeMs": 226797.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            54,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226797.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_xslnasyok",
+          "timeMs": 226847.91666666666,
+          "type": "pitchBend",
+          "data": [
+            224,
+            40,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226847.91666666666
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_9kd0imny0",
+          "timeMs": 226900,
+          "type": "pitchBend",
+          "data": [
+            224,
+            26,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226900
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_gx5hzrmk0",
+          "timeMs": 226950,
+          "type": "pitchBend",
+          "data": [
+            224,
+            13,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 226950
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_21j6yatk0",
+          "timeMs": 227000,
+          "type": "pitchBend",
+          "data": [
+            224,
+            0,
+            32
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 227000
+        },
+        {
+          "id": "gliss_177_seg0_1771125029499_hvyk4i2l6",
+          "timeMs": 227000,
+          "type": "noteOff",
+          "data": [
+            128,
+            62,
+            0
+          ],
+          "sourceCurve": 177,
+          "snippetId": 216,
+          "timestamp": 227000
         }
       ]
     },
@@ -138705,6 +140304,1128 @@
           "sourceCurve": 176,
           "sourceFile": "CRV_20260214_214213_seg02_Cs4_dn.mid",
           "createdAt": 1771123350897
+        },
+        {
+          "id": 216,
+          "name": "Gliss seg1 @ CRV_20260214_220848",
+          "trackIndex": 1,
+          "startTimeMs": 221000,
+          "durationMs": 6000,
+          "startSeconds": 221,
+          "endSeconds": 227,
+          "events": [
+            {
+              "timeMs": 221000,
+              "type": "cc",
+              "data": [
+                176,
+                0,
+                89
+              ]
+            },
+            {
+              "timeMs": 221000,
+              "type": "pitchBend",
+              "data": [
+                224,
+                127,
+                127
+              ]
+            },
+            {
+              "timeMs": 221000,
+              "type": "noteOn",
+              "data": [
+                144,
+                62,
+                64
+              ]
+            },
+            {
+              "timeMs": 221050,
+              "type": "pitchBend",
+              "data": [
+                224,
+                32,
+                126
+              ]
+            },
+            {
+              "timeMs": 221100,
+              "type": "pitchBend",
+              "data": [
+                224,
+                66,
+                124
+              ]
+            },
+            {
+              "timeMs": 221152.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                99,
+                122
+              ]
+            },
+            {
+              "timeMs": 221202.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                6,
+                121
+              ]
+            },
+            {
+              "timeMs": 221252.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                40,
+                119
+              ]
+            },
+            {
+              "timeMs": 221302.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                76,
+                117
+              ]
+            },
+            {
+              "timeMs": 221352.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                112,
+                115
+              ]
+            },
+            {
+              "timeMs": 221404.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                21,
+                114
+              ]
+            },
+            {
+              "timeMs": 221454.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                59,
+                112
+              ]
+            },
+            {
+              "timeMs": 221504.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                99,
+                110
+              ]
+            },
+            {
+              "timeMs": 221554.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                11,
+                109
+              ]
+            },
+            {
+              "timeMs": 221604.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                11,
+                107
+              ]
+            },
+            {
+              "timeMs": 221656.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                55,
+                105
+              ]
+            },
+            {
+              "timeMs": 221706.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                101,
+                103
+              ]
+            },
+            {
+              "timeMs": 221756.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                20,
+                102
+              ]
+            },
+            {
+              "timeMs": 221806.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                70,
+                100
+              ]
+            },
+            {
+              "timeMs": 221856.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                121,
+                98
+              ]
+            },
+            {
+              "timeMs": 221908.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                47,
+                97
+              ]
+            },
+            {
+              "timeMs": 221958.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                102,
+                95
+              ]
+            },
+            {
+              "timeMs": 222008.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                33,
+                94
+              ]
+            },
+            {
+              "timeMs": 222058.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                93,
+                92
+              ]
+            },
+            {
+              "timeMs": 222108.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                28,
+                91
+              ]
+            },
+            {
+              "timeMs": 222160.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                93,
+                89
+              ]
+            },
+            {
+              "timeMs": 222210.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                33,
+                88
+              ]
+            },
+            {
+              "timeMs": 222260.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                104,
+                86
+              ]
+            },
+            {
+              "timeMs": 222310.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                49,
+                85
+              ]
+            },
+            {
+              "timeMs": 222360.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                125,
+                83
+              ]
+            },
+            {
+              "timeMs": 222412.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                76,
+                82
+              ]
+            },
+            {
+              "timeMs": 222462.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                30,
+                81
+              ]
+            },
+            {
+              "timeMs": 222512.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                114,
+                79
+              ]
+            },
+            {
+              "timeMs": 222562.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                74,
+                78
+              ]
+            },
+            {
+              "timeMs": 222612.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                36,
+                77
+              ]
+            },
+            {
+              "timeMs": 222664.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                1,
+                76
+              ]
+            },
+            {
+              "timeMs": 222714.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                98,
+                74
+              ]
+            },
+            {
+              "timeMs": 222764.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                69,
+                73
+              ]
+            },
+            {
+              "timeMs": 222814.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                13,
+                72
+              ]
+            },
+            {
+              "timeMs": 222864.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                119,
+                70
+              ]
+            },
+            {
+              "timeMs": 222916.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                100,
+                69
+              ]
+            },
+            {
+              "timeMs": 222966.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                84,
+                68
+              ]
+            },
+            {
+              "timeMs": 223016.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                71,
+                67
+              ]
+            },
+            {
+              "timeMs": 223066.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                61,
+                66
+              ]
+            },
+            {
+              "timeMs": 223116.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                54,
+                65
+              ]
+            },
+            {
+              "timeMs": 223168.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                50,
+                64
+              ]
+            },
+            {
+              "timeMs": 223218.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                49,
+                63
+              ]
+            },
+            {
+              "timeMs": 223268.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                51,
+                62
+              ]
+            },
+            {
+              "timeMs": 223318.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                56,
+                61
+              ]
+            },
+            {
+              "timeMs": 223368.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                64,
+                60
+              ]
+            },
+            {
+              "timeMs": 223420.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                74,
+                59
+              ]
+            },
+            {
+              "timeMs": 223470.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                88,
+                58
+              ]
+            },
+            {
+              "timeMs": 223520.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                104,
+                57
+              ]
+            },
+            {
+              "timeMs": 223570.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                123,
+                56
+              ]
+            },
+            {
+              "timeMs": 223620.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                16,
+                56
+              ]
+            },
+            {
+              "timeMs": 223672.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                41,
+                55
+              ]
+            },
+            {
+              "timeMs": 223722.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                68,
+                54
+              ]
+            },
+            {
+              "timeMs": 223772.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                97,
+                53
+              ]
+            },
+            {
+              "timeMs": 223822.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                2,
+                53
+              ]
+            },
+            {
+              "timeMs": 223872.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                36,
+                52
+              ]
+            },
+            {
+              "timeMs": 223925,
+              "type": "pitchBend",
+              "data": [
+                224,
+                73,
+                51
+              ]
+            },
+            {
+              "timeMs": 223975,
+              "type": "pitchBend",
+              "data": [
+                224,
+                113,
+                50
+              ]
+            },
+            {
+              "timeMs": 224025,
+              "type": "pitchBend",
+              "data": [
+                224,
+                10,
+                50
+              ]
+            },
+            {
+              "timeMs": 224075,
+              "type": "pitchBend",
+              "data": [
+                224,
+                55,
+                49
+              ]
+            },
+            {
+              "timeMs": 224127.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                102,
+                48
+              ]
+            },
+            {
+              "timeMs": 224177.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                24,
+                48
+              ]
+            },
+            {
+              "timeMs": 224227.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                75,
+                47
+              ]
+            },
+            {
+              "timeMs": 224277.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                1,
+                47
+              ]
+            },
+            {
+              "timeMs": 224327.08333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                57,
+                46
+              ]
+            },
+            {
+              "timeMs": 224379.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                115,
+                45
+              ]
+            },
+            {
+              "timeMs": 224429.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                47,
+                45
+              ]
+            },
+            {
+              "timeMs": 224479.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                108,
+                44
+              ]
+            },
+            {
+              "timeMs": 224529.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                44,
+                44
+              ]
+            },
+            {
+              "timeMs": 224579.16666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                110,
+                43
+              ]
+            },
+            {
+              "timeMs": 224631.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                50,
+                43
+              ]
+            },
+            {
+              "timeMs": 224681.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                119,
+                42
+              ]
+            },
+            {
+              "timeMs": 224731.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                62,
+                42
+              ]
+            },
+            {
+              "timeMs": 224781.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                7,
+                42
+              ]
+            },
+            {
+              "timeMs": 224831.25,
+              "type": "pitchBend",
+              "data": [
+                224,
+                81,
+                41
+              ]
+            },
+            {
+              "timeMs": 224883.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                29,
+                41
+              ]
+            },
+            {
+              "timeMs": 224933.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                107,
+                40
+              ]
+            },
+            {
+              "timeMs": 224983.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                58,
+                40
+              ]
+            },
+            {
+              "timeMs": 225033.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                11,
+                40
+              ]
+            },
+            {
+              "timeMs": 225083.33333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                93,
+                39
+              ]
+            },
+            {
+              "timeMs": 225135.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                49,
+                39
+              ]
+            },
+            {
+              "timeMs": 225185.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                6,
+                39
+              ]
+            },
+            {
+              "timeMs": 225235.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                84,
+                38
+              ]
+            },
+            {
+              "timeMs": 225285.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                44,
+                38
+              ]
+            },
+            {
+              "timeMs": 225335.41666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                5,
+                38
+              ]
+            },
+            {
+              "timeMs": 225387.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                95,
+                37
+              ]
+            },
+            {
+              "timeMs": 225437.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                59,
+                37
+              ]
+            },
+            {
+              "timeMs": 225487.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                23,
+                37
+              ]
+            },
+            {
+              "timeMs": 225537.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                117,
+                36
+              ]
+            },
+            {
+              "timeMs": 225587.5,
+              "type": "pitchBend",
+              "data": [
+                224,
+                84,
+                36
+              ]
+            },
+            {
+              "timeMs": 225639.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                52,
+                36
+              ]
+            },
+            {
+              "timeMs": 225689.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                21,
+                36
+              ]
+            },
+            {
+              "timeMs": 225739.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                119,
+                35
+              ]
+            },
+            {
+              "timeMs": 225789.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                90,
+                35
+              ]
+            },
+            {
+              "timeMs": 225839.58333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                62,
+                35
+              ]
+            },
+            {
+              "timeMs": 225891.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                35,
+                35
+              ]
+            },
+            {
+              "timeMs": 225941.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                9,
+                35
+              ]
+            },
+            {
+              "timeMs": 225991.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                111,
+                34
+              ]
+            },
+            {
+              "timeMs": 226041.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                86,
+                34
+              ]
+            },
+            {
+              "timeMs": 226091.66666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                63,
+                34
+              ]
+            },
+            {
+              "timeMs": 226143.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                40,
+                34
+              ]
+            },
+            {
+              "timeMs": 226193.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                17,
+                34
+              ]
+            },
+            {
+              "timeMs": 226243.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                124,
+                33
+              ]
+            },
+            {
+              "timeMs": 226293.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                103,
+                33
+              ]
+            },
+            {
+              "timeMs": 226343.75,
+              "type": "pitchBend",
+              "data": [
+                224,
+                83,
+                33
+              ]
+            },
+            {
+              "timeMs": 226395.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                63,
+                33
+              ]
+            },
+            {
+              "timeMs": 226445.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                41,
+                33
+              ]
+            },
+            {
+              "timeMs": 226495.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                23,
+                33
+              ]
+            },
+            {
+              "timeMs": 226545.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                5,
+                33
+              ]
+            },
+            {
+              "timeMs": 226595.83333333334,
+              "type": "pitchBend",
+              "data": [
+                224,
+                116,
+                32
+              ]
+            },
+            {
+              "timeMs": 226647.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                100,
+                32
+              ]
+            },
+            {
+              "timeMs": 226697.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                84,
+                32
+              ]
+            },
+            {
+              "timeMs": 226747.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                69,
+                32
+              ]
+            },
+            {
+              "timeMs": 226797.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                54,
+                32
+              ]
+            },
+            {
+              "timeMs": 226847.91666666666,
+              "type": "pitchBend",
+              "data": [
+                224,
+                40,
+                32
+              ]
+            },
+            {
+              "timeMs": 226900,
+              "type": "pitchBend",
+              "data": [
+                224,
+                26,
+                32
+              ]
+            },
+            {
+              "timeMs": 226950,
+              "type": "pitchBend",
+              "data": [
+                224,
+                13,
+                32
+              ]
+            },
+            {
+              "timeMs": 227000,
+              "type": "pitchBend",
+              "data": [
+                224,
+                0,
+                32
+              ]
+            },
+            {
+              "timeMs": 227000,
+              "type": "noteOff",
+              "data": [
+                128,
+                62,
+                0
+              ]
+            }
+          ],
+          "color": "limeGreen",
+          "sourceCurve": 177,
+          "sourceFile": "CRV_20260214_220848_seg01_D4_dn.mid",
+          "createdAt": 1771125029499
         }
       ],
       "nextId": 217

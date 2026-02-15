@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Feb 14, 2026  
-**Current ASB Number:** ASB-013
+**Current ASB Number:** ASB-017
 
 ---
 
@@ -14,27 +14,23 @@
 
 ## Current Session
 
-**Date:** Feb 14, 2026  
-**Focus:** Score automation infrastructure  
-**Tier 1 Count This Session:** 1  
+**Date:** Feb 15, 2026  
+**Focus:** Post-milestone addendum — glissando UI & notation enhancements  
+**Tier 1 Count This Session:** 4  
 **Tier 2 Threshold:** 4 increments
 
-### Session Log
-- Set up workflow methodology and documentation system
-- Created automation framework
-- ASB-001: Created ScoreAutomation object with createGlissandoGesture workflow
-- ASB-002: Created LONG_TONE_GLISSANDO_WORKFLOW.md with step-by-step tracking
-- ASB-003: Step 1 real-time testing, y2=0 bug fix, default color to limeGreen
-- ASB-004: Long Tone Workflow UI + model/slope parameters
-- ASB-005: Step 2a - Glissando notation template + single GO button
-- ASB-006: Steps 2b-4 complete (SVG rendering, MIDI generation, score insertion)
-- ASB-007: Split GO into Step 1 (Curve) + Step 2 (Generate) buttons
-- ASB-008: Fix SVG rendering PowerShell script (Inkscape canvas-fit)
-- ASB-009: Fix MIDI snippet backward compat + startSeconds/endSeconds
-- ASB-010: Fix LilyPond octave notation (' and , marks)
-- ASB-011: Fix SVG positioning (content bounds + leadInSeconds closure bug)
-- ASB-012: Fix audio display not rendering on score load
-- ASB-013: AI Glissando Prompt Guide - two-stage parallel prompting system
+### Session Log (prior sessions)
+- ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
+
+### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
+*Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
+
+- ASB-014: Add dynamic notation marking to glissando (independent from MIDI velocity)
+- ASB-015: UI adjustments — default clef treble, velocity input box (0-127), "Dynamic" label
+- ASB-016: Add color swatches + fill mode (Line/Fill↓/Fill↑) to Long Tone UI
+- Bug fix: SVG resize handle (blue square) persisting after element deletion
+- Bug fix: CurveMaker swatch selectors were unscoped — stripping LT palette defaults
+- ASB-017: Post-Milestone Addendum Protocol — documented in WORKFLOW_METHODOLOGY.md + progress file
 
 ---
 
@@ -68,6 +64,10 @@
 | ASB-011 | Fix SVG positioning (content bounds + leadInSeconds bug) | Complete |
 | ASB-012 | Fix audio display not rendering on score load | Complete |
 | ASB-013 | AI Glissando Prompt Guide - two-stage parallel prompting system | Complete |
+| ASB-014 | Dynamic notation marking (independent from MIDI velocity) | Complete |
+| ASB-015 | UI: default clef treble, velocity input (0-127), Dynamic label | Complete |
+| ASB-016 | Color swatches + fill mode in Long Tone UI (default: limeGreen, Fill↓) | Complete |
+| ASB-017 | Post-Milestone Addendum Protocol (workflow methodology) | Complete |
 
 ---
 
@@ -119,6 +119,15 @@
 3. Create comprehensive memory
 4. Propose git tag
 
+### Post-Milestone Addendums:
+1. Keep original Tier 3 tag intact (rollback point)
+2. Continue linear ASB numbering
+3. Group under `### Addendum: [milestone name]` in session log
+4. Tier 2 commits use `addendum:` prefix in message
+5. Bug fixes during addendum work noted in log (separate ASB only if significant)
+6. If addendums are substantial, create revision tag: `milestone-{name}-v2`
+7. See `docs/WORKFLOW_METHODOLOGY.md` → "Pattern: Post-Milestone Addendums" for full protocol
+
 ### On Session Start ("Continuing AI score building"):
 1. Read this file and workflow file
 2. Report: last session date, pending work, ASB count
@@ -137,5 +146,8 @@
 *(Auto-append new insights here)*
 
 When a workflow insight emerges during development, append it here AND to `docs/WORKFLOW_METHODOLOGY.md`.
+
+### Post-Milestone Addendums (Feb 15, 2026)
+After finalizing a Tier 3 milestone, the next session often reveals refinements that extend the feature — new sub-features, default adjustments, UI polish. These are "addendums," not new features. Protocol: keep original tag intact, continue ASB numbering, group under `### Addendum:` heading, use `addendum:` prefix in Tier 2 commits. See WORKFLOW_METHODOLOGY.md for full pattern.
 
 ---

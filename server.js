@@ -930,7 +930,7 @@ app.get('/api/lilypond/exists/:filename', (req, res) => {
 
 // Create glissando LilyPond file from template
 app.post('/api/lilypond/create-glissando', (req, res) => {
-    const { filename, clef, startPitch, endPitch, glissOffset } = req.body;
+    const { filename, clef, startPitch, endPitch, glissOffset, dynamic } = req.body;
     
     if (!filename || !clef || !startPitch || !endPitch) {
         return res.status(400).json({ success: false, error: 'Missing required parameters' });
@@ -957,8 +957,10 @@ app.post('/api/lilypond/create-glissando', (req, res) => {
         // Clef: replace "\clef alto" with appropriate clef
         template = template.replace(/\\clef alto/g, `\\clef ${clef}`);
         
-        // Start pitch: replace "a4" on the line with START_PITCH comment
-        template = template.replace(/^(\s*)(a4)(\s*$)/m, `$1${startPitch}$3`);
+        // Start pitch + dynamic: replace "a4\p" with new pitch + dynamic marking
+        // Dynamic is a LilyPond dynamic like \p, \ff, \mp, etc. Empty = no dynamic.
+        const dynamicMarkup = dynamic ? `\\${dynamic}` : '';
+        template = template.replace(/^(\s*)(a4\\p)(\s*$)/m, `$1${startPitch}${dynamicMarkup}$3`);
         
         // End pitch: replace "af4" on the line after END_PITCH comment  
         template = template.replace(/^(\s*)(af4)(\s*$)/m, `$1${endPitch}$3`);
