@@ -1003,7 +1003,7 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Glissando</div>
+                <div class="section-label">Glissando Pitch Tracking</div>
                 
                 <div class="curve-input-row">
                     <label>Clef</label>
@@ -15001,7 +15001,35 @@
                 // Create pitch display elements for each staff cursor
                 this.createPitchDisplays();
                 
+                // Re-index any loaded glissando data (pitch list may have changed)
+                this.reindexAllGlissandos();
+                
                 console.debug('GlissandoSystem initialized');
+            },
+            
+            // Re-index glissando startIndex/endIndex from pitch names
+            // Needed after pitch list changes (e.g. half-step fix) so saved data stays correct
+            reindexAllGlissandos() {
+                if (!window.CurveDatabase) return;
+                const curves = CurveDatabase.getAll();
+                let reindexed = 0;
+                for (const curve of curves) {
+                    if (!curve.glissando) continue;
+                    const { startPitch, endPitch } = curve.glissando;
+                    if (!startPitch || !endPitch) continue;
+                    const newStartIdx = this.pitchList.findIndex(p => p.name === startPitch);
+                    const newEndIdx = this.pitchList.findIndex(p => p.name === endPitch);
+                    if (newStartIdx !== -1 && newEndIdx !== -1) {
+                        if (curve.glissando.startIndex !== newStartIdx || curve.glissando.endIndex !== newEndIdx) {
+                            curve.glissando.startIndex = newStartIdx;
+                            curve.glissando.endIndex = newEndIdx;
+                            reindexed++;
+                        }
+                    }
+                }
+                if (reindexed > 0) {
+                    console.debug(`GlissandoSystem: Re-indexed ${reindexed} glissando(s) to match updated pitch list`);
+                }
             },
             
             buildPitchList() {
@@ -15014,14 +15042,16 @@
                 // Chromatic order within octave using sharps (24 quarter-tone steps)
                 // SVG files exist for all these variants
                 // QS = quarter-sharp, S = sharp, TQS = three-quarter-sharp
+                // E-F and B-C are half steps (2 quarter-tone steps, no sharp/TQS)
+                // E# = F and B# = C, so ES/ETQS/BS/BTQS don't exist as distinct pitches
                 const chromaticOrder = [
-                    'C', 'CQS', 'CS', 'CTQS',
-                    'D', 'DQS', 'DS', 'DTQS',
-                    'E', 'EQS', 'ES', 'ETQS',
-                    'F', 'FQS', 'FS', 'FTQS',
-                    'G', 'GQS', 'GS', 'GTQS',
-                    'A', 'AQS', 'AS', 'ATQS',
-                    'B', 'BQS', 'BS', 'BTQS'
+                    'C', 'CQS', 'CS', 'CTQS',       // C  whole step to D (4 quarter tones)
+                    'D', 'DQS', 'DS', 'DTQS',       // D  whole step to E (4 quarter tones)
+                    'E', 'EQS',                       // E  half step to F  (2 quarter tones)
+                    'F', 'FQS', 'FS', 'FTQS',       // F  whole step to G (4 quarter tones)
+                    'G', 'GQS', 'GS', 'GTQS',       // G  whole step to A (4 quarter tones)
+                    'A', 'AQS', 'AS', 'ATQS',       // A  whole step to B (4 quarter tones)
+                    'B', 'BQS'                        // B  half step to C  (2 quarter tones)
                 ];
                 
                 // Build pitch list for octaves 1-7
