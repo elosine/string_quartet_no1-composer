@@ -20,6 +20,7 @@ Create a glissando:
 - End pitch: ___ (e.g., C3, G#4)
 - Clef: ___ (treble / cClef / bass)
 - Dynamic: ___ (p, mp, mf, f, ff, etc. — notation only, not MIDI velocity)
+- Velocity: ___ (0-127, MIDI velocity — independent from dynamic notation)
 - Y1: ___, Y2: ___ (0-10, curve intensity)
 - Model: ___ (logarithmic / exponential / power / sigmoid / bezier)
 - Slope: ___ (-3 to +3)
@@ -38,9 +39,10 @@ Cascade will ask you each parameter in turn. Say "default" to skip any question.
 ### What Happens
 
 - Cascade parses your parameters, shows a summary for confirmation
-- Runs Step 1: curve appears on the score
-- **You can now adjust the slope in the UI** — drag, change model, etc.
-- All pitch/clef/track data is remembered for Stage 2
+- Runs `LongToneUI.step1(params)`: curve appears on the score
+- **You can now adjust the slope/model in the UI** — drag, change model, etc.
+- All manual adjustments are tracked in real time (curve data regenerates on every edit)
+- Pitch/clef/track/dynamic/velocity data is remembered for Stage 2
 
 ---
 
@@ -50,7 +52,7 @@ When you're happy with the curve shape, say:
 
 > **"Generate"**
 
-That's it. Cascade will run Steps 2-4 automatically using the data you provided in Stage 1:
+That's it. Cascade will run `LongToneUI.step2(params)` — Steps 2-4 automatically using the data from Stage 1 **plus any manual slope/model adjustments you made**:
 - Generate LilyPond notation
 - Render and insert SVG
 - Generate and insert MIDI segments
@@ -125,6 +127,50 @@ That's it. Cascade will run Steps 2-4 automatically using the data you provided 
 | `treble` | Treble (G clef) |
 | `cClef` | Alto / C clef |
 | `bass` | Bass (F clef) |
+
+---
+
+## Pre-Step 1 Validation Checklist
+
+<!-- VALIDATION CHECKLIST: Cascade performs these checks before running step1.
+     To add, remove, or modify checks, edit this section.
+     Each check has: what to check, when to flag, and what to suggest. -->
+
+Before running `LongToneUI.step1()`, Cascade validates the parsed parameters and flags issues:
+
+### 1. Missing Required Parameters
+**Check:** Start time, end time, track, start pitch, end pitch must all be provided.
+**Flag:** If any are missing, ask the user before proceeding.
+
+### 2. Clef vs Pitch Range
+**Check:** Do the pitches sit comfortably in the chosen clef?
+**Flag:** If either pitch requires more than 2 ledger lines in the chosen clef.
+**Suggest:** Alternative clef (e.g., "D4 in bass clef needs a ledger line — consider cClef?")
+
+| Clef | Comfortable Range |
+|------|------------------|
+| `treble` | C4 – C7 |
+| `cClef` | C3 – C6 |
+| `bass` | C1 – C4 |
+
+### 3. Unusual Interval
+**Check:** Is the pitch interval very small (<1 semitone) or very large (>2 octaves)?
+**Flag:** Warn and confirm intent.
+**Rationale:** Very small intervals may produce barely audible glissandos; very large intervals may produce unusable MIDI segments.
+
+### 4. Pitch Order vs Y Direction
+**Check:** If start pitch > end pitch, the gliss is descending (Y1 should be > Y2, default 10→0). If start pitch < end pitch, it's ascending (Y1 should be < Y2, i.e., 0→10).
+**Flag:** If the user specifies Y values that contradict the pitch direction.
+**Suggest:** "Your pitches go D4→Cd4 (descending) but Y1=0, Y2=10 implies ascending. Did you mean Y1=10, Y2=0?"
+
+### 5. Time Overlap
+**Check:** Is there already a curve on the same track in the overlapping time range?
+**Flag:** Warn if overlap detected.
+**Note:** This check requires reading CurveDatabase — Cascade should mention if it cannot verify.
+
+### 6. Duration Sanity
+**Check:** Is the duration extremely short (<0.5s) or extremely long (>60s)?
+**Flag:** Warn and confirm intent.
 
 ---
 
