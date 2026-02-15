@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "0979_w_draft_AIpromptTest",
-    "created": "2026-02-15T03:11:13.788Z",
-    "modified": "2026-02-15T03:11:13.830Z",
+    "created": "2026-02-15T03:09:02.626Z",
+    "modified": "2026-02-15T03:09:02.677Z",
     "author": ""
   },
   "tempoHistory": [
@@ -17845,1605 +17845,6 @@
           ],
           "snippetId": 179,
           "timestamp": 171419.9182551853
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_8zkmqrwrv",
-          "timeMs": 221000,
-          "type": "cc",
-          "data": [
-            176,
-            0,
-            89
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221000
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_6egqgcnuk",
-          "timeMs": 221000,
-          "type": "pitchBend",
-          "data": [
-            224,
-            127,
-            127
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221000
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_yx7445eb9",
-          "timeMs": 221000,
-          "type": "noteOn",
-          "data": [
-            144,
-            62,
-            64
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221000
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_318xg2bcp",
-          "timeMs": 221050,
-          "type": "pitchBend",
-          "data": [
-            224,
-            32,
-            126
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221050
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_u1fesqoyk",
-          "timeMs": 221100,
-          "type": "pitchBend",
-          "data": [
-            224,
-            66,
-            124
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221100
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_tpuqgg2ul",
-          "timeMs": 221152.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            99,
-            122
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221152.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_fz74h1uhd",
-          "timeMs": 221202.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            6,
-            121
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221202.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_zkypjm80y",
-          "timeMs": 221252.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            40,
-            119
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221252.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_d3fkqqg9l",
-          "timeMs": 221302.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            76,
-            117
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221302.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_toxp7kqj6",
-          "timeMs": 221352.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            112,
-            115
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221352.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_g2u33yvm4",
-          "timeMs": 221404.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            21,
-            114
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221404.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_kfjqyhwx0",
-          "timeMs": 221454.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            59,
-            112
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221454.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_bz8kzfey5",
-          "timeMs": 221504.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            99,
-            110
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221504.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_84v1ksb3y",
-          "timeMs": 221554.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            11,
-            109
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221554.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_5y4tv873l",
-          "timeMs": 221604.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            11,
-            107
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221604.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_6j19wut5z",
-          "timeMs": 221656.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            55,
-            105
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221656.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_c8jjptt38",
-          "timeMs": 221706.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            101,
-            103
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221706.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ofur7lwcc",
-          "timeMs": 221756.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            20,
-            102
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221756.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_4b7f1cwl1",
-          "timeMs": 221806.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            70,
-            100
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221806.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_5q5a348rm",
-          "timeMs": 221856.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            121,
-            98
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221856.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_uq0017nb4",
-          "timeMs": 221908.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            47,
-            97
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221908.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_3nmn9ikq1",
-          "timeMs": 221958.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            102,
-            95
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 221958.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ijm54hog5",
-          "timeMs": 222008.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            33,
-            94
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222008.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_w3lovy616",
-          "timeMs": 222058.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            93,
-            92
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222058.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_62dok5gxn",
-          "timeMs": 222108.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            28,
-            91
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222108.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_oyw8irevo",
-          "timeMs": 222160.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            93,
-            89
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222160.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_9p0m0lvu5",
-          "timeMs": 222210.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            33,
-            88
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222210.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_6iklcpqmu",
-          "timeMs": 222260.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            104,
-            86
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222260.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_q1fhty0bn",
-          "timeMs": 222310.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            49,
-            85
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222310.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_4u2jmx43d",
-          "timeMs": 222360.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            125,
-            83
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222360.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_qr4cp9aj6",
-          "timeMs": 222412.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            76,
-            82
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222412.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_nusrx2k2b",
-          "timeMs": 222462.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            30,
-            81
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222462.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_vlvjnogvu",
-          "timeMs": 222512.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            114,
-            79
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222512.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_fgua7gq6n",
-          "timeMs": 222562.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            74,
-            78
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222562.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_7klyrgkee",
-          "timeMs": 222612.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            36,
-            77
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222612.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_p7n0wzzpo",
-          "timeMs": 222664.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            1,
-            76
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222664.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_e7g4zpepa",
-          "timeMs": 222714.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            98,
-            74
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222714.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_pqmjogtfd",
-          "timeMs": 222764.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            69,
-            73
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222764.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_70zl0wt61",
-          "timeMs": 222814.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            13,
-            72
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222814.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_7yvuhuvew",
-          "timeMs": 222864.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            119,
-            70
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222864.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_nffjsk8d3",
-          "timeMs": 222916.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            100,
-            69
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222916.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_r2u7l03x1",
-          "timeMs": 222966.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            84,
-            68
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 222966.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_myxjmz8sb",
-          "timeMs": 223016.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            71,
-            67
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223016.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_f5jzcgqef",
-          "timeMs": 223066.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            61,
-            66
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223066.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_nmoo1o58h",
-          "timeMs": 223116.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            54,
-            65
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223116.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_kwn4co7s2",
-          "timeMs": 223168.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            50,
-            64
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223168.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_kl85ljd4z",
-          "timeMs": 223218.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            49,
-            63
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223218.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_qkcrdnqhh",
-          "timeMs": 223268.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            51,
-            62
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223268.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_aa78i5ubh",
-          "timeMs": 223318.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            56,
-            61
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223318.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_uehzgport",
-          "timeMs": 223368.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            64,
-            60
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223368.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_yikg5k6op",
-          "timeMs": 223420.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            74,
-            59
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223420.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_i5jl7oldr",
-          "timeMs": 223470.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            88,
-            58
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223470.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_wrk1pq987",
-          "timeMs": 223520.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            104,
-            57
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223520.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_7rn44ee1i",
-          "timeMs": 223570.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            123,
-            56
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223570.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_iwbk6rlc5",
-          "timeMs": 223620.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            16,
-            56
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223620.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_wxft9gk28",
-          "timeMs": 223672.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            41,
-            55
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223672.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_12yw1892x",
-          "timeMs": 223722.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            68,
-            54
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223722.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ndjxxfjer",
-          "timeMs": 223772.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            97,
-            53
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223772.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_cpdbpc4t6",
-          "timeMs": 223822.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            2,
-            53
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223822.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_v705o8au8",
-          "timeMs": 223872.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            36,
-            52
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223872.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_xxsup81p8",
-          "timeMs": 223925,
-          "type": "pitchBend",
-          "data": [
-            224,
-            73,
-            51
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223925
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ccsic0v9z",
-          "timeMs": 223975,
-          "type": "pitchBend",
-          "data": [
-            224,
-            113,
-            50
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 223975
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_xxu1w74bu",
-          "timeMs": 224025,
-          "type": "pitchBend",
-          "data": [
-            224,
-            10,
-            50
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224025
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_fg4tp12dz",
-          "timeMs": 224075,
-          "type": "pitchBend",
-          "data": [
-            224,
-            55,
-            49
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224075
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_z7tji9xp6",
-          "timeMs": 224127.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            102,
-            48
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224127.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_nv1agl7cp",
-          "timeMs": 224177.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            24,
-            48
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224177.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_tv7ydz1s1",
-          "timeMs": 224227.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            75,
-            47
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224227.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_kyr9ja8i5",
-          "timeMs": 224277.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            1,
-            47
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224277.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_phstj8c0p",
-          "timeMs": 224327.08333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            57,
-            46
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224327.08333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_8vwiooxl3",
-          "timeMs": 224379.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            115,
-            45
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224379.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_sk03epcjt",
-          "timeMs": 224429.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            47,
-            45
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224429.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_nae8qq821",
-          "timeMs": 224479.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            108,
-            44
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224479.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ovwqss0aw",
-          "timeMs": 224529.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            44,
-            44
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224529.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_dh68bpkhx",
-          "timeMs": 224579.16666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            110,
-            43
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224579.16666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_z12iqjmkg",
-          "timeMs": 224631.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            50,
-            43
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224631.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_u98ebbrj7",
-          "timeMs": 224681.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            119,
-            42
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224681.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ert0fnc0y",
-          "timeMs": 224731.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            62,
-            42
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224731.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_yqzihc513",
-          "timeMs": 224781.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            7,
-            42
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224781.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_goo2f3od0",
-          "timeMs": 224831.25,
-          "type": "pitchBend",
-          "data": [
-            224,
-            81,
-            41
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224831.25
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ohr3mv6di",
-          "timeMs": 224883.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            29,
-            41
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224883.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_mfst2d3oo",
-          "timeMs": 224933.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            107,
-            40
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224933.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_g5kjlkwj4",
-          "timeMs": 224983.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            58,
-            40
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 224983.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_znrnwziuq",
-          "timeMs": 225033.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            11,
-            40
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225033.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_sbfcaa6lt",
-          "timeMs": 225083.33333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            93,
-            39
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225083.33333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_s8abxtmau",
-          "timeMs": 225135.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            49,
-            39
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225135.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_16egzjgo4",
-          "timeMs": 225185.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            6,
-            39
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225185.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ctyd0mgdb",
-          "timeMs": 225235.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            84,
-            38
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225235.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_88kp61x6d",
-          "timeMs": 225285.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            44,
-            38
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225285.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_bs0xj0hp5",
-          "timeMs": 225335.41666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            5,
-            38
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225335.41666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_nwsllyexp",
-          "timeMs": 225387.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            95,
-            37
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225387.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_z58s5u1w6",
-          "timeMs": 225437.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            59,
-            37
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225437.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_6tirwp0wz",
-          "timeMs": 225487.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            23,
-            37
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225487.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_d5ecnf6tv",
-          "timeMs": 225537.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            117,
-            36
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225537.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ebbitbgqa",
-          "timeMs": 225587.5,
-          "type": "pitchBend",
-          "data": [
-            224,
-            84,
-            36
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225587.5
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_pqa517rz2",
-          "timeMs": 225639.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            52,
-            36
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225639.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_kxu1yk4g2",
-          "timeMs": 225689.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            21,
-            36
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225689.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_bqccg4iwh",
-          "timeMs": 225739.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            119,
-            35
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225739.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_sky7gij20",
-          "timeMs": 225789.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            90,
-            35
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225789.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ds8fcfdtc",
-          "timeMs": 225839.58333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            62,
-            35
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225839.58333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ei8pdynmw",
-          "timeMs": 225891.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            35,
-            35
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225891.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_9hwn4f13b",
-          "timeMs": 225941.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            9,
-            35
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225941.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ka000ikw5",
-          "timeMs": 225991.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            111,
-            34
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 225991.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_1v8jj5ybz",
-          "timeMs": 226041.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            86,
-            34
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226041.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_my0p6lehp",
-          "timeMs": 226091.66666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            63,
-            34
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226091.66666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_9ztpod3mp",
-          "timeMs": 226143.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            40,
-            34
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226143.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ykfhgbhrv",
-          "timeMs": 226193.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            17,
-            34
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226193.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ax37b9x7p",
-          "timeMs": 226243.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            124,
-            33
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226243.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_4d9on17z0",
-          "timeMs": 226293.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            103,
-            33
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226293.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_aer0w114u",
-          "timeMs": 226343.75,
-          "type": "pitchBend",
-          "data": [
-            224,
-            83,
-            33
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226343.75
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_4lgq98u8z",
-          "timeMs": 226395.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            63,
-            33
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226395.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_e7k5atcbb",
-          "timeMs": 226445.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            41,
-            33
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226445.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_ip7wevwr7",
-          "timeMs": 226495.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            23,
-            33
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226495.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_r02a5zct7",
-          "timeMs": 226545.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            5,
-            33
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226545.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_wt3xmhqy5",
-          "timeMs": 226595.83333333334,
-          "type": "pitchBend",
-          "data": [
-            224,
-            116,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226595.83333333334
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_8obcja1tz",
-          "timeMs": 226647.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            100,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226647.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_4e9yzvaid",
-          "timeMs": 226697.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            84,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226697.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_8msul2sks",
-          "timeMs": 226747.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            69,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226747.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_eubp31eml",
-          "timeMs": 226797.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            54,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226797.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_xslnasyok",
-          "timeMs": 226847.91666666666,
-          "type": "pitchBend",
-          "data": [
-            224,
-            40,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226847.91666666666
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_9kd0imny0",
-          "timeMs": 226900,
-          "type": "pitchBend",
-          "data": [
-            224,
-            26,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226900
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_gx5hzrmk0",
-          "timeMs": 226950,
-          "type": "pitchBend",
-          "data": [
-            224,
-            13,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 226950
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_21j6yatk0",
-          "timeMs": 227000,
-          "type": "pitchBend",
-          "data": [
-            224,
-            0,
-            32
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 227000
-        },
-        {
-          "id": "gliss_177_seg0_1771125029499_hvyk4i2l6",
-          "timeMs": 227000,
-          "type": "noteOff",
-          "data": [
-            128,
-            62,
-            0
-          ],
-          "sourceCurve": 177,
-          "snippetId": 216,
-          "timestamp": 227000
         }
       ]
     },
@@ -101276,14 +99677,14 @@
           "fillMode": "bottom",
           "section": "bottom",
           "page": 27,
-          "x1": 802.375,
-          "y1Pixel": 90,
-          "x2": 1490.125,
-          "y2Pixel": 172,
+          "x1": 245,
+          "y1Pixel": 43.5,
+          "x2": 455,
+          "y2Pixel": 79,
           "origY1Pixel": 43.5,
           "origY2Pixel": 79,
           "tension": 0,
-          "slope": -0.42249799788713194,
+          "slope": -1.68,
           "model": "logarithmic",
           "trackDims": {
             "y": 43.5,
@@ -101295,605 +99696,605 @@
             "sampleInterval": 0.01,
             "samples": [
               1,
-              0.9963746813994095,
-              0.9927494526769374,
-              0.9891244037018199,
-              0.9854996243254388,
-              0.9818752043724456,
-              0.97825123363189,
-              0.974627801848265,
-              0.9710049987126528,
-              0.9673829138538823,
-              0.9637616368296075,
-              0.9601412571174923,
-              0.956521864106414,
-              0.9529035470875911,
-              0.9492863952458349,
-              0.9456704976507628,
-              0.9420559432480965,
-              0.9384428208508828,
-              0.9348312191308363,
-              0.9312212266097106,
-              0.9276129316506084,
-              0.9240064224494178,
-              0.9204017870262826,
-              0.9167991132170186,
-              0.913198488664658,
-              0.9096000008110368,
-              0.9060037368883291,
-              0.9024097839107199,
-              0.8988182286661206,
-              0.8952291577078404,
-              0.8916426573463991,
-              0.8880588136413883,
-              0.8844777123932934,
-              0.8808994391354615,
-              0.8773240791261225,
-              0.8737517173403766,
-              0.8701824384623308,
-              0.8666163268772946,
-              0.8630534666639462,
-              0.8594939415866617,
-              0.8559378350878483,
-              0.8523852302804031,
-              0.8488362099401378,
-              0.8452908564983622,
-              0.8417492520345385,
-              0.8382114782689134,
-              0.8346776165553156,
-              0.8311477478740246,
-              0.8276219528246257,
-              0.8241003116190304,
-              0.8205829040745736,
-              0.8170698096070997,
-              0.8135611072242184,
-              0.8100568755186407,
-              0.8065571926615072,
-              0.8030621363958887,
-              0.7995717840303715,
-              0.7960862124326369,
-              0.7926054980232169,
-              0.7891297167693372,
-              0.7856589441787574,
-              0.7821932552937911,
-              0.7787327246854135,
-              0.7752774264473725,
-              0.7718274341904884,
-              0.7683828210369876,
-              0.7649436596149874,
-              0.7615100220529775,
-              0.7580819799744819,
-              0.7546596044928187,
-              0.7512429662058647,
-              0.7478321351910069,
-              0.7444271810001881,
-              0.7410281726549652,
-              0.7376351786417505,
-              0.7342482669071527,
-              0.7308675048533301,
-              0.7274929593335286,
-              0.7241246966477219,
-              0.7207627825382621,
-              0.7174072821857205,
-              0.7140582602048272,
-              0.7107157806404263,
-              0.7073799069636189,
-              0.7040507020680069,
-              0.7007282282659539,
-              0.6974125472850334,
-              0.6941037202645784,
-              0.6908018077522494,
-              0.6875068697007981,
-              0.6842189654648783,
-              0.6809381537980138,
-              0.6776644928495776,
-              0.6743980401619549,
-              0.6711388526678113,
-              0.6678869866873771,
-              0.6646424979259196,
-              0.6614054414713157,
-              0.6581758717916453,
-              0.6549538427329666,
-              0.6517394075171967,
-              0.648532618740007,
-              0.6453335283689057,
-              0.6421421877414184,
-              0.6389586475632886,
-              0.6357829579068601,
-              0.6326151682095589,
-              0.6294553272723926,
-              0.6263034832586309,
-              0.6231596836925852,
-              0.6200239754584036,
-              0.6168964047990458,
-              0.6137770173153552,
-              0.6106658579651458,
-              0.6075629710624775,
-              0.6044684002769685,
-              0.6013821886332616,
-              0.5983043785104929,
-              0.5952350116419338,
-              0.5921741291147284,
-              0.5891217713696413,
-              0.5860779782009793,
-              0.5830427887566012,
-              0.5800162415379411,
-              0.5769983744002007,
-              0.5739892245526275,
-              0.5709888285588058,
-              0.5679972223371134,
-              0.5650144411612608,
-              0.5620405196608445,
-              0.5590754918220573,
-              0.5561193909884865,
-              0.5531722498619165,
-              0.5502341005032914,
-              0.5473049743337578,
-              0.5443849021357143,
-              0.541473914054015,
-              0.5385720395972518,
-              0.53567930763904,
-              0.5327957464194654,
-              0.5299213835465535,
-              0.5270562459978687,
-              0.5242003601221008,
-              0.5213537516408022,
-              0.5185164456501938,
-              0.5156884666229713,
-              0.5128698384102536,
-              0.5100605842436001,
-              0.5072607267370254,
-              0.5044702878891507,
-              0.5016892890854237,
-              0.49891775110032954,
-              0.4961556940997407,
-              0.4934031376433252,
-              0.49066010068695043,
-              0.48792660158521506,
-              0.48520265809404317,
-              0.4824882873732653,
-              0.47978350598932795,
-              0.47708832991806016,
-              0.47440277454742474,
-              0.4717268546803952,
-              0.4690605845378849,
-              0.46640397776165887,
-              0.463757047417376,
-              0.4611198059976328,
-              0.45849226542510424,
-              0.45587443705565434,
-              0.4532663316815657,
-              0.45066795953480965,
-              0.44807933029029934,
-              0.44550045306924946,
-              0.44293133644258154,
-              0.44037198843430225,
-              0.4378224165249903,
-              0.4352826276553219,
-              0.4327526282295693,
-              0.4302324241192025,
-              0.4277220206665262,
-              0.4252214226882891,
-              0.42273063447939074,
-              0.4202496598166209,
-              0.4177785019623701,
-              0.41531716366843163,
-              0.41286564717983654,
-              0.41042395423865274,
-              0.4079920860878753,
-              0.40557004347534653,
-              0.4031578266576351,
-              0.40075543540401426,
-              0.39836286900041995,
-              0.39598012625347356,
-              0.39360720549445993,
-              0.3912441045833869,
-              0.3888908209130645,
-              0.38654735141314545,
-              0.3842136925542401,
-              0.3818898403520541,
-              0.37957579037147793,
-              0.3772715377307554,
-              0.3749770771056642,
-              0.3726924027336529,
-              0.3704175084180489,
-              0.36815238753227897,
-              0.36589703302404164,
-              0.3636514374195501,
-              0.361415592827781,
-              0.35918949094467867,
-              0.35697312305742046,
-              0.3547664800486918,
-              0.35256955240090915,
-              0.35038233020050524,
-              0.3482048031422188,
-              0.346036960533332,
-              0.34387879129797316,
-              0.3417302839813835,
-              0.3395914267542237,
-              0.3374622074168191,
-              0.3353426134034595,
-              0.33323263178669815,
-              0.33113224928159635,
-              0.329041452250018,
-              0.32696022670492164,
-              0.3248885583145966,
-              0.32282643240694653,
-              0.32077383397376935,
-              0.31873074767497755,
-              0.3166971578428667,
-              0.31467304848637456,
-              0.31265840329528183,
-              0.3106532056444582,
-              0.30865743859809724,
-              0.30667108491389106,
-              0.3046941270472482,
-              0.3027265471554986,
-              0.30076832710203816,
-              0.2988194484605122,
-              0.2968798925189866,
-              0.2949496402840559,
-              0.29302867248499453,
-              0.2911169695778608,
-              0.2892145117496192,
-              0.2873212789221944,
-              0.28543725075655846,
-              0.28356240665680277,
-              0.28169672577414495,
-              0.279840187010969,
-              0.2779927690248457,
-              0.27615445023249185,
-              0.27432520881375555,
-              0.27250502271558563,
-              0.27069386965593467,
-              0.2688917271276905,
-              0.2670985724025873,
-              0.2653143825350517,
-              0.263539134366075,
-              0.26177280452706375,
-              0.26001536944362613,
-              0.2582668053393806,
-              0.2565270882397448,
-              0.25479619397565667,
-              0.2530740981873191,
-              0.2513607763279221,
-              0.24965620366729868,
-              0.24796035529560612,
-              0.24627320612695414,
-              0.24459473090304273,
-              0.24292490419672275,
-              0.24126370041558054,
-              0.23961109380549528,
-              0.23796705845413268,
-              0.2363315682944528,
-              0.2347045971081967,
-              0.23308611852930428,
-              0.2314761060473498,
-              0.22987453301095184,
-              0.22828137263111647,
-              0.22669659798459607,
-              0.2251201820172234,
-              0.22355209754717698,
-              0.22199231726826385,
-              0.22044081375317381,
-              0.21889755945666878,
-              0.21736252671878542,
-              0.21583568776801,
-              0.2143170147243909,
-              0.2128064796026583,
-              0.2113040543153225,
-              0.20980971067570298,
-              0.2083234204009753,
-              0.20684515511516477,
-              0.20537488635213863,
-              0.2039125855585292,
-              0.20245822409666736,
-              0.2010117732474891,
-              0.1995732042133781,
-              0.1981424881210163,
-              0.19671959602420996,
-              0.19530449890664958,
-              0.19389716768467957,
-              0.19249757321004146,
-              0.19110568627255253,
-              0.189721477602794,
-              0.18834491787477126,
-              0.18697597770851193,
-              0.18561462767267145,
-              0.18426083828711104,
-              0.1829145800254156,
-              0.1815758233174165,
-              0.18024453855168832,
-              0.178920696077985,
-              0.17760426620968217,
-              0.17629521922619218,
-              0.1749935253753192,
-              0.1736991548756246,
-              0.1724120779187428,
-              0.17113226467169262,
-              0.16985968527912576,
-              0.1685943098655811,
-              0.16733610853771264,
-              0.16608505138645746,
-              0.16484110848921152,
-              0.16360424991197808,
-              0.16237444571145743,
-              0.1611516659371437,
-              0.15993588063339403,
-              0.15872705984144264,
-              0.15752517360141727,
-              0.15633019195433373,
-              0.1551420849440297,
-              0.15396082261910804,
-              0.15278637503485148,
-              0.1516187122550836,
-              0.1504578043540341,
-              0.14930362141817888,
-              0.14815613354802648,
-              0.1470153108599087,
-              0.14588112348774607,
-              0.1447535415847605,
-              0.1436325353251967,
-              0.14251807490599677,
-              0.14141013054847484,
-              0.1403086724999314,
-              0.13921367103527515,
-              0.13812509645862026,
-              0.13704291910483213,
-              0.1359671093410777,
-              0.1348976375683526,
-              0.1338344742229577,
-              0.13277758977798026,
-              0.13172695474475282,
-              0.1306825396742607,
-              0.12964431515855623,
-              0.12861225183214964,
-              0.1275863203733506,
-              0.12656649150561572,
-              0.1255527359988735,
-              0.12454502467080064,
-              0.12354332838810489,
-              0.12254761806778502,
-              0.1215578646783444,
-              0.12057403924100907,
-              0.11959611283092564,
-              0.11862405657831221,
-              0.11765784166961757,
-              0.1166974393486434,
-              0.11574282091766253,
-              0.11479395773848944,
-              0.11385082123355683,
-              0.1129133828869715,
-              0.11198161424552622,
-              0.11105548691971778,
-              0.1101349725847447,
-              0.10922004298146226,
-              0.1083106699173434,
-              0.10740682526742018,
-              0.10650848097518295,
-              0.10561560905348577,
-              0.1047281815854334,
-              0.10384617072522606,
-              0.1029695486990112,
-              0.1020982878057165,
-              0.10123236041784267,
-              0.1003717389822627,
-              0.09951639602100304,
-              0.09866630413198552,
-              0.09782143598977566,
-              0.096981764346313,
-              0.0961472620316044,
-              0.0953179019544248,
-              0.0944936571029874,
-              0.09367450054561233,
-              0.09286040543135554,
-              0.09205134499064449,
-              0.09124729253589747,
-              0.09044822146210574,
-              0.08965410524742445,
-              0.0888649174537458,
-              0.08808063172723746,
-              0.08730122179888866,
-              0.08652666148503929,
-              0.08575692468787632,
-              0.08499198539593611,
-              0.0842318176845912,
-              0.08347639571650589,
-              0.08272569374209604,
-              0.0819796860999763,
-              0.08123834721737422,
-              0.08050165161055112,
-              0.079769573885209,
-              0.07904208873686658,
-              0.0783191709512413,
-              0.07760079540461828,
-              0.07688693706418925,
-              0.07617757098839806,
-              0.07547267232726529,
-              0.0747722163227088,
-              0.0740761783088354,
-              0.07338453371223874,
-              0.07269725805228366,
-              0.07201432694136423,
-              0.07133571608516609,
-              0.07066140128291865,
-              0.06999135842761972,
-              0.06932556350626506,
-              0.06866399260006883,
-              0.06800662188465556,
-              0.06735342763025942,
-              0.0667043862019131,
-              0.06605947405960977,
-              0.06541866775847172,
-              0.06478194394891013,
-              0.0641492793767574,
-              0.06352065088340719,
-              0.06289603540594546,
-              0.06227540997725467,
-              0.06165875172612734,
-              0.06104603787736784,
-              0.060437245751871815,
-              0.05983235276671328,
-              0.05923133643521272,
-              0.05863417436700802,
-              0.058040844268098524,
-              0.05745132394089725,
-              0.05686559128427482,
-              0.05628362429358025,
-              0.05570540106066901,
-              0.055130899773922826,
-              0.054560098718248295,
-              0.053992976275081817,
-              0.0534295109223869,
-              0.05286968123463076,
-              0.05231346588276731,
-              0.05176084363421385,
-              0.05121179335280568,
-              0.050666293998759215,
-              0.050124324628627814,
-              0.04958586439523682,
-              0.04905089254762651,
-              0.048519388430988575,
-              0.047991331486582745,
-              0.047466701251660526,
-              0.04694547735938304,
-              0.04642763953871998,
-              0.04591316761435715,
-              0.04540204150658933,
-              0.04489424123121599,
-              0.044389746899418436,
-              0.04388853871764309,
-              0.043390596987479046,
-              0.042895902105519745,
-              0.04240443456322984,
-              0.04191617494680844,
-              0.04143110393703431,
-              0.04094920230911947,
-              0.04047045093255619,
-              0.03999483077094901,
-              0.039522322881853866,
-              0.0390529084166118,
-              0.03858656862016663,
-              0.038123284830891446,
-              0.037663038480409305,
-              0.037205811093398156,
-              0.03675158428740455,
-              0.036300339772652124,
-              0.03585205935183544,
-              0.035406724919920696,
-              0.034964318463943656,
-              0.03452482206279173,
-              0.03408821788699512,
-              0.03365448819850758,
-              0.033223615350490676,
-              0.03279558178708186,
-              0.03237037004317156,
-              0.031947962744175995,
-              0.03152834260579662,
-              0.03111149243378597,
-              0.030697395123712945,
-              0.03028603366071192,
-              0.029877391119241148,
-              0.029471450662838516,
-              0.029068195543862085,
-              0.028667609103241287,
-              0.02826967477022302,
-              0.027874376062106743,
-              0.027481696583985804,
-              0.02709162002848775,
-              0.026704130175500773,
-              0.026319210891909472,
-              0.02593684613132674,
-              0.025557019933815206,
-              0.02517971642561523,
-              0.02480491981887112,
-              0.02443261441134592,
-              0.02406278458614497,
-              0.02369541481143056,
-              0.023330489640142393,
-              0.02296799370970426,
-              0.022607911741739484,
-              0.022250228541784045,
-              0.021894928998989704,
-              0.021541998085833458,
-              0.02119142085782655,
-              0.020843182453212594,
-              0.020497268092673493,
-              0.020153663079033324,
-              0.019812352796953037,
-              0.019473322712631913,
-              0.019136558373508028,
-              0.018802045407949053,
-              0.018469769524950386,
-              0.01813971651383206,
-              0.017811872243926552,
-              0.017486222664273243,
-              0.01716275380331289,
-              0.016841451768572546,
-              0.01652230274635702,
-              0.01620529300144069,
-              0.015890408876749973,
-              0.015577636793053573,
-              0.015266963248647514,
-              0.014958374819044162,
-              0.014651858156651487,
-              0.014347399990461085,
-              0.014044987125733877,
-              0.013744606443678364,
-              0.01344624490113644,
-              0.013149889530268077,
-              0.012855527438228265,
-              0.012563145806850917,
-              0.0122727318923328,
-              0.011984273024909564,
-              0.011697756608538667,
-              0.01141317012058174,
-              0.011130501111481172,
-              0.01084973720444049,
-              0.010570866095108378,
-              0.010293875551252163,
-              0.01001875341244074,
-              0.009745487589725155,
-              0.009474066065314646,
-              0.009204476892257007,
-              0.008936708194121401,
-              0.008670748164672282,
-              0.008406585067551986,
-              0.008144207235958989,
-              0.007883603072330603,
-              0.007624761048017792,
-              0.007367669702967428,
-              0.007112317645404875,
-              0.006858693551509698,
-              0.006606786165097689,
-              0.006356584297304901,
-              0.006108076826263353,
-              0.005861252696785169,
-              0.00561610092004583,
-              0.005372610573261771,
-              0.005130770799375739,
-              0.004890570806739936,
-              0.004651999868796497,
-              0.004415047323761967,
-              0.004179702574313882,
-              0.003945955087270248,
-              0.0037137943932773476,
-              0.0034832100864963245,
-              0.003254191824285324,
-              0.003026729326887856,
-              0.0028008123771209315,
-              0.0025764308200596497,
-              0.002353574562727001,
-              0.002132233573781339,
-              0.0019123978832080724,
-              0.0016940575820059145,
-              0.001477202821878576,
-              0.0012618238149284533,
-              0.0010479108333439902,
-              0.0008354542090944772,
-              0.0006244443336245187,
-              0.0004148716575441691,
-              0.0002067266903256204,
+              0.9860009131792389,
+              0.9720073122084133,
+              0.9580246743419429,
+              0.9440584596714615,
+              0.930114102615951,
+              0.916197003497035,
+              0.9023125202267105,
+              0.8884659601352207,
+              0.8746625719649191,
+              0.8609075380550426,
+              0.8472059667423149,
+              0.8335628850000381,
+              0.8199832313370383,
+              0.8064718489775033,
+              0.7930334793398869,
+              0.7796727558325522,
+              0.7663941979810988,
+              0.7532022059019461,
+              0.7401010551339195,
+              0.7270948918378187,
+              0.7141877283731589,
+              0.7013834392584545,
+              0.6886857575196415,
+              0.6760982714304498,
+              0.6636244216457964,
+              0.6512674987275997,
+              0.6390306410617282,
+              0.6269168331622438,
+              0.6149289043576169,
+              0.6030695278530835,
+              0.5913412201610273,
+              0.5797463408900346,
+              0.5682870928830115,
+              0.5569655226927696,
+              0.5457835213825523,
+              0.5347428256389855,
+              0.5238450191832882,
+              0.5130915344659611,
+              0.5024836546304859,
+              0.492022515730019,
+              0.4817091091815955,
+              0.47154428444124497,
+              0.4615287518843191,
+              0.45166308587440007,
+              0.4419477280042132,
+              0.43238299049281204,
+              0.42296905972268894,
+              0.4137059999007343,
+              0.4045937568279889,
+              0.3956321617627411,
+              0.38682093536197093,
+              0.3781596916872726,
+              0.3696479422611916,
+              0.36128510016045967,
+              0.35307048413384,
+              0.34500332273220125,
+              0.3370827584390833,
+              0.3293078517912529,
+              0.32167758547875247,
+              0.31419086841460575,
+              0.30684653976558385,
+              0.2996433729354617,
+              0.29258007949287246,
+              0.2856553130370604,
+              0.2788676729947356,
+              0.2722157083424035,
+              0.2656979212485904,
+              0.2593127706316368,
+              0.2530586756287312,
+              0.24693401897242395,
+              0.24093715027185314,
+              0.23506638919590905,
+              0.22932002855605127,
+              0.22369633728739913,
+              0.21819356332665474,
+              0.21280993638584833,
+              0.20754367062168333,
+              0.20239296720016908,
+              0.19735601675657333,
+              0.19243100175142513,
+              0.18761609872315554,
+              0.1829094804382505,
+              0.1783093179403782,
+              0.1738137824997923,
+              0.16942104746450803,
+              0.16512929001527799,
+              0.16093669282617518,
+              0.15684144563274693,
+              0.15284174671015782,
+              0.14893580426340258,
+              0.1451218377320994,
+              0.14139807901211976,
+              0.13776277359675604,
+              0.13421418163985765,
+              0.13075057894341457,
+              0.12737025787236111,
+              0.12407152819909817,
+              0.12085271788025542,
+              0.11771217376845511,
+              0.11464826226156566,
+              0.1116593698919266,
+              0.10874390385822996,
+              0.10590029250247124,
+              0.10312698573435142,
+              0.10042245540569339,
+              0.09778519563715837,
+              0.09521372309950726,
+              0.09270657725181053,
+              0.09026232053873195,
+              0.08787953854897446,
+              0.08555684013709863,
+              0.08329285751067028,
+              0.08108624628464378,
+              0.07893568550500007,
+              0.0768398776433723,
+              0.07479754856450072,
+              0.07280744746813061,
+              0.07086834680710785,
+              0.06897904218319639,
+              0.06713835222208853,
+              0.06534511842916202,
+              0.06359820502732871,
+              0.06189649877826564,
+              0.06023890878839888,
+              0.05862436630080936,
+              0.057051824474187884,
+              0.05552025815003048,
+              0.0540286636090872,
+              0.05257605831803169,
+              0.05116148066738424,
+              0.04978398970155207,
+              0.0484426648418117,
+              0.047136605603120274,
+              0.045864931305483414,
+              0.04462678078057736,
+              0.04342131207437738,
+              0.04224770214640272,
+              0.0411051465661576,
+              0.03999285920740625,
+              0.03891007194076335,
+              0.03785603432514306,
+              0.036830013298488784,
+              0.035831292868284015,
+              0.034859173802225585,
+              0.03391297331942089,
+              0.03299202478251462,
+              0.03209567739105401,
+              0.031223295876372403,
+              0.03037426019832712,
+              0.029547965244128394,
+              0.02874382052947777,
+              0.02796124990228599,
+              0.027199691249145785,
+              0.02645859620473079,
+              0.02573742986432459,
+              0.02503567049961597,
+              0.024352809277876863,
+              0.02368834998468672,
+              0.023041808750290604,
+              0.022412713779675908,
+              0.021800605086484737,
+              0.021205034230819875,
+              0.020625564060993584,
+              0.020061768459304852,
+              0.01951323209186584,
+              0.01897955016252839,
+              0.018460328170919138,
+              0.01795518167463006,
+              0.017463736055564616,
+              0.01698562629043432,
+              0.01652049672543232,
+              0.016068000855066544,
+              0.015627801105129402,
+              0.015199568619815751,
+              0.014782983052954335,
+              0.014377732363321516,
+              0.013983512614030191,
+              0.013600027775952261,
+              0.013226989535131906,
+              0.012864117104171124,
+              0.012511137037539588,
+              0.01216778305075572,
+              0.011833795843416706,
+              0.011508922926017018,
+              0.01119291845050463,
+              0.010885543044538482,
+              0.010586563649389369,
+              0.010295753361425075,
+              0.010012891277143221,
+              0.009737762341681222,
+              0.00947015720076394,
+              0.0092098720560162,
+              0.008956708523602419,
+              0.008710473496127857,
+              0.008470979007740631,
+              0.008238042102388765,
+              0.008011484705171434,
+              0.007791133496719671,
+              0.007576819790563016,
+              0.007368379413418946,
+              0.007165652588344118,
+              0.006968483820702587,
+              0.00677672178688804,
+              0.006590219225741545,
+              0.006408832832620837,
+              0.006232423156058986,
+              0.006060854496955814,
+              0.0058939948102586515,
+              0.005731715609074262,
+              0.00557389187115398,
+              0.005420401947713427,
+              0.005271127474527848,
+              0.00512595328525034,
+              0.004984767326912554,
+              0.004847460577552698,
+              0.004713926965925319,
+              0.0045840632932430125,
+              0.004457769156908431,
+              0.004334946876188184,
+              0.004215501419781109,
+              0.004099340335242618,
+              0.003986373680219035,
+              0.0038765139554460815,
+              0.0037696760394752005,
+              0.0036657771250860893,
+              0.0035647366573390293,
+              0.003466476273235819,
+              0.0033709197429471205,
+              0.003277992912565253,
+              0.003187623648350346,
+              0.0030997417824328855,
+              0.0030142790599315683,
+              0.002931169087458718,
+              0.0028503472829756182,
+              0.0027717508269632374,
+              0.0026953186148779285,
+              0.002620991210860235,
+              0.0025487108026622796,
+              0.0024784211577670856,
+              0.00241006758066753,
+              0.002343596871277276,
+              0.0022789572844417183,
+              0.00221609849052562,
+              0.0021549715370478006,
+              0.0020955288113344572,
+              0.002037724004168018,
+              0.001981512074406222,
+              0.0019268492145415594,
+              0.0018736928171843026,
+              0.0018220014424396025,
+              0.0017717347861572197,
+              0.0017228536490326851,
+              0.0016753199065357993,
+              0.0016290964796460417,
+              0.0015841473063741285,
+              0.00154043731404796,
+              0.0014979323923447474,
+              0.001456599367047895,
+              0.0014164059745118696,
+              0.0013773208368139667,
+              0.0013393134375765392,
+              0.001302354098442482,
+              0.0012664139561849863,
+              0.0012314649404364664,
+              0.0011974797520186709,
+              0.001164431841860547,
+              0.0011322953904854272,
+              0.0011010452880542143,
+              0.0010706571149500244,
+              0.0010411071228878521,
+              0.0010123722165378268,
+              0.0009844299356471797,
+              0.000957258437646602,
+              0.0009308364807306679,
+              0.0009051434073968911,
+              0.0008801591284324228,
+              0.0008558641073374007,
+              0.0008322393451710708,
+              0.0008092663658110233,
+              0.000786927201613552,
+              0.0007652043794653673,
+              0.0007440809072147836,
+              0.0007235402604729435,
+              0.0007035663697758654,
+              0.0006841436080955443,
+              0.0006652567786925578,
+              0.0006468911033010727,
+              0.0006290322106349278,
+              0.0006116661252087985,
+              0.0005947792564648946,
+              0.0005783583881966425,
+              0.0005623906682611368,
+              0.0005468635985735881,
+              0.0005317650253758854,
+              0.0005170831297697243,
+              0.0005028064185107484,
+              0.000488923715054268,
+              0.00047542415084522727,
+              0.00046229715684753536,
+              0.0004495324553062119,
+              0.0004371200517333529,
+              0.0004250502271155865,
+              0.0004133135303341362,
+              0.0004019007707930511,
+              0.0003908030112496075,
+              0.00038001156084133125,
+              0.00036951796830453354,
+              0.00035931401537847574,
+              0.00034939171039094497,
+              0.00033974328201968884,
+              0.00033036117322560177,
+              0.0003212380353516675,
+              0.00031236672238454943,
+              0.0003037402853740545,
+              0.00029535196700503086,
+              0.00028719519631892343,
+              0.0002792635835808799,
+              0.00027155091528663355,
+              0.00026405114930794227,
+              0.00025675841017058776,
+              0.00024966698446293734,
+              0.00024277131636962768,
+              0.00023606600332970462,
+              0.00022954579181222456,
+              0.00022320557321020562,
+              0.000217040379845157,
+              0.00021104538108396298,
+              0.00020521587956057186,
+              0.00019954730750282312,
+              0.00019403522316019384,
+              0.00018867530732935567,
+              0.00018346335997587726,
+              0.00017839529694885226,
+              0.0001734671467855664,
+              0.00016867504760476049,
+              0.00016401524408493628,
+              0.0001594840845262624,
+              0.0001550780179926381,
+              0.00015079359153369332,
+              0.0001466274474821727,
+              0.00014257632082637084,
+              0.00013863703665439875,
+              0.00013480650766983793,
+              0.00013108173177478477,
+              0.0001274597897198415,
+              0.00012393784281938824,
+              0.0001205131307291385,
+              0.00011718296928475702,
+              0.00011394474840131785,
+              0.00011079593002849553,
+              0.00010773404616504223,
+              0.00010475669692477929,
+              0.00010186154865832187,
+              0.00009904633212554081,
+              0.00009630884071831769,
+              0.0000936469287330377,
+              0.0000910585096898231,
+              0.00008854155469850689,
+              0.00008609409086968167,
+              0.00008371419977004635,
+              0.00008140001591872004,
+              0.00007914972532707676,
+              0.000076961564077771,
+              0.00007483381694228797,
+              0.00007276481603879503,
+              0.00007075293952385486,
+              0.0000687966103237736,
+              0.00006689429489759036,
+              0.00006504450203681511,
+              0.0000632457816965859,
+              0.00006149672385991067,
+              0.00005979595743277333,
+              0.00005814214917043703,
+              0.000056534002632280256,
+              0.00005497025716649784,
+              0.00005344968692189145,
+              0.00005197109988774873,
+              0.00005053333695981266,
+              0.00004913527103211912,
+              0.00004777580611370347,
+              0.000046453876469509936,
+              0.00004516844578594803,
+              0.00004391850635843131,
+              0.0000427030783014537,
+              0.00004152120878175847,
+              0.00004037197126993686,
+              0.00003925446481634065,
+              0.000038167813343426005,
+              0.00003711116495996869,
+              0.000036083691293486986,
+              0.00003508458684053917,
+              0.00003411306833589478,
+              0.00003316837413880336,
+              0.000032249763635472384,
+              0.00003135651665930883,
+              0.000030487932925815642,
+              0.000029643331484252577,
+              0.000028822050183840986,
+              0.000028023445154623516,
+              0.000027246890302756732,
+              0.000026491776820458668,
+              0.000025757512707946795,
+              0.00002504352230958684,
+              0.00002434924586347531,
+              0.00002367413906156912,
+              0.000023017672624026098,
+              0.00002237933188364849,
+              0.000021758616382983043,
+              0.000021155039481524085,
+              0.000020568127974796013,
+              0.000019997421722872666,
+              0.000019442473290220974,
+              0.00001890284759498151,
+              0.000018378121567241834,
+              0.000017867883817968,
+              0.000017371734316595777,
+              0.00001688928407728163,
+              0.000016420154853702407,
+              0.000015963978843291926,
+              0.000015520398397916857,
+              0.00001508906574432256,
+              0.000014669642711351294,
+              0.000014261800464598906,
+              0.00001386521924895412,
+              0.000013479588137577103,
+              0.00001310460478820552,
+              0.000012739975206899068,
+              0.000012385413516224908,
+              0.000012040641732324886,
+              0.000011705389546423639,
+              0.00001137939411333111,
+              0.000011062399844496973,
+              0.000010754158208836628,
+              0.000010454427536998878,
+              0.000010162972832294948,
+              0.000009879565586623507,
+              0.000009603983600947608,
+              0.00000933601081098967,
+              0.000009075437118699625,
+              0.000008822058226387597,
+              0.000008575675477628941,
+              0.000008336095700611779,
+              0.000008103131057590751,
+              0.000007876598896783271,
+              0.00000765632160959484,
+              0.000007442126491619128,
+              0.000007233845606635647,
+              0.0000070313156554924205,
+              0.0000068343778476531725,
+              0.000006642877777296441,
+              0.000006456665301302067,
+              0.000006275594422788799,
+              0.000006099523175429056,
+              0.000005928313513092753,
+              0.000005761831200934431,
+              0.000005599945710810239,
+              0.000005442530118360267,
+              0.000005289461003643581,
+              0.000005140618354881887,
+              0.000004995885473424444,
+              0.000004855148883042837,
+              0.000004718298240780072,
+              0.0000045852262503531804,
+              0.000004455828577887289,
+              0.00000433000377042525,
+              0.000004207653176324655,
+              0.000004088680867431194,
+              0.000003972993564804739,
+              0.000003860500564778491,
+              0.000003751113667904704,
+              0.00000364474711056495,
+              0.0000035413174966913985,
+              0.0000034407437330408186,
+              0.000003342946965689819,
+              0.0000032478505175292938,
+              0.000003155379829089533,
+              0.0000030654623990322705,
+              0.000002978027728417487,
+              0.000002893007264415104,
+              0.0000028103343474583653,
+              0.0000027299441582862016,
+              0.0000026517736672060366,
+              0.000002575761585132952,
+              0.0000025018483152949855,
+              0.0000024299759062706983,
+              0.0000023600880070251407,
+              0.000002292129822056843,
+              0.000002226048069209341,
+              0.0000021617909371496324,
+              0.0000020993080455111723,
+              0.000002038550404925843,
+              0.000001979470378388193,
+              0.000001922021644618077,
+              0.0000018661591609792083,
+              0.0000018118391287291757,
+              0.0000017590189584915095,
+              0.0000017076572368379672,
+              0.0000016577136935369552,
+              0.0000016091491708003502,
+              0.0000015619255914200991,
+              0.0000015160059301244644,
+              0.0000014713541836020028,
+              0.0000014279353428570118,
+              0.0000013857153654539545,
+              0.0000013446611487610838,
+              0.0000013047405044153138,
+              0.0000012659221328981118,
+              0.000001228175598555481,
+              0.0000011914713061722537,
+              0.0000011557804779904757,
+              0.0000011210751306167666,
+              0.0000010873280534839935,
+              0.0000010545127872019222,
+              0.0000010226036027960461,
+              9.915754822786838e-7,
+              9.614040979988303e-7,
+              9.320657938793886e-7,
+              9.03537567431556e-7,
+              8.757970512141e-7,
+              8.488224951808121e-7,
+              8.225927499161401e-7,
+              7.970872502038873e-7,
+              7.722859982628449e-7,
+              7.48169548980826e-7,
+              7.247189935943865e-7,
+              7.019159457000157e-7,
+              6.797425268212365e-7,
+              6.58181351864684e-7,
+              6.372155155753845e-7,
+              6.168285798802131e-7,
+              5.970045604541951e-7,
+              5.777279140639635e-7,
+              5.589835271324617e-7,
+              5.407567029713789e-7,
+              5.230331507899422e-7,
+              5.057989745926861e-7,
+              4.890406618551779e-7,
+              4.7274507330996585e-7,
+              4.568994321774156e-7,
+              4.4149131495085925e-7,
+              4.265086407384544e-7,
+              4.119396623813998e-7,
+              3.9777295712806193e-7,
+              3.839974176411687e-7,
+              3.7060224300500266e-7,
+              3.5757693084281783e-7,
+              3.4491126865709987e-7,
+              3.32595326058005e-7,
+              3.206194464366874e-7,
+              3.089742403039608e-7,
+              2.976505772966931e-7,
+              2.866395789613563e-7,
+              2.759326120926886e-7,
+              2.6552128207235626e-7,
+              2.553974257635261e-7,
+              2.4555310551566123e-7,
+              2.359806029472722e-7,
+              2.266724126176456e-7,
+              2.1762123658675137e-7,
+              2.088199783090161e-7,
+              2.0026173697118566e-7,
+              1.9193980271836608e-7,
+              1.8384765054779706e-7,
+              1.7597893575693746e-7,
+              1.6832748905848405e-7,
+              1.6088731136232326e-7,
+              1.536525688905499e-7,
+              1.4661758951373116e-7,
+              1.397768571997915e-7,
+              1.3312500879436584e-7,
+              1.2665682869172912e-7,
+              1.2036724561514944e-7,
+              1.1425132806497373e-7,
+              1.0830428109898094e-7,
+              1.0252144155842302e-7,
+              9.689827573655663e-8,
+              9.143037471570636e-8,
+              8.611345136966264e-8,
+              8.09433369219903e-8,
+              7.591597772638181e-8,
+              7.102743204701056e-8,
+              6.627386706092864e-8,
+              6.165155586046467e-8,
+              5.715687412255477e-8,
+              5.2786297999318776e-8,
+              4.853640045432428e-8,
+              4.4403849486229774e-8,
+              4.0385405131182495e-8,
+              3.6477916465216254e-8,
+              3.26783199389169e-8,
+              2.8983636490842457e-8,
+              2.539096921605477e-8,
+              2.1897501478740367e-8,
+              1.8500493914608285e-8,
+              1.5197283320667054e-8,
+              1.198527976864483e-8,
+              8.861964939654854e-9,
+              5.824889792727106e-9,
+              2.871673343562975e-9,
               0
             ]
           },
@@ -101915,140 +100316,7 @@
             "page": 28,
             "x1": 0,
             "x2": 175
-          },
-          "glissandoMidiSnippets": [
-            {
-              "segment": 1,
-              "snippetId": 216,
-              "eventIds": [
-                "gliss_177_seg0_1771125029499_8zkmqrwrv",
-                "gliss_177_seg0_1771125029499_6egqgcnuk",
-                "gliss_177_seg0_1771125029499_yx7445eb9",
-                "gliss_177_seg0_1771125029499_318xg2bcp",
-                "gliss_177_seg0_1771125029499_u1fesqoyk",
-                "gliss_177_seg0_1771125029499_tpuqgg2ul",
-                "gliss_177_seg0_1771125029499_fz74h1uhd",
-                "gliss_177_seg0_1771125029499_zkypjm80y",
-                "gliss_177_seg0_1771125029499_d3fkqqg9l",
-                "gliss_177_seg0_1771125029499_toxp7kqj6",
-                "gliss_177_seg0_1771125029499_g2u33yvm4",
-                "gliss_177_seg0_1771125029499_kfjqyhwx0",
-                "gliss_177_seg0_1771125029499_bz8kzfey5",
-                "gliss_177_seg0_1771125029499_84v1ksb3y",
-                "gliss_177_seg0_1771125029499_5y4tv873l",
-                "gliss_177_seg0_1771125029499_6j19wut5z",
-                "gliss_177_seg0_1771125029499_c8jjptt38",
-                "gliss_177_seg0_1771125029499_ofur7lwcc",
-                "gliss_177_seg0_1771125029499_4b7f1cwl1",
-                "gliss_177_seg0_1771125029499_5q5a348rm",
-                "gliss_177_seg0_1771125029499_uq0017nb4",
-                "gliss_177_seg0_1771125029499_3nmn9ikq1",
-                "gliss_177_seg0_1771125029499_ijm54hog5",
-                "gliss_177_seg0_1771125029499_w3lovy616",
-                "gliss_177_seg0_1771125029499_62dok5gxn",
-                "gliss_177_seg0_1771125029499_oyw8irevo",
-                "gliss_177_seg0_1771125029499_9p0m0lvu5",
-                "gliss_177_seg0_1771125029499_6iklcpqmu",
-                "gliss_177_seg0_1771125029499_q1fhty0bn",
-                "gliss_177_seg0_1771125029499_4u2jmx43d",
-                "gliss_177_seg0_1771125029499_qr4cp9aj6",
-                "gliss_177_seg0_1771125029499_nusrx2k2b",
-                "gliss_177_seg0_1771125029499_vlvjnogvu",
-                "gliss_177_seg0_1771125029499_fgua7gq6n",
-                "gliss_177_seg0_1771125029499_7klyrgkee",
-                "gliss_177_seg0_1771125029499_p7n0wzzpo",
-                "gliss_177_seg0_1771125029499_e7g4zpepa",
-                "gliss_177_seg0_1771125029499_pqmjogtfd",
-                "gliss_177_seg0_1771125029499_70zl0wt61",
-                "gliss_177_seg0_1771125029499_7yvuhuvew",
-                "gliss_177_seg0_1771125029499_nffjsk8d3",
-                "gliss_177_seg0_1771125029499_r2u7l03x1",
-                "gliss_177_seg0_1771125029499_myxjmz8sb",
-                "gliss_177_seg0_1771125029499_f5jzcgqef",
-                "gliss_177_seg0_1771125029499_nmoo1o58h",
-                "gliss_177_seg0_1771125029499_kwn4co7s2",
-                "gliss_177_seg0_1771125029499_kl85ljd4z",
-                "gliss_177_seg0_1771125029499_qkcrdnqhh",
-                "gliss_177_seg0_1771125029499_aa78i5ubh",
-                "gliss_177_seg0_1771125029499_uehzgport",
-                "gliss_177_seg0_1771125029499_yikg5k6op",
-                "gliss_177_seg0_1771125029499_i5jl7oldr",
-                "gliss_177_seg0_1771125029499_wrk1pq987",
-                "gliss_177_seg0_1771125029499_7rn44ee1i",
-                "gliss_177_seg0_1771125029499_iwbk6rlc5",
-                "gliss_177_seg0_1771125029499_wxft9gk28",
-                "gliss_177_seg0_1771125029499_12yw1892x",
-                "gliss_177_seg0_1771125029499_ndjxxfjer",
-                "gliss_177_seg0_1771125029499_cpdbpc4t6",
-                "gliss_177_seg0_1771125029499_v705o8au8",
-                "gliss_177_seg0_1771125029499_xxsup81p8",
-                "gliss_177_seg0_1771125029499_ccsic0v9z",
-                "gliss_177_seg0_1771125029499_xxu1w74bu",
-                "gliss_177_seg0_1771125029499_fg4tp12dz",
-                "gliss_177_seg0_1771125029499_z7tji9xp6",
-                "gliss_177_seg0_1771125029499_nv1agl7cp",
-                "gliss_177_seg0_1771125029499_tv7ydz1s1",
-                "gliss_177_seg0_1771125029499_kyr9ja8i5",
-                "gliss_177_seg0_1771125029499_phstj8c0p",
-                "gliss_177_seg0_1771125029499_8vwiooxl3",
-                "gliss_177_seg0_1771125029499_sk03epcjt",
-                "gliss_177_seg0_1771125029499_nae8qq821",
-                "gliss_177_seg0_1771125029499_ovwqss0aw",
-                "gliss_177_seg0_1771125029499_dh68bpkhx",
-                "gliss_177_seg0_1771125029499_z12iqjmkg",
-                "gliss_177_seg0_1771125029499_u98ebbrj7",
-                "gliss_177_seg0_1771125029499_ert0fnc0y",
-                "gliss_177_seg0_1771125029499_yqzihc513",
-                "gliss_177_seg0_1771125029499_goo2f3od0",
-                "gliss_177_seg0_1771125029499_ohr3mv6di",
-                "gliss_177_seg0_1771125029499_mfst2d3oo",
-                "gliss_177_seg0_1771125029499_g5kjlkwj4",
-                "gliss_177_seg0_1771125029499_znrnwziuq",
-                "gliss_177_seg0_1771125029499_sbfcaa6lt",
-                "gliss_177_seg0_1771125029499_s8abxtmau",
-                "gliss_177_seg0_1771125029499_16egzjgo4",
-                "gliss_177_seg0_1771125029499_ctyd0mgdb",
-                "gliss_177_seg0_1771125029499_88kp61x6d",
-                "gliss_177_seg0_1771125029499_bs0xj0hp5",
-                "gliss_177_seg0_1771125029499_nwsllyexp",
-                "gliss_177_seg0_1771125029499_z58s5u1w6",
-                "gliss_177_seg0_1771125029499_6tirwp0wz",
-                "gliss_177_seg0_1771125029499_d5ecnf6tv",
-                "gliss_177_seg0_1771125029499_ebbitbgqa",
-                "gliss_177_seg0_1771125029499_pqa517rz2",
-                "gliss_177_seg0_1771125029499_kxu1yk4g2",
-                "gliss_177_seg0_1771125029499_bqccg4iwh",
-                "gliss_177_seg0_1771125029499_sky7gij20",
-                "gliss_177_seg0_1771125029499_ds8fcfdtc",
-                "gliss_177_seg0_1771125029499_ei8pdynmw",
-                "gliss_177_seg0_1771125029499_9hwn4f13b",
-                "gliss_177_seg0_1771125029499_ka000ikw5",
-                "gliss_177_seg0_1771125029499_1v8jj5ybz",
-                "gliss_177_seg0_1771125029499_my0p6lehp",
-                "gliss_177_seg0_1771125029499_9ztpod3mp",
-                "gliss_177_seg0_1771125029499_ykfhgbhrv",
-                "gliss_177_seg0_1771125029499_ax37b9x7p",
-                "gliss_177_seg0_1771125029499_4d9on17z0",
-                "gliss_177_seg0_1771125029499_aer0w114u",
-                "gliss_177_seg0_1771125029499_4lgq98u8z",
-                "gliss_177_seg0_1771125029499_e7k5atcbb",
-                "gliss_177_seg0_1771125029499_ip7wevwr7",
-                "gliss_177_seg0_1771125029499_r02a5zct7",
-                "gliss_177_seg0_1771125029499_wt3xmhqy5",
-                "gliss_177_seg0_1771125029499_8obcja1tz",
-                "gliss_177_seg0_1771125029499_4e9yzvaid",
-                "gliss_177_seg0_1771125029499_8msul2sks",
-                "gliss_177_seg0_1771125029499_eubp31eml",
-                "gliss_177_seg0_1771125029499_xslnasyok",
-                "gliss_177_seg0_1771125029499_9kd0imny0",
-                "gliss_177_seg0_1771125029499_gx5hzrmk0",
-                "gliss_177_seg0_1771125029499_21j6yatk0",
-                "gliss_177_seg0_1771125029499_hvyk4i2l6"
-              ],
-              "startTimeMs": 221000,
-              "durationMs": 6000
-            }
-          ]
+          }
         }
       ],
       "nextId": 178
@@ -140304,1131 +138572,9 @@
           "sourceCurve": 176,
           "sourceFile": "CRV_20260214_214213_seg02_Cs4_dn.mid",
           "createdAt": 1771123350897
-        },
-        {
-          "id": 216,
-          "name": "Gliss seg1 @ CRV_20260214_220848",
-          "trackIndex": 1,
-          "startTimeMs": 221000,
-          "durationMs": 6000,
-          "startSeconds": 221,
-          "endSeconds": 227,
-          "events": [
-            {
-              "timeMs": 221000,
-              "type": "cc",
-              "data": [
-                176,
-                0,
-                89
-              ]
-            },
-            {
-              "timeMs": 221000,
-              "type": "pitchBend",
-              "data": [
-                224,
-                127,
-                127
-              ]
-            },
-            {
-              "timeMs": 221000,
-              "type": "noteOn",
-              "data": [
-                144,
-                62,
-                64
-              ]
-            },
-            {
-              "timeMs": 221050,
-              "type": "pitchBend",
-              "data": [
-                224,
-                32,
-                126
-              ]
-            },
-            {
-              "timeMs": 221100,
-              "type": "pitchBend",
-              "data": [
-                224,
-                66,
-                124
-              ]
-            },
-            {
-              "timeMs": 221152.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                99,
-                122
-              ]
-            },
-            {
-              "timeMs": 221202.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                6,
-                121
-              ]
-            },
-            {
-              "timeMs": 221252.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                40,
-                119
-              ]
-            },
-            {
-              "timeMs": 221302.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                76,
-                117
-              ]
-            },
-            {
-              "timeMs": 221352.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                112,
-                115
-              ]
-            },
-            {
-              "timeMs": 221404.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                21,
-                114
-              ]
-            },
-            {
-              "timeMs": 221454.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                59,
-                112
-              ]
-            },
-            {
-              "timeMs": 221504.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                99,
-                110
-              ]
-            },
-            {
-              "timeMs": 221554.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                11,
-                109
-              ]
-            },
-            {
-              "timeMs": 221604.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                11,
-                107
-              ]
-            },
-            {
-              "timeMs": 221656.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                55,
-                105
-              ]
-            },
-            {
-              "timeMs": 221706.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                101,
-                103
-              ]
-            },
-            {
-              "timeMs": 221756.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                20,
-                102
-              ]
-            },
-            {
-              "timeMs": 221806.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                70,
-                100
-              ]
-            },
-            {
-              "timeMs": 221856.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                121,
-                98
-              ]
-            },
-            {
-              "timeMs": 221908.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                47,
-                97
-              ]
-            },
-            {
-              "timeMs": 221958.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                102,
-                95
-              ]
-            },
-            {
-              "timeMs": 222008.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                33,
-                94
-              ]
-            },
-            {
-              "timeMs": 222058.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                93,
-                92
-              ]
-            },
-            {
-              "timeMs": 222108.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                28,
-                91
-              ]
-            },
-            {
-              "timeMs": 222160.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                93,
-                89
-              ]
-            },
-            {
-              "timeMs": 222210.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                33,
-                88
-              ]
-            },
-            {
-              "timeMs": 222260.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                104,
-                86
-              ]
-            },
-            {
-              "timeMs": 222310.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                49,
-                85
-              ]
-            },
-            {
-              "timeMs": 222360.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                125,
-                83
-              ]
-            },
-            {
-              "timeMs": 222412.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                76,
-                82
-              ]
-            },
-            {
-              "timeMs": 222462.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                30,
-                81
-              ]
-            },
-            {
-              "timeMs": 222512.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                114,
-                79
-              ]
-            },
-            {
-              "timeMs": 222562.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                74,
-                78
-              ]
-            },
-            {
-              "timeMs": 222612.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                36,
-                77
-              ]
-            },
-            {
-              "timeMs": 222664.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                1,
-                76
-              ]
-            },
-            {
-              "timeMs": 222714.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                98,
-                74
-              ]
-            },
-            {
-              "timeMs": 222764.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                69,
-                73
-              ]
-            },
-            {
-              "timeMs": 222814.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                13,
-                72
-              ]
-            },
-            {
-              "timeMs": 222864.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                119,
-                70
-              ]
-            },
-            {
-              "timeMs": 222916.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                100,
-                69
-              ]
-            },
-            {
-              "timeMs": 222966.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                84,
-                68
-              ]
-            },
-            {
-              "timeMs": 223016.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                71,
-                67
-              ]
-            },
-            {
-              "timeMs": 223066.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                61,
-                66
-              ]
-            },
-            {
-              "timeMs": 223116.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                54,
-                65
-              ]
-            },
-            {
-              "timeMs": 223168.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                50,
-                64
-              ]
-            },
-            {
-              "timeMs": 223218.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                49,
-                63
-              ]
-            },
-            {
-              "timeMs": 223268.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                51,
-                62
-              ]
-            },
-            {
-              "timeMs": 223318.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                56,
-                61
-              ]
-            },
-            {
-              "timeMs": 223368.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                64,
-                60
-              ]
-            },
-            {
-              "timeMs": 223420.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                74,
-                59
-              ]
-            },
-            {
-              "timeMs": 223470.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                88,
-                58
-              ]
-            },
-            {
-              "timeMs": 223520.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                104,
-                57
-              ]
-            },
-            {
-              "timeMs": 223570.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                123,
-                56
-              ]
-            },
-            {
-              "timeMs": 223620.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                16,
-                56
-              ]
-            },
-            {
-              "timeMs": 223672.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                41,
-                55
-              ]
-            },
-            {
-              "timeMs": 223722.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                68,
-                54
-              ]
-            },
-            {
-              "timeMs": 223772.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                97,
-                53
-              ]
-            },
-            {
-              "timeMs": 223822.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                2,
-                53
-              ]
-            },
-            {
-              "timeMs": 223872.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                36,
-                52
-              ]
-            },
-            {
-              "timeMs": 223925,
-              "type": "pitchBend",
-              "data": [
-                224,
-                73,
-                51
-              ]
-            },
-            {
-              "timeMs": 223975,
-              "type": "pitchBend",
-              "data": [
-                224,
-                113,
-                50
-              ]
-            },
-            {
-              "timeMs": 224025,
-              "type": "pitchBend",
-              "data": [
-                224,
-                10,
-                50
-              ]
-            },
-            {
-              "timeMs": 224075,
-              "type": "pitchBend",
-              "data": [
-                224,
-                55,
-                49
-              ]
-            },
-            {
-              "timeMs": 224127.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                102,
-                48
-              ]
-            },
-            {
-              "timeMs": 224177.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                24,
-                48
-              ]
-            },
-            {
-              "timeMs": 224227.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                75,
-                47
-              ]
-            },
-            {
-              "timeMs": 224277.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                1,
-                47
-              ]
-            },
-            {
-              "timeMs": 224327.08333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                57,
-                46
-              ]
-            },
-            {
-              "timeMs": 224379.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                115,
-                45
-              ]
-            },
-            {
-              "timeMs": 224429.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                47,
-                45
-              ]
-            },
-            {
-              "timeMs": 224479.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                108,
-                44
-              ]
-            },
-            {
-              "timeMs": 224529.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                44,
-                44
-              ]
-            },
-            {
-              "timeMs": 224579.16666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                110,
-                43
-              ]
-            },
-            {
-              "timeMs": 224631.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                50,
-                43
-              ]
-            },
-            {
-              "timeMs": 224681.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                119,
-                42
-              ]
-            },
-            {
-              "timeMs": 224731.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                62,
-                42
-              ]
-            },
-            {
-              "timeMs": 224781.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                7,
-                42
-              ]
-            },
-            {
-              "timeMs": 224831.25,
-              "type": "pitchBend",
-              "data": [
-                224,
-                81,
-                41
-              ]
-            },
-            {
-              "timeMs": 224883.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                29,
-                41
-              ]
-            },
-            {
-              "timeMs": 224933.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                107,
-                40
-              ]
-            },
-            {
-              "timeMs": 224983.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                58,
-                40
-              ]
-            },
-            {
-              "timeMs": 225033.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                11,
-                40
-              ]
-            },
-            {
-              "timeMs": 225083.33333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                93,
-                39
-              ]
-            },
-            {
-              "timeMs": 225135.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                49,
-                39
-              ]
-            },
-            {
-              "timeMs": 225185.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                6,
-                39
-              ]
-            },
-            {
-              "timeMs": 225235.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                84,
-                38
-              ]
-            },
-            {
-              "timeMs": 225285.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                44,
-                38
-              ]
-            },
-            {
-              "timeMs": 225335.41666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                5,
-                38
-              ]
-            },
-            {
-              "timeMs": 225387.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                95,
-                37
-              ]
-            },
-            {
-              "timeMs": 225437.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                59,
-                37
-              ]
-            },
-            {
-              "timeMs": 225487.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                23,
-                37
-              ]
-            },
-            {
-              "timeMs": 225537.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                117,
-                36
-              ]
-            },
-            {
-              "timeMs": 225587.5,
-              "type": "pitchBend",
-              "data": [
-                224,
-                84,
-                36
-              ]
-            },
-            {
-              "timeMs": 225639.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                52,
-                36
-              ]
-            },
-            {
-              "timeMs": 225689.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                21,
-                36
-              ]
-            },
-            {
-              "timeMs": 225739.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                119,
-                35
-              ]
-            },
-            {
-              "timeMs": 225789.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                90,
-                35
-              ]
-            },
-            {
-              "timeMs": 225839.58333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                62,
-                35
-              ]
-            },
-            {
-              "timeMs": 225891.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                35,
-                35
-              ]
-            },
-            {
-              "timeMs": 225941.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                9,
-                35
-              ]
-            },
-            {
-              "timeMs": 225991.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                111,
-                34
-              ]
-            },
-            {
-              "timeMs": 226041.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                86,
-                34
-              ]
-            },
-            {
-              "timeMs": 226091.66666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                63,
-                34
-              ]
-            },
-            {
-              "timeMs": 226143.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                40,
-                34
-              ]
-            },
-            {
-              "timeMs": 226193.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                17,
-                34
-              ]
-            },
-            {
-              "timeMs": 226243.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                124,
-                33
-              ]
-            },
-            {
-              "timeMs": 226293.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                103,
-                33
-              ]
-            },
-            {
-              "timeMs": 226343.75,
-              "type": "pitchBend",
-              "data": [
-                224,
-                83,
-                33
-              ]
-            },
-            {
-              "timeMs": 226395.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                63,
-                33
-              ]
-            },
-            {
-              "timeMs": 226445.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                41,
-                33
-              ]
-            },
-            {
-              "timeMs": 226495.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                23,
-                33
-              ]
-            },
-            {
-              "timeMs": 226545.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                5,
-                33
-              ]
-            },
-            {
-              "timeMs": 226595.83333333334,
-              "type": "pitchBend",
-              "data": [
-                224,
-                116,
-                32
-              ]
-            },
-            {
-              "timeMs": 226647.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                100,
-                32
-              ]
-            },
-            {
-              "timeMs": 226697.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                84,
-                32
-              ]
-            },
-            {
-              "timeMs": 226747.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                69,
-                32
-              ]
-            },
-            {
-              "timeMs": 226797.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                54,
-                32
-              ]
-            },
-            {
-              "timeMs": 226847.91666666666,
-              "type": "pitchBend",
-              "data": [
-                224,
-                40,
-                32
-              ]
-            },
-            {
-              "timeMs": 226900,
-              "type": "pitchBend",
-              "data": [
-                224,
-                26,
-                32
-              ]
-            },
-            {
-              "timeMs": 226950,
-              "type": "pitchBend",
-              "data": [
-                224,
-                13,
-                32
-              ]
-            },
-            {
-              "timeMs": 227000,
-              "type": "pitchBend",
-              "data": [
-                224,
-                0,
-                32
-              ]
-            },
-            {
-              "timeMs": 227000,
-              "type": "noteOff",
-              "data": [
-                128,
-                62,
-                0
-              ]
-            }
-          ],
-          "color": "limeGreen",
-          "sourceCurve": 177,
-          "sourceFile": "CRV_20260214_220848_seg01_D4_dn.mid",
-          "createdAt": 1771125029499
         }
       ],
-      "nextId": 217
+      "nextId": 216
     },
     "audioClips": {
       "clips": [

@@ -2,13 +2,13 @@
 
 **Status:** Active  
 **Last Updated:** Feb 14, 2026  
-**Current ASB Number:** ASB-012
+**Current ASB Number:** ASB-013
 
 ---
 
 ## Last Session Summary
 
-> Full glissando automation workflow is feature-complete (Steps 1-4: curve → notation → SVG → MIDI → insertion). All major bugs fixed: LilyPond octave notation, SVG positioning (leadInSeconds closure bug), audio display rendering (async blocking). Next: consider Tier 3 milestone + end-to-end playback test. Tier 2 commit pending (7 increments since last commit).
+> **Tier 3 milestone complete.** Full glissando automation is feature-complete and tested. Two parallel input methods: UI (Step 1/Step 2 buttons) and AI prompt (guided questionnaire / natural language / template). All bugs fixed. AI prompt system tested end-to-end. Tag: `milestone-asb-glissando-complete`. Next session: begin actual score composition work or extend to new gesture types.
 
 ---
 
@@ -16,8 +16,8 @@
 
 **Date:** Feb 14, 2026  
 **Focus:** Score automation infrastructure  
-**Tier 1 Count This Session:** 7 (ASB-006 through ASB-012)  
-**Tier 2 Threshold:** 4 increments → **THRESHOLD MET** (suggest Tier 2 commit)
+**Tier 1 Count This Session:** 1  
+**Tier 2 Threshold:** 4 increments
 
 ### Session Log
 - Set up workflow methodology and documentation system
@@ -34,6 +34,7 @@
 - ASB-010: Fix LilyPond octave notation (' and , marks)
 - ASB-011: Fix SVG positioning (content bounds + leadInSeconds closure bug)
 - ASB-012: Fix audio display not rendering on score load
+- ASB-013: AI Glissando Prompt Guide - two-stage parallel prompting system
 
 ---
 
@@ -41,9 +42,12 @@
 
 *(Items to pick up next session)*
 
-- [ ] Full end-to-end test of glissando workflow (Step 1 → Step 2 → playback)
-- [ ] Update LONG_TONE_IMPLEMENTATION.md with new workflow architecture
-- [ ] Consider Tier 3 milestone: full glissando automation is feature-complete
+- [x] Test AI prompt workflow end-to-end ✔️
+- [x] Full end-to-end test of glissando workflow ✔️
+- [x] Update LONG_TONE_IMPLEMENTATION.md ✔️
+- [x] Tier 3 milestone complete ✔️
+- [ ] Begin actual score composition using the glissando system
+- [ ] Extend AI prompt system to other gesture types (cresc/decresc, etc.)
 
 ---
 
@@ -63,6 +67,7 @@
 | ASB-010 | Fix LilyPond octave notation (' and , marks vs numbers) | Complete |
 | ASB-011 | Fix SVG positioning (content bounds + leadInSeconds bug) | Complete |
 | ASB-012 | Fix audio display not rendering on score load | Complete |
+| ASB-013 | AI Glissando Prompt Guide - two-stage parallel prompting system | Complete |
 
 ---
 
@@ -71,6 +76,7 @@
 | Date | Commit Hash | Summary |
 |------|-------------|---------|
 | Feb 14, 2026 | 78ba06f | Long Tone Workflow Step 1 - UI + model/slope + ASB-001 to ASB-004 |
+| Feb 14, 2026 | ac68bf5 | Long Tone Glissando workflow complete + bug fixes - ASB-005 to ASB-012 |
 
 ---
 
@@ -78,7 +84,7 @@
 
 | Date | Tag | Description |
 |------|-----|-------------|
-| *(none yet)* | | |
+| Feb 14, 2026 | `milestone-asb-glissando-complete` | Full glissando automation: UI + AI prompt, notation, SVG, MIDI, all bugs fixed |
 
 ---
 
