@@ -16656,30 +16656,48 @@
             },
             
             // Render LilyPond file to cropped SVG via server
+            // Retry logic: OneDrive can transiently lock files during sync,
+            // causing the PowerShell Move-Item to fail. One retry after 2s delay
+            // is sufficient for OneDrive to release the lock.
+            // To adjust retry behavior, change MAX_RETRIES or RETRY_DELAY_MS below.
             async renderGlissandoSvg(filename) {
-                try {
-                    const response = await fetch('/api/lilypond/render-glissando', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ filename })
-                    });
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        if (result.rendered) {
-                            console.log('LongToneUI.renderGlissandoSvg: Rendered new SVG:', result.svgPath);
+                const MAX_RETRIES = 1;
+                const RETRY_DELAY_MS = 2000;
+                
+                for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+                    try {
+                        const response = await fetch('/api/lilypond/render-glissando', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ filename })
+                        });
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            if (result.rendered) {
+                                console.debug('LongToneUI.renderGlissandoSvg: Rendered new SVG:', result.svgPath);
+                            } else {
+                                console.debug('LongToneUI.renderGlissandoSvg: SVG already exists:', result.svgPath);
+                            }
+                            return result;
                         } else {
-                            console.log('LongToneUI.renderGlissandoSvg: SVG already exists:', result.svgPath);
+                            console.error('LongToneUI.renderGlissandoSvg: Failed (attempt', attempt + 1 + '):', result.error);
+                            if (attempt < MAX_RETRIES) {
+                                console.debug('LongToneUI.renderGlissandoSvg: Retrying in', RETRY_DELAY_MS + 'ms...');
+                                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+                            }
                         }
-                    } else {
-                        console.error('LongToneUI.renderGlissandoSvg: Failed:', result.error);
+                    } catch (err) {
+                        console.error('LongToneUI.renderGlissandoSvg: Error (attempt', attempt + 1 + '):', err);
+                        if (attempt < MAX_RETRIES) {
+                            console.debug('LongToneUI.renderGlissandoSvg: Retrying in', RETRY_DELAY_MS + 'ms...');
+                            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+                        } else {
+                            return { success: false, error: err.message };
+                        }
                     }
-                    
-                    return result;
-                } catch (err) {
-                    console.error('LongToneUI.renderGlissandoSvg: Error:', err);
-                    return { success: false, error: err.message };
                 }
+                return { success: false, error: 'Render failed after ' + (MAX_RETRIES + 1) + ' attempts' };
             },
             
             // Check if LilyPond file already exists
