@@ -645,6 +645,55 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+        }
+        .drag-handle {
+            cursor: grab;
+            color: #555;
+            margin-right: 6px;
+            font-size: 14px;
+            user-select: none;
+            line-height: 1;
+        }
+        .drag-handle:hover {
+            color: #aaa;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .panel-section.dragging {
+            opacity: 0.3;
+        }
+        .panel-section.drag-over-top {
+            border-top: 2px solid rgba(0, 150, 255, 0.8);
+            margin-top: -2px;
+        }
+        .panel-section.drag-over-bottom {
+            border-bottom: 2px solid rgba(0, 150, 255, 0.8);
+            margin-bottom: -2px;
+        }
+        .panel-section .section-content {
+            overflow: hidden;
+            transition: max-height 0.25s ease;
+        }
+        .panel-section.collapsed .section-content {
+            max-height: 0 !important;
+        }
+        .collapse-toggle {
+            cursor: pointer;
+            color: #666;
+            font-size: 8px;
+            margin-left: auto;
+            user-select: none;
+            padding: 0 2px;
+            transition: transform 0.25s ease;
+        }
+        .collapse-toggle:hover {
+            color: #aaa;
+        }
+        .panel-section.collapsed .collapse-toggle {
+            transform: rotate(-90deg);
         }
         
         /* Curve Selection Bounding Box */
@@ -771,7 +820,7 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Long Tone Workflow</div>
+                <div class="section-label">Long Tone Glissando System</div>
                 
                 <div class="curve-input-row">
                     <label style="width: 35px;">Start</label>
@@ -873,6 +922,60 @@
                 <div class="control-row" style="margin-top: 5px; gap: 5px;">
                     <button id="ltStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
                     <button id="ltStep2Btn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 8px;">2: Generate</button>
+                </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label">Vibrato System</div>
+                
+                <div class="curve-input-row">
+                    <label style="width: 55px;">Direction</label>
+                    <input type="radio" id="vibDirWideNarrow" name="vibDirection" value="wide-narrow" checked>
+                    <label for="vibDirWideNarrow" style="font-size: 24px; cursor: pointer; line-height: 1;" title="Wide to Narrow">&gt;</label>
+                    <input type="radio" id="vibDirNarrowWide" name="vibDirection" value="narrow-wide" style="margin-left: 10px;">
+                    <label for="vibDirNarrowWide" style="font-size: 24px; cursor: pointer; line-height: 1;" title="Narrow to Wide">&lt;</label>
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 55px;">Clef</label>
+                    <select id="vibClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="treble" selected>Treble</option>
+                        <option value="bass">Bass</option>
+                        <option value="cClef">C Clef</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 55px;">Pitch</label>
+                    <input type="text" id="vibPitchInput" class="curve-input" value="C4" style="width: 50px; font-size: 10px;" placeholder="C4" title="C4, C#4, Bb3, C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 55px;">Start Dyn</label>
+                    <select id="vibStartDynamic" style="width: 55px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="pppp">pppp</option>
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p">p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f" selected>f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff">fff</option>
+                        <option value="ffff">ffff</option>
+                    </select>
+                    <label style="width: 45px; margin-left: 5px;">End Dyn</label>
+                    <select id="vibEndDynamic" style="width: 55px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="pppp">pppp</option>
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p">p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f" selected>f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff">fff</option>
+                        <option value="ffff">ffff</option>
+                    </select>
+                </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="vibGenerateBtn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 12px;">Generate</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -16848,6 +16951,428 @@
         };
         LongToneUI.init();
         window.LongToneUI = LongToneUI;
+        
+        // ============================================
+        // VIBRATO UI - Generate vibrato notation SVGs from templates
+        // Uses LilyPond vibrato templates (Wide-Narrow / Narrow-Wide)
+        // Pipeline: read template → substitute params → render LilyPond → crop SVG → save to SVG_graphics
+        // ============================================
+        const VibratoUI = {
+            init() {
+                const btn = document.getElementById('vibGenerateBtn');
+                if (btn) {
+                    btn.addEventListener('click', () => this.generate());
+                }
+                console.log('VibratoUI initialized');
+            },
+            
+            // Generate vibrato filename
+            // Format: Vib-{dir}-{clef}-{pitch}-{startDyn}-{endDyn}.ly
+            generateFilename(direction, clef, pitch, startDyn, endDyn) {
+                const dirCode = direction === 'wide-narrow' ? 'WN' : 'NW';
+                const clefName = clef === 'cClef' ? 'alto' : clef;
+                const safePitch = pitch.replace('#', 's').replace('+', 'q').replace('d', 'qf');
+                return `Vib-${dirCode}-${clefName}-${safePitch}-${startDyn}-${endDyn}.ly`;
+            },
+            
+            // Main generate method (3-phase button: Generate → Generating... → ✓ Done)
+            async generate() {
+                const btn = document.getElementById('vibGenerateBtn');
+                const originalText = btn ? btn.textContent : '';
+                const originalBg = btn ? btn.style.background : '';
+                
+                // Read UI values
+                const dirRadio = document.querySelector('input[name="vibDirection"]:checked');
+                const direction = dirRadio ? dirRadio.value : 'wide-narrow';
+                const clef = document.getElementById('vibClefSelect').value;
+                const pitch = document.getElementById('vibPitchInput').value.trim();
+                const startDynamic = document.getElementById('vibStartDynamic').value;
+                const endDynamic = document.getElementById('vibEndDynamic').value;
+                
+                if (!pitch) {
+                    console.error('VibratoUI: Pitch is required');
+                    return null;
+                }
+                
+                // Convert pitch to LilyPond format (reuse LongToneUI helper)
+                const lpPitch = LongToneUI.pitchToLilyPond(pitch);
+                const lpClef = LongToneUI.clefToLilyPond(clef);
+                const filename = this.generateFilename(direction, clef, pitch, startDynamic, endDynamic);
+                
+                console.log('VibratoUI.generate:', JSON.stringify({
+                    direction, clef: lpClef, pitch: lpPitch, startDynamic, endDynamic, filename
+                }, null, 2));
+                
+                // Set button to generating state
+                if (btn) {
+                    btn.textContent = 'Generating...';
+                    btn.style.background = '#888';
+                    btn.disabled = true;
+                }
+                
+                let result = null;
+                try {
+                    // Step 1: Create LilyPond file from template
+                    const createResp = await fetch('/api/lilypond/create-vibrato', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename,
+                            direction,
+                            clef: lpClef,
+                            pitch: lpPitch,
+                            startDynamic,
+                            endDynamic
+                        })
+                    });
+                    const createResult = await createResp.json();
+                    
+                    if (!createResult.success) {
+                        console.error('VibratoUI: Failed to create file:', createResult.error);
+                        throw new Error(createResult.error);
+                    }
+                    console.log('VibratoUI: LilyPond file created:', filename);
+                    
+                    // Step 2: Render LilyPond to SVG (reuse glissando render endpoint)
+                    const renderResp = await fetch('/api/lilypond/render-glissando', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename })
+                    });
+                    const renderResult = await renderResp.json();
+                    
+                    if (renderResult.success) {
+                        console.log('VibratoUI: SVG rendered:', renderResult.svgPath);
+                        result = {
+                            filename,
+                            direction,
+                            clef: lpClef,
+                            pitch: lpPitch,
+                            startDynamic,
+                            endDynamic,
+                            svgPath: renderResult.svgPath
+                        };
+                    } else {
+                        console.error('VibratoUI: Render failed:', renderResult.error);
+                        throw new Error(renderResult.error || 'Render failed');
+                    }
+                } catch (err) {
+                    console.error('VibratoUI.generate error:', err);
+                } finally {
+                    // 3-phase button: show Done, then restore
+                    if (btn) {
+                        if (result) {
+                            btn.textContent = '✓ Done';
+                            btn.style.background = '#4a4';
+                        } else {
+                            btn.textContent = '✗ Error';
+                            btn.style.background = '#a44';
+                        }
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                            btn.style.background = originalBg;
+                            btn.disabled = false;
+                        }, 1500);
+                    }
+                }
+                
+                return result;
+            }
+        };
+        VibratoUI.init();
+        window.VibratoUI = VibratoUI;
+        
+        // ============================================
+        // PANEL SECTION MANAGER - Draggable reordering of composition panel sections
+        // Dynamically wraps sections, adds drag handles, persists order via localStorage
+        // ============================================
+        const PanelSectionManager = {
+            sections: [],
+            draggedSection: null,
+            
+            init() {
+                const menuSection = document.querySelector('#compositionPanelContent .menu-section');
+                if (!menuSection) return;
+                
+                // Find all section-divider + section-label pairs
+                const children = Array.from(menuSection.children);
+                const sectionStarts = [];
+                
+                for (let i = 0; i < children.length; i++) {
+                    if (children[i].classList.contains('section-divider') &&
+                        i + 1 < children.length &&
+                        children[i + 1].classList.contains('section-label')) {
+                        sectionStarts.push(i);
+                    }
+                }
+                
+                // Build section groups (each group = divider + label + content until next divider)
+                const sectionGroups = [];
+                for (let s = 0; s < sectionStarts.length; s++) {
+                    const startIdx = sectionStarts[s];
+                    const endIdx = s + 1 < sectionStarts.length ? sectionStarts[s + 1] : children.length;
+                    const elements = children.slice(startIdx, endIdx);
+                    const label = children[startIdx + 1].textContent.trim();
+                    const name = label.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                    sectionGroups.push({ name, label, elements });
+                }
+                
+                // Wrap each group in a panel-section div
+                for (const group of sectionGroups) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'panel-section';
+                    wrapper.dataset.section = group.name;
+                    
+                    // Insert wrapper before the first element of the group
+                    group.elements[0].parentNode.insertBefore(wrapper, group.elements[0]);
+                    
+                    // Move all elements into wrapper
+                    for (const el of group.elements) {
+                        wrapper.appendChild(el);
+                    }
+                    
+                    // Add drag handle and collapse toggle to the section label
+                    const label = wrapper.querySelector('.section-label');
+                    if (label) {
+                        const handle = document.createElement('span');
+                        handle.className = 'drag-handle';
+                        handle.textContent = '\u2261'; // ≡
+                        handle.title = 'Drag to reorder';
+                        label.insertBefore(handle, label.firstChild);
+                        
+                        // Add collapse toggle arrow (right side via margin-left: auto)
+                        const toggle = document.createElement('span');
+                        toggle.className = 'collapse-toggle';
+                        toggle.textContent = '\u25BC'; // ▼
+                        toggle.title = 'Click to collapse/expand';
+                        label.appendChild(toggle);
+                    }
+                    
+                    // Wrap content (everything after section-divider and section-label) in section-content div
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.className = 'section-content';
+                    const contentChildren = Array.from(wrapper.children).filter(
+                        el => !el.classList.contains('section-divider') && !el.classList.contains('section-label')
+                    );
+                    if (contentChildren.length > 0) {
+                        wrapper.appendChild(contentWrapper);
+                        for (const el of contentChildren) {
+                            contentWrapper.appendChild(el);
+                        }
+                        // Set max-height for smooth animation
+                        contentWrapper.style.maxHeight = contentWrapper.scrollHeight + 'px';
+                    }
+                    
+                    this.sections.push(wrapper);
+                }
+                
+                // Setup drag events and collapse events
+                this.setupDragEvents();
+                this.setupCollapseEvents();
+                
+                // Restore saved order and collapsed state
+                this.restoreOrder();
+                this.restoreCollapsedState();
+                
+                console.log('PanelSectionManager: Initialized', this.sections.length, 'draggable sections');
+            },
+            
+            setupDragEvents() {
+                for (const section of this.sections) {
+                    const handle = section.querySelector('.drag-handle');
+                    if (!handle) continue;
+                    
+                    // Only allow drag when initiated from handle
+                    handle.addEventListener('mousedown', () => {
+                        section.setAttribute('draggable', 'true');
+                    });
+                    
+                    // Also handle touch for potential tablet use
+                    handle.addEventListener('touchstart', () => {
+                        section.setAttribute('draggable', 'true');
+                    }, { passive: true });
+                    
+                    section.addEventListener('dragstart', (e) => {
+                        this.draggedSection = section;
+                        section.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', section.dataset.section);
+                    });
+                    
+                    section.addEventListener('dragend', () => {
+                        section.classList.remove('dragging');
+                        section.removeAttribute('draggable');
+                        this.draggedSection = null;
+                        this.clearDropIndicators();
+                    });
+                    
+                    section.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        if (!this.draggedSection || this.draggedSection === section) return;
+                        
+                        e.dataTransfer.dropEffect = 'move';
+                        
+                        // Determine if dropping above or below
+                        const rect = section.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        
+                        this.clearDropIndicators();
+                        if (e.clientY < midY) {
+                            section.classList.add('drag-over-top');
+                        } else {
+                            section.classList.add('drag-over-bottom');
+                        }
+                    });
+                    
+                    section.addEventListener('dragleave', () => {
+                        section.classList.remove('drag-over-top', 'drag-over-bottom');
+                    });
+                    
+                    section.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        if (!this.draggedSection || this.draggedSection === section) return;
+                        
+                        const rect = section.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        const parent = section.parentNode;
+                        
+                        if (e.clientY < midY) {
+                            parent.insertBefore(this.draggedSection, section);
+                        } else {
+                            parent.insertBefore(this.draggedSection, section.nextSibling);
+                        }
+                        
+                        this.clearDropIndicators();
+                        this.saveOrder();
+                    });
+                }
+                
+                // Remove draggable on any mouseup (safety cleanup)
+                document.addEventListener('mouseup', () => {
+                    for (const s of this.sections) {
+                        if (!s.classList.contains('dragging')) {
+                            s.removeAttribute('draggable');
+                        }
+                    }
+                });
+            },
+            
+            clearDropIndicators() {
+                for (const s of this.sections) {
+                    s.classList.remove('drag-over-top', 'drag-over-bottom');
+                }
+            },
+            
+            saveOrder() {
+                const parent = this.sections[0]?.parentNode;
+                if (!parent) return;
+                const order = Array.from(parent.querySelectorAll('.panel-section'))
+                    .map(s => s.dataset.section);
+                localStorage.setItem('panelSectionOrder', JSON.stringify(order));
+                console.log('PanelSectionManager: Order saved', order);
+            },
+            
+            restoreOrder() {
+                const saved = localStorage.getItem('panelSectionOrder');
+                if (!saved) return;
+                
+                try {
+                    const order = JSON.parse(saved);
+                    const parent = this.sections[0]?.parentNode;
+                    if (!parent) return;
+                    
+                    // Build lookup map
+                    const sectionMap = {};
+                    for (const s of this.sections) {
+                        sectionMap[s.dataset.section] = s;
+                    }
+                    
+                    // Reorder: append in saved order
+                    for (const name of order) {
+                        if (sectionMap[name]) {
+                            parent.appendChild(sectionMap[name]);
+                            delete sectionMap[name];
+                        }
+                    }
+                    
+                    // Append any new sections not in saved order
+                    for (const name of Object.keys(sectionMap)) {
+                        parent.appendChild(sectionMap[name]);
+                    }
+                    
+                    console.log('PanelSectionManager: Restored saved order');
+                } catch (e) {
+                    console.warn('PanelSectionManager: Failed to restore order:', e);
+                }
+            },
+            
+            setupCollapseEvents() {
+                for (const section of this.sections) {
+                    const toggle = section.querySelector('.collapse-toggle');
+                    const label = section.querySelector('.section-label');
+                    if (!toggle || !label) continue;
+                    
+                    // Click on label text or toggle arrow to collapse/expand
+                    label.addEventListener('click', (e) => {
+                        // Don't collapse when clicking the drag handle
+                        if (e.target.classList.contains('drag-handle')) return;
+                        
+                        const contentWrapper = section.querySelector('.section-content');
+                        if (!contentWrapper) return;
+                        
+                        if (section.classList.contains('collapsed')) {
+                            // Expand
+                            section.classList.remove('collapsed');
+                            contentWrapper.style.maxHeight = contentWrapper.scrollHeight + 'px';
+                        } else {
+                            // Collapse
+                            contentWrapper.style.maxHeight = contentWrapper.scrollHeight + 'px';
+                            // Force reflow then set to 0
+                            contentWrapper.offsetHeight;
+                            section.classList.add('collapsed');
+                        }
+                        
+                        this.saveCollapsedState();
+                    });
+                }
+            },
+            
+            saveCollapsedState() {
+                const collapsed = this.sections
+                    .filter(s => s.classList.contains('collapsed'))
+                    .map(s => s.dataset.section);
+                localStorage.setItem('panelSectionsCollapsed', JSON.stringify(collapsed));
+            },
+            
+            restoreCollapsedState() {
+                const saved = localStorage.getItem('panelSectionsCollapsed');
+                if (!saved) return;
+                
+                try {
+                    const collapsed = JSON.parse(saved);
+                    for (const section of this.sections) {
+                        if (collapsed.includes(section.dataset.section)) {
+                            section.classList.add('collapsed');
+                            const contentWrapper = section.querySelector('.section-content');
+                            if (contentWrapper) {
+                                contentWrapper.style.maxHeight = '0px';
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('PanelSectionManager: Failed to restore collapsed state:', e);
+                }
+            },
+            
+            // Reset to default order and collapse state (clear localStorage)
+            resetOrder() {
+                localStorage.removeItem('panelSectionOrder');
+                localStorage.removeItem('panelSectionsCollapsed');
+                location.reload();
+            }
+        };
+        PanelSectionManager.init();
+        window.PanelSectionManager = PanelSectionManager;
         
         // Bring SVG elements containers to front (after curves are initialized)
         // This ensures inserted SVGs appear on top of curves for selection

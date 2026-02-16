@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 15, 2026  
-**Current ASB Number:** ASB-029
+**Last Updated:** Feb 16, 2026  
+**Current ASB Number:** ASB-033
 
 ---
 
@@ -14,13 +14,19 @@
 
 ## Current Session
 
-**Date:** Feb 15, 2026  
-**Focus:** Glissando pitch tracking fix + SVG positioning clamp + score composition  
+**Date:** Feb 16, 2026  
+**Focus:** Dynamic Vibrato templates, UI reorganization, Vibrato System UI + notation generation  
 **Tier 1 Count This Session:** 0 (reset after Tier 2)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
+
+### Session Log — Vibrato System
+- ASB-030: Dynamic Vibrato LilyPond templates (Wide→Narrow + Narrow→Wide) with Scheme `build-vibrato-stencil` function
+- ASB-031: UI reorganization — rename "Long Tone Workflow" → "Long Tone Glissando System", drag-reorder panel sections, add Vibrato System placeholder
+- ASB-032: Vibrato System UI controls (direction radio, clef, pitch, start/end dynamics) + collapsible panel sections with localStorage persistence
+- ASB-033: Vibrato Generate button + notation pipeline (template selection → LilyPond substitution → SVG render → crop), SVG crop three-pass rewrite for vibrato waves, dynamics auto-positioning fix
 
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
@@ -47,6 +53,8 @@
 - [x] Tier 3 milestone complete ✔️
 - [ ] Begin actual score composition using the glissando system
 - [ ] Extend AI prompt system to other gesture types (cresc/decresc, etc.)
+- [ ] Test vibrato generation with various pitches/clefs/dynamics combinations
+- [ ] Investigate why Pass 2 regex fails on vibrato wave path (Pass 3 string-search fallback works)
 
 ---
 
@@ -83,6 +91,10 @@
 | ASB-027 | Fix SVG reposition persistence — update trackYFraction on drag/manual input. Commit: 19eeaf5 | Complete |
 | ASB-028 | Fix glissando pitch tracking half-step logic (E-F, B-C) + re-index + UI relabel. Commit: a3d7e66 | Complete |
 | ASB-029 | Clamp glissando SVG X to page left edge (prevent off-page notation). | Complete |
+| ASB-030 | Dynamic Vibrato LilyPond templates (Wide→Narrow + Narrow→Wide Bézier wave) | Complete |
+| ASB-031 | UI reorganization: section rename, drag-reorder, Vibrato System placeholder | Complete |
+| ASB-032 | Vibrato System UI controls + collapsible panel sections | Complete |
+| ASB-033 | Vibrato Generate pipeline + SVG crop three-pass rewrite + dynamics fix | Complete |
 
 ---
 
@@ -94,6 +106,7 @@
 | Feb 14, 2026 | ac68bf5 | Long Tone Glissando workflow complete + bug fixes - ASB-005 to ASB-012 |
 | Feb 15, 2026 | af30931 | addendum: glissando - dynamic notation, velocity input, UI polish (ASB-014 to ASB-017) |
 | Feb 15, 2026 | 7c7ee71 | addendum: glissando - SVG positioning investigation (ASB-019 to ASB-021) |
+| Feb 16, 2026 | 01aaad9 | vibrato system: LilyPond templates, UI controls, generate pipeline, SVG crop fix (ASB-030 to ASB-033) |
 
 ---
 

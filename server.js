@@ -976,6 +976,71 @@ app.post('/api/lilypond/create-glissando', (req, res) => {
     }
 });
 
+// Create vibrato LilyPond file from template
+app.post('/api/lilypond/create-vibrato', (req, res) => {
+    const { filename, direction, clef, pitch, startDynamic, endDynamic } = req.body;
+    
+    if (!filename || !direction || !clef || !pitch || !startDynamic || !endDynamic) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters' });
+    }
+    
+    // Select template based on direction
+    const templateName = direction === 'wide-narrow' 
+        ? 'DynamicVibrato-Wide-Narrow_Template.ly'
+        : 'DynamicVibrato-Narrow-Wide_Template.ly';
+    const templatePath = path.join(LILYPOND_DIR, templateName);
+    const outputPath = path.join(LILYPOND_DIR, filename);
+    
+    if (!fs.existsSync(templatePath)) {
+        return res.status(404).json({ success: false, error: `Template not found: ${templateName}` });
+    }
+    
+    try {
+        let template = fs.readFileSync(templatePath, 'utf8');
+        
+        // 1. Substitute clef (line 84: \clef treble)
+        template = template.replace(/\\clef treble/, `\\clef ${clef}`);
+        
+        // 2. Substitute pitch: c'2 immediately before \startTrillSpan
+        //    Strip trailing duration from lpPitch (e.g. "c'4" -> "c'") then append "2" for half note
+        const pitchNoDuration = pitch.replace(/\d+$/, '');
+        template = template.replace(/(c'2)(\s*\n\s*\\startTrillSpan)/, `${pitchNoDuration}2$2`);
+        
+        // 3. First dynamic: replace dynamic marking AND zero out Y offset for auto-positioning
+        template = template.replace(
+            /(extra-offset #'\(0 \. )0\.3(\)[^\n]*\n\s*)\\[a-z]+/,
+            `$10$2\\${startDynamic}`
+        );
+        
+        // 4. Second dynamic: replace dynamic marking AND zero out Y offset
+        template = template.replace(
+            /(extra-offset #'\(-8 \. )0\.3(\)[^\n]*\n\s*)\\[a-z]+/,
+            `$10$2\\${endDynamic}`
+        );
+        
+        // 5. Replace fixed Hairpin.Y-offset with DynamicLineSpanner.staff-padding
+        //    This lets LilyPond auto-position dynamics just below staff (or below noteheads
+        //    if notes extend below the staff)
+        template = template.replace(
+            /\\override Hairpin\.Y-offset = #-0\.9[^\n]*/,
+            '\\override DynamicLineSpanner.staff-padding = #1.2'
+        );
+        
+        // 6. Zero out hairpin extra-offset Y (was 1.2, now let staff-padding handle it)
+        template = template.replace(
+            /(-\\tweak extra-offset #'\(-0\.5 \. )1\.2(\))/,
+            '$10$2'
+        );
+        
+        fs.writeFileSync(outputPath, template);
+        console.log(`Created vibrato LilyPond file: ${filename} (${direction}, ${clef}, ${pitch}, ${startDynamic}->${endDynamic})`);
+        res.json({ success: true, created: true, filename, path: outputPath });
+    } catch (err) {
+        console.error('Error creating vibrato file:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // Crop SVG to content bounds (replaces Inkscape cropping)
 // Parses LilyPond SVG structure: <g transform="translate(tx,ty)"> containing <line>, <rect>, <path>
 function cropSvgToContent(svgFilePath) {
@@ -1039,44 +1104,100 @@ function cropSvgToContent(svgFilePath) {
         return { minX: pMinX, minY: pMinY, maxX: pMaxX, maxY: pMaxY };
     }
     
-    // Match each <g transform="translate(tx, ty)"> and its child element
-    const groupRegex = /<g\s+transform="translate\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)">\s*\n?\s*<(line|rect|path)\s+([^>]*?)\/>/g;
-    let match;
+    // Pass 1: Find all <g transform="translate(tx,ty)"> positions and map to their content
+    // Build a map of translate groups by finding opening <g> tags with translate transforms
+    const translateRegex = /<g\s+transform="translate\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)">/g;
+    let tMatch;
+    const translatePositions = [];
+    while ((tMatch = translateRegex.exec(content)) !== null) {
+        translatePositions.push({
+            tx: parseFloat(tMatch[1]),
+            ty: parseFloat(tMatch[2]),
+            contentStart: tMatch.index + tMatch[0].length
+        });
+    }
     
-    while ((match = groupRegex.exec(content)) !== null) {
-        const tx = parseFloat(match[1]);
-        const ty = parseFloat(match[2]);
-        const tag = match[3];
-        const attrs = match[4];
+    // Pass 2: For each translate group, find the child element and compute bounds
+    for (const tPos of translatePositions) {
+        // Extract the content after the <g> opening tag (up to 2000 chars to cover long paths)
+        const snippet = content.substring(tPos.contentStart, tPos.contentStart + 3000).trimStart();
+        const tx = tPos.tx;
+        const ty = tPos.ty;
         
-        if (tag === 'line') {
-            const x1 = parseFloat((attrs.match(/x1="([^"]+)"/) || [])[1] || 0);
-            const y1 = parseFloat((attrs.match(/y1="([^"]+)"/) || [])[1] || 0);
-            const x2 = parseFloat((attrs.match(/x2="([^"]+)"/) || [])[1] || 0);
-            const y2 = parseFloat((attrs.match(/y2="([^"]+)"/) || [])[1] || 0);
-            const sw = parseFloat((attrs.match(/stroke-width="([^"]+)"/) || [])[1] || 0);
+        if (snippet.startsWith('<line ')) {
+            const x1 = parseFloat((snippet.match(/x1="([^"]+)"/) || [])[1] || 0);
+            const y1 = parseFloat((snippet.match(/y1="([^"]+)"/) || [])[1] || 0);
+            const x2 = parseFloat((snippet.match(/x2="([^"]+)"/) || [])[1] || 0);
+            const y2 = parseFloat((snippet.match(/y2="([^"]+)"/) || [])[1] || 0);
+            const sw = parseFloat((snippet.match(/stroke-width="([^"]+)"/) || [])[1] || 0);
             expandBounds(tx + x1, ty + y1 - sw/2, tx + x2, ty + y2 + sw/2);
-        } else if (tag === 'rect') {
-            const x = parseFloat((attrs.match(/\bx="([^"]+)"/) || [])[1] || 0);
-            const y = parseFloat((attrs.match(/\by="([^"]+)"/) || [])[1] || 0);
-            const w = parseFloat((attrs.match(/width="([^"]+)"/) || [])[1] || 0);
-            const h = parseFloat((attrs.match(/height="([^"]+)"/) || [])[1] || 0);
+        } else if (snippet.startsWith('<rect ')) {
+            const x = parseFloat((snippet.match(/\bx="([^"]+)"/) || [])[1] || 0);
+            const y = parseFloat((snippet.match(/\by="([^"]+)"/) || [])[1] || 0);
+            const w = parseFloat((snippet.match(/width="([^"]+)"/) || [])[1] || 0);
+            const h = parseFloat((snippet.match(/height="([^"]+)"/) || [])[1] || 0);
             expandBounds(tx + x, ty + y, tx + x + w, ty + y + h);
-        } else if (tag === 'path') {
-            const scaleMatch = attrs.match(/transform="scale\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)"/);
-            const dMatch = attrs.match(/d="([^"]+)"/);
+        } else if (snippet.startsWith('<path ')) {
+            const scaleMatch = snippet.match(/transform="scale\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)"/);
+            const dMatch = snippet.match(/\bd="([^"]+)"/);
             if (scaleMatch && dMatch) {
                 const sx = parseFloat(scaleMatch[1]);
                 const sy = parseFloat(scaleMatch[2]);
                 const pb = getPathBounds(dMatch[1]);
-                // Apply scale (negative scale flips coordinates)
                 const x1 = pb.minX * sx, x2 = pb.maxX * sx;
                 const y1 = pb.minY * sy, y2 = pb.maxY * sy;
                 expandBounds(tx + Math.min(x1,x2), ty + Math.min(y1,y2),
                              tx + Math.max(x1,x2), ty + Math.max(y1,y2));
+            } else if (dMatch) {
+                // Path without scale (vibrato wave from make-path-stencil)
+                const pb = getPathBounds(dMatch[1]);
+                expandBounds(tx + pb.minX, ty + pb.minY, tx + pb.maxX, ty + pb.maxY);
             } else {
                 expandBounds(tx - 0.5, ty - 0.5, tx + 0.5, ty + 0.5);
             }
+        } else if (snippet.startsWith('<text ')) {
+            // Estimate text bounds (approximate: 0.5 units per character, font-size height)
+            const fsMatch = snippet.match(/font-size="([^"]+)"/);
+            const fontSize = fsMatch ? parseFloat(fsMatch[1]) : 1.0;
+            const textMatch = snippet.match(/<tspan>([^<]*)<\/tspan>/);
+            const textLen = textMatch ? textMatch[1].length : 5;
+            const estWidth = textLen * fontSize * 0.5;
+            expandBounds(tx, ty - fontSize, tx + estWidth, ty + fontSize * 0.3);
+        }
+    }
+    
+    // Pass 3: String-search fallback for <path d="..."> without scale transforms
+    // This catches vibrato waves that Pass 2 may miss due to regex/substring edge cases
+    let searchPos = 0;
+    while (true) {
+        const pathIdx = content.indexOf('<path ', searchPos);
+        if (pathIdx === -1) break;
+        searchPos = pathIdx + 6;
+        
+        const closeIdx = content.indexOf('/>', pathIdx);
+        if (closeIdx === -1) continue;
+        const pathTag = content.substring(pathIdx, closeIdx + 2);
+        
+        // Skip paths with scale transform (already handled by Pass 2)
+        if (pathTag.includes('scale(')) continue;
+        
+        // Extract d= attribute value using indexOf (no regex on long strings)
+        const dIdx = pathTag.indexOf(' d="');
+        if (dIdx === -1) continue;
+        const dValStart = dIdx + 4;
+        const dValEnd = pathTag.indexOf('"', dValStart);
+        if (dValEnd === -1) continue;
+        const dValue = pathTag.substring(dValStart, dValEnd);
+        if (!dValue.startsWith('M')) continue;
+        
+        // Find parent <g transform="translate(tx,ty)"> by searching backwards
+        const before = content.substring(Math.max(0, pathIdx - 300), pathIdx);
+        const parentMatch = before.match(/<g\s+transform="translate\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)">\s*$/s);
+        if (parentMatch) {
+            const tx = parseFloat(parentMatch[1]);
+            const ty = parseFloat(parentMatch[2]);
+            const pb = getPathBounds(dValue);
+            expandBounds(tx + pb.minX, ty + pb.minY, tx + pb.maxX, ty + pb.maxY);
         }
     }
     
@@ -1084,8 +1205,8 @@ function cropSvgToContent(svgFilePath) {
         throw new Error('No visual elements found in SVG');
     }
     
-    // Add small padding
-    const pad = 0.1;
+    // Add padding (larger to accommodate vibrato waves and text at edges)
+    const pad = 0.5;
     minX -= pad;
     minY -= pad;
     maxX += pad;
