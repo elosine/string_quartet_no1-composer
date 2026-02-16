@@ -192,6 +192,8 @@ function listScores() {
                 };
             }
         });
+    // Sort descending by modified date (most recent first)
+    files.sort((a, b) => new Date(b.modified) - new Date(a.modified));
     return files;
 }
 
@@ -307,6 +309,13 @@ app.get('/api/score/track/:name/:trackIndex', (req, res) => {
     };
     
     res.json({ success: true, data: trackData });
+});
+
+// Get the most recently modified score name (for auto-load after automation)
+app.get('/api/score/latest', (req, res) => {
+    const scores = listScores();
+    if (scores.length === 0) return res.json({ name: null });
+    res.json({ name: scores[0].name }); // listScores already sorted descending by modified
 });
 
 // List all scores
@@ -1300,6 +1309,635 @@ app.post('/api/lilypond/render-glissando', (req, res) => {
             });
         }
     });
+});
+
+// ============================================
+// VIBRATO MOTIVE AUTOMATION - Create and save to score
+// ============================================
+
+// Replicate client-side CurveMaker.computeYAtT for server-side curve generation
+function computeYAtT(model, slope, y1Norm, y2Norm, t) {
+    t = Math.max(0, Math.min(1, t));
+    switch (model) {
+        case 'power': {
+            const exponent = Math.pow(4, slope);
+            const shaped = Math.pow(t, exponent);
+            return y1Norm + (y2Norm - y1Norm) * shaped;
+        }
+        case 'sigmoid': {
+            const steepness = slope * 4;
+            let shaped;
+            if (Math.abs(steepness) < 0.01) {
+                shaped = t;
+            } else {
+                const raw = 1 / (1 + Math.exp(-steepness * (t - 0.5)));
+                const atZero = 1 / (1 + Math.exp(-steepness * -0.5));
+                const atOne = 1 / (1 + Math.exp(-steepness * 0.5));
+                shaped = (raw - atZero) / (atOne - atZero);
+            }
+            return y1Norm + (y2Norm - y1Norm) * shaped;
+        }
+        case 'exponential': {
+            const k = slope * 4;
+            let shaped;
+            if (Math.abs(k) < 0.01) {
+                shaped = t;
+            } else {
+                shaped = (Math.exp(k * t) - 1) / (Math.exp(k) - 1);
+            }
+            return y1Norm + (y2Norm - y1Norm) * shaped;
+        }
+        case 'logarithmic': {
+            const absK = Math.abs(slope) * 5;
+            let shaped;
+            if (absK < 0.01) {
+                shaped = t;
+            } else if (slope < 0) {
+                shaped = Math.tanh(absK * t) / Math.tanh(absK);
+            } else {
+                shaped = 1 - Math.tanh(absK * (1 - t)) / Math.tanh(absK);
+            }
+            return y1Norm + (y2Norm - y1Norm) * shaped;
+        }
+        case 'bezier':
+        default: {
+            const ctrlYNorm = slope >= 0
+                ? y1Norm + (y2Norm - y1Norm) * (1 - Math.abs(slope)) * 0.5
+                : y2Norm - (y2Norm - y1Norm) * (1 - Math.abs(slope)) * 0.5;
+            const ctrlXNorm = 0.5 + Math.max(-1, Math.min(1, slope)) * 0.49;
+            const a = 1 - 2 * ctrlXNorm;
+            const b = 2 * ctrlXNorm;
+            const c = -t;
+            let bT;
+            if (Math.abs(a) < 0.0001) {
+                bT = t;
+            } else {
+                const discriminant = b * b - 4 * a * c;
+                if (discriminant < 0) {
+                    bT = t;
+                } else {
+                    const sqrtD = Math.sqrt(discriminant);
+                    const t1 = (-b + sqrtD) / (2 * a);
+                    const t2 = (-b - sqrtD) / (2 * a);
+                    bT = (t1 >= 0 && t1 <= 1) ? t1 : t2;
+                    bT = Math.max(0, Math.min(1, bT));
+                }
+            }
+            const oneMinusT = 1 - bT;
+            return oneMinusT * oneMinusT * y1Norm
+                 + 2 * oneMinusT * bT * ctrlYNorm
+                 + bT * bT * y2Norm;
+        }
+    }
+}
+
+// Generate curve sample data array (replicates client-side generateCurveDataArray)
+function generateCurveSamples(startSeconds, endSeconds, y1, y2, model, slope) {
+    const SAMPLE_INTERVAL = 0.01; // 10ms = 100 samples/second
+    const duration = endSeconds - startSeconds;
+    if (duration <= 0) return { startTime: startSeconds, endTime: endSeconds, sampleInterval: SAMPLE_INTERVAL, samples: [] };
+    const sampleCount = Math.ceil(duration / SAMPLE_INTERVAL) + 1;
+    const samples = [];
+    const y1Norm = y1 / 10;
+    const y2Norm = y2 / 10;
+    for (let i = 0; i < sampleCount; i++) {
+        const timeT = Math.min(1, (i * SAMPLE_INTERVAL) / duration);
+        const normalizedY = computeYAtT(model, slope, y1Norm, y2Norm, timeT);
+        samples.push(Math.max(0, Math.min(1, normalizedY)));
+    }
+    return { startTime: startSeconds, endTime: endSeconds, sampleInterval: SAMPLE_INTERVAL, samples };
+}
+
+// Convert pitch string (e.g. "C#4", "Bb3") to LilyPond format
+function pitchToLilyPond(pitch) {
+    if (!pitch) return "c'4";
+    const match = pitch.match(/^([A-Ga-g])([#b+d]*)?(\d)$/);
+    if (!match) return "c'4";
+    let [, note, accidentals, octave] = match;
+    note = note.toLowerCase();
+    accidentals = accidentals || '';
+    let lpAccidental = '';
+    if (accidentals === '#') lpAccidental = 's';
+    else if (accidentals === 'b') lpAccidental = 'f';
+    else if (accidentals === '+') lpAccidental = 'qs';
+    else if (accidentals === 'd') lpAccidental = 'qf';
+    else if (accidentals === '#+') lpAccidental = 'tqs';
+    else if (accidentals === 'bd') lpAccidental = 'tqf';
+    const oct = parseInt(octave);
+    let lpOctave = '';
+    if (oct > 3) lpOctave = "'".repeat(oct - 3);
+    else if (oct < 3) lpOctave = ','.repeat(3 - oct);
+    return note + lpAccidental + lpOctave + '4';
+}
+
+function clefToLilyPond(clef) {
+    if (clef === 'cClef') return 'alto';
+    return clef;
+}
+
+// Convert pitch string to MIDI note number
+function pitchToMidi(pitchStr) {
+    const noteMap = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+    const match = pitchStr.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+    if (!match) return 60; // default middle C
+    let [, noteName, accidental, quarterTone, octave] = match;
+    let midi = noteMap[noteName];
+    if (accidental === '#') midi += 1;
+    else if (accidental === 'B') midi -= 1;
+    midi += (parseInt(octave) + 1) * 12;
+    return Math.max(0, Math.min(127, midi));
+}
+
+// Generate vibrato filename
+function generateVibratoFilename(direction, clef, pitch, startDyn, endDyn) {
+    const dirCode = direction === 'wide-narrow' ? 'WN' : 'NW';
+    const clefName = clef === 'cClef' ? 'alto' : clef;
+    const safePitch = pitch.replace('#', 's').replace('+', 'q').replace('d', 'qf');
+    return `Vib-${dirCode}-${clefName}-${safePitch}-${startDyn}-${endDyn}.ly`;
+}
+
+// Build vibrato MIDI file bytes (returns Buffer)
+function buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm) {
+    const TICKS_PER_BEAT = 480;
+    const CC0_ARTICULATION = 89;
+    const MICROSECONDS_PER_BEAT = Math.round(60000000 / bpm);
+
+    const writeVarInt = (value) => {
+        const bytes = [];
+        bytes.push(value & 0x7f);
+        value >>= 7;
+        while (value > 0) {
+            bytes.unshift((value & 0x7f) | 0x80);
+            value >>= 7;
+        }
+        return bytes;
+    };
+    const writeInt = (value, length) => {
+        const bytes = [];
+        for (let i = length - 1; i >= 0; i--) bytes.push((value >> (i * 8)) & 0xff);
+        return bytes;
+    };
+    const secondsToTicks = (seconds) => Math.round(seconds * TICKS_PER_BEAT * bpm / 60);
+
+    // Build track events
+    const trackEvents = [];
+    let lastTick = 0;
+
+    // CC0 = 89 at tick 0
+    trackEvents.push(...writeVarInt(0));
+    trackEvents.push(0xB0, 0x00, CC0_ARTICULATION);
+
+    // Note On at tick 0
+    trackEvents.push(...writeVarInt(0));
+    trackEvents.push(0x90, midiNote, velocity);
+
+    // CC4 + Channel Pressure samples
+    let prevTick = 0;
+    for (let i = 0; i < ccSamples.length; i++) {
+        const sample = ccSamples[i];
+        const tick = secondsToTicks(sample.timeRelative);
+        const deltaTick = Math.max(0, tick - prevTick);
+        trackEvents.push(...writeVarInt(deltaTick));
+        trackEvents.push(0xB0, 0x04, sample.value);
+        trackEvents.push(...writeVarInt(0));
+        trackEvents.push(0xD0, sample.value);
+        prevTick = tick;
+    }
+    lastTick = prevTick;
+
+    // Note Off
+    const endTick = secondsToTicks(duration);
+    const noteOffDelta = Math.max(0, endTick - lastTick);
+    trackEvents.push(...writeVarInt(noteOffDelta));
+    trackEvents.push(0x80, midiNote, 0);
+
+    // End of track
+    trackEvents.push(...writeVarInt(0));
+    trackEvents.push(0xFF, 0x2F, 0x00);
+
+    // Build tempo track
+    const tempoTrack = [];
+    tempoTrack.push(...writeVarInt(0));
+    tempoTrack.push(0xFF, 0x51, 0x03);
+    tempoTrack.push((MICROSECONDS_PER_BEAT >> 16) & 0xFF);
+    tempoTrack.push((MICROSECONDS_PER_BEAT >> 8) & 0xFF);
+    tempoTrack.push(MICROSECONDS_PER_BEAT & 0xFF);
+    tempoTrack.push(...writeVarInt(0));
+    tempoTrack.push(0xFF, 0x2F, 0x00);
+
+    // Build MIDI file
+    const midiFile = [];
+    midiFile.push(0x4D, 0x54, 0x68, 0x64); // MThd
+    midiFile.push(...writeInt(6, 4));
+    midiFile.push(...writeInt(1, 2)); // Format 1
+    midiFile.push(...writeInt(2, 2)); // 2 tracks
+    midiFile.push(...writeInt(TICKS_PER_BEAT, 2));
+    midiFile.push(0x4D, 0x54, 0x72, 0x6B); // MTrk (tempo)
+    midiFile.push(...writeInt(tempoTrack.length, 4));
+    midiFile.push(...tempoTrack);
+    midiFile.push(0x4D, 0x54, 0x72, 0x6B); // MTrk (data)
+    midiFile.push(...writeInt(trackEvents.length, 4));
+    midiFile.push(...trackEvents);
+
+    return Buffer.from(midiFile);
+}
+
+// Parse MIDI file bytes to event array (replicates client-side parseMidiFileToEvents)
+function parseMidiToEvents(midiData, baseTimeMs, bpm) {
+    const events = [];
+    let pos = 0;
+    if (midiData[0] !== 0x4D || midiData[1] !== 0x54 || midiData[2] !== 0x68 || midiData[3] !== 0x64) return events;
+    const ticksPerBeat = (midiData[12] << 8) | midiData[13];
+    pos = 14;
+    // Skip tempo track
+    if (midiData[pos] === 0x4D && midiData[pos+1] === 0x54 && midiData[pos+2] === 0x72 && midiData[pos+3] === 0x6B) {
+        const len = (midiData[pos+4] << 24) | (midiData[pos+5] << 16) | (midiData[pos+6] << 8) | midiData[pos+7];
+        pos += 8 + len;
+    }
+    // Parse data track
+    if (midiData[pos] !== 0x4D || midiData[pos+1] !== 0x54 || midiData[pos+2] !== 0x72 || midiData[pos+3] !== 0x6B) return events;
+    const dataTrackLen = (midiData[pos+4] << 24) | (midiData[pos+5] << 16) | (midiData[pos+6] << 8) | midiData[pos+7];
+    pos += 8;
+    const trackEnd = pos + dataTrackLen;
+    const msPerTick = 60000 / (bpm * ticksPerBeat);
+    let currentTick = 0;
+    let runningStatus = 0;
+    while (pos < trackEnd) {
+        let deltaTime = 0;
+        let byte;
+        do { byte = midiData[pos++]; deltaTime = (deltaTime << 7) | (byte & 0x7F); } while (byte & 0x80);
+        currentTick += deltaTime;
+        const timeMs = baseTimeMs + (currentTick * msPerTick);
+        let status = midiData[pos];
+        if (status < 0x80) { status = runningStatus; } else { pos++; if (status < 0xF0) runningStatus = status; }
+        const eventType = status & 0xF0;
+        if (eventType === 0x90) {
+            const note = midiData[pos++]; const vel = midiData[pos++];
+            events.push({ timeMs, type: vel > 0 ? 'noteOn' : 'noteOff', data: [status, note, vel] });
+        } else if (eventType === 0x80) {
+            const note = midiData[pos++]; const vel = midiData[pos++];
+            events.push({ timeMs, type: 'noteOff', data: [status, note, vel] });
+        } else if (eventType === 0xB0) {
+            const cc = midiData[pos++]; const val = midiData[pos++];
+            events.push({ timeMs, type: 'cc', data: [status, cc, val] });
+        } else if (eventType === 0xD0) {
+            const pressure = midiData[pos++];
+            events.push({ timeMs, type: 'channelPressure', data: [status, pressure] });
+        } else if (eventType === 0xE0) {
+            const lsb = midiData[pos++]; const msb = midiData[pos++];
+            events.push({ timeMs, type: 'pitchBend', data: [status, lsb, msb] });
+        } else if (eventType === 0xA0) {
+            pos += 2; // poly pressure, skip
+        } else if (status === 0xFF) {
+            const metaType = midiData[pos++];
+            let metaLen = 0;
+            do { byte = midiData[pos++]; metaLen = (metaLen << 7) | (byte & 0x7F); } while (byte & 0x80);
+            pos += metaLen;
+        } else if (status === 0xF0 || status === 0xF7) {
+            let sysexLen = 0;
+            do { byte = midiData[pos++]; sysexLen = (sysexLen << 7) | (byte & 0x7F); } while (byte & 0x80);
+            pos += sysexLen;
+        }
+    }
+    return events;
+}
+
+// Find latest score (highest leading number) and determine next name
+function findLatestScoreAndNext() {
+    const files = fs.readdirSync(SCORES_DIR)
+        .filter(f => f.endsWith('.json') && !fs.statSync(path.join(SCORES_DIR, f)).isDirectory());
+    if (files.length === 0) return { latest: null, nextName: '1' };
+    
+    // Extract leading number from each filename
+    let maxNum = 0;
+    let latestFile = null;
+    for (const f of files) {
+        const name = f.replace('.json', '');
+        const numMatch = name.match(/^(\d+)/);
+        if (numMatch) {
+            const num = parseInt(numMatch[1]);
+            if (num > maxNum) {
+                maxNum = num;
+                latestFile = name;
+            }
+        }
+    }
+    if (!latestFile) {
+        // No numbered files, use most recently modified
+        const sorted = files.map(f => ({ name: f.replace('.json', ''), mtime: fs.statSync(path.join(SCORES_DIR, f)).mtime }))
+            .sort((a, b) => b.mtime - a.mtime);
+        return { latest: sorted[0].name, nextName: '1' };
+    }
+    return { latest: latestFile, nextName: String(maxNum + 1) };
+}
+
+// Promisified exec for async/await
+function execAsync(command, options = {}) {
+    return new Promise((resolve, reject) => {
+        exec(command, options, (err, stdout, stderr) => {
+            if (err) reject({ err, stdout, stderr });
+            else resolve({ stdout, stderr });
+        });
+    });
+}
+
+// Main automation endpoint: create vibrato motive and save to score
+app.post('/api/vibrato/create-and-save', async (req, res) => {
+    const {
+        start, end, track = 1, pitch = 'C4', clef = 'treble',
+        startDynamic = 'mp', endDynamic = 'p',
+        velocity = 115, y1 = 10, y2 = 0,
+        model = 'logarithmic', slope = -0.65,
+        color = 'limeGreen', fillMode = 'bottom'
+    } = req.body;
+
+    // Validate required params
+    if (start === undefined || end === undefined) {
+        return res.status(400).json({ success: false, error: 'start and end times are required' });
+    }
+    if (end <= start) {
+        return res.status(400).json({ success: false, error: 'end must be greater than start' });
+    }
+
+    const startSeconds = parseFloat(start);
+    const endSeconds = parseFloat(end);
+    const trackNum = parseInt(track);
+    const gTrack = String(trackNum);
+
+    console.log(`VibratoAutomation: Creating motive ${pitch} on track ${gTrack}, ${startSeconds}s-${endSeconds}s, ${model} slope ${slope}`);
+
+    try {
+        // 1. Find latest score and load it
+        const { latest, nextName } = findLatestScoreAndNext();
+        if (!latest) {
+            return res.status(404).json({ success: false, error: 'No score files found in scores directory' });
+        }
+        const scoreData = JSON.parse(fs.readFileSync(path.join(SCORES_DIR, `${latest}.json`), 'utf8'));
+        console.log(`VibratoAutomation: Loaded score '${latest}', will save as '${nextName}'`);
+
+        // 2. Get BPM from score's tempo history
+        const bpm = (scoreData.tempoHistory && scoreData.tempoHistory[0]) ? scoreData.tempoHistory[0].bpm : 60;
+        const beatsPerPage = (scoreData.tempoHistory && scoreData.tempoHistory[0]) ? scoreData.tempoHistory[0].beatsPerPage : 8;
+        const secondsPerPage = (beatsPerPage / bpm) * 60;
+        const leadIn = scoreData.cursorState ? (scoreData.cursorState.leadInSeconds || 0) : 0;
+
+        // 3. Compute curve data
+        const curveData = generateCurveSamples(startSeconds, endSeconds, y1, y2, model, slope);
+        const duration = endSeconds - startSeconds;
+
+        // 4. Determine direction from Y values
+        const direction = y1 >= y2 ? 'wide-narrow' : 'narrow-wide';
+
+        // 5. Determine page/section for the curve
+        const startActual = startSeconds + leadIn;
+        const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+        const section = startPage % 2 === 0 ? 'top' : 'bottom';
+
+        // 6. Create curve entry for databases.curves
+        // Find next curve ID
+        const existingCurves = scoreData.databases?.curves?.curves || [];
+        const maxCurveId = existingCurves.reduce((max, c) => Math.max(max, c.id || 0), 0);
+        const newCurveId = maxCurveId + 1;
+        const curveName = `CRV_${new Date().toISOString().replace(/[-:T]/g, '').slice(0, 15)}`;
+
+        const curveEntry = {
+            id: newCurveId,
+            name: curveName,
+            startSeconds,
+            endSeconds,
+            y1,
+            y2,
+            gTrack,
+            color,
+            fillMode,
+            section,
+            page: startPage,
+            x1: 0,      // placeholder, recalculated on load
+            y1Pixel: 0,  // placeholder
+            x2: 100,     // placeholder
+            y2Pixel: 0,  // placeholder
+            origY1Pixel: 0,
+            origY2Pixel: 0,
+            tension: 0,
+            slope,
+            model,
+            trackDims: { y: 0, height: 80 }, // placeholder
+            curveData
+        };
+
+        // 7. Create LilyPond file
+        const lpPitch = pitchToLilyPond(pitch);
+        const lpClef = clefToLilyPond(clef);
+        const lyFilename = generateVibratoFilename(direction, clef, pitch, startDynamic, endDynamic);
+
+        const templateName = direction === 'wide-narrow'
+            ? 'DynamicVibrato-Wide-Narrow_Template.ly'
+            : 'DynamicVibrato-Narrow-Wide_Template.ly';
+        const templatePath = path.join(LILYPOND_DIR, templateName);
+
+        if (!fs.existsSync(templatePath)) {
+            return res.status(404).json({ success: false, error: `Template not found: ${templateName}` });
+        }
+
+        let template = fs.readFileSync(templatePath, 'utf8');
+        template = template.replace(/\\clef treble/, `\\clef ${lpClef}`);
+        const pitchNoDuration = lpPitch.replace(/\d+$/, '');
+        template = template.replace(/(c'2)(\s*\n\s*\\startTrillSpan)/, `${pitchNoDuration}2$2`);
+        template = template.replace(
+            /(extra-offset #'\(0 \. )0\.3(\)[^\n]*\n\s*)\\[a-z]+/,
+            `$10$2\\${startDynamic}`
+        );
+        template = template.replace(
+            /(extra-offset #'\(-8 \. )0\.3(\)[^\n]*\n\s*)\\[a-z]+/,
+            `$10$2\\${endDynamic}`
+        );
+        template = template.replace(
+            /\\override Hairpin\.Y-offset = #-0\.9[^\n]*/,
+            '\\override DynamicLineSpanner.staff-padding = #1.2'
+        );
+        template = template.replace(
+            /(-\\tweak extra-offset #'\(-0\.5 \. )1\.2(\))/,
+            '$10$2'
+        );
+        fs.writeFileSync(path.join(LILYPOND_DIR, lyFilename), template);
+        console.log(`VibratoAutomation: Created LilyPond file: ${lyFilename}`);
+
+        // 8. Render SVG
+        const scriptPath = path.join(LILYPOND_DIR, 'render_glissando.ps1');
+        const svgOutputDir = path.join(__dirname, 'public', 'SVG_graphics');
+        const baseName = path.basename(lyFilename, '.ly');
+        const svgFilePath = path.join(svgOutputDir, `${baseName}.svg`);
+
+        try {
+            const command = `powershell -ExecutionPolicy Bypass -File "${scriptPath}" -Filename "${lyFilename}"`;
+            await execAsync(command, { timeout: 60000 });
+            if (fs.existsSync(svgFilePath)) {
+                try { cropSvgToContent(svgFilePath); } catch (e) { console.warn('SVG crop warning:', e.message); }
+                console.log(`VibratoAutomation: Rendered + cropped SVG: ${baseName}.svg`);
+            }
+        } catch (renderErr) {
+            console.error('VibratoAutomation: SVG render failed:', renderErr.stderr || renderErr.err?.message);
+            // Continue without SVG - curve and MIDI still valuable
+        }
+
+        // 9. Create SVG element entry if SVG exists
+        if (fs.existsSync(svgFilePath)) {
+            const svgContent = fs.readFileSync(svgFilePath, 'utf-8');
+            // Parse dimensions
+            let svgWidth = 100, svgHeight = 100;
+            const widthMatch = svgContent.match(/width="([^"]+)"/);
+            const heightMatch = svgContent.match(/height="([^"]+)"/);
+            if (widthMatch) {
+                svgWidth = parseFloat(widthMatch[1]);
+                if (widthMatch[1].includes('mm')) svgWidth *= 3.78;
+            }
+            if (heightMatch) {
+                svgHeight = parseFloat(heightMatch[1]);
+                if (heightMatch[1].includes('mm')) svgHeight *= 3.78;
+            }
+            const svgDataUrl = 'data:image/svg+xml;base64,' + Buffer.from(svgContent).toString('base64');
+
+            // Position: left edge of curve, on the track
+            const xPercent = ((startActual % secondsPerPage) / secondsPerPage) * 100;
+            // Approximate scale (85% of ~80px track height)
+            const approxTrackHeight = 80;
+            const targetHeight = approxTrackHeight * 0.85;
+            const scale = targetHeight / svgHeight;
+            const scaledWidth = svgWidth * scale;
+            // SVG right edge at curve start minus 5px gap (as percentage)
+            const svgXPercent = Math.max(0, xPercent - (scaledWidth / 10) - 0.5);
+
+            const existingSvgElements = scoreData.svgElements || [];
+            const maxSvgId = existingSvgElements.reduce((max, e) => Math.max(max, e.id || 0), 0);
+
+            const svgElement = {
+                id: maxSvgId + 1,
+                name: baseName,
+                x: 0,  // recalculated on load
+                y: 0,
+                startSeconds: startSeconds - (scaledWidth / 1000 * secondsPerPage / 100),
+                xPercent: svgXPercent,
+                yPercent: 10, // fallback only; trackYFraction is preferred
+                trackYFraction: 0, // 0 = top of track (matches client-side VibratoUI positioning)
+                width: svgWidth,
+                height: svgHeight,
+                scale,
+                baseScale: scale,
+                baseScoreWidth: 1000, // approximate, recalculated on load
+                track: trackNum,
+                page: startPage,
+                section,
+                svgDataUrl
+            };
+            if (!scoreData.svgElements) scoreData.svgElements = [];
+            scoreData.svgElements.push(svgElement);
+            console.log(`VibratoAutomation: Added SVG element ${baseName}`);
+        }
+
+        // 10. Generate MIDI file
+        const midiNote = pitchToMidi(pitch);
+        const CC_SAMPLE_INTERVAL = 50; // ms
+        const numCCSamples = Math.max(2, Math.ceil(duration * 1000 / CC_SAMPLE_INTERVAL));
+        const ccSamples = [];
+        for (let i = 0; i < numCCSamples; i++) {
+            const t = startSeconds + (i / (numCCSamples - 1)) * duration;
+            const curveIdx = Math.round((t - curveData.startTime) / curveData.sampleInterval);
+            const clampedIdx = Math.max(0, Math.min(curveData.samples.length - 1, curveIdx));
+            const normalizedY = curveData.samples[clampedIdx];
+            const ccValue = Math.round(Math.max(0, Math.min(127, normalizedY * 127)));
+            ccSamples.push({ timeRelative: (t - startSeconds), value: ccValue });
+        }
+
+        const midiBuffer = buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm);
+        const midiFilename = `Vib_${curveName}_${pitch.replace('#', 's').replace(/[^a-zA-Z0-9]/g, '')}.mid`;
+        const midiFilePath = path.join(__dirname, 'public', 'midi_files', midiFilename);
+
+        // Ensure midi_files directory exists
+        const midiDir = path.join(__dirname, 'public', 'midi_files');
+        if (!fs.existsSync(midiDir)) fs.mkdirSync(midiDir, { recursive: true });
+        fs.writeFileSync(midiFilePath, midiBuffer);
+        console.log(`VibratoAutomation: Saved MIDI file: ${midiFilename} (${ccSamples.length} CC samples)`);
+
+        // 11. Parse MIDI events and add to score's midiTracks
+        const curveStartMs = startSeconds * 1000;
+        const midiEvents = parseMidiToEvents(midiBuffer, curveStartMs, bpm);
+
+        // Add snippet to databases.midiSnippets
+        if (!scoreData.databases) scoreData.databases = {};
+        if (!scoreData.databases.midiSnippets) scoreData.databases.midiSnippets = { snippets: [], nextId: 1 };
+        const snippetId = scoreData.databases.midiSnippets.nextId++;
+        scoreData.databases.midiSnippets.snippets.push({
+            id: snippetId,
+            name: `Vib @ ${curveName}`,
+            trackIndex: trackNum - 1,
+            startTimeMs: curveStartMs,
+            durationMs: duration * 1000,
+            startSeconds,
+            endSeconds,
+            events: midiEvents,
+            color,
+            sourceCurve: newCurveId,
+            sourceFile: midiFilename
+        });
+
+        // Add events to midiTracks
+        if (!scoreData.midiTracks) scoreData.midiTracks = [];
+        while (scoreData.midiTracks.length < trackNum) {
+            scoreData.midiTracks.push({ channel: scoreData.midiTracks.length + 1, midiEvents: [] });
+        }
+        const trackEvents = scoreData.midiTracks[trackNum - 1];
+        for (const event of midiEvents) {
+            trackEvents.midiEvents.push({
+                timeMs: event.timeMs,
+                type: event.type,
+                data: [...event.data],
+                snippetId: snippetId,
+                timestamp: event.timeMs
+            });
+        }
+        trackEvents.midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+
+        // 12. Add curve to databases.curves
+        if (!scoreData.databases.curves) scoreData.databases.curves = { curves: [], nextId: 1 };
+        scoreData.databases.curves.curves.push(curveEntry);
+        scoreData.databases.curves.nextId = newCurveId + 1;
+
+        // 13. Update cursor state so auto-load scrolls to the vibrato position
+        scoreData.cursorState = {
+            editCursorSeconds: startSeconds - 1,
+            gotoDisplaySeconds: startSeconds - 1,
+            leadInSeconds: leadIn
+        };
+
+        // 14. Update metadata
+        scoreData.metadata = scoreData.metadata || {};
+        scoreData.metadata.title = nextName;
+        scoreData.metadata.modified = new Date().toISOString();
+
+        // 15. Save as next iteration
+        const newFilePath = path.join(SCORES_DIR, `${nextName}.json`);
+        fs.writeFileSync(newFilePath, JSON.stringify(scoreData, null, 2));
+        console.log(`VibratoAutomation: Saved score as '${nextName}'`);
+
+        // 16. Also save a version backup
+        const versionFilename = `${nextName}_v${Date.now()}.json`;
+        fs.writeFileSync(path.join(VERSIONS_DIR, versionFilename), JSON.stringify(scoreData, null, 2));
+
+        res.json({
+            success: true,
+            scoreName: nextName,
+            previousScore: latest,
+            curve: { id: newCurveId, name: curveName, startSeconds, endSeconds },
+            direction,
+            midi: { filename: midiFilename, events: midiEvents.length, ccSamples: ccSamples.length },
+            svg: fs.existsSync(svgFilePath) ? baseName + '.svg' : null,
+            message: `Vibrato motive created. Score saved as '${nextName}'. Refresh browser to see it.`
+        });
+
+    } catch (err) {
+        console.error('VibratoAutomation error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
 });
 
 // ============================================

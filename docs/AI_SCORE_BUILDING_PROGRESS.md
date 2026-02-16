@@ -2,20 +2,20 @@
 
 **Status:** Active  
 **Last Updated:** Feb 16, 2026  
-**Current ASB Number:** ASB-033
+**Current ASB Number:** ASB-037
 
 ---
 
 ## Last Session Summary
 
-> **Tier 3 milestone complete.** Full glissando automation is feature-complete and tested. Two parallel input methods: UI (Step 1/Step 2 buttons) and AI prompt (guided questionnaire / natural language / template). All bugs fixed. AI prompt system tested end-to-end. Tag: `milestone-asb-glissando-complete`. Next session: begin actual score composition work or extend to new gesture types.
+> **Vibrato system feature-complete.** Full vibrato automation with server endpoint, UI workflow, and AI prompt. Created vibrato motives on tracks 1, 2, and 4 via automation. Fixed ObjectSelector z-order for SVG drag, server SVG track positioning (trackYFraction), and cursor offset. Implementation doc: `docs/VIBRATO_SYSTEM_IMPLEMENTATION.md`. Next: continue score composition or extend to new gesture types.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 16, 2026  
-**Focus:** Dynamic Vibrato templates, UI reorganization, Vibrato System UI + notation generation  
+**Focus:** Vibrato automation endpoint, bug fixes, score composition  
 **Tier 1 Count This Session:** 0 (reset after Tier 2)  
 **Tier 2 Threshold:** 3-4 increments
 
@@ -27,6 +27,9 @@
 - ASB-031: UI reorganization — rename "Long Tone Workflow" → "Long Tone Glissando System", drag-reorder panel sections, add Vibrato System placeholder
 - ASB-032: Vibrato System UI controls (direction radio, clef, pitch, start/end dynamics) + collapsible panel sections with localStorage persistence
 - ASB-033: Vibrato Generate button + notation pipeline (template selection → LilyPond substitution → SVG render → crop), SVG crop three-pass rewrite for vibrato waves, dynamics auto-positioning fix
+- ASB-035: Vibrato System UI expansion (track, times, Y1/Y2, model/slope, velocity, color, fill) + createCurve() + generate() 4-step flow
+- ASB-036: Vibrato MIDI generation (CC4 + channel pressure) + server automation endpoint (`/api/vibrato/create-and-save`) + auto-load latest score + AI Vibrato Prompt Guide
+- ASB-037: Bug fixes — ObjectSelector SVG z-order for drag, server SVG track positioning (trackYFraction), cursor offset -1s
 
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
@@ -51,9 +54,10 @@
 - [x] Full end-to-end test of glissando workflow ✔️
 - [x] Update LONG_TONE_IMPLEMENTATION.md ✔️
 - [x] Tier 3 milestone complete ✔️
-- [ ] Begin actual score composition using the glissando system
+- [ ] Begin actual score composition using the glissando + vibrato systems
 - [ ] Extend AI prompt system to other gesture types (cresc/decresc, etc.)
-- [ ] Test vibrato generation with various pitches/clefs/dynamics combinations
+- [ ] Extend ObjectSelector z-order fix to curves, motives, MIDI snippets
+- [x] Test vibrato generation with various pitches/clefs/dynamics combinations ✔️ (tracks 1, 2, 4 — treble + bass clefs, natural + quarter-tone pitches)
 - [ ] Investigate why Pass 2 regex fails on vibrato wave path (Pass 3 string-search fallback works)
 
 ---
@@ -95,6 +99,9 @@
 | ASB-031 | UI reorganization: section rename, drag-reorder, Vibrato System placeholder | Complete |
 | ASB-032 | Vibrato System UI controls + collapsible panel sections | Complete |
 | ASB-033 | Vibrato Generate pipeline + SVG crop three-pass rewrite + dynamics fix | Complete |
+| ASB-035 | Vibrato System UI expansion + createCurve() + multi-step generate() | Complete |
+| ASB-036 | Vibrato MIDI generation + server automation endpoint + auto-load + prompt guide | Complete |
+| ASB-037 | Bug fixes: ObjectSelector z-order, SVG track positioning, cursor offset | Complete |
 
 ---
 
@@ -106,7 +113,8 @@
 | Feb 14, 2026 | ac68bf5 | Long Tone Glissando workflow complete + bug fixes - ASB-005 to ASB-012 |
 | Feb 15, 2026 | af30931 | addendum: glissando - dynamic notation, velocity input, UI polish (ASB-014 to ASB-017) |
 | Feb 15, 2026 | 7c7ee71 | addendum: glissando - SVG positioning investigation (ASB-019 to ASB-021) |
-| Feb 16, 2026 | 01aaad9 | vibrato system: LilyPond templates, UI controls, generate pipeline, SVG crop fix (ASB-030 to ASB-033) |
+| Feb 16, 2026 | 3b68813 | vibrato system: LilyPond templates, UI controls, generate pipeline, SVG crop fix (ASB-030 to ASB-033) |
+| Feb 16, 2026 | 568a2a0 | vibrato system: UI expansion, MIDI generation, server automation, bug fixes, implementation doc (ASB-035 to ASB-037) |
 
 ---
 

@@ -928,19 +928,14 @@
                 <div class="section-label">Vibrato System</div>
                 
                 <div class="curve-input-row">
-                    <label style="width: 55px;">Direction</label>
-                    <input type="radio" id="vibDirWideNarrow" name="vibDirection" value="wide-narrow" checked>
-                    <label for="vibDirWideNarrow" style="font-size: 24px; cursor: pointer; line-height: 1;" title="Wide to Narrow">&gt;</label>
-                    <input type="radio" id="vibDirNarrowWide" name="vibDirection" value="narrow-wide" style="margin-left: 10px;">
-                    <label for="vibDirNarrowWide" style="font-size: 24px; cursor: pointer; line-height: 1;" title="Narrow to Wide">&lt;</label>
-                </div>
-                <div class="curve-input-row">
                     <label style="width: 55px;">Clef</label>
                     <select id="vibClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
                         <option value="treble" selected>Treble</option>
                         <option value="bass">Bass</option>
                         <option value="cClef">C Clef</option>
                     </select>
+                    <label style="width: 35px; margin-left: 5px;">Track</label>
+                    <input type="number" id="vibTrackInput" class="curve-input" value="1" min="1" max="4" step="1" style="width: 35px; font-size: 10px;">
                 </div>
                 <div class="curve-input-row">
                     <label style="width: 55px;">Pitch</label>
@@ -973,6 +968,56 @@
                         <option value="fff">fff</option>
                         <option value="ffff">ffff</option>
                     </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Start</label>
+                    <input type="number" id="vibStartInput" class="curve-input" value="0" step="1" style="width: 50px;">
+                    <label style="width: 25px; margin-left: 5px;">End</label>
+                    <input type="number" id="vibEndInput" class="curve-input" value="10" step="1" style="width: 50px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Y1</label>
+                    <input type="number" id="vibY1Input" class="curve-input" value="10" step="0.5" min="0" max="10" style="width: 50px;">
+                    <label style="width: 25px; margin-left: 5px;">Y2</label>
+                    <input type="number" id="vibY2Input" class="curve-input" value="0" step="0.5" min="0" max="10" style="width: 50px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Model</label>
+                    <select id="vibModelSelect" style="width: 80px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="logarithmic" selected>Log</option>
+                        <option value="exponential">Exp</option>
+                        <option value="power">Power</option>
+                        <option value="sigmoid">S-Curve</option>
+                        <option value="bezier">Bezier</option>
+                    </select>
+                    <label style="width: 35px; margin-left: 5px;">Slope</label>
+                    <input type="number" id="vibSlopeInput" class="curve-input" value="-0.65" step="0.5" min="-3" max="3" style="width: 50px;" title="Initial slope / real-time coefficient">
+                </div>
+                <div class="curve-input-row">
+                    <label style="width: 35px;">Vel</label>
+                    <input type="number" id="vibVelocityInput" class="curve-input" value="115" min="0" max="127" style="width: 45px; font-size: 10px;" title="MIDI velocity (0-127)">
+                </div>
+                <div class="color-swatches" id="vibColorSwatches" style="margin-top: 4px;">
+                    <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
+                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
+                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
+                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
+                    <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
+                    <div class="color-swatch selected" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
+                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
+                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
+                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
+                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
+                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
+                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                </div>
+                <div class="curve-fill-toggle" style="margin-top: 3px;">
+                    <input type="radio" id="vibFillLine" name="vibFill" value="line">
+                    <label for="vibFillLine">Line</label>
+                    <input type="radio" id="vibFillBottom" name="vibFill" value="bottom" checked>
+                    <label for="vibFillBottom">Fill ↓</label>
+                    <input type="radio" id="vibFillTop" name="vibFill" value="top">
+                    <label for="vibFillTop">Fill ↑</label>
                 </div>
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="vibGenerateBtn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 12px;">Generate</button>
@@ -2610,6 +2655,15 @@
                 this.deselectAll();
                 this.selectedElement = elementData;
                 elementData.wrapper.classList.add('selected');
+                
+                // Bring SVG container to front so selected element is above
+                // curves, motives, MIDI snippets etc. (enables drag after ObjectSelector pick)
+                this.bringToFront();
+                // Bring this specific element to front within its container
+                const targetContainer = elementData.section === 'bottom' ? this.containerBottom : this.containerTop;
+                if (elementData.wrapper.parentNode === targetContainer) {
+                    targetContainer.appendChild(elementData.wrapper);
+                }
                 
                 // Create resize handles
                 this.createResizeHandles();
@@ -11592,14 +11646,24 @@
                 // Start auto-save
                 this.startAutoSave();
                 
-                // Auto-load last saved score
+                // Auto-load: check server for latest score first (supports automation),
+                // then fall back to localStorage
                 try {
-                    const lastScore = localStorage.getItem('lastScoreName');
-                    if (lastScore) {
-                        console.log(`ScoreManager: Auto-loading last score '${lastScore}'`);
-                        // Small delay to let all systems finish initializing
-                        setTimeout(() => this.loadScore(lastScore), 300);
-                    }
+                    fetch('/api/score/latest').then(r => r.json()).then(data => {
+                        const serverLatest = data?.name;
+                        const localLatest = localStorage.getItem('lastScoreName');
+                        const scoreToLoad = serverLatest || localLatest;
+                        if (scoreToLoad) {
+                            console.log(`ScoreManager: Auto-loading score '${scoreToLoad}' (server: ${serverLatest}, local: ${localLatest})`);
+                            setTimeout(() => this.loadScore(scoreToLoad), 300);
+                        }
+                    }).catch(() => {
+                        // Fallback to localStorage if server unavailable
+                        const lastScore = localStorage.getItem('lastScoreName');
+                        if (lastScore) {
+                            setTimeout(() => this.loadScore(lastScore), 300);
+                        }
+                    });
                 } catch(e) {}
                 
                 console.log('ScoreManager initialized');
@@ -14189,6 +14253,12 @@
                 const ltCoefInput = document.getElementById('ltCurveCoef');
                 if (ltCoefInput) {
                     ltCoefInput.value = slope.toFixed(2);
+                }
+                
+                // Also update Vibrato UI slope display (real-time coefficient)
+                const vibSlopeInput = document.getElementById('vibSlopeInput');
+                if (vibSlopeInput) {
+                    vibSlopeInput.value = slope.toFixed(2);
                 }
             },
             
@@ -16786,6 +16856,23 @@
                                 type: 'pitchBend',
                                 data: [status, lsb, msb]
                             });
+                        } else if (eventType === 0xD0) {
+                            // Channel Pressure (Aftertouch) - 1 data byte
+                            const pressure = midiData[pos++];
+                            events.push({
+                                timeMs: timeMs,
+                                type: 'channelPressure',
+                                data: [status, pressure]
+                            });
+                        } else if (eventType === 0xA0) {
+                            // Polyphonic Key Pressure - 2 data bytes
+                            const note = midiData[pos++];
+                            const pressure = midiData[pos++];
+                            events.push({
+                                timeMs: timeMs,
+                                type: 'polyPressure',
+                                data: [status, note, pressure]
+                            });
                         } else if (status === 0xFF) {
                             // Meta event
                             const metaType = midiData[pos++];
@@ -16963,6 +17050,15 @@
                 if (btn) {
                     btn.addEventListener('click', () => this.generate());
                 }
+                
+                // Color swatch handlers (independent from LT and CurveMaker swatches)
+                document.querySelectorAll('#vibColorSwatches .color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => {
+                        document.querySelectorAll('#vibColorSwatches .color-swatch').forEach(s => s.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                    });
+                });
+                
                 console.log('VibratoUI initialized');
             },
             
@@ -16975,15 +17071,60 @@
                 return `Vib-${dirCode}-${clefName}-${safePitch}-${startDyn}-${endDyn}.ly`;
             },
             
+            // Create a curve from vibrato UI inputs (mirrors LongToneUI.createCurve)
+            createCurve() {
+                const startSeconds = parseFloat(document.getElementById('vibStartInput').value) || 0;
+                const endSeconds = parseFloat(document.getElementById('vibEndInput').value) || 10;
+                const y1 = parseFloat(document.getElementById('vibY1Input').value);
+                const y2 = parseFloat(document.getElementById('vibY2Input').value);
+                const gTrack = document.getElementById('vibTrackInput').value;
+                const slope = parseFloat(document.getElementById('vibSlopeInput').value) || 0;
+                const model = document.getElementById('vibModelSelect').value;
+                
+                const y1Val = isNaN(y1) ? 10 : y1;
+                const y2Val = isNaN(y2) ? 0 : y2;
+                
+                // Read color from vibrato swatches (default limeGreen)
+                const vibSwatch = document.querySelector('#vibColorSwatches .color-swatch.selected');
+                const color = vibSwatch ? vibSwatch.dataset.color : 'limeGreen';
+                
+                // Read fill mode from vibrato radio (default bottom/Fill Down)
+                const vibFill = document.querySelector('input[name="vibFill"]:checked');
+                const fillMode = vibFill ? vibFill.value : 'bottom';
+                
+                const curve = CurveMaker.createCurve({
+                    startSeconds,
+                    endSeconds,
+                    y1: y1Val,
+                    y2: y2Val,
+                    gTrack,
+                    model,
+                    slope,
+                    color,
+                    fillMode
+                });
+                
+                if (curve) {
+                    console.log('VibratoUI: Curve created', curve.name);
+                }
+                
+                return curve;
+            },
+            
             // Main generate method (3-phase button: Generate → Generating... → ✓ Done)
+            // Creates curve + notation + inserts SVG
             async generate() {
                 const btn = document.getElementById('vibGenerateBtn');
                 const originalText = btn ? btn.textContent : '';
                 const originalBg = btn ? btn.style.background : '';
                 
-                // Read UI values
-                const dirRadio = document.querySelector('input[name="vibDirection"]:checked');
-                const direction = dirRadio ? dirRadio.value : 'wide-narrow';
+                // Read UI values for notation
+                // Auto-determine direction from Y1 vs Y2:
+                // High Y → Low Y = wide-narrow vibrato (>)
+                // Low Y → High Y = narrow-wide vibrato (<)
+                const y1 = parseFloat(document.getElementById('vibY1Input').value) || 0;
+                const y2 = parseFloat(document.getElementById('vibY2Input').value) || 0;
+                const direction = y1 >= y2 ? 'wide-narrow' : 'narrow-wide';
                 const clef = document.getElementById('vibClefSelect').value;
                 const pitch = document.getElementById('vibPitchInput').value.trim();
                 const startDynamic = document.getElementById('vibStartDynamic').value;
@@ -17012,7 +17153,16 @@
                 
                 let result = null;
                 try {
-                    // Step 1: Create LilyPond file from template
+                    // Step 1: Create the curve
+                    const curve = this.createCurve();
+                    if (!curve) {
+                        throw new Error('Failed to create curve');
+                    }
+                    
+                    const track = parseInt(document.getElementById('vibTrackInput').value) || 1;
+                    const startSeconds = curve.startSeconds;
+                    
+                    // Step 2: Create LilyPond file from template
                     const createResp = await fetch('/api/lilypond/create-vibrato', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -17033,7 +17183,7 @@
                     }
                     console.log('VibratoUI: LilyPond file created:', filename);
                     
-                    // Step 2: Render LilyPond to SVG (reuse glissando render endpoint)
+                    // Step 3: Render LilyPond to SVG (reuse glissando render endpoint)
                     const renderResp = await fetch('/api/lilypond/render-glissando', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -17043,14 +17193,35 @@
                     
                     if (renderResult.success) {
                         console.log('VibratoUI: SVG rendered:', renderResult.svgPath);
+                        
+                        // Step 4: Insert SVG into score at curve's START position (left edge)
+                        const svgPath = renderResult.svgPath;
+                        const insertResult = await this.insertVibratoSvg(svgPath, startSeconds, track);
+                        if (insertResult) {
+                            console.log('VibratoUI: SVG inserted into score');
+                        }
+                        
+                        // Step 5: Generate and insert MIDI
+                        const midiResult = await this.generateVibratoMidi(curve);
+                        let midiInsert = null;
+                        if (midiResult) {
+                            midiInsert = await this.insertVibratoMidi(midiResult, curve);
+                            if (midiInsert) {
+                                console.log('VibratoUI: MIDI inserted into score');
+                            }
+                        }
+                        
                         result = {
+                            curve: { id: curve.id, name: curve.name, startSeconds, endSeconds: curve.endSeconds },
                             filename,
                             direction,
                             clef: lpClef,
                             pitch: lpPitch,
                             startDynamic,
                             endDynamic,
-                            svgPath: renderResult.svgPath
+                            svgPath: svgPath,
+                            midi: midiResult,
+                            midiInsert: midiInsert
                         };
                     } else {
                         console.error('VibratoUI: Render failed:', renderResult.error);
@@ -17077,6 +17248,417 @@
                 }
                 
                 return result;
+            },
+            
+            // Generate vibrato MIDI: single pitch, CC0=89, CC4 + channel pressure following curve Y
+            async generateVibratoMidi(curve) {
+                const CC_SAMPLE_INTERVAL = 50; // ms between CC/aftertouch messages (20/sec)
+                const TICKS_PER_BEAT = 480;
+                const CC0_ARTICULATION = 89; // senza vibrato / vibrato articulation
+                
+                if (!curve || !curve.curveData || !curve.curveData.samples) {
+                    console.error('VibratoUI.generateVibratoMidi: Invalid curve data');
+                    return null;
+                }
+                
+                // Read pitch from UI
+                const pitchStr = document.getElementById('vibPitchInput').value.trim();
+                const velocity = parseInt(document.getElementById('vibVelocityInput').value) || 115;
+                
+                // Convert pitch string to MIDI note number (reuse LongToneUI helper)
+                const noteMap = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+                const match = pitchStr.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+                if (!match) {
+                    console.error('VibratoUI.generateVibratoMidi: Invalid pitch:', pitchStr);
+                    return null;
+                }
+                let [, noteName, accidental, quarterTone, octave] = match;
+                let midiNote = noteMap[noteName];
+                if (accidental === '#') midiNote += 1;
+                else if (accidental === 'B') midiNote -= 1;
+                midiNote += (parseInt(octave) + 1) * 12;
+                midiNote = Math.max(0, Math.min(127, midiNote));
+                
+                // Get curve samples
+                const curveData = curve.curveData;
+                const samples = curveData.samples; // normalized 0-1
+                const sampleInterval = curveData.sampleInterval; // seconds between samples
+                const startTime = curveData.startTime; // seconds
+                const duration = curve.endSeconds - curve.startSeconds;
+                
+                // Build CC4 + Channel Pressure samples from curve Y
+                // normalizedY (0-1) maps to CC value (0-127)
+                const ccSamples = [];
+                const numSamples = Math.max(2, Math.ceil(duration * 1000 / CC_SAMPLE_INTERVAL));
+                
+                for (let i = 0; i < numSamples; i++) {
+                    const t = curve.startSeconds + (i / (numSamples - 1)) * duration;
+                    // Find closest curve sample
+                    const curveIdx = Math.round((t - startTime) / sampleInterval);
+                    const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
+                    const normalizedY = samples[clampedIdx];
+                    const ccValue = Math.round(Math.max(0, Math.min(127, normalizedY * 127)));
+                    ccSamples.push({ time: t, value: ccValue });
+                }
+                
+                // Build MIDI file
+                const TEMPO_BPM = window.beatsPerMinute || 60;
+                const MICROSECONDS_PER_BEAT = Math.round(60000000 / TEMPO_BPM);
+                
+                const writeVarInt = (value) => {
+                    const bytes = [];
+                    bytes.push(value & 0x7f);
+                    value >>= 7;
+                    while (value > 0) {
+                        bytes.unshift((value & 0x7f) | 0x80);
+                        value >>= 7;
+                    }
+                    return bytes;
+                };
+                
+                const writeInt = (value, length) => {
+                    const bytes = [];
+                    for (let i = length - 1; i >= 0; i--) {
+                        bytes.push((value >> (i * 8)) & 0xff);
+                    }
+                    return bytes;
+                };
+                
+                const secondsToTicks = (seconds) => {
+                    return Math.round(seconds * TICKS_PER_BEAT * TEMPO_BPM / 60);
+                };
+                
+                // Build track events
+                const trackEvents = [];
+                let lastTick = 0;
+                
+                // CC0 = 89 (articulation) at tick 0
+                trackEvents.push(...writeVarInt(0));
+                trackEvents.push(0xB0, 0x00, CC0_ARTICULATION);
+                
+                // Note On at tick 0
+                trackEvents.push(...writeVarInt(0));
+                trackEvents.push(0x90, midiNote, velocity);
+                
+                // CC4 + Channel Pressure samples following curve Y
+                let prevTick = 0;
+                for (let i = 0; i < ccSamples.length; i++) {
+                    const sample = ccSamples[i];
+                    const timeRelative = sample.time - curve.startSeconds;
+                    const tick = secondsToTicks(timeRelative);
+                    const deltaTick = Math.max(0, tick - prevTick);
+                    
+                    // CC4 (controller 4)
+                    trackEvents.push(...writeVarInt(deltaTick));
+                    trackEvents.push(0xB0, 0x04, sample.value);
+                    
+                    // Channel Pressure (aftertouch) - 0xD0, 1 data byte - delta=0 (same time)
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0xD0, sample.value);
+                    
+                    prevTick = tick;
+                }
+                lastTick = prevTick;
+                
+                // Note Off at end
+                const endTick = secondsToTicks(duration);
+                const noteOffDelta = Math.max(0, endTick - lastTick);
+                trackEvents.push(...writeVarInt(noteOffDelta));
+                trackEvents.push(0x80, midiNote, 0);
+                
+                // End of track
+                trackEvents.push(...writeVarInt(0));
+                trackEvents.push(0xFF, 0x2F, 0x00);
+                
+                // Build tempo track
+                const tempoTrack = [];
+                tempoTrack.push(...writeVarInt(0));
+                tempoTrack.push(0xFF, 0x51, 0x03);
+                tempoTrack.push((MICROSECONDS_PER_BEAT >> 16) & 0xFF);
+                tempoTrack.push((MICROSECONDS_PER_BEAT >> 8) & 0xFF);
+                tempoTrack.push(MICROSECONDS_PER_BEAT & 0xFF);
+                tempoTrack.push(...writeVarInt(0));
+                tempoTrack.push(0xFF, 0x2F, 0x00);
+                
+                // Build MIDI file (Format 1, 2 tracks)
+                const midiFile = [];
+                midiFile.push(0x4D, 0x54, 0x68, 0x64); // "MThd"
+                midiFile.push(...writeInt(6, 4));
+                midiFile.push(...writeInt(1, 2)); // Format 1
+                midiFile.push(...writeInt(2, 2)); // 2 tracks
+                midiFile.push(...writeInt(TICKS_PER_BEAT, 2));
+                
+                // Tempo track
+                midiFile.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+                midiFile.push(...writeInt(tempoTrack.length, 4));
+                midiFile.push(...tempoTrack);
+                
+                // Data track
+                midiFile.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+                midiFile.push(...writeInt(trackEvents.length, 4));
+                midiFile.push(...trackEvents);
+                
+                // Save via server
+                const uint8Array = new Uint8Array(midiFile);
+                const base64 = btoa(String.fromCharCode(...uint8Array));
+                const curveName = curve.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+                const pitchName = pitchStr.replace('#', 's').replace(/[^a-zA-Z0-9]/g, '');
+                const fileName = `Vib_${curveName}_${pitchName}.mid`;
+                
+                try {
+                    const response = await fetch('/api/midi/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename: fileName, midiData: base64 })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log(`VibratoUI.generateVibratoMidi: Saved ${fileName} (${ccSamples.length} CC samples @ ${CC_SAMPLE_INTERVAL}ms)`);
+                        return {
+                            filename: fileName,
+                            path: result.path,
+                            midiNote,
+                            velocity,
+                            duration,
+                            ccSamples: ccSamples.length,
+                            startSeconds: curve.startSeconds,
+                            endSeconds: curve.endSeconds
+                        };
+                    } else {
+                        console.error('VibratoUI.generateVibratoMidi: Save failed:', result.error);
+                        return null;
+                    }
+                } catch (err) {
+                    console.error('VibratoUI.generateVibratoMidi: Error:', err);
+                    return null;
+                }
+            },
+            
+            // Insert vibrato MIDI into score (MidiController track + MidiSnippetDatabase)
+            async insertVibratoMidi(midiResult, curve) {
+                if (!midiResult || !midiResult.path) {
+                    console.error('VibratoUI.insertVibratoMidi: No MIDI file to insert');
+                    return null;
+                }
+                
+                const trackIndex = (parseInt(curve.gTrack) || 1) - 1; // 0-indexed
+                const curveStartMs = curve.startSeconds * 1000;
+                const color = curve.color || 'limeGreen';
+                
+                try {
+                    // Fetch and parse the MIDI file
+                    const response = await fetch(midiResult.path);
+                    const arrayBuffer = await response.arrayBuffer();
+                    const midiData = new Uint8Array(arrayBuffer);
+                    
+                    // Reuse LongToneUI's MIDI parser (now supports channel pressure)
+                    const events = LongToneUI.parseMidiFileToEvents(midiData, curveStartMs);
+                    
+                    if (!events || events.length === 0) {
+                        console.warn('VibratoUI.insertVibratoMidi: No events parsed');
+                        return null;
+                    }
+                    
+                    // Create snippet for MidiSnippetDatabase
+                    const snippetData = {
+                        name: `Vib @ ${curve.name}`,
+                        trackIndex: trackIndex,
+                        startTimeMs: curveStartMs,
+                        durationMs: midiResult.duration * 1000,
+                        startSeconds: curve.startSeconds,
+                        endSeconds: curve.endSeconds,
+                        events: events,
+                        color: color,
+                        sourceCurve: curve.id,
+                        sourceFile: midiResult.filename
+                    };
+                    
+                    let snippetId = null;
+                    if (window.MidiSnippetDatabase) {
+                        const snippet = MidiSnippetDatabase.add(snippetData);
+                        snippetId = snippet.id;
+                    }
+                    
+                    // Add events to MidiController track for playback
+                    const eventIds = [];
+                    if (window.MidiController && MidiController.tracks && MidiController.tracks[trackIndex]) {
+                        for (const event of events) {
+                            const eventId = `vib_${curve.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                            const midiEvent = {
+                                id: eventId,
+                                timeMs: event.timeMs,
+                                type: event.type,
+                                data: [...event.data],
+                                sourceCurve: curve.id,
+                                snippetId: snippetId
+                            };
+                            MidiController.tracks[trackIndex].midiEvents.push(midiEvent);
+                            eventIds.push(eventId);
+                        }
+                        
+                        // Sort and re-render
+                        MidiController.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                        MidiController.renderAllMidiDisplays();
+                        MidiController.updateMidiDisplayVisibility();
+                    }
+                    
+                    // Store snippet IDs on curve
+                    if (!curve.vibratoMidiSnippets) {
+                        curve.vibratoMidiSnippets = [];
+                    }
+                    curve.vibratoMidiSnippets.push({
+                        snippetId,
+                        eventIds,
+                        startTimeMs: curveStartMs,
+                        durationMs: midiResult.duration * 1000
+                    });
+                    
+                    console.log(`VibratoUI.insertVibratoMidi: Inserted ${events.length} events on track ${trackIndex + 1}`);
+                    
+                    return {
+                        snippetId,
+                        eventCount: events.length,
+                        trackIndex
+                    };
+                } catch (err) {
+                    console.error('VibratoUI.insertVibratoMidi: Error:', err);
+                    return null;
+                }
+            },
+            
+            // Insert vibrato SVG into score at a timeline position
+            // Adapts LongToneUI.insertGlissandoSvg positioning logic
+            async insertVibratoSvg(svgPath, startSeconds, track) {
+                if (!svgPath) {
+                    console.error('VibratoUI.insertVibratoSvg: Missing svgPath');
+                    return null;
+                }
+                
+                try {
+                    // Fetch the SVG content
+                    const response = await fetch(svgPath);
+                    const svgContent = await response.text();
+                    
+                    // Parse SVG to get dimensions
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const svgEl = svgDoc.documentElement;
+                    
+                    // Get original dimensions (handle mm units)
+                    let svgWidth = parseFloat(svgEl.getAttribute('width')) || 100;
+                    let svgHeight = parseFloat(svgEl.getAttribute('height')) || 100;
+                    const widthStr = svgEl.getAttribute('width') || '';
+                    const heightStr = svgEl.getAttribute('height') || '';
+                    if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
+                    if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
+                    
+                    // Set pixel dimensions on SVG element
+                    svgEl.setAttribute('width', String(svgWidth));
+                    svgEl.setAttribute('height', String(svgHeight));
+                    
+                    // Determine page/section from startSeconds
+                    const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
+                    const leadIn = leadInSeconds;
+                    const displayTime = startSeconds + leadIn;
+                    const pageIndex = Math.floor(displayTime / secondsPerPage);
+                    const section = pageIndex % 2 === 0 ? 'top' : 'bottom';
+                    
+                    // Get score/track dimensions
+                    const scoreEl = document.getElementById(section === 'top' ? 'ScoreTop' : 'ScoreBottom');
+                    const scoreHeight = scoreEl.clientHeight;
+                    const scoreWidth = scoreEl.clientWidth;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(track), scoreEl);
+                    const trackHeight = trackDims.height;
+                    
+                    // Scale to fit ~85% of track height
+                    const targetHeight = trackHeight * 0.85;
+                    const scale = targetHeight / svgHeight;
+                    const scaledWidth = svgWidth * scale;
+                    
+                    // X position: place SVG right edge at the timeline point minus 5px
+                    const xPercent = ((displayTime % secondsPerPage) / secondsPerPage) * 100;
+                    const xPx = (xPercent / 100) * scoreWidth;
+                    const gap = 5;
+                    const svgX = Math.max(0, xPx - gap - scaledWidth);
+                    
+                    // Y position: top of track (slight negative offset to compensate for SVG internal padding)
+                    const trackYFraction = 0;
+                    const scaledHeight = svgHeight * scale;
+                    const svgY = trackDims.y + trackYFraction * (trackHeight - scaledHeight) - 5;
+                    
+                    // Calculate startSeconds for persistence
+                    const svgXPercentRaw = (svgX / scoreWidth) * 100;
+                    const svgStartSeconds = (pageIndex * secondsPerPage) + (svgXPercentRaw / 100 * secondsPerPage) - leadIn;
+                    
+                    // Re-derive position from startSeconds (handles page boundaries)
+                    const startActual = svgStartSeconds + leadIn;
+                    const actualPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const actualSection = actualPage % 2 === 0 ? 'top' : 'bottom';
+                    const actualXPercent = ((startActual / secondsPerPage) - actualPage) * 100;
+                    const actualX = (actualXPercent / 100) * scoreWidth;
+                    
+                    // Create SVG element
+                    const id = SVGElementManager.nextId++;
+                    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    wrapper.setAttribute('id', `svg-element-${id}`);
+                    wrapper.setAttribute('class', 'svg-element-wrapper');
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    let svgString = new XMLSerializer().serializeToString(svgEl);
+                    svgString = svgString.replace(/currentColor/g, '#000000');
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                    image.setAttribute('href', dataUrl);
+                    image.setAttribute('width', svgWidth);
+                    image.setAttribute('height', svgHeight);
+                    wrapper.appendChild(image);
+                    
+                    const elementData = {
+                        id: id,
+                        name: svgPath.split('/').pop().replace('.svg', ''),
+                        wrapper: wrapper,
+                        image: image,
+                        x: actualX,
+                        y: svgY,
+                        startSeconds: svgStartSeconds,
+                        yPercent: (svgY / scoreHeight) * 100,
+                        trackYFraction: trackYFraction,
+                        xPercent: actualXPercent,
+                        width: svgWidth,
+                        height: svgHeight,
+                        scale: scale,
+                        baseScale: scale,
+                        baseScoreWidth: scoreWidth,
+                        track: track,
+                        page: actualPage,
+                        section: actualSection
+                    };
+                    
+                    // Add to SVGElementManager
+                    SVGElementManager.elements.push(elementData);
+                    SVGElementManager.updateElementTransform(elementData);
+                    
+                    const targetContainer = actualSection === 'top' 
+                        ? SVGElementManager.containerTop 
+                        : SVGElementManager.containerBottom;
+                    targetContainer.appendChild(wrapper);
+                    
+                    // Add drag handlers
+                    wrapper.addEventListener('mousedown', (e) => 
+                        SVGElementManager.handleElementMouseDown(e, elementData));
+                    
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                    
+                    console.log('VibratoUI.insertVibratoSvg: Inserted', elementData.name, 
+                        'at startSeconds:', startSeconds, 'track:', track,
+                        'page:', actualPage, 'section:', actualSection,
+                        'scale:', scale.toFixed(3), 'x:', actualX.toFixed(1), 'y:', svgY.toFixed(1));
+                    
+                    return elementData;
+                } catch (err) {
+                    console.error('VibratoUI.insertVibratoSvg: Error:', err);
+                    return null;
+                }
             }
         };
         VibratoUI.init();
