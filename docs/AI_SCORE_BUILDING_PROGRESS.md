@@ -2,21 +2,21 @@
 
 **Status:** Active  
 **Last Updated:** Feb 16, 2026  
-**Current ASB Number:** ASB-037
+**Current ASB Number:** ASB-039
 
 ---
 
 ## Last Session Summary
 
-> **Vibrato system feature-complete.** Full vibrato automation with server endpoint, UI workflow, and AI prompt. Created vibrato motives on tracks 1, 2, and 4 via automation. Fixed ObjectSelector z-order for SVG drag, server SVG track positioning (trackYFraction), and cursor offset. Implementation doc: `docs/VIBRATO_SYSTEM_IMPLEMENTATION.md`. Next: continue score composition or extend to new gesture types.
+> **Curve Fugue Algorithm #1 documented and tested.** Created `docs/CURVE_FUGUE_ALGORITHM_1.md` — full macro algorithm for generating sequences of glissando/vibrato motives via AI prompt automation. Features: parameterized duration/gap ranges (shuffled bins), cumulative quarter-tone pitch descent with scenario interludes, vibrato integration (70/30 split, force after 4 gliss), onset-to-onset gap with same-track collision handling, configurable slopes (`glissandoSlope`, `vibratoSlope`). Ran algorithm 3 times producing 52 motives across scores 51–106. Next: continue score composition, refine algorithm parameters, or extend to new gesture types.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 16, 2026  
-**Focus:** Vibrato automation endpoint, bug fixes, score composition  
-**Tier 1 Count This Session:** 0 (reset after Tier 2)  
+**Focus:** Curve Fugue Algorithm #1 — documentation, parameterization, score composition  
+**Tier 1 Count This Session:** 2 (ASB-038, ASB-039)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -30,6 +30,11 @@
 - ASB-035: Vibrato System UI expansion (track, times, Y1/Y2, model/slope, velocity, color, fill) + createCurve() + generate() 4-step flow
 - ASB-036: Vibrato MIDI generation (CC4 + channel pressure) + server automation endpoint (`/api/vibrato/create-and-save`) + auto-load latest score + AI Vibrato Prompt Guide
 - ASB-037: Bug fixes — ObjectSelector SVG z-order for drag, server SVG track positioning (trackYFraction), cursor offset -1s
+
+### Session Log — Curve Fugue Algorithm
+- ASB-038: Curve Fugue Algorithm #1 documentation — parameterized duration/gap (shuffled bins), cumulative QT pitch descent + scenario interludes, vibrato integration, collision handling, prompt guide
+- ASB-039: Add `glissandoSlope` and `vibratoSlope` as configurable parameters
+- Score composition: Ran algorithm 3× — 13 motives (scores 51–63), 18 motives (scores 66–83), 21 motives (scores 86–106)
 
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
@@ -54,7 +59,7 @@
 - [x] Full end-to-end test of glissando workflow ✔️
 - [x] Update LONG_TONE_IMPLEMENTATION.md ✔️
 - [x] Tier 3 milestone complete ✔️
-- [ ] Begin actual score composition using the glissando + vibrato systems
+- [x] Begin actual score composition using the glissando + vibrato systems ✔️ (Curve Fugue Algorithm #1, 52 motives across 3 runs)
 - [ ] Extend AI prompt system to other gesture types (cresc/decresc, etc.)
 - [ ] Extend ObjectSelector z-order fix to curves, motives, MIDI snippets
 - [x] Test vibrato generation with various pitches/clefs/dynamics combinations ✔️ (tracks 1, 2, 4 — treble + bass clefs, natural + quarter-tone pitches)
@@ -102,6 +107,8 @@
 | ASB-035 | Vibrato System UI expansion + createCurve() + multi-step generate() | Complete |
 | ASB-036 | Vibrato MIDI generation + server automation endpoint + auto-load + prompt guide | Complete |
 | ASB-037 | Bug fixes: ObjectSelector z-order, SVG track positioning, cursor offset | Complete |
+| ASB-038 | Curve Fugue Algorithm #1 documentation — parameterized bins, pitch descent, prompt guide | Complete |
+| ASB-039 | Add glissandoSlope and vibratoSlope parameters to Curve Fugue Algorithm | Complete |
 
 ---
 
@@ -115,6 +122,7 @@
 | Feb 15, 2026 | 7c7ee71 | addendum: glissando - SVG positioning investigation (ASB-019 to ASB-021) |
 | Feb 16, 2026 | 3b68813 | vibrato system: LilyPond templates, UI controls, generate pipeline, SVG crop fix (ASB-030 to ASB-033) |
 | Feb 16, 2026 | 568a2a0 | vibrato system: UI expansion, MIDI generation, server automation, bug fixes, implementation doc (ASB-035 to ASB-037) |
+| Feb 16, 2026 | 6e245fe | Curve Fugue Algorithm #1: documentation, parameterized slopes, score composition (ASB-038 to ASB-039, scores 51-106) |
 
 ---
 

@@ -1,14 +1,21 @@
 # AI Glissando Prompt Guide
 
-Create Long Tone Glissandos via AI prompt — parallel to the UI workflow.
+Create Long Tone Glissandos via AI prompt — **one-step server automation**.
 
-**Two-stage process:**
-1. **Prompt with all data** → curve appears → adjust slope/shape as needed
-2. **Say "Generate"** → notation, SVG, and MIDI are created automatically
+**Single-step process:** User describes the glissando → Cascade calls the server endpoint → score is saved → user refreshes browser.
 
 ---
 
-## Stage 1: Create the Curve
+## How It Works
+
+1. User describes the glissando (natural language, copy-paste template, or guided)
+2. Cascade validates parameters, then calls `POST /api/glissando/create-and-save`
+3. Server creates curve, LilyPond notation, SVG, multi-segment MIDI, saves new score
+4. User refreshes browser — glissando appears with auto-scroll to 1s before start
+
+---
+
+## Prompt Templates
 
 ### Option A: Copy-Paste Template
 
@@ -19,16 +26,18 @@ Create a glissando:
 - Start pitch: ___ (e.g., E4, C#3)
 - End pitch: ___ (e.g., C3, G#4)
 - Clef: ___ (treble / cClef / bass)
-- Dynamic: ___ (p, mp, mf, f, ff, etc. — notation only, not MIDI velocity)
-- Velocity: ___ (0-127, MIDI velocity — independent from dynamic notation)
+- Dynamic: ___ (p, mp, mf, f, ff, etc. — notation only)
+- Velocity: ___ (0-127, MIDI velocity)
 - Y1: ___, Y2: ___ (0-10, curve intensity)
 - Model: ___ (logarithmic / exponential / power / sigmoid / bezier)
 - Slope: ___ (-3 to +3)
+- Color: ___ (brightOrange, blue, limeGreen, etc.)
+- Fill: ___ (line / bottom / top)
 ```
 
 ### Option B: Natural Language
 
-> "Glissando on track 3, 120s to 128s, alto clef, A3 down to F3, mp, logarithmic steep slope"
+> "Glissando on track 3, 120s to 128s, alto clef, A3 down to F3, mp, logarithmic slope -1"
 
 ### Option C: Trigger Phrase (Guided)
 
@@ -36,31 +45,24 @@ Create a glissando:
 
 Cascade will ask you each parameter in turn. Say "default" to skip any question.
 
-### What Happens
-
-- Cascade parses your parameters, runs validation checklist (see below), shows a summary
-- Cascade provides a **copy-paste JS command** for `LongToneUI.step1(params)`
-- **User pastes it in the browser console** (F12 → Console) — curve appears on the score
-- **You can now adjust the slope/model in the UI** — drag, change model, etc.
-- All manual adjustments are tracked in real time (curve data regenerates on every edit)
-- Pitch/clef/track/dynamic/velocity data is remembered for Stage 2
-
-> **Important:** Cascade cannot execute browser JavaScript directly. All commands are
-> copy-paste — Cascade composes them, the user runs them in the browser console.
-> Cascade must NEVER attempt to check, start, or interact with the dev server.
-
 ---
 
-## Stage 2: Generate Everything
+## How Cascade Executes
 
-When you're happy with the curve shape, say:
+Cascade runs this PowerShell command (user approves):
 
-> **"Generate"**
+```powershell
+Invoke-WebRequest -Uri "http://localhost:5000/api/glissando/create-and-save" -Method POST -ContentType "application/json" -Body '{"start":120,"end":128,"track":3,"startPitch":"A3","endPitch":"F3","clef":"cClef","dynamic":"mp","velocity":64,"y1":10,"y2":0,"model":"logarithmic","slope":-1,"color":"brightOrange","fillMode":"bottom"}'
+```
 
-That's it. Cascade will provide a **copy-paste JS command** for `LongToneUI.step2(params)`. User pastes it in the browser console. Steps 2-4 run automatically using the data from Stage 1 **plus any manual slope/model adjustments you made**:
-- Generate LilyPond notation
-- Render and insert SVG
-- Generate and insert MIDI segments
+The server then:
+1. Loads the latest score
+2. Creates curve with computed sample data
+3. Creates LilyPond file from template, renders to SVG, crops
+4. Generates MIDI segments (pitch bend, 2-semitone segments with 5ms overlap)
+5. Adds curve, SVG element, MIDI snippets to score
+6. Saves as next score iteration with version backup
+7. Sets cursor to 1 second before start time
 
 ---
 
@@ -71,10 +73,12 @@ That's it. Cascade will provide a **copy-paste JS command** for `LongToneUI.step
 | Y1 | 10 |
 | Y2 | 0 |
 | Model | logarithmic |
-| Slope | 0 (linear) |
+| Slope | -0.65 |
 | Dynamic | p (notation only) |
 | Velocity | 64 (mp) |
-| Articulation | 89 (senza vibrato) |
+| Articulation | 89 (senza vibrato CC0) |
+| Color | limeGreen |
+| Fill Mode | bottom |
 
 ---
 
@@ -179,16 +183,29 @@ Before running `LongToneUI.step1()`, Cascade validates the parsed parameters and
 
 ---
 
+## MIDI Output Details
+
+- **Format 1 MIDI** per segment (tempo track + data track)
+- **Pitch bend range:** 2 semitones per segment (MIDI standard)
+- **Segments:** Auto-divided when pitch deviates >2 semitones from segment base
+- **Overlap:** 5ms between consecutive segments for seamless transitions
+- **CC0 (articulation):** Sent on first 2 segments only (default 89 = senza vibrato)
+- **Pitch bend samples:** Every 50ms (20 per second)
+- **Note direction:** Gliss down = MIDI note at startPitch-1, bend starts at max; Gliss up = MIDI note at startPitch+1, bend starts at min
+
+---
+
 ## Full Example
 
 **You say:**
 > Create a glissando: Start 120s, End 128s, Track 3, E4 to C3, cClef, mp, Y1=10 Y2=0, logarithmic slope -1
 
-**Cascade responds:**
-> Created curve on track 3 (120s–128s), E4→C3, logarithmic slope -1. Adjust the curve shape if needed, then say "Generate".
+**Cascade runs:**
+```powershell
+Invoke-WebRequest -Uri "http://localhost:5000/api/glissando/create-and-save" -Method POST -ContentType "application/json" -Body '{"start":120,"end":128,"track":3,"startPitch":"E4","endPitch":"C3","clef":"cClef","dynamic":"mp","velocity":64,"y1":10,"y2":0,"model":"logarithmic","slope":-1,"color":"brightOrange","fillMode":"bottom"}'
+```
 
-**You adjust the slope in the UI if desired, then say:**
-> Generate
-
 **Cascade responds:**
-> Done. Notation SVG inserted, 4 MIDI segments generated and placed on track 3.
+> Glissando created on track 3 (120s–128s), E4→C3, cClef, mp, logarithmic slope -1. Score saved as "10". Refresh browser to see it.
+
+> **Note:** The two-stage UI workflow (Step 1: Create Curve → Step 2: Generate) is still available for manual use. The AI automation combines both stages into one server call.
