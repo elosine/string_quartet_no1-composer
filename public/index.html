@@ -1042,54 +1042,45 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Curve Maker</div>
+                <div class="section-label" style="background: var(--clr-brightOrange); color: #fff; padding: 3px 6px; border-radius: 2px;">Curve Maker</div>
                 
-                <div class="curve-input-row">
-                    <label>Name</label>
-                    <input type="text" id="curveNameDisplay" class="curve-input" value="" readonly style="background: rgba(40,40,50,0.8); color: #aaa;">
+                <div class="curve-input-row" style="margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 28px;">Name</label>
+                    <input type="text" id="curveNameDisplay" class="curve-input" value="" readonly style="flex: 1; font-size: 9px; padding: 2px 4px; min-width: 0; background: rgba(40,40,50,0.8); color: #aaa;">
                 </div>
-                <div class="curve-input-row">
-                    <label>Start</label>
-                    <input type="text" id="curveStartInput" class="curve-input" value="0.000">
+                <div class="curve-input-row" style="margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 28px;">Start</label>
+                    <input type="text" id="curveStartInput" class="curve-input" value="0.000" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">End</label>
+                    <input type="text" id="curveEndInput" class="curve-input" value="1.000" style="width: 60px; font-size: 9px; padding: 2px 3px;">
                 </div>
-                <div class="curve-input-row">
-                    <label>End</label>
-                    <input type="text" id="curveEndInput" class="curve-input" value="1.000">
+                <div class="curve-input-row" style="margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 28px;">Y1</label>
+                    <input type="text" id="curveY1Input" class="curve-input" value="0.0" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">Y2</label>
+                    <input type="text" id="curveY2Input" class="curve-input" value="10.0" style="width: 60px; font-size: 9px; padding: 2px 3px;">
                 </div>
-                <div class="curve-input-row">
-                    <label>Y1</label>
-                    <input type="text" id="curveY1Input" class="curve-input" value="0.0">
-                </div>
-                <div class="curve-input-row">
-                    <label>Y2</label>
-                    <input type="text" id="curveY2Input" class="curve-input" value="10.0">
-                </div>
-                
-                <div class="gtrack-radio-group" id="curveGTrackGroup">
-                    <input type="radio" id="curveGTrackG1" name="curveGTrack" value="1" checked>
-                    <label for="curveGTrackG1">T1</label>
-                    <input type="radio" id="curveGTrackG2" name="curveGTrack" value="2">
-                    <label for="curveGTrackG2">T2</label>
-                    <input type="radio" id="curveGTrackG3" name="curveGTrack" value="3">
-                    <label for="curveGTrackG3">T3</label>
-                    <input type="radio" id="curveGTrackG4" name="curveGTrack" value="4">
-                    <label for="curveGTrackG4">T4</label>
-                </div>
-                
-                <div class="gtrack-radio-group" id="curveModelGroup" style="margin-top: 4px;">
-                    <input type="radio" id="curveModelBezier" name="curveModel" value="bezier" checked>
-                    <label for="curveModelBezier">Bezier</label>
-                    <input type="radio" id="curveModelPower" name="curveModel" value="power">
-                    <label for="curveModelPower">Power</label>
-                    <input type="radio" id="curveModelSigmoid" name="curveModel" value="sigmoid">
-                    <label for="curveModelSigmoid">S-Curve</label>
-                    <input type="radio" id="curveModelExp" name="curveModel" value="exponential">
-                    <label for="curveModelExp">Exp</label>
-                    <input type="radio" id="curveModelLog" name="curveModel" value="logarithmic">
-                    <label for="curveModelLog">Log</label>
+                <div class="curve-input-row" style="margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 28px;">Slope</label>
+                    <input type="number" id="curveSlopeInput" class="curve-input" value="0" step="0.1" min="-3" max="3" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">Trk</label>
+                    <select id="curveGTrackSelect" style="font-size: 9px; padding: 2px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                    <label style="font-size: 9px; min-width: 28px; margin-left: 6px;">Model</label>
+                    <select id="curveModelSelect" style="font-size: 9px; padding: 2px;">
+                        <option value="bezier">Bezier</option>
+                        <option value="power">Power</option>
+                        <option value="sigmoid">S-Curve</option>
+                        <option value="exponential">Exp</option>
+                        <option value="logarithmic">Log</option>
+                    </select>
                 </div>
                 
-                <div id="curveCoeffDisplay" style="font-size: 9px; color: #aaa; padding: 2px 4px; margin-top: 2px; font-family: monospace; min-height: 14px;"></div>
+                <div id="curveCoeffDisplay" style="display: none;"></div>
                 
                 <div class="color-swatches" id="colorSwatches">
                     <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
@@ -1115,39 +1106,45 @@
                     <label for="curveFillTop">Fill ↑</label>
                 </div>
                 
-                <button id="curveDrawBtn" class="curve-draw-btn">Draw</button>
-                <button id="curveDeleteBtn" class="curve-draw-btn" style="margin-top: 5px;">Delete</button>
-                <button id="curveSaveBtn" class="curve-draw-btn" style="margin-top: 5px;">Save</button>
-                
-                <div class="curve-input-row" style="margin-top: 8px;">
-                    <label style="font-size: 10px;">Description</label>
+                <div class="control-row" style="margin-top: 4px;">
+                    <button id="curveDrawBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px;">Draw</button>
+                    <button id="curveDeleteBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 6px;">Delete</button>
                 </div>
-                <textarea id="curveDescriptionInput" class="curve-input" style="width: 100%; height: 40px; resize: vertical; font-size: 10px;" placeholder="Curve description..."></textarea>
                 
-                <div class="curve-input-row" style="margin-top: 8px;">
-                    <label style="font-size: 10px;">Recall Curve</label>
+                <div class="curve-input-row" style="margin-top: 6px; margin-bottom: 2px;">
+                    <label style="font-size: 9px;">Description</label>
+                </div>
+                <textarea id="curveDescriptionInput" class="curve-input" style="width: 100%; height: 40px; resize: vertical; font-size: 9px;" placeholder="Curve description..."></textarea>
+                <div class="control-row" style="margin-top: 4px;">
+                    <button id="curveSaveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Save</button>
+                </div>
+                
+                <!-- Divider before Recall Curve -->
+                <div style="border-top: 1px solid rgba(255,255,255,0.15); margin: 6px 0;"></div>
+                <div class="curve-input-row" style="margin-bottom: 3px;">
+                    <label style="font-size: 9px; font-weight: bold; color: rgba(255,255,255,0.7);">Recall Curve</label>
                 </div>
                 <div id="curveRecallDropdown" class="custom-dropdown" style="width: 100%; position: relative;">
-                    <div id="curveRecallSelected" class="custom-dropdown-selected" style="font-size: 10px; padding: 4px 6px; background: rgba(40,40,50,0.9); border: 1px solid #555; border-radius: 3px; cursor: pointer; min-height: 20px;">
+                    <div id="curveRecallSelected" class="custom-dropdown-selected" style="font-size: 9px; padding: 4px 6px; background: rgba(40,40,50,0.9); border: 1px solid #555; border-radius: 3px; cursor: pointer; min-height: 20px;">
                         -- Select Saved Curve --
                     </div>
                     <div id="curveRecallOptions" class="custom-dropdown-options" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: rgba(30,30,40,0.98); border: 1px solid #555; border-top: none; border-radius: 0 0 3px 3px; z-index: 1000;">
                     </div>
                 </div>
                 <input type="hidden" id="curveRecallSelect" value="">
-                <button id="curveInsertBtn" class="curve-draw-btn" style="margin-top: 5px;">Insert at Edit Line</button>
-                
-                <div class="gtrack-radio-group">
-                    <input type="radio" id="gtrackG1" name="gtrack" value="1">
-                    <label for="gtrackG1">T1</label>
-                    <input type="radio" id="gtrackG2" name="gtrack" value="2">
-                    <label for="gtrackG2">T2</label>
-                    <input type="radio" id="gtrackG3" name="gtrack" value="3">
-                    <label for="gtrackG3">T3</label>
-                    <input type="radio" id="gtrackG4" name="gtrack" value="4">
-                    <label for="gtrackG4">T4</label>
-                    <input type="radio" id="gtrackGA" name="gtrack" value="A" checked>
-                    <label for="gtrackGA">TA</label>
+                <div class="curve-input-row" style="margin-top: 3px; margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 28px;">Time</label>
+                    <input type="number" id="curveRecallTime" class="curve-input" value="0" step="0.001" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">Trk</label>
+                    <select id="curveRecallTrack" style="font-size: 9px; padding: 2px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div class="control-row" style="margin-top: 4px;">
+                    <button id="curveInsertBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Insert</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1507,49 +1504,64 @@
                 <button id="gcInsertBtn" class="curve-draw-btn" style="margin-top: 5px; background: rgb(255, 21, 160); border-color: rgb(255, 21, 160); color: #fff;">Insert at Edit Line</button>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">SVG Elements</div>
+                <div class="section-label" style="background: var(--clr-brightBlue); color: #fff; padding: 3px 6px; border-radius: 2px;">SVG Elements</div>
                 
+                <!-- SVG Creation / Insert -->
                 <div class="control-row">
-                    <button id="svgInsertBtn" class="control-btn" style="font-size: 10px;">Insert SVG</button>
+                    <button id="svgLoadBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px;">Load SVG</button>
                     <input type="file" id="svgFileInput" class="file-input-hidden" accept=".svg">
                 </div>
-                <div class="svg-element-list" id="svgElementList">
-                    <!-- SVG elements will be listed here -->
+                <div class="control-row">
+                    <span id="svgFileName" class="midi-filename" style="font-size: 9px;">No file loaded</span>
                 </div>
-                <div class="curve-input-row">
-                    <label>X</label>
-                    <input type="number" id="svgPosX" class="curve-input" value="0" step="1">
-                    <label>Y</label>
-                    <input type="number" id="svgPosY" class="curve-input" value="0" step="1">
-                </div>
-                <div class="curve-input-row">
-                    <label>Scale</label>
-                    <input type="range" id="svgScaleSlider" min="0.1" max="5" step="0.01" value="1" style="width: 150px;">
-                    <input type="number" id="svgScaleInput" class="curve-input" value="1" step="0.01" min="0.1" max="5" style="width: 38px; font-size: 9px; padding: 2px;">
-                </div>
-                <div class="curve-input-row">
-                    <label>Track</label>
-                    <select id="svgTrackSelect" style="font-size: 10px; padding: 2px;">
-                        <option value="1">Track 1</option>
-                        <option value="2">Track 2</option>
-                        <option value="3">Track 3</option>
-                        <option value="4">Track 4</option>
+                <div class="curve-input-row" style="margin-bottom: 2px;">
+                    <label style="font-size: 9px; min-width: 28px;">Time</label>
+                    <input type="number" id="svgInsertTime" class="curve-input" value="0" step="0.001" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">Trk</label>
+                    <select id="svgInsertTrack" style="font-size: 9px; padding: 2px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
                     </select>
                 </div>
-                <div class="curve-input-row">
-                    <label>Section</label>
-                    <select id="svgSectionSelect" style="font-size: 10px; padding: 2px;">
-                        <option value="top">Top</option>
-                        <option value="bottom">Bottom</option>
-                    </select>
+                <div class="control-row" style="margin-top: 4px;">
+                    <button id="svgInsertBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Insert</button>
+                    <button id="svgDeleteBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 6px;">Delete</button>
                 </div>
-                <div class="control-row" style="margin-top: 5px;">
-                    <button id="svgDeleteBtn" class="control-btn" style="font-size: 10px; background: var(--clr-darkRed);">Delete</button>
+                <!-- Divider between creation and info/edit -->
+                <div style="border-top: 1px solid rgba(255,255,255,0.15); margin: 6px 0;"></div>
+                <!-- Standard Object Info Block (repeatable for all object types) -->
+                <div class="object-info-block">
+                    <div class="curve-input-row" style="margin-bottom: 3px;">
+                        <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 28px;">Name</label>
+                        <input type="text" id="svgObjName" class="curve-input" value="" style="flex: 1; font-size: 9px; padding: 2px 4px; min-width: 0;" readonly>
+                    </div>
+                    <div class="curve-input-row" style="margin-bottom: 3px;">
+                        <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 28px;">Start</label>
+                        <input type="number" id="svgObjStart" class="curve-input" value="0" step="0.001" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                        <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 22px; margin-left: 6px;">Trk</label>
+                        <select id="svgTrackSelect" style="font-size: 9px; padding: 2px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="margin-bottom: 3px;">
+                        <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 28px;">X</label>
+                        <input type="number" id="svgPosX" class="curve-input" value="0" step="0.001" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                        <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 22px; margin-left: 6px;">Y</label>
+                        <input type="number" id="svgPosY" class="curve-input" value="0" step="0.001" style="width: 52px; font-size: 9px; padding: 2px 3px;">
+                    </div>
+                    <div class="curve-input-row" style="margin-bottom: 2px;">
+                        <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 28px;">Scale</label>
+                        <input type="range" id="svgScaleSlider" min="0.1" max="5" step="0.01" value="1" style="width: 80px;">
+                        <input type="number" id="svgScaleInput" class="curve-input" value="1" step="0.01" min="0.1" max="5" style="width: 52px; font-size: 9px; padding: 2px 3px; margin-left: 4px;">
+                    </div>
                 </div>
                 
-            </div>
-            
-            <div class="menu-section">
+                <div class="section-divider"></div>
                 <div class="section-label">Connectors</div>
                 <div class="control-row">
                     <button id="connectorModeBtn" class="control-btn" style="font-size: 10px; background: rgba(162,126,198,255); color: #fff;">Connect Mode: OFF</button>
@@ -1616,6 +1628,7 @@
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="connectorDeleteBtn" class="control-btn" style="font-size: 10px; background: var(--clr-darkRed);">Delete</button>
                 </div>
+                
             </div>
             
         </div>
@@ -1781,9 +1794,9 @@
                 <div class="display-toggles">
                     <input type="checkbox" id="showGraphicItems" checked>
                     <label for="showGraphicItems">Graphic Items</label>
-                    <input type="checkbox" id="showMidiDisplay" checked>
+                    <input type="checkbox" id="showMidiDisplay">
                     <label for="showMidiDisplay">MIDI Display</label>
-                    <input type="checkbox" id="showAudioDisplay" checked>
+                    <input type="checkbox" id="showAudioDisplay">
                     <label for="showAudioDisplay">Audio Display</label>
                 </div>
                 <div class="control-row" style="margin-top: 8px;">
@@ -2287,32 +2300,50 @@
         window.CursorControls = CursorControls;
         
         // SVG Element Manager - Insert, resize, move SVG elements on the score
+        // ============================================
+        // SVG ELEMENT MANAGER - Anchor-based positioning system
+        // Each SVG has: referenceSeconds (shared anchor), offsetSeconds (X offset),
+        // offsetYFraction (Y position in track), track, scale (user-controlled)
+        // All pixel positions derived at render time from time + track coordinates
+        // ============================================
         const SVGElementManager = {
             elements: [],      // Array of inserted SVG elements
             selectedElement: null,
             nextId: 1,
+            svgNameCounter: 0,  // Running counter for unique naming
             isDragging: false,
             isResizing: false,
             resizeCorner: null,
             dragStartX: 0,
             dragStartY: 0,
-            elementStartX: 0,
-            elementStartY: 0,
+            dragStartOffsetSeconds: 0,
+            dragStartOffsetYFraction: 0,
             elementStartScale: 1,
             resizeHandles: [],
+            anchorLines: [],    // Thin dotted vertical lines at anchor X
             
             init() {
-                // UI elements
-                this.insertBtn = document.getElementById('svgInsertBtn');
+                // Creation/Insert UI elements
+                this.loadBtn = document.getElementById('svgLoadBtn');
                 this.fileInput = document.getElementById('svgFileInput');
-                this.elementList = document.getElementById('svgElementList');
+                this.fileNameDisplay = document.getElementById('svgFileName');
+                this.insertTimeInput = document.getElementById('svgInsertTime');
+                this.insertTrackSelect = document.getElementById('svgInsertTrack');
+                this.insertBtn = document.getElementById('svgInsertBtn');
+                this.deleteBtn = document.getElementById('svgDeleteBtn');
+                
+                // Info/Edit UI elements
+                this.objNameInput = document.getElementById('svgObjName');
+                this.objStartInput = document.getElementById('svgObjStart');
+                this.trackSelect = document.getElementById('svgTrackSelect');
                 this.posXInput = document.getElementById('svgPosX');
                 this.posYInput = document.getElementById('svgPosY');
                 this.scaleSlider = document.getElementById('svgScaleSlider');
                 this.scaleInput = document.getElementById('svgScaleInput');
-                this.trackSelect = document.getElementById('svgTrackSelect');
-                this.sectionSelect = document.getElementById('svgSectionSelect');
-                this.deleteBtn = document.getElementById('svgDeleteBtn');
+                
+                // Loaded file state (before insert)
+                this.loadedSvgContent = null;
+                this.loadedSvgFilename = '';
                 
                 this.scoreTopEl = document.getElementById('ScoreTop');
                 this.scoreBottomEl = document.getElementById('ScoreBottom');
@@ -2326,17 +2357,19 @@
                 this.containerBottom.setAttribute('id', 'svg-elements-container-bottom');
                 this.scoreBottomEl.appendChild(this.containerBottom);
                 
-                // Event listeners
-                this.insertBtn.addEventListener('click', () => this.fileInput.click());
-                this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
+                // Event listeners — Load/Insert split
+                this.loadBtn.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFileLoad(e));
+                this.insertBtn.addEventListener('click', () => this.insertLoadedSVG());
                 this.deleteBtn.addEventListener('click', () => this.deleteSelected());
                 
+                // Info/Edit listeners
                 this.posXInput.addEventListener('change', () => this.updateSelectedPosition());
                 this.posYInput.addEventListener('change', () => this.updateSelectedPosition());
                 this.scaleSlider.addEventListener('input', () => this.updateSelectedScaleFromSlider());
                 this.scaleInput.addEventListener('change', () => this.updateSelectedScaleFromInput());
                 this.trackSelect.addEventListener('change', () => this.updateSelectedTrack());
-                this.sectionSelect.addEventListener('change', () => this.updateSelectedSection());
+                this.objStartInput.addEventListener('change', () => this.updateSelectedStartTime());
                 
                 // Click on score to deselect
                 this.scoreTopEl.addEventListener('click', (e) => {
@@ -2363,22 +2396,73 @@
                     }, 100);
                 });
                 
-                console.log('SVGElementManager initialized');
+                console.log('SVGElementManager initialized (anchor-based positioning)');
             },
             
-            handleFileSelect(e) {
+            // Generate standard SVG name: SVG_YYYYMMDD_HHMMSS_NN_filename
+            generateSvgName(filename) {
+                const now = new Date();
+                const pad = (n, len) => String(n).padStart(len, '0');
+                const datePart = `${now.getFullYear()}${pad(now.getMonth()+1,2)}${pad(now.getDate(),2)}`;
+                const timePart = `${pad(now.getHours(),2)}${pad(now.getMinutes(),2)}${pad(now.getSeconds(),2)}`;
+                this.svgNameCounter++;
+                const counter = pad(this.svgNameCounter, 2);
+                const cleanFilename = (filename || 'untitled').replace('.svg', '');
+                return `SVG_${datePart}_${timePart}_${counter}_${cleanFilename}`;
+            },
+            
+            // === CORE: Calculate pixel position from anchor data ===
+            // Returns { x, y, page, section, scoreEl } — all derived from time + track
+            calcPixelPosition(el) {
+                const secondsPerPage = window.GraphicTimeline 
+                    ? GraphicTimeline.getSecondsPerPage() 
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const actualSeconds = el.referenceSeconds + el.offsetSeconds;
+                const displayTime = actualSeconds + leadInSeconds;
+                const page = Math.floor(Math.max(0, displayTime) / secondsPerPage);
+                const section = page % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                // X from time
+                const xPercent = ((displayTime / secondsPerPage) - page) * 100;
+                const x = (xPercent / 100) * scoreWidth;
+                
+                // Y from track + offsetYFraction
+                const track = el.track || 1;
+                const trackDims = window.CompositionPanel 
+                    ? CompositionPanel.getTrackDimensions(String(track), scoreEl)
+                    : { y: 0, height: scoreEl.clientHeight / 4 };
+                const y = trackDims.y + el.offsetYFraction * trackDims.height;
+                
+                return { x, y, page, section, scoreEl, trackDims, secondsPerPage };
+            },
+            
+            handleFileLoad(e) {
                 const file = e.target.files[0];
                 if (!file) return;
                 
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    this.insertSVG(event.target.result, file.name);
+                    this.loadedSvgContent = event.target.result;
+                    this.loadedSvgFilename = file.name;
+                    if (this.fileNameDisplay) this.fileNameDisplay.textContent = file.name;
                 };
                 reader.readAsText(file);
                 e.target.value = ''; // Reset input
             },
             
-            insertSVG(svgContent, filename) {
+            insertLoadedSVG() {
+                if (!this.loadedSvgContent) {
+                    console.warn('SVGElementManager: No SVG file loaded');
+                    return;
+                }
+                const referenceSeconds = parseFloat(this.insertTimeInput.value) || 0;
+                const track = parseInt(this.insertTrackSelect.value) || 1;
+                this.insertSVG(this.loadedSvgContent, this.loadedSvgFilename, referenceSeconds, track);
+            },
+            
+            insertSVG(svgContent, filename, referenceSecondsOverride, trackOverride) {
                 const parser = new DOMParser();
                 const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
                 const svgEl = svgDoc.documentElement;
@@ -2392,9 +2476,6 @@
                 const heightStr = svgEl.getAttribute('height') || '';
                 if (widthStr.includes('mm')) width = parseFloat(widthStr) * 3.78;
                 if (heightStr.includes('mm')) height = parseFloat(heightStr) * 3.78;
-                
-                // Get viewBox if present
-                const viewBox = svgEl.getAttribute('viewBox');
                 
                 // Create wrapper group
                 const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -2416,80 +2497,114 @@
                 
                 wrapper.appendChild(image);
                 
-                // Calculate initial position (center of current track)
-                const track = parseInt(this.trackSelect.value) || 1;
-                const scoreHeight = this.scoreTopEl.clientHeight;
-                const scoreWidth = this.scoreTopEl.clientWidth;
-                const timelineHeight = 16;
-                const availableHeight = scoreHeight - timelineHeight;
-                const staffHeight = availableHeight / 4;
-                const trackY = timelineHeight + ((track - 1) * staffHeight) + (staffHeight / 2) - (height / 2);
-                const trackX = scoreWidth * 0.2; // Start at 20% from left
+                // Use overrides if provided, otherwise calculate from current view
+                const track = trackOverride || parseInt(this.insertTrackSelect?.value) || 1;
+                let referenceSeconds;
+                if (referenceSecondsOverride !== undefined && referenceSecondsOverride !== null) {
+                    referenceSeconds = referenceSecondsOverride;
+                } else {
+                    const secondsPerPage = window.GraphicTimeline 
+                        ? GraphicTimeline.getSecondsPerPage() 
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const currentPage = window.GraphicTimeline ? GraphicTimeline.currentTopPage : 0;
+                    referenceSeconds = (currentPage * secondsPerPage) + (0.2 * secondsPerPage) - leadInSeconds;
+                }
                 
-                // Get section from selector and determine page
-                const section = this.sectionSelect?.value || 'top';
-                const currentPage = window.GraphicTimeline 
-                    ? (section === 'top' ? GraphicTimeline.currentTopPage : GraphicTimeline.currentBottomPage)
-                    : (section === 'top' ? 0 : 1);
-                
-                // Calculate time-based position (startSeconds)
-                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
-                const xPercent = (trackX / scoreWidth) * 100;
-                // Convert page + xPercent to startSeconds (display time, where 0 = first beat)
-                const startSeconds = (currentPage * secondsPerPage) + (xPercent / 100 * secondsPerPage) - leadInSeconds;
-                
-                // Calculate Y as percentage of track height (0 = top of track, 100 = bottom)
-                const yPercent = (trackY / scoreHeight) * 100;
-                
-                // Store element data
+                // Store element data — anchor-based
                 const elementData = {
                     id: id,
-                    name: filename.replace('.svg', ''),
+                    name: this.generateSvgName(filename),
                     wrapper: wrapper,
                     image: image,
-                    x: trackX,
-                    y: trackY,
-                    startSeconds: startSeconds,  // Time-based X position
-                    yPercent: yPercent,          // Y as percentage of score height
-                    xPercent: xPercent,          // Keep for backward compatibility
+                    referenceSeconds: referenceSeconds,  // Shared time anchor
+                    offsetSeconds: 0,                    // X offset from anchor
+                    offsetYFraction: 0.3,                // Y position in track (0=top, 1=bottom)
                     width: width,
                     height: height,
                     scale: 1,
-                    baseScale: 1,
-                    baseScoreWidth: scoreWidth,
-                    track: track,
-                    page: currentPage,
-                    section: section
+                    track: track
                 };
                 
                 this.elements.push(elementData);
                 
-                // Apply initial transform
+                // Calculate pixel position and apply
+                const pos = this.calcPixelPosition(elementData);
+                elementData._x = pos.x;
+                elementData._y = pos.y;
+                elementData._page = pos.page;
+                elementData._section = pos.section;
                 this.updateElementTransform(elementData);
                 
                 // Add to correct container based on section
-                const targetContainer = section === 'top' ? this.containerTop : this.containerBottom;
+                const targetContainer = pos.section === 'top' ? this.containerTop : this.containerBottom;
                 targetContainer.appendChild(wrapper);
                 
                 // Add drag handlers
                 wrapper.addEventListener('mousedown', (e) => this.handleElementMouseDown(e, elementData));
                 
-                // Update list and select
-                this.updateElementList();
+                // Select new element
                 this.selectElement(elementData);
             },
             
+            // Apply transform from cached pixel position
             updateElementTransform(el) {
-                const scaledWidth = el.width * el.scale;
-                const scaledHeight = el.height * el.scale;
-                el.wrapper.setAttribute('transform', `translate(${el.x}, ${el.y}) scale(${el.scale})`);
+                el.wrapper.setAttribute('transform', `translate(${el._x}, ${el._y}) scale(${el.scale})`);
                 el.image.setAttribute('width', el.width);
                 el.image.setAttribute('height', el.height);
                 
                 // Update resize handles if this is the selected element
                 if (el === this.selectedElement) {
                     this.updateResizeHandles();
+                    this.updateAnchorLine(el);
                 }
+            },
+            
+            // Show/update the anchor line for selected element
+            updateAnchorLine(el) {
+                this.removeAnchorLines();
+                if (!el) return;
+                
+                // Calculate anchor X position (referenceSeconds, not offset position)
+                const secondsPerPage = window.GraphicTimeline 
+                    ? GraphicTimeline.getSecondsPerPage() 
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const anchorDisplayTime = el.referenceSeconds + leadInSeconds;
+                const anchorPage = Math.floor(Math.max(0, anchorDisplayTime) / secondsPerPage);
+                const anchorSection = anchorPage % 2 === 0 ? 'top' : 'bottom';
+                
+                // Only show if anchor is on same page as the element
+                if (anchorPage !== el._page) return;
+                
+                const scoreEl = anchorSection === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const xPercent = ((anchorDisplayTime / secondsPerPage) - anchorPage) * 100;
+                const anchorX = (xPercent / 100) * scoreWidth;
+                
+                // Scope anchor line to the element's track only
+                const track = el.track || 1;
+                const trackDims = window.CompositionPanel 
+                    ? CompositionPanel.getTrackDimensions(String(track), scoreEl) 
+                    : { y: 0, height: scoreEl.clientHeight / 4 };
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', anchorX);
+                line.setAttribute('y1', trackDims.y);
+                line.setAttribute('x2', anchorX);
+                line.setAttribute('y2', trackDims.y + trackDims.height);
+                line.setAttribute('stroke', '#888');
+                line.setAttribute('stroke-width', '1');
+                line.setAttribute('stroke-dasharray', '3,3');
+                line.setAttribute('opacity', '0.6');
+                line.setAttribute('class', 'svg-anchor-line');
+                
+                const container = anchorSection === 'top' ? this.containerTop : this.containerBottom;
+                container.appendChild(line);
+                this.anchorLines.push(line);
+            },
+            
+            removeAnchorLines() {
+                this.anchorLines.forEach(line => line.remove());
+                this.anchorLines = [];
             },
             
             createResizeHandles() {
@@ -2502,7 +2617,7 @@
                 const corners = ['se']; // Just SE corner for proportional resize
                 
                 // Use correct container based on element's section
-                const targetContainer = this.selectedElement.section === 'bottom' 
+                const targetContainer = this.selectedElement._section === 'bottom' 
                     ? this.containerBottom 
                     : this.containerTop;
                 
@@ -2536,8 +2651,8 @@
                     let hx, hy;
                     
                     if (corner === 'se') {
-                        hx = el.x + scaledWidth - handleSize / 2;
-                        hy = el.y + scaledHeight - handleSize / 2;
+                        hx = el._x + scaledWidth - handleSize / 2;
+                        hy = el._y + scaledHeight - handleSize / 2;
                     }
                     
                     handle.setAttribute('x', hx);
@@ -2559,8 +2674,6 @@
                 this.dragStartX = e.clientX;
                 this.dragStartY = e.clientY;
                 this.elementStartScale = this.selectedElement.scale;
-                this.elementStartX = this.selectedElement.x;
-                this.elementStartY = this.selectedElement.y;
             },
             
             handleElementMouseDown(e, elementData) {
@@ -2572,12 +2685,12 @@
                 e.stopPropagation();
                 this.selectElement(elementData);
                 
-                // Start dragging
+                // Start dragging — store initial offset values (not pixels)
                 this.isDragging = true;
                 this.dragStartX = e.clientX;
                 this.dragStartY = e.clientY;
-                this.elementStartX = elementData.x;
-                this.elementStartY = elementData.y;
+                this.dragStartOffsetSeconds = elementData.offsetSeconds;
+                this.dragStartOffsetYFraction = elementData.offsetYFraction;
             },
             
             handleMouseMove(e) {
@@ -2589,17 +2702,13 @@
                     const dy = (e.clientY - this.dragStartY) / zoomScale;
                     
                     // Use diagonal distance for proportional scaling
+                    // Anchor (top-left) stays fixed; grows right and down
                     const diagonal = (dx + dy) / 2;
                     const baseSize = this.selectedElement.width * this.elementStartScale;
                     const scaleFactor = (baseSize + diagonal) / baseSize;
                     
                     const newScale = Math.max(0.1, Math.min(5, this.elementStartScale * scaleFactor));
                     this.selectedElement.scale = newScale;
-                    
-                    // Update baseScale and baseScoreWidth for resize handling
-                    const scoreWidth = this.scoreTopEl?.clientWidth || 1;
-                    this.selectedElement.baseScale = newScale;
-                    this.selectedElement.baseScoreWidth = scoreWidth;
                     
                     this.updateElementTransform(this.selectedElement);
                     this.updateUIFromSelected();
@@ -2613,31 +2722,29 @@
                 const dx = (e.clientX - this.dragStartX) / zoomScale;
                 const dy = (e.clientY - this.dragStartY) / zoomScale;
                 
-                this.selectedElement.x = this.elementStartX + dx;
-                this.selectedElement.y = this.elementStartY + dy;
+                // Convert pixel delta to time delta for X (offsetSeconds)
+                const scoreEl = this.selectedElement._section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = window.GraphicTimeline 
+                    ? GraphicTimeline.getSecondsPerPage() 
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                this.selectedElement.offsetSeconds = this.dragStartOffsetSeconds + (dx * secondsPerPixel);
                 
-                // Update percentage positions for resize handling
-                const scoreWidth = this.scoreTopEl?.clientWidth || 1;
-                const scoreHeight = this.scoreTopEl?.clientHeight || 1;
-                this.selectedElement.xPercent = (this.selectedElement.x / scoreWidth) * 100;
-                this.selectedElement.yPercent = (this.selectedElement.y / scoreHeight) * 100;
+                // Convert pixel delta to track fraction delta for Y (offsetYFraction)
+                const track = this.selectedElement.track || 1;
+                const trackDims = window.CompositionPanel 
+                    ? CompositionPanel.getTrackDimensions(String(track), scoreEl) 
+                    : { height: scoreEl.clientHeight / 4 };
+                const fractionPerPixel = 1 / trackDims.height;
+                this.selectedElement.offsetYFraction = this.dragStartOffsetYFraction + (dy * fractionPerPixel);
                 
-                // Update time-based startSeconds from new X position
-                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
-                const currentPage = this.selectedElement.page || 0;
-                this.selectedElement.startSeconds = (currentPage * secondsPerPage) + (this.selectedElement.xPercent / 100 * secondsPerPage) - leadInSeconds;
-                
-                // Update trackYFraction so repositioned Y survives save/reload
-                if (this.selectedElement.track !== undefined) {
-                    const elSection = this.selectedElement.section || 'top';
-                    const elScoreEl = elSection === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
-                    const trackDims = CompositionPanel.getTrackDimensions(String(this.selectedElement.track), elScoreEl);
-                    const scaledH = this.selectedElement.height * this.selectedElement.scale;
-                    const denom = trackDims.height - scaledH;
-                    if (denom !== 0) {
-                        this.selectedElement.trackYFraction = (this.selectedElement.y - trackDims.y) / denom;
-                    }
-                }
+                // Recalculate pixel position from updated anchor data
+                const pos = this.calcPixelPosition(this.selectedElement);
+                this.selectedElement._x = pos.x;
+                this.selectedElement._y = pos.y;
+                this.selectedElement._page = pos.page;
+                this.selectedElement._section = pos.section;
                 
                 this.updateElementTransform(this.selectedElement);
                 this.updateUIFromSelected();
@@ -2660,7 +2767,7 @@
                 // curves, motives, MIDI snippets etc. (enables drag after ObjectSelector pick)
                 this.bringToFront();
                 // Bring this specific element to front within its container
-                const targetContainer = elementData.section === 'bottom' ? this.containerBottom : this.containerTop;
+                const targetContainer = elementData._section === 'bottom' ? this.containerBottom : this.containerTop;
                 if (elementData.wrapper.parentNode === targetContainer) {
                     targetContainer.appendChild(elementData.wrapper);
                 }
@@ -2668,9 +2775,11 @@
                 // Create resize handles
                 this.createResizeHandles();
                 
+                // Show anchor line
+                this.updateAnchorLine(elementData);
+                
                 // Update UI
                 this.updateUIFromSelected();
-                this.updateElementList();
             },
             
             deselectAll() {
@@ -2679,37 +2788,63 @@
                 }
                 this.selectedElement = null;
                 this.removeResizeHandles();
-                this.updateElementList();
+                this.removeAnchorLines();
             },
             
             updateUIFromSelected() {
                 if (!this.selectedElement) return;
-                this.posXInput.value = Math.round(this.selectedElement.x);
-                this.posYInput.value = Math.round(this.selectedElement.y);
-                this.scaleSlider.value = this.selectedElement.scale;
-                this.scaleInput.value = this.selectedElement.scale.toFixed(2);
-                this.trackSelect.value = this.selectedElement.track;
-                this.sectionSelect.value = this.selectedElement.section || 'top';
+                const el = this.selectedElement;
+                // X shows offsetSeconds (relative to anchor/dotted line)
+                this.posXInput.value = el.offsetSeconds.toFixed(3);
+                this.posYInput.value = el.offsetYFraction.toFixed(3);
+                this.scaleSlider.value = el.scale;
+                this.scaleInput.value = el.scale.toFixed(2);
+                this.trackSelect.value = el.track;
+                // Standard object info
+                this.objNameInput.value = el.name || '';
+                this.objStartInput.value = el.referenceSeconds.toFixed(3);
+            },
+            
+            updateSelectedStartTime() {
+                if (!this.selectedElement) return;
+                const newRefSec = parseFloat(this.objStartInput.value) || 0;
+                this.selectedElement.referenceSeconds = newRefSec;
+                // Recalculate pixel position
+                const pos = this.calcPixelPosition(this.selectedElement);
+                this.selectedElement._x = pos.x;
+                this.selectedElement._y = pos.y;
+                this.selectedElement._page = pos.page;
+                this.selectedElement._section = pos.section;
+                
+                // Move to correct container if section changed
+                const targetContainer = pos.section === 'top' ? this.containerTop : this.containerBottom;
+                if (this.selectedElement.wrapper.parentNode !== targetContainer) {
+                    targetContainer.appendChild(this.selectedElement.wrapper);
+                }
+                
+                this.updateElementTransform(this.selectedElement);
+                this.updateAnchorLine(this.selectedElement);
+                this.createResizeHandles();
+                this.updateUIFromSelected();
+                this.updateVisibility();
             },
             
             updateSelectedPosition() {
                 if (!this.selectedElement) return;
-                this.selectedElement.x = parseFloat(this.posXInput.value) || 0;
-                this.selectedElement.y = parseFloat(this.posYInput.value) || 0;
+                // posXInput represents offsetSeconds (relative to anchor/dotted line)
+                this.selectedElement.offsetSeconds = parseFloat(this.posXInput.value) || 0;
+                // posYInput represents offsetYFraction
+                this.selectedElement.offsetYFraction = parseFloat(this.posYInput.value) || 0;
                 
-                // Update trackYFraction so repositioned Y survives save/reload
-                if (this.selectedElement.track !== undefined) {
-                    const elSection = this.selectedElement.section || 'top';
-                    const elScoreEl = elSection === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
-                    const trackDims = CompositionPanel.getTrackDimensions(String(this.selectedElement.track), elScoreEl);
-                    const scaledH = this.selectedElement.height * this.selectedElement.scale;
-                    const denom = trackDims.height - scaledH;
-                    if (denom !== 0) {
-                        this.selectedElement.trackYFraction = (this.selectedElement.y - trackDims.y) / denom;
-                    }
-                }
+                // Recalculate pixel position
+                const pos = this.calcPixelPosition(this.selectedElement);
+                this.selectedElement._x = pos.x;
+                this.selectedElement._y = pos.y;
+                this.selectedElement._page = pos.page;
+                this.selectedElement._section = pos.section;
                 
                 this.updateElementTransform(this.selectedElement);
+                this.updateVisibility();
             },
             
             updateSelectedScaleFromSlider() {
@@ -2734,42 +2869,36 @@
                 const track = parseInt(this.trackSelect.value) || 1;
                 this.selectedElement.track = track;
                 
-                // Reposition Y to center in new track
-                const scoreHeight = this.scoreTopEl.clientHeight;
-                const timelineHeight = 16;
-                const availableHeight = scoreHeight - timelineHeight;
-                const staffHeight = availableHeight / 4;
-                const scaledHeight = this.selectedElement.height * this.selectedElement.scale;
-                this.selectedElement.y = timelineHeight + ((track - 1) * staffHeight) + (staffHeight / 2) - (scaledHeight / 2);
+                // Recalculate pixel position
+                const pos = this.calcPixelPosition(this.selectedElement);
+                this.selectedElement._x = pos.x;
+                this.selectedElement._y = pos.y;
+                this.selectedElement._page = pos.page;
+                this.selectedElement._section = pos.section;
+                
+                // Move to correct container if section changed
+                const targetContainer = pos.section === 'top' ? this.containerTop : this.containerBottom;
+                if (this.selectedElement.wrapper.parentNode !== targetContainer) {
+                    targetContainer.appendChild(this.selectedElement.wrapper);
+                }
                 
                 this.updateElementTransform(this.selectedElement);
+                this.updateAnchorLine(this.selectedElement);
+                this.createResizeHandles();
                 this.updateUIFromSelected();
+                this.updateVisibility();
             },
             
             updateSelectedSection() {
-                if (!this.selectedElement) return;
-                const section = this.sectionSelect.value;
-                this.selectedElement.section = section;
-                
-                // Update page to match the current page of the new section
-                if (window.GraphicTimeline) {
-                    this.selectedElement.page = section === 'top' 
-                        ? GraphicTimeline.currentTopPage 
-                        : GraphicTimeline.currentBottomPage;
-                }
-                
-                // Move to correct container
-                const targetContainer = section === 'top' ? this.containerTop : this.containerBottom;
-                targetContainer.appendChild(this.selectedElement.wrapper);
-                
-                this.updateVisibility();
+                // No-op: Section is now fully derived from time. Kept for backward compatibility.
             },
             
             deleteSelected() {
                 if (!this.selectedElement) return;
                 
-                // Remove resize handles first
+                // Remove resize handles and anchor line first
                 this.removeResizeHandles();
+                this.removeAnchorLines();
                 
                 // Remove from DOM
                 this.selectedElement.wrapper.remove();
@@ -2783,26 +2912,7 @@
             },
             
             updateElementList() {
-                this.elementList.innerHTML = '';
-                this.elements.forEach(el => {
-                    const item = document.createElement('div');
-                    item.className = 'svg-element-item' + (el === this.selectedElement ? ' selected' : '');
-                    item.textContent = el.name;
-                    item.addEventListener('click', () => this.selectElement(el));
-                    this.elementList.appendChild(item);
-                });
-            },
-            
-            // Determine track based on Y position
-            getTrackFromY(y) {
-                const scoreHeight = this.scoreTopEl.clientHeight;
-                const timelineHeight = 16;
-                const availableHeight = scoreHeight - timelineHeight;
-                const staffHeight = availableHeight / 4;
-                
-                const relativeY = y - timelineHeight;
-                const track = Math.floor(relativeY / staffHeight) + 1;
-                return Math.max(1, Math.min(4, track));
+                // No-op: element list UI removed; kept for backward compatibility with external callers
             },
             
             // Bring SVG containers to front (call after other elements are initialized)
@@ -2815,7 +2925,7 @@
                 }
             },
             
-            // Show/hide elements based on current page and move to correct container
+            // Show/hide elements based on current page
             updateVisibility() {
                 if (!window.GraphicTimeline) return;
                 
@@ -2826,11 +2936,11 @@
                     let visible = false;
                     let targetContainer = null;
                     
-                    if (el.section === 'top') {
-                        visible = el.page === topPage;
+                    if (el._section === 'top') {
+                        visible = el._page === topPage;
                         targetContainer = this.containerTop;
                     } else {
-                        visible = el.page === bottomPage;
+                        visible = el._page === bottomPage;
                         targetContainer = this.containerBottom;
                     }
                     
@@ -2843,28 +2953,18 @@
                 });
             },
             
-            // Export data for saving
+            // Export data for saving — only anchor-based properties
             exportData() {
-                const scoreWidth = this.scoreTopEl?.clientWidth || 1;
-                const scoreHeight = this.scoreTopEl?.clientHeight || 1;
-                
                 return this.elements.map(el => ({
                     id: el.id,
                     name: el.name,
-                    x: el.x,
-                    y: el.y,
-                    startSeconds: el.startSeconds,  // Time-based X position
-                    xPercent: el.xPercent || (el.x / scoreWidth) * 100,
-                    yPercent: el.yPercent || (el.y / scoreHeight) * 100,
+                    referenceSeconds: el.referenceSeconds,
+                    offsetSeconds: el.offsetSeconds,
+                    offsetYFraction: el.offsetYFraction,
                     width: el.width,
                     height: el.height,
                     scale: el.scale,
-                    baseScale: el.baseScale || el.scale,
-                    baseScoreWidth: el.baseScoreWidth || scoreWidth,
-                    track: el.track || this.getTrackFromY(el.y),
-                    trackYFraction: el.trackYFraction,
-                    page: el.page || 0,
-                    section: el.section || 'top',
+                    track: el.track,
                     svgDataUrl: el.image.getAttribute('href')
                 }));
             },
@@ -2877,11 +2977,12 @@
                 this.elements.forEach(el => el.wrapper.remove());
                 this.elements = [];
                 this.removeResizeHandles();
+                this.removeAnchorLines();
                 this.selectedElement = null;
                 
-                const scoreWidth = this.scoreTopEl?.clientWidth || 1;
-                const scoreHeight = this.scoreTopEl?.clientHeight || 1;
-                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
+                const secondsPerPage = window.GraphicTimeline 
+                    ? GraphicTimeline.getSecondsPerPage() 
+                    : (beatsPerPage / beatsPerMinute) * 60;
                 
                 // Recreate elements
                 data.forEach(elData => {
@@ -2896,66 +2997,80 @@
                     
                     wrapper.appendChild(image);
                     
-                    // Determine startSeconds - use saved value or convert from old format
-                    let startSeconds;
-                    if (elData.startSeconds !== undefined) {
-                        // New format: use saved startSeconds
-                        startSeconds = elData.startSeconds;
+                    // Backward compatibility: convert old format to anchor-based
+                    let referenceSeconds, offsetSeconds, offsetYFraction;
+                    
+                    if (elData.referenceSeconds !== undefined) {
+                        // New anchor format
+                        referenceSeconds = elData.referenceSeconds;
+                        offsetSeconds = elData.offsetSeconds || 0;
+                        offsetYFraction = elData.offsetYFraction || 0;
+                    } else if (elData.startSeconds !== undefined) {
+                        // Old startSeconds format: convert to anchor (reference = startSeconds, offset = 0)
+                        referenceSeconds = elData.startSeconds;
+                        offsetSeconds = 0;
+                        // Convert old Y: trackYFraction or yPercent → offsetYFraction
+                        if (elData.trackYFraction !== undefined) {
+                            offsetYFraction = elData.trackYFraction;
+                        } else if (elData.yPercent !== undefined) {
+                            // Approximate: yPercent was % of score height, convert to track fraction
+                            offsetYFraction = Math.max(0, Math.min(1, elData.yPercent / 25));
+                        } else {
+                            offsetYFraction = 0.3;
+                        }
+                        console.debug(`SVGElementManager: Converted old startSeconds format for element ${elData.id}`);
                     } else {
-                        // Old format: convert from page + xPercent to startSeconds
+                        // Very old format: convert from page + xPercent
                         const oldPage = elData.page || 0;
                         const oldXPercent = elData.xPercent || 0;
-                        startSeconds = (oldPage * secondsPerPage) + (oldXPercent / 100 * secondsPerPage) - leadInSeconds;
-                        console.debug(`SVGElementManager: Converted old format element ${elData.id} to startSeconds=${startSeconds}`);
+                        referenceSeconds = (oldPage * secondsPerPage) + (oldXPercent / 100 * secondsPerPage) - leadInSeconds;
+                        offsetSeconds = 0;
+                        offsetYFraction = elData.trackYFraction || 0.3;
+                        console.debug(`SVGElementManager: Converted very old format for element ${elData.id}`);
                     }
                     
-                    // Calculate page and section from startSeconds
-                    const startActual = startSeconds + leadInSeconds;
-                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
-                    const section = startPage % 2 === 0 ? 'top' : 'bottom';
-                    
-                    // Calculate X position from startSeconds
-                    const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
-                    const x = (startXPercent / 100) * scoreWidth;
-                    
-                    // Calculate Y position from yPercent
-                    const y = elData.yPercent !== undefined ? (elData.yPercent / 100) * scoreHeight : elData.y;
-                    
-                    // Calculate Y: use track-relative if available, else yPercent
-                    let yFinal = y;
-                    if (elData.trackYFraction !== undefined && elData.track !== undefined) {
-                        const elScoreEl = section === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
-                        const trackDims = CompositionPanel.getTrackDimensions(String(elData.track), elScoreEl);
-                        const scaledH = elData.height * elData.scale;
-                        yFinal = trackDims.y + elData.trackYFraction * (trackDims.height - scaledH);
+                    // Retroactive naming: if name doesn't follow SVG_YYYYMMDD_ pattern, rename
+                    let elementName = elData.name || 'untitled';
+                    if (!/^SVG_\d{8}_/.test(elementName)) {
+                        elementName = this.generateSvgName(elementName);
+                        console.debug(`SVGElementManager: Retroactively named "${elData.name}" → "${elementName}"`);
+                    } else {
+                        // Extract counter from existing name to keep svgNameCounter in sync
+                        const counterMatch = elementName.match(/^SVG_\d{8}_\d{6}_(\d+)/);
+                        if (counterMatch) {
+                            const existingCounter = parseInt(counterMatch[1]);
+                            if (existingCounter >= this.svgNameCounter) {
+                                this.svgNameCounter = existingCounter;
+                            }
+                        }
                     }
                     
                     const elementData = {
                         id: elData.id,
-                        name: elData.name,
+                        name: elementName,
                         wrapper: wrapper,
                         image: image,
-                        x: x,
-                        y: yFinal,
-                        startSeconds: startSeconds,  // Time-based X position
-                        xPercent: startXPercent,     // Calculated from startSeconds
-                        yPercent: elData.yPercent || (elData.y / scoreHeight) * 100,
-                        trackYFraction: elData.trackYFraction,
+                        referenceSeconds: referenceSeconds,
+                        offsetSeconds: offsetSeconds,
+                        offsetYFraction: offsetYFraction,
                         width: elData.width,
                         height: elData.height,
                         scale: elData.scale,
-                        baseScale: elData.baseScale || elData.scale,
-                        baseScoreWidth: elData.baseScoreWidth || scoreWidth,
-                        track: elData.track,
-                        page: startPage,
-                        section: section
+                        track: elData.track || 1
                     };
+                    
+                    // Calculate pixel position
+                    const pos = this.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
                     
                     this.elements.push(elementData);
                     this.updateElementTransform(elementData);
                     
                     // Add to correct container based on section
-                    const targetContainer = section === 'top' ? this.containerTop : this.containerBottom;
+                    const targetContainer = pos.section === 'top' ? this.containerTop : this.containerBottom;
                     targetContainer.appendChild(wrapper);
                     
                     // Add drag handlers
@@ -2969,55 +3084,24 @@
                 
                 this.updateElementList();
                 this.updateVisibility();
-                console.debug(`SVGElementManager: Imported ${this.elements.length} elements`);
+                console.debug(`SVGElementManager: Imported ${this.elements.length} elements (anchor-based)`);
             },
             
             // Re-render all elements on window resize or lead-in change
+            // Scale stays fixed — only pixel positions are recalculated from anchor data
             reRenderAllElements() {
-                const scoreWidth = this.scoreTopEl?.clientWidth || 1;
-                const scoreHeight = this.scoreTopEl?.clientHeight || 1;
-                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
-                
                 this.elements.forEach(el => {
-                    // Recalculate positions from time-based startSeconds
-                    if (el.startSeconds !== undefined) {
-                        // Calculate page and section from startSeconds
-                        const startActual = el.startSeconds + leadInSeconds;
-                        const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
-                        const section = startPage % 2 === 0 ? 'top' : 'bottom';
-                        
-                        // Calculate X position from startSeconds
-                        const startXPercent = ((startActual / secondsPerPage) - startPage) * 100;
-                        el.x = (startXPercent / 100) * scoreWidth;
-                        el.xPercent = startXPercent;
-                        el.page = startPage;
-                        el.section = section;
-                        
-                        // Move to correct container if section changed
-                        const targetContainer = section === 'top' ? this.containerTop : this.containerBottom;
-                        if (el.wrapper.parentNode !== targetContainer) {
-                            targetContainer.appendChild(el.wrapper);
-                        }
-                    } else if (el.xPercent !== undefined) {
-                        // Fallback for old percentage-based elements
-                        el.x = (el.xPercent / 100) * scoreWidth;
-                    }
+                    // Recalculate pixel position from anchor data
+                    const pos = this.calcPixelPosition(el);
+                    el._x = pos.x;
+                    el._y = pos.y;
+                    el._page = pos.page;
+                    el._section = pos.section;
                     
-                    // Y position: track-relative (preferred) or yPercent (legacy)
-                    if (el.trackYFraction !== undefined && el.track !== undefined) {
-                        // Track-relative positioning: survives resize correctly
-                        const elScoreEl = el.section === 'bottom' ? this.scoreBottomEl : this.scoreTopEl;
-                        const trackDims = CompositionPanel.getTrackDimensions(String(el.track), elScoreEl);
-                        const scaledH = el.height * el.scale;
-                        el.y = trackDims.y + el.trackYFraction * (trackDims.height - scaledH);
-                    } else if (el.yPercent !== undefined) {
-                        el.y = (el.yPercent / 100) * scoreHeight;
-                    }
-                    
-                    // Scale proportionally based on original score width
-                    if (el.baseScoreWidth) {
-                        const sizeRatio = scoreWidth / el.baseScoreWidth;
-                        el.scale = el.baseScale * sizeRatio;
+                    // Move to correct container if section changed
+                    const targetContainer = pos.section === 'top' ? this.containerTop : this.containerBottom;
+                    if (el.wrapper.parentNode !== targetContainer) {
+                        targetContainer.appendChild(el.wrapper);
                     }
                     
                     this.updateElementTransform(el);
@@ -3026,9 +3110,10 @@
                 // Update visibility based on current page
                 this.updateVisibility();
                 
-                // Update resize handles if element is selected
+                // Update resize handles and anchor line if element is selected
                 if (this.selectedElement) {
                     this.updateResizeHandles();
+                    this.updateAnchorLine(this.selectedElement);
                 }
             }
         };
@@ -3674,8 +3759,8 @@
                 
                 const w = element.width * element.scale;
                 const h = element.height * element.scale;
-                let x = element.x;
-                let y = element.y;
+                let x = element._x !== undefined ? element._x : element.x;
+                let y = element._y !== undefined ? element._y : element.y;
                 
                 switch (side) {
                     case 'top': x += w/2; break;
@@ -3944,8 +4029,9 @@
                 this.connectors.forEach(conn => {
                     // Update connector's section based on start object's current section
                     const startObj = this.getObjectById(conn.startId, conn.startType);
-                    if (startObj && startObj.section) {
-                        const newSection = startObj.section;
+                    const startSection = startObj ? (startObj._section || startObj.section) : null;
+                    if (startObj && startSection) {
+                        const newSection = startSection;
                         if (conn.section !== newSection) {
                             conn.section = newSection;
                             // Move to correct container
@@ -3986,8 +4072,8 @@
                         return;
                     }
                     
-                    const objPage = startObj.page || 0;
-                    const objSection = startObj.section || conn.section || 'top';
+                    const objPage = (startObj._page !== undefined ? startObj._page : startObj.page) || 0;
+                    const objSection = startObj._section || startObj.section || conn.section || 'top';
                     
                     // Check if connector's page matches current visible pages
                     const visible = (objSection === 'top' && objPage === topPage) ||
@@ -6201,6 +6287,9 @@
                     this.renderAllMidiDisplays();
                 });
                 
+                // Apply initial visibility state (checkbox defaults to unchecked = hidden)
+                this.updateMidiDisplayVisibility();
+                
                 console.log('MidiController initialized with cursor-synced playback');
             },
             
@@ -6331,14 +6420,21 @@
                 
                 // Clear and populate output select
                 this.outputSelect.innerHTML = '<option value="">-- Select Output --</option>';
+                const savedOutputName = localStorage.getItem('midiOutputDeviceName');
+                let restoredOutput = false;
                 for (const output of this.midiAccess.outputs.values()) {
                     const option = document.createElement('option');
                     option.value = output.id;
                     option.textContent = output.name;
                     this.outputSelect.appendChild(option);
+                    if (savedOutputName && output.name === savedOutputName) {
+                        option.selected = true;
+                        this.selectOutput(output.id);
+                        restoredOutput = true;
+                    }
                 }
                 
-                console.log('MIDI devices refreshed');
+                console.log('MIDI devices refreshed' + (restoredOutput ? `, auto-selected output: ${savedOutputName}` : ''));
             },
             
             selectInput(inputId) {
@@ -6360,6 +6456,9 @@
             selectOutput(outputId) {
                 if (outputId && this.midiAccess) {
                     this.selectedOutput = this.midiAccess.outputs.get(outputId);
+                    if (this.selectedOutput) {
+                        localStorage.setItem('midiOutputDeviceName', this.selectedOutput.name);
+                    }
                     console.log('MIDI output selected:', this.selectedOutput?.name);
                 } else {
                     this.selectedOutput = null;
@@ -7529,6 +7628,9 @@
                 if (this.showAudioDisplayToggle) {
                     this.showAudioDisplayToggle.addEventListener('change', () => this.updateAudioDisplayVisibility());
                 }
+                
+                // Apply initial visibility state (checkbox defaults to unchecked = hidden)
+                this.updateAudioDisplayVisibility();
                 
                 console.debug('AudioController initialized');
             },
@@ -12695,8 +12797,12 @@
                 this.y1Input = document.getElementById('curveY1Input');
                 this.y2Input = document.getElementById('curveY2Input');
                 this.drawBtn = document.getElementById('curveDrawBtn');
-                this.curveGTrackGroup = document.getElementById('curveGTrackGroup');
+                this.curveGTrackSelect = document.getElementById('curveGTrackSelect');
+                this.curveModelSelect = document.getElementById('curveModelSelect');
+                this.slopeInput = document.getElementById('curveSlopeInput');
                 this.saveBtn = document.getElementById('curveSaveBtn');
+                this.recallTimeInput = document.getElementById('curveRecallTime');
+                this.recallTrackSelect = document.getElementById('curveRecallTrack');
                 this.descriptionInput = document.getElementById('curveDescriptionInput');
                 this.recallSelect = document.getElementById('curveRecallSelect');
                 this.recallDropdown = document.getElementById('curveRecallDropdown');
@@ -12798,9 +12904,9 @@
                     });
                 });
                 
-                // Curve model radio handlers - dynamic for selected curve
-                document.querySelectorAll('input[name="curveModel"]').forEach(radio => {
-                    radio.addEventListener('change', (e) => {
+                // Curve model select handler - dynamic for selected curve
+                if (this.curveModelSelect) {
+                    this.curveModelSelect.addEventListener('change', (e) => {
                         const newModel = e.target.value;
                         if (this.selectedCurve) {
                             this.selectedCurve.model = newModel;
@@ -12809,11 +12915,11 @@
                             this.updateVisibility();
                         }
                     });
-                });
+                }
                 
-                // Curve-specific track radio handlers
-                document.querySelectorAll('input[name="curveGTrack"]').forEach(radio => {
-                    radio.addEventListener('change', (e) => {
+                // Curve-specific track select handler
+                if (this.curveGTrackSelect) {
+                    this.curveGTrackSelect.addEventListener('change', (e) => {
                         if (this.selectedCurve) {
                             const newGTrack = e.target.value;
                             this.selectedCurve.gTrack = newGTrack;
@@ -12830,7 +12936,19 @@
                             this.updateVisibility();
                         }
                     });
-                });
+                }
+                
+                // Slope input handler - dynamic for selected curve
+                if (this.slopeInput) {
+                    this.slopeInput.addEventListener('change', () => {
+                        if (this.selectedCurve) {
+                            this.selectedCurve.slope = parseFloat(this.slopeInput.value) || 0;
+                            this.updateCurveRendering(this.selectedCurve);
+                            this.syncCurveToDatabase(this.selectedCurve);
+                            this.updateVisibility();
+                        }
+                    });
+                }
                 
                 // Input field handlers - dynamic for selected curve
                 this.startInput.addEventListener('change', () => this.updateSelectedFromInputs());
@@ -12861,23 +12979,23 @@
             },
             
             getCurveGTrack() {
-                const radio = document.querySelector('input[name="curveGTrack"]:checked');
-                return radio ? radio.value : '1';
+                const sel = document.getElementById('curveGTrackSelect');
+                return sel ? sel.value : '1';
             },
             
             setCurveGTrack(gTrack) {
-                const radio = document.querySelector(`input[name="curveGTrack"][value="${gTrack}"]`);
-                if (radio) radio.checked = true;
+                const sel = document.getElementById('curveGTrackSelect');
+                if (sel) sel.value = gTrack;
             },
             
             getCurveModel() {
-                const radio = document.querySelector('input[name="curveModel"]:checked');
-                return radio ? radio.value : 'bezier';
+                const sel = document.getElementById('curveModelSelect');
+                return sel ? sel.value : 'bezier';
             },
             
             setCurveModel(model) {
-                const radio = document.querySelector(`input[name="curveModel"][value="${model}"]`);
-                if (radio) radio.checked = true;
+                const sel = document.getElementById('curveModelSelect');
+                if (sel) sel.value = model;
             },
             
             // Unified curve Y computation for all models
@@ -13121,7 +13239,7 @@
                 // Get model and slope from params or UI (default model: logarithmic)
                 const model = params?.model ?? this.getCurveModel() ?? 'logarithmic';
                 const slopeRaw = params?.slope;
-                const slope = slopeRaw !== undefined ? slopeRaw : 0;
+                const slope = slopeRaw !== undefined ? slopeRaw : (this.slopeInput ? parseFloat(this.slopeInput.value) || 0 : 0);
                 
                 // Get track dimensions - use the section where the curve starts
                 // Note: Both top and bottom sections have the same coordinate system
@@ -13489,8 +13607,11 @@
                 // Update curve-specific track radio
                 if (curve.gTrack) this.setCurveGTrack(curve.gTrack);
                 
-                // Update curve model radio
+                // Update curve model select
                 this.setCurveModel(curve.model || 'bezier');
+                
+                // Update slope input
+                if (this.slopeInput) this.slopeInput.value = curve.slope || 0;
                 
                 // Notify MidiModelSystem of curve selection (for Long Tone)
                 if (window.MidiModelSystem && MidiModelSystem.selectedModelKey === 'longTone') {
@@ -14189,6 +14310,7 @@
                 this.endInput.value = endSeconds.toFixed(3);
                 this.y1Input.value = Math.max(0, Math.min(10, y1)).toFixed(1);
                 this.y2Input.value = Math.max(0, Math.min(10, y2)).toFixed(1);
+                if (this.slopeInput) this.slopeInput.value = curve.slope || 0;
                 
                 // Update curve data
                 curve.startSeconds = startSeconds;
@@ -14737,20 +14859,16 @@
                     return;
                 }
                 
-                // Get insertion point from edit cursor (yellow line position)
+                // Get insertion point from recall time input
                 let insertionSeconds = 0;
-                if (window.EditCursor && typeof EditCursor.getPositionSeconds === 'function') {
+                if (this.recallTimeInput) {
+                    insertionSeconds = parseFloat(this.recallTimeInput.value) || 0;
+                } else if (window.EditCursor && typeof EditCursor.getPositionSeconds === 'function') {
                     insertionSeconds = EditCursor.getPositionSeconds();
-                } else if (window.EditCursor) {
-                    insertionSeconds = EditCursor.positionSeconds || 0;
-                } else {
-                    // Fallback: use current score time
-                    const scoreTimeMs = window.ScoreTime ? ScoreTime.now() : 0;
-                    insertionSeconds = (scoreTimeMs / 1000) - leadInSeconds;
                 }
                 
-                // Get target track from curve-specific track radio group
-                const targetGTrack = this.getCurveGTrack();
+                // Get target track from recall track select
+                const targetGTrack = this.recallTrackSelect ? this.recallTrackSelect.value : this.getCurveGTrack();
                 
                 try {
                     const response = await fetch(`/api/curve-library/load/${encodeURIComponent(selectedName)}`);
@@ -16163,7 +16281,8 @@
             },
             
             // Insert glissando SVG into score at curve position
-            // Scales to fit track height, positions just before curve start
+            // Uses anchor-based positioning: referenceSeconds = curve.startSeconds
+            // offsetSeconds = negative (SVG placed to left of curve start)
             async insertGlissandoSvg(svgPath, curve) {
                 if (!svgPath || !curve) {
                     console.error('LongToneUI.insertGlissandoSvg: Missing svgPath or curve');
@@ -16193,56 +16312,28 @@
                     svgEl.setAttribute('width', String(svgWidth));
                     svgEl.setAttribute('height', String(svgHeight));
                     
-                    // Determine which page/section the curve is on
-                    const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
-                    const leadIn = leadInSeconds;
-                    const curveDisplayTime = curve.startSeconds + leadIn;
-                    const curvePageIndex = Math.floor(curveDisplayTime / secondsPerPage);
-                    const curveSection = curvePageIndex % 2 === 0 ? 'top' : 'bottom';
-                    
-                    // Use the correct score panel for dimension calculations
-                    const scoreEl = document.getElementById(curveSection === 'top' ? 'ScoreTop' : 'ScoreBottom');
-                    const scoreHeight = scoreEl.clientHeight;
-                    const scoreWidth = scoreEl.clientWidth;
+                    // Get track dimensions for scaling
                     const track = parseInt(curve.gTrack) || 1;
+                    const scoreEl = document.getElementById('ScoreTop');
+                    const scoreWidth = scoreEl.clientWidth;
                     const trackDims = CompositionPanel.getTrackDimensions(String(track), scoreEl);
                     const trackHeight = trackDims.height;
                     
                     // Scale cropped content to fit ~42% of track height (~0.8 scale)
                     const targetHeight = trackHeight * 0.42;
                     const scale = targetHeight / svgHeight;
-                    const scaledWidth = svgWidth * scale;
-                    const scaledContentWidth = scaledWidth;
+                    const scaledContentWidth = svgWidth * scale;
                     
-                    // Calculate X position: just before curve start
-                    const curveXPercent = ((curveDisplayTime % secondsPerPage) / secondsPerPage) * 100;
-                    const curveXPx = (curveXPercent / 100) * scoreWidth;
-                    
-                    // Position SVG right edge 5px left of curve start
-                    // Clamp to left edge of page so notation stays visible
+                    // Calculate offsetSeconds: position SVG right edge 5px left of curve start
+                    // Convert the gap + scaled width from pixels to seconds
+                    const secondsPerPage = window.GraphicTimeline 
+                        ? GraphicTimeline.getSecondsPerPage() 
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const secondsPerPixel = secondsPerPage / scoreWidth;
                     const gap = 5;
-                    const svgX = Math.max(0, curveXPx - gap - scaledContentWidth);
+                    const offsetSeconds = -(gap + scaledContentWidth) * secondsPerPixel;
                     
-                    // Track-relative Y positioning (survives resize correctly)
-                    // trackYFraction: 0 = top of track, 0.5 = centered, 1 = bottom
-                    const trackYFraction = 0;
-                    const scaledHeight = svgHeight * scale;
-                    const svgY = trackDims.y + trackYFraction * (trackHeight - scaledHeight) + 10;
-                    
-                    // Calculate startSeconds for the SVG element (for persistence)
-                    const svgXPercentRaw = (svgX / scoreWidth) * 100;
-                    const svgStartSeconds = (curvePageIndex * secondsPerPage) + (svgXPercentRaw / 100 * secondsPerPage) - leadIn;
-                    
-                    // Re-derive position from startSeconds (same logic as reRenderAllElements)
-                    // This ensures initial render matches what resize produces,
-                    // and correctly handles page boundaries when svgX is negative
-                    const startActual = svgStartSeconds + leadIn;
-                    const actualPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
-                    const actualSection = actualPage % 2 === 0 ? 'top' : 'bottom';
-                    const actualXPercent = ((startActual / secondsPerPage) - actualPage) * 100;
-                    const actualX = (actualXPercent / 100) * scoreWidth;
-                    
-                    // Create element data structure matching SVGElementManager format
+                    // Create wrapper and image
                     const id = SVGElementManager.nextId++;
                     const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
                     wrapper.setAttribute('id', `svg-element-${id}`);
@@ -16257,32 +16348,35 @@
                     image.setAttribute('height', svgHeight);
                     wrapper.appendChild(image);
                     
+                    // Anchor-based element data
+                    // referenceSeconds = curve start, offsetSeconds = left of curve
+                    // offsetYFraction ~0.1 = near top of track (with slight offset)
                     const elementData = {
                         id: id,
-                        name: svgPath.split('/').pop().replace('.svg', ''),
+                        name: SVGElementManager.generateSvgName(svgPath.split('/').pop()),
                         wrapper: wrapper,
                         image: image,
-                        x: actualX,
-                        y: svgY,
-                        startSeconds: svgStartSeconds,
-                        yPercent: (svgY / scoreHeight) * 100,
-                        trackYFraction: trackYFraction,
-                        xPercent: actualXPercent,
+                        referenceSeconds: curve.startSeconds,
+                        offsetSeconds: offsetSeconds,
+                        offsetYFraction: 0.1,
                         width: svgWidth,
                         height: svgHeight,
                         scale: scale,
-                        baseScale: scale,
-                        baseScoreWidth: scoreWidth,
-                        track: track,
-                        page: actualPage,
-                        section: actualSection
+                        track: track
                     };
+                    
+                    // Calculate pixel position and apply
+                    const pos = SVGElementManager.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
                     
                     // Add to SVGElementManager
                     SVGElementManager.elements.push(elementData);
                     SVGElementManager.updateElementTransform(elementData);
                     
-                    const targetContainer = actualSection === 'top' 
+                    const targetContainer = pos.section === 'top' 
                         ? SVGElementManager.containerTop 
                         : SVGElementManager.containerBottom;
                     targetContainer.appendChild(wrapper);
@@ -16295,10 +16389,9 @@
                     SVGElementManager.updateVisibility();
                     
                     console.log('LongToneUI.insertGlissandoSvg: Inserted', elementData.name, 
-                        'scale:', scale.toFixed(3), 'rawX:', svgX.toFixed(1), 'actualX:', actualX.toFixed(1),
-                        'curveXPx:', curveXPx.toFixed(1), 'scaledContentW:', scaledContentWidth.toFixed(1),
-                        'curvePage:', curvePageIndex, 'svgPage:', actualPage, 'section:', actualSection,
-                        'curveStartSec:', curve.startSeconds, 'leadIn:', leadIn);
+                        'refSec:', curve.startSeconds, 'offsetSec:', offsetSeconds.toFixed(3),
+                        'scale:', scale.toFixed(3), 'track:', track,
+                        'page:', pos.page, 'section:', pos.section);
                     
                     return elementData;
                 } catch (err) {
@@ -17556,16 +17649,8 @@
                     svgEl.setAttribute('width', String(svgWidth));
                     svgEl.setAttribute('height', String(svgHeight));
                     
-                    // Determine page/section from startSeconds
-                    const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 8;
-                    const leadIn = leadInSeconds;
-                    const displayTime = startSeconds + leadIn;
-                    const pageIndex = Math.floor(displayTime / secondsPerPage);
-                    const section = pageIndex % 2 === 0 ? 'top' : 'bottom';
-                    
-                    // Get score/track dimensions
-                    const scoreEl = document.getElementById(section === 'top' ? 'ScoreTop' : 'ScoreBottom');
-                    const scoreHeight = scoreEl.clientHeight;
+                    // Get track dimensions for scaling
+                    const scoreEl = document.getElementById('ScoreTop');
                     const scoreWidth = scoreEl.clientWidth;
                     const trackDims = CompositionPanel.getTrackDimensions(String(track), scoreEl);
                     const trackHeight = trackDims.height;
@@ -17575,27 +17660,13 @@
                     const scale = targetHeight / svgHeight;
                     const scaledWidth = svgWidth * scale;
                     
-                    // X position: place SVG right edge at the timeline point minus 5px
-                    const xPercent = ((displayTime % secondsPerPage) / secondsPerPage) * 100;
-                    const xPx = (xPercent / 100) * scoreWidth;
+                    // Calculate offsetSeconds: SVG right edge 5px left of anchor point
+                    const secondsPerPage = window.GraphicTimeline 
+                        ? GraphicTimeline.getSecondsPerPage() 
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const secondsPerPixel = secondsPerPage / scoreWidth;
                     const gap = 5;
-                    const svgX = Math.max(0, xPx - gap - scaledWidth);
-                    
-                    // Y position: top of track (slight negative offset to compensate for SVG internal padding)
-                    const trackYFraction = 0;
-                    const scaledHeight = svgHeight * scale;
-                    const svgY = trackDims.y + trackYFraction * (trackHeight - scaledHeight) - 5;
-                    
-                    // Calculate startSeconds for persistence
-                    const svgXPercentRaw = (svgX / scoreWidth) * 100;
-                    const svgStartSeconds = (pageIndex * secondsPerPage) + (svgXPercentRaw / 100 * secondsPerPage) - leadIn;
-                    
-                    // Re-derive position from startSeconds (handles page boundaries)
-                    const startActual = svgStartSeconds + leadIn;
-                    const actualPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
-                    const actualSection = actualPage % 2 === 0 ? 'top' : 'bottom';
-                    const actualXPercent = ((startActual / secondsPerPage) - actualPage) * 100;
-                    const actualX = (actualXPercent / 100) * scoreWidth;
+                    const offsetSeconds = -(gap + scaledWidth) * secondsPerPixel;
                     
                     // Create SVG element
                     const id = SVGElementManager.nextId++;
@@ -17612,32 +17683,34 @@
                     image.setAttribute('height', svgHeight);
                     wrapper.appendChild(image);
                     
+                    // Anchor-based element data
+                    // referenceSeconds = startSeconds param, offsetSeconds = left of anchor
                     const elementData = {
                         id: id,
-                        name: svgPath.split('/').pop().replace('.svg', ''),
+                        name: SVGElementManager.generateSvgName(svgPath.split('/').pop()),
                         wrapper: wrapper,
                         image: image,
-                        x: actualX,
-                        y: svgY,
-                        startSeconds: svgStartSeconds,
-                        yPercent: (svgY / scoreHeight) * 100,
-                        trackYFraction: trackYFraction,
-                        xPercent: actualXPercent,
+                        referenceSeconds: startSeconds,
+                        offsetSeconds: offsetSeconds,
+                        offsetYFraction: 0.0,
                         width: svgWidth,
                         height: svgHeight,
                         scale: scale,
-                        baseScale: scale,
-                        baseScoreWidth: scoreWidth,
-                        track: track,
-                        page: actualPage,
-                        section: actualSection
+                        track: track
                     };
+                    
+                    // Calculate pixel position and apply
+                    const pos = SVGElementManager.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
                     
                     // Add to SVGElementManager
                     SVGElementManager.elements.push(elementData);
                     SVGElementManager.updateElementTransform(elementData);
                     
-                    const targetContainer = actualSection === 'top' 
+                    const targetContainer = pos.section === 'top' 
                         ? SVGElementManager.containerTop 
                         : SVGElementManager.containerBottom;
                     targetContainer.appendChild(wrapper);
@@ -17650,9 +17723,9 @@
                     SVGElementManager.updateVisibility();
                     
                     console.log('VibratoUI.insertVibratoSvg: Inserted', elementData.name, 
-                        'at startSeconds:', startSeconds, 'track:', track,
-                        'page:', actualPage, 'section:', actualSection,
-                        'scale:', scale.toFixed(3), 'x:', actualX.toFixed(1), 'y:', svgY.toFixed(1));
+                        'refSec:', startSeconds, 'offsetSec:', offsetSeconds.toFixed(3),
+                        'track:', track, 'scale:', scale.toFixed(3),
+                        'page:', pos.page, 'section:', pos.section);
                     
                     return elementData;
                 } catch (err) {
@@ -21584,7 +21657,7 @@
                 // Check SVG Elements
                 if (window.SVGElementManager && SVGElementManager.elements) {
                     for (const el of SVGElementManager.elements) {
-                        if (el.section !== section) continue;
+                        if (el._section !== section) continue;
                         // SVG elements use track (1-4), convert to string for comparison
                         const elTrack = el.track ? String(el.track) : null;
                         if (clickedTrack && elTrack && elTrack !== clickedTrack) continue;
@@ -21640,12 +21713,12 @@
             },
             
             isPointInSVGElement(x, y, el) {
-                if (el.x === undefined || el.y === undefined) return false;
+                if (el._x === undefined || el._y === undefined) return false;
                 const margin = 5;
                 const scaledWidth = (el.width || 50) * (el.scale || 1);
                 const scaledHeight = (el.height || 50) * (el.scale || 1);
-                return x >= el.x - margin && x <= el.x + scaledWidth + margin &&
-                       y >= el.y - margin && y <= el.y + scaledHeight + margin;
+                return x >= el._x - margin && x <= el._x + scaledWidth + margin &&
+                       y >= el._y - margin && y <= el._y + scaledHeight + margin;
             },
             
             // Show context menu at position

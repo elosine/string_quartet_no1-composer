@@ -1,22 +1,22 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 16, 2026  
-**Current ASB Number:** ASB-039
+**Last Updated:** Feb 17, 2026  
+**Current ASB Number:** ASB-043
 
 ---
 
 ## Last Session Summary
 
-> **Curve Fugue Algorithm #1 documented and tested.** Created `docs/CURVE_FUGUE_ALGORITHM_1.md` — full macro algorithm for generating sequences of glissando/vibrato motives via AI prompt automation. Features: parameterized duration/gap ranges (shuffled bins), cumulative quarter-tone pitch descent with scenario interludes, vibrato integration (70/30 split, force after 4 gliss), onset-to-onset gap with same-track collision handling, configurable slopes (`glissandoSlope`, `vibratoSlope`). Ran algorithm 3 times producing 52 motives across scores 51–106. Next: continue score composition, refine algorithm parameters, or extend to new gesture types.
+> **Curve Fugue Algorithm #1 documented and tested.** Created `docs/CURVE_FUGUE_ALGORITHM_1.md` — full macro algorithm for generating sequences of glissando/vibrato motives via AI prompt automation. Ran algorithm 3 times producing 52 motives across scores 51–106.
 
 ---
 
 ## Current Session
 
-**Date:** Feb 16, 2026  
-**Focus:** Curve Fugue Algorithm #1 — documentation, parameterization, score composition  
-**Tier 1 Count This Session:** 2 (ASB-038, ASB-039)  
+**Date:** Feb 17, 2026  
+**Focus:** SVG & Curve Maker UI Redesign  
+**Tier 1 Count This Session:** 4 (ASB-040, ASB-041, ASB-042, ASB-043)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -35,6 +35,14 @@
 - ASB-038: Curve Fugue Algorithm #1 documentation — parameterized duration/gap (shuffled bins), cumulative QT pitch descent + scenario interludes, vibrato integration, collision handling, prompt guide
 - ASB-039: Add `glissandoSlope` and `vibratoSlope` as configurable parameters
 - Score composition: Ran algorithm 3× — 13 motives (scores 51–63), 18 motives (scores 66–83), 21 motives (scores 86–106)
+
+### Session Log — SVG Anchor System
+- ASB-040: Full SVGElementManager refactor — anchor-based positioning (referenceSeconds + offsetSeconds + offsetYFraction), same formula as CurveMaker, fixed scale on resize, backward-compatible import, updated insertGlissandoSvg/insertVibratoSvg + server endpoints
+- ASB-041: Standard object info UI (Name/Start/Track), SVG_YYYYMMDD_HHMMSS_NN naming convention with retroactive rename on import, anchor line scoped to track, Connectors section made draggable/collapsible
+
+### Session Log — SVG & Curve Maker UI Redesign
+- ASB-042: Curve Maker HTML redesign — orange heading, Start+End/Y1+Y2 same rows, slope input, track+model as dropdowns, button colors (Draw=blue, Delete=red, Save=green), Recall Curve section with dropdown+time+track+Insert
+- ASB-043: CurveMaker JS updates — getCurveGTrack/setCurveGTrack/getCurveModel/setCurveModel use selects, createCurve reads slope input, selectCurve/updateInputsFromCurve sync slope, insertRecalledCurve uses recall time/track inputs
 
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
@@ -109,6 +117,10 @@
 | ASB-037 | Bug fixes: ObjectSelector z-order, SVG track positioning, cursor offset | Complete |
 | ASB-038 | Curve Fugue Algorithm #1 documentation — parameterized bins, pitch descent, prompt guide | Complete |
 | ASB-039 | Add glissandoSlope and vibratoSlope parameters to Curve Fugue Algorithm | Complete |
+| ASB-040 | SVG Anchor System refactor — referenceSeconds + offsetSeconds + offsetYFraction positioning | Complete |
+| ASB-041 | Standard object info UI + SVG naming convention + anchor line track-scoped + Connectors section collapsible | Complete |
+| ASB-042 | Curve Maker HTML redesign — orange heading, layout, selects, slope input, recall section | Complete |
+| ASB-043 | CurveMaker JS updates — select/slope handlers, createCurve slope read, recall time/track | Complete |
 
 ---
 

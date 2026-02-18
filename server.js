@@ -1810,23 +1810,28 @@ app.post('/api/vibrato/create-and-save', async (req, res) => {
             const existingSvgElements = scoreData.svgElements || [];
             const maxSvgId = existingSvgElements.reduce((max, e) => Math.max(max, e.id || 0), 0);
 
+            // Anchor-based SVG element: referenceSeconds = curve start, offsetSeconds = left of anchor
+            // Approximate offsetSeconds from pixel gap (5px + scaledWidth)
+            const approxScoreWidthVib = 1000;
+            const secondsPerPixelVib = secondsPerPage / approxScoreWidthVib;
+            const svgOffsetSeconds = -(5 + scaledWidth) * secondsPerPixelVib;
+
+            // Generate standard name: SVG_YYYYMMDD_HHMMSS_NN_filename
+            const nowVib = new Date();
+            const padVib = (n, len) => String(n).padStart(len, '0');
+            const svgCounter = existingSvgElements.length + 1;
+            const svgStdName = `SVG_${nowVib.getFullYear()}${padVib(nowVib.getMonth()+1,2)}${padVib(nowVib.getDate(),2)}_${padVib(nowVib.getHours(),2)}${padVib(nowVib.getMinutes(),2)}${padVib(nowVib.getSeconds(),2)}_${padVib(svgCounter,2)}_${baseName}`;
+
             const svgElement = {
                 id: maxSvgId + 1,
-                name: baseName,
-                x: 0,  // recalculated on load
-                y: 0,
-                startSeconds: startSeconds - (scaledWidth / 1000 * secondsPerPage / 100),
-                xPercent: svgXPercent,
-                yPercent: 10, // fallback only; trackYFraction is preferred
-                trackYFraction: 0, // 0 = top of track (matches client-side VibratoUI positioning)
+                name: svgStdName,
+                referenceSeconds: startSeconds,
+                offsetSeconds: svgOffsetSeconds,
+                offsetYFraction: 0.0,
                 width: svgWidth,
                 height: svgHeight,
                 scale,
-                baseScale: scale,
-                baseScoreWidth: 1000, // approximate, recalculated on load
                 track: trackNum,
-                page: startPage,
-                section,
                 svgDataUrl
             };
             if (!scoreData.svgElements) scoreData.svgElements = [];
@@ -1936,6 +1941,526 @@ app.post('/api/vibrato/create-and-save', async (req, res) => {
 
     } catch (err) {
         console.error('VibratoAutomation error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Helper: pitch string to MIDI note number with quarter-tone offset (for glissando segments)
+function pitchToMidiFloat(pitchStr) {
+    const noteMap = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+    const match = pitchStr.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+    if (!match) return { midi: 60, quarterTone: 0 };
+    let [, noteName, accidental, quarterTone, octave] = match;
+    let midi = noteMap[noteName];
+    if (accidental === '#') midi += 1;
+    else if (accidental === 'B') midi -= 1;
+    midi += (parseInt(octave) + 1) * 12;
+    midi = Math.max(0, Math.min(127, midi));
+    let qtOffset = 0;
+    if (quarterTone === '+') qtOffset = 0.5;
+    else if (quarterTone === 'D') qtOffset = -0.5;
+    return { midi, quarterTone: qtOffset };
+}
+
+// Helper: check if two pitches share the same staff line (for gliss offset in LilyPond)
+function sameStaffLine(startPitch, endPitch) {
+    return startPitch.charAt(0).toUpperCase() === endPitch.charAt(0).toUpperCase();
+}
+
+// Helper: generate glissando LilyPond filename
+function generateGlissFilename(clef, startPitch, endPitch, dynamic) {
+    const normalizePitch = (p) => p.replace('#', 's').replace('+', 'q').replace('d', 'qf');
+    const clefName = clef === 'cClef' ? 'alto' : clef;
+    const dynSuffix = dynamic ? `-${dynamic}` : '';
+    return `Gliss-${clefName}-${normalizePitch(startPitch)}-${normalizePitch(endPitch)}${dynSuffix}.ly`;
+}
+
+// Helper: build a single glissando MIDI segment file (returns Buffer)
+function buildGlissandoSegmentMidi(segment, bpm) {
+    const TICKS_PER_BEAT = 480;
+    const MICROSECONDS_PER_BEAT = Math.round(60000000 / bpm);
+
+    const writeVarInt = (value) => {
+        const bytes = [];
+        bytes.push(value & 0x7f);
+        value >>= 7;
+        while (value > 0) { bytes.unshift((value & 0x7f) | 0x80); value >>= 7; }
+        return bytes;
+    };
+    const writeInt = (value, length) => {
+        const bytes = [];
+        for (let i = length - 1; i >= 0; i--) bytes.push((value >> (i * 8)) & 0xff);
+        return bytes;
+    };
+    const secondsToTicks = (seconds) => Math.round(seconds * TICKS_PER_BEAT * bpm / 60);
+
+    const trackEvents = [];
+    let lastTick = 0;
+
+    // CC0 (articulation) if applicable (first 2 segments only)
+    if (segment.cc0Value !== null) {
+        trackEvents.push(...writeVarInt(0));
+        trackEvents.push(0xB0, 0x00, segment.cc0Value);
+    }
+
+    // Initial pitch bend
+    const pbLSB = segment.startBend & 0x7F;
+    const pbMSB = (segment.startBend >> 7) & 0x7F;
+    trackEvents.push(...writeVarInt(0));
+    trackEvents.push(0xE0, pbLSB, pbMSB);
+
+    // Note On
+    trackEvents.push(...writeVarInt(0));
+    trackEvents.push(0x90, segment.midiNote, segment.velocity);
+
+    // Pitch bend samples
+    if (segment.pitchBendSamples && segment.pitchBendSamples.length > 1) {
+        let prevTick = 0;
+        for (let pbIdx = 1; pbIdx < segment.pitchBendSamples.length; pbIdx++) {
+            const pbSample = segment.pitchBendSamples[pbIdx];
+            const pbTick = secondsToTicks(pbSample.timeRelative);
+            const deltaTick = Math.max(0, pbTick - prevTick);
+            const lsb = pbSample.value & 0x7F;
+            const msb = (pbSample.value >> 7) & 0x7F;
+            trackEvents.push(...writeVarInt(deltaTick));
+            trackEvents.push(0xE0, lsb, msb);
+            prevTick = pbTick;
+        }
+        lastTick = prevTick;
+    }
+
+    // Note Off
+    const endTick = secondsToTicks(segment.duration);
+    const noteOffDelta = Math.max(0, endTick - lastTick);
+    trackEvents.push(...writeVarInt(noteOffDelta));
+    trackEvents.push(0x80, segment.midiNote, 0);
+
+    // End of track
+    trackEvents.push(...writeVarInt(0));
+    trackEvents.push(0xFF, 0x2F, 0x00);
+
+    // Build tempo track
+    const tempoTrack = [];
+    tempoTrack.push(...writeVarInt(0));
+    tempoTrack.push(0xFF, 0x51, 0x03);
+    tempoTrack.push((MICROSECONDS_PER_BEAT >> 16) & 0xFF);
+    tempoTrack.push((MICROSECONDS_PER_BEAT >> 8) & 0xFF);
+    tempoTrack.push(MICROSECONDS_PER_BEAT & 0xFF);
+    tempoTrack.push(...writeVarInt(0));
+    tempoTrack.push(0xFF, 0x2F, 0x00);
+
+    // Build MIDI file
+    const midiFile = [];
+    midiFile.push(0x4D, 0x54, 0x68, 0x64); // MThd
+    midiFile.push(...writeInt(6, 4));
+    midiFile.push(...writeInt(1, 2)); // Format 1
+    midiFile.push(...writeInt(2, 2)); // 2 tracks
+    midiFile.push(...writeInt(TICKS_PER_BEAT, 2));
+    midiFile.push(0x4D, 0x54, 0x72, 0x6B); // MTrk (tempo)
+    midiFile.push(...writeInt(tempoTrack.length, 4));
+    midiFile.push(...tempoTrack);
+    midiFile.push(0x4D, 0x54, 0x72, 0x6B); // MTrk (data)
+    midiFile.push(...writeInt(trackEvents.length, 4));
+    midiFile.push(...trackEvents);
+
+    return Buffer.from(midiFile);
+}
+
+// Helper: generate glissando segments from curve data and pitch range
+// Replicates client-side LongToneUI.generateGlissandoMidi segment logic
+function generateGlissandoSegments(curveData, startPitchMidi, endPitchMidi, velocity, articulationValue) {
+    const PITCH_BEND_RANGE = 2;
+    const PITCH_BEND_SAMPLE_INTERVAL = 50; // ms
+    const PITCH_BEND_MAX = 16383;
+    const PITCH_BEND_MIN = 0;
+
+    const samples = curveData.samples;
+    const sampleInterval = curveData.sampleInterval;
+    const startTime = curveData.startTime;
+
+    const highPitch = Math.max(startPitchMidi, endPitchMidi);
+    const lowPitch = Math.min(startPitchMidi, endPitchMidi);
+    const pitchRange = highPitch - lowPitch;
+
+    // normalizedY (0-1) maps: 0 = low pitch, 1 = high pitch
+    const pitchAtSample = samples.map(normalizedY => lowPitch + normalizedY * pitchRange);
+
+    const segments = [];
+    let segmentStartIndex = 0;
+    let segmentBasePitch = pitchAtSample[0];
+
+    const createSegment = (segIndex, segStartIndex, segEndIndex, segStartPitch, segEndPitch) => {
+        const segStartTime = startTime + segStartIndex * sampleInterval;
+        const segEndTime = startTime + segEndIndex * sampleInterval;
+        const segDuration = segEndTime - segStartTime;
+        const segIsDown = segEndPitch < segStartPitch;
+
+        // MIDI note offset by 1 semitone based on direction
+        const midiNote = segIsDown ?
+            Math.round(segStartPitch) - 1 :
+            Math.round(segStartPitch) + 1;
+
+        const pitchChangeInSegment = Math.abs(segEndPitch - segStartPitch);
+        const bendRangeUsed = pitchChangeInSegment / PITCH_BEND_RANGE;
+
+        let startBend, endBend;
+        if (segIsDown) {
+            startBend = PITCH_BEND_MAX;
+            endBend = Math.round(PITCH_BEND_MAX - (bendRangeUsed * (PITCH_BEND_MAX - PITCH_BEND_MIN)));
+        } else {
+            startBend = PITCH_BEND_MIN;
+            endBend = Math.round(PITCH_BEND_MIN + (bendRangeUsed * (PITCH_BEND_MAX - PITCH_BEND_MIN)));
+        }
+
+        // Generate pitch bend samples
+        const pitchBendSamples = [];
+        const numPbSamples = Math.max(2, Math.ceil(segDuration * 1000 / PITCH_BEND_SAMPLE_INTERVAL));
+
+        for (let pbIdx = 0; pbIdx < numPbSamples; pbIdx++) {
+            const pbTime = segStartTime + (pbIdx / (numPbSamples - 1)) * segDuration;
+            const curveIdx = Math.round((pbTime - startTime) / sampleInterval);
+            const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
+            const pitchAtTime = pitchAtSample[clampedIdx];
+            const pitchProgress = (segEndPitch !== segStartPitch) ?
+                (pitchAtTime - segStartPitch) / (segEndPitch - segStartPitch) : 0;
+            const clampedProgress = Math.max(0, Math.min(1, pitchProgress));
+            const bendValue = Math.round(startBend + clampedProgress * (endBend - startBend));
+            pitchBendSamples.push({ timeRelative: pbTime - segStartTime, value: bendValue });
+        }
+
+        return {
+            index: segIndex,
+            startTime: segStartTime,
+            endTime: segEndTime,
+            duration: segDuration,
+            startPitch: segStartPitch,
+            endPitch: segEndPitch,
+            midiNote,
+            startBend,
+            endBend,
+            pitchBendSamples,
+            cc0Value: (segIndex < 2) ? articulationValue : null,
+            velocity,
+            isGlissDown: segIsDown
+        };
+    };
+
+    for (let i = 1; i < pitchAtSample.length; i++) {
+        const currentPitch = pitchAtSample[i];
+        const deviation = currentPitch - segmentBasePitch;
+        if (Math.abs(deviation) > PITCH_BEND_RANGE) {
+            const segmentEndPitch = pitchAtSample[i - 1];
+            segments.push(createSegment(segments.length, segmentStartIndex, i - 1, segmentBasePitch, segmentEndPitch));
+            segmentStartIndex = i;
+            segmentBasePitch = currentPitch;
+        }
+    }
+
+    // Add final segment
+    segments.push(createSegment(
+        segments.length,
+        segmentStartIndex,
+        samples.length - 1,
+        segmentBasePitch,
+        pitchAtSample[pitchAtSample.length - 1]
+    ));
+
+    return segments;
+}
+
+// MIDI note number to pitch name (for filenames)
+function midiNoteToPitchName(pitch) {
+    const noteNames = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
+    const octave = Math.floor(pitch / 12) - 1;
+    return noteNames[pitch % 12] + octave;
+}
+
+// Main automation endpoint: create glissando and save to score
+app.post('/api/glissando/create-and-save', async (req, res) => {
+    const {
+        start, end, track = 1, startPitch = 'C4', endPitch = 'C5',
+        clef = 'treble', dynamic = 'p',
+        velocity = 64, articulation = 89,
+        y1 = 10, y2 = 0,
+        model = 'logarithmic', slope = -0.65,
+        color = 'limeGreen', fillMode = 'bottom'
+    } = req.body;
+
+    // Validate required params
+    if (start === undefined || end === undefined) {
+        return res.status(400).json({ success: false, error: 'start and end times are required' });
+    }
+    if (end <= start) {
+        return res.status(400).json({ success: false, error: 'end must be greater than start' });
+    }
+
+    const startSeconds = parseFloat(start);
+    const endSeconds = parseFloat(end);
+    const trackNum = parseInt(track);
+    const gTrack = String(trackNum);
+
+    console.log(`GlissandoAutomation: Creating glissando ${startPitch}->${endPitch} on track ${gTrack}, ${startSeconds}s-${endSeconds}s, ${model} slope ${slope}`);
+
+    try {
+        // 1. Find latest score and load it
+        const { latest, nextName } = findLatestScoreAndNext();
+        if (!latest) {
+            return res.status(404).json({ success: false, error: 'No score files found in scores directory' });
+        }
+        const scoreData = JSON.parse(fs.readFileSync(path.join(SCORES_DIR, `${latest}.json`), 'utf8'));
+        console.log(`GlissandoAutomation: Loaded score '${latest}', will save as '${nextName}'`);
+
+        // 2. Get BPM from score's tempo history
+        const bpm = (scoreData.tempoHistory && scoreData.tempoHistory[0]) ? scoreData.tempoHistory[0].bpm : 60;
+        const beatsPerPage = (scoreData.tempoHistory && scoreData.tempoHistory[0]) ? scoreData.tempoHistory[0].beatsPerPage : 8;
+        const secondsPerPage = (beatsPerPage / bpm) * 60;
+        const leadIn = scoreData.cursorState ? (scoreData.cursorState.leadInSeconds || 0) : 0;
+
+        // 3. Compute curve data
+        const curveData = generateCurveSamples(startSeconds, endSeconds, y1, y2, model, slope);
+        const duration = endSeconds - startSeconds;
+
+        // 4. Determine page/section for the curve
+        const startActual = startSeconds + leadIn;
+        const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+        const section = startPage % 2 === 0 ? 'top' : 'bottom';
+
+        // 5. Create curve entry for databases.curves
+        const existingCurves = scoreData.databases?.curves?.curves || [];
+        const maxCurveId = existingCurves.reduce((max, c) => Math.max(max, c.id || 0), 0);
+        const newCurveId = maxCurveId + 1;
+        const curveName = `CRV_${new Date().toISOString().replace(/[-:T]/g, '').slice(0, 15)}`;
+
+        const curveEntry = {
+            id: newCurveId,
+            name: curveName,
+            startSeconds,
+            endSeconds,
+            y1,
+            y2,
+            gTrack,
+            color,
+            fillMode,
+            section,
+            page: startPage,
+            x1: 0,
+            y1Pixel: 0,
+            x2: 100,
+            y2Pixel: 0,
+            origY1Pixel: 0,
+            origY2Pixel: 0,
+            tension: 0,
+            slope,
+            model,
+            trackDims: { y: 0, height: 80 },
+            curveData
+        };
+
+        // 6. Create LilyPond file
+        const lpStartPitch = pitchToLilyPond(startPitch);
+        const lpEndPitch = pitchToLilyPond(endPitch);
+        const lpClef = clefToLilyPond(clef);
+        const glissOffset = sameStaffLine(startPitch, endPitch) ? '0.3' : '0';
+        const lyFilename = generateGlissFilename(clef, startPitch, endPitch, dynamic);
+
+        const templatePath = path.join(LILYPOND_DIR, 'GlissandoNotationTemplate.ly');
+        if (!fs.existsSync(templatePath)) {
+            return res.status(404).json({ success: false, error: 'Glissando template not found' });
+        }
+
+        let template = fs.readFileSync(templatePath, 'utf8');
+        template = template.replace(/\\clef alto/g, `\\clef ${lpClef}`);
+        const dynamicMarkup = dynamic ? `\\${dynamic}` : '';
+        template = template.replace(/^(\s*)(a4\\p)(\s*$)/m, `$1${lpStartPitch}${dynamicMarkup}$3`);
+        template = template.replace(/^(\s*)(af4)(\s*$)/m, `$1${lpEndPitch}$3`);
+        const offsetValue = glissOffset || '0';
+        template = template.replace(/#'\(0 \. 0\)/g, `#'(0 . ${offsetValue})`);
+        fs.writeFileSync(path.join(LILYPOND_DIR, lyFilename), template);
+        console.log(`GlissandoAutomation: Created LilyPond file: ${lyFilename}`);
+
+        // 7. Render SVG
+        const scriptPath = path.join(LILYPOND_DIR, 'render_glissando.ps1');
+        const svgOutputDir = path.join(__dirname, 'public', 'SVG_graphics');
+        const baseName = path.basename(lyFilename, '.ly');
+        const svgFilePath = path.join(svgOutputDir, `${baseName}.svg`);
+
+        try {
+            const command = `powershell -ExecutionPolicy Bypass -File "${scriptPath}" -Filename "${lyFilename}"`;
+            await execAsync(command, { timeout: 60000 });
+            if (fs.existsSync(svgFilePath)) {
+                try { cropSvgToContent(svgFilePath); } catch (e) { console.warn('SVG crop warning:', e.message); }
+                console.log(`GlissandoAutomation: Rendered + cropped SVG: ${baseName}.svg`);
+            }
+        } catch (renderErr) {
+            console.error('GlissandoAutomation: SVG render failed:', renderErr.stderr || renderErr.err?.message);
+        }
+
+        // 8. Create SVG element entry if SVG exists
+        if (fs.existsSync(svgFilePath)) {
+            const svgContent = fs.readFileSync(svgFilePath, 'utf-8');
+            let svgWidth = 100, svgHeight = 100;
+            const widthMatch = svgContent.match(/width="([^"]+)"/);
+            const heightMatch = svgContent.match(/height="([^"]+)"/);
+            if (widthMatch) {
+                svgWidth = parseFloat(widthMatch[1]);
+                if (widthMatch[1].includes('mm')) svgWidth *= 3.78;
+            }
+            if (heightMatch) {
+                svgHeight = parseFloat(heightMatch[1]);
+                if (heightMatch[1].includes('mm')) svgHeight *= 3.78;
+            }
+            const svgDataUrl = 'data:image/svg+xml;base64,' + Buffer.from(svgContent).toString('base64');
+
+            // Scale to 42% of track height (matches LongToneUI.insertGlissandoSvg)
+            const approxTrackHeight = 80;
+            const approxScoreWidth = 1000;
+            const targetHeight = approxTrackHeight * 0.42;
+            const scale = targetHeight / svgHeight;
+            const scaledContentWidth = svgWidth * scale;
+
+            // Anchor-based SVG element: referenceSeconds = curve start, offsetSeconds = left of anchor
+            // Approximate offsetSeconds from pixel gap (5px + scaledContentWidth)
+            const secondsPerPixelGliss = secondsPerPage / approxScoreWidth;
+            const gap = 5;
+            const svgOffsetSeconds = -(gap + scaledContentWidth) * secondsPerPixelGliss;
+
+            const existingSvgElements = scoreData.svgElements || [];
+            const maxSvgId = existingSvgElements.reduce((max, e) => Math.max(max, e.id || 0), 0);
+
+            // Generate standard name: SVG_YYYYMMDD_HHMMSS_NN_filename
+            const nowGliss = new Date();
+            const padGliss = (n, len) => String(n).padStart(len, '0');
+            const svgCounterGliss = existingSvgElements.length + 1;
+            const svgStdNameGliss = `SVG_${nowGliss.getFullYear()}${padGliss(nowGliss.getMonth()+1,2)}${padGliss(nowGliss.getDate(),2)}_${padGliss(nowGliss.getHours(),2)}${padGliss(nowGliss.getMinutes(),2)}${padGliss(nowGliss.getSeconds(),2)}_${padGliss(svgCounterGliss,2)}_${baseName}`;
+
+            const svgElement = {
+                id: maxSvgId + 1,
+                name: svgStdNameGliss,
+                referenceSeconds: startSeconds,
+                offsetSeconds: svgOffsetSeconds,
+                offsetYFraction: 0.1,
+                width: svgWidth,
+                height: svgHeight,
+                scale,
+                track: trackNum,
+                svgDataUrl
+            };
+            if (!scoreData.svgElements) scoreData.svgElements = [];
+            scoreData.svgElements.push(svgElement);
+            console.log(`GlissandoAutomation: Added SVG element ${baseName}`);
+        }
+
+        // 9. Generate glissando MIDI segments
+        const startPitchObj = pitchToMidiFloat(startPitch);
+        const endPitchObj = pitchToMidiFloat(endPitch);
+        const startPitchMidi = startPitchObj.midi + startPitchObj.quarterTone;
+        const endPitchMidi = endPitchObj.midi + endPitchObj.quarterTone;
+
+        const segments = generateGlissandoSegments(curveData, startPitchMidi, endPitchMidi, velocity, articulation);
+        console.log(`GlissandoAutomation: Generated ${segments.length} MIDI segments`);
+
+        // 10. Save MIDI files and add to score
+        const midiDir = path.join(__dirname, 'public', 'midi_files');
+        if (!fs.existsSync(midiDir)) fs.mkdirSync(midiDir, { recursive: true });
+
+        if (!scoreData.databases) scoreData.databases = {};
+        if (!scoreData.databases.midiSnippets) scoreData.databases.midiSnippets = { snippets: [], nextId: 1 };
+        if (!scoreData.midiTracks) scoreData.midiTracks = [];
+        while (scoreData.midiTracks.length < trackNum) {
+            scoreData.midiTracks.push({ channel: scoreData.midiTracks.length + 1, midiEvents: [] });
+        }
+        const trackEvents = scoreData.midiTracks[trackNum - 1];
+
+        const OVERLAP_MS = 5;
+        let currentInsertTimeMs = startSeconds * 1000;
+        const savedMidiFiles = [];
+
+        for (let i = 0; i < segments.length; i++) {
+            const seg = segments[i];
+            const segNum = String(i + 1).padStart(2, '0');
+            const pitchName = midiNoteToPitchName(seg.midiNote);
+            const direction = seg.isGlissDown ? 'dn' : 'up';
+            const midiFilename = `${curveName}_seg${segNum}_${pitchName}_${direction}.mid`;
+
+            const midiBuffer = buildGlissandoSegmentMidi(seg, bpm);
+            fs.writeFileSync(path.join(midiDir, midiFilename), midiBuffer);
+
+            // Parse MIDI events and add to score
+            const midiEvents = parseMidiToEvents(midiBuffer, currentInsertTimeMs, bpm);
+            const snippetId = scoreData.databases.midiSnippets.nextId++;
+            const segStartSeconds = currentInsertTimeMs / 1000;
+
+            scoreData.databases.midiSnippets.snippets.push({
+                id: snippetId,
+                name: `Gliss seg${i + 1} @ ${curveName}`,
+                trackIndex: trackNum - 1,
+                startTimeMs: currentInsertTimeMs,
+                durationMs: seg.duration * 1000,
+                startSeconds: segStartSeconds,
+                endSeconds: segStartSeconds + seg.duration,
+                events: midiEvents,
+                color,
+                sourceCurve: newCurveId,
+                sourceFile: midiFilename
+            });
+
+            for (const event of midiEvents) {
+                trackEvents.midiEvents.push({
+                    timeMs: event.timeMs,
+                    type: event.type,
+                    data: [...event.data],
+                    snippetId: snippetId,
+                    timestamp: event.timeMs
+                });
+            }
+
+            savedMidiFiles.push(midiFilename);
+
+            // Next segment: end of this note minus overlap
+            currentInsertTimeMs = currentInsertTimeMs + seg.duration * 1000 - OVERLAP_MS;
+        }
+
+        trackEvents.midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+
+        // 11. Add curve to databases.curves
+        if (!scoreData.databases.curves) scoreData.databases.curves = { curves: [], nextId: 1 };
+        scoreData.databases.curves.curves.push(curveEntry);
+        scoreData.databases.curves.nextId = newCurveId + 1;
+
+        // 12. Update cursor state
+        scoreData.cursorState = {
+            editCursorSeconds: startSeconds - 1,
+            gotoDisplaySeconds: startSeconds - 1,
+            leadInSeconds: leadIn
+        };
+
+        // 13. Update metadata
+        scoreData.metadata = scoreData.metadata || {};
+        scoreData.metadata.title = nextName;
+        scoreData.metadata.modified = new Date().toISOString();
+
+        // 14. Save as next iteration
+        const newFilePath = path.join(SCORES_DIR, `${nextName}.json`);
+        fs.writeFileSync(newFilePath, JSON.stringify(scoreData, null, 2));
+        console.log(`GlissandoAutomation: Saved score as '${nextName}'`);
+
+        // 15. Version backup
+        const versionFilename = `${nextName}_v${Date.now()}.json`;
+        fs.writeFileSync(path.join(VERSIONS_DIR, versionFilename), JSON.stringify(scoreData, null, 2));
+
+        res.json({
+            success: true,
+            scoreName: nextName,
+            previousScore: latest,
+            curve: { id: newCurveId, name: curveName, startSeconds, endSeconds },
+            pitchRange: { start: startPitch, end: endPitch },
+            midi: { segments: segments.length, files: savedMidiFiles },
+            svg: fs.existsSync(svgFilePath) ? baseName + '.svg' : null,
+            message: `Glissando created. Score saved as '${nextName}'. Refresh browser to see it.`
+        });
+
+    } catch (err) {
+        console.error('GlissandoAutomation error:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
