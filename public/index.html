@@ -1060,18 +1060,18 @@
                     <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">Y2</label>
                     <input type="text" id="curveY2Input" class="curve-input" value="10.0" style="width: 60px; font-size: 9px; padding: 2px 3px;">
                 </div>
-                <div class="curve-input-row" style="margin-bottom: 3px;">
-                    <label style="font-size: 9px; min-width: 28px;">Slope</label>
-                    <input type="number" id="curveSlopeInput" class="curve-input" value="0" step="0.1" min="-3" max="3" style="width: 60px; font-size: 9px; padding: 2px 3px;">
-                    <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">Trk</label>
-                    <select id="curveGTrackSelect" style="font-size: 9px; padding: 2px;">
+                <div class="curve-input-row" style="margin-bottom: 3px; gap: 2px;">
+                    <label style="font-size: 8px; min-width: 14px;">Slp</label>
+                    <input type="number" id="curveSlopeInput" class="curve-input" value="0" step="0.1" min="-3" max="3" style="width: 48px; font-size: 8px; padding: 1px 2px;">
+                    <label style="font-size: 8px; min-width: 12px; margin-left: 2px;">Tk</label>
+                    <select id="curveGTrackSelect" style="font-size: 8px; padding: 1px 2px;">
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
                         <option value="4">4</option>
                     </select>
-                    <label style="font-size: 9px; min-width: 28px; margin-left: 6px;">Model</label>
-                    <select id="curveModelSelect" style="font-size: 9px; padding: 2px;">
+                    <label style="font-size: 8px; min-width: 14px; margin-left: 2px;">Md</label>
+                    <select id="curveModelSelect" style="font-size: 8px; padding: 1px 2px;">
                         <option value="bezier">Bezier</option>
                         <option value="power">Power</option>
                         <option value="sigmoid">S-Curve</option>
@@ -1116,7 +1116,7 @@
                 </div>
                 <textarea id="curveDescriptionInput" class="curve-input" style="width: 100%; height: 40px; resize: vertical; font-size: 9px;" placeholder="Curve description..."></textarea>
                 <div class="control-row" style="margin-top: 4px;">
-                    <button id="curveSaveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Save</button>
+                    <button id="curveSaveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-mustard); color: #000;">Save</button>
                 </div>
                 
                 <!-- Divider before Recall Curve -->
@@ -1145,6 +1145,39 @@
                 </div>
                 <div class="control-row" style="margin-top: 4px;">
                     <button id="curveInsertBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Insert</button>
+                </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label" style="background: var(--clr-neonMagenta); color: #fff; padding: 3px 6px; border-radius: 2px;">Motive Groups</div>
+                
+                <div class="curve-input-row" style="margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 38px;">Motives</label>
+                </div>
+                <select id="motiveGroupList" size="4" style="width: 100%; font-size: 9px; background: rgba(40,40,50,0.9); color: #ccc; border: 1px solid #555; border-radius: 3px; padding: 2px;">
+                </select>
+                <div class="curve-input-row" style="margin-top: 3px; margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 28px;">Time</label>
+                    <input type="number" id="motiveGroupTime" class="curve-input" value="0" step="0.001" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    <label style="font-size: 8px; min-width: 16px; margin-left: 4px;">Trk</label>
+                    <select id="motiveGroupTrack" style="font-size: 8px; padding: 1px 2px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div class="curve-input-row" style="margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 38px;">Objects</label>
+                </div>
+                <select id="motiveGroupObjects" size="4" style="width: 100%; font-size: 9px; background: rgba(40,40,50,0.9); color: #ccc; border: 1px solid #555; border-radius: 3px; padding: 2px;">
+                </select>
+                <div class="control-row" style="margin-top: 4px;">
+                    <button id="motiveGroupAddBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Add Selected</button>
+                    <button id="motiveGroupRemoveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Remove</button>
+                </div>
+                <div class="control-row" style="margin-top: 4px;">
+                    <button id="motiveGroupSaveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-mustard); color: #000;">Save New</button>
+                    <button id="motiveGroupDeleteBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Delete</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1558,6 +1591,14 @@
                         <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 28px;">Scale</label>
                         <input type="range" id="svgScaleSlider" min="0.1" max="5" step="0.01" value="1" style="width: 80px;">
                         <input type="number" id="svgScaleInput" class="curve-input" value="1" step="0.01" min="0.1" max="5" style="width: 52px; font-size: 9px; padding: 2px 3px; margin-left: 4px;">
+                    </div>
+                </div>
+                
+                <!-- Collapsible SVG Element List -->
+                <div style="margin-top: 4px;">
+                    <div id="svgListToggle" style="cursor: pointer; font-size: 8px; color: rgba(255,255,255,0.6); user-select: none;">▶ All SVG Elements</div>
+                    <div id="svgListContainer" style="display: none; margin-top: 2px;">
+                        <select id="svgElementList" size="6" style="width: 100%; font-size: 8px; background: #1a1a2e; color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2); padding: 1px;"></select>
                     </div>
                 </div>
                 
@@ -2396,6 +2437,33 @@
                     }, 100);
                 });
                 
+                // Collapsible SVG element list
+                this.svgListToggle = document.getElementById('svgListToggle');
+                this.svgListContainer = document.getElementById('svgListContainer');
+                this.svgElementListSelect = document.getElementById('svgElementList');
+                this.svgListOpen = false;
+                
+                this.svgListToggle.addEventListener('click', () => {
+                    this.svgListOpen = !this.svgListOpen;
+                    this.svgListContainer.style.display = this.svgListOpen ? 'block' : 'none';
+                    this.svgListToggle.textContent = (this.svgListOpen ? '▼' : '▶') + ' All SVG Elements';
+                    if (this.svgListOpen) this.refreshSvgElementList();
+                    // Update parent section-content maxHeight so overflow:hidden doesn't clip
+                    requestAnimationFrame(() => {
+                        const sectionContent = this.svgListToggle.closest('.section-content');
+                        if (sectionContent) {
+                            sectionContent.style.maxHeight = sectionContent.scrollHeight + 'px';
+                        }
+                    });
+                });
+                
+                this.svgElementListSelect.addEventListener('change', () => {
+                    const selectedId = parseInt(this.svgElementListSelect.value);
+                    if (isNaN(selectedId)) return;
+                    const el = this.elements.find(e => e.id === selectedId);
+                    if (el) this.selectElement(el);
+                });
+                
                 console.log('SVGElementManager initialized (anchor-based positioning)');
             },
             
@@ -2544,6 +2612,7 @@
                 
                 // Select new element
                 this.selectElement(elementData);
+                this.updateElementList();
             },
             
             // Apply transform from cached pixel position
@@ -2780,6 +2849,26 @@
                 
                 // Update UI
                 this.updateUIFromSelected();
+                if (this.svgListOpen && this.svgElementListSelect) {
+                    this.svgElementListSelect.value = elementData.id;
+                }
+            },
+            
+            refreshSvgElementList() {
+                if (!this.svgElementListSelect) return;
+                const sel = this.svgElementListSelect;
+                const prevVal = sel.value;
+                sel.innerHTML = '';
+                this.elements.forEach(el => {
+                    const opt = document.createElement('option');
+                    opt.value = el.id;
+                    const t = (el.referenceSeconds || 0).toFixed(1);
+                    const trk = el.track || '?';
+                    opt.textContent = `[T${trk} @${t}s] ${el.name || 'SVG ' + el.id}`;
+                    sel.appendChild(opt);
+                });
+                if (prevVal) sel.value = prevVal;
+                if (this.selectedElement) sel.value = this.selectedElement.id;
             },
             
             deselectAll() {
@@ -2912,7 +3001,7 @@
             },
             
             updateElementList() {
-                // No-op: element list UI removed; kept for backward compatibility with external callers
+                if (this.svgListOpen) this.refreshSvgElementList();
             },
             
             // Bring SVG containers to front (call after other elements are initialized)
@@ -8936,6 +9025,65 @@
         };
         window.MotiveDatabase = MotiveDatabase;
         
+        // Motive Group Database - groups of objects (curves, GCs, motives, SVGs, MIDI snippets, audio clips)
+        const MotiveGroupDatabase = {
+            groups: [],
+            nextId: 1,
+            nextGroupNumber: 1,
+            
+            add(groupData) {
+                const group = {
+                    id: this.nextId++,
+                    ...groupData,
+                    createdAt: Date.now()
+                };
+                this.groups.push(group);
+                return group;
+            },
+            
+            get(id) {
+                return this.groups.find(g => g.id === id);
+            },
+            
+            update(id, updates) {
+                const group = this.get(id);
+                if (group) {
+                    Object.assign(group, updates);
+                }
+                return group;
+            },
+            
+            remove(id) {
+                const index = this.groups.findIndex(g => g.id === id);
+                if (index !== -1) {
+                    this.groups.splice(index, 1);
+                    return true;
+                }
+                return false;
+            },
+            
+            getAll() {
+                return this.groups;
+            },
+            
+            exportData() {
+                return {
+                    groups: this.groups,
+                    nextId: this.nextId,
+                    nextGroupNumber: this.nextGroupNumber
+                };
+            },
+            
+            importData(data) {
+                if (data && data.groups) {
+                    this.groups = data.groups;
+                    this.nextId = data.nextId || (this.groups.length > 0 ? Math.max(...this.groups.map(g => g.id)) + 1 : 1);
+                    this.nextGroupNumber = data.nextGroupNumber || (this.groups.length + 1);
+                }
+            }
+        };
+        window.MotiveGroupDatabase = MotiveGroupDatabase;
+        
         // MIDI Snippet Database - stores MIDI file insertions as distinct objects
         const MidiSnippetDatabase = {
             snippets: [],
@@ -11854,6 +12002,17 @@
                     }
                 );
                 
+                // MotiveGroupDatabase
+                this.registerSource('databases.motiveGroups',
+                    () => MotiveGroupDatabase.exportData(),
+                    (data) => {
+                        MotiveGroupDatabase.importData(data);
+                        if (window.MotiveGroupManager) {
+                            MotiveGroupManager.refreshUI();
+                        }
+                    }
+                );
+                
                 // MidiSnippetDatabase
                 this.registerSource('databases.midiSnippets',
                     () => MidiSnippetDatabase.exportData(),
@@ -14645,12 +14804,10 @@
                     if (curve.gTrack && curve.gTrack !== 'A' && window.GTrackSystem) {
                         const trackIndex = parseInt(curve.gTrack) - 1;
                         if (trackIndex >= 0 && trackIndex < 4) {
-                            // Regenerate curveData if not present
-                            let curveDataArray = curve.curveData;
-                            if (!curveDataArray) {
-                                curveDataArray = this.generateCurveDataArray(curve);
-                                curve.curveData = curveDataArray;
-                            }
+                            // Always regenerate curveData from current startSeconds/endSeconds
+                            // (needed after motive group moves change times)
+                            const curveDataArray = this.generateCurveDataArray(curve);
+                            curve.curveData = curveDataArray;
                             
                             GTrackSystem.addGraphicItem(trackIndex, {
                                 type: 'curve',
@@ -18579,6 +18736,10 @@
                         motive.trackDims = CompositionPanel.getTrackDimensions(motive.gTrack, scoreEl);
                     }
                     
+                    // Always regenerate motiveData from current startSeconds/endSeconds
+                    // (needed after motive group moves change times)
+                    motive.motiveData = this.generateMotiveDataArray(motive);
+                    
                     // Render
                     this.renderMotive(motive, motiveGroup, scoreEl);
                     this.motives.push(motive);
@@ -21110,6 +21271,10 @@
                         motive.trackDims = CompositionPanel.getTrackDimensions(motive.gTrack, scoreEl);
                     }
                     
+                    // Always regenerate motiveData from current startSeconds/endSeconds
+                    // (needed after motive group moves change times)
+                    motive.motiveData = this.generateMotiveDataArray(motive);
+                    
                     // Render
                     this.renderMotive(motive, motiveGroup, scoreEl);
                     this.motives.push(motive);
@@ -21444,6 +21609,583 @@
         // DISABLED: Test motives removed
         // MotiveMaker.createTestMotives();
         /* END OF DISABLED MotiveMaker */
+        
+        
+        // ========================================
+        // MotiveGroupManager - Group objects into named motives
+        // ========================================
+        const MotiveGroupManager = {
+            selectedGroupId: null,
+            
+            init() {
+                this.groupList = document.getElementById('motiveGroupList');
+                this.objectList = document.getElementById('motiveGroupObjects');
+                this.timeInput = document.getElementById('motiveGroupTime');
+                this.trackSelect = document.getElementById('motiveGroupTrack');
+                this.addBtn = document.getElementById('motiveGroupAddBtn');
+                this.removeBtn = document.getElementById('motiveGroupRemoveBtn');
+                this.saveBtn = document.getElementById('motiveGroupSaveBtn');
+                this.deleteBtn = document.getElementById('motiveGroupDeleteBtn');
+                
+                // Event handlers
+                if (this.groupList) {
+                    this.groupList.addEventListener('change', () => {
+                        const selectedOption = this.groupList.selectedOptions[0];
+                        if (selectedOption) {
+                            this.selectGroup(parseInt(selectedOption.value));
+                        }
+                    });
+                }
+                
+                if (this.addBtn) {
+                    this.addBtn.addEventListener('click', () => this.addSelectedObject());
+                }
+                if (this.removeBtn) {
+                    this.removeBtn.addEventListener('click', () => this.removeSelectedObject());
+                }
+                if (this.saveBtn) {
+                    this.saveBtn.addEventListener('click', () => this.createGroup());
+                }
+                if (this.deleteBtn) {
+                    this.deleteBtn.addEventListener('click', () => this.deleteGroup());
+                }
+                
+                // Time change handler — move all objects
+                if (this.timeInput) {
+                    this.timeInput.addEventListener('change', () => this.moveGroupToTime());
+                }
+                // Track change handler — move all objects to new track
+                if (this.trackSelect) {
+                    this.trackSelect.addEventListener('change', () => this.moveGroupToTrack());
+                }
+                
+                console.log('MotiveGroupManager initialized');
+            },
+            
+            // Detect currently selected object across all systems
+            getSelectedObject() {
+                // Check CurveMaker
+                if (window.CurveMaker && CurveMaker.selectedCurve) {
+                    const c = CurveMaker.selectedCurve;
+                    return { type: 'curve', id: c.id, name: c.name || `Curve ${c.id}` };
+                }
+                // Check GCMaker
+                if (window.GCMaker && GCMaker.selectedGC) {
+                    const g = GCMaker.selectedGC;
+                    return { type: 'gc', id: g.id, name: g.name || `GC ${g.id}` };
+                }
+                // Check MotiveMaker
+                if (window.MotiveMaker && MotiveMaker.selectedMotive) {
+                    const m = MotiveMaker.selectedMotive;
+                    return { type: 'motive', id: m.id, name: m.name || `Motive ${m.id}` };
+                }
+                // Check SVGElementManager
+                if (window.SVGElementManager && SVGElementManager.selectedElement) {
+                    const s = SVGElementManager.selectedElement;
+                    return { type: 'svg', id: s.id, name: s.name || `SVG ${s.id}` };
+                }
+                // Check MidiController (snippets)
+                if (window.MidiController && MidiController.selectedSnippet) {
+                    const sn = MidiController.selectedSnippet;
+                    return { type: 'midi', id: sn.id, name: sn.name || `MIDI ${sn.id}` };
+                }
+                // Check AudioController (clips)
+                if (window.AudioController && AudioController.selectedClip) {
+                    const ac = AudioController.selectedClip;
+                    return { type: 'audio', id: ac.id, name: ac.name || `Audio ${ac.id}` };
+                }
+                return null;
+            },
+            
+            // Get the time of an object by type and id
+            getObjectTime(type, id) {
+                switch (type) {
+                    case 'curve': {
+                        const c = CurveDatabase.get(id);
+                        return c ? c.startSeconds : null;
+                    }
+                    case 'gc': {
+                        const g = window.GCMaker ? GCMaker.gcs.find(gc => gc.id === id) : null;
+                        return g ? g.startSeconds : null;
+                    }
+                    case 'motive': {
+                        const m = MotiveDatabase.get(id);
+                        return m ? m.startSeconds : null;
+                    }
+                    case 'svg': {
+                        if (!window.SVGElementManager) return null;
+                        const s = SVGElementManager.elements.find(el => el.id === id);
+                        return s ? s.referenceSeconds : null;
+                    }
+                    case 'midi': {
+                        const sn = MidiSnippetDatabase.get(id);
+                        return sn ? sn.startSeconds : null;
+                    }
+                    case 'audio': {
+                        const ac = AudioClipDatabase.get(id);
+                        return ac ? ac.startSeconds : null;
+                    }
+                }
+                return null;
+            },
+            
+            // Get the track of an object (normalized to string '1'-'4')
+            getObjectTrack(type, id) {
+                switch (type) {
+                    case 'curve': {
+                        const c = CurveDatabase.get(id);
+                        return c ? String(c.gTrack) : null;
+                    }
+                    case 'gc': {
+                        const g = window.GCMaker ? GCMaker.gcs.find(gc => gc.id === id) : null;
+                        return g ? String(g.gTrack) : null;
+                    }
+                    case 'motive': {
+                        const m = MotiveDatabase.get(id);
+                        return m ? String(m.gTrack) : null;
+                    }
+                    case 'svg': {
+                        if (!window.SVGElementManager) return null;
+                        const s = SVGElementManager.elements.find(el => el.id === id);
+                        return s ? String(s.track) : null;
+                    }
+                    case 'midi': {
+                        const sn = MidiSnippetDatabase.get(id);
+                        return sn ? String((sn.trackIndex || 0) + 1) : null;
+                    }
+                    case 'audio': {
+                        const ac = AudioClipDatabase.get(id);
+                        return ac ? String((ac.trackIndex || 0) + 1) : null;
+                    }
+                }
+                return null;
+            },
+            
+            // Calculate base time of a group (lowest startSeconds among objects)
+            calcBaseTime(group) {
+                let minTime = Infinity;
+                for (const obj of group.objects) {
+                    const t = this.getObjectTime(obj.type, obj.id);
+                    if (t !== null && t < minTime) minTime = t;
+                }
+                return minTime === Infinity ? 0 : minTime;
+            },
+            
+            // Create a new empty motive group
+            createGroup() {
+                const groupNumber = MotiveGroupDatabase.nextGroupNumber++;
+                const group = MotiveGroupDatabase.add({
+                    name: `Motive ${groupNumber}`,
+                    track: this.trackSelect ? this.trackSelect.value : '1',
+                    objects: []
+                });
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                this.refreshGroupList();
+                this.selectGroup(group.id);
+                console.log(`Created motive group: ${group.name}`);
+            },
+            
+            // Add currently selected object to current group
+            addSelectedObject() {
+                if (!this.selectedGroupId) {
+                    alert('Select or create a motive group first.');
+                    return;
+                }
+                const obj = this.getSelectedObject();
+                if (!obj) {
+                    alert('Select an object on the score first (curve, GC, motive, SVG, MIDI, or audio).');
+                    return;
+                }
+                
+                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                if (!group) return;
+                
+                // Check for duplicates
+                const exists = group.objects.some(o => o.type === obj.type && o.id === obj.id);
+                if (exists) {
+                    alert(`${obj.name} is already in this group.`);
+                    return;
+                }
+                
+                // Calculate time offset from group base time
+                const objTime = this.getObjectTime(obj.type, obj.id);
+                const baseTime = this.calcBaseTime(group);
+                const timeOffset = group.objects.length === 0 ? 0 : (objTime !== null ? objTime - baseTime : 0);
+                
+                group.objects.push({
+                    type: obj.type,
+                    id: obj.id,
+                    name: obj.name,
+                    timeOffset: timeOffset
+                });
+                
+                // Recalculate all offsets from new base time
+                this.recalcOffsets(group);
+                
+                MotiveGroupDatabase.update(group.id, { objects: group.objects });
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                this.refreshObjectList(group);
+                this.updateTimeFromGroup(group);
+                console.log(`Added ${obj.name} to ${group.name}`);
+            },
+            
+            // Recalculate time offsets for all objects in a group
+            recalcOffsets(group) {
+                const baseTime = this.calcBaseTime(group);
+                for (const obj of group.objects) {
+                    const t = this.getObjectTime(obj.type, obj.id);
+                    obj.timeOffset = (t !== null) ? t - baseTime : 0;
+                }
+            },
+            
+            // Remove selected object from current group
+            removeSelectedObject() {
+                if (!this.selectedGroupId) return;
+                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                if (!group) return;
+                
+                const selectedOption = this.objectList.selectedOptions[0];
+                if (!selectedOption) {
+                    alert('Select an object in the list to remove.');
+                    return;
+                }
+                
+                const idx = parseInt(selectedOption.value);
+                if (isNaN(idx) || idx < 0 || idx >= group.objects.length) return;
+                
+                const removed = group.objects.splice(idx, 1)[0];
+                this.recalcOffsets(group);
+                
+                MotiveGroupDatabase.update(group.id, { objects: group.objects });
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                this.refreshObjectList(group);
+                this.updateTimeFromGroup(group);
+                console.log(`Removed ${removed.name} from ${group.name}`);
+            },
+            
+            // Delete the entire selected group
+            deleteGroup() {
+                if (!this.selectedGroupId) return;
+                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                if (!group) return;
+                
+                if (!confirm(`Delete "${group.name}" and ungroup its objects?`)) return;
+                
+                MotiveGroupDatabase.remove(this.selectedGroupId);
+                this.selectedGroupId = null;
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                this.refreshGroupList();
+                this.refreshObjectList(null);
+                console.log(`Deleted motive group: ${group.name}`);
+            },
+            
+            // Select a group and show its objects
+            selectGroup(groupId) {
+                this.selectedGroupId = groupId;
+                const group = MotiveGroupDatabase.get(groupId);
+                if (!group) return;
+                
+                // Highlight in list
+                for (const opt of this.groupList.options) {
+                    opt.selected = parseInt(opt.value) === groupId;
+                }
+                
+                this.refreshObjectList(group);
+                this.updateTimeFromGroup(group);
+                
+                // Update track select
+                if (this.trackSelect && group.track) {
+                    this.trackSelect.value = group.track;
+                }
+            },
+            
+            // Update time input from group's base time
+            updateTimeFromGroup(group) {
+                if (!group || group.objects.length === 0) {
+                    if (this.timeInput) this.timeInput.value = 0;
+                    return;
+                }
+                const baseTime = this.calcBaseTime(group);
+                if (this.timeInput) this.timeInput.value = baseTime.toFixed(3);
+            },
+            
+            // Move all objects in group to a new base time
+            moveGroupToTime() {
+                if (!this.selectedGroupId) return;
+                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                if (!group || group.objects.length === 0) return;
+                
+                const newBaseTime = parseFloat(this.timeInput.value) || 0;
+                const currentBaseTime = this.calcBaseTime(group);
+                const delta = newBaseTime - currentBaseTime;
+                if (Math.abs(delta) < 0.0001) return;
+                
+                // Track which systems need reloading
+                const systemsToReload = new Set();
+                
+                for (const obj of group.objects) {
+                    const newTime = (this.getObjectTime(obj.type, obj.id) || 0) + delta;
+                    this.setObjectTime(obj.type, obj.id, newTime, systemsToReload);
+                }
+                
+                // Reload affected systems
+                this.reloadSystems(systemsToReload);
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                console.log(`Moved ${group.name} by ${delta.toFixed(3)}s`);
+            },
+            
+            // Move all objects in group to a new track
+            moveGroupToTrack() {
+                if (!this.selectedGroupId) return;
+                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                if (!group || group.objects.length === 0) return;
+                
+                const newTrack = this.trackSelect ? this.trackSelect.value : '1';
+                group.track = newTrack;
+                MotiveGroupDatabase.update(group.id, { track: newTrack });
+                
+                const systemsToReload = new Set();
+                
+                for (const obj of group.objects) {
+                    this.setObjectTrack(obj.type, obj.id, newTrack, systemsToReload);
+                }
+                
+                this.reloadSystems(systemsToReload);
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                console.log(`Moved ${group.name} to track ${newTrack}`);
+            },
+            
+            // Set the time of an object by type
+            setObjectTime(type, id, newTime, systemsToReload) {
+                switch (type) {
+                    case 'curve': {
+                        const c = CurveDatabase.get(id);
+                        if (c) {
+                            const duration = (c.endSeconds || 0) - (c.startSeconds || 0);
+                            c.startSeconds = newTime;
+                            c.endSeconds = newTime + duration;
+                            c.curveData = null; // Clear stale data; reloadFromDatabase will regenerate
+                            CurveDatabase.update(id, { startSeconds: newTime, endSeconds: newTime + duration, curveData: null });
+                            systemsToReload.add('curves');
+                        }
+                        break;
+                    }
+                    case 'gc': {
+                        if (window.GCMaker) {
+                            const g = GCMaker.gcs.find(gc => gc.id === id);
+                            if (g) {
+                                const duration = (g.endSeconds || 0) - (g.startSeconds || 0);
+                                g.startSeconds = newTime;
+                                g.endSeconds = newTime + duration;
+                                systemsToReload.add('gcs');
+                            }
+                        }
+                        break;
+                    }
+                    case 'motive': {
+                        const m = MotiveDatabase.get(id);
+                        if (m) {
+                            const duration = (m.endSeconds || 0) - (m.startSeconds || 0);
+                            m.startSeconds = newTime;
+                            m.endSeconds = newTime + duration;
+                            m.motiveData = null; // Clear stale data; reloadFromDatabase will regenerate
+                            MotiveDatabase.update(id, { startSeconds: newTime, endSeconds: newTime + duration, motiveData: null });
+                            systemsToReload.add('motives');
+                        }
+                        break;
+                    }
+                    case 'svg': {
+                        if (window.SVGElementManager) {
+                            const s = SVGElementManager.elements.find(el => el.id === id);
+                            if (s) {
+                                s.referenceSeconds = newTime;
+                                systemsToReload.add('svgs');
+                            }
+                        }
+                        break;
+                    }
+                    case 'midi': {
+                        const sn = MidiSnippetDatabase.get(id);
+                        if (sn) {
+                            const duration = (sn.endSeconds || 0) - (sn.startSeconds || 0);
+                            const deltaMs = (newTime - sn.startSeconds) * 1000;
+                            sn.startSeconds = newTime;
+                            sn.endSeconds = newTime + duration;
+                            // Shift all internal event absolute times by delta
+                            if (sn.events) {
+                                for (const evt of sn.events) {
+                                    evt.timeMs += deltaMs;
+                                }
+                            }
+                            MidiSnippetDatabase.update(id, { startSeconds: newTime, endSeconds: newTime + duration, events: sn.events });
+                            systemsToReload.add('midi');
+                        }
+                        break;
+                    }
+                    case 'audio': {
+                        const ac = AudioClipDatabase.get(id);
+                        if (ac) {
+                            const duration = (ac.endSeconds || 0) - (ac.startSeconds || 0);
+                            ac.startSeconds = newTime;
+                            ac.endSeconds = newTime + duration;
+                            AudioClipDatabase.update(id, { startSeconds: newTime, endSeconds: newTime + duration });
+                            systemsToReload.add('audio');
+                        }
+                        break;
+                    }
+                }
+            },
+            
+            // Set the track of an object by type
+            setObjectTrack(type, id, newTrack, systemsToReload) {
+                switch (type) {
+                    case 'curve': {
+                        const c = CurveDatabase.get(id);
+                        if (c) {
+                            c.gTrack = newTrack;
+                            CurveDatabase.update(id, { gTrack: newTrack });
+                            systemsToReload.add('curves');
+                        }
+                        break;
+                    }
+                    case 'gc': {
+                        if (window.GCMaker) {
+                            const g = GCMaker.gcs.find(gc => gc.id === id);
+                            if (g) {
+                                g.gTrack = newTrack;
+                                systemsToReload.add('gcs');
+                            }
+                        }
+                        break;
+                    }
+                    case 'motive': {
+                        const m = MotiveDatabase.get(id);
+                        if (m) {
+                            m.gTrack = newTrack;
+                            MotiveDatabase.update(id, { gTrack: newTrack });
+                            systemsToReload.add('motives');
+                        }
+                        break;
+                    }
+                    case 'svg': {
+                        if (window.SVGElementManager) {
+                            const s = SVGElementManager.elements.find(el => el.id === id);
+                            if (s) {
+                                s.track = parseInt(newTrack) || 1;
+                                systemsToReload.add('svgs');
+                            }
+                        }
+                        break;
+                    }
+                    case 'midi': {
+                        const sn = MidiSnippetDatabase.get(id);
+                        if (sn) {
+                            sn.trackIndex = (parseInt(newTrack) || 1) - 1;
+                            MidiSnippetDatabase.update(id, { trackIndex: sn.trackIndex });
+                            systemsToReload.add('midi');
+                        }
+                        break;
+                    }
+                    case 'audio': {
+                        const ac = AudioClipDatabase.get(id);
+                        if (ac) {
+                            ac.trackIndex = (parseInt(newTrack) || 1) - 1;
+                            AudioClipDatabase.update(id, { trackIndex: ac.trackIndex });
+                            systemsToReload.add('audio');
+                        }
+                        break;
+                    }
+                }
+            },
+            
+            // Reload only the systems that were affected
+            reloadSystems(systemsToReload) {
+                if (systemsToReload.has('curves') && window.CurveMaker) {
+                    CurveMaker.reloadFromDatabase();
+                }
+                if (systemsToReload.has('gcs') && window.GCMaker) {
+                    GCMaker.reloadFromDatabase();
+                }
+                if (systemsToReload.has('motives') && window.MotiveMaker) {
+                    MotiveMaker.reloadFromDatabase();
+                }
+                if (systemsToReload.has('svgs') && window.SVGElementManager) {
+                    SVGElementManager.importData(SVGElementManager.exportData());
+                }
+                if (systemsToReload.has('midi') && window.MidiController) {
+                    MidiController.reloadFromDatabase();
+                }
+                if (systemsToReload.has('audio') && window.AudioController) {
+                    AudioController.reloadFromDatabase();
+                }
+            },
+            
+            // Refresh the motive group list UI
+            refreshGroupList() {
+                if (!this.groupList) return;
+                this.groupList.innerHTML = '';
+                
+                const groups = MotiveGroupDatabase.getAll();
+                for (const group of groups) {
+                    const option = document.createElement('option');
+                    option.value = group.id;
+                    option.textContent = `${group.name} (${group.objects.length} obj)`;
+                    if (group.id === this.selectedGroupId) option.selected = true;
+                    this.groupList.appendChild(option);
+                }
+            },
+            
+            // Refresh the object list for a given group
+            refreshObjectList(group) {
+                if (!this.objectList) return;
+                this.objectList.innerHTML = '';
+                
+                if (!group) return;
+                
+                for (let i = 0; i < group.objects.length; i++) {
+                    const obj = group.objects[i];
+                    const option = document.createElement('option');
+                    option.value = i;
+                    const typeLabel = obj.type.charAt(0).toUpperCase() + obj.type.slice(1);
+                    option.textContent = `[${typeLabel}] ${obj.name}`;
+                    this.objectList.appendChild(option);
+                }
+            },
+            
+            // Full UI refresh (called after score load)
+            refreshUI() {
+                this.refreshGroupList();
+                if (this.selectedGroupId) {
+                    const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                    if (group) {
+                        this.refreshObjectList(group);
+                        this.updateTimeFromGroup(group);
+                    } else {
+                        this.selectedGroupId = null;
+                        this.refreshObjectList(null);
+                    }
+                }
+            },
+            
+            // Export/import for ScoreManager (handled by MotiveGroupDatabase directly)
+            exportData() {
+                return MotiveGroupDatabase.exportData();
+            },
+            
+            importData(data) {
+                MotiveGroupDatabase.importData(data);
+                this.refreshUI();
+            }
+        };
+        
+        MotiveGroupManager.init();
+        window.MotiveGroupManager = MotiveGroupManager;
         
         
         // ========================================

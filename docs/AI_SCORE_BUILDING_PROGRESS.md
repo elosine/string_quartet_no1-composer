@@ -2,13 +2,13 @@
 
 **Status:** Active  
 **Last Updated:** Feb 17, 2026  
-**Current ASB Number:** ASB-043
+**Current ASB Number:** ASB-050
 
 ---
 
 ## Last Session Summary
 
-> **Curve Fugue Algorithm #1 documented and tested.** Created `docs/CURVE_FUGUE_ALGORITHM_1.md` — full macro algorithm for generating sequences of glissando/vibrato motives via AI prompt automation. Ran algorithm 3 times producing 52 motives across scores 51–106.
+> **UI polish + motive group move fixes.** Tightened Curve Maker Slope/Trk/Mdl row, fixed SVG listbox overflow clipping, and fixed critical bug where moving a motive group didn't update curveData/motiveData/MIDI event times — breaking curve followers, motive followers, and multi-page segments. Added "Moving Objects Requires Deep Data Updates" lesson to Workflow Methodology.
 
 ---
 
@@ -16,7 +16,7 @@
 
 **Date:** Feb 17, 2026  
 **Focus:** SVG & Curve Maker UI Redesign  
-**Tier 1 Count This Session:** 4 (ASB-040, ASB-041, ASB-042, ASB-043)  
+**Tier 1 Count This Session:** 7 (ASB-044 through ASB-050)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -43,6 +43,13 @@
 ### Session Log — SVG & Curve Maker UI Redesign
 - ASB-042: Curve Maker HTML redesign — orange heading, Start+End/Y1+Y2 same rows, slope input, track+model as dropdowns, button colors (Draw=blue, Delete=red, Save=green), Recall Curve section with dropdown+time+track+Insert
 - ASB-043: CurveMaker JS updates — getCurveGTrack/setCurveGTrack/getCurveModel/setCurveModel use selects, createCurve reads slope input, selectCurve/updateInputsFromCurve sync slope, insertRecalledCurve uses recall time/track inputs
+- ASB-044: Curve Maker UI polish — Save button mustard (vs Insert green), tighter spacing on Slope/Trk/Mdl row, 8px fonts on track+model selects
+- ASB-045: Motive Grouping System — MotiveGroupDatabase, MotiveGroupManager, neonMagenta UI section with Motives/Objects listboxes, Add Selected/Remove/Save New/Delete buttons, time+track move for all grouped objects
+- ASB-046: Collapsible SVG element listbox (under scale) + fix offsetYFraction=1 → 0.05 in 119-groups.json
+- ASB-047: Fix SVG element listbox visibility — update parent section-content maxHeight on toggle so overflow:hidden doesn't clip
+- ASB-048: Curve Maker Slope/Trk/Mdl row further tightened — labels abbreviated (Slp/Tk/Md), gap:2px, narrower inputs
+- ASB-049: Motive group move fix — always regenerate curveData/motiveData on reloadFromDatabase, clear stale data in setObjectTime; fixes curve follower, motive follower, and multi-page segments after move
+- ASB-050: MIDI snippet move fix — shift all internal event.timeMs values by delta when moving snippet via motive group; fixes only display bounds moving but MIDI events staying at old positions
 
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
@@ -121,6 +128,9 @@
 | ASB-041 | Standard object info UI + SVG naming convention + anchor line track-scoped + Connectors section collapsible | Complete |
 | ASB-042 | Curve Maker HTML redesign — orange heading, layout, selects, slope input, recall section | Complete |
 | ASB-043 | CurveMaker JS updates — select/slope handlers, createCurve slope read, recall time/track | Complete |
+| ASB-044 | Curve Maker UI polish — Save mustard, tighter spacing, smaller fonts | Complete |
+| ASB-045 | Motive Grouping System — database, manager, UI, time/track move | Complete |
+| ASB-046 | Collapsible SVG element listbox + offsetYFraction fix in 119-groups.json | Complete |
 
 ---
 
@@ -135,6 +145,7 @@
 | Feb 16, 2026 | 3b68813 | vibrato system: LilyPond templates, UI controls, generate pipeline, SVG crop fix (ASB-030 to ASB-033) |
 | Feb 16, 2026 | 568a2a0 | vibrato system: UI expansion, MIDI generation, server automation, bug fixes, implementation doc (ASB-035 to ASB-037) |
 | Feb 16, 2026 | 6e245fe | Curve Fugue Algorithm #1: documentation, parameterized slopes, score composition (ASB-038 to ASB-039, scores 51-106) |
+| Feb 17, 2026 | 5c8fd71 | SVG anchor system + Curve Maker UI redesign (ASB-040 to ASB-043) |
 
 ---
 

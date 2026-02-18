@@ -88,6 +88,15 @@ Use `console.debug()` instead of `console.log()` - browser extensions can interf
 ### let vs var and window Access
 Variables declared with `let` are NOT accessible via `window.varName` (unlike `var`). If a function needs a module-level `let` variable, use the closure variable directly—not `window.varName || fallback`. This caused the glissando notation positioning bug (ASB-011) where `window.leadInSeconds` was always `undefined`, falling back to 0 instead of the actual 2-second lead-in.
 
+### Moving Objects Requires Deep Data Updates
+When moving a score object to a new time, updating only the top-level `startSeconds`/`endSeconds` is insufficient. Every object may carry **internal time-indexed data** that also needs updating:
+- **Curves**: `curveData` contains `startTime`/`endTime` and time-indexed samples — must be regenerated
+- **Motives**: `motiveData` contains `startTime`/`endTime` and time-indexed samples — must be regenerated
+- **MIDI snippets**: `events[].timeMs` are absolute millisecond timestamps — must be shifted by delta
+- **General principle**: Any array or sub-object with cached absolute times becomes stale after a move. Either clear it (forcing regeneration on reload) or shift it in place.
+
+*Example: ASB-049/050 — motive group move updated bounds but left curveData/motiveData/event.timeMs stale, breaking followers and multi-page segments.*
+
 ### Async Operations Blocking Visual Rendering
 Never gate visual rendering on async audio operations that depend on user gestures. Chrome's autoplay policy causes `audioContext.resume()` to hang indefinitely without a user gesture, blocking any code after `await`. Render visual elements synchronously first, then load audio data in background. (ASB-012)
 
