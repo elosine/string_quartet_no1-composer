@@ -1148,18 +1148,18 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label" style="background: var(--clr-neonMagenta); color: #fff; padding: 3px 6px; border-radius: 2px;">Motive Groups</div>
+                <div class="section-label" style="background: var(--clr-neonMagenta); color: #fff; padding: 3px 6px; border-radius: 2px;">Groups</div>
                 
                 <div class="curve-input-row" style="margin-bottom: 3px;">
-                    <label style="font-size: 9px; min-width: 38px;">Motives</label>
+                    <label style="font-size: 9px; min-width: 38px;">Groups</label>
                 </div>
-                <select id="motiveGroupList" size="4" style="width: 100%; font-size: 9px; background: rgba(40,40,50,0.9); color: #ccc; border: 1px solid #555; border-radius: 3px; padding: 2px;">
+                <select id="groupList" size="4" style="width: 100%; font-size: 9px; background: rgba(40,40,50,0.9); color: #ccc; border: 1px solid #555; border-radius: 3px; padding: 2px;">
                 </select>
                 <div class="curve-input-row" style="margin-top: 3px; margin-bottom: 3px;">
                     <label style="font-size: 9px; min-width: 28px;">Time</label>
-                    <input type="number" id="motiveGroupTime" class="curve-input" value="0" step="0.001" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    <input type="number" id="groupTime" class="curve-input" value="0" step="0.001" style="width: 60px; font-size: 9px; padding: 2px 3px;">
                     <label style="font-size: 8px; min-width: 16px; margin-left: 4px;">Trk</label>
-                    <select id="motiveGroupTrack" style="font-size: 8px; padding: 1px 2px;">
+                    <select id="groupTrack" style="font-size: 8px; padding: 1px 2px;">
                         <option value="1">1</option>
                         <option value="2">2</option>
                         <option value="3">3</option>
@@ -1169,15 +1169,15 @@
                 <div class="curve-input-row" style="margin-bottom: 3px;">
                     <label style="font-size: 9px; min-width: 38px;">Objects</label>
                 </div>
-                <select id="motiveGroupObjects" size="4" style="width: 100%; font-size: 9px; background: rgba(40,40,50,0.9); color: #ccc; border: 1px solid #555; border-radius: 3px; padding: 2px;">
+                <select id="groupObjects" size="4" style="width: 100%; font-size: 9px; background: rgba(40,40,50,0.9); color: #ccc; border: 1px solid #555; border-radius: 3px; padding: 2px;">
                 </select>
                 <div class="control-row" style="margin-top: 4px;">
-                    <button id="motiveGroupAddBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Add Selected</button>
-                    <button id="motiveGroupRemoveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Remove</button>
+                    <button id="groupAddBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Add Selected</button>
+                    <button id="groupRemoveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Remove</button>
                 </div>
                 <div class="control-row" style="margin-top: 4px;">
-                    <button id="motiveGroupSaveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-mustard); color: #000;">Save New</button>
-                    <button id="motiveGroupDeleteBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Delete</button>
+                    <button id="groupSaveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-mustard); color: #000;">Save New</button>
+                    <button id="groupDeleteBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Delete</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -9025,8 +9025,8 @@
         };
         window.MotiveDatabase = MotiveDatabase;
         
-        // Motive Group Database - groups of objects (curves, GCs, motives, SVGs, MIDI snippets, audio clips)
-        const MotiveGroupDatabase = {
+        // Group Database - groups of objects (curves, GCs, motives, SVGs, MIDI snippets, audio clips)
+        const GroupDatabase = {
             groups: [],
             nextId: 1,
             nextGroupNumber: 1,
@@ -9082,7 +9082,7 @@
                 }
             }
         };
-        window.MotiveGroupDatabase = MotiveGroupDatabase;
+        window.GroupDatabase = GroupDatabase;
         
         // MIDI Snippet Database - stores MIDI file insertions as distinct objects
         const MidiSnippetDatabase = {
@@ -12002,13 +12002,13 @@
                     }
                 );
                 
-                // MotiveGroupDatabase
+                // GroupDatabase
                 this.registerSource('databases.motiveGroups',
-                    () => MotiveGroupDatabase.exportData(),
+                    () => GroupDatabase.exportData(),
                     (data) => {
-                        MotiveGroupDatabase.importData(data);
-                        if (window.MotiveGroupManager) {
-                            MotiveGroupManager.refreshUI();
+                        GroupDatabase.importData(data);
+                        if (window.GroupManager) {
+                            GroupManager.refreshUI();
                         }
                     }
                 );
@@ -14805,7 +14805,7 @@
                         const trackIndex = parseInt(curve.gTrack) - 1;
                         if (trackIndex >= 0 && trackIndex < 4) {
                             // Always regenerate curveData from current startSeconds/endSeconds
-                            // (needed after motive group moves change times)
+                            // (needed after group moves change times)
                             const curveDataArray = this.generateCurveDataArray(curve);
                             curve.curveData = curveDataArray;
                             
@@ -18737,7 +18737,7 @@
                     }
                     
                     // Always regenerate motiveData from current startSeconds/endSeconds
-                    // (needed after motive group moves change times)
+                    // (needed after group moves change times)
                     motive.motiveData = this.generateMotiveDataArray(motive);
                     
                     // Render
@@ -18747,6 +18747,33 @@
                 
                 console.debug(`MotiveMaker: Reloaded ${this.motives.length} motives from database`);
                 this.updateVisibility();
+            },
+            
+            // Generate normalized pixel-by-pixel array of motive progress
+            // At each X pixel, returns normalized value (0-1) of progress through the motive
+            generateMotiveDataArray(motive) {
+                const SAMPLE_INTERVAL = 0.01; // 10ms = 100 samples/second
+                const startTime = motive.startSeconds;
+                const endTime = motive.endSeconds;
+                const duration = endTime - startTime;
+                
+                if (duration <= 0) return { startTime, endTime, sampleInterval: SAMPLE_INTERVAL, samples: [], duration };
+                
+                const sampleCount = Math.ceil(duration / SAMPLE_INTERVAL) + 1;
+                const samples = [];
+                
+                for (let i = 0; i < sampleCount; i++) {
+                    const progress = i / (sampleCount - 1);
+                    samples.push(Math.max(0, Math.min(1, progress)));
+                }
+                
+                return {
+                    startTime,
+                    endTime,
+                    sampleInterval: SAMPLE_INTERVAL,
+                    samples,
+                    duration
+                };
             }
         };
         
@@ -21272,7 +21299,7 @@
                     }
                     
                     // Always regenerate motiveData from current startSeconds/endSeconds
-                    // (needed after motive group moves change times)
+                    // (needed after group moves change times)
                     motive.motiveData = this.generateMotiveDataArray(motive);
                     
                     // Render
@@ -21601,31 +21628,27 @@
                 return { window1Motive, window2Motive };
             }
         };
+        */
         
-        // Initialize Motive Maker
-        MotiveMaker.init();
-        window.MotiveMaker = MotiveMaker;
-        
-        // DISABLED: Test motives removed
-        // MotiveMaker.createTestMotives();
-        /* END OF DISABLED MotiveMaker */
+        // NOTE: MotiveMaker already initialized above (line ~18780)
+        // MotiveMakerFull is disabled; do not re-init MotiveMaker here
         
         
         // ========================================
-        // MotiveGroupManager - Group objects into named motives
+        // GroupManager - Group objects into named groups
         // ========================================
-        const MotiveGroupManager = {
+        const GroupManager = {
             selectedGroupId: null,
             
             init() {
-                this.groupList = document.getElementById('motiveGroupList');
-                this.objectList = document.getElementById('motiveGroupObjects');
-                this.timeInput = document.getElementById('motiveGroupTime');
-                this.trackSelect = document.getElementById('motiveGroupTrack');
-                this.addBtn = document.getElementById('motiveGroupAddBtn');
-                this.removeBtn = document.getElementById('motiveGroupRemoveBtn');
-                this.saveBtn = document.getElementById('motiveGroupSaveBtn');
-                this.deleteBtn = document.getElementById('motiveGroupDeleteBtn');
+                this.groupList = document.getElementById('groupList');
+                this.objectList = document.getElementById('groupObjects');
+                this.timeInput = document.getElementById('groupTime');
+                this.trackSelect = document.getElementById('groupTrack');
+                this.addBtn = document.getElementById('groupAddBtn');
+                this.removeBtn = document.getElementById('groupRemoveBtn');
+                this.saveBtn = document.getElementById('groupSaveBtn');
+                this.deleteBtn = document.getElementById('groupDeleteBtn');
                 
                 // Event handlers
                 if (this.groupList) {
@@ -21659,7 +21682,7 @@
                     this.trackSelect.addEventListener('change', () => this.moveGroupToTrack());
                 }
                 
-                console.log('MotiveGroupManager initialized');
+                console.log('GroupManager initialized');
             },
             
             // Detect currently selected object across all systems
@@ -21771,11 +21794,11 @@
                 return minTime === Infinity ? 0 : minTime;
             },
             
-            // Create a new empty motive group
+            // Create a new empty group
             createGroup() {
-                const groupNumber = MotiveGroupDatabase.nextGroupNumber++;
-                const group = MotiveGroupDatabase.add({
-                    name: `Motive ${groupNumber}`,
+                const groupNumber = GroupDatabase.nextGroupNumber++;
+                const group = GroupDatabase.add({
+                    name: `Group ${groupNumber}`,
                     track: this.trackSelect ? this.trackSelect.value : '1',
                     objects: []
                 });
@@ -21783,13 +21806,13 @@
                 if (window.ScoreManager) ScoreManager.markDirty();
                 this.refreshGroupList();
                 this.selectGroup(group.id);
-                console.log(`Created motive group: ${group.name}`);
+                console.log(`Created group: ${group.name}`);
             },
             
             // Add currently selected object to current group
             addSelectedObject() {
                 if (!this.selectedGroupId) {
-                    alert('Select or create a motive group first.');
+                    alert('Select or create a group first.');
                     return;
                 }
                 const obj = this.getSelectedObject();
@@ -21798,7 +21821,7 @@
                     return;
                 }
                 
-                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                const group = GroupDatabase.get(this.selectedGroupId);
                 if (!group) return;
                 
                 // Check for duplicates
@@ -21823,7 +21846,7 @@
                 // Recalculate all offsets from new base time
                 this.recalcOffsets(group);
                 
-                MotiveGroupDatabase.update(group.id, { objects: group.objects });
+                GroupDatabase.update(group.id, { objects: group.objects });
                 if (window.ScoreManager) ScoreManager.markDirty();
                 
                 this.refreshObjectList(group);
@@ -21843,7 +21866,7 @@
             // Remove selected object from current group
             removeSelectedObject() {
                 if (!this.selectedGroupId) return;
-                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                const group = GroupDatabase.get(this.selectedGroupId);
                 if (!group) return;
                 
                 const selectedOption = this.objectList.selectedOptions[0];
@@ -21858,7 +21881,7 @@
                 const removed = group.objects.splice(idx, 1)[0];
                 this.recalcOffsets(group);
                 
-                MotiveGroupDatabase.update(group.id, { objects: group.objects });
+                GroupDatabase.update(group.id, { objects: group.objects });
                 if (window.ScoreManager) ScoreManager.markDirty();
                 
                 this.refreshObjectList(group);
@@ -21869,24 +21892,24 @@
             // Delete the entire selected group
             deleteGroup() {
                 if (!this.selectedGroupId) return;
-                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                const group = GroupDatabase.get(this.selectedGroupId);
                 if (!group) return;
                 
                 if (!confirm(`Delete "${group.name}" and ungroup its objects?`)) return;
                 
-                MotiveGroupDatabase.remove(this.selectedGroupId);
+                GroupDatabase.remove(this.selectedGroupId);
                 this.selectedGroupId = null;
                 
                 if (window.ScoreManager) ScoreManager.markDirty();
                 this.refreshGroupList();
                 this.refreshObjectList(null);
-                console.log(`Deleted motive group: ${group.name}`);
+                console.log(`Deleted group: ${group.name}`);
             },
             
             // Select a group and show its objects
             selectGroup(groupId) {
                 this.selectedGroupId = groupId;
-                const group = MotiveGroupDatabase.get(groupId);
+                const group = GroupDatabase.get(groupId);
                 if (!group) return;
                 
                 // Highlight in list
@@ -21916,7 +21939,7 @@
             // Move all objects in group to a new base time
             moveGroupToTime() {
                 if (!this.selectedGroupId) return;
-                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                const group = GroupDatabase.get(this.selectedGroupId);
                 if (!group || group.objects.length === 0) return;
                 
                 const newBaseTime = parseFloat(this.timeInput.value) || 0;
@@ -21942,12 +21965,12 @@
             // Move all objects in group to a new track
             moveGroupToTrack() {
                 if (!this.selectedGroupId) return;
-                const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                const group = GroupDatabase.get(this.selectedGroupId);
                 if (!group || group.objects.length === 0) return;
                 
                 const newTrack = this.trackSelect ? this.trackSelect.value : '1';
                 group.track = newTrack;
-                MotiveGroupDatabase.update(group.id, { track: newTrack });
+                GroupDatabase.update(group.id, { track: newTrack });
                 
                 const systemsToReload = new Set();
                 
@@ -22126,12 +22149,12 @@
                 }
             },
             
-            // Refresh the motive group list UI
+            // Refresh the group list UI
             refreshGroupList() {
                 if (!this.groupList) return;
                 this.groupList.innerHTML = '';
                 
-                const groups = MotiveGroupDatabase.getAll();
+                const groups = GroupDatabase.getAll();
                 for (const group of groups) {
                     const option = document.createElement('option');
                     option.value = group.id;
@@ -22162,7 +22185,7 @@
             refreshUI() {
                 this.refreshGroupList();
                 if (this.selectedGroupId) {
-                    const group = MotiveGroupDatabase.get(this.selectedGroupId);
+                    const group = GroupDatabase.get(this.selectedGroupId);
                     if (group) {
                         this.refreshObjectList(group);
                         this.updateTimeFromGroup(group);
@@ -22173,19 +22196,19 @@
                 }
             },
             
-            // Export/import for ScoreManager (handled by MotiveGroupDatabase directly)
+            // Export/import for ScoreManager (handled by GroupDatabase directly)
             exportData() {
-                return MotiveGroupDatabase.exportData();
+                return GroupDatabase.exportData();
             },
             
             importData(data) {
-                MotiveGroupDatabase.importData(data);
+                GroupDatabase.importData(data);
                 this.refreshUI();
             }
         };
         
-        MotiveGroupManager.init();
-        window.MotiveGroupManager = MotiveGroupManager;
+        GroupManager.init();
+        window.GroupManager = GroupManager;
         
         
         // ========================================

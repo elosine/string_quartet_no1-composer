@@ -1,22 +1,22 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 17, 2026  
-**Current ASB Number:** ASB-050
+**Last Updated:** Feb 18, 2026  
+**Current ASB Number:** ASB-052
 
 ---
 
 ## Last Session Summary
 
-> **UI polish + motive group move fixes.** Tightened Curve Maker Slope/Trk/Mdl row, fixed SVG listbox overflow clipping, and fixed critical bug where moving a motive group didn't update curveData/motiveData/MIDI event times — breaking curve followers, motive followers, and multi-page segments. Added "Moving Objects Requires Deep Data Updates" lesson to Workflow Methodology.
+> **MotiveMaker bug fix + Groups rename.** Fixed critical bug where simplified MotiveMaker was missing `generateMotiveDataArray` method (only existed in disabled MotiveMakerFull), causing TypeError crash on score load — legacy motives invisible. Removed duplicate MotiveMaker init. Renamed entire "Motive Groups" system to "Groups" (MotiveGroupManager→GroupManager, MotiveGroupDatabase→GroupDatabase, all HTML IDs, UI labels, auto-naming, comments). Save key `databases.motiveGroups` kept for backward compat.
 
 ---
 
 ## Current Session
 
-**Date:** Feb 17, 2026  
-**Focus:** SVG & Curve Maker UI Redesign  
-**Tier 1 Count This Session:** 7 (ASB-044 through ASB-050)  
+**Date:** Feb 18, 2026  
+**Focus:** Bug Fixes + Groups Rename  
+**Tier 1 Count This Session:** 2 (ASB-051 through ASB-052)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -50,6 +50,8 @@
 - ASB-048: Curve Maker Slope/Trk/Mdl row further tightened — labels abbreviated (Slp/Tk/Md), gap:2px, narrower inputs
 - ASB-049: Motive group move fix — always regenerate curveData/motiveData on reloadFromDatabase, clear stale data in setObjectTime; fixes curve follower, motive follower, and multi-page segments after move
 - ASB-050: MIDI snippet move fix — shift all internal event.timeMs values by delta when moving snippet via motive group; fixes only display bounds moving but MIDI events staying at old positions
+- ASB-051: Fix MotiveMaker crash — add missing `generateMotiveDataArray` to simplified MotiveMaker (was only in disabled MotiveMakerFull), remove duplicate init; fixes legacy motives invisible on score load
+- ASB-052: Rename "Motive Groups" → "Groups" — MotiveGroupDatabase→GroupDatabase, MotiveGroupManager→GroupManager, all HTML IDs (motiveGroupList→groupList etc), UI labels, auto-naming ("Group N"), comments; save key `databases.motiveGroups` kept for backward compat
 
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
