@@ -12335,6 +12335,11 @@
                     
                     if (this.scoreListSelect) {
                         this.scoreListSelect.innerHTML = '<option value="">-- Select Score --</option>';
+                        scores.sort((a, b) => {
+                            const numA = parseInt(a.name) || 0;
+                            const numB = parseInt(b.name) || 0;
+                            return numB - numA;
+                        });
                         scores.forEach(score => {
                             const option = document.createElement('option');
                             option.value = score.name;

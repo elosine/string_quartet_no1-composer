@@ -2,20 +2,21 @@
 
 **Purpose:** Move all score objects at or after a given time threshold forward or backward by a specified number of seconds.
 
-**Last used:** Feb 18, 2026 — moved all objects ≥84s by -56.3s (143-moveAll → 145-movedForward)
+**Last used:** Feb 18, 2026 — moved all objects ≥135s by -17.4s (170-MoveTo118 → 171-MoveTo118)
 
 ---
 
 ## Quick Reference
 
 ```
-THRESHOLD = 84        ← objects at or after this second get moved
-DELTA     = -56.3     ← negative = earlier, positive = later
-INPUT     = scores/143-moveAll.json    ← original (never modified)
-OUTPUT    = scores/145-movedForward.json  ← working copy with moves applied
+THRESHOLD = 135       ← objects at or after this second get moved
+DELTA     = -17.4     ← negative = earlier, positive = later
+INPUT     = scores/170-MoveTo118.json       ← original (never modified)
+OUTPUT    = scores/171-MoveTo118.json       ← working copy with moves applied
+START_NUM = 171       ← first output file number (increment from here for additional copies)
 ```
 
-Change these three values for any future bulk move.
+Change these values for any future bulk move.
 
 ---
 
@@ -50,6 +51,10 @@ Copy-Item "scores\INPUT.json" "scores\OUTPUT.json"
 ```
 
 Always keep the original untouched as a revert point.
+
+**File numbering:** Output files use incrementing numbers starting from `START_NUM`. If you create multiple copies (e.g. wrong direction then correct), increment each time: 162, 163, 164, etc.
+
+**Save menu registration:** After creating the copy, update `metadata.title` inside the JSON to match the new filename. The app's save/load menu (`GET /api/scores`) reads all `.json` files from `scores/` automatically — but the dropdown displays `metadata.title`, so a stale title makes the file hard to find. After running the move script, refresh the score list in the browser (re-open the Load Score dialog or reload the page).
 
 ### Step 2: Run the move script
 
@@ -108,6 +113,9 @@ for (const t of data.midiTracks) {
   }
 }
 
+// Update metadata for save menu registration
+const outName = INPUT.replace('scores/','').replace('.json','');
+data.metadata.title = outName;
 data.metadata.modified = new Date().toISOString();
 fs.writeFileSync(INPUT, JSON.stringify(data, null, 2));
 console.log('MOVE COMPLETE:', JSON.stringify(log, null, 2));
@@ -236,3 +244,6 @@ console.log('MIDI Track Events: ' + evtMove + ' move, ' + evtKeep + ' keep');
 |---|---|---|---|---|---|
 | 2026-02-18 | 143-moveAll | 144-moveAll | ≥84s | +56.3s | 374 objects + 5435 MIDI events (wrong direction — discarded) |
 | 2026-02-18 | 143-moveAll | 145-movedForward | ≥84s | -56.3s | 374 objects + 5435 MIDI events ✓ |
+| 2026-02-18 | 161-Mv97plus23_3 | 162-Mv97plus23_3 | ≥97s | +23.3s | 305 objects + 5435 MIDI events (wrong direction — discarded) |
+| 2026-02-18 | 161-Mv97plus23_3 | 163-Mv97plus23_3 | ≥97s | -23.3s | 305 objects + 5435 MIDI events ✓ |
+| 2026-02-18 | 170-MoveTo118 | 171-MoveTo118 | ≥135s | -17.4s | 38 objects + 2839 MIDI events ✓ |

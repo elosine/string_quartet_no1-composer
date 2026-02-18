@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "153-NewAudio",
-    "created": "2026-02-18T15:06:55.653Z",
-    "modified": "2026-02-18T15:06:55.716Z",
+    "created": "2026-02-18T21:01:15.842Z",
+    "modified": "2026-02-18T21:01:15.881Z",
     "author": ""
   },
   "tempoHistory": [
@@ -182099,61 +182099,6 @@
           "createdAt": 1769401217711
         },
         {
-          "id": 35,
-          "name": "Flutter_pt2_vln1.wav",
-          "trackIndex": 0,
-          "startSeconds": 44.10000000000001,
-          "endSeconds": 68.47319727891157,
-          "durationSeconds": 24.373197278911565,
-          "audioFilePath": "/audio_files/Flutter_pt2_vln1_1769401314182.wav",
-          "color": "#FF5722",
-          "createdAt": 1769401314187
-        },
-        {
-          "id": 36,
-          "name": "Flutter_pt2_vln2.wav",
-          "trackIndex": 1,
-          "startSeconds": 48,
-          "endSeconds": 68.53748299319729,
-          "durationSeconds": 20.53748299319728,
-          "audioFilePath": "/audio_files/Flutter_pt2_vln2_1769401356679.wav",
-          "color": "#3F51B5",
-          "createdAt": 1769401356685
-        },
-        {
-          "id": 38,
-          "name": "Flutter_pt2_vc.wav",
-          "trackIndex": 3,
-          "startSeconds": 59.10000000000001,
-          "endSeconds": 68.7,
-          "durationSeconds": 9.6,
-          "audioFilePath": "/audio_files/Flutter_pt2_vc_1769401450346.wav",
-          "color": "#E91E63",
-          "createdAt": 1769401450349
-        },
-        {
-          "id": 39,
-          "name": "Flutter_pt2_vla.wav",
-          "trackIndex": 2,
-          "startSeconds": 53.10000000000001,
-          "endSeconds": 68.67453514739229,
-          "durationSeconds": 15.57453514739229,
-          "audioFilePath": "/audio_files/Flutter_pt2_vla_1769451578289.wav",
-          "color": "#00BCD4",
-          "createdAt": 1769451578293
-        },
-        {
-          "id": 40,
-          "name": "HarmonicTrem_Vln1.wav",
-          "trackIndex": 0,
-          "startSeconds": 68.9,
-          "endSeconds": 92.52140589569161,
-          "durationSeconds": 23.62140589569161,
-          "audioFilePath": "/audio_files/HarmonicTrem_Vln1_1769451688428.wav",
-          "color": "#9C27B0",
-          "createdAt": 1769451688433
-        },
-        {
           "id": 41,
           "name": "HarmonicTrem_Vln2.wav",
           "trackIndex": 1,
@@ -182350,9 +182295,53 @@
           "audioFilePath": "/audio_files/Viola-LongTone-215_mastered-loweredVolume_1771118248646.wav",
           "color": "#9C27B0",
           "createdAt": 1771118248715
+        },
+        {
+          "id": 86,
+          "name": "FlutterNew-Vln1-44_1.wav",
+          "trackIndex": 0,
+          "startSeconds": 44.1,
+          "endSeconds": 65.99975056689343,
+          "durationSeconds": 21.899750566893424,
+          "audioFilePath": "/audio_files/FlutterNew-Vln1-44_1_1771448099575.wav",
+          "color": "#00BCD4",
+          "createdAt": 1771448099580
+        },
+        {
+          "id": 88,
+          "name": "FlutterNew-Vln2-48.wav",
+          "trackIndex": 1,
+          "startSeconds": 48,
+          "endSeconds": 66.00102040816327,
+          "durationSeconds": 18.001020408163264,
+          "audioFilePath": "/audio_files/FlutterNew-Vln2-48_1771448160878.wav",
+          "color": "#FF5722",
+          "createdAt": 1771448160883
+        },
+        {
+          "id": 91,
+          "name": "FlutterNew-Vla-53_1.wav",
+          "trackIndex": 2,
+          "startSeconds": 53.1,
+          "endSeconds": 66.00786848072562,
+          "durationSeconds": 12.907868480725623,
+          "audioFilePath": "/audio_files/FlutterNew-Vla-53_1_1771448272628.wav",
+          "color": "#E91E63",
+          "createdAt": 1771448272633
+        },
+        {
+          "id": 93,
+          "name": "FlutterNew-Vc-59_1.wav",
+          "trackIndex": 3,
+          "startSeconds": 59.1,
+          "endSeconds": 65.99845804988662,
+          "durationSeconds": 6.898458049886622,
+          "audioFilePath": "/audio_files/FlutterNew-Vc-59_1_1771448414406.wav",
+          "color": "#795548",
+          "createdAt": 1771448414409
         }
       ],
-      "nextId": 86
+      "nextId": 94
     },
     "gcs": {
       "gcs": [
@@ -185715,8 +185704,8 @@
   ],
   "connectors": [],
   "cursorState": {
-    "editCursorSeconds": 67.92342857850663,
-    "gotoDisplaySeconds": 50,
+    "editCursorSeconds": 59.1,
+    "gotoDisplaySeconds": 65,
     "leadInSeconds": 2
   }
 }
