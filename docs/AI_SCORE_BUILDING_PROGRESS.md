@@ -2,21 +2,21 @@
 
 **Status:** Active  
 **Last Updated:** Feb 18, 2026  
-**Current ASB Number:** ASB-052
+**Current ASB Number:** ASB-056
 
 ---
 
 ## Last Session Summary
 
-> **MotiveMaker bug fix + Groups rename.** Fixed critical bug where simplified MotiveMaker was missing `generateMotiveDataArray` method (only existed in disabled MotiveMakerFull), causing TypeError crash on score load — legacy motives invisible. Removed duplicate MotiveMaker init. Renamed entire "Motive Groups" system to "Groups" (MotiveGroupManager→GroupManager, MotiveGroupDatabase→GroupDatabase, all HTML IDs, UI labels, auto-naming, comments). Save key `databases.motiveGroups` kept for backward compat.
+> **Bulk Move + Score Composition + Audio Mixer + Groups Enhancements.** Bulk moved 170→171 (38 objects, 2839 MIDI events). Composed multiple glissandos and vibratos via AI prompt (tracks 1-4, treble+bass clefs, quarter-tone pitches). Added per-track audio volume sliders (4 GainNodes, 0-150%, real-time) with localStorage persistence. Enhanced GroupManager: button relabels, Delete Group and All Objects, auto-update time/track on add, magenta dashed bounding box for selected group, group deselection (dblclick/click-off). Updated prompt guides to accept start+duration as alternative to start+end.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 18, 2026  
-**Focus:** Bug Fixes + Groups Rename  
-**Tier 1 Count This Session:** 2 (ASB-051 through ASB-052)  
+**Focus:** Bulk Move + Score Composition + Audio Mixer + Groups Enhancements  
+**Tier 1 Count This Session:** 4 (ASB-053 through ASB-056) — committed  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -52,6 +52,14 @@
 - ASB-050: MIDI snippet move fix — shift all internal event.timeMs values by delta when moving snippet via motive group; fixes only display bounds moving but MIDI events staying at old positions
 - ASB-051: Fix MotiveMaker crash — add missing `generateMotiveDataArray` to simplified MotiveMaker (was only in disabled MotiveMakerFull), remove duplicate init; fixes legacy motives invisible on score load
 - ASB-052: Rename "Motive Groups" → "Groups" — MotiveGroupDatabase→GroupDatabase, MotiveGroupManager→GroupManager, all HTML IDs (motiveGroupList→groupList etc), UI labels, auto-naming ("Group N"), comments; save key `databases.motiveGroups` kept for backward compat
+
+### Session Log — Bulk Move + Score Composition + Audio Mixer
+- Bulk move 170→171 (≥135s by -17.4s, 38 objects + 2839 MIDI events, verified)
+- Score composition: Multiple glissandos created via AI prompt (tracks 1, 2, 4 — treble + bass clefs, quarter-tone pitches)
+- ASB-053: Sort score dropdown descending (biggest number on top)
+- ASB-054: Per-track audio volume sliders — 4 GainNodes, range 0-150%, real-time control
+- ASB-055: GroupManager enhancements — button relabels, Delete Group and All Objects, auto-update time/track on add, magenta bounding box, group deselection (dblclick/click-off)
+- ASB-056: Volume slider localStorage persistence (restore on load, save on change)
 
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
@@ -133,6 +141,16 @@
 | ASB-044 | Curve Maker UI polish — Save mustard, tighter spacing, smaller fonts | Complete |
 | ASB-045 | Motive Grouping System — database, manager, UI, time/track move | Complete |
 | ASB-046 | Collapsible SVG element listbox + offsetYFraction fix in 119-groups.json | Complete |
+| ASB-047 | Fix SVG element listbox visibility — update parent maxHeight on toggle | Complete |
+| ASB-048 | Curve Maker Slope/Trk/Mdl row further tightened | Complete |
+| ASB-049 | Motive group move fix — regenerate curveData/motiveData on reload | Complete |
+| ASB-050 | MIDI snippet move fix — shift internal event.timeMs on group move | Complete |
+| ASB-051 | Fix MotiveMaker crash — add missing generateMotiveDataArray | Complete |
+| ASB-052 | Rename Motive Groups → Groups (all code + UI, save key compat) | Complete |
+| ASB-053 | Sort score dropdown descending (biggest number on top) | Complete |
+| ASB-054 | Per-track audio volume sliders (GainNodes, 0-150%, real-time) | Complete |
+| ASB-055 | GroupManager enhancements — delete all objects, auto time/track, bounding box, deselection | Complete |
+| ASB-056 | Volume slider localStorage persistence | Complete |
 
 ---
 
@@ -148,6 +166,7 @@
 | Feb 16, 2026 | 568a2a0 | vibrato system: UI expansion, MIDI generation, server automation, bug fixes, implementation doc (ASB-035 to ASB-037) |
 | Feb 16, 2026 | 6e245fe | Curve Fugue Algorithm #1: documentation, parameterized slopes, score composition (ASB-038 to ASB-039, scores 51-106) |
 | Feb 17, 2026 | 5c8fd71 | SVG anchor system + Curve Maker UI redesign (ASB-040 to ASB-043) |
+| Feb 18, 2026 | c942c2c | audio mixer + groups enhancements + score composition + prompt guide duration option (ASB-053 to ASB-056) |
 
 ---
 

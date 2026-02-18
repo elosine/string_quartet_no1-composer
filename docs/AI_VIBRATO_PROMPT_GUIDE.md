@@ -13,7 +13,7 @@ Create vibrato motives via AI prompt — fully automated, no console commands ne
 
 ```
 Create vibrato motive:
-- Start: ___ s, End: ___ s
+- Start: ___ s, End: ___ s   (OR: Start: ___ s, Duration: ___ s)
 - Track: ___ (1-4)
 - Pitch: ___ (e.g., E4, C#3)
 - Clef: ___ (treble / cClef / bass)
@@ -30,6 +30,9 @@ Create vibrato motive:
 ### Option B: Natural Language
 
 > "Vibrato motive on track 2, 45s to 52s, D4, treble clef, mp to p, wide to narrow, logarithmic steep slope"
+> "Vibrato motive on track 2, start 45s, duration 7s, D4, treble clef, mp to p, wide to narrow, logarithmic steep slope"
+
+**Note:** You can specify timing as either **start + end** or **start + duration**. When duration is given, Cascade calculates end = start + duration before calling the API.
 
 ### Option C: Trigger Phrase (Guided)
 
@@ -184,8 +187,9 @@ The generated MIDI file contains:
 Before calling the endpoint, Cascade validates:
 
 ### 1. Missing Required Parameters
-**Check:** Start time, end time, track, and pitch must all be provided.
+**Check:** Start time, end time (or duration), track, and pitch must all be provided.
 **Flag:** If any are missing, ask the user before proceeding.
+**Note:** If user provides start + duration, Cascade calculates end = start + duration.
 
 ### 2. Clef vs Pitch Range
 **Check:** Does the pitch sit comfortably in the chosen clef?

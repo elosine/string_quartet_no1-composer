@@ -21,7 +21,7 @@ Create Long Tone Glissandos via AI prompt — **one-step server automation**.
 
 ```
 Create a glissando:
-- Start: ___ s, End: ___ s
+- Start: ___ s, End: ___ s   (OR: Start: ___ s, Duration: ___ s)
 - Track: ___ (1-4)
 - Start pitch: ___ (e.g., E4, C#3)
 - End pitch: ___ (e.g., C3, G#4)
@@ -38,6 +38,9 @@ Create a glissando:
 ### Option B: Natural Language
 
 > "Glissando on track 3, 120s to 128s, alto clef, A3 down to F3, mp, logarithmic slope -1"
+> "Glissando on track 3, start 120s, duration 8s, alto clef, A3 down to F3, mp, logarithmic slope -1"
+
+**Note:** You can specify timing as either **start + end** or **start + duration**. When duration is given, Cascade calculates end = start + duration before calling the API.
 
 ### Option C: Trigger Phrase (Guided)
 
@@ -148,8 +151,9 @@ The server then:
 Before running `LongToneUI.step1()`, Cascade validates the parsed parameters and flags issues:
 
 ### 1. Missing Required Parameters
-**Check:** Start time, end time, track, start pitch, end pitch must all be provided.
+**Check:** Start time, end time (or duration), track, start pitch, end pitch must all be provided.
 **Flag:** If any are missing, ask the user before proceeding.
+**Note:** If user provides start + duration, Cascade calculates end = start + duration.
 
 ### 2. Clef vs Pitch Range
 **Check:** Do the pitches sit comfortably in the chosen clef?

@@ -1172,12 +1172,15 @@
                 <select id="groupObjects" size="4" style="width: 100%; font-size: 9px; background: rgba(40,40,50,0.9); color: #ccc; border: 1px solid #555; border-radius: 3px; padding: 2px;">
                 </select>
                 <div class="control-row" style="margin-top: 4px;">
-                    <button id="groupAddBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Add Selected</button>
-                    <button id="groupRemoveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Remove</button>
+                    <button id="groupAddBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-green);">Add Selected Object</button>
+                    <button id="groupRemoveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Remove Object</button>
                 </div>
                 <div class="control-row" style="margin-top: 4px;">
-                    <button id="groupSaveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-mustard); color: #000;">Save New</button>
-                    <button id="groupDeleteBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Delete</button>
+                    <button id="groupSaveBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-mustard); color: #000;">Create New Group</button>
+                    <button id="groupDeleteBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 4px;">Delete Group</button>
+                </div>
+                <div class="control-row" style="margin-top: 4px;">
+                    <button id="groupDeleteAllBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: #B71C1C; color: #fff;">Delete Group and All Objects</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1806,6 +1809,23 @@
                         <label for="audioEnableT3">T3</label>
                         <input type="checkbox" id="audioEnableT4" checked>
                         <label for="audioEnableT4">T4</label>
+                    </div>
+                </div>
+                <div class="track-enable-group" style="margin-top: 8px;">
+                    <label class="track-enable-label">Volume:</label>
+                    <div class="track-toggles" style="flex-wrap: wrap; gap: 2px 6px;">
+                        <label for="audioVolT1" style="font-size: 8px; min-width: 14px;">T1</label>
+                        <input type="range" id="audioVolT1" min="0" max="150" value="100" style="width: 52px; height: 12px;">
+                        <span id="audioVolT1Val" style="font-size: 8px; min-width: 24px;">100%</span>
+                        <label for="audioVolT2" style="font-size: 8px; min-width: 14px;">T2</label>
+                        <input type="range" id="audioVolT2" min="0" max="150" value="100" style="width: 52px; height: 12px;">
+                        <span id="audioVolT2Val" style="font-size: 8px; min-width: 24px;">100%</span>
+                        <label for="audioVolT3" style="font-size: 8px; min-width: 14px;">T3</label>
+                        <input type="range" id="audioVolT3" min="0" max="150" value="100" style="width: 52px; height: 12px;">
+                        <span id="audioVolT3Val" style="font-size: 8px; min-width: 24px;">100%</span>
+                        <label for="audioVolT4" style="font-size: 8px; min-width: 14px;">T4</label>
+                        <input type="range" id="audioVolT4" min="0" max="150" value="100" style="width: 52px; height: 12px;">
+                        <span id="audioVolT4Val" style="font-size: 8px; min-width: 24px;">100%</span>
                     </div>
                 </div>
                 <div class="control-row" style="margin-top: 10px;">
@@ -7627,6 +7647,11 @@
             clipColors: ['#00BCD4', '#9C27B0', '#FF5722', '#3F51B5', '#009688', '#E91E63', '#CDDC39', '#795548'],
             nextColorIndex: 0,
             
+            // Per-track gain nodes for volume control
+            trackGainNodes: [null, null, null, null],
+            volumeSliders: [null, null, null, null],
+            volumeDisplays: [null, null, null, null],
+            
             // Playback state
             activeAudioSources: [], // Currently playing audio source nodes
             lastPlaybackTimeMs: -1,
@@ -7660,6 +7685,27 @@
                     document.getElementById('audioEnableT3'),
                     document.getElementById('audioEnableT4')
                 ];
+                
+                // Get volume sliders and displays, restore from localStorage
+                for (let i = 0; i < 4; i++) {
+                    this.volumeSliders[i] = document.getElementById(`audioVolT${i + 1}`);
+                    this.volumeDisplays[i] = document.getElementById(`audioVolT${i + 1}Val`);
+                    if (this.volumeSliders[i]) {
+                        const idx = i;
+                        // Restore saved volume from localStorage
+                        const savedVol = localStorage.getItem(`audioVolT${idx + 1}`);
+                        if (savedVol !== null) {
+                            this.volumeSliders[idx].value = savedVol;
+                            if (this.volumeDisplays[idx]) this.volumeDisplays[idx].textContent = savedVol + '%';
+                        }
+                        this.volumeSliders[i].addEventListener('input', () => {
+                            const val = parseInt(this.volumeSliders[idx].value);
+                            if (this.volumeDisplays[idx]) this.volumeDisplays[idx].textContent = val + '%';
+                            if (this.trackGainNodes[idx]) this.trackGainNodes[idx].gain.value = val / 100;
+                            localStorage.setItem(`audioVolT${idx + 1}`, val);
+                        });
+                    }
+                }
                 
                 // Set up track selection radio buttons
                 document.querySelectorAll('input[name="audioTrack"]').forEach(radio => {
@@ -7728,7 +7774,13 @@
             initAudioContext() {
                 try {
                     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    console.debug('Web Audio API context created');
+                    // Create per-track gain nodes
+                    for (let i = 0; i < 4; i++) {
+                        this.trackGainNodes[i] = this.audioContext.createGain();
+                        this.trackGainNodes[i].gain.value = this.volumeSliders[i] ? parseInt(this.volumeSliders[i].value) / 100 : 1.0;
+                        this.trackGainNodes[i].connect(this.audioContext.destination);
+                    }
+                    console.debug('Web Audio API context created with per-track gain nodes');
                 } catch (e) {
                     console.error('Web Audio API not supported:', e);
                 }
@@ -8458,7 +8510,9 @@
                     // Create source node
                     const source = this.audioContext.createBufferSource();
                     source.buffer = audioBuffer;
-                    source.connect(this.audioContext.destination);
+                    const trackIdx = clipData.trackIndex != null ? clipData.trackIndex : 0;
+                    const gainNode = this.trackGainNodes[trackIdx] || this.audioContext.destination;
+                    source.connect(gainNode);
                     
                     // Start playback at offset
                     const startOffset = Math.max(0, offsetSeconds);
@@ -21644,6 +21698,7 @@
         // ========================================
         const GroupManager = {
             selectedGroupId: null,
+            boundingBoxElements: [],
             
             init() {
                 this.groupList = document.getElementById('groupList');
@@ -21654,6 +21709,9 @@
                 this.removeBtn = document.getElementById('groupRemoveBtn');
                 this.saveBtn = document.getElementById('groupSaveBtn');
                 this.deleteBtn = document.getElementById('groupDeleteBtn');
+                this.deleteAllBtn = document.getElementById('groupDeleteAllBtn');
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
                 
                 // Event handlers
                 if (this.groupList) {
@@ -21677,6 +21735,9 @@
                 if (this.deleteBtn) {
                     this.deleteBtn.addEventListener('click', () => this.deleteGroup());
                 }
+                if (this.deleteAllBtn) {
+                    this.deleteAllBtn.addEventListener('click', () => this.deleteGroupAndAllObjects());
+                }
                 
                 // Time change handler — move all objects
                 if (this.timeInput) {
@@ -21685,6 +21746,27 @@
                 // Track change handler — move all objects to new track
                 if (this.trackSelect) {
                     this.trackSelect.addEventListener('change', () => this.moveGroupToTrack());
+                }
+                
+                // Click on group list again to deselect
+                if (this.groupList) {
+                    this.groupList.addEventListener('click', (e) => {
+                        const selectedOption = this.groupList.selectedOptions[0];
+                        if (!selectedOption) {
+                            this.deselectGroup();
+                        }
+                    });
+                    this.groupList.addEventListener('dblclick', () => {
+                        this.deselectGroup();
+                    });
+                }
+                
+                // Click on score to deselect group
+                if (this.scoreTopEl) {
+                    this.scoreTopEl.addEventListener('click', () => this.deselectGroup());
+                }
+                if (this.scoreBottomEl) {
+                    this.scoreBottomEl.addEventListener('click', () => this.deselectGroup());
                 }
                 
                 console.log('GroupManager initialized');
@@ -21856,6 +21938,9 @@
                 
                 this.refreshObjectList(group);
                 this.updateTimeFromGroup(group);
+                this.updateTrackFromGroup(group);
+                this.updateBoundingBoxes();
+                this.refreshGroupList();
                 console.log(`Added ${obj.name} to ${group.name}`);
             },
             
@@ -21891,6 +21976,9 @@
                 
                 this.refreshObjectList(group);
                 this.updateTimeFromGroup(group);
+                this.updateTrackFromGroup(group);
+                this.updateBoundingBoxes();
+                this.refreshGroupList();
                 console.log(`Removed ${removed.name} from ${group.name}`);
             },
             
@@ -21904,6 +21992,7 @@
                 
                 GroupDatabase.remove(this.selectedGroupId);
                 this.selectedGroupId = null;
+                this.clearBoundingBoxes();
                 
                 if (window.ScoreManager) ScoreManager.markDirty();
                 this.refreshGroupList();
@@ -21924,11 +22013,8 @@
                 
                 this.refreshObjectList(group);
                 this.updateTimeFromGroup(group);
-                
-                // Update track select
-                if (this.trackSelect && group.track) {
-                    this.trackSelect.value = group.track;
-                }
+                this.updateTrackFromGroup(group);
+                this.updateBoundingBoxes();
             },
             
             // Update time input from group's base time
@@ -22209,6 +22295,265 @@
             importData(data) {
                 GroupDatabase.importData(data);
                 this.refreshUI();
+            },
+            
+            // Deselect the current group
+            deselectGroup() {
+                if (!this.selectedGroupId) return;
+                this.selectedGroupId = null;
+                this.clearBoundingBoxes();
+                if (this.groupList) {
+                    this.groupList.selectedIndex = -1;
+                }
+                this.refreshObjectList(null);
+                if (this.timeInput) this.timeInput.value = 0;
+                if (this.trackSelect) this.trackSelect.value = '1';
+            },
+            
+            // Update track select from group objects (use most common track, or first object's track)
+            updateTrackFromGroup(group) {
+                if (!group || group.objects.length === 0) return;
+                // Use track of the first object as default, update group.track
+                const firstTrack = this.getObjectTrack(group.objects[0].type, group.objects[0].id);
+                if (firstTrack && this.trackSelect) {
+                    this.trackSelect.value = firstTrack;
+                    group.track = firstTrack;
+                    GroupDatabase.update(group.id, { track: firstTrack });
+                }
+            },
+            
+            // Delete group AND all its objects from the score
+            deleteGroupAndAllObjects() {
+                if (!this.selectedGroupId) return;
+                const group = GroupDatabase.get(this.selectedGroupId);
+                if (!group) return;
+                
+                const objCount = group.objects.length;
+                if (!confirm(`Delete "${group.name}" AND permanently delete all ${objCount} objects in it?`)) return;
+                
+                const systemsToReload = new Set();
+                
+                // Delete each object from its respective system
+                for (const obj of group.objects) {
+                    this.deleteObject(obj.type, obj.id, systemsToReload);
+                }
+                
+                // Reload affected systems
+                this.reloadSystems(systemsToReload);
+                
+                // Remove the group itself
+                GroupDatabase.remove(this.selectedGroupId);
+                this.selectedGroupId = null;
+                this.clearBoundingBoxes();
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                this.refreshGroupList();
+                this.refreshObjectList(null);
+                console.log(`Deleted group "${group.name}" and all ${objCount} objects`);
+            },
+            
+            // Delete a single object by type and id
+            deleteObject(type, id, systemsToReload) {
+                switch (type) {
+                    case 'curve': {
+                        const c = CurveDatabase.get(id);
+                        if (c) {
+                            // Remove from GTrackSystem
+                            if (c.gTrack !== 'A' && window.GTrackSystem) {
+                                const trackIndex = parseInt(c.gTrack) - 1;
+                                const gTrack = GTrackSystem.getGTrack(trackIndex);
+                                if (gTrack) {
+                                    const itemIndex = gTrack.graphicItems.findIndex(i => i.curveId === id);
+                                    if (itemIndex !== -1) gTrack.graphicItems.splice(itemIndex, 1);
+                                }
+                            }
+                            CurveDatabase.remove(id);
+                            if (window.CurveMaker) {
+                                const ci = CurveMaker.curves.findIndex(cv => cv.id === id);
+                                if (ci !== -1) CurveMaker.curves.splice(ci, 1);
+                            }
+                            systemsToReload.add('curves');
+                        }
+                        break;
+                    }
+                    case 'gc': {
+                        if (window.GCMaker) {
+                            const gi = GCMaker.gcs.findIndex(gc => gc.id === id);
+                            if (gi !== -1) GCMaker.gcs.splice(gi, 1);
+                            systemsToReload.add('gcs');
+                        }
+                        break;
+                    }
+                    case 'motive': {
+                        const m = MotiveDatabase.get(id);
+                        if (m) {
+                            MotiveDatabase.remove(id);
+                            if (window.MotiveMaker) {
+                                const mi = MotiveMaker.motives.findIndex(mv => mv.id === id);
+                                if (mi !== -1) MotiveMaker.motives.splice(mi, 1);
+                            }
+                            systemsToReload.add('motives');
+                        }
+                        break;
+                    }
+                    case 'svg': {
+                        if (window.SVGElementManager) {
+                            const s = SVGElementManager.elements.find(el => el.id === id);
+                            if (s) {
+                                if (s.wrapper) s.wrapper.remove();
+                                const si = SVGElementManager.elements.indexOf(s);
+                                if (si > -1) SVGElementManager.elements.splice(si, 1);
+                            }
+                            systemsToReload.add('svgs');
+                        }
+                        break;
+                    }
+                    case 'midi': {
+                        MidiSnippetDatabase.remove(id);
+                        systemsToReload.add('midi');
+                        break;
+                    }
+                    case 'audio': {
+                        AudioClipDatabase.remove(id);
+                        systemsToReload.add('audio');
+                        break;
+                    }
+                }
+            },
+            
+            // Get the end time of an object by type and id
+            getObjectEndTime(type, id) {
+                switch (type) {
+                    case 'curve': {
+                        const c = CurveDatabase.get(id);
+                        return c ? (c.endSeconds || c.startSeconds) : null;
+                    }
+                    case 'gc': {
+                        const g = window.GCMaker ? GCMaker.gcs.find(gc => gc.id === id) : null;
+                        return g ? (g.endSeconds || g.startSeconds) : null;
+                    }
+                    case 'motive': {
+                        const m = MotiveDatabase.get(id);
+                        return m ? (m.endSeconds || m.startSeconds) : null;
+                    }
+                    case 'svg': {
+                        if (!window.SVGElementManager) return null;
+                        const s = SVGElementManager.elements.find(el => el.id === id);
+                        // SVG elements: use referenceSeconds + approximate width
+                        return s ? (s.referenceSeconds + (s.offsetSeconds || 0) + 2) : null;
+                    }
+                    case 'midi': {
+                        const sn = MidiSnippetDatabase.get(id);
+                        return sn ? (sn.endSeconds || sn.startSeconds) : null;
+                    }
+                    case 'audio': {
+                        const ac = AudioClipDatabase.get(id);
+                        return ac ? (ac.endSeconds || ac.startSeconds) : null;
+                    }
+                }
+                return null;
+            },
+            
+            // Clear all bounding box SVG elements
+            clearBoundingBoxes() {
+                for (const el of this.boundingBoxElements) {
+                    el.remove();
+                }
+                this.boundingBoxElements = [];
+            },
+            
+            // Update bounding boxes for the selected group
+            updateBoundingBoxes() {
+                this.clearBoundingBoxes();
+                if (!this.selectedGroupId) return;
+                const group = GroupDatabase.get(this.selectedGroupId);
+                if (!group || group.objects.length === 0) return;
+                
+                const secondsPerPage = window.GraphicTimeline 
+                    ? GraphicTimeline.getSecondsPerPage() 
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                
+                const scoreTopEl = this.scoreTopEl;
+                const scoreBottomEl = this.scoreBottomEl;
+                if (!scoreTopEl || !scoreBottomEl) return;
+                
+                const scoreWidth = scoreTopEl.clientWidth || 1000;
+                const scoreHeight = scoreTopEl.clientHeight || 400;
+                const timelineHeight = 8;
+                const trackHeight = (scoreHeight - timelineHeight) / 4;
+                
+                // Gather object bounds: {startTime, endTime, track, page, section}
+                const objBounds = [];
+                for (const obj of group.objects) {
+                    const startTime = this.getObjectTime(obj.type, obj.id);
+                    const endTime = this.getObjectEndTime(obj.type, obj.id);
+                    const track = this.getObjectTrack(obj.type, obj.id);
+                    if (startTime === null) continue;
+                    
+                    const displayStart = startTime + leadInSeconds;
+                    const displayEnd = (endTime || startTime) + leadInSeconds;
+                    const startPage = Math.floor(Math.max(0, displayStart) / secondsPerPage);
+                    const endPage = Math.floor(Math.max(0, displayEnd) / secondsPerPage);
+                    const trackIdx = (parseInt(track) || 1) - 1;
+                    
+                    // Object may span multiple pages
+                    for (let page = startPage; page <= endPage; page++) {
+                        const section = page % 2 === 0 ? 'top' : 'bottom';
+                        const pageStartSec = page * secondsPerPage;
+                        const clampedStart = Math.max(displayStart - pageStartSec, 0);
+                        const clampedEnd = Math.min(displayEnd - pageStartSec, secondsPerPage);
+                        
+                        objBounds.push({
+                            x1: (clampedStart / secondsPerPage) * scoreWidth,
+                            x2: (clampedEnd / secondsPerPage) * scoreWidth,
+                            trackIdx: trackIdx,
+                            section: section
+                        });
+                    }
+                }
+                
+                if (objBounds.length === 0) return;
+                
+                // Group by section and draw one bounding box per section
+                const sections = { top: [], bottom: [] };
+                for (const b of objBounds) {
+                    sections[b.section].push(b);
+                }
+                
+                for (const [section, bounds] of Object.entries(sections)) {
+                    if (bounds.length === 0) continue;
+                    
+                    const svgEl = section === 'top' ? scoreTopEl : scoreBottomEl;
+                    let minX = Infinity, maxX = -Infinity;
+                    let minTrack = Infinity, maxTrack = -Infinity;
+                    
+                    for (const b of bounds) {
+                        if (b.x1 < minX) minX = b.x1;
+                        if (b.x2 > maxX) maxX = b.x2;
+                        if (b.trackIdx < minTrack) minTrack = b.trackIdx;
+                        if (b.trackIdx > maxTrack) maxTrack = b.trackIdx;
+                    }
+                    
+                    const padding = 4;
+                    const y = timelineHeight + (minTrack * trackHeight) - padding;
+                    const height = ((maxTrack - minTrack + 1) * trackHeight) + (padding * 2);
+                    const x = minX - padding;
+                    const width = (maxX - minX) + (padding * 2);
+                    
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', Math.max(0, x));
+                    rect.setAttribute('y', Math.max(0, y));
+                    rect.setAttribute('width', Math.max(1, width));
+                    rect.setAttribute('height', Math.max(1, height));
+                    rect.setAttribute('fill', 'none');
+                    rect.setAttribute('stroke', '#FF00FF');
+                    rect.setAttribute('stroke-width', '2');
+                    rect.setAttribute('stroke-dasharray', '6,3');
+                    rect.setAttribute('pointer-events', 'none');
+                    rect.setAttribute('class', 'group-bounding-box');
+                    svgEl.appendChild(rect);
+                    this.boundingBoxElements.push(rect);
+                }
             }
         };
         
