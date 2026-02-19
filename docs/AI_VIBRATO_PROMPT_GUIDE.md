@@ -13,24 +13,24 @@ Create vibrato motives via AI prompt — fully automated, no console commands ne
 
 ```
 Create vibrato motive:
-- Start: ___ s, End: ___ s   (OR: Start: ___ s, Duration: ___ s)
 - Track: ___ (1-4)
-- Pitch: ___ (e.g., E4, C#3)
 - Clef: ___ (treble / cClef / bass)
-- Start dynamic: ___ (p, mp, mf, f, ff, etc.)
-- End dynamic: ___ (p, mp, mf, f, ff, etc.)
-- Velocity: ___ (0-127)
+- Start: ___ s, End: ___ s   (OR: Start: ___ s, Duration: ___ s)
+- Pitch: ___ (e.g., E4, C#3)
 - Y1: ___, Y2: ___ (0-10, vibrato intensity)
 - Model: ___ (logarithmic / exponential / power / sigmoid / bezier)
 - Slope: ___ (-3 to +3)
+- Start dynamic: ___ (p, mp, mf, f, ff, etc.)
+- End dynamic: ___ (p, mp, mf, f, ff, etc.)
+- Velocity: ___ (0-127)
 - Color: ___ (limeGreen, brightOrange, brightBlue, etc.)
 - Fill: ___ (bottom / top / line)
 ```
 
 ### Option B: Natural Language
 
-> "Vibrato motive on track 2, 45s to 52s, D4, treble clef, mp to p, wide to narrow, logarithmic steep slope"
-> "Vibrato motive on track 2, start 45s, duration 7s, D4, treble clef, mp to p, wide to narrow, logarithmic steep slope"
+> "Vibrato motive on track 2, treble clef, 45s to 52s, D4, Y1 10 Y2 0, logarithmic slope -1, mp to p, velocity 115"
+> "Vibrato motive on track 2, treble clef, start 45s, duration 7s, D4, logarithmic slope -1, mp to p"
 
 **Note:** You can specify timing as either **start + end** or **start + duration**. When duration is given, Cascade calculates end = start + duration before calling the API.
 
@@ -215,7 +215,7 @@ Before calling the endpoint, Cascade validates:
 ## Full Example
 
 **You say:**
-> Create vibrato motive: Start 120s, End 128s, Track 3, D4, cClef, mp to p, Y1=10 Y2=0, logarithmic slope -0.65
+> Create vibrato motive: Track 3, cClef, start 120s, end 128s, D4, Y1 10 Y2 0, logarithmic slope -0.65, mp to p, velocity 115
 
 **Cascade responds:**
 > Creating vibrato motive on track 3 (120s–128s), D4, cClef, mp→p, wide-narrow, logarithmic slope -0.65...

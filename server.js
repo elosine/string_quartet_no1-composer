@@ -1457,7 +1457,7 @@ function generateVibratoFilename(direction, clef, pitch, startDyn, endDyn) {
 }
 
 // Build vibrato MIDI file bytes (returns Buffer)
-function buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm) {
+function buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm, midiChannel = 0) {
     const TICKS_PER_BEAT = 480;
     const CC0_ARTICULATION = 89;
     const MICROSECONDS_PER_BEAT = Math.round(60000000 / bpm);
@@ -1485,11 +1485,11 @@ function buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm) {
 
     // CC0 = 89 at tick 0
     trackEvents.push(...writeVarInt(0));
-    trackEvents.push(0xB0, 0x00, CC0_ARTICULATION);
+    trackEvents.push(0xB0 | midiChannel, 0x00, CC0_ARTICULATION);
 
     // Note On at tick 0
     trackEvents.push(...writeVarInt(0));
-    trackEvents.push(0x90, midiNote, velocity);
+    trackEvents.push(0x90 | midiChannel, midiNote, velocity);
 
     // CC4 + Channel Pressure samples
     let prevTick = 0;
@@ -1498,9 +1498,9 @@ function buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm) {
         const tick = secondsToTicks(sample.timeRelative);
         const deltaTick = Math.max(0, tick - prevTick);
         trackEvents.push(...writeVarInt(deltaTick));
-        trackEvents.push(0xB0, 0x04, sample.value);
+        trackEvents.push(0xB0 | midiChannel, 0x04, sample.value);
         trackEvents.push(...writeVarInt(0));
-        trackEvents.push(0xD0, sample.value);
+        trackEvents.push(0xD0 | midiChannel, sample.value);
         prevTick = tick;
     }
     lastTick = prevTick;
@@ -1509,7 +1509,7 @@ function buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm) {
     const endTick = secondsToTicks(duration);
     const noteOffDelta = Math.max(0, endTick - lastTick);
     trackEvents.push(...writeVarInt(noteOffDelta));
-    trackEvents.push(0x80, midiNote, 0);
+    trackEvents.push(0x80 | midiChannel, midiNote, 0);
 
     // End of track
     trackEvents.push(...writeVarInt(0));
@@ -1814,7 +1814,13 @@ app.post('/api/vibrato/create-and-save', async (req, res) => {
             // Approximate offsetSeconds from pixel gap (5px + scaledWidth)
             const approxScoreWidthVib = 1000;
             const secondsPerPixelVib = secondsPerPage / approxScoreWidthVib;
-            const svgOffsetSeconds = -(5 + scaledWidth) * secondsPerPixelVib;
+            let svgOffsetSeconds = -(5 + scaledWidth) * secondsPerPixelVib;
+
+            // Clamp: don't let SVG fall off the left edge of the page
+            const pageStartScoreSeconds = (startPage * secondsPerPage) - leadIn;
+            if (startSeconds + svgOffsetSeconds < pageStartScoreSeconds) {
+                svgOffsetSeconds = pageStartScoreSeconds - startSeconds;
+            }
 
             // Generate standard name: SVG_YYYYMMDD_HHMMSS_NN_filename
             const nowVib = new Date();
@@ -1853,7 +1859,9 @@ app.post('/api/vibrato/create-and-save', async (req, res) => {
             ccSamples.push({ timeRelative: (t - startSeconds), value: ccValue });
         }
 
-        const midiBuffer = buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm);
+        // Vibrato uses MIDI channels 5-8 (0-indexed: 4-7) = trackNum + 3
+        const vibratoMidiChannel = trackNum + 3; // Track 1→ch4(=MIDI ch5), Track 2→ch5(=MIDI ch6), etc.
+        const midiBuffer = buildVibratoMidiFile(midiNote, velocity, duration, ccSamples, bpm, vibratoMidiChannel);
         const midiFilename = `Vib_${curveName}_${pitch.replace('#', 's').replace(/[^a-zA-Z0-9]/g, '')}.mid`;
         const midiFilePath = path.join(__dirname, 'public', 'midi_files', midiFilename);
 
@@ -1861,7 +1869,7 @@ app.post('/api/vibrato/create-and-save', async (req, res) => {
         const midiDir = path.join(__dirname, 'public', 'midi_files');
         if (!fs.existsSync(midiDir)) fs.mkdirSync(midiDir, { recursive: true });
         fs.writeFileSync(midiFilePath, midiBuffer);
-        console.log(`VibratoAutomation: Saved MIDI file: ${midiFilename} (${ccSamples.length} CC samples)`);
+        console.log(`VibratoAutomation: Saved MIDI file: ${midiFilename} (${ccSamples.length} CC samples, MIDI ch ${vibratoMidiChannel + 1})`);
 
         // 11. Parse MIDI events and add to score's midiTracks
         const curveStartMs = startSeconds * 1000;
@@ -2322,7 +2330,13 @@ app.post('/api/glissando/create-and-save', async (req, res) => {
             // Approximate offsetSeconds from pixel gap (5px + scaledContentWidth)
             const secondsPerPixelGliss = secondsPerPage / approxScoreWidth;
             const gap = 5;
-            const svgOffsetSeconds = -(gap + scaledContentWidth) * secondsPerPixelGliss;
+            let svgOffsetSeconds = -(gap + scaledContentWidth) * secondsPerPixelGliss;
+
+            // Clamp: don't let SVG fall off the left edge of the page
+            const pageStartScoreSeconds = (startPage * secondsPerPage) - leadIn;
+            if (startSeconds + svgOffsetSeconds < pageStartScoreSeconds) {
+                svgOffsetSeconds = pageStartScoreSeconds - startSeconds;
+            }
 
             const existingSvgElements = scoreData.svgElements || [];
             const maxSvgId = existingSvgElements.reduce((max, e) => Math.max(max, e.id || 0), 0);

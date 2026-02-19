@@ -1,22 +1,22 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 18, 2026  
-**Current ASB Number:** ASB-056
+**Last Updated:** Feb 19, 2026  
+**Current ASB Number:** ASB-062
 
 ---
 
 ## Last Session Summary
 
-> **Bulk Move + Score Composition + Audio Mixer + Groups Enhancements.** Bulk moved 170→171 (38 objects, 2839 MIDI events). Composed multiple glissandos and vibratos via AI prompt (tracks 1-4, treble+bass clefs, quarter-tone pitches). Added per-track audio volume sliders (4 GainNodes, 0-150%, real-time) with localStorage persistence. Enhanced GroupManager: button relabels, Delete Group and All Objects, auto-update time/track on add, magenta dashed bounding box for selected group, group deselection (dblclick/click-off). Updated prompt guides to accept start+duration as alternative to start+end.
+> **Two-Stage Vibrato + Prompt Guide Rewrite + Bug Fixes + Score Composition.** Refactored Vibrato System to two-stage workflow (Step 1: Curve, Step 2: Generate) matching Long Tone Glissando pattern. Rewrote prompt guide templates for natural dictation order. Added server-side SVG left-edge clamping. Fixed OneDrive file-locking bug in render_glissando.ps1 with retry loop. Added pitch tracking marker clamping to prevent off-page notation. Composed vibratos (tracks 1, 2, 4) and glissandos (tracks 2, 4) — scores 222–230.
 
 ---
 
 ## Current Session
 
-**Date:** Feb 18, 2026  
-**Focus:** Bulk Move + Score Composition + Audio Mixer + Groups Enhancements  
-**Tier 1 Count This Session:** 4 (ASB-053 through ASB-056) — committed  
+**Date:** Feb 19, 2026  
+**Focus:** Two-Stage Vibrato + Bug Fixes + Score Composition  
+**Tier 1 Count This Session:** 5 (ASB-058 through ASB-062)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -59,7 +59,16 @@
 - ASB-053: Sort score dropdown descending (biggest number on top)
 - ASB-054: Per-track audio volume sliders — 4 GainNodes, range 0-150%, real-time control
 - ASB-055: GroupManager enhancements — button relabels, Delete Group and All Objects, auto-update time/track on add, magenta bounding box, group deselection (dblclick/click-off)
-- ASB-056: Volume slider localStorage persistence (restore on load, save on change)
+- ASB-056: Volume slider localStorage persistence
+
+### Session Log — Two-Stage Vibrato + Bug Fixes + Score Composition
+- ASB-057: Vibrato MIDI channel offset +4 (channels 5-8) — server + existing score patch
+- ASB-058: Rewrite Glissando + Vibrato Prompt Guide templates for natural dictation order
+- ASB-059: Server-side SVG left-edge clamping for glissando + vibrato endpoints
+- ASB-060: Vibrato System two-stage generation (Step 1: Curve, Step 2: Generate) + programmatic params + UI styling
+- ASB-061: Fix OneDrive file-lock in render_glissando.ps1 — retry loop (5 attempts, 1s delay) for Move-Item
+- ASB-062: Glissando pitch tracking marker clamping — clamp left/right edges to prevent off-page markers
+- Score composition: Regenerated track 4 vibrato (A+3, bass, 186-192s, score 222). Created glissandos (tracks 2+4, G+3→Ad3/Ab3, 192.2-202s, scores 225-226). Created vibratos (tracks 1+2+4, Ad3/Ab3/Abd3, 202.15-206.6s, scores 228-230) (restore on load, save on change)
 
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
@@ -151,6 +160,12 @@
 | ASB-054 | Per-track audio volume sliders (GainNodes, 0-150%, real-time) | Complete |
 | ASB-055 | GroupManager enhancements — delete all objects, auto time/track, bounding box, deselection | Complete |
 | ASB-056 | Volume slider localStorage persistence | Complete |
+| ASB-057 | Vibrato MIDI channel offset +4 (channels 5-8) — server + existing score patch | Complete |
+| ASB-058 | Rewrite Glissando + Vibrato Prompt Guide templates for natural dictation order | Complete |
+| ASB-059 | Server-side SVG left-edge clamping for glissando + vibrato endpoints | Complete |
+| ASB-060 | Vibrato System two-stage generation + programmatic params + UI styling | Complete |
+| ASB-061 | Fix OneDrive file-lock in render_glissando.ps1 — Move-Item retry loop | Complete |
+| ASB-062 | Glissando pitch tracking marker clamping — left/right edge clamp | Complete |
 
 ---
 
@@ -167,6 +182,7 @@
 | Feb 16, 2026 | 6e245fe | Curve Fugue Algorithm #1: documentation, parameterized slopes, score composition (ASB-038 to ASB-039, scores 51-106) |
 | Feb 17, 2026 | 5c8fd71 | SVG anchor system + Curve Maker UI redesign (ASB-040 to ASB-043) |
 | Feb 18, 2026 | c942c2c | audio mixer + groups enhancements + score composition + prompt guide duration option (ASB-053 to ASB-056) |
+| Feb 19, 2026 | d039063 | two-stage vibrato, prompt guide rewrite, bug fixes, pitch tracking clamping, score composition (ASB-057 to ASB-062, scores 209-230) |
 
 ---
 

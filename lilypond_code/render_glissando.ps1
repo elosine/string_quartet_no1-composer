@@ -44,13 +44,26 @@ if (-not (Test-Path $renderedSvg)) {
 Write-Host "  LilyPond output: $renderedSvg"
 
 # Step 2: Move uncropped SVG to output directory (cropping handled by server-side Node.js)
-Move-Item $renderedSvg -Destination $outputSvg -Force
+# Retry loop: OneDrive or antivirus may briefly lock the file after creation
+$maxRetries = 5
+$retryDelay = 1
+$moved = $false
+for ($i = 1; $i -le $maxRetries; $i++) {
+    try {
+        Move-Item $renderedSvg -Destination $outputSvg -Force -ErrorAction Stop
+        $moved = $true
+        break
+    } catch {
+        Write-Host "  Move attempt $i failed (file locked), retrying in ${retryDelay}s..."
+        Start-Sleep -Seconds $retryDelay
+    }
+}
 
-if (Test-Path $outputSvg) {
+if ($moved -and (Test-Path $outputSvg)) {
     Write-Host "  Success: $outputSvg"
     Write-Host "OUTPUT:$outputSvg"
     exit 0
 } else {
-    Write-Host "  Error: Failed to move SVG to output"
+    Write-Host "  Error: Failed to move SVG to output after $maxRetries attempts"
     exit 1
 }

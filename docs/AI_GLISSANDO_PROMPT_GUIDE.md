@@ -21,24 +21,24 @@ Create Long Tone Glissandos via AI prompt — **one-step server automation**.
 
 ```
 Create a glissando:
-- Start: ___ s, End: ___ s   (OR: Start: ___ s, Duration: ___ s)
 - Track: ___ (1-4)
+- Clef: ___ (treble / cClef / bass)
+- Start: ___ s, End: ___ s   (OR: Start: ___ s, Duration: ___ s)
 - Start pitch: ___ (e.g., E4, C#3)
 - End pitch: ___ (e.g., C3, G#4)
-- Clef: ___ (treble / cClef / bass)
-- Dynamic: ___ (p, mp, mf, f, ff, etc. — notation only)
-- Velocity: ___ (0-127, MIDI velocity)
 - Y1: ___, Y2: ___ (0-10, curve intensity)
 - Model: ___ (logarithmic / exponential / power / sigmoid / bezier)
 - Slope: ___ (-3 to +3)
+- Dynamic: ___ (p, mp, mf, f, ff, etc. — notation only)
+- Velocity: ___ (0-127, MIDI velocity)
 - Color: ___ (brightOrange, blue, limeGreen, etc.)
 - Fill: ___ (line / bottom / top)
 ```
 
 ### Option B: Natural Language
 
-> "Glissando on track 3, 120s to 128s, alto clef, A3 down to F3, mp, logarithmic slope -1"
-> "Glissando on track 3, start 120s, duration 8s, alto clef, A3 down to F3, mp, logarithmic slope -1"
+> "Glissando on track 3, alto clef, 120s to 128s, A3 down to F3, Y1 10 Y2 0, logarithmic slope -1, mp, velocity 64"
+> "Glissando on track 3, alto clef, start 120s, duration 8s, A3 down to F3, logarithmic slope -1, mp"
 
 **Note:** You can specify timing as either **start + end** or **start + duration**. When duration is given, Cascade calculates end = start + duration before calling the API.
 
@@ -202,7 +202,7 @@ Before running `LongToneUI.step1()`, Cascade validates the parsed parameters and
 ## Full Example
 
 **You say:**
-> Create a glissando: Start 120s, End 128s, Track 3, E4 to C3, cClef, mp, Y1=10 Y2=0, logarithmic slope -1
+> Create a glissando: Track 3, cClef, start 120s, end 128s, E4 to C3, Y1 10 Y2 0, logarithmic slope -1, dynamic mp, velocity 64
 
 **Cascade runs:**
 ```powershell

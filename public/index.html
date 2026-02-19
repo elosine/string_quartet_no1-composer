@@ -982,16 +982,16 @@
                     <input type="number" id="vibY2Input" class="curve-input" value="0" step="0.5" min="0" max="10" style="width: 50px;">
                 </div>
                 <div class="curve-input-row">
-                    <label style="width: 35px;">Model</label>
-                    <select id="vibModelSelect" style="width: 80px; background: #333; color: #fff; border: 1px solid #555;">
+                    <label style="width: 30px;">Model</label>
+                    <select id="vibModelSelect" style="width: 70px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
                         <option value="logarithmic" selected>Log</option>
                         <option value="exponential">Exp</option>
                         <option value="power">Power</option>
                         <option value="sigmoid">S-Curve</option>
                         <option value="bezier">Bezier</option>
                     </select>
-                    <label style="width: 35px; margin-left: 5px;">Slope</label>
-                    <input type="number" id="vibSlopeInput" class="curve-input" value="-0.65" step="0.5" min="-3" max="3" style="width: 50px;" title="Initial slope / real-time coefficient">
+                    <label style="width: 28px; margin-left: 3px;">Slope</label>
+                    <input type="number" id="vibSlopeInput" class="curve-input" value="-0.65" step="0.5" min="-3" max="3" style="width: 45px; font-size: 10px;" title="Initial slope / real-time coefficient">
                 </div>
                 <div class="curve-input-row">
                     <label style="width: 35px;">Vel</label>
@@ -1019,8 +1019,9 @@
                     <input type="radio" id="vibFillTop" name="vibFill" value="top">
                     <label for="vibFillTop">Fill ↑</label>
                 </div>
-                <div class="control-row" style="margin-top: 5px;">
-                    <button id="vibGenerateBtn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 12px;">Generate</button>
+                <div class="control-row" style="margin-top: 5px; gap: 5px;">
+                    <button id="vibStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
+                    <button id="vibStep2Btn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 8px;">2: Generate</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -6463,10 +6464,15 @@
                             // Send to output if available
                             if (this.selectedOutput) {
                                 // Remap channel for channel voice messages (0x80-0xEF)
+                                // Vibrato events use channels 5-8 (0-indexed 4-7) — pass through as-is
+                                // Standard/glissando events use channels 1-4 (0-indexed 0-3) — remap to track output channel
                                 const data = [...event.data];
                                 const statusByte = data[0];
                                 if (statusByte >= 0x80 && statusByte < 0xF0) {
-                                    data[0] = (statusByte & 0xF0) | outputChannel;
+                                    const embeddedChannel = statusByte & 0x0F;
+                                    if (embeddedChannel < 4) {
+                                        data[0] = (statusByte & 0xF0) | outputChannel;
+                                    }
                                 }
                                 this.selectedOutput.send(data);
                             }
@@ -15994,10 +16000,15 @@
                     const pageStartTime = pointPage * secondsPerPage;
                     const timeOnPage = pointTimeActual - pageStartTime;
                     const xPercent = (timeOnPage / secondsPerPage) * 100;
-                    const xPos = (xPercent / 100) * scoreWidth;
+                    let xPos = (xPercent / 100) * scoreWidth;
                     
                     // Calculate marker size (25% of track height)
                     const markerHeight = targetTrackDims.height * 0.25;
+                    const estimatedMarkerWidth = markerHeight * 0.6;
+                    
+                    // Clamp: keep markers within page edges
+                    if (xPos < 0) xPos = 0;
+                    if (xPos + estimatedMarkerWidth > scoreWidth) xPos = scoreWidth - estimatedMarkerWidth;
                     
                     // Center vertically in track
                     const yPos = targetTrackDims.y + (targetTrackDims.height - markerHeight) / 2;
@@ -17354,10 +17365,17 @@
         // Pipeline: read template → substitute params → render LilyPond → crop SVG → save to SVG_graphics
         // ============================================
         const VibratoUI = {
+            pendingCurve: null, // Stores curve from Step 1 for use in Step 2
+            
             init() {
-                const btn = document.getElementById('vibGenerateBtn');
-                if (btn) {
-                    btn.addEventListener('click', () => this.generate());
+                const step1Btn = document.getElementById('vibStep1Btn');
+                const step2Btn = document.getElementById('vibStep2Btn');
+                
+                if (step1Btn) {
+                    step1Btn.addEventListener('click', () => this.step1());
+                }
+                if (step2Btn) {
+                    step2Btn.addEventListener('click', () => this.step2());
                 }
                 
                 // Color swatch handlers (independent from LT and CurveMaker swatches)
@@ -17368,7 +17386,7 @@
                     });
                 });
                 
-                console.log('VibratoUI initialized');
+                console.log('VibratoUI initialized (two-phase workflow)');
             },
             
             // Generate vibrato filename
@@ -17380,26 +17398,26 @@
                 return `Vib-${dirCode}-${clefName}-${safePitch}-${startDyn}-${endDyn}.ly`;
             },
             
-            // Create a curve from vibrato UI inputs (mirrors LongToneUI.createCurve)
-            createCurve() {
-                const startSeconds = parseFloat(document.getElementById('vibStartInput').value) || 0;
-                const endSeconds = parseFloat(document.getElementById('vibEndInput').value) || 10;
-                const y1 = parseFloat(document.getElementById('vibY1Input').value);
-                const y2 = parseFloat(document.getElementById('vibY2Input').value);
-                const gTrack = document.getElementById('vibTrackInput').value;
-                const slope = parseFloat(document.getElementById('vibSlopeInput').value) || 0;
-                const model = document.getElementById('vibModelSelect').value;
+            // Create a curve from vibrato UI inputs or programmatic params
+            createCurve(params = null) {
+                const startSeconds = params?.startSeconds ?? (parseFloat(document.getElementById('vibStartInput').value) || 0);
+                const endSeconds = params?.endSeconds ?? (parseFloat(document.getElementById('vibEndInput').value) || 10);
+                const y1 = params?.y1 ?? parseFloat(document.getElementById('vibY1Input').value);
+                const y2 = params?.y2 ?? parseFloat(document.getElementById('vibY2Input').value);
+                const gTrack = params?.gTrack ?? document.getElementById('vibTrackInput').value;
+                const slope = params?.slope ?? (parseFloat(document.getElementById('vibSlopeInput').value) || 0);
+                const model = params?.model ?? document.getElementById('vibModelSelect').value;
                 
                 const y1Val = isNaN(y1) ? 10 : y1;
                 const y2Val = isNaN(y2) ? 0 : y2;
                 
                 // Read color from vibrato swatches (default limeGreen)
                 const vibSwatch = document.querySelector('#vibColorSwatches .color-swatch.selected');
-                const color = vibSwatch ? vibSwatch.dataset.color : 'limeGreen';
+                const color = params?.color ?? (vibSwatch ? vibSwatch.dataset.color : 'limeGreen');
                 
                 // Read fill mode from vibrato radio (default bottom/Fill Down)
                 const vibFill = document.querySelector('input[name="vibFill"]:checked');
-                const fillMode = vibFill ? vibFill.value : 'bottom';
+                const fillMode = params?.fillMode ?? (vibFill ? vibFill.value : 'bottom');
                 
                 const curve = CurveMaker.createCurve({
                     startSeconds,
@@ -17420,38 +17438,44 @@
                 return curve;
             },
             
-            // Main generate method (3-phase button: Generate → Generating... → ✓ Done)
-            // Creates curve + notation + inserts SVG
-            async generate() {
-                const btn = document.getElementById('vibGenerateBtn');
-                const originalText = btn ? btn.textContent : '';
-                const originalBg = btn ? btn.style.background : '';
+            // Step 1: Create curve only — allows user to adjust curve shape before generating
+            step1(params = null) {
+                console.log('VibratoUI.step1: Creating curve...', params ? '(programmatic)' : '(UI)');
                 
-                // Read UI values for notation
-                // Auto-determine direction from Y1 vs Y2:
-                // High Y → Low Y = wide-narrow vibrato (>)
-                // Low Y → High Y = narrow-wide vibrato (<)
-                const y1 = parseFloat(document.getElementById('vibY1Input').value) || 0;
-                const y2 = parseFloat(document.getElementById('vibY2Input').value) || 0;
-                const direction = y1 >= y2 ? 'wide-narrow' : 'narrow-wide';
-                const clef = document.getElementById('vibClefSelect').value;
-                const pitch = document.getElementById('vibPitchInput').value.trim();
-                const startDynamic = document.getElementById('vibStartDynamic').value;
-                const endDynamic = document.getElementById('vibEndDynamic').value;
-                
-                if (!pitch) {
-                    console.error('VibratoUI: Pitch is required');
+                const curve = this.createCurve(params);
+                if (!curve) {
+                    console.error('VibratoUI.step1: Failed to create curve');
                     return null;
                 }
                 
-                // Convert pitch to LilyPond format (reuse LongToneUI helper)
-                const lpPitch = LongToneUI.pitchToLilyPond(pitch);
-                const lpClef = LongToneUI.clefToLilyPond(clef);
-                const filename = this.generateFilename(direction, clef, pitch, startDynamic, endDynamic);
+                // Store curve for Step 2
+                this.pendingCurve = curve;
                 
-                console.log('VibratoUI.generate:', JSON.stringify({
-                    direction, clef: lpClef, pitch: lpPitch, startDynamic, endDynamic, filename
-                }, null, 2));
+                console.log('VibratoUI.step1: Curve created. Adjust shape as needed, then click "2: Generate"');
+                console.log('VibratoUI.step1: Curve ID:', curve.id, 'Name:', curve.name);
+                
+                return curve;
+            },
+            
+            // Step 2: Generate notation, SVG, MIDI using the pending curve
+            async step2(params = null) {
+                const btn = document.getElementById('vibStep2Btn');
+                const originalText = btn ? btn.textContent : '';
+                const originalBg = btn ? btn.style.background : '';
+                
+                // Use pending curve from Step 1, or find selected curve
+                let curve = this.pendingCurve;
+                
+                if (!curve) {
+                    // Try to use currently selected curve
+                    if (window.CurveMaker && CurveMaker.selectedCurve) {
+                        curve = CurveMaker.selectedCurve;
+                        console.log('VibratoUI.step2: Using selected curve:', curve.name);
+                    } else {
+                        console.error('VibratoUI.step2: No pending curve. Run Step 1 first or select a curve.');
+                        return null;
+                    }
+                }
                 
                 // Set button to generating state
                 if (btn) {
@@ -17460,18 +17484,37 @@
                     btn.disabled = true;
                 }
                 
+                console.log('VibratoUI.step2: Generating notation, SVG, and MIDI for curve:', curve.name);
+                
+                // Read UI values for notation (params override UI)
+                const y1 = params?.y1 ?? (parseFloat(document.getElementById('vibY1Input').value) || 0);
+                const y2 = params?.y2 ?? (parseFloat(document.getElementById('vibY2Input').value) || 0);
+                const direction = y1 >= y2 ? 'wide-narrow' : 'narrow-wide';
+                const clef = params?.clef ?? document.getElementById('vibClefSelect').value;
+                const pitch = (params?.pitch ?? document.getElementById('vibPitchInput').value).trim();
+                const startDynamic = params?.startDynamic ?? document.getElementById('vibStartDynamic').value;
+                const endDynamic = params?.endDynamic ?? document.getElementById('vibEndDynamic').value;
+                
+                if (!pitch) {
+                    console.error('VibratoUI.step2: Pitch is required');
+                    if (btn) { btn.textContent = originalText; btn.style.background = originalBg; btn.disabled = false; }
+                    return null;
+                }
+                
+                const lpPitch = LongToneUI.pitchToLilyPond(pitch);
+                const lpClef = LongToneUI.clefToLilyPond(clef);
+                const filename = this.generateFilename(direction, clef, pitch, startDynamic, endDynamic);
+                
+                console.log('VibratoUI.step2:', JSON.stringify({
+                    direction, clef: lpClef, pitch: lpPitch, startDynamic, endDynamic, filename
+                }, null, 2));
+                
                 let result = null;
                 try {
-                    // Step 1: Create the curve
-                    const curve = this.createCurve();
-                    if (!curve) {
-                        throw new Error('Failed to create curve');
-                    }
-                    
-                    const track = parseInt(document.getElementById('vibTrackInput').value) || 1;
+                    const track = params?.track ?? (parseInt(document.getElementById('vibTrackInput').value) || 1);
                     const startSeconds = curve.startSeconds;
                     
-                    // Step 2: Create LilyPond file from template
+                    // Create LilyPond file from template
                     const createResp = await fetch('/api/lilypond/create-vibrato', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -17487,12 +17530,12 @@
                     const createResult = await createResp.json();
                     
                     if (!createResult.success) {
-                        console.error('VibratoUI: Failed to create file:', createResult.error);
+                        console.error('VibratoUI.step2: Failed to create file:', createResult.error);
                         throw new Error(createResult.error);
                     }
-                    console.log('VibratoUI: LilyPond file created:', filename);
+                    console.log('VibratoUI.step2: LilyPond file created:', filename);
                     
-                    // Step 3: Render LilyPond to SVG (reuse glissando render endpoint)
+                    // Render LilyPond to SVG
                     const renderResp = await fetch('/api/lilypond/render-glissando', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -17501,22 +17544,22 @@
                     const renderResult = await renderResp.json();
                     
                     if (renderResult.success) {
-                        console.log('VibratoUI: SVG rendered:', renderResult.svgPath);
+                        console.log('VibratoUI.step2: SVG rendered:', renderResult.svgPath);
                         
-                        // Step 4: Insert SVG into score at curve's START position (left edge)
+                        // Insert SVG into score at curve's START position
                         const svgPath = renderResult.svgPath;
                         const insertResult = await this.insertVibratoSvg(svgPath, startSeconds, track);
                         if (insertResult) {
-                            console.log('VibratoUI: SVG inserted into score');
+                            console.log('VibratoUI.step2: SVG inserted into score');
                         }
                         
-                        // Step 5: Generate and insert MIDI
+                        // Generate and insert MIDI
                         const midiResult = await this.generateVibratoMidi(curve);
                         let midiInsert = null;
                         if (midiResult) {
                             midiInsert = await this.insertVibratoMidi(midiResult, curve);
                             if (midiInsert) {
-                                console.log('VibratoUI: MIDI inserted into score');
+                                console.log('VibratoUI.step2: MIDI inserted into score');
                             }
                         }
                         
@@ -17533,11 +17576,11 @@
                             midiInsert: midiInsert
                         };
                     } else {
-                        console.error('VibratoUI: Render failed:', renderResult.error);
+                        console.error('VibratoUI.step2: Render failed:', renderResult.error);
                         throw new Error(renderResult.error || 'Render failed');
                     }
                 } catch (err) {
-                    console.error('VibratoUI.generate error:', err);
+                    console.error('VibratoUI.step2 error:', err);
                 } finally {
                     // 3-phase button: show Done, then restore
                     if (btn) {
@@ -17556,6 +17599,19 @@
                     }
                 }
                 
+                return result;
+            },
+            
+            // Convenience method: Run entire workflow in one call (for AI prompts)
+            async go(params = null) {
+                console.log('VibratoUI.go: Running full workflow...', params ? '(programmatic)' : '(UI)');
+                
+                // Step 1: Create curve
+                const curve = this.step1(params);
+                if (!curve) return null;
+                
+                // Step 2: Generate notation, SVG, MIDI
+                const result = await this.step2(params);
                 return result;
             },
             
