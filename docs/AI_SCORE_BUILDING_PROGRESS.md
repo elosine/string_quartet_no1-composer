@@ -2,21 +2,21 @@
 
 **Status:** Active  
 **Last Updated:** Feb 19, 2026  
-**Current ASB Number:** ASB-062
+**Current ASB Number:** ASB-063
 
 ---
 
 ## Last Session Summary
 
-> **Two-Stage Vibrato + Prompt Guide Rewrite + Bug Fixes + Score Composition.** Refactored Vibrato System to two-stage workflow (Step 1: Curve, Step 2: Generate) matching Long Tone Glissando pattern. Rewrote prompt guide templates for natural dictation order. Added server-side SVG left-edge clamping. Fixed OneDrive file-locking bug in render_glissando.ps1 with retry loop. Added pitch tracking marker clamping to prevent off-page notation. Composed vibratos (tracks 1, 2, 4) and glissandos (tracks 2, 4) — scores 222–230.
+> **SVG Page-Boundary Clamp + Score Composition (scores 233–251).** Fixed SVG notation disappearing when glissando moved near page edge via group move — added dynamic client-side clamp in calcPixelPosition. Created glissandos on tracks 1, 2, 4 (207–216.3s and 223.25–240.4s) and vibratos on tracks 1, 2, 4 (215.55–223.25s).
 
 ---
 
 ## Current Session
 
 **Date:** Feb 19, 2026  
-**Focus:** Two-Stage Vibrato + Bug Fixes + Score Composition  
-**Tier 1 Count This Session:** 5 (ASB-058 through ASB-062)  
+**Focus:** SVG Page-Boundary Clamp + Score Composition  
+**Tier 1 Count This Session:** 1 (ASB-063)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -70,6 +70,10 @@
 - ASB-062: Glissando pitch tracking marker clamping — clamp left/right edges to prevent off-page markers
 - Score composition: Regenerated track 4 vibrato (A+3, bass, 186-192s, score 222). Created glissandos (tracks 2+4, G+3→Ad3/Ab3, 192.2-202s, scores 225-226). Created vibratos (tracks 1+2+4, Ad3/Ab3/Abd3, 202.15-206.6s, scores 228-230) (restore on load, save on change)
 
+### Session Log — SVG Page-Boundary Clamp + Score Composition
+- ASB-063: Dynamic client-side SVG page-boundary clamp in calcPixelPosition — prevents SVG notation from disappearing when moved near page edge via group move
+- Score composition: Created glissandos (tracks 1+2+4, G+3→Ab3/Ad3/G#3, 207-216.3s + 223.25-240.4s, scores 233-235 + 249-251). Created vibratos (tracks 1+2+4, A+3/Ad3/Ab3, 215.55-223.25s, ff→f, scores 244-246)
+
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
 
@@ -85,7 +89,7 @@
 
 ## Pending Work
 
-**Rollback point:** `git checkout milestone-glissando-ui-prompt-good` — scale 0.42 + Y offset 10px, confirmed working.
+**Rollback point:** `git checkout beating-section-complete` — all beating section composition done (scores up to 255), SVG page-boundary clamp fix, commit 55e5127.
 
 *(Items to pick up next session)*
 
@@ -166,6 +170,7 @@
 | ASB-060 | Vibrato System two-stage generation + programmatic params + UI styling | Complete |
 | ASB-061 | Fix OneDrive file-lock in render_glissando.ps1 — Move-Item retry loop | Complete |
 | ASB-062 | Glissando pitch tracking marker clamping — left/right edge clamp | Complete |
+| ASB-063 | Dynamic client-side SVG page-boundary clamp in calcPixelPosition | Complete |
 
 ---
 
@@ -183,6 +188,7 @@
 | Feb 17, 2026 | 5c8fd71 | SVG anchor system + Curve Maker UI redesign (ASB-040 to ASB-043) |
 | Feb 18, 2026 | c942c2c | audio mixer + groups enhancements + score composition + prompt guide duration option (ASB-053 to ASB-056) |
 | Feb 19, 2026 | d039063 | two-stage vibrato, prompt guide rewrite, bug fixes, pitch tracking clamping, score composition (ASB-057 to ASB-062, scores 209-230) |
+| Feb 19, 2026 | 9857d39 | SVG page-boundary clamp fix + score composition (ASB-063, scores 233-251) |
 
 ---
 
@@ -193,6 +199,7 @@
 | Feb 14, 2026 | `milestone-asb-glissando-complete` | Full glissando automation: UI + AI prompt, notation, SVG, MIDI, all bugs fixed |
 | Feb 15, 2026 | `milestone-glissando-ui-prompt-good` | Glissando System UI Prompt Good. Caveat: SVG notation manual reposition may vary with different size SVGs |
 | Feb 15, 2026 | `milestone-ai-prompt-validated-copy-paste` | AI prompt tested with validation checklist + copy-paste workflow clarified |
+| Feb 19, 2026 | `beating-section-complete` | Beating section composition complete (scores 233–255), SVG page-boundary clamp fix (ASB-063) |
 
 ---
 

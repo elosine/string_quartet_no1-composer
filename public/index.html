@@ -2507,7 +2507,19 @@
                     ? GraphicTimeline.getSecondsPerPage() 
                     : (beatsPerPage / beatsPerMinute) * 60;
                 const actualSeconds = el.referenceSeconds + el.offsetSeconds;
-                const displayTime = actualSeconds + leadInSeconds;
+                let displayTime = actualSeconds + leadInSeconds;
+                
+                // Clamp: if negative offsetSeconds pulls SVG onto previous page,
+                // clamp to the left edge of the page the reference point is on
+                if (el.offsetSeconds < 0) {
+                    const refDisplayTime = el.referenceSeconds + leadInSeconds;
+                    const refPage = Math.floor(Math.max(0, refDisplayTime) / secondsPerPage);
+                    const pageStartTime = refPage * secondsPerPage;
+                    if (displayTime < pageStartTime) {
+                        displayTime = pageStartTime;
+                    }
+                }
+                
                 const page = Math.floor(Math.max(0, displayTime) / secondsPerPage);
                 const section = page % 2 === 0 ? 'top' : 'bottom';
                 const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
