@@ -100,6 +100,20 @@ When moving a score object to a new time, updating only the top-level `startSeco
 ### Async Operations Blocking Visual Rendering
 Never gate visual rendering on async audio operations that depend on user gestures. Chrome's autoplay policy causes `audioContext.resume()` to hang indefinitely without a user gesture, blocking any code after `await`. Render visual elements synchronously first, then load audio data in background. (ASB-012)
 
+### DOM Layout Timing on Window Resize (ASB-067)
+When reading `clientHeight`/`clientWidth` after a window resize, the DOM may return **stale cached values** if the browser hasn't completed layout reflow. Systems that mutate DOM before reading (like CurveMaker's `innerHTML = ''` + recreate) accidentally force a synchronous reflow and get correct values. Systems that only read passively (like SVGElementManager's in-place update) can get stale values, especially after extreme resize transitions (minimize → maximize).
+
+**Fix pattern:**
+1. Use `requestAnimationFrame` inside the debounced resize handler (runs after layout)
+2. Add `void element.offsetHeight` before reading dimensions (forces synchronous reflow)
+3. Guard against degenerate values (e.g., `height <= 0` when window is tiny) — keep last good state
+
+### Proportional Resize with heightFraction (ASB-066/067)
+To make SVG elements resize proportionally with their containing track on window resize, store a **`heightFraction`** (what fraction of track height the element occupies) rather than a fixed `scale`. On each resize, recompute `scale = (heightFraction * trackHeight) / svgHeight`. Key pitfalls:
+- **Old saves**: Data saved before `heightFraction` existed won't have it. Compute it at **import time** (not on first resize) to lock it in consistently for the session. Re-save to persist.
+- **Degenerate heights**: When window is extremely small, `trackHeight` can go to 0 or negative (e.g., `(clientHeight - timelineOffset) / 4`). Guard with `th > 0` check; skip scale update and preserve last good value.
+- **Compare with working systems**: If another system (curves) handles resize correctly, study its approach. The difference is often in DOM mutation timing, not math.
+
 ### Debugging Session Management
 When a debugging session becomes unproductive — fixes create new problems, diagnostics are inconclusive, or the root cause remains elusive — follow this protocol:
 

@@ -1050,6 +1050,151 @@ app.post('/api/lilypond/create-vibrato', (req, res) => {
     }
 });
 
+// Create crescendo LilyPond file from template
+app.post('/api/lilypond/create-crescendo', (req, res) => {
+    const { filename, pitchModel, clef, pitchInfo, dynamic1, dynamic2, hairpin } = req.body;
+    
+    if (!filename || !pitchModel || !clef || !pitchInfo || !dynamic1 || !dynamic2 || !hairpin) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters' });
+    }
+    
+    // Select template based on pitch model
+    const templateName = pitchModel === 'glissando' 
+        ? 'CrescendoGlissandoTemplate.ly'
+        : 'CrescendoSinglePitchTemplate.ly';
+    const templatePath = path.join(LILYPOND_DIR, templateName);
+    const outputPath = path.join(LILYPOND_DIR, filename);
+    
+    if (!fs.existsSync(templatePath)) {
+        return res.status(404).json({ success: false, error: `Template not found: ${templateName}` });
+    }
+    
+    try {
+        let template = fs.readFileSync(templatePath, 'utf8');
+        
+        // 1. Substitute clef
+        template = template.replace(/\\clef treble/, `\\clef ${clef}`);
+        
+        if (pitchModel === 'glissando') {
+            // Glissando pitch model: two pitches with glissando line
+            const startPitch = pitchInfo.lpStartPitch ? pitchInfo.lpStartPitch.replace(/\d+$/, '') : 'a';
+            const endPitch = pitchInfo.lpEndPitch ? pitchInfo.lpEndPitch.replace(/\d+$/, '') : 'a';
+            const glissOffset = pitchInfo.glissOffset || '0';
+            
+            // 2. Substitute start pitch (quarter note): replace "as4" after START PITCH comment
+            template = template.replace(
+                /(% === START PITCH ===\n\s*)as4/,
+                `$1${startPitch}4`
+            );
+            
+            // 3. Substitute end pitch (quarter note): replace "a4" after END PITCH comment
+            template = template.replace(
+                /(% === END PITCH ===\n\s*)a4/,
+                `$1${endPitch}4`
+            );
+            
+            // 4. Substitute gliss Y offset
+            if (glissOffset !== '0') {
+                template = template.replace(
+                    /(% === GLISS_Y_OFFSET ===\n\s*-\\tweak extra-offset #'\(0 \. )0(\))/,
+                    `$1${glissOffset}$2`
+                );
+            }
+        } else {
+            // Single pitch model: one half-note pitch
+            const pitch = pitchInfo.lpPitch ? pitchInfo.lpPitch.replace(/\d+$/, '') : 'a';
+            
+            // 2. Substitute pitch (half note): replace "a2" after PITCH comment
+            template = template.replace(
+                /(% === PITCH ===\n\s*)a2/,
+                `$1${pitch}2`
+            );
+        }
+        
+        // 5. Substitute dynamic 1
+        template = template.replace(
+            /(% === DYNAMIC_1 ===\n\s*-\\tweak extra-offset[^\n]*\n\s*)\\ppp/,
+            `$1\\${dynamic1}`
+        );
+        
+        // 6. Substitute dynamic 2
+        template = template.replace(
+            /(% === DYNAMIC_2 ===\n\s*-\\tweak extra-offset[^\n]*\n\s*)\\f/,
+            `$1\\${dynamic2}`
+        );
+        
+        // 7. Substitute hairpin direction
+        const hairpinCmd = hairpin === '<' ? '\\<' : '\\>';
+        template = template.replace(
+            /(% === HAIRPIN ===\n\s*-\\tweak extra-offset[^\n]*\n\s*-\\tweak shorten-pair[^\n]*\n\s*)\\</,
+            `$1${hairpinCmd}`
+        );
+        
+        // 8. Pitch-register-based positioning adjustments
+        //    Analyze highest pitch to determine if ledger lines exist above/below staff
+        //    Then adjust dynamics (below) and Non-Vib text (above) accordingly
+        const noteLetters = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+        function pitchToStaffPos(lpPitch) {
+            // Convert LilyPond pitch to absolute staff position (C4 = 0)
+            const letter = lpPitch.charAt(0);
+            const octave = parseInt((lpPitch.match(/\d+/) || ['4'])[0]);
+            return (octave - 4) * 7 + noteLetters.indexOf(letter);
+        }
+        function getStaffRange(clefName) {
+            // Returns [bottomLinePos, topLinePos] in absolute staff positions
+            if (clefName === 'treble') return [2, 10];   // E4 to F5
+            if (clefName === 'alto')   return [-1, 7];   // B3 to C5
+            if (clefName === 'bass')   return [-10, -2];  // G2 to A3
+            return [2, 10]; // default treble
+        }
+        
+        // Get the pitches to analyze
+        let pitchesToCheck = [];
+        if (pitchModel === 'glissando') {
+            const sp = pitchInfo.lpStartPitch || 'a4';
+            const ep = pitchInfo.lpEndPitch || 'a4';
+            pitchesToCheck = [sp, ep];
+        } else {
+            pitchesToCheck = [pitchInfo.lpPitch || 'a4'];
+        }
+        
+        const staffPositions = pitchesToCheck.map(p => pitchToStaffPos(p));
+        const highestPos = Math.max(...staffPositions);
+        const lowestPos = Math.min(...staffPositions);
+        const [staffBottom, staffTop] = getStaffRange(clef);
+        
+        const hasLedgerAbove = highestPos > staffTop;
+        const hasLedgerBelow = lowestPos < staffBottom;
+        const positionsAbove = Math.max(0, highestPos - staffTop);
+        
+        // 8a. If NO ledger lines below: use DynamicLineSpanner.staff-padding
+        //     so dynamics/hairpin auto-position up close to staff
+        if (!hasLedgerBelow) {
+            template = template.replace(
+                /\\override Hairpin\.Y-offset = #-0\.3[^\n]*/,
+                '\\override DynamicLineSpanner.staff-padding = #1.2'
+            );
+        }
+        
+        // 8b. If ledger lines above: shift Non-Vib text Y up
+        //     ~0.8 staff-spaces per position above the staff
+        if (hasLedgerAbove) {
+            const nonVibYShift = positionsAbove * 0.8;
+            template = template.replace(
+                /(% Non-Vib Text\n\s*-\\tweak extra-offset #'\(0 \. )0(\))/,
+                `$1${nonVibYShift.toFixed(1)}$2`
+            );
+        }
+        
+        fs.writeFileSync(outputPath, template);
+        console.log(`Created crescendo LilyPond file: ${filename} (${pitchModel}, ${clef}, ${dynamic1}->${dynamic2}, hairpin ${hairpin}, ledgerAbove=${hasLedgerAbove}, ledgerBelow=${hasLedgerBelow})`);
+        res.json({ success: true, created: true, filename, path: outputPath });
+    } catch (err) {
+        console.error('Error creating crescendo file:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // Crop SVG to content bounds (replaces Inkscape cropping)
 // Parses LilyPond SVG structure: <g transform="translate(tx,ty)"> containing <line>, <rect>, <path>
 function cropSvgToContent(svgFilePath) {

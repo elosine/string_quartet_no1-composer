@@ -820,7 +820,7 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Long Tone Glissando System</div>
+                <div class="section-label" style="background: var(--clr-limeGreen); color: #000; padding: 3px 6px; border-radius: 2px;">Long Tone Glissando System</div>
                 
                 <div class="curve-input-row">
                     <label style="width: 35px;">Start</label>
@@ -925,7 +925,7 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Vibrato System</div>
+                <div class="section-label" style="background: var(--clr-brightRed); color: #fff; padding: 3px 6px; border-radius: 2px;">Vibrato System</div>
                 
                 <div class="curve-input-row">
                     <label style="width: 55px;">Clef</label>
@@ -1025,7 +1025,128 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Curve Segments</div>
+                <div class="section-label" style="background: var(--clr-darkRed); color: #fff; padding: 3px 6px; border-radius: 2px;">Crescendo / Decrescendo System</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Track</label>
+                    <input type="number" id="cdTrackInput" class="curve-input" value="1" min="1" max="4" step="1" style="width: 35px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">Clef</label>
+                    <select id="cdClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="treble" selected>Treble</option>
+                        <option value="bass">Bass</option>
+                        <option value="cClef">C Clef</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Start</label>
+                    <input type="number" id="cdStartInput" class="curve-input" value="0" step="0.1" style="width: 50px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 10px; margin-left: 2px;" id="cdTimeLabel2">End</label>
+                    <input type="number" id="cdEndInput" class="curve-input" value="10" step="0.1" style="width: 50px; font-size: 10px;">
+                    <select id="cdTimeMode" style="width: 38px; background: #333; color: #fff; border: 1px solid #555; font-size: 8px; margin-left: 2px;" title="Switch between End time and Duration">
+                        <option value="end" selected>End</option>
+                        <option value="dur">Dur</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Y1</label>
+                    <input type="number" id="cdY1Input" class="curve-input" value="0" step="0.5" min="0" max="10" style="width: 50px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 14px; margin-left: 5px;">Y2</label>
+                    <input type="number" id="cdY2Input" class="curve-input" value="10" step="0.5" min="0" max="10" style="width: 50px; font-size: 10px;">
+                </div>
+                <div class="curve-input-row" style="gap: 2px;">
+                    <label style="font-size: 8px; min-width: 14px;">Md</label>
+                    <select id="cdModelSelect" style="font-size: 8px; padding: 1px 2px; background: #333; color: #fff; border: 1px solid #555; width: 52px;">
+                        <option value="logarithmic" selected>Log</option>
+                        <option value="exponential">Exp</option>
+                        <option value="power">Power</option>
+                        <option value="sigmoid">S-Curve</option>
+                        <option value="bezier">Bezier</option>
+                    </select>
+                    <label style="font-size: 8px; min-width: 14px; margin-left: 2px;">Slp</label>
+                    <input type="number" id="cdSlopeInput" class="curve-input" value="-0.65" step="0.05" min="-3" max="3" style="width: 48px; font-size: 8px; padding: 1px 2px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Pitch</label>
+                    <select id="cdPitchModel" style="width: 80px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="glissando" selected>Glissando</option>
+                        <option value="single">Single Pitch</option>
+                    </select>
+                </div>
+                <div id="cdGlissPitchRow" class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Start</label>
+                    <input type="text" id="cdStartPitch" class="curve-input" value="A3" style="width: 45px; font-size: 10px;" placeholder="A3">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 3px;">End</label>
+                    <input type="text" id="cdEndPitch" class="curve-input" value="Ab3" style="width: 45px; font-size: 10px;" placeholder="Ab3">
+                </div>
+                <div id="cdSinglePitchRow" class="curve-input-row" style="display: none;">
+                    <label style="font-size: 9px; min-width: 28px;">Pitch</label>
+                    <input type="text" id="cdSinglePitchInput" class="curve-input" value="A3" style="width: 55px; font-size: 10px;" placeholder="A3">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Dyn1</label>
+                    <select id="cdDynamic1" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="pppp">pppp</option>
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p" selected>p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f">f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff">fff</option>
+                        <option value="ffff">ffff</option>
+                    </select>
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 3px;">Dyn2</label>
+                    <select id="cdDynamic2" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="pppp">pppp</option>
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p">p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f" selected>f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff">fff</option>
+                        <option value="ffff">ffff</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Vel</label>
+                    <input type="number" id="cdVelocityInput" class="curve-input" value="115" min="0" max="127" style="width: 45px; font-size: 10px;" title="MIDI velocity (0-127)">
+                </div>
+                <div class="color-swatches" id="cdColorSwatches" style="margin-top: 4px;">
+                    <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
+                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
+                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
+                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
+                    <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
+                    <div class="color-swatch selected" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
+                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
+                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
+                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
+                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
+                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
+                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                </div>
+                <div class="curve-fill-toggle" style="margin-top: 3px;">
+                    <input type="radio" id="cdFillLine" name="cdFill" value="line">
+                    <label for="cdFillLine">Line</label>
+                    <input type="radio" id="cdFillBottom" name="cdFill" value="bottom" checked>
+                    <label for="cdFillBottom">Fill ↓</label>
+                    <input type="radio" id="cdFillTop" name="cdFill" value="top">
+                    <label for="cdFillTop">Fill ↑</label>
+                </div>
+                <div class="control-row" style="margin-top: 3px; gap: 5px; align-items: center;">
+                    <input type="checkbox" id="cdSeccoCheckbox" checked style="margin: 0;">
+                    <label for="cdSeccoCheckbox" style="font-size: 11px;">Secco (CC7 ramp-down after note-off)</label>
+                </div>
+                <div class="control-row" style="margin-top: 5px; gap: 5px;">
+                    <button id="cdStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
+                    <button id="cdStep2Btn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 8px;">2: Generate</button>
+                </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label" style="background: var(--clr-navyBlue); color: #fff; padding: 3px 6px; border-radius: 2px;">Curve Segments</div>
                 
                 <div class="curve-input-row">
                     <button id="segmentX1Btn" class="control-btn" style="font-size: 10px; width: 30px;">X1</button>
@@ -1185,7 +1306,7 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Glissando Pitch Tracking</div>
+                <div class="section-label" style="background: var(--clr-green); color: #fff; padding: 3px 6px; border-radius: 2px;">Glissando Pitch Tracking</div>
                 
                 <div class="curve-input-row">
                     <label>Clef</label>
@@ -1211,7 +1332,7 @@
                 <button id="glissandoRemoveBtn" class="curve-draw-btn" style="margin-top: 5px;">Remove Glissando</button>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Motive Maker</div>
+                <div class="section-label" style="background: var(--clr-plum); color: #fff; padding: 3px 6px; border-radius: 2px;">Motive Maker</div>
                 
                 <!-- DISABLED: Name field (code kept in MotiveMaker)
                 <div class="curve-input-row">
@@ -1299,7 +1420,7 @@
                 -->
                 
                 <div class="section-divider"></div>
-                <div class="section-label">MIDI Model</div>
+                <div class="section-label" style="background: var(--clr-mustard); color: #000; padding: 3px 6px; border-radius: 2px;">MIDI Model</div>
                 
                 <div class="curve-input-row">
                     <label style="font-size: 10px;">Model</label>
@@ -1475,7 +1596,7 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">GC (Bouncing Ball)</div>
+                <div class="section-label" style="background: var(--clr-lavander); color: #fff; padding: 3px 6px; border-radius: 2px;">GC (Bouncing Ball)</div>
                 
                 <div class="curve-input-row">
                     <label>Impact</label>
@@ -1607,7 +1728,7 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label">Connectors</div>
+                <div class="section-label" style="background: var(--clr-brightGreen); color: #000; padding: 3px 6px; border-radius: 2px;">Connectors</div>
                 <div class="control-row">
                     <button id="connectorModeBtn" class="control-btn" style="font-size: 10px; background: rgba(162,126,198,255); color: #fff;">Connect Mode: OFF</button>
                 </div>
@@ -2450,11 +2571,12 @@
                 document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
                 
                 // Re-render SVG elements on window resize (debounced)
+                // Uses requestAnimationFrame to ensure DOM layout is settled
                 let resizeTimeout;
                 window.addEventListener('resize', () => {
                     clearTimeout(resizeTimeout);
                     resizeTimeout = setTimeout(() => {
-                        this.reRenderAllElements();
+                        requestAnimationFrame(() => this.reRenderAllElements());
                     }, 100);
                 });
                 
@@ -2612,6 +2734,14 @@
                 }
                 
                 // Store element data — anchor-based
+                // Compute heightFraction: what fraction of track the scaled SVG occupies
+                const initTrackDims = window.CompositionPanel 
+                    ? CompositionPanel.getTrackDimensions(String(track), 
+                        document.getElementById('ScoreTop'))
+                    : { height: 200 };
+                const initialScale = 1;
+                const heightFraction = (initialScale * height) / initTrackDims.height;
+                
                 const elementData = {
                     id: id,
                     name: this.generateSvgName(filename),
@@ -2622,7 +2752,8 @@
                     offsetYFraction: 0.3,                // Y position in track (0=top, 1=bottom)
                     width: width,
                     height: height,
-                    scale: 1,
+                    scale: initialScale,
+                    heightFraction: heightFraction,      // Fraction of track height (resize-independent)
                     track: track
                 };
                 
@@ -2811,6 +2942,7 @@
                     
                     const newScale = Math.max(0.1, Math.min(5, this.elementStartScale * scaleFactor));
                     this.selectedElement.scale = newScale;
+                    this._syncHeightFraction(this.selectedElement);
                     
                     this.updateElementTransform(this.selectedElement);
                     this.updateUIFromSelected();
@@ -2973,6 +3105,7 @@
                 if (!this.selectedElement) return;
                 this.selectedElement.scale = parseFloat(this.scaleSlider.value) || 1;
                 this.scaleInput.value = this.selectedElement.scale.toFixed(2);
+                this._syncHeightFraction(this.selectedElement);
                 this.updateElementTransform(this.selectedElement);
             },
             
@@ -2983,7 +3116,17 @@
                 this.selectedElement.scale = scale;
                 this.scaleSlider.value = scale;
                 this.scaleInput.value = scale.toFixed(2);
+                this._syncHeightFraction(this.selectedElement);
                 this.updateElementTransform(this.selectedElement);
+            },
+            
+            // Recompute heightFraction from current scale and track height
+            _syncHeightFraction(el) {
+                const scoreEl = el._section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const trackDims = window.CompositionPanel 
+                    ? CompositionPanel.getTrackDimensions(String(el.track || 1), scoreEl)
+                    : { height: 200 };
+                el.heightFraction = (el.scale * el.height) / trackDims.height;
             },
             
             updateSelectedTrack() {
@@ -3086,6 +3229,7 @@
                     width: el.width,
                     height: el.height,
                     scale: el.scale,
+                    heightFraction: el.heightFraction,
                     track: el.track,
                     svgDataUrl: el.image.getAttribute('href')
                 }));
@@ -3178,6 +3322,7 @@
                         width: elData.width,
                         height: elData.height,
                         scale: elData.scale,
+                        heightFraction: elData.heightFraction || null,
                         track: elData.track || 1
                     };
                     
@@ -3187,6 +3332,12 @@
                     elementData._y = pos.y;
                     elementData._page = pos.page;
                     elementData._section = pos.section;
+                    
+                    // Backward compat: compute heightFraction for old saves that lack it
+                    // Must happen at import (not on first resize) so it's consistent
+                    if (!elementData.heightFraction && elementData.height && pos.trackDims && pos.trackDims.height > 0) {
+                        elementData.heightFraction = (elementData.scale * elementData.height) / pos.trackDims.height;
+                    }
                     
                     this.elements.push(elementData);
                     this.updateElementTransform(elementData);
@@ -3210,8 +3361,11 @@
             },
             
             // Re-render all elements on window resize or lead-in change
-            // Scale stays fixed — only pixel positions are recalculated from anchor data
+            // Scale is recomputed from heightFraction to maintain proportional size relative to track
             reRenderAllElements() {
+                // Force layout reflow so clientHeight/clientWidth reflect final dimensions
+                void this.scoreTopEl.offsetHeight;
+                
                 this.elements.forEach(el => {
                     // Recalculate pixel position from anchor data
                     const pos = this.calcPixelPosition(el);
@@ -3219,6 +3373,14 @@
                     el._y = pos.y;
                     el._page = pos.page;
                     el._section = pos.section;
+                    
+                    // Recompute scale from heightFraction if track height is valid (>0)
+                    // Elements without heightFraction (shouldn't happen after import fix) keep fixed scale
+                    const th = pos.trackDims ? pos.trackDims.height : 0;
+                    if (el.heightFraction && el.height && th > 0) {
+                        el.scale = (el.heightFraction * th) / el.height;
+                    }
+                    // If th <= 0 (degenerate window size), keep last good scale
                     
                     // Move to correct container if section changed
                     const targetContainer = pos.section === 'top' ? this.containerTop : this.containerBottom;
@@ -6476,8 +6638,9 @@
                             // Send to output if available
                             if (this.selectedOutput) {
                                 // Remap channel for channel voice messages (0x80-0xEF)
-                                // Vibrato events use channels 5-8 (0-indexed 4-7) — pass through as-is
-                                // Standard/glissando events use channels 1-4 (0-indexed 0-3) — remap to track output channel
+                                // Standard/glissando events: ch 1-4 (0-indexed 0-3) — remap to track output channel
+                                // Vibrato events: ch 5-8 (0-indexed 4-7) — pass through as-is
+                                // Crescendo events: ch 9-12 (0-indexed 8-11) — pass through as-is
                                 const data = [...event.data];
                                 const statusByte = data[0];
                                 if (statusByte >= 0x80 && statusByte < 0xF0) {
@@ -16601,6 +16764,7 @@
                         width: svgWidth,
                         height: svgHeight,
                         scale: scale,
+                        heightFraction: 0.42,
                         track: track
                     };
                     
@@ -17980,6 +18144,7 @@
                         width: svgWidth,
                         height: svgHeight,
                         scale: scale,
+                        heightFraction: 0.85,
                         track: track
                     };
                     
@@ -18020,6 +18185,917 @@
         };
         VibratoUI.init();
         window.VibratoUI = VibratoUI;
+        
+        // ============================================
+        // CRESCENDO / DECRESCENDO SYSTEM
+        // ============================================
+        // Creates curves with notation SVG + MIDI (pitch bend + CC7 volume ramp)
+        // Supports two pitch models: Glissando (two pitches) and Single Pitch
+        // Pipeline: create curve → LilyPond → SVG → insert SVG → generate MIDI → insert MIDI
+        // ============================================
+        const CrescendoUI = {
+            pendingCurve: null,
+            
+            init() {
+                const step1Btn = document.getElementById('cdStep1Btn');
+                const step2Btn = document.getElementById('cdStep2Btn');
+                
+                if (step1Btn) {
+                    step1Btn.addEventListener('click', () => this.step1());
+                }
+                if (step2Btn) {
+                    step2Btn.addEventListener('click', () => this.step2());
+                }
+                
+                // Color swatch handlers (independent from LT, Vibrato, and CurveMaker swatches)
+                document.querySelectorAll('#cdColorSwatches .color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => {
+                        document.querySelectorAll('#cdColorSwatches .color-swatch').forEach(s => s.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                    });
+                });
+                
+                // Pitch model toggle: show/hide glissando vs single pitch rows
+                const pitchModelSelect = document.getElementById('cdPitchModel');
+                if (pitchModelSelect) {
+                    pitchModelSelect.addEventListener('change', () => {
+                        const isGliss = pitchModelSelect.value === 'glissando';
+                        document.getElementById('cdGlissPitchRow').style.display = isGliss ? '' : 'none';
+                        document.getElementById('cdSinglePitchRow').style.display = isGliss ? 'none' : '';
+                    });
+                }
+                
+                // Time mode toggle: switch between End time and Duration
+                const timeModeSelect = document.getElementById('cdTimeMode');
+                if (timeModeSelect) {
+                    timeModeSelect.addEventListener('change', () => {
+                        const label = document.getElementById('cdTimeLabel2');
+                        if (label) label.textContent = timeModeSelect.value === 'end' ? 'End' : 'Dur';
+                    });
+                }
+                
+                console.log('CrescendoUI initialized (two-phase workflow)');
+            },
+            
+            // Generate crescendo filename
+            // Format: Cres-{pitchModel}-{clef}-{pitch(es)}-{dyn1}-{dyn2}.ly
+            generateFilename(pitchModel, clef, pitchInfo, dyn1, dyn2) {
+                const clefName = clef === 'cClef' ? 'alto' : clef;
+                const safePitch = (str) => str.replace('#', 's').replace('+', 'q').replace('d', 'qf');
+                let pitchPart;
+                if (pitchModel === 'glissando') {
+                    pitchPart = `${safePitch(pitchInfo.startPitch)}-${safePitch(pitchInfo.endPitch)}`;
+                } else {
+                    pitchPart = safePitch(pitchInfo.pitch);
+                }
+                const modelCode = pitchModel === 'glissando' ? 'Gliss' : 'Single';
+                return `Cres-${modelCode}-${clefName}-${pitchPart}-${dyn1}-${dyn2}.ly`;
+            },
+            
+            // Compute end seconds from UI (handles End vs Duration mode)
+            getEndSeconds(startSeconds) {
+                const timeMode = document.getElementById('cdTimeMode').value;
+                const val = parseFloat(document.getElementById('cdEndInput').value) || 10;
+                if (timeMode === 'dur') {
+                    return startSeconds + val;
+                }
+                return val;
+            },
+            
+            // Create a curve from crescendo UI inputs or programmatic params
+            createCurve(params = null) {
+                const startSeconds = params?.startSeconds ?? (parseFloat(document.getElementById('cdStartInput').value) || 0);
+                const endSeconds = params?.endSeconds ?? this.getEndSeconds(startSeconds);
+                const y1 = params?.y1 ?? parseFloat(document.getElementById('cdY1Input').value);
+                const y2 = params?.y2 ?? parseFloat(document.getElementById('cdY2Input').value);
+                const gTrack = params?.gTrack ?? document.getElementById('cdTrackInput').value;
+                const slope = params?.slope ?? (parseFloat(document.getElementById('cdSlopeInput').value) || 0);
+                const model = params?.model ?? document.getElementById('cdModelSelect').value;
+                
+                const y1Val = isNaN(y1) ? 0 : y1;
+                const y2Val = isNaN(y2) ? 10 : y2;
+                
+                // Read color from crescendo swatches (default limeGreen)
+                const cdSwatch = document.querySelector('#cdColorSwatches .color-swatch.selected');
+                const color = params?.color ?? (cdSwatch ? cdSwatch.dataset.color : 'limeGreen');
+                
+                // Read fill mode from crescendo radio (default bottom/Fill Down)
+                const cdFill = document.querySelector('input[name="cdFill"]:checked');
+                const fillMode = params?.fillMode ?? (cdFill ? cdFill.value : 'bottom');
+                
+                const curve = CurveMaker.createCurve({
+                    startSeconds,
+                    endSeconds,
+                    y1: y1Val,
+                    y2: y2Val,
+                    gTrack,
+                    model,
+                    slope,
+                    color,
+                    fillMode
+                });
+                
+                if (curve) {
+                    console.log('CrescendoUI: Curve created', curve.name);
+                }
+                
+                return curve;
+            },
+            
+            // Step 1: Create curve only
+            step1(params = null) {
+                console.log('CrescendoUI.step1: Creating curve...', params ? '(programmatic)' : '(UI)');
+                
+                const curve = this.createCurve(params);
+                if (!curve) {
+                    console.error('CrescendoUI.step1: Failed to create curve');
+                    return null;
+                }
+                
+                this.pendingCurve = curve;
+                
+                console.log('CrescendoUI.step1: Curve created. Adjust shape as needed, then click "2: Generate"');
+                console.log('CrescendoUI.step1: Curve ID:', curve.id, 'Name:', curve.name);
+                
+                return curve;
+            },
+            
+            // Step 2: Generate notation SVG + MIDI using the pending curve
+            async step2(params = null) {
+                const btn = document.getElementById('cdStep2Btn');
+                const originalText = btn ? btn.textContent : '';
+                const originalBg = btn ? btn.style.background : '';
+                
+                // Use pending curve from Step 1, or find selected curve
+                let curve = this.pendingCurve;
+                
+                if (!curve) {
+                    if (window.CurveMaker && CurveMaker.selectedCurve) {
+                        curve = CurveMaker.selectedCurve;
+                        console.log('CrescendoUI.step2: Using selected curve:', curve.name);
+                    } else {
+                        console.error('CrescendoUI.step2: No pending curve. Run Step 1 first or select a curve.');
+                        return null;
+                    }
+                }
+                
+                // Set button to generating state
+                if (btn) {
+                    btn.textContent = 'Generating...';
+                    btn.style.background = '#888';
+                    btn.disabled = true;
+                }
+                
+                console.log('CrescendoUI.step2: Generating notation, SVG, and MIDI for curve:', curve.name);
+                
+                // Read UI values for notation (params override UI)
+                const pitchModel = params?.pitchModel ?? document.getElementById('cdPitchModel').value;
+                const clef = params?.clef ?? document.getElementById('cdClefSelect').value;
+                const dyn1 = params?.dynamic1 ?? document.getElementById('cdDynamic1').value;
+                const dyn2 = params?.dynamic2 ?? document.getElementById('cdDynamic2').value;
+                const track = params?.track ?? (parseInt(document.getElementById('cdTrackInput').value) || 1);
+                const startSeconds = curve.startSeconds;
+                
+                // Determine hairpin direction based on curve Y
+                const y1 = params?.y1 ?? (parseFloat(document.getElementById('cdY1Input').value) || 0);
+                const y2 = params?.y2 ?? (parseFloat(document.getElementById('cdY2Input').value) || 0);
+                // Y goes up = crescendo, Y goes down = decrescendo
+                const hairpin = y2 > y1 ? '\\<' : '\\>';
+                
+                let startPitch, endPitch, singlePitch;
+                if (pitchModel === 'glissando') {
+                    startPitch = (params?.startPitch ?? document.getElementById('cdStartPitch').value).trim();
+                    endPitch = (params?.endPitch ?? document.getElementById('cdEndPitch').value).trim();
+                    if (!startPitch || !endPitch) {
+                        console.error('CrescendoUI.step2: Start and end pitches required for glissando model');
+                        if (btn) { btn.textContent = originalText; btn.style.background = originalBg; btn.disabled = false; }
+                        return null;
+                    }
+                } else {
+                    singlePitch = (params?.pitch ?? document.getElementById('cdSinglePitchInput').value).trim();
+                    if (!singlePitch) {
+                        console.error('CrescendoUI.step2: Pitch required for single pitch model');
+                        if (btn) { btn.textContent = originalText; btn.style.background = originalBg; btn.disabled = false; }
+                        return null;
+                    }
+                }
+                
+                // Build LilyPond parameters
+                const lpClef = LongToneUI.clefToLilyPond(clef);
+                let pitchInfo, filename;
+                
+                if (pitchModel === 'glissando') {
+                    const lpStartPitch = LongToneUI.pitchToLilyPond(startPitch);
+                    const lpEndPitch = LongToneUI.pitchToLilyPond(endPitch);
+                    const glissOffset = LongToneUI.sameStaffLine(startPitch, endPitch) ? '0.3' : '0';
+                    pitchInfo = { startPitch, endPitch, lpStartPitch, lpEndPitch, glissOffset };
+                    filename = this.generateFilename('glissando', clef, { startPitch, endPitch }, dyn1, dyn2);
+                } else {
+                    const lpPitch = LongToneUI.pitchToLilyPond(singlePitch);
+                    pitchInfo = { pitch: singlePitch, lpPitch };
+                    filename = this.generateFilename('single', clef, { pitch: singlePitch }, dyn1, dyn2);
+                }
+                
+                console.log('CrescendoUI.step2:', JSON.stringify({
+                    pitchModel, clef: lpClef, pitchInfo, dyn1, dyn2, hairpin, filename
+                }, null, 2));
+                
+                let result = null;
+                try {
+                    // Create LilyPond file from template
+                    const createResp = await fetch('/api/lilypond/create-crescendo', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename,
+                            pitchModel,
+                            clef: lpClef,
+                            pitchInfo,
+                            dynamic1: dyn1,
+                            dynamic2: dyn2,
+                            hairpin: y2 > y1 ? '<' : '>'
+                        })
+                    });
+                    const createResult = await createResp.json();
+                    
+                    if (!createResult.success) {
+                        console.error('CrescendoUI.step2: Failed to create file:', createResult.error);
+                        throw new Error(createResult.error);
+                    }
+                    console.log('CrescendoUI.step2: LilyPond file created:', filename);
+                    
+                    // Render LilyPond to SVG (reuse existing render endpoint)
+                    const renderResp = await fetch('/api/lilypond/render-glissando', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename })
+                    });
+                    const renderResult = await renderResp.json();
+                    
+                    if (renderResult.success) {
+                        console.log('CrescendoUI.step2: SVG rendered:', renderResult.svgPath);
+                        
+                        // Insert SVG into score
+                        const svgPath = renderResult.svgPath;
+                        const insertResult = await this.insertCrescendoSvg(svgPath, startSeconds, track);
+                        if (insertResult) {
+                            console.log('CrescendoUI.step2: SVG inserted into score');
+                        }
+                        
+                        // Generate and insert MIDI (pitch bend segments + CC7 volume ramp)
+                        const midiResult = await this.generateCrescendoMidi(curve, pitchModel, pitchInfo, params);
+                        let midiInsert = null;
+                        if (midiResult) {
+                            midiInsert = await this.insertCrescendoMidi(midiResult, curve);
+                            if (midiInsert) {
+                                console.log('CrescendoUI.step2: MIDI inserted into score');
+                            }
+                        }
+                        
+                        result = {
+                            curve: { id: curve.id, name: curve.name, startSeconds, endSeconds: curve.endSeconds },
+                            filename,
+                            pitchModel,
+                            clef: lpClef,
+                            pitchInfo,
+                            dynamic1: dyn1,
+                            dynamic2: dyn2,
+                            svgPath: svgPath,
+                            midi: midiResult,
+                            midiInsert: midiInsert
+                        };
+                    } else {
+                        console.error('CrescendoUI.step2: Render failed:', renderResult.error);
+                        throw new Error(renderResult.error || 'Render failed');
+                    }
+                } catch (err) {
+                    console.error('CrescendoUI.step2 error:', err);
+                } finally {
+                    if (btn) {
+                        if (result) {
+                            btn.textContent = '✓ Done';
+                            btn.style.background = '#4a4';
+                        } else {
+                            btn.textContent = '✗ Error';
+                            btn.style.background = '#a44';
+                        }
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                            btn.style.background = originalBg;
+                            btn.disabled = false;
+                        }, 1500);
+                    }
+                }
+                
+                return result;
+            },
+            
+            // Convenience method: Run entire workflow in one call (for AI prompts)
+            async go(params = null) {
+                console.log('CrescendoUI.go: Running full workflow...', params ? '(programmatic)' : '(UI)');
+                const curve = this.step1(params);
+                if (!curve) return null;
+                const result = await this.step2(params);
+                return result;
+            },
+            
+            // Generate crescendo MIDI: pitch bend segments (like glissando) + CC7 volume ramp following curve Y
+            async generateCrescendoMidi(curve, pitchModel, pitchInfo, params = {}) {
+                const CC_SAMPLE_INTERVAL = 50; // ms between CC7 messages (20/sec)
+                const PITCH_BEND_RANGE = 2;
+                const PITCH_BEND_SAMPLE_INTERVAL = 50;
+                const PITCH_BEND_MAX = 16383;
+                const PITCH_BEND_MIN = 0;
+                const TICKS_PER_BEAT = 480;
+                
+                const velocity = params?.velocity ?? (parseInt(document.getElementById('cdVelocityInput').value) || 115);
+                const articulationValue = params?.articulation ?? 89; // senza vibrato CC0 value
+                
+                if (!curve || !curve.curveData || !curve.curveData.samples) {
+                    console.error('CrescendoUI.generateCrescendoMidi: Invalid curve data');
+                    return null;
+                }
+                
+                // Convert pitch strings to MIDI
+                const noteNameToPitch = (noteName) => {
+                    const noteMap = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+                    const match = noteName.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+                    if (!match) return null;
+                    let [, note, accidental, quarterTone, octave] = match;
+                    let pitch = noteMap[note];
+                    if (pitch === undefined) return null;
+                    if (accidental === '#') pitch += 1;
+                    else if (accidental === 'B') pitch -= 1;
+                    pitch += (parseInt(octave) + 1) * 12;
+                    pitch = Math.max(0, Math.min(127, pitch));
+                    let quarterToneOffset = 0;
+                    if (quarterTone === '+') quarterToneOffset = 0.5;
+                    else if (quarterTone === 'D') quarterToneOffset = -0.5;
+                    return { pitch, quarterTone: quarterToneOffset };
+                };
+                
+                const midiToPitchName = (pitch) => {
+                    const noteNames = ['C', 'Cs', 'D', 'Ds', 'E', 'F', 'Fs', 'G', 'Gs', 'A', 'As', 'B'];
+                    const octave = Math.floor(pitch / 12) - 1;
+                    return noteNames[pitch % 12] + octave;
+                };
+                
+                const curveData = curve.curveData;
+                const samples = curveData.samples;
+                const sampleInterval = curveData.sampleInterval;
+                const startTime = curveData.startTime;
+                const duration = curve.endSeconds - curve.startSeconds;
+                
+                // Build CC7 volume ramp samples from curve Y
+                // normalizedY (0-1) maps to CC7 value (0-127)
+                const cc7Samples = [];
+                const numCC7Samples = Math.max(2, Math.ceil(duration * 1000 / CC_SAMPLE_INTERVAL));
+                
+                for (let i = 0; i < numCC7Samples; i++) {
+                    const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
+                    const curveIdx = Math.round((t - startTime) / sampleInterval);
+                    const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
+                    const normalizedY = samples[clampedIdx];
+                    const ccValue = Math.round(Math.max(0, Math.min(127, normalizedY * 127)));
+                    cc7Samples.push({ time: t, value: ccValue });
+                }
+                
+                // Determine segments based on pitch model
+                let segments = [];
+                
+                if (pitchModel === 'glissando') {
+                    // Glissando: generate pitch bend segments like LongToneUI
+                    const startPitchObj = noteNameToPitch(pitchInfo.startPitch);
+                    const endPitchObj = noteNameToPitch(pitchInfo.endPitch);
+                    
+                    if (!startPitchObj || !endPitchObj) {
+                        console.error('CrescendoUI.generateCrescendoMidi: Invalid pitch format');
+                        return null;
+                    }
+                    
+                    const startPitchMidi = startPitchObj.pitch + startPitchObj.quarterTone;
+                    const endPitchMidi = endPitchObj.pitch + endPitchObj.quarterTone;
+                    
+                    const highPitch = Math.max(startPitchMidi, endPitchMidi);
+                    const lowPitch = Math.min(startPitchMidi, endPitchMidi);
+                    const pitchRange = highPitch - lowPitch;
+                    
+                    // Map curve Y to pitch
+                    const pitchAtSample = samples.map(normalizedY => 
+                        lowPitch + normalizedY * pitchRange
+                    );
+                    
+                    // Create segments when pitch deviates > PITCH_BEND_RANGE
+                    let segmentStartIndex = 0;
+                    let segmentBasePitch = pitchAtSample[0];
+                    
+                    const createSegment = (segIndex, segStartIndex, segEndIndex, segStartPitch, segEndPitch) => {
+                        const segStartTime = startTime + segStartIndex * sampleInterval;
+                        const segEndTime = startTime + segEndIndex * sampleInterval;
+                        const segDuration = segEndTime - segStartTime;
+                        const segIsDown = segEndPitch < segStartPitch;
+                        
+                        const midiNote = segIsDown ? 
+                            Math.round(segStartPitch) - 1 : 
+                            Math.round(segStartPitch) + 1;
+                        
+                        const pitchChangeInSegment = Math.abs(segEndPitch - segStartPitch);
+                        const bendRangeUsed = pitchChangeInSegment / PITCH_BEND_RANGE;
+                        
+                        let startBend, endBend;
+                        if (segIsDown) {
+                            startBend = PITCH_BEND_MAX;
+                            endBend = Math.round(PITCH_BEND_MAX - (bendRangeUsed * (PITCH_BEND_MAX - PITCH_BEND_MIN)));
+                        } else {
+                            startBend = PITCH_BEND_MIN;
+                            endBend = Math.round(PITCH_BEND_MIN + (bendRangeUsed * (PITCH_BEND_MAX - PITCH_BEND_MIN)));
+                        }
+                        
+                        const pitchBendSamples = [];
+                        const numPbSamples = Math.max(2, Math.ceil(segDuration * 1000 / PITCH_BEND_SAMPLE_INTERVAL));
+                        
+                        for (let pbIdx = 0; pbIdx < numPbSamples; pbIdx++) {
+                            const pbTime = segStartTime + (pbIdx / (numPbSamples - 1)) * segDuration;
+                            const curveIdx = Math.round((pbTime - startTime) / sampleInterval);
+                            const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
+                            const pitchAtTime = pitchAtSample[clampedIdx];
+                            const pitchProgress = (segEndPitch !== segStartPitch) ? 
+                                (pitchAtTime - segStartPitch) / (segEndPitch - segStartPitch) : 0;
+                            const clampedProgress = Math.max(0, Math.min(1, pitchProgress));
+                            const bendValue = Math.round(startBend + clampedProgress * (endBend - startBend));
+                            pitchBendSamples.push({ time: pbTime, value: bendValue });
+                        }
+                        
+                        return {
+                            index: segIndex,
+                            startTime: segStartTime,
+                            endTime: segEndTime,
+                            duration: segDuration,
+                            startPitch: segStartPitch,
+                            endPitch: segEndPitch,
+                            midiNote: midiNote,
+                            startBend: startBend,
+                            endBend: endBend,
+                            pitchBendSamples: pitchBendSamples,
+                            cc0Value: (segIndex < 2) ? articulationValue : null,
+                            velocity: velocity,
+                            isGlissDown: segIsDown
+                        };
+                    };
+                    
+                    for (let i = 1; i < pitchAtSample.length; i++) {
+                        const currentPitch = pitchAtSample[i];
+                        const deviation = currentPitch - segmentBasePitch;
+                        
+                        if (Math.abs(deviation) > PITCH_BEND_RANGE) {
+                            const segmentEndPitch = pitchAtSample[i - 1];
+                            segments.push(createSegment(segments.length, segmentStartIndex, i - 1, segmentBasePitch, segmentEndPitch));
+                            segmentStartIndex = i;
+                            segmentBasePitch = currentPitch;
+                        }
+                    }
+                    
+                    segments.push(createSegment(
+                        segments.length, segmentStartIndex, samples.length - 1,
+                        segmentBasePitch, pitchAtSample[pitchAtSample.length - 1]
+                    ));
+                    
+                } else {
+                    // Single pitch: one segment for the full duration
+                    const pitchObj = noteNameToPitch(pitchInfo.pitch);
+                    if (!pitchObj) {
+                        console.error('CrescendoUI.generateCrescendoMidi: Invalid pitch format');
+                        return null;
+                    }
+                    const midiNote = pitchObj.pitch;
+                    
+                    segments.push({
+                        index: 0,
+                        startTime: curve.startSeconds,
+                        endTime: curve.endSeconds,
+                        duration: duration,
+                        midiNote: midiNote,
+                        startBend: 8192, // center (no bend)
+                        endBend: 8192,
+                        pitchBendSamples: [],
+                        cc0Value: articulationValue,
+                        velocity: velocity,
+                        isGlissDown: false
+                    });
+                }
+                
+                console.log(`CrescendoUI.generateCrescendoMidi: Generated ${segments.length} segments + ${cc7Samples.length} CC7 samples`);
+                
+                // Export MIDI files - each segment gets CC7 volume data interleaved
+                // Crescendo uses MIDI channels 9-12 (0-indexed: 8-11) = trackIndex + 8
+                // This bypasses the playback channel remapper (only ch 0-3 are remapped)
+                // Vibrato uses ch 5-8 (0-indexed 4-7), glissando uses ch 1-4 (0-indexed 0-3)
+                const trackIndex = (parseInt(curve.gTrack) || 1) - 1;
+                const midiChannel = trackIndex + 8; // Track 1→ch8(MIDI ch9), Track 2→ch9, etc.
+                const TEMPO_BPM = window.beatsPerMinute || 60;
+                const MICROSECONDS_PER_BEAT = Math.round(60000000 / TEMPO_BPM);
+                
+                const writeVarInt = (value) => {
+                    const bytes = [];
+                    bytes.push(value & 0x7f);
+                    value >>= 7;
+                    while (value > 0) {
+                        bytes.unshift((value & 0x7f) | 0x80);
+                        value >>= 7;
+                    }
+                    return bytes;
+                };
+                
+                const writeInt = (value, length) => {
+                    const bytes = [];
+                    for (let i = length - 1; i >= 0; i--) {
+                        bytes.push((value >> (i * 8)) & 0xff);
+                    }
+                    return bytes;
+                };
+                
+                const secondsToTicks = (seconds) => {
+                    return Math.round(seconds * TICKS_PER_BEAT * TEMPO_BPM / 60);
+                };
+                
+                const curveName = curve.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+                const savedFiles = [];
+                
+                for (let i = 0; i < segments.length; i++) {
+                    const seg = segments[i];
+                    const segNum = String(i + 1).padStart(2, '0');
+                    const pitchName = midiToPitchName(seg.midiNote);
+                    const fileName = `Cres_${curveName}_seg${segNum}_${pitchName}.mid`;
+                    
+                    // Build track events - interleave pitch bend + CC7 volume
+                    const trackEvents = [];
+                    
+                    // CC0 (articulation) at tick 0
+                    if (seg.cc0Value !== null) {
+                        trackEvents.push(...writeVarInt(0));
+                        trackEvents.push(0xB0 | midiChannel, 0x00, seg.cc0Value);
+                    }
+                    
+                    // Initial pitch bend at tick 0
+                    const pbLSB = seg.startBend & 0x7F;
+                    const pbMSB = (seg.startBend >> 7) & 0x7F;
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0xE0 | midiChannel, pbLSB, pbMSB);
+                    
+                    // Initial CC7 volume at tick 0
+                    const segStartCC7 = cc7Samples.find(s => s.time >= seg.startTime);
+                    const initialCC7 = segStartCC7 ? segStartCC7.value : 64;
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0xB0 | midiChannel, 0x07, initialCC7);
+                    
+                    // Note On at tick 0
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0x90 | midiChannel, seg.midiNote, seg.velocity);
+                    
+                    // Merge pitch bend samples and CC7 samples for this segment's time range
+                    // Create unified event list sorted by time
+                    const mergedEvents = [];
+                    
+                    // Add pitch bend events
+                    if (seg.pitchBendSamples && seg.pitchBendSamples.length > 1) {
+                        for (let pbIdx = 1; pbIdx < seg.pitchBendSamples.length; pbIdx++) {
+                            const pb = seg.pitchBendSamples[pbIdx];
+                            mergedEvents.push({ time: pb.time, type: 'pb', value: pb.value });
+                        }
+                    }
+                    
+                    // Add CC7 events for this segment's time range
+                    for (const cc7 of cc7Samples) {
+                        if (cc7.time > seg.startTime && cc7.time <= seg.endTime) {
+                            mergedEvents.push({ time: cc7.time, type: 'cc7', value: cc7.value });
+                        }
+                    }
+                    
+                    // Sort by time
+                    mergedEvents.sort((a, b) => a.time - b.time);
+                    
+                    // Write merged events
+                    let prevTick = 0;
+                    for (const evt of mergedEvents) {
+                        const timeRelative = evt.time - seg.startTime;
+                        const tick = secondsToTicks(timeRelative);
+                        const deltaTick = Math.max(0, tick - prevTick);
+                        
+                        if (evt.type === 'pb') {
+                            const lsb = evt.value & 0x7F;
+                            const msb = (evt.value >> 7) & 0x7F;
+                            trackEvents.push(...writeVarInt(deltaTick));
+                            trackEvents.push(0xE0 | midiChannel, lsb, msb);
+                        } else if (evt.type === 'cc7') {
+                            trackEvents.push(...writeVarInt(deltaTick));
+                            trackEvents.push(0xB0 | midiChannel, 0x07, evt.value);
+                        }
+                        
+                        prevTick = tick;
+                    }
+                    
+                    // Note Off
+                    const endTick = secondsToTicks(seg.duration);
+                    const noteOffDelta = Math.max(0, endTick - prevTick);
+                    trackEvents.push(...writeVarInt(noteOffDelta));
+                    trackEvents.push(0x80 | midiChannel, seg.midiNote, 0);
+                    
+                    // Secco: CC7 ramp-down after last segment's note-off
+                    // Wait 5ms, then ramp CC7 to 0 over 10ms (3 steps)
+                    const isLastSegment = (i === segments.length - 1);
+                    const seccoEnabled = params?.secco ?? (document.getElementById('cdSeccoCheckbox')?.checked !== false);
+                    if (isLastSegment && seccoEnabled) {
+                        const lastCC7 = cc7Samples.length > 0 ? cc7Samples[cc7Samples.length - 1].value : 127;
+                        const waitTicks = secondsToTicks(0.005); // 5ms wait
+                        const rampSteps = 3;
+                        const rampStepTicks = Math.max(1, Math.round(secondsToTicks(0.010) / rampSteps)); // 10ms / 3
+                        
+                        // 5ms wait + first ramp step
+                        trackEvents.push(...writeVarInt(waitTicks));
+                        trackEvents.push(0xB0 | midiChannel, 0x07, Math.round(lastCC7 * 0.66));
+                        
+                        trackEvents.push(...writeVarInt(rampStepTicks));
+                        trackEvents.push(0xB0 | midiChannel, 0x07, Math.round(lastCC7 * 0.33));
+                        
+                        trackEvents.push(...writeVarInt(rampStepTicks));
+                        trackEvents.push(0xB0 | midiChannel, 0x07, 0);
+                    }
+                    
+                    // End of track
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0xFF, 0x2F, 0x00);
+                    
+                    // Build tempo track
+                    const tempoTrack = [];
+                    tempoTrack.push(...writeVarInt(0));
+                    tempoTrack.push(0xFF, 0x51, 0x03);
+                    tempoTrack.push((MICROSECONDS_PER_BEAT >> 16) & 0xFF);
+                    tempoTrack.push((MICROSECONDS_PER_BEAT >> 8) & 0xFF);
+                    tempoTrack.push(MICROSECONDS_PER_BEAT & 0xFF);
+                    tempoTrack.push(...writeVarInt(0));
+                    tempoTrack.push(0xFF, 0x2F, 0x00);
+                    
+                    // Build MIDI file (Format 1, 2 tracks)
+                    const midiFile = [];
+                    midiFile.push(0x4D, 0x54, 0x68, 0x64); // "MThd"
+                    midiFile.push(...writeInt(6, 4));
+                    midiFile.push(...writeInt(1, 2)); // Format 1
+                    midiFile.push(...writeInt(2, 2)); // 2 tracks
+                    midiFile.push(...writeInt(TICKS_PER_BEAT, 2));
+                    
+                    // Tempo track
+                    midiFile.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+                    midiFile.push(...writeInt(tempoTrack.length, 4));
+                    midiFile.push(...tempoTrack);
+                    
+                    // Data track
+                    midiFile.push(0x4D, 0x54, 0x72, 0x6B); // "MTrk"
+                    midiFile.push(...writeInt(trackEvents.length, 4));
+                    midiFile.push(...trackEvents);
+                    
+                    // Save via server
+                    const uint8Array = new Uint8Array(midiFile);
+                    const base64 = btoa(String.fromCharCode(...uint8Array));
+                    
+                    try {
+                        const response = await fetch('/api/midi/save', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ filename: fileName, midiData: base64 })
+                        });
+                        const result = await response.json();
+                        if (result.success) {
+                            savedFiles.push({ filename: fileName, path: result.path, segment: i + 1 });
+                            console.log(`CrescendoUI.generateCrescendoMidi: Saved ${fileName}`);
+                        } else {
+                            console.error(`CrescendoUI.generateCrescendoMidi: Failed to save ${fileName}:`, result.error);
+                        }
+                    } catch (err) {
+                        console.error(`CrescendoUI.generateCrescendoMidi: Error saving ${fileName}:`, err);
+                    }
+                }
+                
+                return {
+                    segments: segments.length,
+                    segmentData: segments.map(seg => ({
+                        index: seg.index,
+                        startTime: seg.startTime,
+                        duration: seg.duration,
+                        midiNote: seg.midiNote,
+                        cc0Value: seg.cc0Value,
+                        velocity: seg.velocity
+                    })),
+                    cc7Samples: cc7Samples.length,
+                    files: savedFiles,
+                    startSeconds: curve.startSeconds,
+                    endSeconds: curve.endSeconds
+                };
+            },
+            
+            // Insert crescendo MIDI segments into score
+            async insertCrescendoMidi(midiResult, curve) {
+                if (!midiResult || !midiResult.files || midiResult.files.length === 0) {
+                    console.error('CrescendoUI.insertCrescendoMidi: No MIDI files to insert');
+                    return null;
+                }
+                
+                const trackIndex = (parseInt(curve.gTrack) || 1) - 1;
+                const curveStartMs = curve.startSeconds * 1000;
+                const color = curve.color || 'limeGreen';
+                
+                let totalEvents = 0;
+                const snippetIds = [];
+                
+                for (const file of midiResult.files) {
+                    try {
+                        const response = await fetch(file.path);
+                        const arrayBuffer = await response.arrayBuffer();
+                        const midiData = new Uint8Array(arrayBuffer);
+                        
+                        // Calculate segment start time offset
+                        const segData = midiResult.segmentData[file.segment - 1];
+                        const segStartMs = segData ? segData.startTime * 1000 : curveStartMs;
+                        
+                        const events = LongToneUI.parseMidiFileToEvents(midiData, segStartMs);
+                        
+                        if (!events || events.length === 0) continue;
+                        
+                        // Create snippet
+                        const snippetData = {
+                            name: `Cres @ ${curve.name} seg${file.segment}`,
+                            trackIndex: trackIndex,
+                            startTimeMs: segStartMs,
+                            durationMs: (segData ? segData.duration : (curve.endSeconds - curve.startSeconds)) * 1000,
+                            startSeconds: segData ? segData.startTime : curve.startSeconds,
+                            endSeconds: segData ? (segData.startTime + segData.duration) : curve.endSeconds,
+                            events: events,
+                            color: color,
+                            sourceCurve: curve.id,
+                            sourceFile: file.filename
+                        };
+                        
+                        let snippetId = null;
+                        if (window.MidiSnippetDatabase) {
+                            const snippet = MidiSnippetDatabase.add(snippetData);
+                            snippetId = snippet.id;
+                            snippetIds.push(snippetId);
+                        }
+                        
+                        // Add events to MidiController track
+                        if (window.MidiController && MidiController.tracks && MidiController.tracks[trackIndex]) {
+                            for (const event of events) {
+                                const eventId = `cres_${curve.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                                MidiController.tracks[trackIndex].midiEvents.push({
+                                    id: eventId,
+                                    timeMs: event.timeMs,
+                                    type: event.type,
+                                    data: [...event.data],
+                                    sourceCurve: curve.id,
+                                    snippetId: snippetId
+                                });
+                            }
+                            totalEvents += events.length;
+                        }
+                    } catch (err) {
+                        console.error(`CrescendoUI.insertCrescendoMidi: Error inserting ${file.filename}:`, err);
+                    }
+                }
+                
+                // Sort and re-render
+                if (window.MidiController && MidiController.tracks && MidiController.tracks[trackIndex]) {
+                    MidiController.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                    MidiController.renderAllMidiDisplays();
+                    MidiController.updateMidiDisplayVisibility();
+                }
+                
+                console.log(`CrescendoUI.insertCrescendoMidi: Inserted ${totalEvents} events from ${midiResult.files.length} segments on track ${trackIndex + 1}`);
+                
+                return {
+                    snippetIds,
+                    totalEvents,
+                    trackIndex,
+                    segments: midiResult.files.length
+                };
+            },
+            
+            // Insert crescendo SVG into score (matches LongToneUI.insertGlissandoSvg pattern)
+            async insertCrescendoSvg(svgPath, startSeconds, track) {
+                if (!svgPath) {
+                    console.error('CrescendoUI.insertCrescendoSvg: Missing svgPath');
+                    return null;
+                }
+                
+                try {
+                    // Fetch the SVG content
+                    const response = await fetch(svgPath);
+                    const svgContent = await response.text();
+                    
+                    // Parse SVG to get dimensions
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const svgEl = svgDoc.documentElement;
+                    
+                    // Get original dimensions (handle mm units)
+                    let svgWidth = parseFloat(svgEl.getAttribute('width')) || 100;
+                    let svgHeight = parseFloat(svgEl.getAttribute('height')) || 100;
+                    const widthStr = svgEl.getAttribute('width') || '';
+                    const heightStr = svgEl.getAttribute('height') || '';
+                    if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
+                    if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
+                    
+                    // SVG is already tightly cropped server-side by cropSvgToContent()
+                    // Set pixel dimensions on SVG element for correct rendering
+                    svgEl.setAttribute('width', String(svgWidth));
+                    svgEl.setAttribute('height', String(svgHeight));
+                    
+                    // Get track dimensions for scaling
+                    const trackNum = parseInt(track) || 1;
+                    const scoreEl = document.getElementById('ScoreTop');
+                    const scoreWidth = scoreEl.clientWidth;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(trackNum), scoreEl);
+                    const trackHeight = trackDims.height;
+                    
+                    // Scale cropped content to fit ~67% of track height
+                    const targetHeight = trackHeight * 0.67;
+                    const scale = targetHeight / svgHeight;
+                    const scaledContentWidth = svgWidth * scale;
+                    
+                    // Calculate offsetSeconds: position SVG near curve start with slight overlap
+                    const secondsPerPage = window.GraphicTimeline 
+                        ? GraphicTimeline.getSecondsPerPage() 
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const secondsPerPixel = secondsPerPage / scoreWidth;
+                    const overlap = 8;
+                    const offsetSeconds = -(scaledContentWidth - overlap) * secondsPerPixel;
+                    
+                    // Create wrapper and image
+                    const id = SVGElementManager.nextId++;
+                    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    wrapper.setAttribute('id', `svg-element-${id}`);
+                    wrapper.setAttribute('class', 'svg-element-wrapper');
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    let svgString = new XMLSerializer().serializeToString(svgEl);
+                    svgString = svgString.replace(/currentColor/g, '#000000');
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                    image.setAttribute('href', dataUrl);
+                    image.setAttribute('width', svgWidth);
+                    image.setAttribute('height', svgHeight);
+                    wrapper.appendChild(image);
+                    
+                    // Anchor-based element data
+                    const elementData = {
+                        id: id,
+                        name: SVGElementManager.generateSvgName(svgPath.split('/').pop()),
+                        wrapper: wrapper,
+                        image: image,
+                        referenceSeconds: startSeconds,
+                        offsetSeconds: offsetSeconds,
+                        offsetYFraction: 0.05,
+                        width: svgWidth,
+                        height: svgHeight,
+                        scale: scale,
+                        heightFraction: 0.67,
+                        track: trackNum
+                    };
+                    
+                    // Calculate pixel position and apply
+                    const pos = SVGElementManager.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
+                    
+                    // Add to SVGElementManager
+                    SVGElementManager.elements.push(elementData);
+                    SVGElementManager.updateElementTransform(elementData);
+                    
+                    const targetContainer = pos.section === 'top' 
+                        ? SVGElementManager.containerTop 
+                        : SVGElementManager.containerBottom;
+                    targetContainer.appendChild(wrapper);
+                    
+                    // Add drag handlers
+                    wrapper.addEventListener('mousedown', (e) => 
+                        SVGElementManager.handleElementMouseDown(e, elementData));
+                    
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                    
+                    console.log('CrescendoUI.insertCrescendoSvg: Inserted', elementData.name, 
+                        'refSec:', startSeconds, 'offsetSec:', offsetSeconds.toFixed(3),
+                        'scale:', scale.toFixed(3), 'track:', trackNum,
+                        'page:', pos.page, 'section:', pos.section);
+                    
+                    return elementData;
+                } catch (err) {
+                    console.error('CrescendoUI.insertCrescendoSvg: Error:', err);
+                    return null;
+                }
+            }
+        };
+        CrescendoUI.init();
+        window.CrescendoUI = CrescendoUI;
         
         // ============================================
         // PANEL SECTION MANAGER - Draggable reordering of composition panel sections
@@ -22313,7 +23389,7 @@
                 if (!this.groupList) return;
                 this.groupList.innerHTML = '';
                 
-                const groups = GroupDatabase.getAll();
+                const groups = GroupDatabase.getAll().slice().sort((a, b) => b.id - a.id);
                 for (const group of groups) {
                     const option = document.createElement('option');
                     option.value = group.id;

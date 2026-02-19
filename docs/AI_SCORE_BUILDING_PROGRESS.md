@@ -2,21 +2,21 @@
 
 **Status:** Active  
 **Last Updated:** Feb 19, 2026  
-**Current ASB Number:** ASB-063
+**Current ASB Number:** ASB-068
 
 ---
 
 ## Last Session Summary
 
-> **SVG Page-Boundary Clamp + Score Composition (scores 233–251).** Fixed SVG notation disappearing when glissando moved near page edge via group move — added dynamic client-side clamp in calcPixelPosition. Created glissandos on tracks 1, 2, 4 (207–216.3s and 223.25–240.4s) and vibratos on tracks 1, 2, 4 (215.55–223.25s).
+> **Crescendo-Decrescendo System + SVG Dynamic Resize.** Built complete Crescendo-Decrescendo system (LilyPond templates, UI, JS, MIDI generation with CC7 volume, server endpoint, prompt guide). Fixed SVG notation not resizing on window resize by introducing `heightFraction` property and scale recomputation in `reRenderAllElements`. Fixed extreme resize breakage (rAF + forced reflow + degenerate height guard). Fixed backward compatibility for old saves missing `heightFraction`.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 19, 2026  
-**Focus:** SVG Page-Boundary Clamp + Score Composition  
-**Tier 1 Count This Session:** 1 (ASB-063)  
+**Focus:** Crescendo-Decrescendo System + SVG Dynamic Resize  
+**Tier 1 Count This Session:** 0 (reset after Tier 2)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -74,6 +74,13 @@
 - ASB-063: Dynamic client-side SVG page-boundary clamp in calcPixelPosition — prevents SVG notation from disappearing when moved near page edge via group move
 - Score composition: Created glissandos (tracks 1+2+4, G+3→Ab3/Ad3/G#3, 207-216.3s + 223.25-240.4s, scores 233-235 + 249-251). Created vibratos (tracks 1+2+4, A+3/Ad3/Ab3, 215.55-223.25s, ff→f, scores 244-246)
 
+### Session Log — Crescendo-Decrescendo System + SVG Dynamic Resize
+- ASB-064: Crescendo-Decrescendo System — LilyPond templates (CrescendoGlissandoTemplate.ly, CrescendoSinglePitchTemplate.ly), UI HTML (darkRed heading, secco checkbox), CrescendoUI JS object (go/step1/step2, generateCrescendoMidi, insertCrescendoSvg), server endpoint (/api/lilypond/create-crescendo with pitch-register positioning), AI Crescendo Prompt Guide
+- ASB-065: Crescendo bug fixes — SVG insertion rewrite to match insertGlissandoSvg pattern (containerTop/Bottom, updateElementTransform, drag handlers), MIDI channel offset (trackIndex+8 = channels 9-12), Secco checkbox + CC7 ramp-down (5ms wait + 10ms ramp after last segment note-off)
+- ASB-066: SVG dynamic resize on window resize — introduced `heightFraction` property (fraction of track height SVG occupies), `reRenderAllElements` recomputes scale from heightFraction on resize, added to all insertion functions (glissando=0.42, vibrato=0.85, crescendo=0.67), export/import persistence
+- ASB-067: SVG resize robustness — `requestAnimationFrame` in resize handler (ensures DOM layout settled before reading dimensions), `void scoreTopEl.offsetHeight` forced reflow, guard against degenerate `trackDims.height <= 0` (keeps last good scale), moved backward-compat `heightFraction` computation from `reRenderAllElements` to `importData` (prevents corruption when window size at load differs from creation)
+- ASB-068: Crescendo default tuning — heightFraction 0.42→0.67 (matching user's 0.47→0.75 manual adjustment), offsetYFraction 0.1→0.05, X positioning overlap=8 (SVG extends slightly past anchor)
+
 ### Addendum: Glissando Milestone (`milestone-asb-glissando-complete`)
 *Post-finalization refinements — extending the glissando workflow with notation, velocity, and UI polish*
 
@@ -98,7 +105,7 @@
 - [x] Update LONG_TONE_IMPLEMENTATION.md ✔️
 - [x] Tier 3 milestone complete ✔️
 - [x] Begin actual score composition using the glissando + vibrato systems ✔️ (Curve Fugue Algorithm #1, 52 motives across 3 runs)
-- [ ] Extend AI prompt system to other gesture types (cresc/decresc, etc.)
+- [x] Extend AI prompt system to other gesture types (cresc/decresc, etc.) ✔️ (Crescendo-Decrescendo System)
 - [ ] Extend ObjectSelector z-order fix to curves, motives, MIDI snippets
 - [x] Test vibrato generation with various pitches/clefs/dynamics combinations ✔️ (tracks 1, 2, 4 — treble + bass clefs, natural + quarter-tone pitches)
 - [ ] Investigate why Pass 2 regex fails on vibrato wave path (Pass 3 string-search fallback works)
@@ -171,6 +178,11 @@
 | ASB-061 | Fix OneDrive file-lock in render_glissando.ps1 — Move-Item retry loop | Complete |
 | ASB-062 | Glissando pitch tracking marker clamping — left/right edge clamp | Complete |
 | ASB-063 | Dynamic client-side SVG page-boundary clamp in calcPixelPosition | Complete |
+| ASB-064 | Crescendo-Decrescendo System — templates, UI, JS, server endpoint, prompt guide | Complete |
+| ASB-065 | Crescendo bug fixes — SVG insertion rewrite, MIDI channel offset, Secco feature | Complete |
+| ASB-066 | SVG dynamic resize — heightFraction property, reRenderAllElements scale recompute | Complete |
+| ASB-067 | SVG resize robustness — rAF, forced reflow, degenerate height guard, import-time compat | Complete |
+| ASB-068 | Crescendo default tuning — heightFraction 0.67, offsetY 0.05, X overlap | Complete |
 
 ---
 
@@ -189,6 +201,7 @@
 | Feb 18, 2026 | c942c2c | audio mixer + groups enhancements + score composition + prompt guide duration option (ASB-053 to ASB-056) |
 | Feb 19, 2026 | d039063 | two-stage vibrato, prompt guide rewrite, bug fixes, pitch tracking clamping, score composition (ASB-057 to ASB-062, scores 209-230) |
 | Feb 19, 2026 | 9857d39 | SVG page-boundary clamp fix + score composition (ASB-063, scores 233-251) |
+| Feb 19, 2026 | 775913a | crescendo-decrescendo system + SVG dynamic resize + bug fixes (ASB-064 to ASB-068) |
 
 ---
 
@@ -264,6 +277,9 @@ When a workflow insight emerges during development, append it here AND to `docs/
 
 ### Post-Milestone Addendums (Feb 15, 2026)
 After finalizing a Tier 3 milestone, the next session often reveals refinements that extend the feature — new sub-features, default adjustments, UI polish. These are "addendums," not new features. Protocol: keep original tag intact, continue ASB numbering, group under `### Addendum:` heading, use `addendum:` prefix in Tier 2 commits. See WORKFLOW_METHODOLOGY.md for full pattern.
+
+### DOM Layout Timing + Proportional Resize (Feb 19, 2026)
+When updating SVG positions/scales on window resize, passively reading `clientHeight`/`clientWidth` can return stale values (unlike CurveMaker which forces reflow via DOM mutation). Fix: `requestAnimationFrame` + `void el.offsetHeight` + guard degenerate heights. For proportional resize, store `heightFraction` and recompute scale on each resize. Compute `heightFraction` at import time for old saves (not on first resize). See WORKFLOW_METHODOLOGY.md → "DOM Layout Timing on Window Resize" and "Proportional Resize with heightFraction".
 
 ### Debugging Session Management (Feb 15, 2026)
 When debugging becomes unproductive (>3 iterations without convergence, diagnostics pass but visual reality mismatches, fixes create new problems), follow the Abort Protocol: stop immediately, clean up all diagnostic code, commit with clear INCONCLUSIVE note, create memory documenting what was tried/confirmed/unresolved. Tag as INCONCLUSIVE not "failed" — ruled-out causes are valuable. Fresh start: don't re-read old session, state problem simply, test ONE thing at a time, ensure test element is VISIBLE. See WORKFLOW_METHODOLOGY.md → "Debugging Session Management" for full protocol.
