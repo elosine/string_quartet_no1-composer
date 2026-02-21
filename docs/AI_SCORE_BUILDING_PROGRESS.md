@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 20, 2026  
-**Current ASB Number:** ASB-076
+**Last Updated:** Feb 21, 2026  
+**Current ASB Number:** ASB-079
 
 ---
 
@@ -27,6 +27,8 @@ That's it. Everything else below is for Cascade.
 | This file (`AI_SCORE_BUILDING_PROGRESS.md`) | Always | `/ai-score-building` |
 | `docs/LILYPOND_SETTINGS_REGISTRY.md` | Any `.ly` file work | `/lilypond-registry` |
 | `docs/BARTOK_PIZZICATO_WORKFLOW.md` | Bartók pizz work | `/bartok-pizz` |
+| `docs/AI_BARTOK_PIZZ_PROMPT_GUIDE.md` | AI-prompted Bartók pizz insertion | — |
+| `docs/MUSICAL_MATERIAL_WORKFLOW.md` | Building any new musical material system | — |
 | `docs/WORKFLOW_METHODOLOGY.md` | Debugging or process questions | — |
 
 ### 2. Active Rules
@@ -39,11 +41,12 @@ That's it. Everything else below is for Cascade.
 
 | Workflow | Status | Next Step |
 |----------|--------|-----------|
-| Bartók Pizzicato | Pipeline complete | Score integration |
+| Bartók Pizzicato | Complete (Pattern 4 — AI Direct) | Maintenance only |
 | Glissando System | Complete | Maintenance only |
 | Vibrato System | Complete | Maintenance only |
 | Crescendo-Decrescendo | Complete | Maintenance only |
 | LilyPond Settings Registry | Active | Update when settings change |
+| Musical Material Workflow | Active | Expand as new material types are built |
 
 ### 4. Reusable Tools (remember these exist)
 
@@ -70,24 +73,27 @@ That's it. Everything else below is for Cascade.
 |--------|---------|---------------|
 | `modify_midi.js` is general-purpose | Built for Bartók pizz but designed for reuse. Accepts any CC messages via `--cc` flag. Channel rewrite is always applied. | Any new LilyPond-rendered MIDI workflow (col legno, harmonics, etc.) |
 | Bartók pizz shares MIDI channels 1–4 with glissando | Both systems use track→channel 1:1 mapping. OK for now because Bartók events are discrete (single 16th notes). | If a 3rd system needs channels 1–4, address potential conflicts |
+| Synth pitch bend range is ±1 semitone | All quarter-tone pitch bends use 8192 per semitone. Quarter sharp = 12288, quarter flat = 4096, center = 8192. Applied in Bartók pizz, Crescendo single-pitch, Vibrato. Glissando systems use their own segment-based approach (untouched). | If pitch bend sounds wrong or if synth config changes |
 | Registry §28 microtonal pitch syntax | Full suffix reference for quarter/three-quarter tones. Used by `render_bartok_pizz.js` pitch parser. | Any new pitch-input automation |
 | `crop_svg.js` Pass 3 fix | Handles nested `<g>`/`<a>` groups with scale transforms. Fix ported to both standalone and server.js. | If SVG cropping bugs reappear — check Pass 3 first |
-| Score integration is next for Bartók pizz | Pipeline outputs SVG + MIDI to `public/SVG_graphics/bartok_pizzicato/`. Needs server endpoint + UI to place them in the score at a time/track. | When user says "score integration" or "place Bartók pizz in score" |
+| AI Command Bridge (Pattern 4) is the ideal pattern | `POST /api/ai/command` → Socket.IO `aiCommand` → browser `eval()`. Cascade sends commands directly to browser — no paste, no save, no reload. First used in Bartók Pizzicato. Pattern 3 (Direct Live Insertion) is the fallback. See `docs/MUSICAL_MATERIAL_WORKFLOW.md` "Insertion Patterns". | When building any new musical material system |
 | MasterTemplate.ly has settings not in Registry | Registry scan found settings missing from MasterTemplate (tupletFullLength, feathered beams, pressure wedge, etc.) | If MasterTemplate is updated or a new technique needs these settings |
+| Saved GCs disappeared | GC library appears empty despite GCs existing in score save files (e.g., GC_20260117_204645 in 271-work). Needs investigation. | If user tries to recall saved GCs or if GC library features are used |
+| Musical Material Workflow doc | `docs/MUSICAL_MATERIAL_WORKFLOW.md` — general process for multi-component musical objects. Includes 4 insertion patterns (Console→Save/Reload→Direct Live→AI Direct). | When building any new musical material system |
 
 ---
 
 ## Last Session Summary
 
-> **LilyPond Settings Registry + Bartók Pizzicato Workflow + Continuity System.** Created exhaustive LilyPond Settings Registry (27 sections, 771 settings from 433 .ly files). Built full Bartók Pizzicato pipeline: 3 test files, crop bug fix (dynamics cut off), standalone `crop_svg.js`, general-purpose `modify_midi.js`, automated `render_bartok_pizz.js` (single + batch mode), `/bartok-pizz` slash command. Established session continuity system: Startup Checklist, Open Threads, Wrap-Up Protocol. **Next up: Bartók Pizzicato score integration.**
+> **AI Command Bridge + Quarter-Tone Pitch Bend.** Built Pattern 4 (AI Direct): `POST /api/ai/command` → Socket.IO → browser eval — Cascade sends commands directly to browser, no paste needed. First tested with Bartók Pizzicato (F+4 fff at 243.5s appeared hands-free). AI Bartók Pizz Prompt Guide created. Quarter-tone pitch bend added to all single-pitch systems (Bartók pizz, Crescendo, Vibrato) using ±1 semitone range (8192/semitone). Documented Pattern 4 in `MUSICAL_MATERIAL_WORKFLOW.md`. **Bartók Pizzicato is the first material using Pattern 4 (AI Direct — hands-free).**
 
 ---
 
 ## Current Session
 
-**Date:** Feb 20, 2026  
-**Focus:** LilyPond Settings Registry + Bartók Pizzicato Workflow  
-**Tier 1 Count This Session:** 0 (reset after Tier 2 commit 2f6e750)  
+**Date:** Feb 21, 2026  
+**Focus:** AI Command Bridge (Pattern 4) + Quarter-Tone Pitch Bend + AI Prompt Guide  
+**Tier 1 Count This Session:** 3 (ASB-077, ASB-078, ASB-079) — ready for Tier 2  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -113,6 +119,9 @@ That's it. Everything else below is for Cascade.
 ### Session Log — Bartók Pizzicato Workflow
 - ASB-075: Bartók Pizzicato automation — 3 test .ly files (B4, F¾#6, E¼♭3 with ledger lines + microtonal accidentals), Registry §28 (Microtonal Pitch Syntax) + §29 (Bartók Pizzicato) + "When to Engage the Registry" guide, workflow document (`docs/BARTOK_PIZZICATO_WORKFLOW.md`), standalone SVG cropper (`lilypond_code/crop_svg.js`), **bug fix** in Pass 3 crop logic (nested `<g>`/`<a>` groups with scale transforms were missed — dynamics like fff cut off), fix ported to both crop_svg.js and server.js. Output dir: `public/SVG_graphics/bartok_pizzicato/`, each clef generated fresh (no copy-transpose).
 - ASB-076: Bartók Pizzicato pipeline + MIDI tools — `render_bartok_pizz.js` full pipeline (single + batch mode, auto paper dimensions from pitch/clef/ledger lines), `modify_midi.js` general-purpose MIDI post-processor (configurable `--cc` args, channel rewrite, reusable across workflows), dynamic + track added to naming convention and Step 1 inputs, SVG+MIDI stored together in output dir, `/bartok-pizz` slash command created.
+- ASB-077: Bartók Pizzicato score integration + Musical Material Workflow — `docs/MUSICAL_MATERIAL_WORKFLOW.md` (general multi-component material creation process, 3 insertion patterns documented), server endpoint `POST /api/bartok-pizz/generate`, UI section (neonMagenta, Track/Clef/Pitch/Dynamic/Time + Go button), `BartokPizzUI` JS object (Direct Live Insertion — Pattern 3), plain English pitch input (C#4 not `cis'`), `englishToMidi()`/`englishToLilypond()` converters, **bug fixes**: LilyPond `#` prefix on `Accidental.font-size`, English pitch suffixes (`s`/`f` not `is`/`es`), MIDI insertion via `MidiSnippetDatabase.add()` + `MidiController.reloadFromDatabase()` (not direct track push).
+- ASB-078: AI Bartók Pizzicato Prompt Guide — `docs/AI_BARTOK_PIZZ_PROMPT_GUIDE.md`, copy-paste/natural language/batch/guided prompt templates, `BartokPizzUI.go()` execution format, pre-execution validation checklist, clef↔pitch range guidelines.
+- ASB-079: AI Command Bridge (Pattern 4) + quarter-tone pitch bend — server `POST /api/ai/command` relays JS to browser via Socket.IO `aiCommand` event, client-side async eval listener (magenta console logging), Pattern 4 documented in `MUSICAL_MATERIAL_WORKFLOW.md` + `AI_BARTOK_PIZZ_PROMPT_GUIDE.md`. Quarter-tone pitch bend (±1 semitone range, 8192/semitone) added to Bartók pizz `insertBartokMidi`, Crescendo `generateCrescDecrescEvents` (4096→8192 fix), Vibrato `generateVibratoMidi` (new bend+reset). Tested hands-free: F+4 + F#+4 at 243.5/244.5s.
 
 ### Session Log — SVG Anchor System
 - ASB-040: Full SVGElementManager refactor — anchor-based positioning (referenceSeconds + offsetSeconds + offsetYFraction), same formula as CurveMaker, fixed scale on resize, backward-compatible import, updated insertGlissandoSvg/insertVibratoSvg + server endpoints
@@ -270,6 +279,9 @@ That's it. Everything else below is for Cascade.
 | ASB-074 | LilyPond Settings Registry — 27-section exhaustive scan of 433 .ly files (771 settings) | Complete |
 | ASB-075 | Bartók Pizzicato workflow — test files, registry updates, workflow doc, crop_svg.js, crop bug fix | Complete |
 | ASB-076 | Bartók Pizzicato pipeline + general MIDI modifier — render_bartok_pizz.js, modify_midi.js, /bartok-pizz slash command | Complete |
+| ASB-077 | Bartók Pizz score integration — server endpoint, UI, BartokPizzUI JS, Direct Live Insertion (Pattern 3), plain English pitch, MIDI reloadFromDatabase, Musical Material Workflow doc | Complete |
+| ASB-078 | AI Bartók Pizzicato Prompt Guide — copy-paste/natural language/batch/guided templates, validation checklist, clef↔pitch range guidelines | Complete |
+| ASB-079 | AI Command Bridge (Pattern 4) + quarter-tone pitch bend — REST→Socket.IO command relay, Bartók/Crescendo/Vibrato pitch bend for microtones (±1 semitone range) | Complete |
 
 ---
 

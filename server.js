@@ -1475,6 +1475,75 @@ app.post('/api/lilypond/render-glissando', (req, res) => {
 });
 
 // ============================================
+// BARTÓK PIZZICATO PIPELINE - Run full pipeline from inputs
+// ============================================
+
+app.post('/api/bartok-pizz/generate', (req, res) => {
+    const { pitch, dynamic, clef, track } = req.body;
+    
+    if (!pitch || !dynamic || !clef || !track) {
+        return res.status(400).json({ success: false, error: 'Missing required fields: pitch, dynamic, clef, track' });
+    }
+    
+    const scriptPath = path.join(LILYPOND_DIR, 'render_bartok_pizz.js');
+    if (!fs.existsSync(scriptPath)) {
+        return res.status(404).json({ success: false, error: 'Pipeline script not found' });
+    }
+    
+    // Run the pipeline script
+    const command = `node "${scriptPath}" --pitch "${pitch}" --dynamic ${dynamic} --clef ${clef} --track ${track}`;
+    console.log('Bartók pizz command:', command);
+    
+    exec(command, { cwd: LILYPOND_DIR, timeout: 30000 }, (err, stdout, stderr) => {
+        if (err) {
+            console.error('Bartók pizz pipeline error:', err.message);
+            console.error('Bartók pizz stderr:', stderr);
+            console.error('Bartók pizz stdout:', stdout);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Pipeline failed',
+                details: stderr || err.message,
+                stdout: stdout
+            });
+        }
+        
+        // Parse the output to find SVG and MIDI paths
+        const svgMatch = stdout.match(/SVG → (.+)/);
+        const midiMatch = stdout.match(/MIDI → (.+?)(?:\s+\(|$)/m);
+        
+        if (!svgMatch) {
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Pipeline completed but SVG path not found in output',
+                stdout: stdout
+            });
+        }
+        
+        // Convert filesystem paths to web-accessible paths
+        const svgRelPath = svgMatch[1].trim().replace(/\\/g, '/');
+        const midiRelPath = midiMatch ? midiMatch[1].trim().replace(/\\/g, '/') : null;
+        
+        // Extract just the filename for web paths
+        const svgFilename = path.basename(svgRelPath);
+        const midiFilename = midiRelPath ? path.basename(midiRelPath) : null;
+        
+        const svgWebPath = `/SVG_graphics/bartok_pizzicato/${svgFilename}`;
+        const midiWebPath = midiFilename ? `/SVG_graphics/bartok_pizzicato/${midiFilename}` : null;
+        
+        console.log(`Bartók pizz generated: ${svgFilename}`);
+        
+        res.json({
+            success: true,
+            svgPath: svgWebPath,
+            midiPath: midiWebPath,
+            svgFilename: svgFilename,
+            midiFilename: midiFilename,
+            stdout: stdout
+        });
+    });
+});
+
+// ============================================
 // VIBRATO MOTIVE AUTOMATION - Create and save to score
 // ============================================
 
@@ -2793,6 +2862,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve lilypond_code directory for staff header SVGs
 app.use('/lilypond_code', express.static(path.join(__dirname, 'lilypond_code')));
+
+// AI Command Bridge — Cascade sends JS commands via REST, server relays to browser via Socket.IO
+app.post('/api/ai/command', (req, res) => {
+    const { command } = req.body;
+    if (!command) {
+        return res.status(400).json({ success: false, error: 'No command provided' });
+    }
+    console.log(`AI Command Bridge: ${command.substring(0, 120)}${command.length > 120 ? '...' : ''}`);
+    io.emit('aiCommand', { command, timestamp: Date.now() });
+    res.json({ success: true, message: 'Command sent to browser' });
+});
 
 // Serve index.html for the root route
 app.get('/', (req, res) => {

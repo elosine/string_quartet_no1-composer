@@ -139,7 +139,7 @@ function generateLy(pitch, dynamic, clef, paperW, paperH) {
     \\override DynamicText.font-size = #-6
     \\override Stem.details.beamed-lengths = #'(5.5)
     \\override Stem.details.lengths = #'(6.5)
-    \\override Accidental.font-size = -4
+    \\override Accidental.font-size = #-4
     
     
     % NOTATION HERE /////////////////////////////////////////////////////

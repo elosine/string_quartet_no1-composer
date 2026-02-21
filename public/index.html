@@ -1146,6 +1146,43 @@
                 </div>
                 
                 <div class="section-divider"></div>
+                <div class="section-label" style="background: var(--clr-neonMagenta); color: #fff; padding: 3px 6px; border-radius: 2px;">Bartók Pizzicato</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Track</label>
+                    <input type="number" id="bpTrackInput" class="curve-input" value="1" min="1" max="4" step="1" style="width: 35px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">Clef</label>
+                    <select id="bpClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="treble" selected>Treble</option>
+                        <option value="alto">Alto</option>
+                        <option value="bass">Bass</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Pitch</label>
+                    <input type="text" id="bpPitchInput" class="curve-input" value="B4" style="width: 55px; font-size: 10px;" placeholder="B4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 3px;">Dyn</label>
+                    <select id="bpDynamicSelect" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p">p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f">f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff" selected>fff</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Time</label>
+                    <input type="number" id="bpTimeInput" class="curve-input" value="0" step="0.1" style="width: 65px; font-size: 10px;" title="Impact time in seconds">
+                    <span style="font-size: 8px; color: #888; margin-left: 3px;">s</span>
+                </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="bpGoBtn" class="control-btn" style="font-size: 11px; background: var(--clr-neonMagenta); color: #fff; font-weight: bold; padding: 4px 12px;">Go</button>
+                </div>
+                
+                <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-navyBlue); color: #fff; padding: 3px 6px; border-radius: 2px;">Curve Segments</div>
                 
                 <div class="curve-input-row">
@@ -2377,6 +2414,17 @@
                 
                 ClockSync.socket.on('scoreGoto', (data) => {
                     this.onScoreGoto(data);
+                });
+                
+                // AI Command Bridge — execute JS commands sent by Cascade via server
+                ClockSync.socket.on('aiCommand', async (data) => {
+                    console.log('%c[AI Command]', 'color: #ff00ff; font-weight: bold', data.command);
+                    try {
+                        const result = await eval(`(async () => { ${data.command} })()`);
+                        if (result !== undefined) console.log('%c[AI Command Result]', 'color: #ff00ff', result);
+                    } catch (err) {
+                        console.error('%c[AI Command Error]', 'color: red; font-weight: bold', err);
+                    }
                 });
             },
             
@@ -11357,7 +11405,7 @@
                 
                 // If using quarter tones for start pitch, send initial pitch bend
                 if (startQuarterTone !== 0) {
-                    const bendValue = Math.round(8192 + (startQuarterTone * 4096)); // 4096 = 1 semitone
+                    const bendValue = Math.round(8192 + (startQuarterTone * 8192)); // 8192 = 1 semitone (±1 semitone range)
                     const lsb = bendValue & 0x7F;
                     const msb = (bendValue >> 7) & 0x7F;
                     events.push({
@@ -17877,6 +17925,14 @@
                 trackEvents.push(...writeVarInt(0));
                 trackEvents.push(0xB0, 0x00, CC0_ARTICULATION);
                 
+                // Quarter-tone pitch bend before Note On (±1 semitone range: 8192 per semitone)
+                const needsQTBend = quarterTone === '+' || quarterTone === 'D';
+                if (needsQTBend) {
+                    const bendValue = quarterTone === '+' ? 12288 : 4096; // +50 cents or -50 cents
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0xE0, bendValue & 0x7F, (bendValue >> 7) & 0x7F);
+                }
+                
                 // Note On at tick 0
                 trackEvents.push(...writeVarInt(0));
                 trackEvents.push(0x90, midiNote, velocity);
@@ -17906,6 +17962,12 @@
                 const noteOffDelta = Math.max(0, endTick - lastTick);
                 trackEvents.push(...writeVarInt(noteOffDelta));
                 trackEvents.push(0x80, midiNote, 0);
+                
+                // Reset quarter-tone pitch bend after Note Off
+                if (needsQTBend) {
+                    trackEvents.push(...writeVarInt(0));
+                    trackEvents.push(0xE0, 0x00, 0x40); // 8192 = center
+                }
                 
                 // End of track
                 trackEvents.push(...writeVarInt(0));
@@ -19096,6 +19158,362 @@
         };
         CrescendoUI.init();
         window.CrescendoUI = CrescendoUI;
+        
+        // ============================================
+        // BARTÓK PIZZICATO UI
+        // Single-click workflow: pipeline → GC → SVG → MIDI
+        // ============================================
+        const BartokPizzUI = {
+            // Fixed GC parameters (from GC_20260117_204645)
+            GC_PARAMS: {
+                stiffness: 62,
+                damping: 100,
+                ictus: 90,
+                descentRatio: 60,
+                duration: 0.6,
+                color: 'neonMagenta'
+            },
+            
+            init() {
+                const goBtn = document.getElementById('bpGoBtn');
+                if (goBtn) {
+                    goBtn.addEventListener('click', () => this.go());
+                }
+                console.log('BartokPizzUI initialized');
+            },
+            
+            // Dynamic → MIDI velocity mapping
+            dynamicToVelocity(dynamic) {
+                const map = { ppp: 30, pp: 45, p: 60, mp: 70, mf: 85, f: 95, ff: 107, fff: 120 };
+                return map[dynamic] || 100;
+            },
+            
+            // Convert plain English pitch (C#4, Ab3, C+4, Cd4, C#+4, Cbd4) to LilyPond notation
+            englishToLilypond(pitchStr) {
+                const match = pitchStr.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+                if (!match) return null;
+                
+                let [, note, accidental, quarterTone, octave] = match;
+                
+                // Letter
+                let ly = note.toLowerCase();
+                
+                // Accidental + quarter tone suffix
+                if (accidental === '#' && quarterTone === '+') ly += 'tqs';      // 3/4 sharp
+                else if (accidental === 'B' && quarterTone === 'D') ly += 'tqf'; // 3/4 flat
+                else if (accidental === '#') ly += 's';                           // sharp (English: cs, not cis)
+                else if (accidental === 'B') ly += 'f';                           // flat (English: cf, not ces)
+                else if (quarterTone === '+') ly += 'qs';                         // quarter sharp
+                else if (quarterTone === 'D') ly += 'qf';                        // quarter flat
+                
+                // Octave marks: 3 = no mark, 4 = ', 5 = '', etc.
+                const oct = parseInt(octave);
+                if (oct > 3) ly += "'".repeat(oct - 3);
+                else if (oct < 3) ly += ",".repeat(3 - oct);
+                
+                return ly;
+            },
+            
+            // Convert plain English pitch to MIDI note number
+            englishToMidi(pitchStr) {
+                const noteMap = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+                const match = pitchStr.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+                if (!match) return null;
+                
+                let [, note, accidental, quarterTone, octave] = match;
+                let pitch = noteMap[note];
+                if (pitch === undefined) return null;
+                
+                if (accidental === '#') pitch += 1;
+                else if (accidental === 'B') pitch -= 1;
+                
+                pitch += (parseInt(octave) + 1) * 12;
+                return Math.max(0, Math.min(127, pitch));
+            },
+            
+            // Full workflow (UI or programmatic)
+            async go(params = null) {
+                const pitchEnglish = params?.pitch ?? document.getElementById('bpPitchInput').value.trim();
+                const dynamic = params?.dynamic ?? document.getElementById('bpDynamicSelect').value;
+                const clef = params?.clef ?? document.getElementById('bpClefSelect').value;
+                const track = params?.track ?? parseInt(document.getElementById('bpTrackInput').value);
+                const impactTime = params?.time ?? parseFloat(document.getElementById('bpTimeInput').value);
+                
+                if (!pitchEnglish) { console.error('BartokPizzUI: pitch required'); return null; }
+                
+                // Convert plain English to LilyPond notation for pipeline
+                const pitch = this.englishToLilypond(pitchEnglish);
+                if (!pitch) {
+                    console.error('BartokPizzUI: Invalid pitch format:', pitchEnglish, '— Use: C4, C#4, Bb3, C+4, Cd4, C#+4, Cbd4');
+                    alert('Invalid pitch. Format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat)');
+                    return null;
+                }
+                
+                const btn = document.getElementById('bpGoBtn');
+                const originalText = btn?.textContent;
+                if (btn) { btn.textContent = '...'; btn.disabled = true; }
+                
+                let result = null;
+                try {
+                    console.log('BartokPizzUI.go:', { pitch, dynamic, clef, track, impactTime });
+                    
+                    // Step 1: Run pipeline (server calls render_bartok_pizz.js)
+                    const pipelineResp = await fetch('/api/bartok-pizz/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pitch, dynamic, clef, track })
+                    });
+                    const pipelineResult = await pipelineResp.json();
+                    
+                    if (!pipelineResult.success) {
+                        console.error('BartokPizzUI: Pipeline failed:', pipelineResult.error);
+                        throw new Error(pipelineResult.error);
+                    }
+                    console.log('BartokPizzUI: Pipeline complete:', pipelineResult.svgPath);
+                    
+                    // Step 2: Create GC at impact time
+                    let gc = null;
+                    if (window.GCMaker) {
+                        const savedStiffness = GCMaker.stiffness;
+                        const savedDamping = GCMaker.damping;
+                        const savedIctus = GCMaker.ictus;
+                        const savedDescentRatio = GCMaker.descentRatio;
+                        const savedDuration = GCMaker.duration;
+                        
+                        GCMaker.stiffness = this.GC_PARAMS.stiffness;
+                        GCMaker.damping = this.GC_PARAMS.damping;
+                        GCMaker.ictus = this.GC_PARAMS.ictus;
+                        GCMaker.descentRatio = this.GC_PARAMS.descentRatio;
+                        GCMaker.duration = this.GC_PARAMS.duration;
+                        
+                        if (GCMaker.impactInput) GCMaker.impactInput.value = impactTime;
+                        if (GCMaker.trackSelect) GCMaker.trackSelect.value = String(track);
+                        
+                        GCMaker.createGC();
+                        gc = GCMaker.gcs[GCMaker.gcs.length - 1];
+                        
+                        if (gc) {
+                            gc.color = this.GC_PARAMS.color;
+                            gc.name = `BartokPizz_${gc.name}`;
+                            GCMaker.rerenderAllGCs();
+                            console.log('BartokPizzUI: GC created:', gc.name);
+                        }
+                        
+                        GCMaker.stiffness = savedStiffness;
+                        GCMaker.damping = savedDamping;
+                        GCMaker.ictus = savedIctus;
+                        GCMaker.descentRatio = savedDescentRatio;
+                        GCMaker.duration = savedDuration;
+                    }
+                    
+                    // Step 3: Insert SVG notation
+                    let svgElement = null;
+                    if (pipelineResult.svgPath) {
+                        svgElement = await this.insertBartokSvg(pipelineResult.svgPath, impactTime, track);
+                        if (svgElement) {
+                            console.log('BartokPizzUI: SVG inserted:', svgElement.name);
+                        }
+                    }
+                    
+                    // Step 4: Insert MIDI (programmatic — single note + CC0=97)
+                    let midiSnippet = null;
+                    if (window.MidiController) {
+                        midiSnippet = this.insertBartokMidi(pitchEnglish, dynamic, track, impactTime);
+                        if (midiSnippet) {
+                            console.log('BartokPizzUI: MIDI inserted');
+                        }
+                    }
+                    
+                    result = { gc, svgElement, midiSnippet, pipelineResult };
+                    console.log('BartokPizzUI: Complete');
+                    
+                } catch (err) {
+                    console.error('BartokPizzUI error:', err);
+                } finally {
+                    if (btn) {
+                        if (result) {
+                            btn.textContent = '✓';
+                            btn.style.background = 'var(--clr-green)';
+                            setTimeout(() => { btn.textContent = originalText; btn.style.background = 'var(--clr-neonMagenta)'; btn.disabled = false; }, 1500);
+                        } else {
+                            btn.textContent = '✗';
+                            btn.style.background = 'var(--clr-brightRed)';
+                            setTimeout(() => { btn.textContent = originalText; btn.style.background = 'var(--clr-neonMagenta)'; btn.disabled = false; }, 2000);
+                        }
+                    }
+                }
+                return result;
+            },
+            
+            // Insert Bartók pizz SVG into score (follows insertCrescendoSvg pattern)
+            async insertBartokSvg(svgPath, startSeconds, track) {
+                if (!svgPath) return null;
+                
+                try {
+                    const response = await fetch(svgPath);
+                    const svgContent = await response.text();
+                    
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const svgEl = svgDoc.documentElement;
+                    
+                    let svgWidth = parseFloat(svgEl.getAttribute('width')) || 100;
+                    let svgHeight = parseFloat(svgEl.getAttribute('height')) || 100;
+                    const widthStr = svgEl.getAttribute('width') || '';
+                    const heightStr = svgEl.getAttribute('height') || '';
+                    if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
+                    if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
+                    
+                    svgEl.setAttribute('width', String(svgWidth));
+                    svgEl.setAttribute('height', String(svgHeight));
+                    
+                    const trackNum = parseInt(track) || 1;
+                    const scoreEl = document.getElementById('ScoreTop');
+                    const scoreWidth = scoreEl.clientWidth;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(trackNum), scoreEl);
+                    const trackHeight = trackDims.height;
+                    
+                    // Bartók pizz is small — scale to ~50% of track height
+                    const heightFraction = 0.50;
+                    const targetHeight = trackHeight * heightFraction;
+                    const scale = targetHeight / svgHeight;
+                    const scaledContentWidth = svgWidth * scale;
+                    
+                    // Position SVG centered on impact time
+                    const secondsPerPage = window.GraphicTimeline 
+                        ? GraphicTimeline.getSecondsPerPage() 
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const secondsPerPixel = secondsPerPage / scoreWidth;
+                    const offsetSeconds = -(scaledContentWidth / 2) * secondsPerPixel;
+                    
+                    const id = SVGElementManager.nextId++;
+                    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    wrapper.setAttribute('id', `svg-element-${id}`);
+                    wrapper.setAttribute('class', 'svg-element-wrapper');
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    let svgString = new XMLSerializer().serializeToString(svgEl);
+                    svgString = svgString.replace(/currentColor/g, '#000000');
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                    image.setAttribute('href', dataUrl);
+                    image.setAttribute('width', svgWidth);
+                    image.setAttribute('height', svgHeight);
+                    wrapper.appendChild(image);
+                    
+                    const elementData = {
+                        id: id,
+                        name: SVGElementManager.generateSvgName(svgPath.split('/').pop()),
+                        wrapper: wrapper,
+                        image: image,
+                        referenceSeconds: startSeconds,
+                        offsetSeconds: offsetSeconds,
+                        offsetYFraction: 0.05,
+                        width: svgWidth,
+                        height: svgHeight,
+                        scale: scale,
+                        heightFraction: heightFraction,
+                        track: trackNum
+                    };
+                    
+                    const pos = SVGElementManager.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
+                    
+                    SVGElementManager.elements.push(elementData);
+                    SVGElementManager.updateElementTransform(elementData);
+                    
+                    const targetContainer = pos.section === 'top' 
+                        ? SVGElementManager.containerTop 
+                        : SVGElementManager.containerBottom;
+                    targetContainer.appendChild(wrapper);
+                    
+                    wrapper.addEventListener('mousedown', (e) => 
+                        SVGElementManager.handleElementMouseDown(e, elementData));
+                    
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                    
+                    return elementData;
+                } catch (err) {
+                    console.error('BartokPizzUI.insertBartokSvg error:', err);
+                    return null;
+                }
+            },
+            
+            // Insert MIDI events for Bartók pizzicato (programmatic, matches insertAtEditCursor pattern)
+            insertBartokMidi(pitchEnglish, dynamic, track, impactTime) {
+                if (!window.MidiController || !window.MidiSnippetDatabase) return null;
+                
+                const trackIndex = parseInt(track) - 1;
+                const midiChannel = trackIndex; // 0-indexed: track 1 → ch 0
+                const velocity = this.dynamicToVelocity(dynamic);
+                
+                // Convert English pitch to MIDI note number
+                const midiNote = this.englishToMidi(pitchEnglish);
+                if (midiNote === null) {
+                    console.error('BartokPizzUI: Could not convert pitch to MIDI:', pitchEnglish);
+                    return null;
+                }
+                
+                const impactMs = impactTime * 1000;
+                const noteDurationMs = 95.4; // snap pizz is very short
+                const durationSec = noteDurationMs / 1000;
+                
+                // Detect quarter-tone component for pitch bend (±1 semitone range)
+                // Quarter sharp (+): +50 cents = 12288, Quarter flat (D): -50 cents = 4096, None: 8192 (center)
+                const qtMatch = pitchEnglish.trim().toUpperCase().match(/^[A-G][#B]?([+D]?)-?\d$/);
+                const quarterTone = qtMatch ? qtMatch[1] : '';
+                const needsBend = quarterTone === '+' || quarterTone === 'D';
+                const bendValue = quarterTone === '+' ? 12288 : quarterTone === 'D' ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
+                
+                // Build MIDI events with raw data arrays (matching MidiController event format)
+                const snippetEvents = [];
+                
+                // Pitch bend before note (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({ timeMs: impactMs, relativeTimeMs: 0, type: 0xE0, data: [0xE0 | midiChannel, bendLSB, bendMSB] });
+                }
+                
+                snippetEvents.push(
+                    { timeMs: impactMs, relativeTimeMs: 0, type: 0xB0, data: [0xB0 | midiChannel, 0x00, 97] },                      // CC0 = 97
+                    { timeMs: impactMs, relativeTimeMs: 0, type: 0x90, data: [0x90 | midiChannel, midiNote, velocity] },              // Note On
+                    { timeMs: impactMs + noteDurationMs, relativeTimeMs: noteDurationMs, type: 0x80, data: [0x80 | midiChannel, midiNote, 0] } // Note Off
+                );
+                
+                // Reset pitch bend after note off (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({ timeMs: impactMs + noteDurationMs, relativeTimeMs: noteDurationMs, type: 0xE0, data: [0xE0 | midiChannel, 0x00, 0x40] }); // bend = 8192 (center)
+                }
+                
+                // Get next color from MidiController palette
+                const color = MidiController.snippetColors[MidiController.nextColorIndex % MidiController.snippetColors.length];
+                MidiController.nextColorIndex++;
+                
+                // Register snippet in database
+                const snippet = MidiSnippetDatabase.add({
+                    name: `BartokPizz_t${track}_${impactTime.toFixed(1)}s`,
+                    trackIndex: trackIndex,
+                    startSeconds: impactTime,
+                    endSeconds: impactTime + durationSec,
+                    events: snippetEvents,
+                    color: color
+                });
+                
+                // Mark dirty so auto-save captures the new snippet
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // Rebuild tracks from database (clears + repopulates + sorts + re-renders)
+                MidiController.reloadFromDatabase();
+                
+                return snippet.id;
+            }
+        };
+        BartokPizzUI.init();
+        window.BartokPizzUI = BartokPizzUI;
         
         // ============================================
         // PANEL SECTION MANAGER - Draggable reordering of composition panel sections
