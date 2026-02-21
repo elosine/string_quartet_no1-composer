@@ -1,0 +1,327 @@
+﻿%                 \override Script.transparent = ##t
+%           \override #'(baseline-skip . 2)
+%           \override #'(font-name . "Crimson Pro Light Italic")
+%         \once \override Accidental.transparent = ##t
+%         \once \override NoteHead.no-ledgers = ##t
+%         \once \override NoteHead.transparent = ##t
+%         \override Glissando.bound-details.left.padding = #0.5
+%         \override NoteHead.no-ledgers = ##f
+%         \override NoteHead.no-ledgers = ##t
+%         \override NoteHead.transparent = ##f
+%         \override NoteHead.transparent = ##t
+%         \override Script.transparent = ##t
+%         \override Script.transparent = #f
+%         \override Staff.BarLine.transparent =##f
+%         \override Staff.BarLine.transparent =##t
+%         \override Staff.Clef.transparent =##f
+%         \override Staff.Clef.transparent =##t
+%         \override Stem.transparent = ##f
+%         \override Stem.transparent = ##t
+%         \override TupletBracket.bracket-visibility = ##f
+%         \override TupletBracket.bracket-visibility = ##t
+%         \override TupletNumber.transparent = ##f
+%         \override TupletNumber.transparent = ##t
+%     \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-6
+%     \override StaffSymbol.line-count = #1
+%     ^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "3rd" }
+%     ^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "4th" }
+%     ^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "7th" }
+%     ^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "9th" }
+%     _\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-8 "molto premuto (jeté)" }
+%     _\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-8 "ord. c.l. batt. →" }
+%   \override #'(font-name . "Crimson Pro Light Italic")
+%   \override Glissando.style = #'zigzag
+%   \override NoteHead.no-ledgers = ##f
+%   \override NoteHead.no-ledgers = ##t
+%   \override NoteHead.style = #'harmonic
+%   \override NoteHead.transparent = ##f
+%   \override NoteHead.transparent = ##t
+%   \override Script.transparent = ##f
+%   \override Script.transparent = ##t
+%   \override Staff.BarLine.transparent = ##f
+%   \override Staff.BarLine.transparent = ##t
+%   \override Staff.Clef.transparent = ##f
+%   \override Staff.Clef.transparent = ##t
+%   \override Stem.transparent = ##f
+%   \override Stem.transparent = ##t
+%   \override TupletBracket.bracket-visibility = ##f
+%   \override TupletBracket.bracket-visibility = ##t
+%   \override TupletNumber.transparent = ##f
+%   \override TupletNumber.transparent = ##t
+%  \override SpacingSpanner.strict-grace-spacing = ##t
+%  \override SpacingSpanner.strict-note-spacing = ##t
+% % \override TrillSpanner.bound-details.left.text = ##f
+% % \override TrillSpanner.Y-offset = #3.5
+% ; Hide the "tr" symbol with: \override TrillSpanner.bound-details.left.text = ##f
+% \once \override Accidental.extra-offset = #'(0.3 . 0)
+% \once \override Dots.dot-count = #0
+% \once \override DynamicText.extra-spacing-width = #'(+inf.0 . -inf.0)
+% \once \override NoteColumn.X-offset = #-0.7
+% \once \override NoteColumn.X-offset = #-0.8
+% \once \override NoteColumn.X-offset = #-1
+% \once \override NoteColumn.X-offset = #-1.4
+% \once \override NoteColumn.X-offset = #-1.5
+% \once \override NoteColumn.X-offset = #-1.8
+% \once \override NoteColumn.X-offset = \noteColumnOffset1
+% \once \override NoteHead.style = #'default
+% \once \override Stem.direction = #down
+% \once \override TupletBracket.positions = #'(10 . 10)  % both values equal = flat
+% \once \override TupletNumber.text =
+% \once \override TupletNumber.text = "7:4"            % manual per-tuplet ratio text
+% \override Beam.breakable = ##t
+% \override DynamicLineSpanner.staff-padding = \dynamicLineSpannerPadding
+% \override Glissando.bound-details.left.padding = #0.5
+% \override Glissando.breakable = ##t
+% \override Glissando.style = #'zigzag
+% \override Hairpin.bound-details.left.padding = #0
+% \override Hairpin.height = #0.5
+% \override Hairpin.minimum-length = \hairpinMinLength
+% \override Hairpin.Y-offset = #-0.9
+% \override NoteColumn.accent-skip = ##t
+% \override NoteHead.no-ledgers = ##t
+% \override NoteHead.style = #'harmonic
+% \override Score.BarNumber.break-visibility = ##(#f #f #f)
+% \override SpacingSpanner.strict-grace-spacing = ##t
+% \override SpacingSpanner.strict-note-spacing = ##t
+% \override SpacingSpanner.uniform-stretching = ##t
+% \override Stem.details.beamed-lengths = #'(7)
+% \override Stem.details.lengths = #'(7)
+% \override Stem.transparent = ##f  % Show stem for pizz
+% \override TextSpanner.breakable = ##t
+% \override TrillSpanner.bound-details.left.text = ##f  % Hide "tr" symbol
+% \override TrillSpanner.Y-offset = \vibratoYOffset
+% \override TupletNumber.stencil = ##f                 % hide numbers (Cello_E2_cell.ly)
+% \override TupletNumber.visibility = ##f              % hide numbers entirely (sf004 default)
+% ║    Move accidental: \once \override Accidental.extra-offset = #'(X . Y)  ║
+% ║    Move note:       \once \override NoteColumn.X-offset = #N             ║
+% Hide the "tr" symbol with: \override TrillSpanner.bound-details.left.text = ##f
+%\once \override TupletNumber #'text = "7:4"
+%\override SpacingSpanner.uniform-stretching = ##t
+%\override Stem.details.lengths = #'(7)
+%\override Stem.transparent = ##t
+\line { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-2 "col Legno battuto" }
+\line { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-2 "ricochet" }
+\once  \override Stem.direction = #down
+\once \override Accidental.extra-offset = #'(0.1 . 0)  % Move sharp closer to note (positive=right)
+\once \override Accidental.extra-offset = #'(0.3 . 0)
+\once \override Accidental.extra-offset = #'(0.3 . 0)  % Move sharp closer to note (positive=right)
+\once \override Accidental.font-size = #-3
+\once \override Accidental.transparent = ##t
+\once \override Beam.grow-direction = #RIGHT
+\once \override DynamicText.extra-spacing-width = #'(+inf.0 . -inf.0)
+\once \override DynamicText.font-size = #-6
+\once \override Hairpin.height = #0.3
+\once \override Hairpin.minimum-length = #8
+\once \override Hairpin.Y-offset = #-5
+\once \override NoteColumn.X-offset = #0 %notecolumn 2
+\once \override NoteColumn.X-offset = #-0.5 %Note Column 1 adjustment
+\once \override NoteColumn.X-offset = #-0.7
+\once \override NoteColumn.X-offset = #-0.7 %Note Column 1 adjustment
+\once \override NoteColumn.X-offset = #-0.8
+\once \override NoteColumn.X-offset = #-0.9
+\once \override NoteColumn.X-offset = #-1
+\once \override NoteColumn.X-offset = #-1 %notecolumn 2
+\once \override NoteColumn.X-offset = #-1.0
+\once \override NoteColumn.X-offset = #-1.2
+\once \override NoteColumn.X-offset = #-1.4 %Note Column 1 adjustment
+\once \override NoteColumn.X-offset = #-1.5
+\once \override NoteColumn.X-offset = #-1.5 %Note Column 1 adjustment
+\once \override NoteColumn.X-offset = #-1.6
+\once \override NoteColumn.X-offset = #-1.7
+\once \override NoteColumn.X-offset = #-1.8
+\once \override NoteColumn.X-offset = #-1.8 %notecolumn 2
+\once \override NoteColumn.X-offset = #-2
+\once \override NoteColumn.X-offset = #-2.5
+\once \override NoteColumn.X-offset = \noteColumnOffset1
+\once \override NoteColumn.X-offset = \noteColumnOffset2
+\once \override NoteHead.font-size = #-1.5
+\once \override NoteHead.no-ledgers = ##t
+\once \override NoteHead.stencil = #arrow-down-notehead
+\once \override NoteHead.stencil = #arrow-up-notehead
+\once \override NoteHead.stencil = #ly:text-interface::print
+\once \override NoteHead.style = #'cross
+\once \override NoteHead.style = #'harmonic
+\once \override NoteHead.text = \markup {
+\once \override NoteHead.transparent = ##t
+\once \override Script.font-size = #1
+\once \override Staff.Clef.font-size = #-4
+\once \override Staff.Clef.X-extent = #'(0 . 1.2)
+\once \override Staff.Clef.Y-extent = #'(-1.5 . 1.5)
+\once \override Stem.direction = #down
+\once \override Stem.stencil = ##f
+\once \override TextScript.extra-offset = #'(-1 . 2.5)
+\once \override TextScript.extra-offset = #'(-1.5 . 2.5)
+\once \override TextScript.extra-offset = #'(-2 . 3)
+\once \override TextScript.extra-offset = #'(-2 . 3.5)
+\once \override TextScript.extra-offset = #'(-2 . 4)
+\once \override TextScript.extra-offset = #'(-3 . 2)
+\once \override TextScript.extra-offset = #'(-3 . 3)
+\once \override TextScript.extra-offset = #'(-3 . 4)
+\once \override TextScript.extra-offset = #'(-3 . 5)
+\once \override TextScript.extra-offset = #'(-4 . 4)
+\once \override TextScript.font-size = #-2
+\once \override TextScript.font-size = #-3
+\once \override TextSpanner.bound-details.left.padding = #0
+\once \override TextSpanner.bound-details.right.padding = #0
+\once \override TextSpanner.extra-offset = #'(0 . -2)
+\once \override TextSpanner.extra-offset = #'(-1.8 . -12)
+\once \override TextSpanner.extra-offset = #'(-1.8 . -12.2)
+\once \override TextSpanner.extra-offset = #'(-1.8 . -13)
+\once \override TextSpanner.padding = #3
+\once \override TextSpanner.padding = #3 % Height above staff
+\once \override TextSpanner.stencil =
+\once \override TrillSpanner.after-line-breaking =
+\once \override TupletBracket.positions = #'(11.5 . 11.5)  % individual bracket height (adjust number: lower = closer to notes)
+\once \override TupletBracket.positions = #'(9 . 9)  % individual bracket height (adjust number: lower = closer to notes)
+\once \override TupletNumber #'text = "5:2"
+\once \override TupletNumber #'text = "7:1"
+\once \override TupletNumber.text =
+\override #'(baseline-skip . 2)
+\override #'(font-name . "Crimson Pro Light Italic")
+\override #'(font-name . "Crimson Pro Light Italic") \fontsize #-6
+\override #'(font-name . "Crimson Pro")
+\override #'(font-name . "Crimson Pro") \fontsize #-6
+\override #'(thickness . 0.4)
+\override #'(thickness . 0.8)
+\override #'(thickness . 0.8)  % <-- LINE THICKNESS
+\override #`(font-name . "Crimson Pro Light Italic")
+\override Accidental.font-size = #-4
+\override Accidental.font-size = \accidentalSize
+\override Accidental.font-size = -2
+\override Accidental.font-size = -4
+\override Accidental.font-size = -5
+\override Accidental.font-size = -6
+\override Accidental.stencil = ##f
+\override BarLine.stencil = ##f
+\override Beam.breakable = ##t
+\override Beam.damping = #+inf.0
+\override Beam.damping = #+inf.0  % forces perfectly flat/horizontal beams (no slope)
+\override Beam.grow-direction = #RIGHT
+\override DynamicLineSpanner.staff-padding = #1.2
+\override DynamicText.font-size = #-2
+\override DynamicText.font-size = #-6
+\override DynamicText.font-size = #-7
+\override DynamicText.font-size = #-8.5
+\override DynamicText.font-size = #-9
+\override DynamicText.font-size = \dynamicTextSize
+\override Glissando.bound-details.left.padding = #0.5
+\override Glissando.bound-details.left.padding = #1.2
+\override Glissando.bound-details.right.padding = #1
+\override Glissando.breakable = ##t
+\override Glissando.style = #'trill
+\override Glissando.style = #'zigzag
+\override Hairpin.bound-details.left.padding = #0
+\override Hairpin.extra-offset = #'(-0.7 . 0)
+\override Hairpin.extra-offset = #'(-1 . 0)
+\override Hairpin.height = #0.5  % hairpin height
+\override Hairpin.height = #0.65  % hairpin height
+\override Hairpin.height = #0.7  % hairpin height
+\override Hairpin.height = #0.7  % Increase height (default ~0.66)
+\override Hairpin.height = #1.1  % Increase height (default ~0.66)
+\override Hairpin.height = \hairpinHeight
+\override Hairpin.minimum-length = #0.0
+\override Hairpin.minimum-length = #0.1
+\override Hairpin.Y-offset = #-0.3  % Move down slightly
+\override Hairpin.Y-offset = #-0.3  % Move hairpin y
+\override Hairpin.Y-offset = #-0.9  % Move hairpin y
+\override Hairpin.Y-offset = #-1  % Move hairpin y
+\override Hairpin.Y-offset = \hairpinYOffset
+\override InstrumentName.font-size = #-1
+\override InstrumentName.padding = #instrument-name-padding
+\override NoteHead.font-size = #-1.25
+\override NoteHead.font-size = #-2
+\override NoteHead.font-size = #-2.5
+\override NoteHead.font-size = #-2.8
+\override NoteHead.font-size = #-3.3
+\override NoteHead.font-size = #-4
+\override NoteHead.font-size = #-6
+\override NoteHead.font-size = #-8
+\override NoteHead.font-size = \noteHeadSize
+\override NoteHead.no-ledgers = ##t
+\override NoteHead.stencil = #ly:text-interface::print
+\override NoteHead.style = #'cross
+\override NoteHead.style = #'default
+\override NoteHead.style = #'harmonic
+\override NoteHead.text = \markup {
+\override Rest.font-size = #-4
+\override Rest.font-size = \restSize
+\override Score.BarNumber.break-visibility = ##(#f #f #f)
+\override Score.BarNumber.break-visibility = ##(#f #f #f) %The order of the three values is end of line visible, middle of line visible, beginning of line visible.
+\override Score.Script.font-size = #-2 %change articulation font size
+\override SpacingSpanner.strict-note-spacing = ##t
+\override SpacingSpanner.uniform-stretching = ##t
+\override Staff.BarLine.transparent =##t
+\override Staff.Clef.stencil = ##f
+\override Staff.Clef.transparent =##t
+\override StaffSymbol.ledger-line-thickness = #'(1 . 0)
+\override StaffSymbol.line-count = #1
+\override StaffSymbol.line-count = #5
+\override StaffSymbol.stencil =
+\override StaffSymbol.stencil = #(lambda (grob)
+\override StaffSymbol.stencil = #(make-custom-staff-stencil lh-fingering-staff-width)
+\override StaffSymbol.stencil = #(make-custom-staff-stencil lh-pluck-staff-width)
+\override StaffSymbol.stencil = #(make-custom-staff-stencil rh-pluck-staff-width)
+\override StaffSymbol.stencil = #custom-staff-lines
+\override StaffSymbol.thickness = #0.5
+\override StaffSymbol.thickness = #1
+\override StaffSymbol.thickness = #1 %thickness of stafflines, ledger lines, and stems
+\override StaffSymbol.thickness = \staffThickness
+\override StaffSymbol.transparent = ##t
+\override Stem.details.beamed-lengths = #'(0)
+\override Stem.details.beamed-lengths = #'(4)
+\override Stem.details.beamed-lengths = #'(4.5)
+\override Stem.details.beamed-lengths = #'(5)
+\override Stem.details.beamed-lengths = #'(5.5)
+\override Stem.details.beamed-lengths = #'(6)
+\override Stem.details.beamed-lengths = #'(7)
+\override Stem.details.beamed-lengths = #'(7.5)
+\override Stem.details.beamed-lengths = #'(9)
+\override Stem.details.beamed-lengths = \stemBeamedLengths
+\override Stem.details.lengths = #'(0)
+\override Stem.details.lengths = #'(5)
+\override Stem.details.lengths = #'(5.5)
+\override Stem.details.lengths = #'(6)
+\override Stem.details.lengths = #'(6.5)
+\override Stem.details.lengths = #'(7)
+\override Stem.details.lengths = #'(7.5)
+\override Stem.details.lengths = #'(9)
+\override Stem.details.lengths = \stemLengths
+\override Stem.details.stem-shorten = #`(,pluck-stem-shorten)
+\override Stem.direction = #up
+\override Stem.length = #12
+\override Stem.length = #8
+\override Stem.length = #pluck-stem-length
+\override Stem.transparent = ##f
+\override Stem.transparent = ##t
+\override Stem.Y-extent = #`(,pluck-stem-bottom . ,pluck-stem-top)
+\override SystemStartBar.thickness = #0.5
+\override SystemStartBracket.collapse-height = #1
+\override SystemStartBracket.padding = #0.3
+\override SystemStartBracket.thickness = #0.5
+\override TextScript.font-size = #-2
+\override TextScript.font-size = #-3
+\override TextSpanner.breakable = ##t
+\override TrillSpanner.bound-details.left.text = ##f
+\override TrillSpanner.Y-offset = #3.5  % Vibrato line Y position (adjust as needed)
+\override TupletBracket.after-line-breaking = #flatten-tuplet-bracket
+\override TupletBracket.bracket-visibility = ##f
+\override TupletBracket.bracket-visibility = ##t
+\override TupletBracket.direction = #UP
+\override TupletBracket.padding = #0.5       % bracket height: lower = closer to notes (try 1, 1.5, 2, 3)
+\override TupletBracket.padding = #0.5     % bracket height: lower = closer to notes (try 0.5, 1, 1.5, 2, 3)
+\override TupletBracket.padding = 3
+\override TupletNumber.font-size = #-3
+\override TupletNumber.font-size = #-5
+\override TupletNumber.stencil = ##f
+\override TupletNumber.text = #tuplet-number::calc-fraction-text
+\override TupletNumber.transparent = ##t
+\override TupletNumber.visibility = ##f
+\override TupletNumber.visibility = ##t
+^\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-6 "max. pressure" }
+^\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-6 "ord." }
+^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "3rd" }
+^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "4th" }
+^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "7th" }
+^\markup { \override #'(font-name . "Crimson Pro") \fontsize #-10 "9th" }
+_\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-8 "molto premuto (jeté)" }
+_\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-8 "ord. c.l. batt. →" }

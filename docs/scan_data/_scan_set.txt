@@ -1,0 +1,4 @@
+﻿% \set tupletFullLength = ##t
+%\set tupletFullLength = ##t %http://lilypond.org/doc/v2.19/Documentation/snippets/rhythms
+\set Score.tempoHideNote = ##t
+\set tupletFullLength = ##t %http://lilypond.org/doc/v2.19/Documentation/snippets/rhythms

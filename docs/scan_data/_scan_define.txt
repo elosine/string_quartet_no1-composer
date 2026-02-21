@@ -1,0 +1,23 @@
+﻿#(define (arrow-down-notehead grob)
+#(define (arrow-up-notehead grob)
+#(define (build-vibrato-stencil grob amplitudes wavelength thick width-frac)
+#(define (flatten-tuplet-bracket grob)
+#(define (make-custom-staff-stencil width-mm)
+#(define arrow-notehead-y-offset 0.5)
+#(define custom-staff-lines
+#(define instrument-name-font-size -3)
+#(define instrument-name-font-size -6)
+#(define instrument-name-padding -1)
+#(define instrument-name-padding -2.5)
+#(define lh-fingering-staff-width 2.9)
+#(define lh-pluck-staff-width 2.9)
+#(define pluck-stem-bottom 0)   % bottom of stem
+#(define pluck-stem-length 12)
+#(define pluck-stem-shorten -2)
+#(define pluck-stem-top 13)     % top of stem (increase to reach top notehead)
+#(define rh-pluck-staff-width 2.9)
+#(define staff-line-width-mm 10)
+#(define staff-line-width-mm 2.4)
+#(define-markup-command (nail layout props) ()
+#(define-music-function (amplitudes wavelength thickness width-frac)
+% ; To change: edit the #(define staff-line-width-mm 2.4) line at the top.

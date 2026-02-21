@@ -1,0 +1,284 @@
+﻿%           \tuplet 5/4 {    f16\hide-> f f f f }
+%           \tuplet 5/4 {c'''16\hide-> c'''c'''c'''c'''}
+%           \tuplet 5/4 {e'''16\hide-> e'''e'''e'''e'''}
+%           \tuplet 5/4 {f16\hide-> f f f f}
+%         \once \override Accidental.transparent = ##t
+%         \once \override NoteHead.no-ledgers = ##t
+%         \once \override NoteHead.transparent = ##t
+%     \revert NoteHead.style
+%     -\tweak extra-offset #'(1.4 . -0.2)
+%     -\tweak extra-offset #'(1.4 . 1.6)
+%     -\tweak extra-offset #'(1.4 . 2)
+%     -\tweak extra-offset #'(1.4 . -2.9)
+%     -\tweak extra-offset #'(-2 . -2.75)
+%     -\tweak extra-offset #'(-2.25 . -2.75)
+%     \tweak NoteHead.extra-offset #'(2 . 0) fqf'''
+%     \tweak NoteHead.extra-offset #'(4 . 0) d''
+%     \tweak NoteHead.extra-offset #'(6 . 0) a'''
+%     -\tweak outside-staff-priority ##f
+%   \tweak NoteHead.extra-offset #'(X . 0) for horizontal spread
+%   -\tweak outside-staff-priority ##f
+%  -\tweak outside-staff-priority ##f
+% --- Hairpin Tweaks (per-instance, applied with \tweak) ---
+% \hide LedgerLineSpanner
+% \hide NoteHead
+% \hide Stem
+% \hide TupletNumber
+% \hideNotes r8 \unHideNotes
+% \once \override Accidental.extra-offset = #'(0.3 . 0)
+% \once \override Dots.dot-count = #0
+% \once \override DynamicText.extra-spacing-width = #'(+inf.0 . -inf.0)
+% \once \override NoteColumn.X-offset = #-0.7
+% \once \override NoteColumn.X-offset = #-0.8
+% \once \override NoteColumn.X-offset = #-1
+% \once \override NoteColumn.X-offset = #-1.4
+% \once \override NoteColumn.X-offset = #-1.5
+% \once \override NoteColumn.X-offset = #-1.8
+% \once \override NoteColumn.X-offset = \noteColumnOffset1
+% \once \override NoteHead.style = #'default
+% \once \override Stem.direction = #down
+% \once \override TupletBracket.positions = #'(10 . 10)  % both values equal = flat
+% \once \override TupletNumber.text =
+% \once \override TupletNumber.text = "7:4"            % manual per-tuplet ratio text
+% -\tweak bound-details.left.padding #0.2
+% -\tweak bound-details.left.padding #0.4
+% -\tweak bound-details.right.padding #-0.1
+% -\tweak extra-offset #'(0 . 0)
+% -\tweak extra-offset #'(0 . 0)      % Y: 0.3 for same-staff-line
+% -\tweak extra-offset #'(0 . 0.0)
+% -\tweak extra-offset #'(0 . -0.2)
+% -\tweak extra-offset #'(0 . 0.3)
+% -\tweak extra-offset #'(-0.5 . 1.2)
+% -\tweak extra-offset #'(-0.8 . 0)
+% -\tweak extra-offset #'(-4.6 . -2.9)
+% -\tweak extra-offset #'(-5.3 . -0.2)
+% -\tweak extra-offset #'(-5.5 . 3.5)
+% -\tweak extra-offset #'(-8 . 0.3)
+% -\tweak shorten-pair #'(0 . 4)     % Shorter right end for single-note layout
+% -\tweak shorten-pair #'(0 . 7)
+% ║    Move accidental: \once \override Accidental.extra-offset = #'(X . Y)  ║
+% ║    Move element:    -\tweak extra-offset #'(X . Y)                       ║
+% ║    Move note:       \once \override NoteColumn.X-offset = #N             ║
+% ║    Shorten hairpin: -\tweak shorten-pair #'(left . right)                ║
+% Individual bracket height (use \once before a specific \tuplet):
+% PARTIAL NUMBER LABELS: Attached to each note using \tweak self-alignment-X
+% Using \tweak extra-offset to shift this specific markup
+%\hide NoteHead
+%\omit BarLine
+%\once \override TupletNumber #'text = "7:4"
+\hide Stem
+\hideNotes e''2. \unHideNotes
+\hideNotes e''4 \unHideNotes
+\hideNotes r8 \unHideNotes
+\omit BarLine
+\omit Clef
+\omit KeySignature
+\omit LedgerLineSpanner
+\omit TimeSignature
+\once  \override Stem.direction = #down
+\once \hideNotes
+\once \override Accidental.extra-offset = #'(0.1 . 0)  % Move sharp closer to note (positive=right)
+\once \override Accidental.extra-offset = #'(0.3 . 0)
+\once \override Accidental.extra-offset = #'(0.3 . 0)  % Move sharp closer to note (positive=right)
+\once \override Accidental.font-size = #-3
+\once \override Accidental.transparent = ##t
+\once \override Beam.grow-direction = #RIGHT
+\once \override DynamicText.extra-spacing-width = #'(+inf.0 . -inf.0)
+\once \override DynamicText.font-size = #-6
+\once \override Hairpin.height = #0.3
+\once \override Hairpin.minimum-length = #8
+\once \override Hairpin.Y-offset = #-5
+\once \override NoteColumn.X-offset = #0 %notecolumn 2
+\once \override NoteColumn.X-offset = #-0.5 %Note Column 1 adjustment
+\once \override NoteColumn.X-offset = #-0.7
+\once \override NoteColumn.X-offset = #-0.7 %Note Column 1 adjustment
+\once \override NoteColumn.X-offset = #-0.8
+\once \override NoteColumn.X-offset = #-0.9
+\once \override NoteColumn.X-offset = #-1
+\once \override NoteColumn.X-offset = #-1 %notecolumn 2
+\once \override NoteColumn.X-offset = #-1.0
+\once \override NoteColumn.X-offset = #-1.2
+\once \override NoteColumn.X-offset = #-1.4 %Note Column 1 adjustment
+\once \override NoteColumn.X-offset = #-1.5
+\once \override NoteColumn.X-offset = #-1.5 %Note Column 1 adjustment
+\once \override NoteColumn.X-offset = #-1.6
+\once \override NoteColumn.X-offset = #-1.7
+\once \override NoteColumn.X-offset = #-1.8
+\once \override NoteColumn.X-offset = #-1.8 %notecolumn 2
+\once \override NoteColumn.X-offset = #-2
+\once \override NoteColumn.X-offset = #-2.5
+\once \override NoteColumn.X-offset = \noteColumnOffset1
+\once \override NoteColumn.X-offset = \noteColumnOffset2
+\once \override NoteHead.font-size = #-1.5
+\once \override NoteHead.no-ledgers = ##t
+\once \override NoteHead.stencil = #arrow-down-notehead
+\once \override NoteHead.stencil = #arrow-up-notehead
+\once \override NoteHead.stencil = #ly:text-interface::print
+\once \override NoteHead.style = #'cross
+\once \override NoteHead.style = #'harmonic
+\once \override NoteHead.text = \markup {
+\once \override NoteHead.transparent = ##t
+\once \override Script.font-size = #1
+\once \override Staff.Clef.font-size = #-4
+\once \override Staff.Clef.X-extent = #'(0 . 1.2)
+\once \override Staff.Clef.Y-extent = #'(-1.5 . 1.5)
+\once \override Stem.direction = #down
+\once \override Stem.stencil = ##f
+\once \override TextScript.extra-offset = #'(-1 . 2.5)
+\once \override TextScript.extra-offset = #'(-1.5 . 2.5)
+\once \override TextScript.extra-offset = #'(-2 . 3)
+\once \override TextScript.extra-offset = #'(-2 . 3.5)
+\once \override TextScript.extra-offset = #'(-2 . 4)
+\once \override TextScript.extra-offset = #'(-3 . 2)
+\once \override TextScript.extra-offset = #'(-3 . 3)
+\once \override TextScript.extra-offset = #'(-3 . 4)
+\once \override TextScript.extra-offset = #'(-3 . 5)
+\once \override TextScript.extra-offset = #'(-4 . 4)
+\once \override TextScript.font-size = #-2
+\once \override TextScript.font-size = #-3
+\once \override TextSpanner.bound-details.left.padding = #0
+\once \override TextSpanner.bound-details.right.padding = #0
+\once \override TextSpanner.extra-offset = #'(0 . -2)
+\once \override TextSpanner.extra-offset = #'(-1.8 . -12)
+\once \override TextSpanner.extra-offset = #'(-1.8 . -12.2)
+\once \override TextSpanner.extra-offset = #'(-1.8 . -13)
+\once \override TextSpanner.padding = #3
+\once \override TextSpanner.padding = #3 % Height above staff
+\once \override TextSpanner.stencil =
+\once \override TrillSpanner.after-line-breaking =
+\once \override TupletBracket.positions = #'(11.5 . 11.5)  % individual bracket height (adjust number: lower = closer to notes)
+\once \override TupletBracket.positions = #'(9 . 9)  % individual bracket height (adjust number: lower = closer to notes)
+\once \override TupletNumber #'text = "5:2"
+\once \override TupletNumber #'text = "7:1"
+\once \override TupletNumber.text =
+\revert NoteHead.style
+\startTextSpan -\tweak extra-offset #'(0 . 2) _\marcato
+-\tweak bound-details.left.padding #0.2
+-\tweak bound-details.left.padding #0.2   % Gap from left note
+-\tweak bound-details.left.padding #0.3   % Gap from left note
+-\tweak bound-details.left.padding #0.4
+-\tweak bound-details.left.padding #0.4   % Gap from left note
+-\tweak bound-details.left.padding #0.5   % Gap from left note
+-\tweak bound-details.right.padding #0  % Gap from right note
+-\tweak bound-details.right.padding #-0.1
+-\tweak bound-details.right.padding #0.1  % Gap from right note
+-\tweak bound-details.right.padding #-0.1  % Gap from right note
+-\tweak extra-offset #'(0 . 0)
+-\tweak extra-offset #'(0 . 0)       % Y offset: use 0.3 for same-staff-line pitches
+-\tweak extra-offset #'(0 . 0)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . 0) %gliss position
+-\tweak extra-offset #'(0 . 0.0)
+-\tweak extra-offset #'(0 . 0.0) %gliss position
+-\tweak extra-offset #'(0 . 0.1)
+-\tweak extra-offset #'(0 . 0.2)
+-\tweak extra-offset #'(0 . -0.2)
+-\tweak extra-offset #'(0 . -0.2)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . 0.3)
+-\tweak extra-offset #'(0 . 0.3)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . 0.3) %gliss position
+-\tweak extra-offset #'(0 . 0.4)
+-\tweak extra-offset #'(0 . 0.4)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . -0.6)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . -0.8)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . -1.6)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . -2)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . -2.1)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . -2.5)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0 . 3)
+-\tweak extra-offset #'(0 . 3.4)
+-\tweak extra-offset #'(0 . -9)
+-\tweak extra-offset #'(-0.2 . -0.2)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0.2 . -6.6)
+-\tweak extra-offset #'(-0.3 . -2)  % X,Y offset in staff spaces (adjust X to align with vibrato start)
+-\tweak extra-offset #'(-0.5 . 0)
+-\tweak extra-offset #'(-0.5 . 0)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(-0.5 . 1.2)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0.5 . 1.45)
+-\tweak extra-offset #'(-0.5 . 2) \>
+-\tweak extra-offset #'(0.6 . -0.2)
+-\tweak extra-offset #'(0.6 . -0.2)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(-0.8 . 0)
+-\tweak extra-offset #'(-0.8 . 0)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(-0.8 . 1.2)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(-0.8 . 1.3)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(0.8 . 1.45)
+-\tweak extra-offset #'(1.4 . -0.2)
+-\tweak extra-offset #'(1.4 . -0.3)
+-\tweak extra-offset #'(1.4 . -0.7)
+-\tweak extra-offset #'(1.4 . -1.2)
+-\tweak extra-offset #'(1.4 . -1.4)
+-\tweak extra-offset #'(1.4 . 1.6)
+-\tweak extra-offset #'(1.4 . -1.7)
+-\tweak extra-offset #'(1.4 . 2)
+-\tweak extra-offset #'(1.4 . 2.1)
+-\tweak extra-offset #'(1.4 . 2.5)
+-\tweak extra-offset #'(1.4 . 2.6)
+-\tweak extra-offset #'(1.4 . -2.9)
+-\tweak extra-offset #'(1.4 . 3)
+-\tweak extra-offset #'(1.9 . 1.4)
+-\tweak extra-offset #'(-2 . 0.8)
+-\tweak extra-offset #'(-2 . -2.1)
+-\tweak extra-offset #'(-2 . -2.75)
+-\tweak extra-offset #'(-2.25 . -2.1)
+-\tweak extra-offset #'(-2.25 . -2.75)
+-\tweak extra-offset #'(4 . -5)
+-\tweak extra-offset #'(-4.6 . -2.9)
+-\tweak extra-offset #'(-4.7 . -0.8)
+-\tweak extra-offset #'(-5.3 . -0.2)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(-5.5 . 3.5)  % X,Y offset in staff spaces (adjust X to align with vibrato end)
+-\tweak extra-offset #'(-5.6 . -0.3)
+-\tweak extra-offset #'(-5.6 . -0.8)
+-\tweak extra-offset #'(-5.6 . -1.9)
+-\tweak extra-offset #'(-5.6 . -2.4)
+-\tweak extra-offset #'(6 . 1.3)
+-\tweak extra-offset #'(6.7 . 1.3)
+-\tweak extra-offset #'(-8 . 0)  % X,Y offset in staff spaces
+-\tweak extra-offset #'(-8 . 0.3)  % X,Y offset in staff spaces
+\tweak NoteColumn.X-offset #0 c'
+\tweak NoteColumn.X-offset #0 c''
+\tweak NoteColumn.X-offset #0 g''
+\tweak NoteColumn.X-offset #2 beh'
+\tweak NoteColumn.X-offset #2 beh''
+\tweak NoteColumn.X-offset #2 feh'''
+\tweak NoteColumn.X-offset #4 d''
+\tweak NoteColumn.X-offset #4 g
+\tweak NoteColumn.X-offset #4 g'
+\tweak NoteColumn.X-offset #6 a'''
+\tweak NoteColumn.X-offset #6 d''
+\tweak NoteColumn.X-offset #6 d'''
+\tweak NoteHead.extra-offset #'(0 . 0) b
+\tweak NoteHead.extra-offset #'(0 . 0) e,
+\tweak NoteHead.extra-offset #'(0 . 0) f
+\tweak NoteHead.extra-offset #'(0 . 0) f'''
+\tweak NoteHead.extra-offset #'(0 . 0) fs'''
+\tweak NoteHead.extra-offset #'(0 . 0) g''
+\tweak NoteHead.extra-offset #'(0 . 0) g'''
+\tweak NoteHead.extra-offset #'(0 . 1) b'
+\tweak NoteHead.extra-offset #'(0 . -1) b'
+\tweak NoteHead.extra-offset #'(0 . -1.1) b'
+\tweak NoteHead.extra-offset #'(-0.4 . 0.3)
+\tweak NoteHead.extra-offset #'(0.45 . 0.3)
+\tweak NoteHead.extra-offset #'(2 . 0) feh'''
+\tweak NoteHead.extra-offset #'(2 . 0) fqf'''
+\tweak NoteHead.extra-offset #'(4 . 0) d''
+\tweak NoteHead.extra-offset #'(6 . 0) a'''
+-\tweak outside-staff-priority ##f
+-\tweak shorten-pair #'(0 . 0)    % (left . right) - positive=shorter
+-\tweak shorten-pair #'(0 . 1.5)    % (left . right) - positive=shorter
+-\tweak shorten-pair #'(0 . -1.8)    % (left . right) - positive=shorter
+-\tweak shorten-pair #'(0 . -1.8)   % Adjust right value: negative=longer, positive=shorter
+-\tweak shorten-pair #'(0 . 2.4)
+-\tweak shorten-pair #'(0 . 4)    % (left . right) - positive=shorter
+-\tweak shorten-pair #'(0 . 4.5)    % (left . right) - positive=shorter
+-\tweak shorten-pair #'(0 . 5.8)    % (left . right) - positive=shorter
+-\tweak shorten-pair #'(0 . 6)    % (left . right) - positive=shorter
+-\tweak shorten-pair #'(0 . 7)    % (left . right) - positive=shorter
+\undo \omit Staff.BarLine
+^\tweak extra-offset #'(0 . -2.8)
+^\tweak extra-offset #'(-1 . -0.2)
+^\tweak extra-offset #'(-1 . 0.25)
+_\tweak extra-offset #'(0 . 0)\f
+_\tweak extra-offset #'(0 . 0)\p
+_\tweak extra-offset #'(0 . 2)
+_\tweak extra-offset #'(0 . 2.6)\f
+g'8.-\tweak extra-offset #'(0 . 0.95) --

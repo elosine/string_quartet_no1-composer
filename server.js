@@ -1320,8 +1320,9 @@ function cropSvgToContent(svgFilePath) {
         }
     }
     
-    // Pass 3: String-search fallback for <path d="..."> without scale transforms
-    // This catches vibrato waves that Pass 2 may miss due to regex/substring edge cases
+    // Pass 3: Find ALL <path> elements, parse their local transforms, and
+    // trace back to the nearest ancestor <g transform="translate(tx,ty)">
+    // This handles paths inside nested <g>, <a>, etc. (e.g. dynamics like fff)
     let searchPos = 0;
     while (true) {
         const pathIdx = content.indexOf('<path ', searchPos);
@@ -1332,10 +1333,6 @@ function cropSvgToContent(svgFilePath) {
         if (closeIdx === -1) continue;
         const pathTag = content.substring(pathIdx, closeIdx + 2);
         
-        // Skip paths with scale transform (already handled by Pass 2)
-        if (pathTag.includes('scale(')) continue;
-        
-        // Extract d= attribute value using indexOf (no regex on long strings)
         const dIdx = pathTag.indexOf(' d="');
         if (dIdx === -1) continue;
         const dValStart = dIdx + 4;
@@ -1344,14 +1341,35 @@ function cropSvgToContent(svgFilePath) {
         const dValue = pathTag.substring(dValStart, dValEnd);
         if (!dValue.startsWith('M')) continue;
         
-        // Find parent <g transform="translate(tx,ty)"> by searching backwards
-        const before = content.substring(Math.max(0, pathIdx - 300), pathIdx);
-        const parentMatch = before.match(/<g\s+transform="translate\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)">\s*$/s);
+        // Parse local transform on the <path> itself (scale, translate+scale, or none)
+        let localTx = 0, localTy = 0, localSx = 1, localSy = 1;
+        const localTransform = pathTag.match(/transform="([^"]+)"/);
+        if (localTransform) {
+            const tVal = localTransform[1];
+            const ltMatch = tVal.match(/translate\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)/);
+            if (ltMatch) { localTx = parseFloat(ltMatch[1]); localTy = parseFloat(ltMatch[2]); }
+            const lsMatch = tVal.match(/scale\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)/);
+            if (lsMatch) { localSx = parseFloat(lsMatch[1]); localSy = parseFloat(lsMatch[2]); }
+        }
+        
+        // Find nearest ancestor <g transform="translate(tx,ty)"> — search back further
+        // to handle intermediate <g>, <a>, whitespace between translate group and path
+        const before = content.substring(Math.max(0, pathIdx - 500), pathIdx);
+        const parentMatch = before.match(/<g\s+transform="translate\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)">/g);
         if (parentMatch) {
-            const tx = parseFloat(parentMatch[1]);
-            const ty = parseFloat(parentMatch[2]);
+            // Use the last (nearest) translate group found
+            const last = parentMatch[parentMatch.length - 1];
+            const coords = last.match(/translate\(\s*([\d.e+-]+)\s*,\s*([\d.e+-]+)\s*\)/);
+            const tx = parseFloat(coords[1]);
+            const ty = parseFloat(coords[2]);
             const pb = getPathBounds(dValue);
-            expandBounds(tx + pb.minX, ty + pb.minY, tx + pb.maxX, ty + pb.maxY);
+            // Apply local scale, then local translate, then parent translate
+            const x1 = pb.minX * localSx + localTx;
+            const x2 = pb.maxX * localSx + localTx;
+            const y1 = pb.minY * localSy + localTy;
+            const y2 = pb.maxY * localSy + localTy;
+            expandBounds(tx + Math.min(x1,x2), ty + Math.min(y1,y2),
+                         tx + Math.max(x1,x2), ty + Math.max(y1,y2));
         }
     }
     

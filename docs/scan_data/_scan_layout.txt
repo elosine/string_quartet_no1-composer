@@ -1,0 +1,131 @@
+﻿#(define staff-line-width-mm 10)
+#(define staff-line-width-mm 2.4)
+#(layout-set-staff-size 18)
+#(layout-set-staff-size 20)
+#(layout-set-staff-size 20) %staff height
+#(layout-set-staff-size 30)
+#(layout-set-staff-size 33) %staff height
+%  proportionalNotationDuration = #(ly:make-moment 1/16) %smallest space quintuplet or 5*4
+% #(layout-set-staff-size 20)
+% #(layout-set-staff-size 20)  % staff height in points (from sf004; default is 20)
+% ; BARTOK PIZZ (single note):     paper-width=9mm,  paper-height=21mm, line-width=37mm
+% ; CELLO CELL:                    paper-width=130mm, paper-height=500mm, line-width=37mm
+% ; COL LEGNO BATTUTO:             paper-width=130mm, paper-height=500mm, line-width=20mm
+% ; CRESCENDO GLISSANDO:           paper-width=23mm, paper-height=25mm, line-width=50mm
+% ; CRESCENDO INSTANCE (old):      paper-width=17mm, paper-height=20-25mm, line-width=50mm
+% ; CRESCENDO SINGLE PITCH:        paper-width=22mm, paper-height=25mm, line-width=50mm
+% ; Custom-width staff lines. Change staff-line-width-mm to adjust.
+% ; GLISSANDO (two notes):         paper-width=19mm, paper-height=20mm, line-width=18mm
+% ; To change: edit the #(define staff-line-width-mm 2.4) line at the top.
+% ; VIBRATO:                       paper-width=80mm, paper-height=40mm, line-width=55mm
+% ║    3. Set paper-width (line 35) — see presets below                      ║
+% ║    4. Set staff-line-width-mm (line 57) — see presets below              ║
+% ║  PAPER-WIDTH PRESETS:                                                    ║
+% ║  STAFF-LINE-WIDTH PRESETS:                                               ║
+% Controls the visual appearance (fonts, spacing, line-width) of the score.
+% Draws staff lines at 22mm width while keeping line-width at 30mm for notation spacing
+% indent controls the total space reserved for instrument names
+% Set paper-width=19mm, paper-height=20mm, staffLineWidthMM=2.4
+% Set paper-width=80mm, paper-height=40mm, staffLineWidthMM=2.8
+% Set paper-width=9mm, paper-height=21mm, staffLineWidthMM=1.2
+% staffLineWidth: Controlled by Scheme variable staff-line-width-mm in Section 0.
+%line-width = 158
+%proportionalNotationDuration = #(ly:make-moment 1/20) %smallest space quintuplet or 5*4
+%proportionalNotationDuration = #(ly:make-moment 1/28)
+%proportionalNotationDuration = #(ly:make-moment 1/8)
+(width staff-line-width-mm)
+\time 1/4 %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+\time 2/4 %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+\time 3/4 %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+\time 4/4 %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+indent = 0
+indent = -0.9
+indent = 0\mm
+indent = -1.5
+indent = 12\mm
+indent = 15\mm
+indent = 18\mm
+line-width = 10\mm
+line-width = 100
+line-width = 100\mm
+line-width = 11
+line-width = 11\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+line-width = 120
+line-width = 140\mm
+line-width = 1450 %50px per beat
+line-width = 16\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+line-width = 160\mm
+line-width = 18\mm
+line-width = 18\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+line-width = 180\mm
+line-width = 1800 %50px per beat +1 for last beat marking border
+line-width = 20\mm
+line-width = 2150 %50px per beat +1 for last beat marking border
+line-width = 22\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+line-width = 28\mm
+line-width = 2923 %79px per 36 beats +1 for last beat marking border
+line-width = 30
+line-width = 30\mm
+line-width = 35\mm
+line-width = 37\mm
+line-width = 3885
+line-width = 40
+line-width = 40\mm
+line-width = 50\mm
+line-width = 50\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+line-width = 55
+line-width = 55\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+line-width = 59\mm
+line-width = 80\mm
+paper-height = 100
+paper-height = 100\mm
+paper-height = 150
+paper-height = 20\mm
+paper-height = 21\mm
+paper-height = 23\mm
+paper-height = 25\mm
+paper-height = 25\mm      % Adjust for your notation height
+paper-height = 30
+paper-height = 40\mm
+paper-height = 500
+paper-height = 500\mm
+paper-width = 100
+paper-width = 11\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+paper-width = 120
+paper-width = 13
+paper-width = 130
+paper-width = 130\mm
+paper-width = 14.5\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+paper-width = 140
+paper-width = 1450 %50px per beat
+paper-width = 16\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+paper-width = 17\mm
+paper-width = 17\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+paper-width = 180
+paper-width = 1800 %50px per beat +1 for last beat marking border
+paper-width = 19\mm
+paper-width = 19\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+paper-width = 200
+paper-width = 21\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+paper-width = 2150 %50px per beat +1 for last beat marking border
+paper-width = 22\mm
+paper-width = 22\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+paper-width = 220
+paper-width = 23\mm
+paper-width = 23\mm       % Adjust for your notation width
+paper-width = 2923 %79px per 36 beats +1 for last beat marking border
+paper-width = 3885 %105px per 36 beats +1 for last beat marking border
+paper-width = 50\mm
+paper-width = 70\mm
+paper-width = 80\mm %adjust paper-width,line-width @bottom, and \time 4/4 to get proper display width
+paper-width = 9\mm
+proportionalNotationDuration = #(ly:make-moment 1/13)  % tighter spacing (try 1/8 tighter, 1/20 wider, 1/28 widest)
+proportionalNotationDuration = #(ly:make-moment 1/16) %smallest space quintuplet or 5*4
+proportionalNotationDuration = #(ly:make-moment 1/20) %smallest space quintuplet or 5*4
+proportionalNotationDuration = #(ly:make-moment 1/24)
+proportionalNotationDuration = #(ly:make-moment 1/28)
+proportionalNotationDuration = #(ly:make-moment 1/32)
+proportionalNotationDuration = #(ly:make-moment 1/35)
+proportionalNotationDuration = #(ly:make-moment 1/40)
+proportionalNotationDuration = #(ly:make-moment 1/56)
+short-indent = 8\mm

@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 19, 2026  
-**Current ASB Number:** ASB-069
+**Last Updated:** Feb 20, 2026  
+**Current ASB Number:** ASB-076
 
 ---
 
@@ -14,9 +14,9 @@
 
 ## Current Session
 
-**Date:** Feb 19, 2026  
-**Focus:** LilyPond Master Template  
-**Tier 1 Count This Session:** 2  
+**Date:** Feb 20, 2026  
+**Focus:** LilyPond Settings Registry + Bartók Pizzicato Workflow  
+**Tier 1 Count This Session:** 3 (ASB-074, ASB-075, ASB-076)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -35,6 +35,13 @@
 - ASB-038: Curve Fugue Algorithm #1 documentation — parameterized duration/gap (shuffled bins), cumulative QT pitch descent + scenario interludes, vibrato integration, collision handling, prompt guide
 - ASB-039: Add `glissandoSlope` and `vibratoSlope` as configurable parameters
 - Score composition: Ran algorithm 3× — 13 motives (scores 51–63), 18 motives (scores 66–83), 21 motives (scores 86–106)
+
+### Session Log — LilyPond Settings Registry
+- ASB-074: Exhaustive scan of all 433 .ly files (771 unique setting lines), created `docs/LILYPOND_SETTINGS_REGISTRY.md` — 27-section registry covering noteheads, stems, beams, accidentals, dynamics, hairpins, rests, tuplets, glissando, vibrato, staff lines, text/markup, articulations, note column, layout, paper, staff visibility, clef, bar numbers, system brackets, instrument names, feathered beams, pressure wedge, special noteheads, arpeggio, Scheme definitions, tweak reference. Captured decision history (e.g. tuplet padding 3→2→0.5, stem lengths 7→6, accidental sizes -2→-4→-5). Found settings missed in MasterTemplate: tupletFullLength, padding=3, TupletNumber.stencil=##f, old-syntax ratio text, feathered beams, pressure wedge, system brackets, Rest.font-size, Score.Script.font-size.
+
+### Session Log — Bartók Pizzicato Workflow
+- ASB-075: Bartók Pizzicato automation — 3 test .ly files (B4, F¾#6, E¼♭3 with ledger lines + microtonal accidentals), Registry §28 (Microtonal Pitch Syntax) + §29 (Bartók Pizzicato) + "When to Engage the Registry" guide, workflow document (`docs/BARTOK_PIZZICATO_WORKFLOW.md`), standalone SVG cropper (`lilypond_code/crop_svg.js`), **bug fix** in Pass 3 crop logic (nested `<g>`/`<a>` groups with scale transforms were missed — dynamics like fff cut off), fix ported to both crop_svg.js and server.js. Output dir: `public/SVG_graphics/bartok_pizzicato/`, each clef generated fresh (no copy-transpose).
+- ASB-076: Bartók Pizzicato pipeline + MIDI tools — `render_bartok_pizz.js` full pipeline (single + batch mode, auto paper dimensions from pitch/clef/ledger lines), `modify_midi.js` general-purpose MIDI post-processor (configurable `--cc` args, channel rewrite, reusable across workflows), dynamic + track added to naming convention and Step 1 inputs, SVG+MIDI stored together in output dir, `/bartok-pizz` slash command created.
 
 ### Session Log — SVG Anchor System
 - ASB-040: Full SVGElementManager refactor — anchor-based positioning (referenceSeconds + offsetSeconds + offsetYFraction), same formula as CurveMaker, fixed scale on resize, backward-compatible import, updated insertGlissandoSvg/insertVibratoSvg + server endpoints
@@ -189,6 +196,9 @@
 | ASB-068 | Crescendo default tuning — heightFraction 0.67, offsetY 0.05, X overlap | Complete |
 | ASB-069 | LilyPond Master Template — unified settings repo, toggle system, 8 examples, guide doc | Complete |
 | ASB-070 | StartingTemplate.ly (base defaults) + AI LilyPond Prompt Guide (user + AI reference) | Complete |
+| ASB-074 | LilyPond Settings Registry — 27-section exhaustive scan of 433 .ly files (771 settings) | Complete |
+| ASB-075 | Bartók Pizzicato workflow — test files, registry updates, workflow doc, crop_svg.js, crop bug fix | Complete |
+| ASB-076 | Bartók Pizzicato pipeline + general MIDI modifier — render_bartok_pizz.js, modify_midi.js, /bartok-pizz slash command | Complete |
 
 ---
 
