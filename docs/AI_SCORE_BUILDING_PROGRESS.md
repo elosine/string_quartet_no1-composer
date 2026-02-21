@@ -6,9 +6,80 @@
 
 ---
 
+## 👤 For User
+
+**To start a session:** Say *"Continuing AI score building"* or just describe what you want to work on. Cascade will read the checklist below and get oriented automatically.
+
+**To end a session:** Say *"Wrapping up"* or *"End session."* Cascade will summarize, suggest a commit if needed, and update everything for next time.
+
+That's it. Everything else below is for Cascade.
+
+---
+
+## ⚡ Session Startup Checklist
+
+**Read this section FIRST at every session start. Then read the docs listed below before doing any work.**
+
+### 1. Required Reading (before any code work)
+
+| Document | When Required | Slash Command |
+|----------|---------------|---------------|
+| This file (`AI_SCORE_BUILDING_PROGRESS.md`) | Always | `/ai-score-building` |
+| `docs/LILYPOND_SETTINGS_REGISTRY.md` | Any `.ly` file work | `/lilypond-registry` |
+| `docs/BARTOK_PIZZICATO_WORKFLOW.md` | Bartók pizz work | `/bartok-pizz` |
+| `docs/WORKFLOW_METHODOLOGY.md` | Debugging or process questions | — |
+
+### 2. Active Rules
+
+- **LilyPond Registry**: ALWAYS read `docs/LILYPOND_SETTINGS_REGISTRY.md` before creating or modifying any `.ly` file. Use CURRENT DEFAULT values from the registry. Update the registry when settings change.
+- **Tiered Documentation**: Follow the 3-tier system (see `/ai-score-building` workflow). Tier 1 after each code change, suggest Tier 2 at 3–4 increments, Tier 3 at major milestones.
+- **Naming Conventions**: SVG files use `BartokPizz-[clef]-[Pitch]-[dynamic]` pattern. ASB numbers are sequential. Commit messages reference ASB ranges.
+
+### 3. Active Workflows & Their State
+
+| Workflow | Status | Next Step |
+|----------|--------|-----------|
+| Bartók Pizzicato | Pipeline complete | Score integration |
+| Glissando System | Complete | Maintenance only |
+| Vibrato System | Complete | Maintenance only |
+| Crescendo-Decrescendo | Complete | Maintenance only |
+| LilyPond Settings Registry | Active | Update when settings change |
+
+### 4. Reusable Tools (remember these exist)
+
+| Tool | Location | Use For |
+|------|----------|---------|
+| `modify_midi.js` | `lilypond_code/` | Any MIDI post-processing (channel rewrite, CC insertion). Args: `<in> <out> <ch> [--cc <n> <v>] ...` |
+| `crop_svg.js` | `lilypond_code/` | Standalone SVG cropping (same logic as server.js) |
+| `render_bartok_pizz.js` | `lilypond_code/` | Full Bartók pizz pipeline (single or batch) |
+
+### 5. Available Slash Commands
+
+- `/ai-score-building` — Full workflow methodology (tiers, triggers, checklists)
+- `/lilypond-registry` — LilyPond settings consultation workflow
+- `/bartok-pizz` — Bartók Pizzicato generation workflow
+- `/long-tone-dev` — Long Tone development workflow
+
+---
+
+## 🔮 Open Threads
+
+*Medium/long-term context that may become relevant in future sessions. Review at session start; update at session wrap-up.*
+
+| Thread | Context | When Relevant |
+|--------|---------|---------------|
+| `modify_midi.js` is general-purpose | Built for Bartók pizz but designed for reuse. Accepts any CC messages via `--cc` flag. Channel rewrite is always applied. | Any new LilyPond-rendered MIDI workflow (col legno, harmonics, etc.) |
+| Bartók pizz shares MIDI channels 1–4 with glissando | Both systems use track→channel 1:1 mapping. OK for now because Bartók events are discrete (single 16th notes). | If a 3rd system needs channels 1–4, address potential conflicts |
+| Registry §28 microtonal pitch syntax | Full suffix reference for quarter/three-quarter tones. Used by `render_bartok_pizz.js` pitch parser. | Any new pitch-input automation |
+| `crop_svg.js` Pass 3 fix | Handles nested `<g>`/`<a>` groups with scale transforms. Fix ported to both standalone and server.js. | If SVG cropping bugs reappear — check Pass 3 first |
+| Score integration is next for Bartók pizz | Pipeline outputs SVG + MIDI to `public/SVG_graphics/bartok_pizzicato/`. Needs server endpoint + UI to place them in the score at a time/track. | When user says "score integration" or "place Bartók pizz in score" |
+| MasterTemplate.ly has settings not in Registry | Registry scan found settings missing from MasterTemplate (tupletFullLength, feathered beams, pressure wedge, etc.) | If MasterTemplate is updated or a new technique needs these settings |
+
+---
+
 ## Last Session Summary
 
-> **Crescendo-Decrescendo System + SVG Dynamic Resize.** Built complete Crescendo-Decrescendo system (LilyPond templates, UI, JS, MIDI generation with CC7 volume, server endpoint, prompt guide). Fixed SVG notation not resizing on window resize by introducing `heightFraction` property and scale recomputation in `reRenderAllElements`. Fixed extreme resize breakage (rAF + forced reflow + degenerate height guard). Fixed backward compatibility for old saves missing `heightFraction`.
+> **LilyPond Settings Registry + Bartók Pizzicato Workflow + Continuity System.** Created exhaustive LilyPond Settings Registry (27 sections, 771 settings from 433 .ly files). Built full Bartók Pizzicato pipeline: 3 test files, crop bug fix (dynamics cut off), standalone `crop_svg.js`, general-purpose `modify_midi.js`, automated `render_bartok_pizz.js` (single + batch mode), `/bartok-pizz` slash command. Established session continuity system: Startup Checklist, Open Threads, Wrap-Up Protocol. **Next up: Bartók Pizzicato score integration.**
 
 ---
 
@@ -16,7 +87,7 @@
 
 **Date:** Feb 20, 2026  
 **Focus:** LilyPond Settings Registry + Bartók Pizzicato Workflow  
-**Tier 1 Count This Session:** 3 (ASB-074, ASB-075, ASB-076)  
+**Tier 1 Count This Session:** 0 (reset after Tier 2 commit 2f6e750)  
 **Tier 2 Threshold:** 3-4 increments
 
 ### Session Log (prior sessions)
@@ -218,6 +289,7 @@
 | Feb 19, 2026 | d039063 | two-stage vibrato, prompt guide rewrite, bug fixes, pitch tracking clamping, score composition (ASB-057 to ASB-062, scores 209-230) |
 | Feb 19, 2026 | 9857d39 | SVG page-boundary clamp fix + score composition (ASB-063, scores 233-251) |
 | Feb 19, 2026 | a3ef721 | crescendo-decrescendo system + SVG dynamic resize + bug fixes (ASB-064 to ASB-068) |
+| Feb 20, 2026 | 2f6e750 | bartok pizzicato: workflow, pipeline, crop fix, MIDI tools (ASB-074 to ASB-076) |
 
 ---
 

@@ -176,21 +176,33 @@ Start with ASB-001 for new AI Score Building work.
 3. Propose git tag name
 
 ### Session Start Trigger
-**User says:** "Continuing AI score building" or similar
+**User says:** "Continuing AI score building" or similar, OR any new session begins
 
 **I do:**
-1. Read `docs/AI_SCORE_BUILDING_PROGRESS.md`
-2. Read this workflow file
-3. Report: last session date, pending work, current ASB-XXX number
-4. Ask what to work on
+1. Read `docs/AI_SCORE_BUILDING_PROGRESS.md` — specifically the **Session Startup Checklist** at the top
+2. Read all docs listed in the "Required Reading" table that are relevant to the upcoming work
+3. Review the **Open Threads** section for anything relevant
+4. Review the **Active Workflows & Their State** table
+5. Report: last session date, pending work, current ASB-XXX number, any relevant open threads
+6. Ask what to work on
+
+**Critical:** Do NOT skip the Required Reading. If the user asks about `.ly` files, read the LilyPond Settings Registry BEFORE writing any code. If a reusable tool exists (see Reusable Tools table), use it instead of rebuilding.
 
 ### Session End Trigger
 **User says:** "Wrapping up" or "End session" or similar
 
-**I do:**
-1. Summarize what was accomplished
+**I do (Wrap-Up Protocol):**
+1. Summarize what was accomplished this session
 2. Suggest Tier 2 commit if threshold met
-3. Update progress file: pending work, "Last Updated" date, and **"Last Session Summary"** (2-3 line blockquote at top of progress file for instant context recovery next session)
+3. **Update `AI_SCORE_BUILDING_PROGRESS.md`:**
+   a. Update **"Last Session Summary"** (2-3 line blockquote)
+   b. Update **"Last Updated"** date
+   c. Update **Session Startup Checklist** §3 (Active Workflows) if workflow states changed
+   d. Update **Session Startup Checklist** §4 (Reusable Tools) if new tools were created
+   e. Update **Open Threads** — add new threads from this session, remove resolved ones
+   f. Update **Session Startup Checklist** §1 (Required Reading) if new docs were created
+   g. Update **Session Startup Checklist** §2 (Active Rules) if new rules were established
+4. Ask: "Anything else to note for next session?" — user may add open threads or context
 
 ### Stalled Debugging Trigger
 **When:** Debugging becomes unproductive (>3 fix→new-problem iterations, diagnostics pass but visual mismatch, user signals reset)
