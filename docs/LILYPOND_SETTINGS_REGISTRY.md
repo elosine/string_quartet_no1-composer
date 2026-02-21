@@ -9,6 +9,8 @@
 > - **Source files** = where each value was found (representative, not exhaustive)
 > - **Commented** = setting was present but commented out (% or ;)
 > - When creating a new .ly file, start from StartingTemplate.ly and consult this registry for technique-specific settings.
+>
+> **Working MO:** AI writes/edits the `.ly` code; the user renders it themselves in **Frescobaldi**. Do NOT run `lilypond` compilation commands — just produce the code.
 
 ---
 
@@ -48,7 +50,7 @@ When this registry is updated, follow these rules:
 3. **Always note rationale.** Even one sentence — "too tall" or "matches Draft output" is enough.
 4. **Propagate defaults.** If a CURRENT DEFAULT changes, also update:
    - `lilypond_code/StartingTemplate.ly`
-   - `lilypond_code/MasterTemplate.ly`
+   - `lilypond_code/MasterTemplate.ly` *(legacy — only update if StartingTemplate is also updated; do NOT use MasterTemplate as a source of truth. This registry + StartingTemplate are the authoritative references.)*
 5. **Technique-specific values don't propagate.** Only defaults go into templates.
 6. **New sections are fine.** If a setting doesn't fit anywhere, add a new numbered section + TOC entry.
 
@@ -85,6 +87,7 @@ When this registry is updated, follow these rules:
 27. [Tweak Reference (per-instance)](#27-tweak-reference)
 28. [Microtonal Pitch Syntax](#28-microtonal-pitch-syntax)
 29. [Bartók Pizzicato](#29-bartók-pizzicato)
+30. [Z-Stem Pizzicato Tremolo](#30-z-stem-pizzicato-tremolo)
 
 ---
 
@@ -94,12 +97,12 @@ When this registry is updated, follow these rules:
 
 | Value | Status | Context | Source Files |
 |-------|--------|---------|-------------|
-| **#-2** | **CURRENT DEFAULT** | Standard project notehead size | StartingTemplate, MasterTemplate, most files |
+| **#-3.3** | **CURRENT DEFAULT** | Standard project notehead size (changed Feb 21, 2026) | StartingTemplate, MasterTemplate, ZstemPizzTrem, PizzMotive001 |
+| #-2 | Previous default | Was project standard before ASB-080 | Most older files |
 | #-1.25 | Variant | Larger noteheads (cluster notation) | e4_e5_b4cluster.ly |
 | #-1.5 | Variant | Per-instance larger note | \once override in various |
 | #-2.5 | Variant | Slightly smaller | Cello_E2_cell.ly |
 | #-2.8 | Variant | Slightly smaller | Viola_B3_cell.ly |
-| #-3.3 | Variant | Smaller | PitchCell variants |
 | #-4 | Variant | Small noteheads | Various |
 | #-6 | Variant | Very small (feathered beams context) | FeatheredBeams_draft.ly |
 | #-8 | Variant | Tiny (inside grace note clusters) | grace note clusters.ly |
@@ -109,7 +112,8 @@ When this registry is updated, follow these rules:
 - Grace note clusters used #-8 inside `\grace{}` blocks for cluster effect
 - Feathered beams draft used #-6 for small-notation context
 - Cell/pitch-cell files experimented with #-2.5 to #-3.3
-- **#-2 settled as project standard**
+- #-2 was project standard through ASB-079
+- **ASB-080 (Feb 21, 2026): Changed default to #-3.3** — better proportion with small staff lines
 
 ### NoteHead.style
 
@@ -169,13 +173,12 @@ When this registry is updated, follow these rules:
 
 | Value | Status | Context | Source Files |
 |-------|--------|---------|-------------|
-| **#'(6)** | **CURRENT DEFAULT** | Standard stem length | StartingTemplate, MasterTemplate, PizzMotive001 |
+| **#'(7)** | **CURRENT DEFAULT** | Standard stem length (changed Feb 21, 2026) | StartingTemplate, MasterTemplate, ZstemPizzTrem |
+| #'(6) | Previous default | Was project standard before ASB-080 | PizzMotive001, most older files |
 | #'(0) | Variant | No visible stem | Various (commented) |
 | #'(5) | Variant | Short (action notation) | Huebler_ActionNotation |
 | #'(5.5) | Variant | Medium | M3_vla_accented_long_tone_bowpressure, FeatheredBeams |
-| #'(6) | Current | Also used in Crumb, Lachenmann, QuasiGuitarra |
 | #'(6.5) | Variant | Slightly longer | Various |
-| #'(7) | Previous default | Was project standard | sf004, ILL, older templates |
 | #'(7.5) | Variant | Long | col legno ricochet, M2a_jete, PizzicatoStorm |
 | #'(9) | Variant | Very long | proportional spacing template.ly |
 
@@ -698,6 +701,7 @@ Three implementations found:
 | Hidden accent | `\hide->` | Commented in older files |
 | Tenuto | `--` | Various |
 | Staccato | `-.` | Various |
+| Laissez vibrer | `\laissezVibrer` | PizzMotive001_Cello_Render |
 
 ### Script.transparent
 
@@ -1034,6 +1038,7 @@ Found in: `M3_vla_accented_long_tone_bowpressure.ly`
 | `build-vibrato-stencil` | Cubic Bézier vibrato wave | MasterTemplate, Vibrato templates |
 | `\vibrato` (music function) | Wraps vibrato stencil | MasterTemplate |
 | `flatten-tuplet-bracket` | Forces flat tuplet brackets | MasterTemplate, StartingTemplate, PizzMotive001 |
+| `stem-with-z` | Z-stem calligraphic polygon overlay (bars + diagonal) | ZstemPizzTrem-treble-B4-fff-test.ly |
 | `arrow-down-notehead` | Custom down-arrow notehead | PizzicatoStorm |
 | `arrow-up-notehead` | Custom up-arrow notehead | PizzicatoStorm |
 
@@ -1052,6 +1057,13 @@ Found in: `M3_vla_accented_long_tone_bowpressure.ly`
 | `lh-pluck-staff-width` | 2.9 | PizzicatoStorm |
 | `lh-fingering-staff-width` | 2.9 | PizzicatoStorm |
 | `rh-pluck-staff-width` | 2.9 | PizzicatoStorm |
+| `z-bar-width` | 1.1 | ZstemPizzTrem-treble-B4-fff-test.ly |
+| `z-bar-height` | 0.4 | ZstemPizzTrem-treble-B4-fff-test.ly |
+| `z-y-offset` | -0.7 | ZstemPizzTrem-treble-B4-fff-test.ly |
+| `z-bar-vpos` | 1.4 | ZstemPizzTrem-treble-B4-fff-test.ly |
+| `z-nib-ratio` | 0.6 | ZstemPizzTrem-treble-B4-fff-test.ly |
+| `z-diag-thick` | 0.09 | ZstemPizzTrem-treble-B4-fff-test.ly |
+| `z-diag-nudge` | 0.06 | ZstemPizzTrem-treble-B4-fff-test.ly |
 
 ### Markup Commands
 
@@ -1209,6 +1221,73 @@ Examples:
 - `bartok_pizz_secco.ly` — secco variant
 
 *(Section added: Feb 20, 2026)*
+
+---
+
+## 30. Z-Stem Pizzicato Tremolo
+
+**Technique:** Unmeasured tremolo indicated by Z shape on stem (Penderecki style). Player repeats the note "as fast as possible," visually distinct from 3-slash measured tremolo.
+
+### Implementation
+
+Custom `Stem.stencil` override using `make-path-stencil` filled polygons. Three shapes composited via `ly:stencil-add`:
+1. **Diagonal line** (drawn first, underneath)
+2. **Top bar** — parallelogram with / slants
+3. **Bottom bar** — parallelogram with / slants (drawn last, on top)
+
+Usage: `\override Stem.stencil = #stem-with-z`
+
+### Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `z-bar-width` | 1.1 | Total horizontal extent of each bar (wider/narrower, always centered) |
+| `z-bar-height` | 0.4 | Line thickness of each bar (taller/shorter, slant angles maintained) |
+| `z-y-offset` | -0.7 | Shift entire Z up (negative) or down (positive) on stem |
+| `z-bar-vpos` | 1.4 | Vertical distance from Z center to bar outer edge |
+| `z-nib-ratio` | 0.6 | Slant angle ratio — `s = height × ratio` (controls / angle) |
+| `z-diag-thick` | 0.09 | Stroke thickness of diagonal connecting line |
+| `z-diag-nudge` | 0.06 | Shift diagonal endpoints outward (visual left/right) |
+
+**User knobs:** `z-bar-width`, `z-bar-height`, `z-y-offset` are the primary controls. The rest are "fixed" tuning parameters.
+
+### Coordinate System Notes
+
+`make-path-stencil` coordinate mapping (discovered during ASB-081):
+- **Y-down**: Negative Y = visually UP (toward flag)
+- **X-flipped**: Positive X = visually LEFT (confirmed empirically)
+- The `dn` (nudge) variable is negated in the `let*` binding to compensate for the X-flip
+- For / slants: the visually-upper edge of each bar is shifted toward more-negative X in code
+
+### Stencil Layering
+
+To avoid white anti-aliasing artifacts at polygon overlap edges, the Z shape is split into two independent `make-path-stencil` calls:
+- `bars-stencil` — both parallelogram bars (single path, two sub-paths)
+- `diag-stencil` — diagonal connecting line (separate path)
+
+Draw order in `ly:stencil-add`: diagonal first, bars second (bars paint over diagonal at overlap points).
+
+### Template Settings
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| `Stem.transparent` | `##f` | Stems must be visible |
+| `Stem.direction` | `#UP` | Force stems up |
+| `Stem.stencil` | `#stem-with-z` | Custom Z overlay |
+| `Stem.details.lengths` | `#'(7)` | Current default |
+| `Stem.details.beamed-lengths` | `#'(5.5)` | Technique-specific |
+| `NoteHead.font-size` | `#-3.3` | Current default |
+| `Accidental.font-size` | `#-4` | Technique-specific |
+| `DynamicText.font-size` | `#-8.5` | Current default |
+| `staff-line-width-mm` | `1.2` | Narrow for single-note |
+| Paper | 9mm × 23mm | Single note notation |
+
+### Source Files
+
+- `ZstemPizzTrem-treble-B4-fff-test.ly` — current working test file with parameterized controls
+- `ZstemPizzTrem-treble-B4-fff.ly` — original development file (ASB-080)
+
+*(Section added: Feb 21, 2026)*
 
 ---
 

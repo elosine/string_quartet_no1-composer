@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Feb 21, 2026  
-**Current ASB Number:** ASB-079
+**Current ASB Number:** ASB-081
 
 ---
 
@@ -77,7 +77,7 @@ That's it. Everything else below is for Cascade.
 | Registry §28 microtonal pitch syntax | Full suffix reference for quarter/three-quarter tones. Used by `render_bartok_pizz.js` pitch parser. | Any new pitch-input automation |
 | `crop_svg.js` Pass 3 fix | Handles nested `<g>`/`<a>` groups with scale transforms. Fix ported to both standalone and server.js. | If SVG cropping bugs reappear — check Pass 3 first |
 | AI Command Bridge (Pattern 4) is the ideal pattern | `POST /api/ai/command` → Socket.IO `aiCommand` → browser `eval()`. Cascade sends commands directly to browser — no paste, no save, no reload. First used in Bartók Pizzicato. Pattern 3 (Direct Live Insertion) is the fallback. See `docs/MUSICAL_MATERIAL_WORKFLOW.md` "Insertion Patterns". | When building any new musical material system |
-| MasterTemplate.ly has settings not in Registry | Registry scan found settings missing from MasterTemplate (tupletFullLength, feathered beams, pressure wedge, etc.) | If MasterTemplate is updated or a new technique needs these settings |
+| MasterTemplate.ly is legacy | Registry + StartingTemplate are now the authoritative sources. MasterTemplate still exists but should NOT be consulted as source of truth. Only update it when StartingTemplate changes (propagation). Do NOT pull settings from MasterTemplate for new files. | If tempted to reference MasterTemplate for settings — use Registry instead |
 | Saved GCs disappeared | GC library appears empty despite GCs existing in score save files (e.g., GC_20260117_204645 in 271-work). Needs investigation. | If user tries to recall saved GCs or if GC library features are used |
 | Musical Material Workflow doc | `docs/MUSICAL_MATERIAL_WORKFLOW.md` — general process for multi-component musical objects. Includes 4 insertion patterns (Console→Save/Reload→Direct Live→AI Direct). | When building any new musical material system |
 
@@ -85,16 +85,16 @@ That's it. Everything else below is for Cascade.
 
 ## Last Session Summary
 
-> **AI Command Bridge + Quarter-Tone Pitch Bend.** Built Pattern 4 (AI Direct): `POST /api/ai/command` → Socket.IO → browser eval — Cascade sends commands directly to browser, no paste needed. First tested with Bartók Pizzicato (F+4 fff at 243.5s appeared hands-free). AI Bartók Pizz Prompt Guide created. Quarter-tone pitch bend added to all single-pitch systems (Bartók pizz, Crescendo, Vibrato) using ±1 semitone range (8192/semitone). Documented Pattern 4 in `MUSICAL_MATERIAL_WORKFLOW.md`. **Bartók Pizzicato is the first material using Pattern 4 (AI Direct — hands-free).**
+> **Z-Stem Pizzicato Tremolo — Research + Calligraphic Polygon.** Researched Z-on-stem unmeasured tremolo (Penderecki style). Built custom `stem-with-z` Scheme stencil using `make-path-stencil` filled polygons. Discovered coordinate system: Y-down (negative Y = up) + **X-flipped** (positive X = visual left). Created parameterized two-knob system (7 variables) for calligraphic broad-nib Z shape with / slanted parallelogram bars + thin diagonal connecting line. Split into separate stencils (diag + bars) to fix white anti-aliasing artifacts. User dialed final values in Frescobaldi. Registry updated with §30 Z-Stem Pizzicato Tremolo. **Test file: `ZstemPizzTrem-treble-B4-fff-test.ly`.**
 
 ---
 
 ## Current Session
 
 **Date:** Feb 21, 2026  
-**Focus:** AI Command Bridge (Pattern 4) + Quarter-Tone Pitch Bend + AI Prompt Guide  
-**Tier 1 Count This Session:** 3 (ASB-077, ASB-078, ASB-079) — ready for Tier 2  
-**Tier 2 Threshold:** 3-4 increments
+**Focus:** Z-Stem Pizzicato Tremolo — research, calligraphic polygon, parameterized controls  
+**Tier 1 Count This Session:** 2 (ASB-080, ASB-081) → Tier 2 commit  
+**Tier 2 Threshold:** 3-4 increments (reached — user-requested milestone commit)
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -115,6 +115,10 @@ That's it. Everything else below is for Cascade.
 
 ### Session Log — LilyPond Settings Registry
 - ASB-074: Exhaustive scan of all 433 .ly files (771 unique setting lines), created `docs/LILYPOND_SETTINGS_REGISTRY.md` — 27-section registry covering noteheads, stems, beams, accidentals, dynamics, hairpins, rests, tuplets, glissando, vibrato, staff lines, text/markup, articulations, note column, layout, paper, staff visibility, clef, bar numbers, system brackets, instrument names, feathered beams, pressure wedge, special noteheads, arpeggio, Scheme definitions, tweak reference. Captured decision history (e.g. tuplet padding 3→2→0.5, stem lengths 7→6, accidental sizes -2→-4→-5). Found settings missed in MasterTemplate: tupletFullLength, padding=3, TupletNumber.stencil=##f, old-syntax ratio text, feathered beams, pressure wedge, system brackets, Rest.font-size, Score.Script.font-size.
+
+### Session Log — Z-Stem Pizzicato Tremolo
+- ASB-080: Notation research (Z-stem unmeasured tremolo — Penderecki, Wieniawski, Stockhausen, SMuFL glyphs, 3 LilyPond implementation approaches). Added to `docs/Notation_Research.md`. First test .ly file (`ZstemPizzTrem-treble-B4-fff.ly`) using custom `stem-with-z` Scheme stencil — compiles clean, Z renders correctly at stem midpoint.
+- ASB-081: Z-stem calligraphic polygon — evolved from stroked path to filled parallelogram bars with / slants. Discovered `make-path-stencil` coordinate mapping (negative Y = up, **positive X = visual LEFT** — X-axis flipped). Built parameterized two-knob system: `z-bar-width` (wider/narrower, centered), `z-bar-height` (thicker/thinner, angle preserved via `z-nib-ratio`). Added `z-y-offset` (shift entire Z up/down), diagonal connecting line (thin polygon, adjusts with nib-ratio), `z-diag-nudge` (fine-tune diagonal endpoint position, negated for X-flip). Split into separate `bars-stencil` + `diag-stencil` to fix white anti-aliasing artifacts at polygon overlaps. User-dialed final values: width=1.1, height=0.4, y-offset=-0.7, vpos=1.4, nib=0.6, diag=0.09, nudge=0.06. Test file: `ZstemPizzTrem-treble-B4-fff-test.ly`. Registry §30 added. Registry §4 clarified: MasterTemplate is legacy, registry + StartingTemplate are authoritative.
 
 ### Session Log — Bartók Pizzicato Workflow
 - ASB-075: Bartók Pizzicato automation — 3 test .ly files (B4, F¾#6, E¼♭3 with ledger lines + microtonal accidentals), Registry §28 (Microtonal Pitch Syntax) + §29 (Bartók Pizzicato) + "When to Engage the Registry" guide, workflow document (`docs/BARTOK_PIZZICATO_WORKFLOW.md`), standalone SVG cropper (`lilypond_code/crop_svg.js`), **bug fix** in Pass 3 crop logic (nested `<g>`/`<a>` groups with scale transforms were missed — dynamics like fff cut off), fix ported to both crop_svg.js and server.js. Output dir: `public/SVG_graphics/bartok_pizzicato/`, each clef generated fresh (no copy-transpose).
@@ -282,6 +286,8 @@ That's it. Everything else below is for Cascade.
 | ASB-077 | Bartók Pizz score integration — server endpoint, UI, BartokPizzUI JS, Direct Live Insertion (Pattern 3), plain English pitch, MIDI reloadFromDatabase, Musical Material Workflow doc | Complete |
 | ASB-078 | AI Bartók Pizzicato Prompt Guide — copy-paste/natural language/batch/guided templates, validation checklist, clef↔pitch range guidelines | Complete |
 | ASB-079 | AI Command Bridge (Pattern 4) + quarter-tone pitch bend — REST→Socket.IO command relay, Bartók/Crescendo/Vibrato pitch bend for microtones (±1 semitone range) | Complete |
+| ASB-080 | Z-stem notation research + first test file (Penderecki-style unmeasured tremolo, custom Scheme stencil) | Complete |
+| ASB-081 | Z-stem calligraphic polygon — parameterized two-knob system (width/height), centered / slants, y-offset, diagonal line, coordinate discovery (X-flip), split stencils, diag-nudge, registry §30 | Complete |
 
 ---
 
@@ -302,6 +308,8 @@ That's it. Everything else below is for Cascade.
 | Feb 19, 2026 | 9857d39 | SVG page-boundary clamp fix + score composition (ASB-063, scores 233-251) |
 | Feb 19, 2026 | a3ef721 | crescendo-decrescendo system + SVG dynamic resize + bug fixes (ASB-064 to ASB-068) |
 | Feb 20, 2026 | 2f6e750 | bartok pizzicato: workflow, pipeline, crop fix, MIDI tools (ASB-074 to ASB-076) |
+| Feb 21, 2026 | 46ec8ee | bartok pizzicato: AI command bridge, prompt guide, quarter-tone pitch bend (ASB-077 to ASB-079) |
+| Feb 21, 2026 | c12330c | z-stem pizzicato tremolo: research, calligraphic polygon, parameterized controls, registry §30 (ASB-080 to ASB-081) |
 
 ---
 

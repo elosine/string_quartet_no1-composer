@@ -293,6 +293,141 @@ c4\startTextSpan d e f\stopTextSpan
 
 ---
 
+## Z-Stem Notation — Unmeasured Tremolo / Pizzicato Tremolo
+
+*(Research date: Feb 21, 2026)*
+
+### What It Is
+
+A **Z-shaped mark on the stem** of a note indicating **unmeasured tremolo** — "as fast as possible," with no specific rhythmic subdivision. Visually distinct from the standard 3-slash tremolo notation, which can be ambiguous (potentially read as measured 32nd notes, especially in slow tempi).
+
+For **pizzicato tremolo**, the Z-stem indicates rapid unmeasured repeated plucking — a "buzz pizz" effect distinct from Bartók pizz (single snap) or standard pizz (single pluck).
+
+### Variants (SMuFL Standard Music Font Layout)
+
+SMuFL codifies four distinct unmeasured tremolo glyphs:
+
+| Glyph Name | SMuFL Code | Origin | Description |
+|---|---|---|---|
+| **buzzRoll** | U+E22A (Tremolos range) | Percussion (snare drum) | Z shape — buzz/press roll. The percussion original. |
+| **pendereckiTremolo** | U+E22B (Tremolos) + Stems range | Krzysztof Penderecki (~early 1960s) | Slightly different Z — introduced specifically for **strings**. Listed in both Tremolos and Stems ranges. |
+| **Wieniawski unmeasured tremolo** | U+E22C / U+E22D (later U+E26C–E26D) | Henryk Wieniawski (19th c.) | Romantic-era variant, two glyphs (up/down stem). |
+| **Stockhausen irregular tremolo** | U+E232 | Karlheinz Stockhausen | For irregular (not just fast) tremolo. |
+
+The **Penderecki variant** (U+E22B) is the one most associated with contemporary string writing and the recommended choice for this project.
+
+### Composers Who Use It
+
+- **Krzysztof Penderecki** — Originated the string-specific Z-stem in the early 1960s (Polish school). Found throughout his string orchestra works (*Threnody to the Victims of Hiroshima*, *Polymorphia*, etc.). The definitive source.
+- **Henryk Wieniawski** — Earlier variant from the Romantic virtuoso violin tradition.
+- **Karlheinz Stockhausen** — His own variant for *irregular* tremolo.
+- **Helmut Lachenmann** — Uses various extended tremolo notations in his string works.
+- **Kaija Saariaho** — Uses tremolo with pitch changes under sustained tremolo.
+- **Polish school broadly** — Roman Czura (composer/teacher in Poland): *"it needs one short explanation, then it is clear... it visually stands out from 3 slashes"*
+
+### Sciarrino Note
+
+Salvatore Sciarrino's *Sei Capricci* (1976) are primarily focused on harmonics and extreme extended techniques rather than Z-stem tremolo. His notation is famously idiosyncratic — described as "a sometimes-exasperating exercise in code breaking" (Yotam Haber, New Music USA). The Z-stem for unmeasured tremolo is more firmly Penderecki's territory.
+
+### Why Z Instead of 3 Slashes?
+
+- **Unambiguous** — 3 slashes can be misread as measured 32nds in slow tempi
+- **Visually distinct** — One glance tells the player "unmeasured"
+- **Efficient** — needs one short explanation, then clear for the rest of the piece
+- **Evocative** — Z shape visually suggests buzzing/trembling
+
+### LilyPond Implementation Approaches
+
+Three approaches found for drawing Z-on-stem in LilyPond:
+
+#### Approach 1: Text Markup with Positioning (simplest)
+
+From LilyPond Cookbook (2015). Uses a "z" character with typewriter font, positioned via TextScript.extra-offset:
+
+```lilypond
+z = \markup { \override #'(font-family . typewriter) \fontsize #2 "z" }
+\once \override TextScript.extra-offset = #'(.4 . -2.5)
+c4^\z
+```
+
+**Pros:** Very simple.
+**Cons:** Fragile — positioning must be adjusted per stem direction and note duration. Collides with eighth-note flags. Not automatic.
+
+#### Approach 2: SVG Path + grob-transformer (most robust, LilyPond 2.23+)
+
+From Reddit/robfelty (2024). Draws the Z as an SVG path, overlaid on the stem via `grob-transformer`:
+
+```lilypond
+buzzSymbol = \markup \path #0.25
+  #(let ((x 1/2) (y 1/2))
+    `((moveto ,x ,(- y)) (lineto ,(- x) ,(- y))
+      (lineto ,x ,y) (lineto ,(- x) ,y)))
+
+applyBuzzSymbol = #(grob-transformer 'stencil
+  (lambda (grob orig)
+    (let* ((yex (ly:stencil-extent orig Y))
+           (ypos (interval-index yex CENTER))
+           (sten (grob-interpret-markup grob buzzSymbol)))
+      (ly:stencil-add orig
+        (ly:stencil-translate-axis sten ypos Y)))))
+
+buzz = \tweak Stem.stencil \applyBuzzSymbol \etc
+```
+
+**Pros:** Automatic centering on stem, works with both stem directions, clean Z shape.
+**Cons:** Requires `grob-transformer` (LilyPond 2.23+). **NOT available in our project (2.20.0).**
+
+#### Approach 3: Custom Stem Stencil Override (LilyPond 2.20 compatible) ← PROJECT APPROACH
+
+Adapts Approach 2 for LilyPond 2.20 by directly overriding `Stem.stencil` with a Scheme lambda that draws the original stem + Z overlay:
+
+```lilypond
+#(define z-path '((moveto 0.45 -0.55)
+                  (lineto -0.45 -0.55)
+                  (lineto 0.45 0.55)
+                  (lineto -0.45 0.55)))
+
+#(define (stem-with-z grob)
+   (let* ((orig (ly:stem::print grob))
+          (yex (ly:stencil-extent orig Y))
+          (ymid (/ (+ (car yex) (cdr yex)) 2))
+          (z-stencil (grob-interpret-markup grob
+                       (markup #:path 0.15 z-path))))
+     (ly:stencil-add orig
+       (ly:stencil-translate-axis z-stencil ymid Y))))
+```
+
+Usage: `\override Stem.stencil = #stem-with-z`
+
+**Pros:** Works in 2.20, automatic centering, clean path rendering.
+**Cons:** Overrides entire stem stencil (must revert when Z is not wanted).
+
+### Path Geometry
+
+The Z shape is drawn as four connected line segments:
+```
+(-0.45, -0.55) ——— (0.45, -0.55)   ← top horizontal bar
+                  /
+                /
+              /
+(-0.45, 0.55) ——— (0.45, 0.55)     ← bottom horizontal bar
+```
+- Path line thickness: 0.15 (adjustable)
+- X extent: ±0.45 (width of Z)
+- Y extent: ±0.55 (height of Z)
+- Centered at stem midpoint
+
+### References
+
+- SMuFL Tremolos range: https://w3c.github.io/smufl/latest/tables/tremolos.html
+- SMuFL Stems range: https://w3c.github.io/smufl/latest/tables/stems.html
+- LilyPond Cookbook — Buzz Roll: https://lilypond-cookbook.tumblr.com/post/108846925424/noting-a-buzz-roll
+- Dorico Forum — Z on stem: https://forums.steinberg.net/t/z-on-stem/739656
+- Tim Davies — Tremolo and the Abstract Truth: https://www.timusic.net/debreved/tremolo-and-the-abstract-truth/
+- MusicXML SMuFL tremolos issue: https://github.com/w3c/musicxml/issues/99
+
+---
+
 ## Notes (add as needed)
 
 <!-- Add new research findings here -->
