@@ -28,60 +28,52 @@ Notation Fragments are small, self-contained pieces of musical notation rendered
 
 ---
 
-## Step 2: Generate LilyPond File ⬅️ CURRENT
+## Step 2: Create Notation Fragments in LilyPond with Custom Scheme MIDI Tagging
 
-**Status:** In Progress
+**Status:** Active
 
-### Step 2A: Create Notation Fragments
+Create the `.ly` file for a notation fragment, embedding MIDI metadata directly in the notation using **Custom Scheme MIDI Tagging**. This system uses LilyPond `\set` context properties (via shorthand variables) to mark articulation modes, technique changes, and velocity overrides. A Scheme engraver reads these properties during compilation and writes a JSON event log alongside the SVG and MIDI output.
 
-*Placeholder — details TBD.*
+The tags are invisible — they have no effect on the rendered notation. They exist solely to inform the MIDI post-processing pipeline (Steps 3–4).
 
-### Step 2B: Render LilyPond → SVG + MIDI
+### File Setup
 
-Render the `.ly` file to produce both the SVG (notation graphic) and MIDI (raw musical data). The `.ly` file must include a `\midi {}` block for MIDI output.
+Every `.ly` file that produces MIDI output needs three things:
 
-**During development:** User renders manually in **Frescobaldi** (iterative editing).
-
-**In automated pipeline:** Use `lilypond` CLI, following the pattern from `render_bartok_pizz.js`:
-```powershell
-lilypond --svg -dbackend=svg -o "<output_base>" "<input.ly>"
-```
-
-This produces `<output_base>.svg` (or `-1.svg`) and `<output_base>.mid` (or `.midi`).
-
-**Output naming:** `NotationFragment[NNN]-[Instrument].mid` / `.svg`
-
-### Step 2C: Tag Notation with MIDI Properties + Modify MIDI
-
-Post-process the LilyPond-generated MIDI file to add CC messages that the notation implies but LilyPond doesn't encode (articulation presets, volume shaping, etc.).
-
-**Tools:**
-- `lilypond_code/midi-tags.ily` — shorthand variables for `\set` context properties (include in every `.ly` file)
-- `lilypond_code/modify_midi.js` — injects CC messages into MIDI
-- `docs/cc_mapping_registry.json` — persistent lookup table for notation symbol → CC/velocity mappings
-
-#### MIDI Tagging Protocol
-
-When writing a `.ly` file that will produce MIDI output, embed MIDI metadata directly in the notation using `\set` context properties. These are invisible (no visual effect) and read by the Scheme engraver during compilation.
-
-**Setup:** Add both includes at the top of the `.ly` file:
+**1. Includes** at the top of the file:
 ```lilypond
 \include "midi-tags.ily"
 \include "midi-logger.ily"
 ```
-Also add `\consists \midiLogEngraver` to the Voice context in `\layout`.
 
-**Checklist (follow every time):**
+**2. Engraver** in the `\layout` block:
+```lilypond
+\layout {
+  \context {
+    \Voice
+    \consists \midiLogEngraver
+  }
+}
+```
+
+**3. MIDI block** in the `\score`:
+```lilypond
+\midi {}
+```
+
+### Tagging Checklist
+
+Follow every time when writing or editing a `.ly` file:
 
 1. ✅ `\include "midi-tags.ily"` and `\include "midi-logger.ily"` at top of file
-1b. ✅ `\context { \Voice \consists \midiLogEngraver }` in `\layout`
-2. ✅ Set initial articulation mode BEFORE the first note (e.g., `\midiPizz`)
-3. ✅ Add `\midiXxx` BEFORE each note where the technique changes
-4. ✅ One-shot CC0 pattern: `\midiPizzOpen` → note → `\midiPizz` (revert)
-5. ✅ One-shot velocity pattern: `\midiSfz` → note → `\midiVelReset`
-6. ✅ Walk through the music — every note should have an active `midiCCZero` value
+2. ✅ `\context { \Voice \consists \midiLogEngraver }` in `\layout`
+3. ✅ Set initial articulation mode BEFORE the first note (e.g., `\midiPizz`)
+4. ✅ Add `\midiXxx` BEFORE each note where the technique changes
+5. ✅ One-shot CC0 pattern: `\midiPizzOpen` → note → `\midiPizz` (revert)
+6. ✅ One-shot velocity pattern: `\midiSfz` → note → `\midiVelReset`
+7. ✅ Walk through the music — every note should have an active `midiCCZero` value
 
-#### Quick Lookup Table
+### Quick Lookup Table
 
 | You see this in the score | Add this in the `.ly` file | Behavior |
 |---|---|---|
@@ -91,19 +83,18 @@ Also add `\consists \midiLogEngraver` to the Voice context in `\layout`.
 | Return to arco / sustained | `\midiArco` | Persistent |
 | `\sfz` dynamic | `\midiSfz` → note → `\midiVelReset` | One-shot, manual revert |
 
-**Context properties used:**
+### Context Properties
 
 | Property | Type | Persistence | Purpose |
 |---|---|---|---|
 | `Voice.midiCCZero` | integer (0–127) | Persistent until next `\set` | CC0 articulation mode |
 | `Voice.midiVelocity` | integer (0–127) | One-shot — must `\unset` after note | Velocity override |
 
-**Source of truth:** `docs/cc_mapping_registry.json` — defines all CC values, shorthand names, and revert patterns.
-
-#### Example: Tagged Notation
+### Example: Tagged Notation
 
 ```lilypond
 \include "midi-tags.ily"
+\include "midi-logger.ily"
 
 \midiPizz                           % CC0=95 for all following notes
 fs'16-. ^\markup { "pizz." } \ff
@@ -117,76 +108,256 @@ c,16 ^\markup { \teeny "o" }
 \midiVelReset                       % clear velocity override
 ```
 
-#### CC Injection Pipeline
+### MIDI Tagging System Reference
 
-1. Scheme engraver reads `\set` properties during compilation → produces event log
-2. Node.js state tracker converts event log → JSON map for `modify_midi.js`
-3. `modify_midi.js` injects CC events and velocity overrides into the MIDI
-4. Save modified MIDI with `-Mod` suffix
-
-**JSON map format:**
-```json
-{
-  "noteEvents": [
-    { "noteIndex": 0, "cc": [{ "num": 0, "val": 95 }] },
-    { "noteIndex": 1, "cc": [{ "num": 0, "val": 95 }], "vel": 127 }
-  ]
-}
-```
-
-**Output naming:** `NotationFragment[NNN]-[Instrument]-Mod.mid`
-
-**Output location:** `public/midi_files/`
-
-**Example command:**
-```
-node modify_midi.js input.mid output.mid 0 --map fragment001_cc.json
-```
-
-**Expandability:** Any CC 0–127 can be specified per note group. Future uses include CC7 for volume/crescendo shaping, CC1 for vibrato intensity, pitch bend for glissando, etc. New properties are added to `midi-tags.ily` and `cc_mapping_registry.json`.
-
----
-
-## Step 3: Adjust Paper Dimensions & Layout
-
-**Status:** Pending
-
-Tune `paper-width`, `paper-height`, `line-width`, and `proportionalNotationDuration` so the notation fits tightly in the SVG output. The user renders in Frescobaldi and adjusts iteratively.
-
-### Key Settings
-
-| Setting | Purpose | Typical Range |
-|---------|---------|---------------|
-| paper-width | Total SVG width | 20–100\mm |
-| paper-height | Total SVG height | 20–50\mm |
-| line-width | Notation area width | paper-width minus margins |
-| proportionalNotationDuration | Note spacing density | 1/8 (tightest) to 1/28 (widest) |
-| staff-line-width-mm | Staff line extent | Match notation width |
+| Resource | Location | What it contains |
+|---|---|---|
+| Shorthand variables + property registration | `lilypond_code/midi-tags.ily` | `\midiPizz`, `\midiSfz`, etc. + `set-object-property!` registration |
+| Scheme engraver | `lilypond_code/midi-logger.ily` | Reads context properties, writes JSON event log |
+| CC mapping registry | `docs/cc_mapping_registry.json` | All CC values, shorthands, state rules, revert patterns |
+| State tracker | `lilypond_code/state_tracker.js` | Converts event log → CC map for `modify_midi.js` |
+| MIDI post-processor | `lilypond_code/modify_midi.js` | Injects CC events + velocity overrides into MIDI |
+| Debugging protocols | `docs/MIDI_MUSIC_GENERATION.md` §17 | Three-level verification (event log → CC map → MIDI) |
 
 ### Deliverable
 
-✅ Paper dimensions tuned — notation renders cleanly without clipping or excess whitespace.
+✅ `.ly` file with notation + `\midiXxx` tags, ready to render.
 
 ---
 
-## Step 4: SVG Cropping
+## Step 3: Render LilyPond → SVG + MIDI + Event Log
+
+**Status:** Active
+
+Compile the `.ly` file to produce three outputs: notation SVG, raw MIDI, and the Scheme engraver event log.
+
+### Command
+
+Standard LilyPond CLI — not a custom renderer:
+
+```powershell
+# If LilyPond is on PATH (current system):
+lilypond --svg -dbackend=svg -o "NotationFragment[NNN]-[Instrument]" "NotationFragment[NNN]-[Instrument].ly"
+
+# If LilyPond is NOT on PATH, use the full path:
+& "C:\Users\jwloy\AppData\Local\frescobaldi\frescobaldi\lilypond-binaries\lilypond-2.24.4\bin\lilypond.exe" --svg -dbackend=svg -o "NotationFragment[NNN]-[Instrument]" "NotationFragment[NNN]-[Instrument].ly"
+```
+
+**During development:** User may also render in **Frescobaldi** for iterative editing (produces the same outputs).
+
+> **Raw MIDI output:** The LilyPond render produces a raw `.mid` file alongside the SVG and event log. This is an interim base MIDI file — it will be used as input for the CC Injection Pipeline (Step 4).
+
+### Outputs
+
+All outputs are generated in the same directory as the `.ly` file (`lilypond_code/`):
+
+| Output | Filename | Description |
+|---|---|---|
+| SVG | `NotationFragment[NNN]-[Instrument].svg` | Uncropped notation graphic |
+| MIDI | `NotationFragment[NNN]-[Instrument].mid` | Raw MIDI (before CC injection) |
+| Event Log | `NotationFragment[NNN]-[Instrument]-midi-log.json` | JSON event log from Scheme engraver — CC0 and velocity values per note group |
+
+### Notes
+
+- **LilyPond on PATH:** Currently installed at `C:\Users\jwloy\OneDrive\Documents\lilypond-2.24.4\bin\lilypond.exe` and available as `lilypond` on PATH. Frescobaldi uses its own copy at `C:\Users\jwloy\AppData\Local\frescobaldi\...\lilypond-2.24.4\bin\lilypond.exe` — same version.
+- **SVG filename fallback:** LilyPond sometimes outputs `baseName-1.svg` instead of `baseName.svg`. Check for both.
+- **MIDI extension fallback:** LilyPond may output `.mid` or `.midi`. Check for both.
+- **Render command is identical** to what `render_bartok_pizz.js` and `render_pizz_tremolo.js` use — no special processing during rendering.
+- **Version declaration:** `.ly` files declare `\version "2.20.0"` but LilyPond 2.24.4 is backward-compatible with 2.20 syntax. No need to update existing files.
+
+### Verify
+
+Check the event log (`-midi-log.json`) for correct `midiCCZero` and `midiVelocity` values at each note group. This is **Level 1** of the three-level verification protocol (see `MIDI_MUSIC_GENERATION.md` §17).
+
+### Deliverable
+
+✅ SVG, MIDI, and event log generated in `lilypond_code/`. Event log values match the `\midiXxx` tags in the `.ly` source.
+
+---
+
+## Step 4: Custom Score-Derived MIDI Data Injection Pipeline (Bespoke Application Set) (state_tracker.js → modify_midi.js → -Mod.mid)
+
+**Status:** Active
+
+Convert the raw LilyPond MIDI + Scheme engraver event log into a final modified MIDI file with per-note CC injections and velocity overrides. This is a two-stage Node.js pipeline.
+
+### Stage A: Event Log → CC Map (`state_tracker.js`)
+
+Converts the Scheme engraver event log (from Step 3) into a JSON CC map compatible with `modify_midi.js`.
+
+```powershell
+node state_tracker.js NotationFragment[NNN]-[Instrument]-midi-log.json --out fragment[NNN]_cc.json
+```
+
+**Input:** `lilypond_code/NotationFragment[NNN]-[Instrument]-midi-log.json` (event log from Step 3)
+**Output:** `lilypond_code/fragment[NNN]_cc.json` (CC map)
+
+The CC map contains one entry per note group with:
+- `noteIndex` — 0-based index of the note group (chords count as one group)
+- `cc` — array of CC messages to inject (e.g., `{ "num": 0, "val": 95 }` for pizzicato)
+- `vel` — optional velocity override (e.g., `127` for sforzando)
+
+### Stage B: CC Map + Raw MIDI → Modified MIDI (`modify_midi.js`)
+
+Injects CC events and velocity overrides into the raw LilyPond MIDI file.
+
+```powershell
+node modify_midi.js NotationFragment[NNN]-[Instrument].mid NotationFragment[NNN]-[Instrument]-Mod.mid 0 --map fragment[NNN]_cc.json
+```
+
+**Inputs:**
+- `lilypond_code/NotationFragment[NNN]-[Instrument].mid` (raw MIDI from Step 3)
+- `lilypond_code/fragment[NNN]_cc.json` (CC map from Stage A)
+
+**Output:** `lilypond_code/NotationFragment[NNN]-[Instrument]-Mod.mid` (final modified MIDI)
+
+**Arguments:**
+| Argument | Description |
+|---|---|
+| `input.mid` | Raw MIDI from LilyPond render |
+| `output.mid` | Destination for modified MIDI — use `-Mod.mid` suffix |
+| `channel` | MIDI channel, 0-indexed (track 1→0, track 2→1, etc.) |
+| `--map` | Path to the CC map JSON file |
+
+### Outputs Summary
+
+All files are generated in `lilypond_code/`:
+
+| Stage | Output | Filename |
+|---|---|---|
+| A | CC map | `fragment[NNN]_cc.json` |
+| B | Modified MIDI | `NotationFragment[NNN]-[Instrument]-Mod.mid` |
+
+### Verify
+
+- **Level 2:** Inspect `fragment[NNN]_cc.json` — confirm correct `noteIndex`, CC numbers, and velocity overrides per note group.
+- **Level 3:** Check `modify_midi.js` console output — confirm correct number of note groups processed, CC injections, and velocity overrides applied.
+
+See `MIDI_MUSIC_GENERATION.md` §17 for the full three-level verification protocol.
+
+### Notes
+
+- The `state_tracker.js` → `modify_midi.js` pipeline is the **bespoke application set** — custom scripts built for this project's MIDI post-processing needs.
+- `modify_midi.js` also supports tick-0 CC injection (`--cc <num> <val>`) and channel-only mode (no CC), but the `--map` workflow is the standard path for notation fragments.
+- The final `-Mod.mid` file is what gets loaded into the DAW or inserted into the score's `MidiSnippetDatabase`.
+
+### Expanding the Pipeline
+
+The Custom Score-Derived MIDI Data Injection Pipeline is designed to be extensible. To add a new MIDI control type (new CC number, pitch bend, channel pressure, etc.), update four components:
+
+#### 1. Register a new context property in `midi-tags.ily`
+
+Add a `set-object-property!` registration and a shorthand variable:
+
+```lilypond
+%% Register the property type
+#(set-object-property! 'midiNewProperty 'translation-type? number?)
+
+%% Create a shorthand
+midiNewTag = { \set Voice.midiNewProperty = #<value> }
+```
+
+**Existing properties:** `midiCCZero` (CC0 articulation), `midiVelocity` (velocity override).
+
+**Candidate future properties:**
+
+| Property Name | MIDI Message Type | Use Case |
+|---|---|---|
+| `midiPitchBend` | Pitch Bend (0–16383) | Quarter-tone adjustments, glissando start points |
+| `midiChannelPressure` | Channel Pressure (0–127) | Aftertouch effects, vibrato intensity |
+| `midiCC7` | CC7 Volume (0–127) | Dynamic shaping, volume automation |
+| `midiCC4` | CC4 (0–127) | Vibrato intensity per note |
+| `midiProgramChange` | Program Change (0–127) | Patch switching mid-stream |
+
+#### 2. Read the property in `midi-logger.ily`
+
+In the Scheme engraver's `process-music` callback, add a `ly:context-property` call for the new property and include it in the JSON event log output:
+
+```scheme
+(let* ((new-prop (ly:context-property context 'midiNewProperty)))
+  ;; add to the JSON entry alongside midiCCZero and midiVelocity
+```
+
+#### 3. Map the property in `state_tracker.js`
+
+Add logic to read the new field from the event log and emit the corresponding MIDI instruction in the CC map JSON. For example:
+
+- **New CC number:** Add to the `ccList` array as `{ "num": <N>, "val": <V> }`
+- **Pitch bend:** Add a `"bend": <0–16383>` field to the note event
+- **Channel pressure:** Add a `"pressure": <0–127>` field
+
+#### 4. Inject in `modify_midi.js`
+
+Add handling for the new JSON field. Insert the appropriate MIDI message bytes before the Note On event of the targeted group. See `MIDI_MUSIC_GENERATION.md` §15 for the enhancement roadmap and planned JSON field names.
+
+#### Summary: Files to Touch
+
+| File | What to change |
+|---|---|
+| `lilypond_code/midi-tags.ily` | Register property + add shorthand variable |
+| `lilypond_code/midi-logger.ily` | Read property in `process-music`, add to JSON output |
+| `lilypond_code/state_tracker.js` | Map new event log field → CC map JSON field |
+| `lilypond_code/modify_midi.js` | Inject new MIDI message type at note position |
+| `docs/cc_mapping_registry.json` | Add entry for new CC/message type |
+| `docs/MIDI_MUSIC_GENERATION.md` | Update §4 (CC Registry), §15 (Enhancement Roadmap) |
+
+### Deliverable
+
+✅ Final `-Mod.mid` file in `lilypond_code/` with all CC and velocity data injected. Verification at Levels 2 and 3 passes.
+
+---
+
+## Step 5: SVG Cropping
 
 **Status:** Pending
 
-Crop the rendered SVG to remove whitespace around the notation. Uses the same cropping pipeline as other systems.
+Crop the rendered SVG to remove excess whitespace around the notation. LilyPond SVGs include the full paper dimensions — cropping trims the viewBox and physical dimensions to tightly fit the content.
+
+### Command
+
+```powershell
+node crop_svg.js NotationFragment[NNN]-[Instrument].svg
+```
+
+Run from `lilypond_code/`. Supports multiple files: `node crop_svg.js file1.svg file2.svg ...`
+
+### How It Works
+
+`crop_svg.js` parses all visual elements in the SVG (lines, rects, paths, text) including nested `<g transform="translate(...)">` groups, computes the bounding box, adds 0.5-unit padding, then rewrites the `viewBox`, `width`, and `height` attributes. The file is modified **in-place**.
+
+### Input / Output
+
+| | File | Location |
+|---|---|---|
+| **Input** | `NotationFragment[NNN]-[Instrument].svg` | `lilypond_code/` (from Step 3) |
+| **Output** | Same file, overwritten in-place | `lilypond_code/` |
+
+Console output shows the cropped dimensions:
+```
+Cropped: NotationFragment001-Cello.svg → 18.42x12.31mm (viewBox: 1.23,3.45 10.48x7.00)
+```
 
 ### Tools
 
-- `lilypond_code/crop_svg.js` — standalone SVG cropper
-- Server-side crop in `server.js` (same logic)
+| Tool | Location | Notes |
+|---|---|---|
+| `crop_svg.js` | `lilypond_code/crop_svg.js` | Standalone CLI cropper — extracted from `server.js` |
+| `cropSvgToContent()` | `server.js` | Same logic, server-side (used by render pipelines) |
+
+### Notes
+
+- **In-place modification:** The SVG is overwritten. If you need the uncropped version, copy it first.
+- **Same script** used by `render_bartok_pizz.js` and `render_pizz_tremolo.js` — identical cropping logic.
+- Handles LilyPond's SVG structure: `<g transform="translate(tx,ty)">` groups containing `<line>`, `<rect>`, `<path>`, and `<text>` elements, including nested paths (e.g., dynamics like `fff`).
+- For notation fragments, the cropped SVG may need additional adjustments before score integration (Step 6) — e.g., if the fragment includes elements that extend beyond the staff.
 
 ### Deliverable
 
-✅ Cropped SVG ready for score insertion.
+✅ Cropped SVG in `lilypond_code/`, dimensions tightly fit to notation content.
 
 ---
 
-## Step 5: Score Integration
+## Step 6: Score Integration
 
 **Status:** Pending
 
@@ -208,7 +379,7 @@ Insert the cropped SVG into the score at a specified time and track. Uses the SV
 
 ---
 
-## Step 6: MIDI Generation (if needed)
+## Step 7: MIDI Generation (if needed)
 
 **Status:** Pending
 
@@ -222,7 +393,7 @@ Generate MIDI corresponding to the notation fragment. This step is optional — 
 
 ---
 
-## Step 7: Pipeline Automation
+## Step 8: Pipeline Automation
 
 **Status:** Pending
 
@@ -236,7 +407,7 @@ Automate the full workflow: LilyPond render → SVG crop → score insertion (�
 
 ---
 
-## Step 8: AI Prompt Guide
+## Step 9: AI Prompt Guide
 
 **Status:** Pending
 

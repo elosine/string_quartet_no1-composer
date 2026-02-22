@@ -99,9 +99,10 @@ CC0 (Bank Select / Articulation ID) is used as a **technique identifier** so the
 
 | CC0 Value | Technique | System |
 |-----------|-----------|--------|
-| 89 | Senza vibrato / vibrato articulation | Vibrato, Glissando, Crescendo |
-| 97 | Bartók pizzicato (snap pizz) | Bartók Pizzicato |
-| 95 | Z-stem pizzicato tremolo (pizz velocity) | Z-Stem Pizz Trem |
+| 71 | Pizzicato open string (one-shot) | Notation Fragments |
+| 89 | Senza vibrato / arco (default sustained) | Vibrato, Glissando, Crescendo, Notation Fragments |
+| 95 | Pizzicato | Z-Stem Pizz Trem, Notation Fragments |
+| 97 | Bartók pizzicato (snap pizz, one-shot) | Bartók Pizzicato, Notation Fragments |
 
 ### Other CC Messages Used
 
@@ -364,6 +365,39 @@ node generate_pizz_tremolo_midi.js --pitch <ly_pitch> --dynamic <dyn> --track <1
 - CC0=95 patch select, CC7 linear volume ramp, pitch bend for quarter-tones
 - Channels 8–11 (track + 7)
 
+### Custom Score-Derived MIDI Data Injection Pipeline (Bespoke Application Set)
+
+The following tools form the **Custom Score-Derived MIDI Data Injection Pipeline** for notation fragments. They convert LilyPond notation (with embedded MIDI tags) into a fully post-processed MIDI file with per-note CC injections and velocity overrides.
+
+| Tool | Location | Role |
+|---|---|---|
+| `midi-tags.ily` | `lilypond_code/` | LilyPond shorthand variables for `\set` MIDI context properties |
+| `midi-logger.ily` | `lilypond_code/` | Scheme engraver — reads context properties, writes JSON event log |
+| `state_tracker.js` | `lilypond_code/` | Node.js — converts event log → CC map JSON for `modify_midi.js` |
+| `modify_midi.js` | `lilypond_code/` | Node.js — injects CC events + velocity overrides into MIDI |
+
+**Pipeline flow:**
+```
+.ly file (with \midiXxx tags)
+  → LilyPond render → raw .mid + event log (.json)
+    → state_tracker.js → CC map (.json)
+      → modify_midi.js → final -Mod.mid
+```
+
+See `docs/NOTATION_FRAGMENT_WORKFLOW.md` Step 4 for full usage instructions and expansion guide.
+
+### `lilypond_code/state_tracker.js`
+
+Converts a Scheme engraver event log into a CC map for `modify_midi.js`.
+
+```powershell
+node state_tracker.js <event-log.json> [--out <output.json>]
+```
+
+- Reads `midiCCZero` → emits `cc: [{num: 0, val: N}]`
+- Reads `midiVelocity` → emits `vel: N`
+- Console summary: input events, output events, CC count, velocity override count
+
 ### `lilypond_code/modify_midi.js`
 
 General-purpose MIDI post-processor. Rewrites channel, inserts CC messages (tick 0 and/or per-note), overrides velocity.
@@ -548,13 +582,15 @@ Persistent mappings and one-shot rules stored in `docs/cc_mapping_registry.json`
 
 ### Implementation Path
 
-| Phase | Approach | Who does analysis? |
-|-------|----------|--------------------|
-| **Now** | AI reads `.ly`, applies state machine cognitively, produces JSON map | AI (Option A) |
-| **Next** | LilyPond Scheme engraver outputs note event log; Node.js script applies state machine + config lookup | Automated (Option E) |
-| **Fallback** | Node.js regex parser reads `.ly` directly; applies state machine + config lookup | Automated (Option D) |
+| Phase | Approach | Who does analysis? | Status |
+|-------|----------|--------------------|---------|
+| **Completed** | AI reads `.ly`, applies state machine cognitively, produces JSON map | AI (Option A) | ✅ Proven (ASB-088/089) |
+| **Active** | Custom Scheme MIDI Tagging: `\midiXxx` tags in `.ly` → Scheme engraver event log → `state_tracker.js` → `modify_midi.js` | Automated (Option E) | ✅ Proven (ASB-090/091) |
+| **Fallback** | Node.js regex parser reads `.ly` directly; applies state machine + config lookup | Automated (Option D) | Backup |
 
 See `docs/NOTATION_FRAGMENT_WORKFLOW.md` → Analysis Roadmap for full option descriptions.
+
+> **Note:** The pipeline is now formally called the **Custom Score-Derived MIDI Data Injection Pipeline (Bespoke Application Set)**. See `NOTATION_FRAGMENT_WORKFLOW.md` Step 4 for full documentation including an expansion guide for adding new CC types, pitch bend, channel pressure, etc.
 
 ---
 
@@ -671,9 +707,9 @@ This fragment has been manually verified and serves as the reference for pipelin
 ### Quick Verification Commands
 
 ```powershell
-# Full pipeline (once all tools are built):
+# Full pipeline — run from lilypond_code/ directory:
 lilypond --svg -dbackend=svg -o "NotationFragment001-Cello" "NotationFragment001-Cello.ly"
-node state_tracker.js event_log.json > fragment001_cc.json
+node state_tracker.js NotationFragment001-Cello-midi-log.json --out fragment001_cc.json
 node modify_midi.js NotationFragment001-Cello.mid NotationFragment001-Cello-Mod.mid 0 --map fragment001_cc.json
 ```
 
