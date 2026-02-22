@@ -1183,6 +1183,61 @@
                 </div>
                 
                 <div class="section-divider"></div>
+                <div class="section-label" style="background: var(--clr-brightBlue); color: #fff; padding: 3px 6px; border-radius: 2px;">Pizzicato Tremolo</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Track</label>
+                    <input type="number" id="ptTrackInput" class="curve-input" value="1" min="1" max="4" step="1" style="width: 35px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">Clef</label>
+                    <select id="ptClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="treble" selected>Treble</option>
+                        <option value="alto">Alto</option>
+                        <option value="bass">Bass</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Pitch</label>
+                    <input type="text" id="ptPitchInput" class="curve-input" value="C4" style="width: 55px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 3px;">Dyn</label>
+                    <select id="ptDynamicSelect" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p">p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f">f</option>
+                        <option value="ff" selected>ff</option>
+                        <option value="fff">fff</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Start</label>
+                    <input type="number" id="ptStartInput" class="curve-input" value="0" step="0.1" style="width: 55px; font-size: 10px;" title="Start time in seconds">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 3px;">Dur</label>
+                    <input type="number" id="ptDurationInput" class="curve-input" value="3" step="0.1" min="0.5" style="width: 45px; font-size: 10px;" title="Duration in seconds">
+                    <span style="font-size: 8px; color: #888; margin-left: 2px;">s</span>
+                </div>
+                <div class="curve-input-row" style="gap: 3px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px;">Shape:</label>
+                    <input type="radio" id="ptShapeCres" name="ptShape" value="cres" checked style="margin: 0;">
+                    <label for="ptShapeCres" style="font-size: 9px; cursor: pointer;">Cres</label>
+                    <input type="radio" id="ptShapeDecres" name="ptShape" value="decres" style="margin: 0 0 0 4px;">
+                    <label for="ptShapeDecres" style="font-size: 9px; cursor: pointer;">Decres</label>
+                    <input type="radio" id="ptShapeBoth" name="ptShape" value="hp" style="margin: 0 0 0 4px;">
+                    <label for="ptShapeBoth" style="font-size: 9px; cursor: pointer;">Both</label>
+                </div>
+                <div class="curve-input-row" style="gap: 3px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px;">Align:</label>
+                    <input type="radio" id="ptAlignPre" name="ptAlign" value="pre" checked style="margin: 0;">
+                    <label for="ptAlignPre" style="font-size: 9px; cursor: pointer;">Pre</label>
+                    <input type="radio" id="ptAlignPost" name="ptAlign" value="post" style="margin: 0 0 0 8px;">
+                    <label for="ptAlignPost" style="font-size: 9px; cursor: pointer;">Post</label>
+                </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="ptGoBtn" class="control-btn" style="font-size: 11px; background: var(--clr-brightBlue); color: #fff; font-weight: bold; padding: 4px 12px;">Go</button>
+                </div>
+                
+                <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-navyBlue); color: #fff; padding: 3px 6px; border-radius: 2px;">Curve Segments</div>
                 
                 <div class="curve-input-row">
@@ -19514,6 +19569,497 @@
         };
         BartokPizzUI.init();
         window.BartokPizzUI = BartokPizzUI;
+        
+        // ============================================
+        // PIZZICATO TREMOLO UI
+        // Single-click workflow: pipeline → GC → SVG + arrow → MIDI
+        // ============================================
+        const PizzTremUI = {
+            GC_PARAMS: {
+                stiffness: 62,
+                damping: 100,
+                ictus: 90,
+                descentRatio: 60,
+                duration: 0.6,
+                color: 'neonMagenta'
+            },
+            
+            // MIDI constants (match generate_pizz_tremolo_midi.js)
+            CC0_PIZZ_TREMOLO: 95,
+            CC7_PP_VOLUME: 50,
+            CC7_INTERVAL_MS: 20,
+            CHANNEL_OFFSET: 8,  // trackIndex 0 → ch 8, 1 → ch 9, etc.
+            
+            timingDb: null,  // cached timing database
+            
+            init() {
+                const goBtn = document.getElementById('ptGoBtn');
+                if (goBtn) {
+                    goBtn.addEventListener('click', () => this.go());
+                }
+                console.log('PizzTremUI initialized');
+            },
+            
+            getInputs() {
+                return {
+                    track: parseInt(document.getElementById('ptTrackInput').value) || 1,
+                    clef: document.getElementById('ptClefSelect').value,
+                    pitch: document.getElementById('ptPitchInput').value.trim(),
+                    dynamic: document.getElementById('ptDynamicSelect').value,
+                    start: parseFloat(document.getElementById('ptStartInput').value) || 0,
+                    duration: parseFloat(document.getElementById('ptDurationInput').value) || 3,
+                    shape: document.querySelector('input[name="ptShape"]:checked')?.value || 'cres',
+                    alignment: document.querySelector('input[name="ptAlign"]:checked')?.value || 'pre'
+                };
+            },
+            
+            // Dynamic → MIDI velocity mapping (same as Bartók/generate_pizz_tremolo_midi.js)
+            dynamicToVelocity(dynamic) {
+                const map = { ppp: 30, pp: 45, p: 60, mp: 70, mf: 85, f: 95, ff: 107, fff: 120 };
+                return map[dynamic] || 100;
+            },
+            
+            // Convert plain English pitch to LilyPond notation (same as BartokPizzUI)
+            englishToLilypond(pitchStr) {
+                const match = pitchStr.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+                if (!match) return null;
+                let [, note, accidental, quarterTone, octave] = match;
+                let ly = note.toLowerCase();
+                if (accidental === '#' && quarterTone === '+') ly += 'tqs';
+                else if (accidental === 'B' && quarterTone === 'D') ly += 'tqf';
+                else if (accidental === '#') ly += 's';
+                else if (accidental === 'B') ly += 'f';
+                else if (quarterTone === '+') ly += 'qs';
+                else if (quarterTone === 'D') ly += 'qf';
+                const oct = parseInt(octave);
+                if (oct > 3) ly += "'".repeat(oct - 3);
+                else if (oct < 3) ly += ",".repeat(3 - oct);
+                return ly;
+            },
+            
+            // Convert plain English pitch to MIDI note number (same as BartokPizzUI)
+            englishToMidi(pitchStr) {
+                const noteMap = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+                const match = pitchStr.trim().toUpperCase().match(/^([A-G])([#B]?)([+D]?)(-?\d)$/);
+                if (!match) return null;
+                let [, note, accidental, quarterTone, octave] = match;
+                let pitch = noteMap[note];
+                if (pitch === undefined) return null;
+                if (accidental === '#') pitch += 1;
+                else if (accidental === 'B') pitch -= 1;
+                pitch += (parseInt(octave) + 1) * 12;
+                return Math.max(0, Math.min(127, pitch));
+            },
+            
+            // Fetch and cache the timing database
+            async getTimingDb() {
+                if (this.timingDb) return this.timingDb;
+                const resp = await fetch('/midi_files/pizz_tremolo_db.json');
+                this.timingDb = await resp.json();
+                return this.timingDb;
+            },
+            
+            // Sample notes from timing DB (ported from generate_pizz_tremolo_midi.js)
+            sampleNotes(db, durationMs) {
+                const allNotes = [];
+                for (const segment of db.segments) {
+                    for (const note of segment.notes) allNotes.push(note);
+                }
+                if (allNotes.length === 0) throw new Error('No notes in timing database');
+                let totalGap = 0, gapCount = 0;
+                for (const n of allNotes) {
+                    if (n.gapBeforeMs > 0) { totalGap += n.gapBeforeMs; gapCount++; }
+                }
+                const avgGap = gapCount > 0 ? totalGap / gapCount : 45;
+                const startIdx = Math.floor(Math.random() * allNotes.length);
+                const sampled = [];
+                let currentTimeMs = 0;
+                let idx = startIdx;
+                let wrapCount = 0;
+                while (currentTimeMs < durationMs) {
+                    const poolIdx = idx % allNotes.length;
+                    const note = allNotes[poolIdx];
+                    if (idx > startIdx && poolIdx === 0) wrapCount++;
+                    if (sampled.length === 0) {
+                        sampled.push({ onsetMs: 0, durationMs: note.durationMs });
+                        currentTimeMs = note.durationMs;
+                    } else {
+                        const gap = (poolIdx === 0 && wrapCount > 0) ? avgGap : (note.gapBeforeMs || avgGap);
+                        const onset = currentTimeMs + gap;
+                        sampled.push({ onsetMs: onset, durationMs: note.durationMs });
+                        currentTimeMs = onset + note.durationMs;
+                    }
+                    idx++;
+                    if (idx - startIdx > allNotes.length * 10) break;
+                }
+                if (sampled.length > 0) {
+                    const lastNote = sampled[sampled.length - 1];
+                    const noteEnd = lastNote.onsetMs + lastNote.durationMs;
+                    if (noteEnd > durationMs) {
+                        lastNote.durationMs = Math.max(10, durationMs - lastNote.onsetMs);
+                    } else if (noteEnd < durationMs) {
+                        lastNote.durationMs = durationMs - lastNote.onsetMs;
+                    }
+                }
+                return sampled;
+            },
+            
+            // Generate CC7 volume ramp (ported from generate_pizz_tremolo_midi.js)
+            generateCC7Ramp(shape, durationMs) {
+                const points = [];
+                const numSteps = Math.max(1, Math.floor(durationMs / this.CC7_INTERVAL_MS));
+                for (let i = 0; i <= numSteps; i++) {
+                    const t = i / numSteps;
+                    const timeMs = t * durationMs;
+                    let volume;
+                    if (shape === 'cres') {
+                        volume = this.CC7_PP_VOLUME + t * (127 - this.CC7_PP_VOLUME);
+                    } else if (shape === 'decres') {
+                        volume = 127 - t * 127;
+                    } else { // hp
+                        if (t <= 0.5) {
+                            const t2 = t * 2;
+                            volume = this.CC7_PP_VOLUME + t2 * (127 - this.CC7_PP_VOLUME);
+                        } else {
+                            const t2 = (t - 0.5) * 2;
+                            volume = 127 - t2 * 127;
+                        }
+                    }
+                    points.push({ timeMs, volume: Math.round(Math.max(0, Math.min(127, volume))) });
+                }
+                return points;
+            },
+            
+            // Insert SVG notation + blue arrow (from Step 8 graphic notation)
+            async insertPizzTremSvg(svgPath, startTime, track, alignment, gc) {
+                if (!svgPath) return null;
+                try {
+                    const response = await fetch(svgPath);
+                    const svgContent = await response.text();
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const svgEl = svgDoc.documentElement;
+                    let svgWidth = parseFloat(svgEl.getAttribute('width')) || 100;
+                    let svgHeight = parseFloat(svgEl.getAttribute('height')) || 100;
+                    const widthStr = svgEl.getAttribute('width') || '';
+                    const heightStr = svgEl.getAttribute('height') || '';
+                    if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
+                    if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
+                    svgEl.setAttribute('width', String(svgWidth));
+                    svgEl.setAttribute('height', String(svgHeight));
+                    
+                    const trackNum = parseInt(track) || 1;
+                    const scoreEl = document.getElementById('ScoreTop');
+                    const scoreWidth = scoreEl.clientWidth;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(trackNum), scoreEl);
+                    
+                    const heightFraction = 0.70;
+                    const targetHeight = trackDims.height * heightFraction;
+                    const scale = targetHeight / svgHeight;
+                    const scaledContentWidth = svgWidth * scale;
+                    
+                    const secondsPerPage = window.GraphicTimeline
+                        ? GraphicTimeline.getSecondsPerPage()
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const secondsPerPixel = secondsPerPage / scoreWidth;
+                    const svgWidthInSeconds = scaledContentWidth * secondsPerPixel;
+                    
+                    // Alignment positioning (Step 8 logic)
+                    let anchorSeconds, offsetSeconds;
+                    if (alignment === 'pre') {
+                        anchorSeconds = gc ? gc.startSeconds : startTime;
+                        offsetSeconds = 0;
+                    } else {
+                        anchorSeconds = gc ? gc.endSeconds : startTime;
+                        offsetSeconds = -svgWidthInSeconds;
+                    }
+                    
+                    const id = SVGElementManager.nextId++;
+                    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    wrapper.setAttribute('id', `svg-element-${id}`);
+                    wrapper.setAttribute('class', 'svg-element-wrapper');
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    let svgString = new XMLSerializer().serializeToString(svgEl);
+                    svgString = svgString.replace(/currentColor/g, '#000000');
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                    image.setAttribute('href', dataUrl);
+                    image.setAttribute('width', svgWidth);
+                    image.setAttribute('height', svgHeight);
+                    wrapper.appendChild(image);
+                    
+                    // Blue right-pointing arrow
+                    const arrowLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    const arrowY = svgHeight + 4;
+                    arrowLine.setAttribute('x1', svgWidth * 0.1);
+                    arrowLine.setAttribute('x2', svgWidth);
+                    arrowLine.setAttribute('marker-end', 'url(#arrow-end-brightBlue-triangle-8)');
+                    arrowLine.setAttribute('y1', arrowY);
+                    arrowLine.setAttribute('y2', arrowY);
+                    arrowLine.setAttribute('stroke', 'rgba(56,126,211,255)');
+                    arrowLine.setAttribute('stroke-width', '1.5');
+                    wrapper.appendChild(arrowLine);
+                    
+                    const elementData = {
+                        id: id,
+                        name: SVGElementManager.generateSvgName(svgPath.split('/').pop()),
+                        wrapper: wrapper,
+                        image: image,
+                        referenceSeconds: anchorSeconds,
+                        offsetSeconds: offsetSeconds,
+                        offsetYFraction: 0.10,
+                        width: svgWidth,
+                        height: svgHeight,
+                        scale: scale,
+                        heightFraction: heightFraction,
+                        track: trackNum
+                    };
+                    
+                    const pos = SVGElementManager.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
+                    
+                    SVGElementManager.elements.push(elementData);
+                    SVGElementManager.updateElementTransform(elementData);
+                    
+                    const targetContainer = pos.section === 'top'
+                        ? SVGElementManager.containerTop
+                        : SVGElementManager.containerBottom;
+                    targetContainer.appendChild(wrapper);
+                    
+                    wrapper.addEventListener('mousedown', (e) =>
+                        SVGElementManager.handleElementMouseDown(e, elementData));
+                    
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                    
+                    console.log('PizzTremUI: SVG inserted:', elementData.name, 'align:', alignment);
+                    return elementData;
+                } catch (err) {
+                    console.error('PizzTremUI.insertPizzTremSvg error:', err);
+                    return null;
+                }
+            },
+            
+            // Insert MIDI snippet events (programmatic, with timing DB sampling)
+            async insertPizzTremMidi(pitchEnglish, dynamic, track, startTime, durationSec, shape, alignment) {
+                if (!window.MidiController || !window.MidiSnippetDatabase) return null;
+                
+                const trackIndex = parseInt(track) - 1;
+                const midiChannel = trackIndex + this.CHANNEL_OFFSET; // track 1→ch8, etc.
+                const velocity = this.dynamicToVelocity(dynamic);
+                const midiNote = this.englishToMidi(pitchEnglish);
+                if (midiNote === null) {
+                    console.error('PizzTremUI: Could not convert pitch to MIDI:', pitchEnglish);
+                    return null;
+                }
+                
+                const durationMs = durationSec * 1000;
+                
+                // Fetch timing database and sample notes
+                const db = await this.getTimingDb();
+                const sampledNotes = this.sampleNotes(db, durationMs);
+                const cc7Points = this.generateCC7Ramp(shape, durationMs);
+                
+                // Determine snippet absolute start time based on alignment
+                // Pre: snippet ends at startTime → snippet starts at (startTime - durationSec)
+                // Post: snippet begins at startTime
+                let snippetStartSec;
+                if (alignment === 'pre') {
+                    snippetStartSec = startTime - durationSec;
+                } else {
+                    snippetStartSec = startTime;
+                }
+                const snippetStartMs = snippetStartSec * 1000;
+                
+                // Detect quarter-tone for pitch bend
+                const qtMatch = pitchEnglish.trim().toUpperCase().match(/^[A-G][#B]?([+D]?)-?\d$/);
+                const quarterTone = qtMatch ? qtMatch[1] : '';
+                const needsBend = quarterTone === '+' || quarterTone === 'D';
+                const bendValue = quarterTone === '+' ? 12288 : quarterTone === 'D' ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
+                
+                // Build MIDI events
+                const snippetEvents = [];
+                
+                // CC0 = 95 at snippet start
+                snippetEvents.push({
+                    timeMs: snippetStartMs, relativeTimeMs: 0,
+                    type: 0xB0, data: [0xB0 | midiChannel, 0x00, this.CC0_PIZZ_TREMOLO]
+                });
+                
+                // Pitch bend at start (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: snippetStartMs, relativeTimeMs: 0,
+                        type: 0xE0, data: [0xE0 | midiChannel, bendLSB, bendMSB]
+                    });
+                }
+                
+                // CC7 volume ramp
+                for (const pt of cc7Points) {
+                    snippetEvents.push({
+                        timeMs: snippetStartMs + pt.timeMs,
+                        relativeTimeMs: pt.timeMs,
+                        type: 0xB0, data: [0xB0 | midiChannel, 0x07, pt.volume]
+                    });
+                }
+                
+                // Note events
+                for (const note of sampledNotes) {
+                    snippetEvents.push({
+                        timeMs: snippetStartMs + note.onsetMs,
+                        relativeTimeMs: note.onsetMs,
+                        type: 0x90, data: [0x90 | midiChannel, midiNote, velocity]
+                    });
+                    snippetEvents.push({
+                        timeMs: snippetStartMs + note.onsetMs + note.durationMs,
+                        relativeTimeMs: note.onsetMs + note.durationMs,
+                        type: 0x80, data: [0x80 | midiChannel, midiNote, 0]
+                    });
+                }
+                
+                // Pitch bend reset at end
+                if (needsBend) {
+                    const lastNote = sampledNotes[sampledNotes.length - 1];
+                    const endRelMs = lastNote.onsetMs + lastNote.durationMs;
+                    snippetEvents.push({
+                        timeMs: snippetStartMs + endRelMs,
+                        relativeTimeMs: endRelMs,
+                        type: 0xE0, data: [0xE0 | midiChannel, 0x00, 0x40]
+                    });
+                }
+                
+                // Sort events by time
+                snippetEvents.sort((a, b) => a.timeMs - b.timeMs || a.type - b.type);
+                
+                // Get next color
+                const color = MidiController.snippetColors[MidiController.nextColorIndex % MidiController.snippetColors.length];
+                MidiController.nextColorIndex++;
+                
+                // Register snippet
+                const snippet = MidiSnippetDatabase.add({
+                    name: `PizzTrem_t${track}_${startTime.toFixed(1)}s_${shape}_${alignment}`,
+                    trackIndex: trackIndex,
+                    startSeconds: snippetStartSec,
+                    endSeconds: snippetStartSec + durationSec,
+                    events: snippetEvents,
+                    color: color
+                });
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                MidiController.reloadFromDatabase();
+                
+                console.log('PizzTremUI: MIDI snippet inserted:', snippet.id,
+                    `${sampledNotes.length} notes, ch ${midiChannel}, ${alignment}`,
+                    `${snippetStartSec.toFixed(2)}s → ${(snippetStartSec + durationSec).toFixed(2)}s`);
+                return snippet.id;
+            },
+            
+            // Full workflow (UI or programmatic)
+            async go(params = null) {
+                const inputs = params || this.getInputs();
+                const pitchEnglish = inputs.pitch;
+                if (!pitchEnglish) { console.error('PizzTremUI: pitch required'); return null; }
+                
+                const pitch = this.englishToLilypond(pitchEnglish);
+                if (!pitch) {
+                    console.error('PizzTremUI: Invalid pitch format:', pitchEnglish);
+                    alert('Invalid pitch. Format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat)');
+                    return null;
+                }
+                
+                const btn = document.getElementById('ptGoBtn');
+                const originalText = btn?.textContent;
+                if (btn) { btn.textContent = '...'; btn.disabled = true; }
+                
+                let result = null;
+                try {
+                    console.log('PizzTremUI.go:', inputs);
+                    
+                    // Step 1: Run server pipeline (render LilyPond → crop SVG → generate MIDI file)
+                    const pipelineResp = await fetch('/api/pizz-tremolo/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            pitch, dynamic: inputs.dynamic, clef: inputs.clef,
+                            track: inputs.track, shape: inputs.shape, duration: inputs.duration
+                        })
+                    });
+                    const pipelineResult = await pipelineResp.json();
+                    
+                    if (!pipelineResult.success) {
+                        console.error('PizzTremUI: Pipeline failed:', pipelineResult.error);
+                        throw new Error(pipelineResult.error);
+                    }
+                    console.log('PizzTremUI: Pipeline complete:', pipelineResult.svgPath);
+                    
+                    // Step 2: Create GC at start time
+                    let gc = null;
+                    if (window.GCMaker) {
+                        const saved = {
+                            stiffness: GCMaker.stiffness, damping: GCMaker.damping,
+                            ictus: GCMaker.ictus, descentRatio: GCMaker.descentRatio,
+                            duration: GCMaker.duration
+                        };
+                        Object.assign(GCMaker, this.GC_PARAMS);
+                        if (GCMaker.impactInput) GCMaker.impactInput.value = inputs.start;
+                        if (GCMaker.trackSelect) GCMaker.trackSelect.value = String(inputs.track);
+                        GCMaker.createGC();
+                        gc = GCMaker.gcs[GCMaker.gcs.length - 1];
+                        if (gc) {
+                            gc.color = this.GC_PARAMS.color;
+                            gc.name = `PizzTrem_${gc.name}`;
+                            GCMaker.rerenderAllGCs();
+                            console.log('PizzTremUI: GC created:', gc.name);
+                        }
+                        Object.assign(GCMaker, saved);
+                    }
+                    
+                    // Step 3: Insert SVG notation + blue arrow
+                    let svgElement = null;
+                    if (pipelineResult.svgPath) {
+                        svgElement = await this.insertPizzTremSvg(
+                            pipelineResult.svgPath, inputs.start, inputs.track,
+                            inputs.alignment, gc
+                        );
+                    }
+                    
+                    // Step 4: Insert MIDI snippet (programmatic, from timing DB)
+                    let midiSnippet = null;
+                    if (window.MidiController) {
+                        midiSnippet = await this.insertPizzTremMidi(
+                            pitchEnglish, inputs.dynamic, inputs.track,
+                            inputs.start, inputs.duration, inputs.shape, inputs.alignment
+                        );
+                    }
+                    
+                    result = { gc, svgElement, midiSnippet, pipelineResult };
+                    console.log('PizzTremUI: Complete');
+                    
+                } catch (err) {
+                    console.error('PizzTremUI error:', err);
+                } finally {
+                    if (btn) {
+                        if (result) {
+                            btn.textContent = '✓';
+                            btn.style.background = 'var(--clr-green)';
+                            setTimeout(() => { btn.textContent = originalText; btn.style.background = 'var(--clr-brightBlue)'; btn.disabled = false; }, 1500);
+                        } else {
+                            btn.textContent = '✗';
+                            btn.style.background = 'var(--clr-brightRed)';
+                            setTimeout(() => { btn.textContent = originalText; btn.style.background = 'var(--clr-brightBlue)'; btn.disabled = false; }, 2000);
+                        }
+                    }
+                }
+                return result;
+            }
+        };
+        PizzTremUI.init();
+        window.PizzTremUI = PizzTremUI;
         
         // ============================================
         // PANEL SECTION MANAGER - Draggable reordering of composition panel sections

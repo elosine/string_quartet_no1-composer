@@ -1544,6 +1544,75 @@ app.post('/api/bartok-pizz/generate', (req, res) => {
 });
 
 // ============================================
+// PIZZICATO TREMOLO PIPELINE - Run full pipeline from inputs
+// ============================================
+
+app.post('/api/pizz-tremolo/generate', (req, res) => {
+    const { pitch, dynamic, clef, track, shape, duration } = req.body;
+    
+    if (!pitch || !dynamic || !clef || !track || !shape || !duration) {
+        return res.status(400).json({ success: false, error: 'Missing required fields: pitch, dynamic, clef, track, shape, duration' });
+    }
+    
+    const scriptPath = path.join(LILYPOND_DIR, 'render_pizz_tremolo.js');
+    if (!fs.existsSync(scriptPath)) {
+        return res.status(404).json({ success: false, error: 'Pipeline script not found' });
+    }
+    
+    // Run the pipeline script
+    const command = `node "${scriptPath}" --pitch "${pitch}" --dynamic ${dynamic} --clef ${clef} --track ${track} --shape ${shape} --duration ${duration}`;
+    console.log('Pizz tremolo command:', command);
+    
+    exec(command, { cwd: LILYPOND_DIR, timeout: 45000 }, (err, stdout, stderr) => {
+        if (err) {
+            console.error('Pizz tremolo pipeline error:', err.message);
+            console.error('Pizz tremolo stderr:', stderr);
+            console.error('Pizz tremolo stdout:', stdout);
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Pipeline failed',
+                details: stderr || err.message,
+                stdout: stdout
+            });
+        }
+        
+        // Parse the output to find SVG and MIDI paths
+        const svgMatch = stdout.match(/SVG → (.+)/);
+        const midiMatch = stdout.match(/MIDI → (.+?)(?:\s+\(|$)/m);
+        
+        if (!svgMatch) {
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Pipeline completed but SVG path not found in output',
+                stdout: stdout
+            });
+        }
+        
+        // Convert filesystem paths to web-accessible paths
+        const svgRelPath = svgMatch[1].trim().replace(/\\/g, '/');
+        const midiRelPath = midiMatch ? midiMatch[1].trim().replace(/\\/g, '/') : null;
+        
+        // Extract just the filename for web paths
+        const svgFilename = path.basename(svgRelPath);
+        const midiFilename = midiRelPath ? path.basename(midiRelPath) : null;
+        
+        const svgWebPath = `/SVG_graphics/pizz_tremolo/${svgFilename}`;
+        const midiWebPath = midiFilename ? `/SVG_graphics/pizz_tremolo/${midiFilename}` : null;
+        
+        console.log(`Pizz tremolo generated: ${svgFilename}`);
+        
+        res.json({
+            success: true,
+            svgPath: svgWebPath,
+            midiPath: midiWebPath,
+            svgFilename: svgFilename,
+            midiFilename: midiFilename,
+            stdout: stdout
+        });
+    });
+});
+
+// ============================================
 // VIBRATO MOTIVE AUTOMATION - Create and save to score
 // ============================================
 
