@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Feb 21, 2026  
-**Current ASB Number:** ASB-081
+**Current ASB Number:** ASB-084
 
 ---
 
@@ -45,6 +45,7 @@ That's it. Everything else below is for Cascade.
 | Glissando System | Complete | Maintenance only |
 | Vibrato System | Complete | Maintenance only |
 | Crescendo-Decrescendo | Complete | Maintenance only |
+| Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
 | LilyPond Settings Registry | Active | Update when settings change |
 | Musical Material Workflow | Active | Expand as new material types are built |
 
@@ -55,6 +56,9 @@ That's it. Everything else below is for Cascade.
 | `modify_midi.js` | `lilypond_code/` | Any MIDI post-processing (channel rewrite, CC insertion). Args: `<in> <out> <ch> [--cc <n> <v>] ...` |
 | `crop_svg.js` | `lilypond_code/` | Standalone SVG cropping (same logic as server.js) |
 | `render_bartok_pizz.js` | `lilypond_code/` | Full Bartók pizz pipeline (single or batch) |
+| `ingest_pizz_tremolo.js` | `lilypond_code/` | Parse recorded MIDI → JSON timing database (new/append modes) |
+| `render_pizz_tremolo.js` | `lilypond_code/` | Full pizz tremolo pipeline (single + batch: .ly → SVG → MIDI) |
+| `generate_pizz_tremolo_midi.js` | `lilypond_code/` | Standalone tremolo MIDI generator (timing DB sampling + CC7 ramp) |
 
 ### 5. Available Slash Commands
 
@@ -85,16 +89,16 @@ That's it. Everything else below is for Cascade.
 
 ## Last Session Summary
 
-> **Z-Stem Pizzicato Tremolo — Research + Calligraphic Polygon.** Researched Z-on-stem unmeasured tremolo (Penderecki style). Built custom `stem-with-z` Scheme stencil using `make-path-stencil` filled polygons. Discovered coordinate system: Y-down (negative Y = up) + **X-flipped** (positive X = visual left). Created parameterized two-knob system (7 variables) for calligraphic broad-nib Z shape with / slanted parallelogram bars + thin diagonal connecting line. Split into separate stencils (diag + bars) to fix white anti-aliasing artifacts. User dialed final values in Frescobaldi. Registry updated with §30 Z-Stem Pizzicato Tremolo. **Test file: `ZstemPizzTrem-treble-B4-fff-test.ly`.**
+> **Pizzicato Tremolo — COMPLETE (Steps 1–10).** Full end-to-end system: Z-stem calligraphic notation (7 parameterized Scheme variables), 3 LilyPond templates (cres/decres/hp), MIDI ingestion from recorded performance (378 notes, 9 segments), programmatic MIDI generator with CC7 volume ramps, GC + SVG notation + blue arrow graphic objects with pre/post alignment, UI panel (PizzTremUI), server pipeline (`render_pizz_tremolo.js` + `/api/pizz-tremolo/generate`), client-side `PizzTremUI.go()` fully wired, AI Command Bridge (Pattern 4) tested. MIDI channels 8–11. Prompt guide created. All documentation updated.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 21, 2026  
-**Focus:** Z-Stem Pizzicato Tremolo — research, calligraphic polygon, parameterized controls  
-**Tier 1 Count This Session:** 2 (ASB-080, ASB-081) → Tier 2 commit  
-**Tier 2 Threshold:** 3-4 increments (reached — user-requested milestone commit)
+**Focus:** Pizzicato Tremolo — complete system (Steps 1–10)  
+**Tier 1 Count This Session:** 3 (ASB-082 through ASB-084)  
+**Tier 2 Threshold:** 3-4 increments — **threshold met**
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -119,6 +123,9 @@ That's it. Everything else below is for Cascade.
 ### Session Log — Z-Stem Pizzicato Tremolo
 - ASB-080: Notation research (Z-stem unmeasured tremolo — Penderecki, Wieniawski, Stockhausen, SMuFL glyphs, 3 LilyPond implementation approaches). Added to `docs/Notation_Research.md`. First test .ly file (`ZstemPizzTrem-treble-B4-fff.ly`) using custom `stem-with-z` Scheme stencil — compiles clean, Z renders correctly at stem midpoint.
 - ASB-081: Z-stem calligraphic polygon — evolved from stroked path to filled parallelogram bars with / slants. Discovered `make-path-stencil` coordinate mapping (negative Y = up, **positive X = visual LEFT** — X-axis flipped). Built parameterized two-knob system: `z-bar-width` (wider/narrower, centered), `z-bar-height` (thicker/thinner, angle preserved via `z-nib-ratio`). Added `z-y-offset` (shift entire Z up/down), diagonal connecting line (thin polygon, adjusts with nib-ratio), `z-diag-nudge` (fine-tune diagonal endpoint position, negated for X-flip). Split into separate `bars-stencil` + `diag-stencil` to fix white anti-aliasing artifacts at polygon overlaps. User-dialed final values: width=1.1, height=0.4, y-offset=-0.7, vpos=1.4, nib=0.6, diag=0.09, nudge=0.06. Test file: `ZstemPizzTrem-treble-B4-fff-test.ly`. Registry §30 added. Registry §4 clarified: MasterTemplate is legacy, registry + StartingTemplate are authoritative.
+- ASB-082: Pizzicato Tremolo pipeline — MIDI ingestion script (`ingest_pizz_tremolo.js`, new/append modes, gap threshold), ran on `PizzTremeloMidiSampleforDB.mid` (378 notes, 9 segments). Created `docs/MIDI_MUSIC_GENERATION.md` (consolidated all MIDI system insights). Created `docs/PIZZICATO_TREMOLO_WORKFLOW.md` (8-step process, 8 inputs including Dynamic Shape). Built 3 LilyPond notation templates with Z-stem + "pizz." text + dynamic + hairpin: `PizzTrem-*-cres.ly`, `PizzTrem-*-decres.ly`, `PizzTrem-*-hp.ly`. User tuned in Frescobaldi: z-y-offset=0.85, Stem.lengths=#'(6.2), Hairpin.height=#0.4, staff-line-factor=3.1, paper-height=50mm. Established hairpin tweak defaults. Registry §30 updated. MUSICAL_MATERIAL_WORKFLOW.md updated.
+- ASB-083: Pizzicato Tremolo graphic notation — GC (same baton-physics model as Bartók Pizz, neonMagenta), SVG notation (70% track height, offsetYFraction=0.10), blue direction arrow (brightBlue, always right-pointing, reuses FlowchartConnector markers), pre/post alignment positioning (pre: left edge at gc.startSeconds; post: right edge at gc.endSeconds). Test script: `test_pizz_trem_gc.js`.
+- ASB-084: Pizzicato Tremolo pipeline execution + AI prompt guide — `render_pizz_tremolo.js` (full pipeline: generate .ly → render → crop SVG → generate tremolo MIDI), server endpoint `POST /api/pizz-tremolo/generate`, `PizzTremUI.go()` fully wired (4-step: server pipeline → GC creation → SVG+arrow insertion → MIDI snippet from timing DB), MIDI channels 8–11 (trackIndex+8), AI Prompt Guide (`AI_PIZZ_TREMOLO_PROMPT_GUIDE.md`). Tested: UI Go button + AI Command Bridge (Pattern 4).
 
 ### Session Log — Bartók Pizzicato Workflow
 - ASB-075: Bartók Pizzicato automation — 3 test .ly files (B4, F¾#6, E¼♭3 with ledger lines + microtonal accidentals), Registry §28 (Microtonal Pitch Syntax) + §29 (Bartók Pizzicato) + "When to Engage the Registry" guide, workflow document (`docs/BARTOK_PIZZICATO_WORKFLOW.md`), standalone SVG cropper (`lilypond_code/crop_svg.js`), **bug fix** in Pass 3 crop logic (nested `<g>`/`<a>` groups with scale transforms were missed — dynamics like fff cut off), fix ported to both crop_svg.js and server.js. Output dir: `public/SVG_graphics/bartok_pizzicato/`, each clef generated fresh (no copy-transpose).
@@ -193,6 +200,8 @@ That's it. Everything else below is for Cascade.
 
 **Rollback point:** `git checkout beating-section-complete` — all beating section composition done (scores up to 255), SVG page-boundary clamp fix, commit 55e5127.
 
+**Pizzicato Tremolo rollback:** Commit `f921a75` — all 10 steps complete, pipeline fully operational.
+
 *(Items to pick up next session)*
 
 - [x] Test AI prompt workflow end-to-end ✔️
@@ -204,6 +213,7 @@ That's it. Everything else below is for Cascade.
 - [ ] Extend ObjectSelector z-order fix to curves, motives, MIDI snippets
 - [x] Test vibrato generation with various pitches/clefs/dynamics combinations ✔️ (tracks 1, 2, 4 — treble + bass clefs, natural + quarter-tone pitches)
 - [ ] Investigate why Pass 2 regex fails on vibrato wave path (Pass 3 string-search fallback works)
+- [ ] **Add Glissando capability to Pizzicato Tremolo system** — allow pizz tremolo to follow a pitch glissando (pitch bend ramp during the rapid repeated notes)
 
 ---
 
@@ -288,6 +298,9 @@ That's it. Everything else below is for Cascade.
 | ASB-079 | AI Command Bridge (Pattern 4) + quarter-tone pitch bend — REST→Socket.IO command relay, Bartók/Crescendo/Vibrato pitch bend for microtones (±1 semitone range) | Complete |
 | ASB-080 | Z-stem notation research + first test file (Penderecki-style unmeasured tremolo, custom Scheme stencil) | Complete |
 | ASB-081 | Z-stem calligraphic polygon — parameterized two-knob system (width/height), centered / slants, y-offset, diagonal line, coordinate discovery (X-flip), split stencils, diag-nudge, registry §30 | Complete |
+| ASB-082 | Pizz tremolo pipeline — MIDI ingestion, timing DB, MIDI_MUSIC_GENERATION.md, workflow doc, 3 notation templates (cres/decres/hp), hairpin tweak defaults, registry §30 update | Complete |
+| ASB-083 | Pizz tremolo graphic notation — GC + SVG (70% height) + blue arrow + pre/post alignment + test script | Complete |
+| ASB-084 | Pizz tremolo pipeline execution — render_pizz_tremolo.js, server endpoint, PizzTremUI.go() wired, AI Prompt Guide | Complete |
 
 ---
 
@@ -309,7 +322,8 @@ That's it. Everything else below is for Cascade.
 | Feb 19, 2026 | a3ef721 | crescendo-decrescendo system + SVG dynamic resize + bug fixes (ASB-064 to ASB-068) |
 | Feb 20, 2026 | 2f6e750 | bartok pizzicato: workflow, pipeline, crop fix, MIDI tools (ASB-074 to ASB-076) |
 | Feb 21, 2026 | 46ec8ee | bartok pizzicato: AI command bridge, prompt guide, quarter-tone pitch bend (ASB-077 to ASB-079) |
-| Feb 21, 2026 | c12330c | z-stem pizzicato tremolo: research, calligraphic polygon, parameterized controls, registry §30 (ASB-080 to ASB-081) |
+| Feb 21, 2026 | b86008e | z-stem pizzicato tremolo: research, calligraphic polygon, parameterized controls, registry §30 (ASB-080 to ASB-081) |
+| Feb 21, 2026 | be6caa4 | pizzicato tremolo complete: full system, documentation wrap-up (ASB-082 to ASB-084) |
 
 ---
 
@@ -388,6 +402,12 @@ After finalizing a Tier 3 milestone, the next session often reveals refinements 
 
 ### DOM Layout Timing + Proportional Resize (Feb 19, 2026)
 When updating SVG positions/scales on window resize, passively reading `clientHeight`/`clientWidth` can return stale values (unlike CurveMaker which forces reflow via DOM mutation). Fix: `requestAnimationFrame` + `void el.offsetHeight` + guard degenerate heights. For proportional resize, store `heightFraction` and recompute scale on each resize. Compute `heightFraction` at import time for old saves (not on first resize). See WORKFLOW_METHODOLOGY.md → "DOM Layout Timing on Window Resize" and "Proportional Resize with heightFraction".
+
+### LilyPond Stencil Coordinate System + Split Stencils (Feb 21, 2026)
+`make-path-stencil` uses Y-down AND X-flipped coordinates. For complex filled polygons, split into separate stencil calls composited via `ly:stencil-add` to avoid white anti-aliasing artifacts at polygon overlaps. See WORKFLOW_METHODOLOGY.md → "LilyPond `make-path-stencil` Coordinate System".
+
+### Decoupled Notation and MIDI + Human Performance Timing Databases (Feb 21, 2026)
+When notation and MIDI serve different purposes for the same gesture, generate them independently from shared input parameters. For unmeasured/irregular patterns (tremolo, ornaments), record a human performance and extract pitch-agnostic timing into a JSON database, then sample programmatically at generation time. This produces more natural results than algorithmic generation. See WORKFLOW_METHODOLOGY.md → "Decoupled Notation and MIDI Outputs" and "Human Performance Timing Databases".
 
 ### Debugging Session Management (Feb 15, 2026)
 When debugging becomes unproductive (>3 iterations without convergence, diagnostics pass but visual reality mismatches, fixes create new problems), follow the Abort Protocol: stop immediately, clean up all diagnostic code, commit with clear INCONCLUSIVE note, create memory documenting what was tried/confirmed/unresolved. Tag as INCONCLUSIVE not "failed" — ruled-out causes are valuable. Fresh start: don't re-read old session, state problem simply, test ONE thing at a time, ensure test element is VISIBLE. See WORKFLOW_METHODOLOGY.md → "Debugging Session Management" for full protocol.

@@ -1,0 +1,2583 @@
+{
+  "type": "pizz_tremolo_timing_db",
+  "version": 1,
+  "created": "2026-02-21T19:44:24.980Z",
+  "updated": "2026-02-21T19:44:24.998Z",
+  "description": "Pizzicato tremolo note-on/off timing and velocity database. Pitch-agnostic — only timing and dynamics are stored.",
+  "gapThresholdMs": 200,
+  "ingestions": [
+    {
+      "timestamp": "2026-02-21T19:44:24.998Z",
+      "source": "PizzTremeloMidiSampleforDB",
+      "inputFile": "PizzTremeloMidiSampleforDB.mid",
+      "gapThresholdMs": 200,
+      "rawNoteEvents": 756,
+      "pairedNotes": 378,
+      "burstsDetected": 9,
+      "segmentsAdded": 9,
+      "segmentIndexRange": [
+        0,
+        8
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "segmentIndex": 0,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 22,
+      "totalDurationMs": 2239.35,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 60.46,
+          "minMs": 50.46,
+          "maxMs": 70.37
+        },
+        "velocity": {
+          "avg": 110,
+          "min": 83,
+          "max": 127
+        },
+        "gap": {
+          "avgMs": 43.3,
+          "minMs": 9.72,
+          "maxMs": 97.22
+        },
+        "ioi": {
+          "avgMs": 104.21,
+          "minMs": 67.13,
+          "maxMs": 159.72
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 62.5,
+          "gapBeforeMs": 0,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 159.72,
+          "durationMs": 62.04,
+          "gapBeforeMs": 97.22,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 256.94,
+          "durationMs": 50.93,
+          "gapBeforeMs": 35.19,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 397.22,
+          "durationMs": 65.28,
+          "gapBeforeMs": 89.35,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 527.78,
+          "durationMs": 50.46,
+          "gapBeforeMs": 65.28,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 613.43,
+          "durationMs": 59.72,
+          "gapBeforeMs": 35.19,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 726.39,
+          "durationMs": 51.39,
+          "gapBeforeMs": 53.24,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 812.96,
+          "durationMs": 56.94,
+          "gapBeforeMs": 35.19,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 920.37,
+          "durationMs": 52.78,
+          "gapBeforeMs": 50.46,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 1024.07,
+          "durationMs": 62.96,
+          "gapBeforeMs": 50.93,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 1149.54,
+          "durationMs": 54.63,
+          "gapBeforeMs": 62.5,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1224.07,
+          "durationMs": 64.81,
+          "gapBeforeMs": 19.91,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 1346.29,
+          "durationMs": 57.87,
+          "gapBeforeMs": 57.41,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 1424.07,
+          "durationMs": 69.91,
+          "gapBeforeMs": 19.91,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 1532.87,
+          "durationMs": 65.28,
+          "gapBeforeMs": 38.89,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1638.42,
+          "durationMs": 68.52,
+          "gapBeforeMs": 40.28,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 1734.26,
+          "durationMs": 65.28,
+          "gapBeforeMs": 27.31,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 1836.11,
+          "durationMs": 70.37,
+          "gapBeforeMs": 36.57,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 1925.92,
+          "durationMs": 63.43,
+          "gapBeforeMs": 19.44,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 2033.79,
+          "durationMs": 66.67,
+          "gapBeforeMs": 44.44,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 2121.29,
+          "durationMs": 57.41,
+          "gapBeforeMs": 20.83,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 2188.42,
+          "durationMs": 50.93,
+          "gapBeforeMs": 9.72,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "segmentIndex": 1,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 31,
+      "totalDurationMs": 3240.27,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 71.09,
+          "minMs": 56.48,
+          "maxMs": 145.37
+        },
+        "velocity": {
+          "avg": 100,
+          "min": 83,
+          "max": 119
+        },
+        "gap": {
+          "avgMs": 34.55,
+          "minMs": 9.72,
+          "maxMs": 79.17
+        },
+        "ioi": {
+          "avgMs": 105.71,
+          "minMs": 75.46,
+          "maxMs": 171.76
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 66.2,
+          "gapBeforeMs": 0,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 99.07,
+          "durationMs": 77.31,
+          "gapBeforeMs": 32.87,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 237.04,
+          "durationMs": 65.28,
+          "gapBeforeMs": 60.65,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 320.83,
+          "durationMs": 67.13,
+          "gapBeforeMs": 18.52,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 467.13,
+          "durationMs": 64.81,
+          "gapBeforeMs": 79.17,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 560.65,
+          "durationMs": 74.07,
+          "gapBeforeMs": 28.7,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 694.91,
+          "durationMs": 71.3,
+          "gapBeforeMs": 60.19,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 792.59,
+          "durationMs": 72.69,
+          "gapBeforeMs": 26.39,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 902.31,
+          "durationMs": 69.91,
+          "gapBeforeMs": 37.04,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 996.3,
+          "durationMs": 74.07,
+          "gapBeforeMs": 24.07,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 1100.92,
+          "durationMs": 67.13,
+          "gapBeforeMs": 30.56,
+          "velocity": 91
+        },
+        {
+          "relativeOnsetMs": 1194.91,
+          "durationMs": 67.59,
+          "gapBeforeMs": 26.85,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 1297.68,
+          "durationMs": 62.5,
+          "gapBeforeMs": 35.19,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 1390.28,
+          "durationMs": 68.52,
+          "gapBeforeMs": 30.09,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1506.94,
+          "durationMs": 56.48,
+          "gapBeforeMs": 48.15,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 1587.5,
+          "durationMs": 70.37,
+          "gapBeforeMs": 24.07,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1715.28,
+          "durationMs": 63.43,
+          "gapBeforeMs": 57.41,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 1793.05,
+          "durationMs": 64.35,
+          "gapBeforeMs": 14.35,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1914.35,
+          "durationMs": 65.74,
+          "gapBeforeMs": 56.94,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1989.81,
+          "durationMs": 71.3,
+          "gapBeforeMs": 9.72,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 2106.94,
+          "durationMs": 62.96,
+          "gapBeforeMs": 45.83,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 2185.65,
+          "durationMs": 67.59,
+          "gapBeforeMs": 15.74,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2293.98,
+          "durationMs": 64.81,
+          "gapBeforeMs": 40.74,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2381.94,
+          "durationMs": 75.46,
+          "gapBeforeMs": 23.15,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2496.76,
+          "durationMs": 63.43,
+          "gapBeforeMs": 39.35,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2582.4,
+          "durationMs": 74.54,
+          "gapBeforeMs": 22.22,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 2684.26,
+          "durationMs": 70.83,
+          "gapBeforeMs": 27.31,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 2772.68,
+          "durationMs": 83.8,
+          "gapBeforeMs": 17.59,
+          "velocity": 109
+        },
+        {
+          "relativeOnsetMs": 2878.7,
+          "durationMs": 65.74,
+          "gapBeforeMs": 22.22,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2999.53,
+          "durationMs": 145.37,
+          "gapBeforeMs": 55.09,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 3171.29,
+          "durationMs": 68.98,
+          "gapBeforeMs": 26.39,
+          "velocity": 119
+        }
+      ]
+    },
+    {
+      "segmentIndex": 2,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 55,
+      "totalDurationMs": 5895.36,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 64.22,
+          "minMs": 48.15,
+          "maxMs": 122.22
+        },
+        "velocity": {
+          "avg": 103,
+          "min": 75,
+          "max": 123
+        },
+        "gap": {
+          "avgMs": 43.77,
+          "minMs": 8.8,
+          "maxMs": 98.15
+        },
+        "ioi": {
+          "avgMs": 108.1,
+          "minMs": 71.29,
+          "maxMs": 207.87
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 56.94,
+          "gapBeforeMs": 0,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 106.94,
+          "durationMs": 61.57,
+          "gapBeforeMs": 50,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 240.28,
+          "durationMs": 55.09,
+          "gapBeforeMs": 71.76,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 313.43,
+          "durationMs": 57.41,
+          "gapBeforeMs": 18.06,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 468.98,
+          "durationMs": 61.57,
+          "gapBeforeMs": 98.15,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 602.78,
+          "durationMs": 63.43,
+          "gapBeforeMs": 72.22,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 692.59,
+          "durationMs": 64.35,
+          "gapBeforeMs": 26.39,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 810.18,
+          "durationMs": 59.26,
+          "gapBeforeMs": 53.24,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 916.2,
+          "durationMs": 62.04,
+          "gapBeforeMs": 46.76,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1035.65,
+          "durationMs": 61.57,
+          "gapBeforeMs": 57.41,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 1134.26,
+          "durationMs": 57.41,
+          "gapBeforeMs": 37.04,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1239.81,
+          "durationMs": 63.43,
+          "gapBeforeMs": 48.15,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 1337.04,
+          "durationMs": 56.48,
+          "gapBeforeMs": 33.8,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1432.87,
+          "durationMs": 59.26,
+          "gapBeforeMs": 39.35,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 1524.07,
+          "durationMs": 58.33,
+          "gapBeforeMs": 31.94,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 1632.41,
+          "durationMs": 63.43,
+          "gapBeforeMs": 50,
+          "velocity": 119
+        },
+        {
+          "relativeOnsetMs": 1716.66,
+          "durationMs": 55.56,
+          "gapBeforeMs": 20.83,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1826.85,
+          "durationMs": 63.89,
+          "gapBeforeMs": 54.63,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 1918.05,
+          "durationMs": 59.72,
+          "gapBeforeMs": 27.31,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2026.39,
+          "durationMs": 62.5,
+          "gapBeforeMs": 48.61,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 2128.24,
+          "durationMs": 53.7,
+          "gapBeforeMs": 39.35,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2232.41,
+          "durationMs": 67.13,
+          "gapBeforeMs": 50.46,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 2340.74,
+          "durationMs": 48.15,
+          "gapBeforeMs": 41.2,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 2471.29,
+          "durationMs": 51.85,
+          "gapBeforeMs": 82.41,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 2555.09,
+          "durationMs": 54.63,
+          "gapBeforeMs": 31.94,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 2695.37,
+          "durationMs": 51.39,
+          "gapBeforeMs": 85.65,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 2766.66,
+          "durationMs": 59.26,
+          "gapBeforeMs": 19.91,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 2893.52,
+          "durationMs": 74.54,
+          "gapBeforeMs": 67.59,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3008.33,
+          "durationMs": 65.28,
+          "gapBeforeMs": 40.28,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 3105.09,
+          "durationMs": 70.37,
+          "gapBeforeMs": 31.48,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3219.44,
+          "durationMs": 62.96,
+          "gapBeforeMs": 43.98,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 3312.03,
+          "durationMs": 66.67,
+          "gapBeforeMs": 29.63,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 3415.74,
+          "durationMs": 66.2,
+          "gapBeforeMs": 37.04,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 3527.31,
+          "durationMs": 78.7,
+          "gapBeforeMs": 45.37,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3621.76,
+          "durationMs": 65.28,
+          "gapBeforeMs": 15.74,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 3737.03,
+          "durationMs": 74.07,
+          "gapBeforeMs": 50,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 3827.31,
+          "durationMs": 62.96,
+          "gapBeforeMs": 16.2,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 3942.59,
+          "durationMs": 68.06,
+          "gapBeforeMs": 52.31,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 4025.92,
+          "durationMs": 63.89,
+          "gapBeforeMs": 15.28,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 4149.07,
+          "durationMs": 69.44,
+          "gapBeforeMs": 59.26,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 4230.09,
+          "durationMs": 63.89,
+          "gapBeforeMs": 11.57,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 4355.55,
+          "durationMs": 77.78,
+          "gapBeforeMs": 61.57,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 4442.13,
+          "durationMs": 69.44,
+          "gapBeforeMs": 8.8,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 4571.29,
+          "durationMs": 77.31,
+          "gapBeforeMs": 59.72,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 4670.37,
+          "durationMs": 65.28,
+          "gapBeforeMs": 21.76,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 4796.75,
+          "durationMs": 72.22,
+          "gapBeforeMs": 61.11,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 4881.48,
+          "durationMs": 49.54,
+          "gapBeforeMs": 12.5,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 5021.75,
+          "durationMs": 122.22,
+          "gapBeforeMs": 90.74,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 5229.62,
+          "durationMs": 76.39,
+          "gapBeforeMs": 85.65,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 5352.77,
+          "durationMs": 61.57,
+          "gapBeforeMs": 46.76,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 5464.35,
+          "durationMs": 74.07,
+          "gapBeforeMs": 50,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 5560.64,
+          "durationMs": 61.57,
+          "gapBeforeMs": 22.22,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 5672.22,
+          "durationMs": 62.5,
+          "gapBeforeMs": 50,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5756.01,
+          "durationMs": 62.5,
+          "gapBeforeMs": 21.3,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5837.49,
+          "durationMs": 57.87,
+          "gapBeforeMs": 18.98,
+          "velocity": 110
+        }
+      ]
+    },
+    {
+      "segmentIndex": 3,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 27,
+      "totalDurationMs": 3298.14,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 82.15,
+          "minMs": 62.5,
+          "maxMs": 149.07
+        },
+        "velocity": {
+          "avg": 101,
+          "min": 76,
+          "max": 119
+        },
+        "gap": {
+          "avgMs": 41.54,
+          "minMs": 8.8,
+          "maxMs": 85.65
+        },
+        "ioi": {
+          "avgMs": 123.95,
+          "minMs": 77.32,
+          "maxMs": 229.16
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 63.89,
+          "gapBeforeMs": 0,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 118.52,
+          "durationMs": 63.89,
+          "gapBeforeMs": 54.63,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 220.37,
+          "durationMs": 66.67,
+          "gapBeforeMs": 37.96,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 306.48,
+          "durationMs": 71.3,
+          "gapBeforeMs": 19.44,
+          "velocity": 119
+        },
+        {
+          "relativeOnsetMs": 444.91,
+          "durationMs": 132.87,
+          "gapBeforeMs": 67.13,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 634.72,
+          "durationMs": 68.52,
+          "gapBeforeMs": 56.94,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 712.04,
+          "durationMs": 69.91,
+          "gapBeforeMs": 8.8,
+          "velocity": 76
+        },
+        {
+          "relativeOnsetMs": 833.33,
+          "durationMs": 70.37,
+          "gapBeforeMs": 51.39,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 948.15,
+          "durationMs": 68.52,
+          "gapBeforeMs": 44.44,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 1039.35,
+          "durationMs": 62.5,
+          "gapBeforeMs": 22.69,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1153.7,
+          "durationMs": 69.91,
+          "gapBeforeMs": 51.85,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 1236.57,
+          "durationMs": 76.39,
+          "gapBeforeMs": 12.96,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 1364.81,
+          "durationMs": 74.07,
+          "gapBeforeMs": 51.85,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 1459.72,
+          "durationMs": 62.96,
+          "gapBeforeMs": 20.83,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1580.55,
+          "durationMs": 76.85,
+          "gapBeforeMs": 57.87,
+          "velocity": 114
+        },
+        {
+          "relativeOnsetMs": 1677.31,
+          "durationMs": 65.28,
+          "gapBeforeMs": 19.91,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1785.65,
+          "durationMs": 71.3,
+          "gapBeforeMs": 43.06,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 1877.31,
+          "durationMs": 70.83,
+          "gapBeforeMs": 20.37,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 1987.5,
+          "durationMs": 69.91,
+          "gapBeforeMs": 39.35,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2077.78,
+          "durationMs": 75.46,
+          "gapBeforeMs": 20.37,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 2198.61,
+          "durationMs": 78.7,
+          "gapBeforeMs": 45.37,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2287.96,
+          "durationMs": 71.3,
+          "gapBeforeMs": 10.65,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 2406.48,
+          "durationMs": 149.07,
+          "gapBeforeMs": 47.22,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2605.55,
+          "durationMs": 138.89,
+          "gapBeforeMs": 50,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 2803.24,
+          "durationMs": 148.61,
+          "gapBeforeMs": 58.8,
+          "velocity": 109
+        },
+        {
+          "relativeOnsetMs": 3032.4,
+          "durationMs": 104.63,
+          "gapBeforeMs": 80.56,
+          "velocity": 119
+        },
+        {
+          "relativeOnsetMs": 3222.68,
+          "durationMs": 75.46,
+          "gapBeforeMs": 85.65,
+          "velocity": 119
+        }
+      ]
+    },
+    {
+      "segmentIndex": 4,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 40,
+      "totalDurationMs": 4170.37,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 61.87,
+          "minMs": 26.85,
+          "maxMs": 121.76
+        },
+        "velocity": {
+          "avg": 106,
+          "min": 75,
+          "max": 127
+        },
+        "gap": {
+          "avgMs": 43.47,
+          "minMs": 10.65,
+          "maxMs": 76.85
+        },
+        "ioi": {
+          "avgMs": 105.42,
+          "minMs": 80.1,
+          "maxMs": 192.59
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 58.8,
+          "gapBeforeMs": 0,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 135.65,
+          "durationMs": 60.19,
+          "gapBeforeMs": 76.85,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 225.46,
+          "durationMs": 26.85,
+          "gapBeforeMs": 29.63,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 324.07,
+          "durationMs": 62.04,
+          "gapBeforeMs": 71.76,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 440.28,
+          "durationMs": 56.02,
+          "gapBeforeMs": 54.17,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 539.35,
+          "durationMs": 58.33,
+          "gapBeforeMs": 43.06,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 640.74,
+          "durationMs": 49.07,
+          "gapBeforeMs": 43.06,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 736.57,
+          "durationMs": 55.09,
+          "gapBeforeMs": 46.76,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 836.57,
+          "durationMs": 52.31,
+          "gapBeforeMs": 44.91,
+          "velocity": 91
+        },
+        {
+          "relativeOnsetMs": 930.09,
+          "durationMs": 61.57,
+          "gapBeforeMs": 41.2,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 1037.5,
+          "durationMs": 56.48,
+          "gapBeforeMs": 45.83,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 1125.46,
+          "durationMs": 63.89,
+          "gapBeforeMs": 31.48,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1245.37,
+          "durationMs": 53.7,
+          "gapBeforeMs": 56.02,
+          "velocity": 91
+        },
+        {
+          "relativeOnsetMs": 1327.78,
+          "durationMs": 63.43,
+          "gapBeforeMs": 28.7,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1439.35,
+          "durationMs": 54.17,
+          "gapBeforeMs": 48.15,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 1540.74,
+          "durationMs": 65.74,
+          "gapBeforeMs": 47.22,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 1646.76,
+          "durationMs": 61.11,
+          "gapBeforeMs": 40.28,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1757.41,
+          "durationMs": 68.98,
+          "gapBeforeMs": 49.54,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1860.18,
+          "durationMs": 63.89,
+          "gapBeforeMs": 33.8,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1962.04,
+          "durationMs": 67.59,
+          "gapBeforeMs": 37.96,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2060.65,
+          "durationMs": 56.48,
+          "gapBeforeMs": 31.02,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 2160.18,
+          "durationMs": 65.74,
+          "gapBeforeMs": 43.06,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2251.39,
+          "durationMs": 58.33,
+          "gapBeforeMs": 25.46,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2368.05,
+          "durationMs": 70.83,
+          "gapBeforeMs": 58.33,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2450.92,
+          "durationMs": 57.87,
+          "gapBeforeMs": 12.04,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 2575.92,
+          "durationMs": 71.3,
+          "gapBeforeMs": 67.13,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 2700,
+          "durationMs": 62.5,
+          "gapBeforeMs": 52.78,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2801.85,
+          "durationMs": 64.35,
+          "gapBeforeMs": 39.35,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 2906.94,
+          "durationMs": 61.11,
+          "gapBeforeMs": 40.74,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 3010.65,
+          "durationMs": 63.43,
+          "gapBeforeMs": 42.59,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3101.39,
+          "durationMs": 62.5,
+          "gapBeforeMs": 27.31,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3203.24,
+          "durationMs": 65.74,
+          "gapBeforeMs": 39.35,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 3288.89,
+          "durationMs": 58.33,
+          "gapBeforeMs": 19.91,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 3388.42,
+          "durationMs": 69.44,
+          "gapBeforeMs": 41.2,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 3468.52,
+          "durationMs": 52.78,
+          "gapBeforeMs": 10.65,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 3581.94,
+          "durationMs": 121.76,
+          "gapBeforeMs": 60.65,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 3774.53,
+          "durationMs": 72.22,
+          "gapBeforeMs": 70.83,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 3903.24,
+          "durationMs": 55.56,
+          "gapBeforeMs": 56.48,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 4003.7,
+          "durationMs": 66.67,
+          "gapBeforeMs": 44.91,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 4111.57,
+          "durationMs": 58.8,
+          "gapBeforeMs": 41.2,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "segmentIndex": 5,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 67,
+      "totalDurationMs": 7606.01,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 70.29,
+          "minMs": 45.37,
+          "maxMs": 137.96
+        },
+        "velocity": {
+          "avg": 105,
+          "min": 84,
+          "max": 123
+        },
+        "gap": {
+          "avgMs": 43.89,
+          "minMs": 8.8,
+          "maxMs": 88.43
+        },
+        "ioi": {
+          "avgMs": 114.37,
+          "minMs": 68.98,
+          "maxMs": 210.18
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 53.24,
+          "gapBeforeMs": 0,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 116.2,
+          "durationMs": 56.94,
+          "gapBeforeMs": 62.96,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 218.52,
+          "durationMs": 45.37,
+          "gapBeforeMs": 45.37,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 300.46,
+          "durationMs": 63.43,
+          "gapBeforeMs": 36.57,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 434.72,
+          "durationMs": 57.87,
+          "gapBeforeMs": 70.83,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 503.7,
+          "durationMs": 61.11,
+          "gapBeforeMs": 11.11,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 645.37,
+          "durationMs": 131.02,
+          "gapBeforeMs": 80.56,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 841.67,
+          "durationMs": 68.06,
+          "gapBeforeMs": 65.28,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 966.2,
+          "durationMs": 67.59,
+          "gapBeforeMs": 56.48,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 1068.98,
+          "durationMs": 59.26,
+          "gapBeforeMs": 35.19,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1173.61,
+          "durationMs": 66.67,
+          "gapBeforeMs": 45.37,
+          "velocity": 119
+        },
+        {
+          "relativeOnsetMs": 1276.39,
+          "durationMs": 55.56,
+          "gapBeforeMs": 36.11,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1377.31,
+          "durationMs": 62.5,
+          "gapBeforeMs": 45.37,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1475,
+          "durationMs": 52.78,
+          "gapBeforeMs": 35.19,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1567.59,
+          "durationMs": 62.5,
+          "gapBeforeMs": 39.81,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 1661.11,
+          "durationMs": 56.94,
+          "gapBeforeMs": 31.02,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 1769.44,
+          "durationMs": 64.81,
+          "gapBeforeMs": 51.39,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 1862.5,
+          "durationMs": 55.56,
+          "gapBeforeMs": 28.24,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1975,
+          "durationMs": 68.98,
+          "gapBeforeMs": 56.94,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2097.68,
+          "durationMs": 55.56,
+          "gapBeforeMs": 53.7,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 2204.63,
+          "durationMs": 61.11,
+          "gapBeforeMs": 51.39,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2301.85,
+          "durationMs": 57.41,
+          "gapBeforeMs": 36.11,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2408.79,
+          "durationMs": 61.57,
+          "gapBeforeMs": 49.54,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2499.07,
+          "durationMs": 62.96,
+          "gapBeforeMs": 28.7,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 2606.48,
+          "durationMs": 65.74,
+          "gapBeforeMs": 44.44,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2699.53,
+          "durationMs": 56.02,
+          "gapBeforeMs": 27.31,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 2792.13,
+          "durationMs": 72.22,
+          "gapBeforeMs": 36.57,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2885.65,
+          "durationMs": 62.96,
+          "gapBeforeMs": 21.3,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 2993.05,
+          "durationMs": 73.61,
+          "gapBeforeMs": 44.44,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3088.42,
+          "durationMs": 56.94,
+          "gapBeforeMs": 21.76,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 3197.68,
+          "durationMs": 73.15,
+          "gapBeforeMs": 52.31,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3286.11,
+          "durationMs": 53.7,
+          "gapBeforeMs": 15.28,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 3405.55,
+          "durationMs": 70.83,
+          "gapBeforeMs": 65.74,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3498.14,
+          "durationMs": 58.8,
+          "gapBeforeMs": 21.76,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 3635.64,
+          "durationMs": 121.3,
+          "gapBeforeMs": 78.7,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 3845.37,
+          "durationMs": 137.96,
+          "gapBeforeMs": 88.43,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 4055.55,
+          "durationMs": 77.31,
+          "gapBeforeMs": 72.22,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 4202.77,
+          "durationMs": 58.33,
+          "gapBeforeMs": 69.91,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 4297.22,
+          "durationMs": 75,
+          "gapBeforeMs": 36.11,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 4413.42,
+          "durationMs": 66.2,
+          "gapBeforeMs": 41.2,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 4515.74,
+          "durationMs": 79.63,
+          "gapBeforeMs": 36.11,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 4628.7,
+          "durationMs": 61.11,
+          "gapBeforeMs": 33.33,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 4723.14,
+          "durationMs": 78.24,
+          "gapBeforeMs": 33.33,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 4825.46,
+          "durationMs": 62.5,
+          "gapBeforeMs": 24.07,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 4931.48,
+          "durationMs": 75.93,
+          "gapBeforeMs": 43.52,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5034.72,
+          "durationMs": 66.2,
+          "gapBeforeMs": 27.31,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 5150.46,
+          "durationMs": 72.69,
+          "gapBeforeMs": 49.54,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 5238.88,
+          "durationMs": 68.06,
+          "gapBeforeMs": 15.74,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5356.94,
+          "durationMs": 83.33,
+          "gapBeforeMs": 50,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 5453.7,
+          "durationMs": 60.65,
+          "gapBeforeMs": 13.43,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 5579.16,
+          "durationMs": 133.8,
+          "gapBeforeMs": 64.81,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5785.64,
+          "durationMs": 118.52,
+          "gapBeforeMs": 72.69,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 5981.94,
+          "durationMs": 75.46,
+          "gapBeforeMs": 77.78,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 6113.88,
+          "durationMs": 57.87,
+          "gapBeforeMs": 56.48,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 6221.29,
+          "durationMs": 79.63,
+          "gapBeforeMs": 49.54,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 6322.68,
+          "durationMs": 63.43,
+          "gapBeforeMs": 21.76,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 6435.64,
+          "durationMs": 75.93,
+          "gapBeforeMs": 49.54,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 6527.77,
+          "durationMs": 61.57,
+          "gapBeforeMs": 16.2,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 6640.73,
+          "durationMs": 71.3,
+          "gapBeforeMs": 51.39,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 6724.53,
+          "durationMs": 59.26,
+          "gapBeforeMs": 12.5,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 6847.22,
+          "durationMs": 122.69,
+          "gapBeforeMs": 63.43,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 7055.55,
+          "durationMs": 72.22,
+          "gapBeforeMs": 85.65,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 7137.49,
+          "durationMs": 56.94,
+          "gapBeforeMs": 9.72,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 7273.6,
+          "durationMs": 67.59,
+          "gapBeforeMs": 79.17,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 7359.25,
+          "durationMs": 62.5,
+          "gapBeforeMs": 18.06,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 7463.88,
+          "durationMs": 75.93,
+          "gapBeforeMs": 42.13,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 7548.6,
+          "durationMs": 57.41,
+          "gapBeforeMs": 8.8,
+          "velocity": 98
+        }
+      ]
+    },
+    {
+      "segmentIndex": 6,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 26,
+      "totalDurationMs": 2946.76,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 77.85,
+          "minMs": 57.87,
+          "maxMs": 156.02
+        },
+        "velocity": {
+          "avg": 99,
+          "min": 84,
+          "max": 106
+        },
+        "gap": {
+          "avgMs": 36.91,
+          "minMs": 11.57,
+          "maxMs": 77.31
+        },
+        "ioi": {
+          "avgMs": 111.98,
+          "minMs": 72.23,
+          "maxMs": 205.56
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 74.54,
+          "gapBeforeMs": 0,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 125.46,
+          "durationMs": 67.59,
+          "gapBeforeMs": 50.93,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 241.67,
+          "durationMs": 60.65,
+          "gapBeforeMs": 48.61,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 322.68,
+          "durationMs": 68.52,
+          "gapBeforeMs": 20.37,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 456.94,
+          "durationMs": 60.65,
+          "gapBeforeMs": 65.74,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 529.17,
+          "durationMs": 57.87,
+          "gapBeforeMs": 11.57,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 657.41,
+          "durationMs": 128.24,
+          "gapBeforeMs": 70.37,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 862.96,
+          "durationMs": 67.59,
+          "gapBeforeMs": 77.31,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 956.48,
+          "durationMs": 81.02,
+          "gapBeforeMs": 25.93,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 1087.5,
+          "durationMs": 67.13,
+          "gapBeforeMs": 50,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 1183.8,
+          "durationMs": 77.31,
+          "gapBeforeMs": 29.17,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1306.48,
+          "durationMs": 70.83,
+          "gapBeforeMs": 45.37,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 1410.18,
+          "durationMs": 78.24,
+          "gapBeforeMs": 32.87,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 1518.05,
+          "durationMs": 67.59,
+          "gapBeforeMs": 29.63,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1619.44,
+          "durationMs": 74.07,
+          "gapBeforeMs": 33.8,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1715.28,
+          "durationMs": 65.74,
+          "gapBeforeMs": 21.76,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1819.44,
+          "durationMs": 75.46,
+          "gapBeforeMs": 38.43,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 1913.42,
+          "durationMs": 65.74,
+          "gapBeforeMs": 18.52,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 2025.92,
+          "durationMs": 76.39,
+          "gapBeforeMs": 46.76,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 2118.98,
+          "durationMs": 65.74,
+          "gapBeforeMs": 16.67,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 2222.68,
+          "durationMs": 79.17,
+          "gapBeforeMs": 37.96,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 2314.35,
+          "durationMs": 62.04,
+          "gapBeforeMs": 12.5,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 2410.18,
+          "durationMs": 156.02,
+          "gapBeforeMs": 33.8,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 2615.74,
+          "durationMs": 68.06,
+          "gapBeforeMs": 49.54,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2697.68,
+          "durationMs": 60.65,
+          "gapBeforeMs": 13.89,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 2799.53,
+          "durationMs": 147.22,
+          "gapBeforeMs": 41.2,
+          "velocity": 91
+        }
+      ]
+    },
+    {
+      "segmentIndex": 7,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 66,
+      "totalDurationMs": 7991.2,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 71.75,
+          "minMs": 44.44,
+          "maxMs": 149.07
+        },
+        "velocity": {
+          "avg": 105,
+          "min": 84,
+          "max": 119
+        },
+        "gap": {
+          "avgMs": 50.09,
+          "minMs": 6.02,
+          "maxMs": 133.33
+        },
+        "ioi": {
+          "avgMs": 121.93,
+          "minMs": 67.59,
+          "maxMs": 234.26
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 60.65,
+          "gapBeforeMs": 0,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 121.3,
+          "durationMs": 55.56,
+          "gapBeforeMs": 60.65,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 194.44,
+          "durationMs": 44.44,
+          "gapBeforeMs": 17.59,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 304.17,
+          "durationMs": 54.63,
+          "gapBeforeMs": 65.28,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 373.61,
+          "durationMs": 50.46,
+          "gapBeforeMs": 14.81,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 482.87,
+          "durationMs": 54.63,
+          "gapBeforeMs": 58.8,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 550.46,
+          "durationMs": 45.83,
+          "gapBeforeMs": 12.96,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 664.35,
+          "durationMs": 104.63,
+          "gapBeforeMs": 68.06,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 842.59,
+          "durationMs": 53.7,
+          "gapBeforeMs": 73.61,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 918.98,
+          "durationMs": 48.15,
+          "gapBeforeMs": 22.69,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 1028.7,
+          "durationMs": 61.57,
+          "gapBeforeMs": 61.57,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 1138.89,
+          "durationMs": 57.87,
+          "gapBeforeMs": 48.61,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1231.94,
+          "durationMs": 66.2,
+          "gapBeforeMs": 35.19,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 1337.5,
+          "durationMs": 55.56,
+          "gapBeforeMs": 39.35,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 1423.61,
+          "durationMs": 60.19,
+          "gapBeforeMs": 30.56,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 1525,
+          "durationMs": 53.7,
+          "gapBeforeMs": 41.2,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 1609.72,
+          "durationMs": 58.33,
+          "gapBeforeMs": 31.02,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1706.02,
+          "durationMs": 58.33,
+          "gapBeforeMs": 37.96,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1818.52,
+          "durationMs": 66.2,
+          "gapBeforeMs": 54.17,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 1893.98,
+          "durationMs": 50.46,
+          "gapBeforeMs": 9.26,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 2031.48,
+          "durationMs": 102.78,
+          "gapBeforeMs": 87.04,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2233.79,
+          "durationMs": 62.5,
+          "gapBeforeMs": 99.54,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2332.41,
+          "durationMs": 66.2,
+          "gapBeforeMs": 36.11,
+          "velocity": 119
+        },
+        {
+          "relativeOnsetMs": 2447.22,
+          "durationMs": 67.13,
+          "gapBeforeMs": 48.61,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2550.92,
+          "durationMs": 57.87,
+          "gapBeforeMs": 36.57,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2648.61,
+          "durationMs": 74.54,
+          "gapBeforeMs": 39.81,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2752.31,
+          "durationMs": 64.81,
+          "gapBeforeMs": 29.17,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 2856.94,
+          "durationMs": 70.37,
+          "gapBeforeMs": 39.81,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 2940.27,
+          "durationMs": 62.96,
+          "gapBeforeMs": 12.96,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3050.92,
+          "durationMs": 70.37,
+          "gapBeforeMs": 47.69,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 3133.79,
+          "durationMs": 55.56,
+          "gapBeforeMs": 12.5,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 3254.16,
+          "durationMs": 149.07,
+          "gapBeforeMs": 64.81,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 3458.79,
+          "durationMs": 73.15,
+          "gapBeforeMs": 55.56,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 3549.07,
+          "durationMs": 65.74,
+          "gapBeforeMs": 17.13,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3671.29,
+          "durationMs": 68.98,
+          "gapBeforeMs": 56.48,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 3768.05,
+          "durationMs": 63.89,
+          "gapBeforeMs": 27.78,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 3887.96,
+          "durationMs": 68.98,
+          "gapBeforeMs": 56.02,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 3973.61,
+          "durationMs": 65.28,
+          "gapBeforeMs": 16.67,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 4097.68,
+          "durationMs": 73.15,
+          "gapBeforeMs": 58.8,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 4176.85,
+          "durationMs": 62.04,
+          "gapBeforeMs": 6.02,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 4297.68,
+          "durationMs": 133.8,
+          "gapBeforeMs": 58.8,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 4495.37,
+          "durationMs": 131.94,
+          "gapBeforeMs": 63.89,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 4722.22,
+          "durationMs": 116.67,
+          "gapBeforeMs": 94.91,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 4925,
+          "durationMs": 120.83,
+          "gapBeforeMs": 86.11,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 5132.4,
+          "durationMs": 68.52,
+          "gapBeforeMs": 86.57,
+          "velocity": 119
+        },
+        {
+          "relativeOnsetMs": 5224.53,
+          "durationMs": 63.43,
+          "gapBeforeMs": 23.61,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 5391.2,
+          "durationMs": 98.15,
+          "gapBeforeMs": 103.24,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5622.68,
+          "durationMs": 69.91,
+          "gapBeforeMs": 133.33,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5731.01,
+          "durationMs": 73.61,
+          "gapBeforeMs": 38.43,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5855.09,
+          "durationMs": 68.52,
+          "gapBeforeMs": 50.46,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 5956.48,
+          "durationMs": 73.15,
+          "gapBeforeMs": 32.87,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 6062.03,
+          "durationMs": 62.96,
+          "gapBeforeMs": 32.41,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 6161.1,
+          "durationMs": 76.39,
+          "gapBeforeMs": 36.11,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 6251.38,
+          "durationMs": 67.59,
+          "gapBeforeMs": 13.89,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 6368.98,
+          "durationMs": 72.69,
+          "gapBeforeMs": 50,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 6453.23,
+          "durationMs": 60.19,
+          "gapBeforeMs": 11.57,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 6575.46,
+          "durationMs": 72.22,
+          "gapBeforeMs": 62.04,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 6662.03,
+          "durationMs": 56.48,
+          "gapBeforeMs": 14.35,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 6786.1,
+          "durationMs": 73.15,
+          "gapBeforeMs": 67.59,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 6873.14,
+          "durationMs": 65.28,
+          "gapBeforeMs": 13.89,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 7010.18,
+          "durationMs": 134.26,
+          "gapBeforeMs": 71.76,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 7244.44,
+          "durationMs": 89.81,
+          "gapBeforeMs": 100,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 7464.81,
+          "durationMs": 76.39,
+          "gapBeforeMs": 130.56,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 7666.2,
+          "durationMs": 67.59,
+          "gapBeforeMs": 125,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 7807.4,
+          "durationMs": 69.91,
+          "gapBeforeMs": 73.61,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 7925.46,
+          "durationMs": 65.74,
+          "gapBeforeMs": 48.15,
+          "velocity": 110
+        }
+      ]
+    },
+    {
+      "segmentIndex": 8,
+      "source": "PizzTremeloMidiSampleforDB",
+      "noteCount": 44,
+      "totalDurationMs": 6373.14,
+      "stats": {
+        "noteDuration": {
+          "avgMs": 86.69,
+          "minMs": 50.46,
+          "maxMs": 156.94
+        },
+        "velocity": {
+          "avg": 96,
+          "min": 79,
+          "max": 108
+        },
+        "gap": {
+          "avgMs": 59.51,
+          "minMs": 13.43,
+          "maxMs": 144.91
+        },
+        "ioi": {
+          "avgMs": 146.19,
+          "minMs": 74.08,
+          "maxMs": 283.33
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "durationMs": 57.41,
+          "gapBeforeMs": 0,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 115.28,
+          "durationMs": 61.57,
+          "gapBeforeMs": 57.87,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 234.72,
+          "durationMs": 50.46,
+          "gapBeforeMs": 57.87,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 308.8,
+          "durationMs": 67.13,
+          "gapBeforeMs": 23.61,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 449.54,
+          "durationMs": 56.48,
+          "gapBeforeMs": 73.61,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 534.26,
+          "durationMs": 76.39,
+          "gapBeforeMs": 28.24,
+          "velocity": 93
+        },
+        {
+          "relativeOnsetMs": 671.76,
+          "durationMs": 67.59,
+          "gapBeforeMs": 61.11,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 787.96,
+          "durationMs": 68.06,
+          "gapBeforeMs": 48.61,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 890.74,
+          "durationMs": 66.2,
+          "gapBeforeMs": 34.72,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 995.37,
+          "durationMs": 74.54,
+          "gapBeforeMs": 38.43,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 1104.63,
+          "durationMs": 67.59,
+          "gapBeforeMs": 34.72,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 1214.35,
+          "durationMs": 78.24,
+          "gapBeforeMs": 42.13,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 1322.68,
+          "durationMs": 72.22,
+          "gapBeforeMs": 30.09,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 1443.05,
+          "durationMs": 82.87,
+          "gapBeforeMs": 48.15,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 1550,
+          "durationMs": 66.67,
+          "gapBeforeMs": 24.07,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 1665.28,
+          "durationMs": 72.22,
+          "gapBeforeMs": 48.61,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 1757.87,
+          "durationMs": 70.37,
+          "gapBeforeMs": 20.37,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 1883.33,
+          "durationMs": 78.24,
+          "gapBeforeMs": 55.09,
+          "velocity": 91
+        },
+        {
+          "relativeOnsetMs": 1975,
+          "durationMs": 73.61,
+          "gapBeforeMs": 13.43,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 2101.85,
+          "durationMs": 156.94,
+          "gapBeforeMs": 53.24,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 2327.31,
+          "durationMs": 152.31,
+          "gapBeforeMs": 68.52,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 2564.81,
+          "durationMs": 75.93,
+          "gapBeforeMs": 85.19,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 2656.48,
+          "durationMs": 55.56,
+          "gapBeforeMs": 15.74,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 2817.13,
+          "durationMs": 123.61,
+          "gapBeforeMs": 105.09,
+          "velocity": 108
+        },
+        {
+          "relativeOnsetMs": 3066.2,
+          "durationMs": 152.31,
+          "gapBeforeMs": 125.46,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 3349.53,
+          "durationMs": 82.41,
+          "gapBeforeMs": 131.02,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 3452.77,
+          "durationMs": 66.67,
+          "gapBeforeMs": 20.83,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 3629.63,
+          "durationMs": 119.91,
+          "gapBeforeMs": 110.19,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 3846.76,
+          "durationMs": 120.37,
+          "gapBeforeMs": 97.22,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 4096.29,
+          "durationMs": 119.91,
+          "gapBeforeMs": 129.17,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 4361.11,
+          "durationMs": 71.3,
+          "gapBeforeMs": 144.91,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 4516.2,
+          "durationMs": 80.56,
+          "gapBeforeMs": 83.8,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 4639.35,
+          "durationMs": 62.04,
+          "gapBeforeMs": 42.59,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 4751.38,
+          "durationMs": 75.93,
+          "gapBeforeMs": 50,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 4849.07,
+          "durationMs": 54.63,
+          "gapBeforeMs": 21.76,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 4963.88,
+          "durationMs": 141.67,
+          "gapBeforeMs": 60.19,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 5173.14,
+          "durationMs": 135.19,
+          "gapBeforeMs": 67.59,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 5387.96,
+          "durationMs": 81.48,
+          "gapBeforeMs": 79.63,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 5484.25,
+          "durationMs": 67.13,
+          "gapBeforeMs": 14.81,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 5616.2,
+          "durationMs": 84.72,
+          "gapBeforeMs": 64.81,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 5722.22,
+          "durationMs": 62.04,
+          "gapBeforeMs": 21.3,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 5855.09,
+          "durationMs": 143.98,
+          "gapBeforeMs": 70.83,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 6076.38,
+          "durationMs": 132.87,
+          "gapBeforeMs": 77.31,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 6286.1,
+          "durationMs": 87.04,
+          "gapBeforeMs": 76.85,
+          "velocity": 104
+        }
+      ]
+    }
+  ],
+  "globalStats": {
+    "totalSegments": 9,
+    "totalNotes": 378,
+    "noteDuration": {
+      "avgMs": 71.54,
+      "minMs": 26.85,
+      "maxMs": 156.94
+    },
+    "velocity": {
+      "avg": 103,
+      "min": 75,
+      "max": 127
+    },
+    "gap": {
+      "avgMs": 45.31,
+      "minMs": 6.02,
+      "maxMs": 144.91
+    }
+  }
+}

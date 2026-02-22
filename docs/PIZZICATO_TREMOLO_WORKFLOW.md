@@ -19,7 +19,7 @@ End-to-end process for generating Z-stem Pizzicato Tremolo notation SVGs and MID
 | **Duration** | Yes | Tremolo duration in seconds | `2.0`, `3.5` |
 | **Alignment** | Yes | Whether the motive is placed before or after the start time | `pre`, `post` |
 
-Track determines the MIDI channel (1:1 mapping: track 1 → MIDI ch 1, etc.).
+Track determines the MIDI channel: track 1 → MIDI ch 8, track 2 → ch 9, track 3 → ch 10, track 4 → ch 11. Formula: `midiChannel = trackIndex + 8`.
 
 See Registry §28 (Microtonal Pitch Syntax) for full suffix reference.
 
@@ -403,7 +403,13 @@ PizzTremUI.go({ pitch: 'C#4', dynamic: 'ff', clef: 'treble', track: 1, start: 12
 
 ### Section B: AI Prompt Launch
 
-*Details TBD — will allow AI-driven batch generation from compositional prompts.*
+Cascade sends commands directly to the browser via the AI Command Bridge (Pattern 4 — hands-free):
+
+```powershell
+Invoke-WebRequest -Uri "http://localhost:5000/api/ai/command" -Method POST -ContentType "application/json" -Body '{"command": "return await PizzTremUI.go({ pitch: ''G#5'', dynamic: ''fff'', clef: ''treble'', track: 1, start: 243, duration: 3, shape: ''cres'', alignment: ''pre'' })"}'
+```
+
+Fallback: Cascade provides JS for browser console paste (Pattern 3). See `docs/AI_PIZZ_TREMOLO_PROMPT_GUIDE.md` for full prompt templates, validation checklist, and parameter reference.
 
 ### Pipeline Script
 

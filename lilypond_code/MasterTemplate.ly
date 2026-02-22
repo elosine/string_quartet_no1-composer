@@ -228,7 +228,7 @@ stemBeamedLengths = #'(6)
 % ;   #'(7)   — previous standard
 % ;   (commented #'(7) also found in sf004 templates)
 
-stemLengths = #'(6)
+stemLengths = #'(7)
 % ; Length of unbeamed stems.
 % ; Variations:
 % ;   #'(5.5) — Cello_E2_cell.ly, sf004 templates

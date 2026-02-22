@@ -161,6 +161,48 @@ Cascade sends commands directly to the browser via an **AI Command Bridge** (RES
 - **Graphic Object:** Curve (CurveMaker)
 - **MIDI:** CC4 + channel pressure
 
+### Pizzicato Tremolo (Z-Stem)
+
+**Status:** Complete — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion)
+
+**Components:**
+- **Notation:** Z-stem note with "pizz." text + dynamic + hairpin (3 templates: cres, decres, hp). Z-stem uses calligraphic filled polygon (7 parameterized variables). LilyPond Scheme `stem-with-z` stencil override.
+- **Graphic Object:** GC (Gravitational Conductor) — same fixed parameters as Bartók Pizzicato (stiffness=62, damping=100, ictus=90, descentRatio=60, duration=0.6, neonMagenta) + blue right-pointing direction arrow
+- **MIDI:** Rapid repeated notes sampled from human performance timing database (`pizz_tremolo_db.json`), velocity shaped by dynamic shape envelope, CC0=95 (technique ID), CC7 linear volume ramp (cres/decres/hp), channels 8–11
+
+**MIDI Timing Database:** `public/midi_files/pizz_tremolo_db.json` — 378 notes across 9 segments extracted from recorded performance via `lilypond_code/ingest_pizz_tremolo.js`. Pitch-agnostic (only timing + velocity stored). Supports append mode for future recordings.
+
+**Pipeline:** `lilypond_code/render_pizz_tremolo.js` (single + batch mode)
+**Server Endpoint:** `POST /api/pizz-tremolo/generate`
+**Workflow Doc:** `docs/PIZZICATO_TREMOLO_WORKFLOW.md`
+**Prompt Guide:** `docs/AI_PIZZ_TREMOLO_PROMPT_GUIDE.md`
+**Slash Command:** `/bartok-pizz` (shared pattern)
+
+**UI Inputs:**
+| Input | Type | Description |
+|-------|------|-------------|
+| Track | number 1–4 | Score track (→ MIDI channel 8–11) |
+| Clef | select | treble / alto / bass |
+| Pitch | text | Plain English (e.g., C4, C#4, Bb3, C+4, Cd4) |
+| Dynamic | select | ppp–fff (peak velocity) |
+| Start | number | Score time in seconds |
+| Duration | number | Tremolo duration in seconds (default 3) |
+| Shape | radio | cres / decres / hp (hairpin shape + CC7 envelope) |
+| Alignment | radio | pre (ends at start time) / post (begins at start time) |
+
+**On Go:**
+1. Server runs pipeline → returns SVG path + MIDI path
+2. Create GC at start time on the specified track
+3. Insert SVG notation + blue arrow with pre/post alignment positioning
+4. Build MIDI snippet programmatically from timing DB (CC0=95, CC7 ramp, rapid notes)
+5. Add to `MidiSnippetDatabase`, call `MidiController.reloadFromDatabase()`
+
+**Key design differences from other materials:**
+- MIDI is not derived from LilyPond's raw MIDI output. Instead, it is generated programmatically by sampling a timing database of human-played pizzicato tremolo, giving natural rhythmic feel.
+- The notation SVG and MIDI are independent outputs from the same input parameters.
+- Uses dedicated MIDI channels 8–11 (offset +8) to avoid conflicts with all other systems.
+- Alignment parameter (pre/post) controls both SVG placement relative to the GC and MIDI snippet temporal positioning.
+
 ---
 
 ## Reusable Tools
@@ -171,6 +213,9 @@ These tools are shared across all material types:
 |------|----------|---------|
 | `modify_midi.js` | `lilypond_code/` | MIDI post-processing (channel rewrite, CC insertion) |
 | `crop_svg.js` | `lilypond_code/` | Standalone SVG cropping |
+| `render_pizz_tremolo.js` | `lilypond_code/` | Full pizz tremolo pipeline (LilyPond → SVG → MIDI, single + batch) |
+| `generate_pizz_tremolo_midi.js` | `lilypond_code/` | Standalone tremolo MIDI generator (timing DB sampling + CC7 ramp) |
+| `ingest_pizz_tremolo.js` | `lilypond_code/` | Parse recorded MIDI → JSON timing database (new/append modes) |
 | `insertCrescendoSvg()` pattern | `index.html` | SVG insertion into score (anchor-based positioning) |
 | `MidiSnippetDatabase.add()` + `MidiController.reloadFromDatabase()` | `index.html` | MIDI snippet insertion + track rebuild (Pattern 3) |
 | `GCMaker.createGC()` | `index.html` | Programmatic GC creation |
@@ -182,4 +227,4 @@ These tools are shared across all material types:
 - **Saved GCs disappeared** — GC library appears empty despite GCs existing in score save files. Needs investigation.
 - **Audio component** — Future: attach audio files to materials
 - **Batch score insertion** — Currently one-at-a-time via UI; batch insertion from JSON would be useful for large sections
-- **Cross-system channel conflicts** — Bartók pizz and glissando share MIDI channels 1–4. Monitor as more systems are added.
+- **Cross-system channel conflicts** — Bartók pizz and glissando share MIDI channels 1–4; vibrato uses 5–8; pizz tremolo uses 9–12. All currently non-conflicting. Monitor as more systems are added.

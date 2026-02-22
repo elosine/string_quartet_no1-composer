@@ -122,10 +122,10 @@
     % --- Rests: ~35% smaller than default ---
     \override Rest.font-size = #-4
 
-    % --- Stems: all UP, lengths 6 ---
+    % --- Stems: all UP, lengths 7 ---
     \override Stem.direction = #UP
     \override Stem.details.beamed-lengths = #'(6)
-    \override Stem.details.lengths = #'(6)
+    \override Stem.details.lengths = #'(7)
 
     % --- Stems: visible by default ---
     % Change ##f to ##t to hide stems (e.g., for long tone glissando)

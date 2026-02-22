@@ -1243,7 +1243,7 @@ Usage: `\override Stem.stencil = #stem-with-z`
 |----------|---------|-------------|
 | `z-bar-width` | 1.1 | Total horizontal extent of each bar (wider/narrower, always centered) |
 | `z-bar-height` | 0.4 | Line thickness of each bar (taller/shorter, slant angles maintained) |
-| `z-y-offset` | -0.7 | Shift entire Z up (negative) or down (positive) on stem |
+| `z-y-offset` | -0.7 (single note), 0.85 (pizz tremolo templates) | Shift entire Z up (negative) or down (positive) on stem |
 | `z-bar-vpos` | 1.4 | Vertical distance from Z center to bar outer edge |
 | `z-nib-ratio` | 0.6 | Slant angle ratio — `s = height × ratio` (controls / angle) |
 | `z-diag-thick` | 0.09 | Stroke thickness of diagonal connecting line |
@@ -1274,20 +1274,54 @@ Draw order in `ly:stencil-add`: diagonal first, bars second (bars paint over dia
 | `Stem.transparent` | `##f` | Stems must be visible |
 | `Stem.direction` | `#UP` | Force stems up |
 | `Stem.stencil` | `#stem-with-z` | Custom Z overlay |
-| `Stem.details.lengths` | `#'(7)` | Current default |
+| `Stem.details.lengths` | `#'(7)` (single note), `#'(6.2)` (pizz trem templates) | Current default / technique variant |
 | `Stem.details.beamed-lengths` | `#'(5.5)` | Technique-specific |
 | `NoteHead.font-size` | `#-3.3` | Current default |
 | `Accidental.font-size` | `#-4` | Technique-specific |
 | `DynamicText.font-size` | `#-8.5` | Current default |
-| `staff-line-width-mm` | `1.2` | Narrow for single-note |
-| Paper | 9mm × 23mm | Single note notation |
+| `DynamicLineSpanner.staff-padding` | `#1.2` | Consistent dynamic/hairpin vertical placement |
+| `Hairpin.height` | `#0.4` | Small hairpin for notation snippet |
+| `staff-line-width-mm` | `1.2` | Narrow for notation snippet |
+| `staff-line-factor` | `3.1` | Width-staff-spaces conversion (was 2.8346 in earlier files) |
+| Paper (single note) | 9mm × 23mm | Single note without hairpin |
+| Paper (cres/decres) | 20mm × 50mm | Note + single hairpin |
+| Paper (hp wedge) | 27mm × 50mm | Note + two hairpin segments |
+
+### Pizz Tremolo Hairpin Tweaks
+
+These tweak values position the dynamic marking and hairpin correctly in the notation snippet. Use as defaults for new pizz tremolo instances.
+
+**Dynamic marking (all shapes):**
+
+| Tweak | Value |
+|-------|-------|
+| DynamicText extra-offset | `#'(-0.7 . -0.1)` |
+
+**Hairpin (cres / decres — single hairpin):**
+
+| Tweak | Value |
+|-------|-------|
+| Hairpin extra-offset | `#'(-1.3 . -0.1)` |
+| Hairpin shorten-pair | `#'(0 . 4)` |
+
+**Hairpin (hp — wedge, second decrescendo hairpin):**
+
+| Tweak | Value |
+|-------|-------|
+| Hairpin extra-offset | `#'(-5.5 . -0.1)` |
+| Hairpin shorten-pair | `#'(0 . 5.3)` |
+
+**"pizz." text marking:** `^\markup { \override #'(font-name . "Crimson Pro Light Italic") \fontsize #-6 "pizz." }` — positioned above note.
 
 ### Source Files
 
-- `ZstemPizzTrem-treble-B4-fff-test.ly` — current working test file with parameterized controls
+- `ZstemPizzTrem-treble-B4-fff-test.ly` — original working test file (single note, no hairpin)
 - `ZstemPizzTrem-treble-B4-fff.ly` — original development file (ASB-080)
+- `PizzTrem-treble-CTQS4-fff-cres.ly` — **template**: crescendo hairpin
+- `PizzTrem-treble-CTQS4-fff-decres.ly` — **template**: decrescendo hairpin
+- `PizzTrem-treble-CTQS4-fff-hp.ly` — **template**: wedge (cres→decres) hairpin
 
-*(Section added: Feb 21, 2026)*
+*(Section added: Feb 21, 2026; updated: Feb 21, 2026 — pizz tremolo templates + hairpin tweaks)*
 
 ---
 

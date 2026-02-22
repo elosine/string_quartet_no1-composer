@@ -97,8 +97,16 @@ When moving a score object to a new time, updating only the top-level `startSeco
 
 *Example: ASB-049/050 — motive group move updated bounds but left curveData/motiveData/event.timeMs stale, breaking followers and multi-page segments.*
 
-### Async Operations Blocking Visual Rendering
-Never gate visual rendering on async audio operations that depend on user gestures. Chrome's autoplay policy causes `audioContext.resume()` to hang indefinitely without a user gesture, blocking any code after `await`. Render visual elements synchronously first, then load audio data in background. (ASB-012)
+### LilyPond `make-path-stencil` Coordinate System (ASB-081)
+`make-path-stencil` uses Y-down (negative Y = visually UP) **and X-flipped** (positive X = visually LEFT). This is unintuitive and was confirmed empirically. When building complex filled polygons (e.g., Z-stem calligraphic bars), any nudge variables affecting X must be negated in the Scheme binding. Also: a single `make-path-stencil` with multiple sub-paths causes white anti-aliasing artifacts at polygon overlap edges. Fix: split into separate stencil calls composited via `ly:stencil-add`, drawing the background shape first and foreground shapes on top.
+
+### Decoupled Notation and MIDI Outputs (ASB-082)
+When notation and MIDI serve different purposes for the same musical gesture, they can be generated independently from the same input parameters. The Pizzicato Tremolo system generates notation SVG (Z-stem + hairpin) via LilyPond and MIDI (rapid repeated notes) by sampling a human-performance timing database — two completely separate pipelines sharing only pitch, dynamic, and shape inputs. This avoids forcing LilyPond to produce playable MIDI and allows the MIDI to capture realistic human timing that notation can't represent.
+
+### Human Performance Timing Databases (ASB-082)
+For unmeasured/irregular patterns (tremolo, rubato, ornaments), record a human performance, extract timing data into a pitch-agnostic JSON database (note onsets, durations, velocities, segmented by gaps), then sample from it programmatically at generation time. This produces more natural-sounding results than algorithmic generation. The database supports append mode for accumulating multiple performances. Key: store only relative timing — pitch and dynamics are applied at generation time.
+
+### Async Operations Blocking Visual Rendering Chrome's autoplay policy causes `audioContext.resume()` to hang indefinitely without a user gesture, blocking any code after `await`. Render visual elements synchronously first, then load audio data in background. (ASB-012)
 
 ### DOM Layout Timing on Window Resize (ASB-067)
 When reading `clientHeight`/`clientWidth` after a window resize, the DOM may return **stale cached values** if the browser hasn't completed layout reflow. Systems that mutate DOM before reading (like CurveMaker's `innerHTML = ''` + recreate) accidentally force a synchronous reflow and get correct values. Systems that only read passively (like SVGElementManager's in-place update) can get stale values, especially after extreme resize transitions (minimize → maximize).
@@ -176,4 +184,4 @@ When a debugging session becomes unproductive — fixes create new problems, dia
 
 ---
 
-*Last updated: Feb 2026*
+*Last updated: Feb 21, 2026*
