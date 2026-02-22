@@ -22,6 +22,9 @@ Reference document for MIDI file generation across all musical material systems 
 12. [Tools & Scripts](#12-tools--scripts)
 13. [LilyPond Raw MIDI Characteristics](#13-lilypond-raw-midi-characteristics)
 14. [Discoveries & Gotchas](#14-discoveries--gotchas)
+15. [modify_midi.js Enhancement Roadmap](#15-modifymidijs-enhancement-roadmap)
+16. [Notation → MIDI: State Tracker Strategy](#16-notation--midi-state-tracker-strategy)
+17. [MIDI Tagging: Debugging & Testing Protocols](#17-midi-tagging-debugging--testing-protocols)
 
 ---
 
@@ -363,14 +366,17 @@ node generate_pizz_tremolo_midi.js --pitch <ly_pitch> --dynamic <dyn> --track <1
 
 ### `lilypond_code/modify_midi.js`
 
-General-purpose MIDI post-processor. Rewrites channel + inserts CC messages at tick 0.
+General-purpose MIDI post-processor. Rewrites channel, inserts CC messages (tick 0 and/or per-note), overrides velocity.
 
 ```powershell
-node modify_midi.js <input.mid> <output.mid> <channel> [--cc <num> <val>] ...
+node modify_midi.js <input.mid> <output.mid> <channel> [--cc <num> <val>] ... [--map <file.json>]
 ```
 
 - `channel` is 0-indexed
-- `--cc` is repeatable
+- `--cc` is repeatable; inserts at tick 0
+- `--map` accepts JSON file with per-note CC insertion and velocity overrides
+- JSON map `noteIndex` is 0-based note *groups* (chords at same tick = 1 group)
+- Optional `"vel"` field overrides velocity for all notes in a group (e.g. sfz → 127)
 - Preserves tempo track (track 0) unchanged
 - Rewrites Note On/Off, CC, Program Change, Channel Pressure, Pitch Bend channels
 
@@ -463,6 +469,213 @@ This raw MIDI needs post-processing via `modify_midi.js` to:
 
 - `writeVarInt` / `writeInt` / `secondsToTicks` are duplicated across multiple builder functions (server + client)
 - Consider extracting to a shared utility if more builders are added
+
+---
+
+## 15. modify_midi.js Enhancement Roadmap
+
+A roadmap for building new MIDI manipulation capabilities into `modify_midi.js`. Each feature extends the JSON map format.
+
+### Implemented
+
+| Feature | JSON Field | Description | Added |
+|---------|-----------|-------------|-------|
+| Per-note CC injection | `cc: [{num, val}]` | Insert CC messages before Note On of targeted group | ASB-087 |
+| Velocity override | `vel: 0-127` | Override velocity for all notes in a group (e.g. sfz→127) | ASB-089 |
+| Tick-0 CC | `--cc` flag | Insert CC at tick 0 (backward compat) | Original |
+| Channel rewrite | `<channel>` arg | Rewrite all channel voice events | Original |
+
+### Planned / Future
+
+| Feature | Proposed JSON Field | Use Case | Priority |
+|---------|-------------------|----------|----------|
+| Pitch bend at note | `"bend": 0-16383` | Quarter-tones, glissando start points | Medium |
+| Channel pressure at note | `"pressure": 0-127` | Vibrato intensity, aftertouch effects | Low |
+| Note duration override | `"durTicks": N` | Shorten/lengthen specific notes | Low |
+| CC envelope (multi-point) | `"ccEnv": [{tick, num, val}]` | Volume shaping (CC7 ramps), vibrato (CC4) over time | Medium |
+| Pitch bend envelope | `"bendEnv": [{tick, val}]` | Glissando curves within a note | Medium |
+| Note transposition | `"transpose": ±N` | Shift pitch by N semitones | Low |
+| Program Change at note | `"pc": 0-127` | Patch switch mid-stream | Low |
+
+### Design Principles
+
+1. **JSON map is the single interface** — all per-note modifications go through the `noteEvents` array
+2. **One group = one notational event** — chords at same tick are one group, one `noteIndex`
+3. **Additive, not destructive** — new fields are optional; omitting them preserves original MIDI data
+4. **CC before Note On** — CC/bend/pressure injected immediately before the first Note On of the group
+5. **Velocity applies to all notes in group** — a sfz chord gets all notes at vel 127
+
+---
+
+## 16. Notation → MIDI: State Tracker Strategy
+
+When translating notation symbols to MIDI CC messages, some symbols set a **persistent mode** (stays until changed) while others are **one-shot** (apply once, then revert). This requires a state machine.
+
+### State Machine Design
+
+```
+State: { currentMode: "pizz", currentCC0: 95 }
+
+For each note group:
+  1. Check for MODE CHANGERS (persistent):
+     - "pizz." → set currentMode="pizz", currentCC0=95
+     - "arco" → set currentMode="arco", currentCC0=89
+     - \snappizzicato → set currentMode="bartok", currentCC0=97
+
+  2. Check for MODIFIERS (one-shot):
+     - "o" (open string) + currentMode="pizz" → use CC0=71 THIS NOTE ONLY
+     - "o" (open string) + currentMode="arco" → no CC change (arco open string = same patch)
+
+  3. Check for VELOCITY OVERRIDES (one-shot):
+     - \sfz → vel=127 THIS NOTE ONLY
+     - \fp → vel=127 THIS NOTE ONLY (with CC7 decay, future)
+
+  4. Emit CC0 = resolved value (persistent or one-shot)
+  5. After one-shot, revert to currentCC0 for next note
+```
+
+### Lookup Table
+
+Persistent mappings and one-shot rules stored in `docs/cc_mapping_registry.json`:
+
+| Symbol | Type | CC0 Value | Condition | State Rule |
+|--------|------|-----------|-----------|------------|
+| `"pizz."` | Mode changer | 95 | — | Persistent |
+| `"arco"` | Mode changer | 89 | — | Persistent |
+| `\snappizzicato` | Mode changer | 97 | — | Persistent |
+| `"o"` | Modifier | 71 | currentMode = pizz | One-shot |
+| `\sfz` | Velocity override | — | — | One-shot, vel=127 |
+
+### Implementation Path
+
+| Phase | Approach | Who does analysis? |
+|-------|----------|--------------------|
+| **Now** | AI reads `.ly`, applies state machine cognitively, produces JSON map | AI (Option A) |
+| **Next** | LilyPond Scheme engraver outputs note event log; Node.js script applies state machine + config lookup | Automated (Option E) |
+| **Fallback** | Node.js regex parser reads `.ly` directly; applies state machine + config lookup | Automated (Option D) |
+
+See `docs/NOTATION_FRAGMENT_WORKFLOW.md` → Analysis Roadmap for full option descriptions.
+
+---
+
+## 17. MIDI Tagging: Debugging & Testing Protocols
+
+Verification procedures for the `\set` context property tagging system (`midi-tags.ily`).
+
+### Overview
+
+The MIDI tagging pipeline has three stages, each with its own verification point:
+
+```
+.ly file (\midiXxx tags) → Scheme engraver → event log (.json)
+event log → Node.js state tracker → CC map (.json)
+CC map → modify_midi.js → modified MIDI (.mid)
+```
+
+### Level 1: Scheme Event Log Inspection
+
+**What it checks:** Did the Scheme engraver correctly read the `\set` properties at each timestep?
+
+**How:** After LilyPond compilation, inspect the event log JSON file. Each entry shows:
+
+```json
+[
+  {"moment": "0/1", "notes": ["fs'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "1/20", "notes": ["a"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "1/10", "notes": ["af,"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "1/4", "notes": ["g'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "11/24", "notes": ["c,"], "midiCCZero": 71, "midiVelocity": null},
+  {"moment": "5/8", "notes": ["f'", "b", "fs"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "3/4", "notes": ["d'", "af", "e"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "27/32", "notes": ["bf", "fs", "b,"], "midiCCZero": 95, "midiVelocity": 127}
+]
+```
+
+**Verify:**
+- Every note group has a `midiCCZero` value (no nulls unless intentional)
+- One-shot values (CC0=71, velocity) appear only where intended
+- Values match the `\midiXxx` tags in the `.ly` source
+
+### Level 2: JSON Map Comparison
+
+**What it checks:** Did the Node.js state tracker correctly translate the event log into a CC map?
+
+**How:** Compare the generated JSON map against a hand-verified expected map:
+
+```powershell
+node state_tracker.js event_log.json > actual_map.json
+# Visual diff:
+diff expected_map.json actual_map.json
+```
+
+**Expected map structure:**
+```json
+{
+  "noteEvents": [
+    { "noteIndex": 0, "cc": [{ "num": 0, "val": 95 }] },
+    { "noteIndex": 4, "cc": [{ "num": 0, "val": 71 }] },
+    { "noteIndex": 7, "cc": [{ "num": 0, "val": 95 }], "vel": 127 }
+  ]
+}
+```
+
+**Verify:**
+- Correct `noteIndex` for each CC event
+- Correct CC number and value pairs
+- Velocity overrides only on intended note groups
+
+### Level 3: MIDI Binary Verification
+
+**What it checks:** Did `modify_midi.js` correctly inject CC events and velocity overrides into the MIDI file?
+
+**How:** Use `modify_midi.js` console output (already logs CC injections and velocity overrides) or a MIDI dump script:
+
+```powershell
+node modify_midi.js input.mid output.mid 0 --map cc_map.json
+```
+
+**Console output shows:**
+```
+Note group CC injections:
+  Group 0: CC0=95
+  Group 4: CC0=71
+  Group 7: CC0=95
+Velocity overrides:
+  Group 7: vel=127
+```
+
+**Verify:**
+- CC injections at correct note groups
+- Velocity overrides at correct note groups
+- Total byte count is reasonable (original + injected CC bytes)
+
+### Regression Testing
+
+**Golden test case:** `NotationFragment001-Cello.ly`
+
+This fragment has been manually verified and serves as the reference for pipeline testing:
+
+| Note Group | Expected CC0 | Expected Velocity | Reason |
+|---|---|---|---|
+| 0 (fs') | 95 | default | First pizz note |
+| 1 (a) | 95 | default | Continuing pizz |
+| 2 (af,) | 95 | default | Continuing pizz |
+| 3 (g') | 95 | default | Continuing pizz |
+| 4 (c,) | 71 | default | Open string pizz (one-shot) |
+| 5 (f' b fs) | 95 | default | Revert to pizz, chord |
+| 6 (d' af e) | 95 | default | Continuing pizz, chord |
+| 7 (bf fs b,) | 95 | 127 | sfz chord |
+
+**After any toolchain change**, re-run the full pipeline on this fragment and compare output to the expected values above.
+
+### Quick Verification Commands
+
+```powershell
+# Full pipeline (once all tools are built):
+lilypond --svg -dbackend=svg -o "NotationFragment001-Cello" "NotationFragment001-Cello.ly"
+node state_tracker.js event_log.json > fragment001_cc.json
+node modify_midi.js NotationFragment001-Cello.mid NotationFragment001-Cello-Mod.mid 0 --map fragment001_cc.json
+```
 
 ---
 

@@ -1,8 +1,11 @@
 \version "2.20.0"
 \language "english"
 
+\include "midi-tags.ily"
+\include "midi-logger.ily"
+
 % ╔════════════════════════════════════════════════════════════════════════════╗
-% ║  NotationFragment002 — Viola                                             ║
+% ║  NotationFragment001 — Cello                                             ║
 % ║  Notation Fragment System                                                ║
 % ╚════════════════════════════════════════════════════════════════════════════╝
 
@@ -44,7 +47,7 @@
             (thickness (ly:grob-property grob 'thickness 1))
             (line-thickness (* thickness (ly:staff-symbol-line-thickness grob)))
             (width staff-line-width-mm)
-            (width-staff-spaces (/ (* width 1.8) staff-space))
+            (width-staff-spaces (/ (* width 2.8) staff-space))
             (half-height (* (/ (- line-count 1) 2) staff-space)))
        (apply ly:stencil-add
               (map (lambda (i)
@@ -67,13 +70,13 @@
     \omit Clef
     \omit KeySignature
 
-    \clef alto
+    \clef bass
 
     \override StaffSymbol.thickness = #1
     \override StaffSymbol.stencil = #custom-staff-lines
   }
   {
-    \time 2/4
+    \time 4/4
 
     % --- Base overrides ---
     \override NoteHead.font-size = #-3.3
@@ -81,7 +84,7 @@
     \override DynamicText.font-size = #-8.5
     \override Rest.font-size = #-4
     \override Stem.direction = #UP
-    \override Stem.details.beamed-lengths = #'(5.5)
+    \override Stem.details.beamed-lengths = #'(6)
     \override Stem.details.lengths = #'(6)
     \override Stem.transparent = ##f
 
@@ -101,25 +104,46 @@
     % =================================================================
 
     % --- Quintuplet: 5 sixteenths in the space of 4 ---
-    \once \override TupletBracket.positions = #'(9 . 11)
+    \once \override TupletBracket.positions = #'(9 . 9)  % individual bracket height (adjust number: lower = closer to notes)
     \tuplet 5/4 {
-      ds''16-.
-      -\tweak extra-offset #'(-2 . -0.5)
+      r16
+      \midiPizz
+      fs'16-.
+      -\tweak extra-offset #'(-2 . 0.8)
       ^\markup {
         \override #'(font-name . "Crimson Pro Light Italic")
         \fontsize #-4
         "pizz."
       }
-      \fff
-      d16-\tweak font-size #-3 \snappizzicato
-      <d cs' f' b'>8.~\sfz
+      \ff
+      a16-.
+      af,16-.
+      r16
     }
 
-    % --- 16th notes ---
-    <d cs' f' b'>16[
-    fs''16-\tweak font-size #-3 \snappizzicato
-    gf16-\tweak font-size #-3 \snappizzicato
-    r16]
+    % --- Sextuplet: 6 sixteenths in the space of 4 ---
+    \once \override TupletBracket.positions = #'(11.5 . 11.5)  % individual bracket height (adjust number: lower = closer to notes)
+    \tuplet 6/4 {
+      r16
+      g'8.-\tweak extra-offset #'(0 . 0.95) --
+      r16
+      \midiPizzOpen
+      c,16
+      -\tweak extra-offset #'(0 . -9)
+      ^\markup { \teeny "o" }\laissezVibrer
+      \midiPizz
+    }
+
+    % --- Quintuplet: 5 eighths in the space of 4 ---
+    \tuplet 5/4 {
+      r8
+      <f' b fs>8
+      <d' af e>8
+      \midiSfz
+      r16 <bf fs b,>16\sfz
+      \midiVelReset
+      r8
+    }
 
     % =================================================================
   }
@@ -127,6 +151,10 @@
     \context {
       \Score
       proportionalNotationDuration = #(ly:make-moment 1/13)  % tighter spacing (try 1/8 tighter, 1/20 wider, 1/28 widest)
+    }
+    \context {
+      \Voice
+      \consists \midiLogEngraver
     }
     indent = -0.9
     line-width = 59\mm

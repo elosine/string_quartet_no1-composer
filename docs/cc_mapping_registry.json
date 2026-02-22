@@ -1,0 +1,76 @@
+{
+  "_description": "Persistent CC mapping registry for notation symbol → MIDI CC translation. Used by AI analysis (Option A), \set context properties (Option E), and future automated tools.",
+  "_updated": "2026-02-22",
+  "_include_file": "lilypond_code/midi-tags.ily",
+
+  "cc0_articulations": {
+    "89": {
+      "technique": "Senza vibrato / arco",
+      "notation_symbol": null,
+      "shorthand": "\\midiArco",
+      "set_command": "\\set Staff.midiCCZero = #89",
+      "state_rule": "persistent",
+      "notes": "Default sustained articulation"
+    },
+    "95": {
+      "technique": "Pizzicato",
+      "notation_symbol": "\"pizz.\"",
+      "shorthand": "\\midiPizz",
+      "set_command": "\\set Staff.midiCCZero = #95",
+      "state_rule": "persistent",
+      "notes": "Pizzicato velocity patch. Stays active until another articulation mode is set."
+    },
+    "71": {
+      "technique": "Pizzicato open string",
+      "notation_symbol": "\"o\"",
+      "shorthand": "\\midiPizzOpen",
+      "set_command": "\\set Staff.midiCCZero = #71",
+      "state_rule": "one-shot",
+      "revert_pattern": "\\midiPizzOpen → note → \\midiPizz",
+      "requires_mode": "pizz",
+      "notes": "Pizzicato open strings velocity patch. One-shot: composer must explicitly revert to current mode after the note."
+    },
+    "97": {
+      "technique": "Bartók pizzicato",
+      "notation_symbol": "\\snappizzicato",
+      "shorthand": "\\midiBartokPizz",
+      "set_command": "\\set Staff.midiCCZero = #97",
+      "state_rule": "persistent",
+      "notes": "Bartók (snap) pizzicato patch."
+    }
+  },
+
+  "velocity_overrides": {
+    "sfz": {
+      "velocity": 127,
+      "notation_symbol": "\\sfz",
+      "shorthand": "\\midiSfz → note → \\midiVelReset",
+      "set_command": "\\set Staff.midiVelocity = #127",
+      "unset_command": "\\unset Staff.midiVelocity",
+      "scope": "note-only",
+      "notes": "Sforzando — maximum velocity for the marked note/chord only. Composer must \\midiVelReset after the note."
+    }
+  },
+
+  "context_properties": {
+    "midiCCZero": {
+      "type": "integer (0-127)",
+      "persistence": "persistent — stays until next \\set",
+      "purpose": "CC0 articulation mode selector"
+    },
+    "midiVelocity": {
+      "type": "integer (0-127)",
+      "persistence": "one-shot — must \\unset after note",
+      "purpose": "Velocity override for next note/chord"
+    }
+  },
+
+  "state_rules": {
+    "persistent": "CC0 value stays active until a different articulation mode is set (e.g., pizz stays until arco). Composer sets once, applies to all following notes.",
+    "one-shot": "Value applies only to the marked note. Composer must explicitly revert after the note (Option A: manual revert)."
+  },
+
+  "cello_open_strings": ["C2", "G2", "D3", "A3"],
+  "viola_open_strings": ["C3", "G3", "D4", "A4"],
+  "violin_open_strings": ["G3", "D4", "A4", "E5"]
+}

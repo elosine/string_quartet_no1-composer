@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 21, 2026  
-**Current ASB Number:** ASB-084
+**Last Updated:** Feb 22, 2026  
+**Current ASB Number:** ASB-090
 
 ---
 
@@ -46,6 +46,7 @@ That's it. Everything else below is for Cascade.
 | Vibrato System | Complete | Maintenance only |
 | Crescendo-Decrescendo | Complete | Maintenance only |
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
+| Notation Fragment System | **In Progress** | Option E active: `midi-tags.ily` + `midi-logger.ily` + `state_tracker.js` built (ASB-090). Next: test full pipeline on NotationFragment001-Cello.ly |
 | LilyPond Settings Registry | Active | Update when settings change |
 | Musical Material Workflow | Active | Expand as new material types are built |
 
@@ -53,7 +54,10 @@ That's it. Everything else below is for Cascade.
 
 | Tool | Location | Use For |
 |------|----------|---------|
-| `modify_midi.js` | `lilypond_code/` | Any MIDI post-processing (channel rewrite, CC insertion). Args: `<in> <out> <ch> [--cc <n> <v>] ...` |
+| `modify_midi.js` | `lilypond_code/` | MIDI post-processing: channel rewrite, CC at tick 0 (`--cc`), per-note CC + velocity override via JSON map (`--map`). See §15 in MIDI_MUSIC_GENERATION.md for enhancement roadmap. |
+| `midi-tags.ily` | `lilypond_code/` | LilyPond include: shorthand variables for `\set` MIDI context properties (`\midiPizz`, `\midiSfz`, etc.). Source of truth: `cc_mapping_registry.json`. |
+| `midi-logger.ily` | `lilypond_code/` | LilyPond include: Scheme engraver that reads `\set` properties and writes JSON event log during compilation. |
+| `state_tracker.js` | `lilypond_code/` | Converts Scheme event log → CC map JSON for `modify_midi.js`. |
 | `crop_svg.js` | `lilypond_code/` | Standalone SVG cropping (same logic as server.js) |
 | `render_bartok_pizz.js` | `lilypond_code/` | Full Bartók pizz pipeline (single or batch) |
 | `ingest_pizz_tremolo.js` | `lilypond_code/` | Parse recorded MIDI → JSON timing database (new/append modes) |
@@ -75,7 +79,7 @@ That's it. Everything else below is for Cascade.
 
 | Thread | Context | When Relevant |
 |--------|---------|---------------|
-| `modify_midi.js` is general-purpose | Built for Bartók pizz but designed for reuse. Accepts any CC messages via `--cc` flag. Channel rewrite is always applied. | Any new LilyPond-rendered MIDI workflow (col legno, harmonics, etc.) |
+| `modify_midi.js` enhanced with `--map` | Now supports per-note CC injection via JSON map file. Note groups (chords = one group) get CC just before first Note On. Expandable: any CC 0–127 per note (CC0 for articulation, CC7 for volume, etc.). `--cc` still works for tick-0 insertion. | Any notation fragment MIDI post-processing, future articulation systems |
 | Bartók pizz shares MIDI channels 1–4 with glissando | Both systems use track→channel 1:1 mapping. OK for now because Bartók events are discrete (single 16th notes). | If a 3rd system needs channels 1–4, address potential conflicts |
 | Synth pitch bend range is ±1 semitone | All quarter-tone pitch bends use 8192 per semitone. Quarter sharp = 12288, quarter flat = 4096, center = 8192. Applied in Bartók pizz, Crescendo single-pitch, Vibrato. Glissando systems use their own segment-based approach (untouched). | If pitch bend sounds wrong or if synth config changes |
 | Registry §28 microtonal pitch syntax | Full suffix reference for quarter/three-quarter tones. Used by `render_bartok_pizz.js` pitch parser. | Any new pitch-input automation |
@@ -89,16 +93,16 @@ That's it. Everything else below is for Cascade.
 
 ## Last Session Summary
 
-> **Pizzicato Tremolo — COMPLETE (Steps 1–10).** Full end-to-end system: Z-stem calligraphic notation (7 parameterized Scheme variables), 3 LilyPond templates (cres/decres/hp), MIDI ingestion from recorded performance (378 notes, 9 segments), programmatic MIDI generator with CC7 volume ramps, GC + SVG notation + blue arrow graphic objects with pre/post alignment, UI panel (PizzTremUI), server pipeline (`render_pizz_tremolo.js` + `/api/pizz-tremolo/generate`), client-side `PizzTremUI.go()` fully wired, AI Command Bridge (Pattern 4) tested. MIDI channels 8–11. Prompt guide created. All documentation updated.
+> **Notation Fragment System — Option E MIDI Tagging System.** Built full pipeline: `midi-tags.ily` (shorthand variables for `\set` context properties), `midi-logger.ily` (Scheme engraver writing JSON event log), `state_tracker.js` (event log → CC map). Expanded `cc_mapping_registry.json` with `\set` property names and shorthands. Rewrote Step 2C in NOTATION_FRAGMENT_WORKFLOW.md with MIDI tagging protocol, lookup table, and pipeline description. Added §17 Debugging & Testing Protocols to MIDI_MUSIC_GENERATION.md. Tagged NotationFragment001-Cello.ly with `\midiPizz`/`\midiPizzOpen`/`\midiSfz`. **First test:** LilyPond compiles clean, event log JSON created with correct note groups (8 entries, correct pitches and moments), BUT all `midiCCZero`/`midiVelocity` values are `null` — Scheme `ly:context-property` not reading the `\set` values. **Bug to fix next session.**
 
 ---
 
 ## Current Session
 
-**Date:** Feb 21, 2026  
-**Focus:** Pizzicato Tremolo — complete system (Steps 1–10)  
-**Tier 1 Count This Session:** 3 (ASB-082 through ASB-084)  
-**Tier 2 Threshold:** 3-4 increments — **threshold met**
+**Date:** Feb 22, 2026  
+**Focus:** Notation Fragment System — Option E MIDI Tagging System build + first test  
+**Tier 1 Count This Session:** 3 (ASB-088, ASB-089, ASB-090)  
+**Tier 2 Threshold:** 3-4 increments — **READY FOR TIER 2 COMMIT**
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -126,6 +130,13 @@ That's it. Everything else below is for Cascade.
 - ASB-082: Pizzicato Tremolo pipeline — MIDI ingestion script (`ingest_pizz_tremolo.js`, new/append modes, gap threshold), ran on `PizzTremeloMidiSampleforDB.mid` (378 notes, 9 segments). Created `docs/MIDI_MUSIC_GENERATION.md` (consolidated all MIDI system insights). Created `docs/PIZZICATO_TREMOLO_WORKFLOW.md` (8-step process, 8 inputs including Dynamic Shape). Built 3 LilyPond notation templates with Z-stem + "pizz." text + dynamic + hairpin: `PizzTrem-*-cres.ly`, `PizzTrem-*-decres.ly`, `PizzTrem-*-hp.ly`. User tuned in Frescobaldi: z-y-offset=0.85, Stem.lengths=#'(6.2), Hairpin.height=#0.4, staff-line-factor=3.1, paper-height=50mm. Established hairpin tweak defaults. Registry §30 updated. MUSICAL_MATERIAL_WORKFLOW.md updated.
 - ASB-083: Pizzicato Tremolo graphic notation — GC (same baton-physics model as Bartók Pizz, neonMagenta), SVG notation (70% track height, offsetYFraction=0.10), blue direction arrow (brightBlue, always right-pointing, reuses FlowchartConnector markers), pre/post alignment positioning (pre: left edge at gc.startSeconds; post: right edge at gc.endSeconds). Test script: `test_pizz_trem_gc.js`.
 - ASB-084: Pizzicato Tremolo pipeline execution + AI prompt guide — `render_pizz_tremolo.js` (full pipeline: generate .ly → render → crop SVG → generate tremolo MIDI), server endpoint `POST /api/pizz-tremolo/generate`, `PizzTremUI.go()` fully wired (4-step: server pipeline → GC creation → SVG+arrow insertion → MIDI snippet from timing DB), MIDI channels 8–11 (trackIndex+8), AI Prompt Guide (`AI_PIZZ_TREMOLO_PROMPT_GUIDE.md`). Tested: UI Go button + AI Command Bridge (Pattern 4).
+
+### Session Log — Notation Fragment System
+- ASB-086: Notation Fragment system initial setup — NotationFragment001-Cello.ly (from PizzMotive001), NotationFragment002-Viola.ly (alto clef, quintuplet 5:4 + 16th notes with pizz/Bartók pizz/quad stops/ties), NOTATION_FRAGMENT_WORKFLOW.md (8-step workflow mirroring PizzTrem pattern, Step 1: Gather Input with tempo param, Step 2: Generate LilyPond File current), Viola_Notation_Guide.md + Violin_Notation_Guide.md (comprehensive instrument-specific references), Registry updates (§3 beams over rests default, §29 snap pizz font-size #-3 scaling)
+- ASB-087: Enhanced modify_midi.js with --map flag for per-note CC injection via JSON. Note groups (chords at same tick = one group). Expandable for any CC 0–127 (CC0 articulation, CC7 volume, etc.). Documented Step 2B in NOTATION_FRAGMENT_WORKFLOW.md. CC0 mapping: 95=pizz, 97=Bartók pizz, 89=senza vibrato.
+- ASB-088: First end-to-end test of modify_midi.js --map. AI cognitive analysis (Option A) of NotationFragment001-Cello.ly → fragment001_cc.json (8 note groups). Created cc_mapping_registry.json (CC0 articulations, velocity overrides, state rules, open strings). Analysis Roadmap added to NOTATION_FRAGMENT_WORKFLOW.md (5 options: A→E).
+- ASB-089: Per-note velocity override in modify_midi.js (optional `vel` field). Enhancement Roadmap (§15) and State Tracker Strategy (§16) added to MIDI_MUSIC_GENERATION.md. Tested: group 7 sfz → vel=127 ✓.
+- ASB-090: Option E MIDI Tagging System — built `midi-tags.ily` (shorthand variables), `midi-logger.ily` (Scheme engraver → JSON event log), `state_tracker.js` (event log → CC map). Expanded `cc_mapping_registry.json` with `\set` property names. Rewrote Step 2C with tagging protocol + lookup table. Added §17 Debugging & Testing Protocols. Tagged NotationFragment001-Cello.ly. **First test:** compiles clean, event log created (8 entries, correct pitches/moments), BUT `midiCCZero`/`midiVelocity` all null — Scheme `ly:context-property` not reading `\set` values. **Bug to fix.**
 
 ### Session Log — Bartók Pizzicato Workflow
 - ASB-075: Bartók Pizzicato automation — 3 test .ly files (B4, F¾#6, E¼♭3 with ledger lines + microtonal accidentals), Registry §28 (Microtonal Pitch Syntax) + §29 (Bartók Pizzicato) + "When to Engage the Registry" guide, workflow document (`docs/BARTOK_PIZZICATO_WORKFLOW.md`), standalone SVG cropper (`lilypond_code/crop_svg.js`), **bug fix** in Pass 3 crop logic (nested `<g>`/`<a>` groups with scale transforms were missed — dynamics like fff cut off), fix ported to both crop_svg.js and server.js. Output dir: `public/SVG_graphics/bartok_pizzicato/`, each clef generated fresh (no copy-transpose).
@@ -214,6 +225,8 @@ That's it. Everything else below is for Cascade.
 - [x] Test vibrato generation with various pitches/clefs/dynamics combinations ✔️ (tracks 1, 2, 4 — treble + bass clefs, natural + quarter-tone pitches)
 - [ ] Investigate why Pass 2 regex fails on vibrato wave path (Pass 3 string-search fallback works)
 - [ ] **Add Glissando capability to Pizzicato Tremolo system** — allow pizz tremolo to follow a pitch glissando (pitch bend ramp during the rapid repeated notes)
+- [ ] **MIDI snippet generating system** — longer-term goal: system that reads notation and/or instructions, knows what CC messages to add, and produces enhanced MIDI files automatically. Builds on modify_midi.js --map approach.
+- [ ] **Test modify_midi.js --map with NotationFragment002-Viola.ly** — render MIDI in Frescobaldi, create JSON map, run post-processing, verify CC0 at correct note positions
 
 ---
 
@@ -301,6 +314,11 @@ That's it. Everything else below is for Cascade.
 | ASB-082 | Pizz tremolo pipeline — MIDI ingestion, timing DB, MIDI_MUSIC_GENERATION.md, workflow doc, 3 notation templates (cres/decres/hp), hairpin tweak defaults, registry §30 update | Complete |
 | ASB-083 | Pizz tremolo graphic notation — GC + SVG (70% height) + blue arrow + pre/post alignment + test script | Complete |
 | ASB-084 | Pizz tremolo pipeline execution — render_pizz_tremolo.js, server endpoint, PizzTremUI.go() wired, AI Prompt Guide | Complete |
+| ASB-086 | Notation Fragment system setup — 2 .ly files, workflow doc, Viola+Violin notation guides, Registry §3+§29 updates | Complete |
+| ASB-087 | Enhanced modify_midi.js — --map flag for per-note CC injection via JSON, note group detection, expandable CC types | Complete |
+| ASB-088 | First modify_midi.js --map test + cc_mapping_registry.json + Analysis Roadmap (5 options) | Complete |
+| ASB-089 | Per-note velocity override + Enhancement Roadmap (§15) + State Tracker Strategy (§16) | Complete |
+| ASB-090 | Option E MIDI Tagging System — midi-tags.ily, midi-logger.ily, state_tracker.js, docs updates, first test (context property bug found) | In Progress |
 
 ---
 

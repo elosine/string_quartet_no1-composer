@@ -240,6 +240,21 @@ When this registry is updated, follow these rules:
 |-------|--------|-------------|
 | **##t** | **CURRENT DEFAULT** | Always in layout \Score context | All files |
 
+### Beams Over Rests
+
+| Method | Status |
+|--------|--------|
+| **Explicit `[` and `]` beam brackets** | **CURRENT DEFAULT** |
+
+**Rule:** Beams should always extend over rests rather than breaking. Use explicit beam brackets `[` on the first note and `]` on the last note/rest of the beamed group.
+
+```lilypond
+c16[ d16 r16 e16]    % beam stretches continuously over the rest
+```
+
+- LilyPond breaks beams at rests by default. Explicit brackets override this.
+- Added Feb 21, 2026 (Notation Fragment system). Before this, beams broke at rests.
+
 ### Beam.grow-direction
 
 | Value | Context | Source Files |
@@ -1175,6 +1190,7 @@ Based on `BartokPizz-Violin-G5.ly` and test files (Feb 20, 2026).
 | Setting | Value | Notes |
 |---------|-------|-------|
 | `\snappizzicato` | Articulation mark | Circle-with-line symbol above note |
+| **Snap pizz font-size** | **`-\tweak font-size #-3`** | **Scale symbol to match reduced noteheads (see below)** |
 | Note duration | `16` (sixteenth) | Single short note |
 | `Stem.transparent` | `##f` | Stems visible for pizz |
 | `NoteColumn.X-offset` | `#-0.8` | Shift notation left |
@@ -1220,7 +1236,25 @@ Examples:
 - `bartok pizz.ly` — older technique study
 - `bartok_pizz_secco.ly` — secco variant
 
-*(Section added: Feb 20, 2026)*
+### Snap Pizzicato Symbol Scaling
+
+The `\snappizzicato` symbol (⊙) does not scale automatically with `NoteHead.font-size`. In standalone BartokPizz files where `NoteHead.font-size = #-2`, the default symbol size is proportionate. In contexts with smaller noteheads (e.g., `-3.3` in Notation Fragment files), the symbol appears oversized.
+
+**Fix:** Apply `-\tweak font-size #-3` before each `\snappizzicato`:
+
+```lilypond
+d16-\tweak font-size #-3 \snappizzicato    % scaled snap pizz symbol
+```
+
+| Context | NoteHead size | Snap pizz tweak | Result |
+|---------|---------------|-----------------|--------|
+| Standalone BartokPizz files | `#-2` | None needed | Proportionate at default |
+| Notation Fragment files | `#-3.3` | `-\tweak font-size #-3` | Proportionate |
+
+- The `-` before `\tweak` is the articulation direction prefix (default placement).
+- Added Feb 21, 2026 (NotationFragment002-Viola.ly).
+
+*(Section added: Feb 20, 2026; updated: Feb 21, 2026)*
 
 ---
 

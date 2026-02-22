@@ -1,0 +1,15 @@
+{
+  "_source": "NotationFragment001-Cello.ly",
+  "_analysis": "Option A (AI cognitive analysis), 2026-02-22",
+  "_notes": "8 note groups. Pizz mode starts at group 0. Group 4 has 'o' (open string) → CC0=71 (one-shot), reverts to 95 at group 5. Group 7 has sfz → vel:127 override.",
+  "noteEvents": [
+    { "noteIndex": 0, "cc": [{ "num": 0, "val": 95 }] },
+    { "noteIndex": 1, "cc": [{ "num": 0, "val": 95 }] },
+    { "noteIndex": 2, "cc": [{ "num": 0, "val": 95 }] },
+    { "noteIndex": 3, "cc": [{ "num": 0, "val": 95 }] },
+    { "noteIndex": 4, "cc": [{ "num": 0, "val": 71 }] },
+    { "noteIndex": 5, "cc": [{ "num": 0, "val": 95 }] },
+    { "noteIndex": 6, "cc": [{ "num": 0, "val": 95 }] },
+    { "noteIndex": 7, "cc": [{ "num": 0, "val": 95 }], "vel": 127 }
+  ]
+}
