@@ -1,0 +1,8 @@
+[
+  {"moment": "0/1", "notes": ["dih'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "1/20", "notes": ["d,"], "midiCCZero": 97, "midiVelocity": null},
+  {"moment": "1/10", "notes": ["d,", "cih'", "f'", "b'"], "midiCCZero": 95, "midiVelocity": 127},
+  {"moment": "1/4", "notes": ["d,", "cih'", "f'", "b'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "5/16", "notes": ["fih'"], "midiCCZero": 97, "midiVelocity": null},
+  {"moment": "3/8", "notes": ["geh,"], "midiCCZero": 97, "midiVelocity": null}
+]

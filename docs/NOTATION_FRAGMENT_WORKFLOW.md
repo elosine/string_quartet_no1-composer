@@ -87,7 +87,7 @@ Also add `\consists \midiLogEngraver` to the Voice context in `\layout`.
 |---|---|---|
 | `"pizz."` text markup | `\midiPizz` | Persistent |
 | `"o"` markup (open string in pizz context) | `\midiPizzOpen` → note → `\midiPizz` | One-shot, manual revert |
-| `\snappizzicato` | `\midiBartokPizz` | Persistent |
+| `\snappizzicato` | `\midiBartokPizz` → note → revert to base mode | One-shot (consecutive Bartók pizz: no revert needed) |
 | Return to arco / sustained | `\midiArco` | Persistent |
 | `\sfz` dynamic | `\midiSfz` → note → `\midiVelReset` | One-shot, manual revert |
 

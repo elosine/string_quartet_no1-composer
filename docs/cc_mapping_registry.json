@@ -35,8 +35,9 @@
       "notation_symbol": "\\snappizzicato",
       "shorthand": "\\midiBartokPizz",
       "set_command": "\\set Voice.midiCCZero = #97",
-      "state_rule": "persistent",
-      "notes": "Bartók (snap) pizzicato patch."
+      "state_rule": "one-shot",
+      "revert_pattern": "\\midiBartokPizz → note → revert to base mode (e.g. \\midiPizz). Consecutive Bartók pizz notes: no revert needed between them.",
+      "notes": "Bartók (snap) pizzicato patch. Always explicitly notated. One-shot: revert to current base mode after the note, unless the next note is also Bartók pizz."
     }
   },
 

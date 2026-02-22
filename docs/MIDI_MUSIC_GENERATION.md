@@ -542,7 +542,7 @@ Persistent mappings and one-shot rules stored in `docs/cc_mapping_registry.json`
 |--------|------|-----------|-----------|------------|
 | `"pizz."` | Mode changer | 95 | — | Persistent |
 | `"arco"` | Mode changer | 89 | — | Persistent |
-| `\snappizzicato` | Mode changer | 97 | — | Persistent |
+| `\snappizzicato` | One-shot | 97 | — | One-shot (consecutive: no revert needed) |
 | `"o"` | Modifier | 71 | currentMode = pizz | One-shot |
 | `\sfz` | Velocity override | — | — | One-shot, vel=127 |
 

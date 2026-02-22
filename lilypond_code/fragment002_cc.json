@@ -1,0 +1,61 @@
+{
+  "source": "state_tracker.js",
+  "inputFile": "NotationFragment002-Viola-midi-log.json",
+  "noteEvents": [
+    {
+      "noteIndex": 0,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ]
+    },
+    {
+      "noteIndex": 1,
+      "cc": [
+        {
+          "num": 0,
+          "val": 97
+        }
+      ]
+    },
+    {
+      "noteIndex": 2,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ],
+      "vel": 127
+    },
+    {
+      "noteIndex": 3,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ]
+    },
+    {
+      "noteIndex": 4,
+      "cc": [
+        {
+          "num": 0,
+          "val": 97
+        }
+      ]
+    },
+    {
+      "noteIndex": 5,
+      "cc": [
+        {
+          "num": 0,
+          "val": 97
+        }
+      ]
+    }
+  ]
+}
