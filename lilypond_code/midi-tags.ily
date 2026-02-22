@@ -43,35 +43,41 @@
 %% ----------------------------------------------------------------
 %% CONTEXT PROPERTIES USED:
 %%
-%%   Staff.midiCCZero     — CC0 value (integer, 0–127)
+%%   Voice.midiCCZero     — CC0 value (integer, 0–127)
 %%                          Persistent: stays until next \set
-%%   Staff.midiVelocity   — Velocity override (integer, 0–127)
+%%   Voice.midiVelocity   — Velocity override (integer, 0–127)
 %%                          One-shot: must \unset after the note
 %%
 %% ================================================================
+
+
+%% === Register custom context properties with LilyPond ===
+%% Without this, \set will be silently rejected ("cannot find property type-check")
+#(set-object-property! 'midiCCZero 'translation-type? number?)
+#(set-object-property! 'midiVelocity 'translation-type? number?)
 
 
 %% === Articulation Modes (persistent — stays until changed) ===
 %% These set CC0, which selects the articulation/technique preset
 %% in the sample library.
 
-midiArco = { \set Staff.midiCCZero = #89 }
+midiArco = { \set Voice.midiCCZero = #89 }
 %% CC0=89: Senza vibrato / arco (default sustained articulation)
 
-midiPizz = { \set Staff.midiCCZero = #95 }
+midiPizz = { \set Voice.midiCCZero = #95 }
 %% CC0=95: Pizzicato
 
-midiPizzOpen = { \set Staff.midiCCZero = #71 }
+midiPizzOpen = { \set Voice.midiCCZero = #71 }
 %% CC0=71: Pizzicato open string (one-shot — revert after note)
 
-midiBartokPizz = { \set Staff.midiCCZero = #97 }
+midiBartokPizz = { \set Voice.midiCCZero = #97 }
 %% CC0=97: Bartók (snap) pizzicato
 
 
 %% === Velocity Overrides (one-shot — MUST \unset after the note) ===
 
-midiSfz = { \set Staff.midiVelocity = #127 }
+midiSfz = { \set Voice.midiVelocity = #127 }
 %% Velocity 127: Sforzando — maximum attack
 
-midiVelReset = { \unset Staff.midiVelocity }
+midiVelReset = { \unset Voice.midiVelocity }
 %% Clear velocity override — subsequent notes use LilyPond default

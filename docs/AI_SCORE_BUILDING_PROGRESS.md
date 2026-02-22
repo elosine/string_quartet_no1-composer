@@ -342,6 +342,7 @@ That's it. Everything else below is for Cascade.
 | Feb 21, 2026 | 46ec8ee | bartok pizzicato: AI command bridge, prompt guide, quarter-tone pitch bend (ASB-077 to ASB-079) |
 | Feb 21, 2026 | b86008e | z-stem pizzicato tremolo: research, calligraphic polygon, parameterized controls, registry §30 (ASB-080 to ASB-081) |
 | Feb 21, 2026 | be6caa4 | pizzicato tremolo complete: full system, documentation wrap-up (ASB-082 to ASB-084) |
+| Feb 22, 2026 | 3c3f1bf | notation fragments: Option E MIDI tagging system + velocity override + CC registry (ASB-088 to ASB-090) |
 
 ---
 

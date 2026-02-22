@@ -58,60 +58,60 @@
 
 %% The engraver definition
 #(define midiLogEngraver
-   (lambda (context)
-     (make-engraver
+   (make-engraver
 
-      ;; Initialize: open the output file
-      ((initialize translator)
-       (let* ((outname (ly:parser-output-name))
-              (logfile (string-append outname "-midi-log.json")))
-         (set! midi-log-port (open-output-file logfile))
-         (set! midi-log-first-entry #t)
-         (display "[\n" midi-log-port)))
+    ;; Initialize: open the output file
+    ((initialize engraver)
+     (let* ((outname (ly:parser-output-name))
+            (logfile (string-append outname "-midi-log.json")))
+       (set! midi-log-port (open-output-file logfile))
+       (set! midi-log-first-entry #t)
+       (display "[\n" midi-log-port)))
 
-      ;; Listen for note events — collect pitches at this timestep
-      (listeners
-       ((note-event engraver event)
-        (let ((pitch (ly:event-property event 'pitch)))
-          (if (ly:pitch? pitch)
-              (set! midi-log-current-notes
-                    (append midi-log-current-notes
-                            (list (pitch->lily-string pitch))))))))
+    ;; Listen for note events — collect pitches at this timestep
+    (listeners
+     ((note-event engraver event)
+      (let ((pitch (ly:event-property event 'pitch)))
+        (if (ly:pitch? pitch)
+            (set! midi-log-current-notes
+                  (append midi-log-current-notes
+                          (list (pitch->lily-string pitch))))))))
 
-      ;; Process music: after all listeners have fired for this timestep,
-      ;; emit an entry if we collected any notes
-      ((process-music translator)
-       (if (and midi-log-port (not (null? midi-log-current-notes)))
-           (let* ((mom (ly:context-current-moment context))
-                  (mom-str (moment->fraction-string mom))
-                  (cc0-raw (ly:context-property context 'midiCCZero '()))
-                  (vel-raw (ly:context-property context 'midiVelocity '()))
-                  (cc0 (if (null? cc0-raw) "null" (number->string cc0-raw)))
-                  (vel (if (null? vel-raw) "null" (number->string vel-raw)))
-                  ;; Format notes as JSON array of strings
-                  (notes-json (string-append "["
-                               (string-join
-                                (map (lambda (n) (format #f "\"~a\"" n))
-                                     midi-log-current-notes)
-                                ", ")
-                               "]"))
-                  ;; Build the JSON object
-                  (entry (format #f "  {\"moment\": \"~a\", \"notes\": ~a, \"midiCCZero\": ~a, \"midiVelocity\": ~a}"
-                                 mom-str notes-json cc0 vel)))
-             ;; Comma before all entries except the first
-             (if midi-log-first-entry
-                 (set! midi-log-first-entry #f)
-                 (display ",\n" midi-log-port))
-             (display entry midi-log-port))))
+    ;; Process music: after all listeners have fired for this timestep,
+    ;; emit an entry if we collected any notes
+    ((process-music engraver)
+     (if (and midi-log-port (not (null? midi-log-current-notes)))
+         (let* ((ctx (ly:translator-context engraver))
+                (mom (ly:context-current-moment ctx))
+                (mom-str (moment->fraction-string mom))
+                (cc0-raw (ly:context-property ctx 'midiCCZero))
+                (vel-raw (ly:context-property ctx 'midiVelocity))
+                (cc0 (if (null? cc0-raw) "null" (number->string cc0-raw)))
+                (vel (if (null? vel-raw) "null" (number->string vel-raw)))
+                ;; Format notes as JSON array of strings
+                (notes-json (string-append "["
+                             (string-join
+                              (map (lambda (n) (format #f "\"~a\"" n))
+                                   midi-log-current-notes)
+                              ", ")
+                             "]"))
+                ;; Build the JSON object
+                (entry (format #f "  {\"moment\": \"~a\", \"notes\": ~a, \"midiCCZero\": ~a, \"midiVelocity\": ~a}"
+                               mom-str notes-json cc0 vel)))
+           ;; Comma before all entries except the first
+           (if midi-log-first-entry
+               (set! midi-log-first-entry #f)
+               (display ",\n" midi-log-port))
+           (display entry midi-log-port))))
 
-      ;; Stop translation timestep: reset note collector
-      ((stop-translation-timestep translator)
-       (set! midi-log-current-notes '()))
+    ;; Stop translation timestep: reset note collector
+    ((stop-translation-timestep engraver)
+     (set! midi-log-current-notes '()))
 
-      ;; Finalize: close the JSON array and file
-      ((finalize translator)
-       (if midi-log-port
-           (begin
-             (display "\n]\n" midi-log-port)
-             (close-port midi-log-port)
-             (set! midi-log-port #f)))))))
+    ;; Finalize: close the JSON array and file
+    ((finalize engraver)
+     (if midi-log-port
+         (begin
+           (display "\n]\n" midi-log-port)
+           (close-port midi-log-port)
+           (set! midi-log-port #f))))))
