@@ -64,11 +64,17 @@ Post-process the LilyPond-generated MIDI file to add CC messages that the notati
 
 When writing a `.ly` file that will produce MIDI output, embed MIDI metadata directly in the notation using `\set` context properties. These are invisible (no visual effect) and read by the Scheme engraver during compilation.
 
-**Setup:** Add `\include "midi-tags.ily"` at the top of the `.ly` file.
+**Setup:** Add both includes at the top of the `.ly` file:
+```lilypond
+\include "midi-tags.ily"
+\include "midi-logger.ily"
+```
+Also add `\consists \midiLogEngraver` to the Voice context in `\layout`.
 
 **Checklist (follow every time):**
 
-1. ✅ `\include "midi-tags.ily"` at top of file
+1. ✅ `\include "midi-tags.ily"` and `\include "midi-logger.ily"` at top of file
+1b. ✅ `\context { \Voice \consists \midiLogEngraver }` in `\layout`
 2. ✅ Set initial articulation mode BEFORE the first note (e.g., `\midiPizz`)
 3. ✅ Add `\midiXxx` BEFORE each note where the technique changes
 4. ✅ One-shot CC0 pattern: `\midiPizzOpen` → note → `\midiPizz` (revert)
@@ -89,8 +95,8 @@ When writing a `.ly` file that will produce MIDI output, embed MIDI metadata dir
 
 | Property | Type | Persistence | Purpose |
 |---|---|---|---|
-| `Staff.midiCCZero` | integer (0–127) | Persistent until next `\set` | CC0 articulation mode |
-| `Staff.midiVelocity` | integer (0–127) | One-shot — must `\unset` after note | Velocity override |
+| `Voice.midiCCZero` | integer (0–127) | Persistent until next `\set` | CC0 articulation mode |
+| `Voice.midiVelocity` | integer (0–127) | One-shot — must `\unset` after note | Velocity override |
 
 **Source of truth:** `docs/cc_mapping_registry.json` — defines all CC values, shorthand names, and revert patterns.
 

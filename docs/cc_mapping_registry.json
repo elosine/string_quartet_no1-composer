@@ -8,7 +8,7 @@
       "technique": "Senza vibrato / arco",
       "notation_symbol": null,
       "shorthand": "\\midiArco",
-      "set_command": "\\set Staff.midiCCZero = #89",
+      "set_command": "\\set Voice.midiCCZero = #89",
       "state_rule": "persistent",
       "notes": "Default sustained articulation"
     },
@@ -16,7 +16,7 @@
       "technique": "Pizzicato",
       "notation_symbol": "\"pizz.\"",
       "shorthand": "\\midiPizz",
-      "set_command": "\\set Staff.midiCCZero = #95",
+      "set_command": "\\set Voice.midiCCZero = #95",
       "state_rule": "persistent",
       "notes": "Pizzicato velocity patch. Stays active until another articulation mode is set."
     },
@@ -24,7 +24,7 @@
       "technique": "Pizzicato open string",
       "notation_symbol": "\"o\"",
       "shorthand": "\\midiPizzOpen",
-      "set_command": "\\set Staff.midiCCZero = #71",
+      "set_command": "\\set Voice.midiCCZero = #71",
       "state_rule": "one-shot",
       "revert_pattern": "\\midiPizzOpen → note → \\midiPizz",
       "requires_mode": "pizz",
@@ -34,7 +34,7 @@
       "technique": "Bartók pizzicato",
       "notation_symbol": "\\snappizzicato",
       "shorthand": "\\midiBartokPizz",
-      "set_command": "\\set Staff.midiCCZero = #97",
+      "set_command": "\\set Voice.midiCCZero = #97",
       "state_rule": "persistent",
       "notes": "Bartók (snap) pizzicato patch."
     }
@@ -45,8 +45,8 @@
       "velocity": 127,
       "notation_symbol": "\\sfz",
       "shorthand": "\\midiSfz → note → \\midiVelReset",
-      "set_command": "\\set Staff.midiVelocity = #127",
-      "unset_command": "\\unset Staff.midiVelocity",
+      "set_command": "\\set Voice.midiVelocity = #127",
+      "unset_command": "\\unset Voice.midiVelocity",
       "scope": "note-only",
       "notes": "Sforzando — maximum velocity for the marked note/chord only. Composer must \\midiVelReset after the note."
     }
