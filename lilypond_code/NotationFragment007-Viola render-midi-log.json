@@ -1,0 +1,15 @@
+[
+  {"moment": "0/1", "notes": ["df", "a", "g'"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
+  {"moment": "1/4", "notes": ["c"], "midiCCZero": 80, "midiVelocity": null, "midiGliss": null},
+  {"moment": "5/16", "notes": ["af"], "midiCCZero": 97, "midiVelocity": null, "midiGliss": null},
+  {"moment": "7/16", "notes": ["c"], "midiCCZero": 71, "midiVelocity": 127, "midiGliss": null},
+  {"moment": "1/2", "notes": ["c", "c"], "midiCCZero": 80, "midiVelocity": null, "midiGliss": null},
+  {"moment": "31/60", "notes": ["c"], "midiCCZero": 80, "midiVelocity": null, "midiGliss": null},
+  {"moment": "8/15", "notes": ["c"], "midiCCZero": 80, "midiVelocity": null, "midiGliss": null},
+  {"moment": "11/20", "notes": ["c"], "midiCCZero": 80, "midiVelocity": null, "midiGliss": null},
+  {"moment": "17/30", "notes": ["c"], "midiCCZero": 80, "midiVelocity": null, "midiGliss": null},
+  {"moment": "7/12", "notes": ["c"], "midiCCZero": 71, "midiVelocity": 127, "midiGliss": null},
+  {"moment": "5/8", "notes": ["a'"], "midiCCZero": 80, "midiVelocity": null, "midiGliss": null},
+  {"moment": "2/3", "notes": ["af"], "midiCCZero": 97, "midiVelocity": null, "midiGliss": null},
+  {"moment": "17/24", "notes": ["d'"], "midiCCZero": 80, "midiVelocity": null, "midiGliss": null}
+]

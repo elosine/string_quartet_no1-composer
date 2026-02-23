@@ -88,6 +88,9 @@ When this registry is updated, follow these rules:
 28. [Microtonal Pitch Syntax](#28-microtonal-pitch-syntax)
 29. [Bartók Pizzicato](#29-bartók-pizzicato)
 30. [Z-Stem Pizzicato Tremolo](#30-z-stem-pizzicato-tremolo)
+31. [Hidden MIDI Voice (Dual-Score Pattern)](#31-hidden-midi-voice-dual-score-pattern)
+32. [Behind-the-Bridge (b.b.) Convention](#32-behind-the-bridge-bb-convention)
+33. [Default Independent Positioning Rule](#33-default-independent-positioning-rule)
 
 ---
 
@@ -470,19 +473,23 @@ c16[ d16 r16 e16]    % beam stretches continuously over the rest
 
 > Both values must be equal for a flat bracket. Lower number = closer to notes.
 
-### TupletBracket — Forced Height via Lambda (bypasses flatten callback)
+### TupletBracket — Forced Height via Lambda ⭐ CURRENT DEFAULT (per-tuplet independent positioning)
 
-The standard `flatten-tuplet-bracket` callback (`after-line-breaking`) reads auto-calculated positions and flattens them. This **overwrites** any `\once \override TupletBracket.positions` set before line-breaking. To force a specific bracket height, replace the callback for that tuplet:
+**Rule:** Every tuplet in new notation files MUST have its own `\once \override TupletBracket.after-line-breaking` lambda placed immediately before the `\tuplet` command. This gives each bracket an independent, tweakable height from the start — no need to add the override later during rendering.
+
+The standard `flatten-tuplet-bracket` callback (`after-line-breaking`) reads auto-calculated positions and flattens them. This **overwrites** any `\once \override TupletBracket.positions` set before line-breaking. The per-tuplet lambda replaces the global callback for that single tuplet, allowing precise control.
 
 ```lilypond
 \once \override TupletBracket.after-line-breaking =
   #(lambda (grob) (ly:grob-set-property! grob 'positions (cons 9 9)))
+\tuplet 5/4 { ... }
 ```
 
 - Change `9` to the desired height (staff-space units above center of staff).
+- Initialize to a reasonable default (e.g., 7–10) and adjust during rendering in Frescobaldi.
 - This override replaces the flatten callback for **one tuplet only** — subsequent tuplets revert to the global `flatten-tuplet-bracket`.
-- Use when `\once \override TupletBracket.positions` has no effect (because the flatten callback overwrites it).
-- First used in NF004-Violin (Feb 2026) for the 11:8 tuplet.
+- The AI should include this override before **every** `\tuplet` command when writing new notation.
+- First used in NF004-Violin (Feb 2026); established as default convention in NF008-Cello (Feb 2026).
 
 ### TupletNumber — Visibility Methods
 
@@ -597,7 +604,7 @@ To override the global padding for a **single glissando** (e.g., same-staff-line
 
 ```lilypond
 f''16
--\tweak extra-offset #'(0 . -0.3)           % Y-offset for same staff line
+-\tweak extra-offset #'(0 . 0.3)            % Y-offset UP for same staff line
 -\tweak bound-details.left.padding #0.15    % per-instance left gap
 -\tweak bound-details.right.padding #-0.6   % per-instance right gap (negative = extends past notehead)
 \glissando
@@ -605,11 +612,58 @@ f''16
 
 | Tweak | Value | Context |
 |-------|-------|---------|
-| `extra-offset` Y | 0.3 or -0.3 | Same staff line — offset so gliss line is visible |
+| `extra-offset` Y | **0.3** | Same staff line — offset gliss line **up** so it is visible |
 | `bound-details.left.padding` | 0 – 0.5 | Per-instance left gap (overrides global) |
 | `bound-details.right.padding` | -0.6 – 0.5 | Per-instance right gap (negative = tighter/past notehead) |
 
-> **Rule:** When start and end pitches land on the same staff line (e.g., F5→F#5, A4→Ab4), use `extra-offset` Y of ±0.3 so the glissando line is visible. Sign depends on desired direction of the line.
+> **Rule:** When **both** the start and end pitches of a glissando sit on the **same staff line**, use `extra-offset` Y of **0.3** (positive = up) so the glissando line is visible above the staff line.
+>
+> **"Same staff line" means:**
+> - Both notes occupy one of the **5 actual lines** of the staff (not a space between lines, and not a ledger line above or below the staff).
+> - Two notes are on the same staff line if they share the same **diatonic letter name + octave** and that pitch is a staff-line pitch for the current clef. Accidentals don't change which line a note sits on (e.g., Gb2 and G2 are both on the G2 line).
+> - Notes on **spaces** (between staff lines) or **ledger lines** (above/below the staff) do **not** trigger this rule, even if both notes share the same space or ledger line.
+
+#### Staff-Line Pitches by Clef
+
+Use these tables to determine whether a glissando pair triggers the rule. Only pitches listed here (with any accidental) are on actual staff lines.
+
+**Treble clef:**
+
+| Line | Pitch | LilyPond |
+|------|-------|----------|
+| 1 (bottom) | E4 | `e'` |
+| 2 | G4 | `g'` |
+| 3 (middle) | B4 | `b'` |
+| 4 | D5 | `d''` |
+| 5 (top) | F5 | `f''` |
+
+**Alto clef:**
+
+| Line | Pitch | LilyPond |
+|------|-------|----------|
+| 1 (bottom) | F3 | `f` |
+| 2 | A3 | `a` |
+| 3 (middle = C4) | C4 | `c'` |
+| 4 | E4 | `e'` |
+| 5 (top) | G4 | `g'` |
+
+**Bass clef:**
+
+| Line | Pitch | LilyPond |
+|------|-------|----------|
+| 1 (bottom) | G2 | `g,` |
+| 2 | B2 | `b,` |
+| 3 (middle) | D3 | `d` |
+| 4 | F3 | `f` |
+| 5 (top) | A3 | `a` |
+
+#### Decision Procedure
+
+1. Look up both pitches (ignoring accidentals) in the table for the current clef.
+2. If **both** pitches appear in the table **on the same row** → apply `extra-offset` Y of **0.3** (up).
+3. If either pitch is on a space, a ledger line, or they are on different staff lines → no offset needed.
+
+**Example (bass clef):** Gb2→G2 — both are "G2" → bottom line → **offset needed**. Db2→D2 — both are "D2" → D2 is a space below the staff, not a staff line → **no offset**. Eb2→E2 — both are "E2" → E2 is a ledger line below the staff, not a staff line → **no offset**.
 
 ### Glissando.breakable
 
@@ -1409,6 +1463,180 @@ These tweak values position the dynamic marking and hairpin correctly in the not
 - `PizzTrem-treble-CTQS4-fff-hp.ly` — **template**: wedge (cres→decres) hairpin
 
 *(Section added: Feb 21, 2026; updated: Feb 21, 2026 — pizz tremolo templates + hairpin tweaks)*
+
+---
+
+## 31. Hidden MIDI Voice (Dual-Score Pattern)
+
+**Problem:** When using proportional notation (`proportionalNotationDuration`) with a hidden `\new Voice` for MIDI-only content (e.g., transparent quintuplet for pizzicato tremolo playback), the hidden notes create extra `PaperColumn` grobs at the Score level. The `SpacingSpanner` allocates horizontal space proportional to time for ALL columns, regardless of voice-level visibility overrides. This causes a visible gap between the display note and subsequent notes.
+
+**When it matters:** Only when the hidden voice is in the MIDDLE of a phrase (notes follow it). End-of-piece polyphonic sections (NF003, NF005) don't exhibit this because nothing comes after.
+
+**First encountered:** NF007-Viola (Feb 23, 2026)
+
+### What Doesn't Work
+
+| Approach | Why it fails |
+|---|---|
+| `NoteColumn.X-extent = #'(0 . 0)` | PaperColumns still exist at Score level |
+| `NoteColumn.force-hshift = #0` | Same — columns still have proportional positions |
+| `NoteSpacing.spacing-increment = #0` | Proportional SpacingSpanner ignores per-voice NoteSpacing |
+| `\newSpacingSection` + `\unset proportionalNotationDuration` | Causes odd spacing artifacts; doesn't integrate cleanly |
+| `\override NoteColumn.X-offset` / `extra-offset` after `<< >>` | Voice context lost after polyphonic block — overrides have no effect |
+| `\tweak NoteColumn.extra-offset` on individual notes | Same — no effect in proportional mode after polyphonic section |
+| `\once \override NoteSpacing.padding = #N` | Proportional SpacingSpanner ignores NoteSpacing padding entirely |
+
+### Shifting Display Notes Within a Polyphonic Block
+
+To create visual separation between a preceding note (e.g., with `\laissezVibrer`) and the start of a polyphonic beat, use `\once \override NoteColumn.X-offset` on the **display voice's first note** inside the `<< { } >>` block.
+
+```lilypond
+<<
+  {
+    \once \override NoteColumn.X-offset = #2   % shift display note right
+    c8[ ...
+  }
+  \tag #'midiVoice \new Voice { ... }
+>>
+```
+
+- This works because the override is applied **inside** the display voice before the polyphonic split, where the voice context is still active.
+- Positive values shift right; useful for separating from `\laissezVibrer` ties that would otherwise look like slurs.
+- Does NOT affect MIDI timing or hidden voice positioning.
+- **NoteSpacing.padding does NOT work** for this purpose in proportional notation.
+
+**Source:** NF007-Viola, beat 3 display voice (Feb 23, 2026)
+
+### Solution: Dual-Score with `\tag` Filtering ⭐ CURRENT STANDARD
+
+Use LilyPond's `\tag` / `\removeWithTag` system with two `\score` blocks in the same .ly file. The music is defined as a top-level variable.
+
+**Structure:**
+
+```lilypond
+music = {
+  ... display notes ...
+  <<
+    { displayNote8[ }
+    \tag #'midiVoice
+    \new Voice {
+      \override NoteHead.transparent = ##t
+      \override Stem.transparent = ##t
+      ... other transparent overrides ...
+      \tuplet 5/4 { c32 c32 c32 c32 c32 }
+    }
+  >>
+  ... more display notes ...]
+}
+
+% Score 1: Clean layout (SVG) — hidden voice removed, no spacing issues
+\score {
+  \new Staff \with { ... } {
+    \removeWithTag #'midiVoice \music
+  }
+  \layout { ... }   % NO \midi here
+}
+
+% Score 2: MIDI Logger + MIDI — includes hidden voice for event capture
+\score {
+  \new Staff \with { ... } {
+    \music
+  }
+  \layout {
+    \context { \Voice \consists \midiLogEngraver }
+    ...
+  }
+  \midi {}
+}
+```
+
+**How it works:**
+- **Score 1** produces clean SVG (`filename.svg`) with no spacing pollution from hidden voices
+- **Score 2** produces the event log (`midi-log.json`) + MIDI file, plus `filename-1.svg` (ignored)
+- The `midiLogEngraver` runs in Score 2's `\layout` context, capturing all voices including hidden ones
+- LilyPond auto-suffixes output: Score 1 → `filename.svg`, Score 2 → `filename-1.svg`
+
+**Scales to:** Any number of hidden voices at any position in the music. No manual repositioning needed.
+
+**Trade-offs:** Extra unused SVG file (`-1.svg`), music defined as a variable (slightly different .ly structure than single-score pattern).
+
+**Key rules:**
+1. Tag the hidden `\new Voice` with `\tag #'midiVoice` immediately before it
+2. Score 1 uses `\removeWithTag #'midiVoice \music` — layout only, no `\midi {}`
+3. Score 2 uses `\music` (full) — includes `\layout` with `\midiLogEngraver` AND `\midi {}`
+4. The `\with { ... }` block must be duplicated in both scores (cannot be stored as a variable)
+5. Hidden voice still needs transparent overrides for Score 2's layout rendering
+
+**Source files:** NF007-Viola (first implementation, Feb 23, 2026)
+
+*(Section added: Feb 23, 2026)*
+
+---
+
+## 32. Behind-the-Bridge (b.b.) Convention
+
+**Rule:** Every note marked behind-the-bridge (b.b.) must have **all three** of the following:
+
+| Component | Implementation | Purpose |
+|-----------|---------------|----------|
+| **MIDI tag** | `\midiBB` (CC0=80) | MIDI playback articulation |
+| **X notehead** | `\xHeadOnce` | Visual: cross notehead indicating noise/indefinite pitch |
+| **Text marking** | `^\markup { ... "b.b." }` with `-\tweak extra-offset` | Visual: technique instruction text |
+
+**Checklist for each b.b. note:**
+
+```lilypond
+\midiBB
+\xHeadOnce
+c16
+-\tweak extra-offset #'(0 . 0)
+^\markup {
+  \override #'(font-name . "Crimson Pro Light Italic")
+  \fontsize #-4
+  "b.b."
+}
+```
+
+- The text markup uses Crimson Pro Light Italic at fontsize #-4 (project standard for technique text).
+- The `-\tweak extra-offset` enables independent positioning of the text per note.
+- `\xHeadOnce` applies the cross notehead style and the independent X notehead size (`x-notehead-size` variable, currently #-4.5).
+- If the b.b. note also has a Z-stem (pizz tremolo), add `\once \override Stem.stencil = #stem-with-z` as well.
+
+**Source files:** NF005-Violin, NF007-Viola
+
+*(Section added: Feb 23, 2026)*
+
+---
+
+## 33. Default Independent Positioning Rule
+
+**Rule:** All visual objects attached to notes should include an `extra-offset` tweak or override so they can be independently repositioned without affecting other elements. Initialize to `#'(0 . 0)` (no displacement) and adjust as needed in Frescobaldi.
+
+### Objects That Must Have Independent Positioning
+
+| Object | How to Make Positionable | Example |
+|--------|-------------------------|----------|
+| **Text instructions** ("b.b.", "pizz.", etc.) | `-\tweak extra-offset #'(X . Y)` before `^\markup { ... }` | `b.b.` text, `pizz.` text |
+| **Articulations** (snap pizz, accents) | `-\tweak font-size` / `-\tweak extra-offset` before articulation | `-\tweak font-size #-3 \snappizzicato` |
+| **Open string "o"** | `-\tweak extra-offset #'(X . Y)` before `^\markup { \teeny "o" }` | Beat 2.4 and beat 3 in NF007 |
+| **Dynamics** | `-\tweak extra-offset #'(X . Y)` before `\sfz`, `\ff`, etc. | — |
+| **Tuplet brackets** | `\once \override TupletBracket.after-line-breaking = #(lambda (grob) (ly:grob-set-property! grob 'positions (cons N N)))` before **every** `\tuplet` | All tuplets in NF007, NF008 |
+| **Accidentals** | `\override Accidental.extra-offset #'(X . Y)` | Base override in music variable |
+| **LaissezVibrer ties** | `-\tweak LaissezVibrerTie.extra-offset #'(X . Y)` before `\laissezVibrer` | Beat 2.4 in NF007 |
+| **Beam positions** | `\once \override Beam.positions #'(L . R)` | Beat 1 beam in NF007 |
+
+### Rationale
+
+In proportional notation with dense, mixed-technique passages, LilyPond's automatic placement often overlaps or mispositions markings. By including `extra-offset` tweaks initialized to `(0 . 0)` on every visual object, the user can fine-tune positions directly in Frescobaldi without needing to add new overrides — just change the values.
+
+### Convention
+
+- **Always add** `-\tweak extra-offset #'(0 . 0)` when attaching any text markup, articulation, or visual annotation to a note.
+- **Always add** `\override ... extra-offset #'(0 . 0)` for persistent objects like accidentals.
+- **Always add** `\once \override TupletBracket.after-line-breaking` with position lambda before **every** `\tuplet` command (see Section 8).
+- The AI should include these by default when writing new notation. The user adjusts the values during rendering.
+
+*(Section added: Feb 23, 2026)*
 
 ---
 

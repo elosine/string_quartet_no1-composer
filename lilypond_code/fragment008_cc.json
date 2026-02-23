@@ -1,0 +1,186 @@
+{
+  "source": "state_tracker.js",
+  "inputFile": "NotationFragment008-Cello-midi-log.json",
+  "noteEvents": [
+    {
+      "noteIndex": 0,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ],
+      "gliss": {
+        "semitones": 1
+      }
+    },
+    {
+      "noteIndex": 1,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ],
+      "gliss": {
+        "semitones": 1
+      }
+    },
+    {
+      "noteIndex": 2,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ],
+      "gliss": {
+        "semitones": 1
+      }
+    },
+    {
+      "noteIndex": 3,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ]
+    },
+    {
+      "noteIndex": 4,
+      "cc": [
+        {
+          "num": 0,
+          "val": 80
+        }
+      ]
+    },
+    {
+      "noteIndex": 5,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ],
+      "gliss": {
+        "semitones": 1
+      }
+    },
+    {
+      "noteIndex": 6,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ],
+      "gliss": {
+        "semitones": 1
+      }
+    },
+    {
+      "noteIndex": 7,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ],
+      "gliss": {
+        "semitones": 1
+      }
+    },
+    {
+      "noteIndex": 8,
+      "cc": [
+        {
+          "num": 0,
+          "val": 95
+        }
+      ]
+    },
+    {
+      "noteIndex": 9,
+      "cc": [
+        {
+          "num": 0,
+          "val": 97
+        }
+      ]
+    },
+    {
+      "noteIndex": 10,
+      "cc": [
+        {
+          "num": 0,
+          "val": 80
+        }
+      ]
+    },
+    {
+      "noteIndex": 11,
+      "cc": [
+        {
+          "num": 0,
+          "val": 97
+        }
+      ]
+    },
+    {
+      "noteIndex": 12,
+      "cc": [
+        {
+          "num": 0,
+          "val": 80
+        }
+      ]
+    },
+    {
+      "noteIndex": 13,
+      "cc": [
+        {
+          "num": 0,
+          "val": 80
+        }
+      ]
+    },
+    {
+      "noteIndex": 14,
+      "cc": [
+        {
+          "num": 0,
+          "val": 80
+        }
+      ]
+    },
+    {
+      "noteIndex": 15,
+      "cc": [
+        {
+          "num": 0,
+          "val": 80
+        }
+      ]
+    },
+    {
+      "noteIndex": 16,
+      "cc": [
+        {
+          "num": 0,
+          "val": 80
+        }
+      ]
+    },
+    {
+      "noteIndex": 17,
+      "cc": [
+        {
+          "num": 0,
+          "val": 80
+        }
+      ]
+    }
+  ]
+}

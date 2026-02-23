@@ -1,10 +1,10 @@
 [
-  {"moment": "1/20", "notes": ["fih'"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
-  {"moment": "1/10", "notes": ["a,"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
-  {"moment": "3/20", "notes": ["aeh,,"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
+  {"moment": "1/20", "notes": ["fs'"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
+  {"moment": "1/10", "notes": ["a"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
+  {"moment": "3/20", "notes": ["af,"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
   {"moment": "7/24", "notes": ["g'"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
-  {"moment": "11/24", "notes": ["c,,"], "midiCCZero": 71, "midiVelocity": null, "midiGliss": null},
-  {"moment": "3/5", "notes": ["f'", "b,", "fih,"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
-  {"moment": "7/10", "notes": ["d'", "aeh,", "e,"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
-  {"moment": "17/20", "notes": ["beh,", "fih,", "b,,"], "midiCCZero": 95, "midiVelocity": 127, "midiGliss": null}
+  {"moment": "11/24", "notes": ["c,"], "midiCCZero": 71, "midiVelocity": null, "midiGliss": null},
+  {"moment": "3/5", "notes": ["f'", "b", "fs"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
+  {"moment": "7/10", "notes": ["d'", "af", "e"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
+  {"moment": "17/20", "notes": ["bf", "fs", "b,"], "midiCCZero": 95, "midiVelocity": 127, "midiGliss": null}
 ]
