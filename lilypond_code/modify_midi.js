@@ -27,6 +27,13 @@
 //   Optional "vel" field overrides velocity for all notes in the group
 //   (e.g. sforzando → 127). Applies to every Note On at that tick.
 //
+//   Optional "gliss" field triggers pitch bend ramp insertion:
+//     { "gliss": { "semitones": 1 } }    // +1 = up, -1 = down
+//   The script inserts a 20-step linear pitch bend ramp across the note's
+//   duration, then resets pitch bend to center (8192) before the next Note On.
+//   Synth pitch bend range assumed: ±1 semitone.
+//   Fractional semitones supported (e.g. 0.5 = quarter tone).
+//
 //   Multiple CC types per note are supported for expandability:
 //     CC0  — articulation/preset select (e.g. 95=pizz, 97=Bartók pizz)
 //     CC7  — volume (e.g. crescendo shaping)
@@ -101,12 +108,14 @@ while (i < args.length) {
 // Load note event map if provided
 const noteEventMap = new Map(); // noteGroupIndex → [{num, val}, ...]
 const velocityOverrideMap = new Map(); // noteGroupIndex → velocity (0-127)
+const glissMap = new Map(); // noteGroupIndex → { semitones: number }
 if (mapFile) {
     const mapData = JSON.parse(fs.readFileSync(mapFile, 'utf8'));
     if (mapData.noteEvents) {
         for (const entry of mapData.noteEvents) {
             if (entry.cc) noteEventMap.set(entry.noteIndex, entry.cc);
             if (entry.vel !== undefined) velocityOverrideMap.set(entry.noteIndex, entry.vel);
+            if (entry.gliss) glissMap.set(entry.noteIndex, entry.gliss);
         }
     }
 }
@@ -135,15 +144,36 @@ if (ccMessages.length > 0) {
 } else if (noteEventMap.size === 0) {
     console.log(`No CC messages to insert (channel rewrite only)`);
 }
-if (noteEventMap.size > 0 || velocityOverrideMap.size > 0) {
-    console.log(`Per-note map: ${noteEventMap.size} CC group(s), ${velocityOverrideMap.size} velocity override(s)`);
-    const allIndices = new Set([...noteEventMap.keys(), ...velocityOverrideMap.keys()]);
+if (noteEventMap.size > 0 || velocityOverrideMap.size > 0 || glissMap.size > 0) {
+    console.log(`Per-note map: ${noteEventMap.size} CC group(s), ${velocityOverrideMap.size} velocity override(s), ${glissMap.size} gliss bend(s)`);
+    const allIndices = new Set([...noteEventMap.keys(), ...velocityOverrideMap.keys(), ...glissMap.keys()]);
     for (const idx of [...allIndices].sort((a, b) => a - b)) {
         const parts = [];
         if (noteEventMap.has(idx)) parts.push(noteEventMap.get(idx).map(c => `CC${c.num}=${c.val}`).join(', '));
         if (velocityOverrideMap.has(idx)) parts.push(`vel=${velocityOverrideMap.get(idx)}`);
+        if (glissMap.has(idx)) parts.push(`gliss=${glissMap.get(idx).semitones}st`);
         console.log(`  Note group ${idx}: ${parts.join(', ')}`);
     }
+}
+
+// ── Pitch bend constants ────────────────────────────────────────────
+const PITCH_BEND_CENTER = 8192;    // no bend
+const PITCH_BEND_MAX = 16383;     // +1 semitone (with ±1 range)
+const PITCH_BEND_MIN = 0;         // -1 semitone (with ±1 range)
+const GLISS_STEPS = 20;           // resolution of pitch bend ramp
+
+// Helper: encode integer as MIDI variable-length quantity
+function encodeVarLen(value) {
+    if (value < 0) value = 0;
+    const bytes = [];
+    bytes.push(value & 0x7F);
+    value >>= 7;
+    while (value > 0) {
+        bytes.push((value & 0x7F) | 0x80);
+        value >>= 7;
+    }
+    bytes.reverse();
+    return bytes;
 }
 
 // ── Process tracks ───────────────────────────────────────────────────
@@ -287,6 +317,167 @@ for (let t = 0; t < numTracks; t++) {
         }
     }
 
+    // ── Phase 2: Insert pitch bend ramps for gliss-marked notes ─────
+    // Parse Phase 1 output into absolute-tick event list, insert ramps,
+    // then re-encode with delta times.
+    if (glissMap.size > 0) {
+        // 2a. Parse the Phase 1 byte array into an event list with absolute ticks
+        const events = [];
+        let p2Pos = 0;
+        let p2AbsTick = 0;
+        const p1Buf = Buffer.from(newEvents);
+
+        while (p2Pos < p1Buf.length) {
+            // Read variable-length delta
+            let delta = 0;
+            while (p2Pos < p1Buf.length) {
+                const b = p1Buf[p2Pos++];
+                delta = (delta << 7) | (b & 0x7F);
+                if ((b & 0x80) === 0) break;
+            }
+            p2AbsTick += delta;
+
+            if (p2Pos >= p1Buf.length) break;
+            const status = p1Buf[p2Pos];
+
+            let eventBytes;
+            if (status === 0xFF) {
+                // Meta event: 0xFF type varlen data
+                const metaStart = p2Pos;
+                p2Pos++; // skip 0xFF
+                p2Pos++; // skip meta type
+                let metaLen = 0;
+                while (p2Pos < p1Buf.length) {
+                    const b = p1Buf[p2Pos++];
+                    metaLen = (metaLen << 7) | (b & 0x7F);
+                    if ((b & 0x80) === 0) break;
+                }
+                p2Pos += metaLen;
+                eventBytes = p1Buf.slice(metaStart, p2Pos);
+            } else if ((status & 0xF0) === 0xC0 || (status & 0xF0) === 0xD0) {
+                // 1 data byte
+                eventBytes = p1Buf.slice(p2Pos, p2Pos + 2);
+                p2Pos += 2;
+            } else if ((status & 0xF0) >= 0x80) {
+                // 2 data bytes (Note On/Off, CC, Pitch Bend, etc.)
+                eventBytes = p1Buf.slice(p2Pos, p2Pos + 3);
+                p2Pos += 3;
+            } else {
+                // Unknown — skip one byte
+                eventBytes = p1Buf.slice(p2Pos, p2Pos + 1);
+                p2Pos += 1;
+            }
+
+            events.push({ tick: p2AbsTick, bytes: Buffer.from(eventBytes) });
+        }
+
+        // 2b. Build note group info: map noteGroupIndex → { noteOnTick, noteOffTick, noteNum }
+        const noteGroupInfo = new Map();
+        let p2NoteGroupIdx = -1;
+        let p2LastNoteOnTick = -1;
+        const activeNotes = new Map(); // noteNum → noteGroupIndex
+
+        for (const ev of events) {
+            const st = ev.bytes[0] & 0xF0;
+            if (st === 0x90 && ev.bytes.length >= 3 && ev.bytes[2] > 0) {
+                // Note On
+                const isNewGroup = (ev.tick !== p2LastNoteOnTick);
+                if (isNewGroup) {
+                    p2NoteGroupIdx++;
+                    p2LastNoteOnTick = ev.tick;
+                }
+                const noteNum = ev.bytes[1];
+                activeNotes.set(noteNum, p2NoteGroupIdx);
+                if (!noteGroupInfo.has(p2NoteGroupIdx)) {
+                    noteGroupInfo.set(p2NoteGroupIdx, { noteOnTick: ev.tick, noteOffTick: null, noteNum });
+                }
+            } else if (st === 0x80 || (st === 0x90 && ev.bytes.length >= 3 && ev.bytes[2] === 0)) {
+                // Note Off
+                const noteNum = ev.bytes[1];
+                if (activeNotes.has(noteNum)) {
+                    const groupIdx = activeNotes.get(noteNum);
+                    const info = noteGroupInfo.get(groupIdx);
+                    if (info && info.noteOffTick === null) {
+                        info.noteOffTick = ev.tick;
+                    }
+                    activeNotes.delete(noteNum);
+                }
+            }
+        }
+
+        // 2c. Insert pitch bend ramps for gliss-marked notes
+        const newEventsToInsert = [];
+
+        for (const [groupIdx, glissInfo] of glissMap) {
+            const info = noteGroupInfo.get(groupIdx);
+            if (!info || info.noteOffTick === null) {
+                console.warn(`  Warning: gliss note group ${groupIdx} — could not determine duration, skipping`);
+                continue;
+            }
+
+            const { noteOnTick, noteOffTick } = info;
+            const duration = noteOffTick - noteOnTick;
+            if (duration <= 0) {
+                console.warn(`  Warning: gliss note group ${groupIdx} — zero/negative duration, skipping`);
+                continue;
+            }
+
+            const semitones = glissInfo.semitones;
+            // Calculate target pitch bend value
+            // semitones = +1 → bend from center to max (16383)
+            // semitones = -1 → bend from center to min (0)
+            // Fractional values scale proportionally
+            const bendRange = semitones > 0
+                ? (PITCH_BEND_MAX - PITCH_BEND_CENTER)
+                : (PITCH_BEND_CENTER - PITCH_BEND_MIN);
+            const targetBend = Math.round(PITCH_BEND_CENTER + (semitones * bendRange));
+            const clampedTarget = Math.max(PITCH_BEND_MIN, Math.min(PITCH_BEND_MAX, targetBend));
+
+            console.log(`  Gliss group ${groupIdx}: tick ${noteOnTick}→${noteOffTick} (${duration} ticks), bend ${PITCH_BEND_CENTER}→${clampedTarget} (${semitones} st)`);
+
+            // Generate ramp: GLISS_STEPS evenly spaced pitch bend messages
+            // Start immediately at note on, last step reaches target at end of note
+            for (let step = 0; step < GLISS_STEPS; step++) {
+                const t = Math.round(noteOnTick + (step / (GLISS_STEPS - 1)) * (duration - 1));
+                const progress = step / (GLISS_STEPS - 1);
+                const bendVal = Math.round(PITCH_BEND_CENTER + progress * (clampedTarget - PITCH_BEND_CENTER));
+                const lsb = bendVal & 0x7F;
+                const msb = (bendVal >> 7) & 0x7F;
+                newEventsToInsert.push({
+                    tick: t,
+                    bytes: Buffer.from([0xE0 | midiChannel, lsb, msb])
+                });
+            }
+
+            // Reset pitch bend to center at note off tick
+            // (before next Note On — avoids audible slide down on next note)
+            const centerLsb = PITCH_BEND_CENTER & 0x7F;
+            const centerMsb = (PITCH_BEND_CENTER >> 7) & 0x7F;
+            newEventsToInsert.push({
+                tick: noteOffTick,
+                bytes: Buffer.from([0xE0 | midiChannel, centerLsb, centerMsb])
+            });
+        }
+
+        // 2d. Merge new events into the event list and re-sort by tick
+        events.push(...newEventsToInsert);
+        // Stable sort: pitch bend resets at noteOff tick should come after the Note Off
+        events.sort((a, b) => a.tick - b.tick);
+
+        // 2e. Re-encode event list with delta times
+        newEvents.length = 0;
+        let prevTick = 0;
+        for (const ev of events) {
+            const delta = ev.tick - prevTick;
+            prevTick = ev.tick;
+            const deltaEnc = encodeVarLen(delta);
+            for (const db of deltaEnc) newEvents.push(db);
+            for (const eb of ev.bytes) newEvents.push(eb);
+        }
+
+        console.log(`  Phase 2: inserted ${newEventsToInsert.length} pitch bend events`);
+    }
+
     // Build new track chunk
     const newTrackData = Buffer.from(newEvents);
     const newTrackHeader = Buffer.alloc(8);
@@ -307,4 +498,7 @@ if (ccMessages.length > 0) {
 }
 if (noteEventMap.size > 0) {
     console.log(`  ${noteEventMap.size} note group(s) with per-note CC`);
+}
+if (glissMap.size > 0) {
+    console.log(`  ${glissMap.size} note group(s) with pitch bend glissando`);
 }

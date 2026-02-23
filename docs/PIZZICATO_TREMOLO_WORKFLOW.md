@@ -439,3 +439,45 @@ Outputs to `public/SVG_graphics/pizz_tremolo/`:
 | 8. Graphic notation | ✅ Done | GC + SVG notation + blue arrow; pre/post alignment tested |
 | 9. UI development | ✅ Done | PizzTremUI panel — Track, Clef, Pitch, Dynamic, Start, Duration, Shape, Alignment |
 | 10. Pipeline execution | ✅ Done | `render_pizz_tremolo.js` + server endpoint + PizzTremUI.go() wired; MIDI ch 8-11 |
+
+---
+
+## TODO: Gravitational Conductor Alignment System
+
+**Status:** Not yet implemented — placeholder for future enhancement.
+
+The pizzicato tremolo system should support Gravitational Conductor (GC) alignment, where the **composer explicitly chooses** a performance alignment strategy. Unlike the Notation Fragment system (where the performer decides and the system simulates via weighted random), here the composer selects a specific alignment and the system realizes it — determining notation placement, MIDI snippet tempo, and MIDI onset time accordingly.
+
+### Gravitational Conductor System
+
+Gravitational Conductors (GCs) are an ictus-based conduction system — essentially an animated bouncing ball that impacts at a particular point in time. Like a real-life conductor, or like an object thrown into the air and acted upon by gravity, the GC provides not just the ictus (the impact point) but also the *feel* of the motion leading into and away from impact.
+
+The core principle is that the kinetic information in the curve — the descent into impact and the ascent from impact — can inform how material is performed. Playing something just before impact has a certain feel to its accent and approach. Playing something just after impact is shaped by the release energy of the curve. The entire spectrum of the GC's curve — from the top of the arc, through descent, at impact, through the rebound — can influence the way anything is played.
+
+The GC graphic object itself has a curve that descends into the impact point and ascends from the impact point. This curve can be used to inform performance interpretation across its full duration.
+
+### Alignment Choices
+
+There is a variety of ways to align a pizzicato tremolo with a GC, including:
+
+- **Begin at the top of the curve** — let the gravity of the descending curve influence how the fragment unfolds into impact
+- **Begin along the descending curve** — start the fragment at some point during the descent, letting the accelerating gravitational pull shape the approach toward impact
+- **End on impact** — the fragment is played leading into the ictus, ending at the impact point; the weight of the descending curve drives the performance toward the downbeat
+- **Begin just before impact** — the fragment starts moments before the ictus, charged by the final gravitational acceleration into impact
+- **Begin on impact** — the fragment starts at the ictus (the most conventional mode)
+- **Begin just after impact** — the fragment starts moments after the ictus, propelled by the immediate release energy of the bounce
+- **Begin after impact** — start the fragment somewhere during the ascending curve, letting the rebound energy shape the performance
+- **Begin at the end of the curve** — the fragment starts at the tail of the ascending arc, where the upward momentum dissipates and weightlessness takes over
+
+The GC curve provides a continuous spectrum of interpretive possibilities — any point along the curve can serve as a starting or ending reference for the fragment.
+
+### Implementation Notes
+
+**Composer-driven choice:** The composer selects one of the alignment choices above as an input parameter (e.g., alongside pitch, dynamic, track, etc.). The system then:
+
+1. Derives the MIDI onset time from the chosen alignment + the GC's curve geometry (curveStart, impact, curveEnd)
+2. Derives the tempo from the curve data and alignment category (pre-impact → faster, post-impact → moderate, end-of-curve → slower)
+3. Places the notation SVG at the appropriate position on the timeline
+4. Adjusts the MIDI snippet to reflect the computed tempo
+
+See `NOTATION_FRAGMENT_WORKFLOW.md` Overview → Development Notes for the full MIDI placement logic, tempo logic, and implementation plan.

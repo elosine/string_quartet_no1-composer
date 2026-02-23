@@ -25,6 +25,7 @@ Reference document for MIDI file generation across all musical material systems 
 15. [modify_midi.js Enhancement Roadmap](#15-modifymidijs-enhancement-roadmap)
 16. [Notation → MIDI: State Tracker Strategy](#16-notation--midi-state-tracker-strategy)
 17. [MIDI Tagging: Debugging & Testing Protocols](#17-midi-tagging-debugging--testing-protocols)
+18. [Software Synth Settings: X-Sample Contemporary Solo Strings](#18-software-synth-settings-x-sample-contemporary-solo-strings)
 
 ---
 
@@ -493,6 +494,27 @@ This raw MIDI needs post-processing via `modify_midi.js` to:
 - Vibrato was moved to channels 5–8 (ASB-057) to avoid conflicts with sustained glissando notes
 - If a 3rd sustained system needs channels, address potential conflicts
 
+### MIDI State Reset Problem (open issue)
+
+**Problem:** When a MIDI snippet uses continuous controllers (CC7 volume ramps, CC4/channel pressure for vibrato), the controller state persists after the snippet ends. The next snippet on the same channel inherits the final CC value — e.g., a volume ramp to zero means the next snippet starts silently, or a ramp to max means the next snippet starts at full volume.
+
+**What doesn't work:**
+- CC120 (All Sound Off) — synth doesn't respond
+- CC123 (All Notes Off) — synth doesn't respond
+- Sending CC7→0 immediately after note-off — sounds like a distinct cutoff; the tail disappears abruptly and then you hear the ramp-up of the next snippet. Unnatural.
+
+**Current workaround:** Dedicate separate channel banks per modification type. Systems using CC7 volume or channel pressure get their own channel offset (e.g., vibrato → ch 4–7, pizz tremolo → ch 8–11). This way, consecutive snippets within the same system follow each other correctly because they share the same CC trajectory expectations.
+
+**Channel pressure / vibrato:** May be simpler — after note-off, reset channel pressure to 0 (unity). Needs testing.
+
+**Volume (CC7):** Harder — the audible artifact of instant reset is the core problem. Possible approaches to investigate:
+1. **Micro-fade:** Brief CC7 ramp (e.g., 50ms) from end value to neutral before next snippet
+2. **Inter-snippet gap:** Ensure enough silence between snippets that the reset isn't audible
+3. **Channel rotation:** Alternate channels so each snippet gets a "clean" channel
+4. **Accept the workaround:** Keep using dedicated channel banks (current approach works, just uses more channels)
+
+**Channel limit:** MIDI supports 16 channels per port. Current usage: ch 0–3 (base), ch 4–7 (vibrato), ch 8–11 (pizz tremolo) = 12 of 16. To expand beyond 16, use **multiple MIDI ports** — each port provides a fresh set of 16 channels. Most modern DAWs support multi-port MIDI routing. Bank Select (CC0/CC32) does NOT expand the channel count — it only switches instrument patches.
+
 ### CC0 as Articulation ID
 
 - Sent at tick 0 (or event start time) on the note's channel
@@ -516,6 +538,7 @@ A roadmap for building new MIDI manipulation capabilities into `modify_midi.js`.
 |---------|-----------|-------------|-------|
 | Per-note CC injection | `cc: [{num, val}]` | Insert CC messages before Note On of targeted group | ASB-087 |
 | Velocity override | `vel: 0-127` | Override velocity for all notes in a group (e.g. sfz→127) | ASB-089 |
+| Glissando pitch bend ramp | `gliss: {semitones: N}` | 20-step linear pitch bend ramp across note duration, reset at Note Off. ±1 semitone range, fractional OK. Phase 2 post-processing. | ASB-091 |
 | Tick-0 CC | `--cc` flag | Insert CC at tick 0 (backward compat) | Original |
 | Channel rewrite | `<channel>` arg | Rewrite all channel voice events | Original |
 
@@ -527,7 +550,6 @@ A roadmap for building new MIDI manipulation capabilities into `modify_midi.js`.
 | Channel pressure at note | `"pressure": 0-127` | Vibrato intensity, aftertouch effects | Low |
 | Note duration override | `"durTicks": N` | Shorten/lengthen specific notes | Low |
 | CC envelope (multi-point) | `"ccEnv": [{tick, num, val}]` | Volume shaping (CC7 ramps), vibrato (CC4) over time | Medium |
-| Pitch bend envelope | `"bendEnv": [{tick, val}]` | Glissando curves within a note | Medium |
 | Note transposition | `"transpose": ±N` | Shift pitch by N semitones | Low |
 | Program Change at note | `"pc": 0-127` | Patch switch mid-stream | Low |
 
@@ -712,6 +734,29 @@ lilypond --svg -dbackend=svg -o "NotationFragment001-Cello" "NotationFragment001
 node state_tracker.js NotationFragment001-Cello-midi-log.json --out fragment001_cc.json
 node modify_midi.js NotationFragment001-Cello.mid NotationFragment001-Cello-Mod.mid 0 --map fragment001_cc.json
 ```
+
+---
+
+## 18. Software Synth Settings: X-Sample Contemporary Solo Strings
+
+### Glissando Key Switches
+
+Key switch approach for achieving glissando effects in the X-Sample Contemporary Solo Strings library:
+
+| Key Switch | Function | Notes |
+|------------|----------|-------|
+| **B0** (high velocity) | Switch into glissando key switch mode | Must be sent before slide keys |
+| **G#1** (between notes) | Slide **down** | Insert between the two sounding notes |
+| **A1** (between notes) | Slide **up** | Insert between the two sounding notes |
+
+### Legato Settings (TO INVESTIGATE)
+
+Research and investigate legato behavior using the following CCs:
+
+| CC | Function | Status |
+|----|----------|--------|
+| **CC68** | Legato on/off | Needs testing |
+| **CC24** | Legato intensity | Needs testing |
 
 ---
 

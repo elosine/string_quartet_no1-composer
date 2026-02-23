@@ -272,7 +272,8 @@ c16[ d16 r16 e16]    % beam stretches continuously over the rest
 
 | Value | Status | Context | Source Files |
 |-------|--------|---------|-------------|
-| **#-5** | **CURRENT DEFAULT** | Standard project accidental size | StartingTemplate, MasterTemplate |
+| **#-7** | **CURRENT DEFAULT** | Standard project accidental size | NF004-Violin (Feb 2026) |
+| #-5 | Previous default | Was project standard before NF004 | StartingTemplate, MasterTemplate |
 | -2 | Variant | Large (old ILL/grace note files) | ILL20231216, grace note clusters |
 | #-3 | Variant | Per-instance (\once) | Various |
 | -4 | Variant | Medium — common in older files | sf004, M-series, col legno, Crumb, Lachenmann, QuasiGuitarra |
@@ -282,14 +283,19 @@ c16[ d16 r16 e16]    % beam stretches continuously over the rest
 **Decision History:**
 - Oldest files: -2 (same size as noteheads)
 - Middle era: -4 (most common across M-series and technique files)
-- Current: **-5** (settled in StartingTemplate era)
+- Previous: -5 (settled in StartingTemplate era)
+- Current: **-7** (NF004, Feb 2026 — tighter with glissando-heavy notation)
 
 ### Accidental.extra-offset
 
-| Value | Context | Source Files |
-|-------|---------|-------------|
-| `#'(0.1 . 0)` | Move sharp slightly right | Various |
-| `#'(0.3 . 0)` | Move sharp closer to note | MasterTemplate, various |
+| Value | Status | Context | Source Files |
+|-------|--------|---------|-------------|
+| **`#'(0 . 0)`** | **STANDARD TEMPLATE** | Default (no offset) — always include in new files | All new files |
+| `#'(0.1 . 0)` | Variant | Move sharp slightly right | Various |
+| `#'(0.3 . 0)` | Variant | Move sharp closer to note | MasterTemplate, various |
+| `#'(0.32 . 0)` | Variant | Tight accidentals with small noteheads | NF004-Violin |
+
+> **Standard template rule:** Always include `\override Accidental.extra-offset = #'(0 . 0)` in every new file with the comment `% move accidental closer to notehead (positive X = rightward)`. This makes the override visible and easy to tweak without having to remember it exists. Positive X moves the accidental rightward (closer to the notehead).
 
 ### Accidental.stencil
 
@@ -464,6 +470,20 @@ c16[ d16 r16 e16]    % beam stretches continuously over the rest
 
 > Both values must be equal for a flat bracket. Lower number = closer to notes.
 
+### TupletBracket — Forced Height via Lambda (bypasses flatten callback)
+
+The standard `flatten-tuplet-bracket` callback (`after-line-breaking`) reads auto-calculated positions and flattens them. This **overwrites** any `\once \override TupletBracket.positions` set before line-breaking. To force a specific bracket height, replace the callback for that tuplet:
+
+```lilypond
+\once \override TupletBracket.after-line-breaking =
+  #(lambda (grob) (ly:grob-set-property! grob 'positions (cons 9 9)))
+```
+
+- Change `9` to the desired height (staff-space units above center of staff).
+- This override replaces the flatten callback for **one tuplet only** — subsequent tuplets revert to the global `flatten-tuplet-bracket`.
+- Use when `\once \override TupletBracket.positions` has no effect (because the flatten callback overwrites it).
+- First used in NF004-Violin (Feb 2026) for the 11:8 tuplet.
+
 ### TupletNumber — Visibility Methods
 
 Three different ways to hide tuplet numbers have been used:
@@ -541,22 +561,55 @@ Three different ways to hide tuplet numbers have been used:
 | `#'zigzag` | Variant | Zigzag line | MasterTemplate (commented) |
 | `#'trill` | Variant | Wavy line (action notation) | PizzicatoStorm_final.ly |
 
-### Glissando.bound-details
+### Glissando — Global Padding (layout \Score context)
 
-| Setting | Value | Source Files |
-|---------|-------|-------------|
-| left.padding | #0.5 | MasterTemplate (commented) |
-| left.padding | #1.2 | PizzicatoStorm_final.ly |
-| right.padding | #1 | PizzicatoStorm_final.ly |
+These overrides go in the `\layout { \context { \Score ... } }` block and affect **all** glissandos in the file. Required for glissandos to render in tight proportional spacing.
 
-### Glissando extra-offset (via \tweak)
+```lilypond
+\layout {
+  \context {
+    \Score
+    \override Glissando.breakable = ##t
+    \override Glissando.minimum-length = #3
+    \override Glissando.bound-details.left.padding = #0.15
+    \override Glissando.bound-details.right.padding = #0.05
+  }
+}
+```
 
-| Y Value | Context | Source Files |
-|---------|---------|-------------|
-| 0 | Different staff lines (default) | Most glissando files |
-| 0.1 - 0.4 | Same staff line adjustment | Various Gliss-*.ly files |
+| Setting | Value | Status | Context | Source Files |
+|---------|-------|--------|---------|-------------|
+| breakable | **##t** | **CURRENT DEFAULT** | Required for glissandos to render | All files |
+| minimum-length | **#3** | **CURRENT DEFAULT** | Ensures gliss lines appear in tight spacing | NF004-Violin |
+| left.padding | **#0.15** | **CURRENT DEFAULT** | Gap from left notehead to gliss start | NF004-Violin |
+| right.padding | **#0.05** | **CURRENT DEFAULT** | Gap from gliss end to right notehead | NF004-Violin |
+| left.padding | #0.5 | Variant | Wider gap | MasterTemplate (commented) |
+| left.padding | #1.2 | Variant | Wide gap | PizzicatoStorm_final.ly |
+| right.padding | #1 | Variant | Wide gap | PizzicatoStorm_final.ly |
 
-> **Rule:** When start and end pitches land on the same staff line (e.g., A4→Ab4), a small Y-offset (0.3) is needed so the glissando line is visible.
+> **Placement:** These MUST go in the `\Score` context inside `\layout`, not in the music block.
+
+> **minimum-length** is critical — without it, glissandos may not render at all in tight proportional spacing (e.g., `1/13` or tighter).
+
+### Glissando — Per-Instance Padding (via \tweak)
+
+To override the global padding for a **single glissando** (e.g., same-staff-line pairs that need tighter lines), stack `-\tweak` directives before `\glissando`:
+
+```lilypond
+f''16
+-\tweak extra-offset #'(0 . -0.3)           % Y-offset for same staff line
+-\tweak bound-details.left.padding #0.15    % per-instance left gap
+-\tweak bound-details.right.padding #-0.6   % per-instance right gap (negative = extends past notehead)
+\glissando
+```
+
+| Tweak | Value | Context |
+|-------|-------|---------|
+| `extra-offset` Y | 0.3 or -0.3 | Same staff line — offset so gliss line is visible |
+| `bound-details.left.padding` | 0 – 0.5 | Per-instance left gap (overrides global) |
+| `bound-details.right.padding` | -0.6 – 0.5 | Per-instance right gap (negative = tighter/past notehead) |
+
+> **Rule:** When start and end pitches land on the same staff line (e.g., F5→F#5, A4→Ab4), use `extra-offset` Y of ±0.3 so the glissando line is visible. Sign depends on desired direction of the line.
 
 ### Glissando.breakable
 
@@ -1387,6 +1440,38 @@ Key file categories:
 - **ILL files:** ILL20231216.ly, ill20240130*.ly
 - **Pizz motives:** PizzMotive001_Cello_Draft/Render.ly
 - **Two-handed pizz finals:** TwoHandedPizz-Cello-C2_final.ly, TwoHandedPizz-Viola-C3_final.ly
+
+---
+
+## Render Workflow (Main File ↔ Frescobaldi)
+
+**Problem:** Cascade edits `.ly` files, but the user renders in Frescobaldi. Tweaking in Frescobaldi risks overwriting Cascade's version and vice versa.
+
+**Solution:** Two-file system with a copy command.
+
+| File | Role | Who edits |
+|------|------|-----------|
+| `NotationFragmentXXX-Instrument.ly` | **Source of truth** | Cascade |
+| `NotationFragmentXXX-Instrument_render.ly` | **Scratch pad for rendering** | User (in Frescobaldi) |
+
+### Steps
+
+1. **Cascade edits** the main `.ly` file
+2. **User copies** main → render:
+   ```powershell
+   Copy-Item "lilypond_code\NotationFragment003-Violin.ly" "lilypond_code\NotationFragment003-Violin_render.ly" -Force
+   ```
+3. **User switches to Frescobaldi** → reloads `_render.ly` (if prompted) → engraves (Ctrl+M)
+4. **User tweaks** values in `_render.ly` in Frescobaldi, re-engraves as needed
+5. **User saves** in Frescobaldi (Ctrl+S) and tells Cascade: **"pull changes from render"**
+6. **Cascade reads** `_render.ly`, diffs it, and updates the main file
+
+### Generic copy command pattern
+```powershell
+Copy-Item "lilypond_code\<MAIN_FILE>.ly" "lilypond_code\<MAIN_FILE>_render.ly" -Force
+```
+
+> **If you forget:** just say "how do I render?" and the AI will remind you.
 
 ---
 

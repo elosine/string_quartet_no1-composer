@@ -1,13 +1,13 @@
 {
   "source": "state_tracker.js",
-  "inputFile": "NotationFragment001-Cello-midi-log.json",
+  "inputFile": "NotationFragment004-Violin-midi-log.json",
   "noteEvents": [
     {
       "noteIndex": 0,
       "cc": [
         {
           "num": 0,
-          "val": 95
+          "val": 97
         }
       ]
     },
@@ -16,16 +16,17 @@
       "cc": [
         {
           "num": 0,
-          "val": 95
+          "val": 71
         }
-      ]
+      ],
+      "vel": 127
     },
     {
       "noteIndex": 2,
       "cc": [
         {
           "num": 0,
-          "val": 95
+          "val": 97
         }
       ]
     },
@@ -36,16 +37,22 @@
           "num": 0,
           "val": 95
         }
-      ]
+      ],
+      "gliss": {
+        "semitones": 1
+      }
     },
     {
       "noteIndex": 4,
       "cc": [
         {
           "num": 0,
-          "val": 71
+          "val": 95
         }
-      ]
+      ],
+      "gliss": {
+        "semitones": 1
+      }
     },
     {
       "noteIndex": 5,
@@ -54,7 +61,10 @@
           "num": 0,
           "val": 95
         }
-      ]
+      ],
+      "gliss": {
+        "semitones": 1
+      }
     },
     {
       "noteIndex": 6,
@@ -63,7 +73,10 @@
           "num": 0,
           "val": 95
         }
-      ]
+      ],
+      "gliss": {
+        "semitones": 1
+      }
     },
     {
       "noteIndex": 7,
@@ -72,8 +85,16 @@
           "num": 0,
           "val": 95
         }
-      ],
-      "vel": 127
+      ]
+    },
+    {
+      "noteIndex": 8,
+      "cc": [
+        {
+          "num": 0,
+          "val": 70
+        }
+      ]
     }
   ]
 }

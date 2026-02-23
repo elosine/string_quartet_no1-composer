@@ -38,6 +38,36 @@
       "state_rule": "one-shot",
       "revert_pattern": "\\midiBartokPizz → note → revert to base mode (e.g. \\midiPizz). Consecutive Bartók pizz notes: no revert needed between them.",
       "notes": "Bartók (snap) pizzicato patch. Always explicitly notated. One-shot: revert to current base mode after the note, unless the next note is also Bartók pizz."
+    },
+    "70": {
+      "technique": "Molto vibrato (pizzicato context)",
+      "notation_symbol": "\"m.v.\"",
+      "shorthand": "\\midiMoltoVibPizz",
+      "set_command": "\\set Voice.midiCCZero = #70",
+      "state_rule": "one-shot",
+      "revert_pattern": "\\midiMoltoVibPizz → note → \\midiPizz",
+      "requires_mode": "pizz",
+      "notes": "Molto vibrato in pizzicato context. One-shot: revert to pizz base mode after the note."
+    },
+    "2": {
+      "technique": "Molto vibrato (arco context)",
+      "notation_symbol": "\"m.v.\"",
+      "shorthand": "\\midiMoltoVibArco",
+      "set_command": "\\set Voice.midiCCZero = #2",
+      "state_rule": "one-shot",
+      "revert_pattern": "\\midiMoltoVibArco → note → \\midiArco",
+      "requires_mode": "arco",
+      "notes": "Molto vibrato in arco context. One-shot: revert to arco base mode after the note."
+    },
+    "6": {
+      "technique": "Open string (arco context)",
+      "notation_symbol": "\"o\"",
+      "shorthand": "\\midiArcoOpen",
+      "set_command": "\\set Voice.midiCCZero = #6",
+      "state_rule": "one-shot",
+      "revert_pattern": "\\midiArcoOpen → note → \\midiArco",
+      "requires_mode": "arco",
+      "notes": "Open string in arco context. One-shot: revert to arco base mode after the note."
     }
   },
 
@@ -63,12 +93,18 @@
       "type": "integer (0-127)",
       "persistence": "one-shot — must \\unset after note",
       "purpose": "Velocity override for next note/chord"
+    },
+    "midiGliss": {
+      "type": "number (semitones, fractional OK)",
+      "persistence": "persistent — stays until \\unset",
+      "purpose": "Pitch bend glissando. +1 = up 1 semitone, -1 = down 1 semitone, 0.5 = quarter tone up. modify_midi.js inserts 20-step linear ramp across note duration, resets to center before next Note On. Synth pitch bend range: ±1 semitone."
     }
   },
 
   "state_rules": {
     "persistent": "CC0 value stays active until a different articulation mode is set (e.g., pizz stays until arco). Composer sets once, applies to all following notes.",
-    "one-shot": "Value applies only to the marked note. Composer must explicitly revert after the note (Option A: manual revert)."
+    "one-shot": "Value applies only to the marked note. Composer must explicitly revert after the note (Option A: manual revert).",
+    "mode_persistence": "The base mode (pizz/arco) persists until the composer explicitly changes it. Do NOT infer mode changes from expression markings (e.g., 'm.v.' does not imply arco). Only explicit 'arco' or 'pizz.' text resets the base mode."
   },
 
   "cello_open_strings": ["C2", "G2", "D3", "A3"],

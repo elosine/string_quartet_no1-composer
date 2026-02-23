@@ -1,0 +1,12 @@
+[
+  {"moment": "0/1", "notes": ["c''"], "midiCCZero": 97, "midiVelocity": null},
+  {"moment": "1/16", "notes": ["d'"], "midiCCZero": 71, "midiVelocity": 127},
+  {"moment": "3/16", "notes": ["d'"], "midiCCZero": 97, "midiVelocity": null},
+  {"moment": "1/4", "notes": ["d'"], "midiCCZero": 97, "midiVelocity": null},
+  {"moment": "13/44", "notes": ["dih'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "15/44", "notes": ["e'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "17/44", "notes": ["f'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "19/44", "notes": ["fih'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "21/44", "notes": ["g'"], "midiCCZero": 95, "midiVelocity": null},
+  {"moment": "1/2", "notes": ["c'"], "midiCCZero": 89, "midiVelocity": null}
+]

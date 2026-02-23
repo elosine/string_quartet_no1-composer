@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Feb 22, 2026  
-**Current ASB Number:** ASB-090
+**Current ASB Number:** ASB-091
 
 ---
 
@@ -46,7 +46,7 @@ That's it. Everything else below is for Cascade.
 | Vibrato System | Complete | Maintenance only |
 | Crescendo-Decrescendo | Complete | Maintenance only |
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
-| Notation Fragment System | **In Progress** | Option E active: `midi-tags.ily` + `midi-logger.ily` + `state_tracker.js` built (ASB-090). Next: test full pipeline on NotationFragment001-Cello.ly |
+| Notation Fragment System | **In Progress** | Option E active: full pipeline proven (ASB-090/091). Glissando pitch bend (Phase 2) + tie-event fix. NF001+NF004 tested. Next: compose more fragments |
 | LilyPond Settings Registry | Active | Update when settings change |
 | Musical Material Workflow | Active | Expand as new material types are built |
 
@@ -54,10 +54,10 @@ That's it. Everything else below is for Cascade.
 
 | Tool | Location | Use For |
 |------|----------|---------|
-| `modify_midi.js` | `lilypond_code/` | MIDI post-processing: channel rewrite, CC at tick 0 (`--cc`), per-note CC + velocity override via JSON map (`--map`). See §15 in MIDI_MUSIC_GENERATION.md for enhancement roadmap. |
+| `modify_midi.js` | `lilypond_code/` | MIDI post-processing: channel rewrite, CC at tick 0 (`--cc`), per-note CC + velocity override + **glissando pitch bend ramps** via JSON map (`--map`). Phase 2 inserts 20-step linear pitch bend for gliss-marked notes. See §15 in MIDI_MUSIC_GENERATION.md. |
 | `midi-tags.ily` | `lilypond_code/` | LilyPond include: shorthand variables for `\set` MIDI context properties (`\midiPizz`, `\midiSfz`, etc.). Source of truth: `cc_mapping_registry.json`. |
-| `midi-logger.ily` | `lilypond_code/` | LilyPond include: Scheme engraver that reads `\set` properties and writes JSON event log during compilation. |
-| `state_tracker.js` | `lilypond_code/` | Converts Scheme event log → CC map JSON for `modify_midi.js`. |
+| `midi-logger.ily` | `lilypond_code/` | LilyPond include: Scheme engraver that reads `\set` properties and writes JSON event log during compilation. Handles ties (skips continuations). |
+| `state_tracker.js` | `lilypond_code/` | Converts Scheme event log → CC map JSON for `modify_midi.js`. Supports CC0, velocity overrides, and glissando pitch bend. |
 | `crop_svg.js` | `lilypond_code/` | Standalone SVG cropping (same logic as server.js) |
 | `render_bartok_pizz.js` | `lilypond_code/` | Full Bartók pizz pipeline (single or batch) |
 | `ingest_pizz_tremolo.js` | `lilypond_code/` | Parse recorded MIDI → JSON timing database (new/append modes) |
@@ -88,21 +88,23 @@ That's it. Everything else below is for Cascade.
 | MasterTemplate.ly is legacy | Registry + StartingTemplate are now the authoritative sources. MasterTemplate still exists but should NOT be consulted as source of truth. Only update it when StartingTemplate changes (propagation). Do NOT pull settings from MasterTemplate for new files. | If tempted to reference MasterTemplate for settings — use Registry instead |
 | Saved GCs disappeared | GC library appears empty despite GCs existing in score save files (e.g., GC_20260117_204645 in 271-work). Needs investigation. | If user tries to recall saved GCs or if GC library features are used |
 | Musical Material Workflow doc | `docs/MUSICAL_MATERIAL_WORKFLOW.md` — general process for multi-component musical objects. Includes 4 insertion patterns (Console→Save/Reload→Direct Live→AI Direct). | When building any new musical material system |
+| **TODO: GC logic for Pizzicato Tremolo** | Add Gravitational Conductor alignment system to pizz tremolo workflow. Composer-driven choice (not performer-decides): composer explicitly selects an alignment (e.g., "begin along descending curve"), which determines notation placement, MIDI snippet tempo, and MIDI onset time. See `NOTATION_FRAGMENT_WORKFLOW.md` Overview → Gravitational Conductor System for alignment definitions. | Next pizz tremolo enhancement session |
+| **TODO: MIDI State Reset Problem** | CC state (CC7 volume, CC4/channel pressure) persists after snippet ends — next snippet on same channel inherits final value. CC120/CC123 don't work with synth. Current workaround: dedicated channel banks per modification type. Need to investigate: micro-fade, inter-snippet gaps, channel rotation, or multi-port expansion (16 ch per port limit). See `MIDI_MUSIC_GENERATION.md` §13 "MIDI State Reset Problem." | When adding volume/vibrato to notation fragments or when channel count becomes limiting |
 
 ---
 
 ## Last Session Summary
 
-> **Notation Fragment System — Option E MIDI Tagging System.** Built full pipeline: `midi-tags.ily` (shorthand variables for `\set` context properties), `midi-logger.ily` (Scheme engraver writing JSON event log), `state_tracker.js` (event log → CC map). Expanded `cc_mapping_registry.json` with `\set` property names and shorthands. Rewrote Step 2C in NOTATION_FRAGMENT_WORKFLOW.md with MIDI tagging protocol, lookup table, and pipeline description. Added §17 Debugging & Testing Protocols to MIDI_MUSIC_GENERATION.md. Tagged NotationFragment001-Cello.ly with `\midiPizz`/`\midiPizzOpen`/`\midiSfz`. **Full pipeline test PASSED** on NotationFragment001-Cello.ly: 8 note groups, CC0 values correct (95/71/95), velocity 127 on sfz chord, 251-byte modified MIDI. **Bug found & fixed:** LilyPond requires `set-object-property!` to register custom context properties before `\set` will accept them (commit 9ce8239). **Next session:** Tag NotationFragment002-Viola.ly from scratch and run full pipeline end-to-end.
+> **Notation Fragment System — Glissando Pitch Bend + Tie Fix.** Added 3 new multi-state CC0 tags (midiMoltoVibPizz=70, midiMoltoVibArco=2, midiArcoOpen=6). Implemented full glissando pitch bend pipeline: `midiGliss` context property in midi-tags.ily, midi-logger.ily reads it, state_tracker.js maps to `gliss` field, modify_midi.js Phase 2 inserts 20-step linear pitch bend ramps with center reset at Note Off. **Tie fix:** Added `tie-event` listener in midi-logger.ily to skip tie continuation entries (LilyPond ties merge into single MIDI Note On but engraver fires for each notation moment). NF004-Violin full pipeline test PASSED: 9 note groups, 4 gliss bends, CC0=70 molto vibrato correct. NF001-Cello regression PASSED. Documented X-Sample synth settings (§18 in MIDI_MUSIC_GENERATION.md). **Next session:** Compose new notation fragments.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 22, 2026  
-**Focus:** Notation Fragment System — Option E MIDI Tagging System build + first test  
-**Tier 1 Count This Session:** 3 (ASB-088, ASB-089, ASB-090)  
-**Tier 2 Threshold:** 3-4 increments — **READY FOR TIER 2 COMMIT**
+**Focus:** Notation Fragment System — Glissando pitch bend, multi-state modifiers, tie fix, NF004 pipeline test  
+**Tier 1 Count This Session:** 1 (ASB-091)  
+**Tier 2 Threshold:** Committing now
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -137,6 +139,7 @@ That's it. Everything else below is for Cascade.
 - ASB-088: First end-to-end test of modify_midi.js --map. AI cognitive analysis (Option A) of NotationFragment001-Cello.ly → fragment001_cc.json (8 note groups). Created cc_mapping_registry.json (CC0 articulations, velocity overrides, state rules, open strings). Analysis Roadmap added to NOTATION_FRAGMENT_WORKFLOW.md (5 options: A→E).
 - ASB-089: Per-note velocity override in modify_midi.js (optional `vel` field). Enhancement Roadmap (§15) and State Tracker Strategy (§16) added to MIDI_MUSIC_GENERATION.md. Tested: group 7 sfz → vel=127 ✓.
 - ASB-090: Option E MIDI Tagging System — built `midi-tags.ily` (shorthand variables), `midi-logger.ily` (Scheme engraver → JSON event log), `state_tracker.js` (event log → CC map). Expanded `cc_mapping_registry.json` with `\set` property names. Rewrote Step 2C with tagging protocol + lookup table. Added §17 Debugging & Testing Protocols. Tagged NotationFragment001-Cello.ly. **First test:** compiles clean, event log created (8 entries, correct pitches/moments), BUT `midiCCZero`/`midiVelocity` all null — Scheme `ly:context-property` not reading `\set` values. **Bug to fix.**
+- ASB-091: Glissando pitch bend + multi-state CC0 tags + tie-event fix — `midiGliss` property (persistent, ±1 semitone), Phase 2 in modify_midi.js (20-step linear pitch bend ramp, center reset at Note Off), 3 new CC0 tags (midiMoltoVibPizz=70, midiMoltoVibArco=2, midiArcoOpen=6), tie-event listener in midi-logger.ily (skips tie continuations to match MIDI Note On count). NF004-Violin full pipeline test PASSED (9 groups, 4 gliss bends, CC0=70 correct). NF001-Cello regression PASSED. X-Sample synth docs (§18 MIDI_MUSIC_GENERATION.md).
 
 ### Session Log — Bartók Pizzicato Workflow
 - ASB-075: Bartók Pizzicato automation — 3 test .ly files (B4, F¾#6, E¼♭3 with ledger lines + microtonal accidentals), Registry §28 (Microtonal Pitch Syntax) + §29 (Bartók Pizzicato) + "When to Engage the Registry" guide, workflow document (`docs/BARTOK_PIZZICATO_WORKFLOW.md`), standalone SVG cropper (`lilypond_code/crop_svg.js`), **bug fix** in Pass 3 crop logic (nested `<g>`/`<a>` groups with scale transforms were missed — dynamics like fff cut off), fix ported to both crop_svg.js and server.js. Output dir: `public/SVG_graphics/bartok_pizzicato/`, each clef generated fresh (no copy-transpose).
@@ -318,7 +321,8 @@ That's it. Everything else below is for Cascade.
 | ASB-087 | Enhanced modify_midi.js — --map flag for per-note CC injection via JSON, note group detection, expandable CC types | Complete |
 | ASB-088 | First modify_midi.js --map test + cc_mapping_registry.json + Analysis Roadmap (5 options) | Complete |
 | ASB-089 | Per-note velocity override + Enhancement Roadmap (§15) + State Tracker Strategy (§16) | Complete |
-| ASB-090 | Option E MIDI Tagging System — midi-tags.ily, midi-logger.ily, state_tracker.js, docs updates, first test (context property bug found) | In Progress |
+| ASB-090 | Option E MIDI Tagging System — midi-tags.ily, midi-logger.ily, state_tracker.js, docs updates, first test (context property bug found) | Complete |
+| ASB-091 | Glissando pitch bend (Phase 2 ramps) + multi-state CC0 tags + tie-event fix + NF004 pipeline test + X-Sample synth docs (§18) | Complete |
 
 ---
 

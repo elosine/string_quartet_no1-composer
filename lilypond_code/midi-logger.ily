@@ -14,7 +14,7 @@
 %%
 %% The event log is a JSON array of objects, one per note group:
 %%   [
-%%     {"moment": "0/1", "notes": ["fs'"], "midiCCZero": 95, "midiVelocity": null},
+%%     {"moment": "0/1", "notes": ["fs'"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null},
 %%     ...
 %%   ]
 %%
@@ -27,6 +27,8 @@
 #(define midi-log-port #f)
 #(define midi-log-first-entry #t)
 #(define midi-log-current-notes '())
+#(define midi-log-tie-heard #f)
+#(define midi-log-skip-next #f)
 
 %% Helper: convert a LilyPond pitch to a readable string like "fs'" or "af,"
 #(define (pitch->lily-string pitch)
@@ -68,26 +70,31 @@
        (set! midi-log-first-entry #t)
        (display "[\n" midi-log-port)))
 
-    ;; Listen for note events — collect pitches at this timestep
+    ;; Listen for note events and tie events
     (listeners
      ((note-event engraver event)
       (let ((pitch (ly:event-property event 'pitch)))
         (if (ly:pitch? pitch)
             (set! midi-log-current-notes
                   (append midi-log-current-notes
-                          (list (pitch->lily-string pitch))))))))
+                          (list (pitch->lily-string pitch)))))))
+     ((tie-event engraver event)
+      (set! midi-log-tie-heard #t)))
 
     ;; Process music: after all listeners have fired for this timestep,
     ;; emit an entry if we collected any notes
     ((process-music engraver)
-     (if (and midi-log-port (not (null? midi-log-current-notes)))
+     (if (and midi-log-port (not (null? midi-log-current-notes))
+              (not midi-log-skip-next))
          (let* ((ctx (ly:translator-context engraver))
                 (mom (ly:context-current-moment ctx))
                 (mom-str (moment->fraction-string mom))
                 (cc0-raw (ly:context-property ctx 'midiCCZero))
                 (vel-raw (ly:context-property ctx 'midiVelocity))
+                (gliss-raw (ly:context-property ctx 'midiGliss))
                 (cc0 (if (null? cc0-raw) "null" (number->string cc0-raw)))
                 (vel (if (null? vel-raw) "null" (number->string vel-raw)))
+                (gliss (if (null? gliss-raw) "null" (number->string gliss-raw)))
                 ;; Format notes as JSON array of strings
                 (notes-json (string-append "["
                              (string-join
@@ -96,13 +103,21 @@
                               ", ")
                              "]"))
                 ;; Build the JSON object
-                (entry (format #f "  {\"moment\": \"~a\", \"notes\": ~a, \"midiCCZero\": ~a, \"midiVelocity\": ~a}"
-                               mom-str notes-json cc0 vel)))
+                (entry (format #f "  {\"moment\": \"~a\", \"notes\": ~a, \"midiCCZero\": ~a, \"midiVelocity\": ~a, \"midiGliss\": ~a}"
+                               mom-str notes-json cc0 vel gliss)))
            ;; Comma before all entries except the first
            (if midi-log-first-entry
                (set! midi-log-first-entry #f)
                (display ",\n" midi-log-port))
-           (display entry midi-log-port))))
+           (display entry midi-log-port)))
+     ;; If we were told to skip (tie continuation), just clear the flag
+     (if midi-log-skip-next
+         (set! midi-log-skip-next #f))
+     ;; If a tie was heard this timestep, skip the NEXT timestep
+     (if midi-log-tie-heard
+         (begin
+           (set! midi-log-skip-next #t)
+           (set! midi-log-tie-heard #f))))
 
     ;; Stop translation timestep: reset note collector
     ((stop-translation-timestep engraver)

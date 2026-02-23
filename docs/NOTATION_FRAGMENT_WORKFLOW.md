@@ -8,7 +8,163 @@ End-to-end process for creating notation fragment SVGs for score insertion.
 
 ## Overview
 
-Notation Fragments are small, self-contained pieces of musical notation rendered as SVGs via LilyPond. Each fragment represents a compositional gesture — tuplets, chords, articulations, text markings — that will be inserted into the score as a graphic element.
+Notation Fragments are small, self-contained pieces of musical notation created in LilyPond. The system uses custom scripts to produce a relatively accurate representation in a MIDI file, customized and adapted to specific software instruments.
+
+### Gravitational Conductor System
+
+Gravitational Conductors (GCs) are an ictus-based conduction system — essentially an animated bouncing ball that impacts at a particular point in time. Like a real-life conductor, or like an object thrown into the air and acted upon by gravity, the GC provides not just the ictus (the impact point) but also the *feel* of the motion leading into and away from impact.
+
+The core principle is that the kinetic information in the curve — the descent into impact and the ascent from impact — can inform how material is performed. Playing something just before impact has a certain feel to its accent and approach. Playing something just after impact is shaped by the release energy of the curve. The entire spectrum of the GC's curve — from the top of the arc, through descent, at impact, through the rebound — can influence the way anything is played.
+
+The GC graphic object itself has a curve that descends into the impact point and ascends from the impact point. This curve can be used to inform performance interpretation across its full duration.
+
+### Fragments and Gravitational Conductors
+
+Notation fragments are used in conjunction with the Gravitational Conductor system. An assortment of notated fragments is available as a menu of material that can be played in coordination with GCs. The performer interprets the fragment relative to the GC's curve and impact point.
+
+There is a variety of ways to align a fragment with a GC, including:
+
+- **Begin at the top of the curve** — let the gravity of the descending curve influence how the fragment unfolds into impact
+- **Begin along the descending curve** — start the fragment at some point during the descent, letting the accelerating gravitational pull shape the approach toward impact
+- **End on impact** — the fragment is played leading into the ictus, ending at the impact point; the weight of the descending curve drives the performance toward the downbeat
+- **Begin just before impact** — the fragment starts moments before the ictus, charged by the final gravitational acceleration into impact
+- **Begin on impact** — the fragment starts at the ictus (the most conventional mode)
+- **Begin just after impact** — the fragment starts moments after the ictus, propelled by the immediate release energy of the bounce
+- **Begin after impact** — start the fragment somewhere during the ascending curve, letting the rebound energy shape the performance
+- **Begin at the end of the curve** — the fragment starts at the tail of the ascending arc, where the upward momentum dissipates and weightlessness takes over
+
+The GC curve provides a continuous spectrum of interpretive possibilities — any point along the curve can serve as a starting or ending reference for the fragment.
+
+### Development Notes (working sketch)
+
+#### Performance Model: Performer Decides
+
+The performer decides how to interpret the GC and the notational fragment. The score does not prescribe a specific alignment — instead, a **bright orange GC** signals to the performer: "learn this fragment, then in performance, decide when and where to play it relative to this GC." Performance notes in the score will describe the meaning of orange GCs and how to approach them.
+
+**GC reference model:** `GC_20260116_151414` (save score 284). Orange GCs use **bright orange** color.
+
+This means the composer does not need to make explicit choices about tempo or onset/offset for each fragment. The system makes those choices algorithmically for MIDI playback simulation.
+
+#### MIDI Placement Logic
+
+Each GC provides three key times: **curveStart** (top of arc), **impact** (ictus), and **curveEnd** (end of ascending arc). The system selects an alignment and derives the MIDI onset:
+
+| Alignment | MIDI Onset Time |
+|---|---|
+| Begin at top of curve | `curveStart` |
+| Begin along descending curve | Random between `curveStart` and `impact` |
+| End on impact | `impact - fragmentDuration` |
+| Just before impact | `impact - smallOffset` (e.g., 0.1–0.5s) |
+| On impact | `impact` |
+| Just after impact | `impact + smallOffset` |
+| Along ascending curve | Random between `impact` and `curveEnd` |
+| At end of curve | `curveEnd` |
+
+#### Tempo Logic
+
+Tempo is the primary lever for simulating the gravitational feel of each curve position. The system derives tempo from the GC curve data rather than the composer specifying it explicitly.
+
+| Curve Position | Gravitational Feel | Tempo Tendency |
+|---|---|---|
+| Pre-impact (top, descending, end-on, just-before) | Gravity accelerating, energy building | Faster |
+| On impact | Decisive, direct | Moderate-fast |
+| Post-impact (just-after, ascending) | Rebound energy, dissipating | Moderate |
+| End of curve | Weightless, suspended | Slower |
+
+**Sliding tempo scale (per-motive max, 10 BPM decrements outward):**
+
+Each notation fragment has its own **max tempo** (set by the composer). The Core tier uses the max tempo; Mid and Outer tiers decrement by 10 BPM each.
+
+| Tier | BPM Formula | Alignments |
+|---|---|---|
+| Core | `maxTempo` | On impact, End on impact |
+| Mid | `maxTempo − 10` | Just before impact, Just after impact |
+| Mid-Outer | `maxTempo − 20` | Along descending curve, Along ascending curve |
+| Outer | `maxTempo − 30` | Begin at top of curve, At end of curve |
+
+**Examples:**
+
+| Fragment | Max Tempo | Core | Mid | Mid-Outer | Outer |
+|---|---|---|---|---|---|
+| NF001-Cello | 110 | 110 | 100 | 90 | 80 |
+| NF002-Viola | 110 | 110 | 100 | 90 | 80 |
+| NF003-Violin | 90 | 90 | 80 | 70 | 60 |
+
+Pattern: 10 BPM decrements moving outward from impact. Max tempo is a per-fragment composer input (see Step 1).
+
+> **TODO — Tempo implementation testing:**
+> When applying tempo to MIDI snippets, we need to test two approaches:
+> 1. **MIDI tempo meta-event only** — change the tempo in the MIDI file header
+> 2. **Delta-time compression** — scale all note durations and gap durations (as done in `rewrite_tempo.js`)
+>
+> The DAW may ignore MIDI tempo meta-events when inserting snippets into a session at a fixed project tempo. If so, approach 2 (delta-time compression) is required. Test by playing back a snippet at different tempos in the DAW and comparing results.
+
+#### Alignment Selection: Weighted Random
+
+The system uses **weighted random selection** to choose which of the 8 alignment possibilities to simulate for MIDI playback. Default weights can be set globally, and overridden per-fragment when the composer wants to nudge the behavior (e.g., weight a rhythmically punchy fragment toward impact-adjacent alignments, or a lyrical fragment toward curve positions).
+
+**Default weights:**
+
+| Alignment | Weight | Tier | Tier total |
+|---|---|---|---|
+| On impact | 30% | Core | 60% |
+| End on impact | 30% | Core | |
+| Just before impact | 12.5% | Mid | 25% |
+| Just after impact | 12.5% | Mid | |
+| Begin along descending curve | 3.75% | Outer | 15% |
+| Along ascending curve | 3.75% | Outer | |
+| Begin at top of curve | 3.75% | Outer | |
+| At end of curve | 3.75% | Outer | |
+
+Weights are overridable per-fragment. For example, a rhythmically punchy fragment could shift weight toward Core; a lyrical fragment could shift toward Outer.
+
+#### Implementation Plan
+
+**Key insight:** Unlike the pizzicato tremolo or glissando systems where parameters vary freely at composition time, notation fragments have a small, fixed menu of pre-composed material. This means we can **pre-generate everything** — SVGs, enhanced MIDIs, and tempo variants — and store them in a database. At composition time, the composer just selects and inserts from the database.
+
+**What exists:**
+
+1. ✅ Notation fragment `.ly` files with MIDI tagging (Steps 2–4)
+2. ✅ SVG rendering + cropping pipeline (Steps 3, 5)
+3. ✅ MIDI post-processing with CC injection (Step 4)
+4. ✅ GC system exists in the score (bouncing ball animation with curve data)
+5. ✅ `rewrite_tempo.js` — rewrites Set Tempo meta-event in MIDI files to any BPM
+
+**What is pre-generated (one-time, per fragment):**
+
+- **SVG** — cropped notation graphic (static, doesn't vary)
+- **Enhanced MIDI** — CC-injected MIDI with correct articulation/velocity data (static)
+- **Tempo variants** — pre-generated MIDI files at each alignment tempo (limited set, pre-generated)
+
+**Expandability:** The collection of fragments will grow. A clear pipeline must exist for adding a new fragment: compose .ly → render → crop SVG → tag MIDI → inject CCs → generate tempo variants → register in database.
+
+**Composition workflow (target):**
+
+1. Composer opens UI, selects a fragment from a menu (sees SVG preview)
+2. Composer sets start time
+3. Composer either hits **Go** (algorithmic choice) or explicitly selects an alignment
+4. System chooses alignment (weighted random) or uses the explicit choice
+5. System grabs the appropriate pre-generated MIDI snippet for that alignment's tempo
+6. System computes MIDI onset time from the GC curve geometry + alignment
+7. System places SVG notation + orange GC + MIDI snippet on the timeline
+
+**Steps / decisions to make:**
+
+| # | Item | Type | Status |
+|---|------|------|--------|
+| 1 | Decide tempo per alignment — listen to tempo variants in DAW, determine BPM ranges | Decision | ✅ Resolved — 110/100/90/80 BPM tiers |
+| 2 | Develop the weighted random alignment selector algorithm | Build | Pending |
+| 3 | Define default alignment weights | Decision | ✅ Resolved — 60/25/15% tiers |
+| 4 | Build the fragment object database (JSON registry of fragments with SVG/MIDI paths, instrument, duration, alignment weights) | Build | Pending |
+| 5 | Build clear pipeline/workflow for adding new fragments and incorporating into the system | Document | Pending |
+| 6 | Build MIDI onset time calculator (alignment + GC curve → onset time) | Build | Pending |
+| 7 | Build score integration (SVG placement, MIDI snippet loading, orange GC creation) | Build | Pending |
+| 8 | Build bright orange GC visual indicator (ref: `GC_20260116_151414`, save score 284) | Build | Pending |
+| 9 | Build fragment selection UI (menu, SVG preview, start time, Go button, explicit alignment override) | Build | Pending |
+| 10 | Write performance notes for the score (meaning of orange GCs, how performers should approach fragments) | Document | Pending |
+
+
+### Conventions
 
 **Naming convention:** `NotationFragment[NNN]-[Instrument].ly`
 
@@ -18,13 +174,45 @@ Notation Fragments are small, self-contained pieces of musical notation rendered
 
 ---
 
-## Step 1: Gather Input
+## Step 1: Gather Inputs
 
-**Status:** Pending
+**Status:** Active
 
-| Parameter | Required | Options | Notes |
-|-----------|----------|---------|-------|
-| **Tempo** | Yes | `random` or specific BPM (e.g. `120`) | If `random`, generate a random tempo within certain bounds (bounds TBD) |
+These are the inputs required at **composition time** when inserting a fragment into the score.
+
+| # | Parameter | Required | Source | Options / Default | Notes |
+|---|-----------|----------|--------|-------------------|-------|
+| 1 | **Fragment ID** | Yes | UI menu | e.g. `NF001`, `NF002` | Menu is organized by instrument section (Violin, Viola, Cello); composer selects with SVG preview |
+| 2 | **Instrument** | Auto | Fragment ID | Derived from fragment filename | e.g. `NotationFragment002-Viola.ly` → Viola. No separate instrument choice needed |
+| 3 | **Violin part** | If instrument = Violin | Composer | `Violin 1` or `Violin 2` | Only prompted when a Violin fragment is selected; Viola/Cello skip this step |
+| 4 | **Start time** | Yes | Composer | Timeline position (seconds or beats) | Where the fragment begins on the score timeline |
+| 5 | **Alignment mode** | Yes | Composer | `algorithmic` (default) or explicit choice | `algorithmic` = weighted random; explicit = composer picks one of the 8 alignments |
+| 6 | **Explicit alignment** | If mode = explicit | Composer | One of 8 alignment choices | Only used when alignment mode is explicit |
+| 7 | **Weight overrides** | No | Composer | Per-alignment weight adjustments | **Strictly optional** — sensible defaults are built in. The composer should never feel obligated to provide weights; the system works well without them. Only use when intentionally biasing a specific fragment toward certain alignments. |
+
+**Instrument → Track / Channel mapping (0-indexed):**
+
+| Instrument | Track | MIDI Channel |
+|---|---|---|
+| Violin 1 | 0 | Ch 0 |
+| Violin 2 | 1 | Ch 1 |
+| Viola | 2 | Ch 2 |
+| Cello | 3 | Ch 3 |
+
+**Resolved by system at insertion time (not composer inputs):**
+
+| Derived value | Source | Notes |
+|---------------|--------|-------|
+| **Track** | Instrument (+ violin part choice if applicable) | 0-indexed; see mapping table above |
+| **MIDI channel** | Track | Same as track number for notation fragments. **Future:** may need channel offsets if fragments use CC7 volume ramps or channel pressure (see MIDI State Reset Problem in `MIDI_MUSIC_GENERATION.md` §13). |
+| **Selected alignment** | Weighted random or explicit choice | Determines tempo + onset |
+| **Tempo (BPM)** | Alignment → tempo lookup (110/100/90/80) | Pre-generated MIDI variant selected |
+| **MIDI file path** | Fragment DB + selected tempo | Points to pre-generated tempo variant |
+| **SVG file path** | Fragment DB | Static, one per fragment |
+| **Orange GC** | Start time + GC reference model (`GC_20260116_151414`) | System creates a bright orange GC at the start time using the reference model parameters |
+| **GC curve times** | Orange GC | curveStart, impact, curveEnd derived from the generated GC |
+| **MIDI onset time** | GC curve times + alignment | Computed from curveStart, impact, curveEnd |
+| **SVG placement position** | Start time + layout rules | Where the notation graphic goes on the visual timeline |
 
 ---
 
@@ -69,18 +257,26 @@ Follow every time when writing or editing a `.ly` file:
 2. ✅ `\context { \Voice \consists \midiLogEngraver }` in `\layout`
 3. ✅ Set initial articulation mode BEFORE the first note (e.g., `\midiPizz`)
 4. ✅ Add `\midiXxx` BEFORE each note where the technique changes
-5. ✅ One-shot CC0 pattern: `\midiPizzOpen` → note → `\midiPizz` (revert)
-6. ✅ One-shot velocity pattern: `\midiSfz` → note → `\midiVelReset`
-7. ✅ Walk through the music — every note should have an active `midiCCZero` value
+5. ✅ **MODE PERSISTENCE:** Base mode (pizz/arco) persists until explicitly changed. Do NOT infer mode changes from expression markings (e.g., "m.v." does not imply arco). Only explicit "arco" or "pizz." text resets the base mode.
+6. ✅ One-shot CC0 pattern: `\midiPizzOpen` → note → `\midiPizz` (revert)
+7. ✅ Multi-state modifier pattern: `\midiMoltoVibPizz` → note → `\midiPizz` (revert to base mode)
+8. ✅ Glissando pitch bend pattern (Mode 1, ≤1 semitone): `\midiGlissUp` → gliss notes → `\midiGlissReset` before destination
+9. ✅ One-shot velocity pattern: `\midiSfz` → note → `\midiVelReset`
+10. ✅ Walk through the music — every note should have an active `midiCCZero` value
 
 ### Quick Lookup Table
 
 | You see this in the score | Add this in the `.ly` file | Behavior |
 |---|---|---|
 | `"pizz."` text markup | `\midiPizz` | Persistent |
-| `"o"` markup (open string in pizz context) | `\midiPizzOpen` → note → `\midiPizz` | One-shot, manual revert |
+| `"o"` markup (open string, **pizz** context) | `\midiPizzOpen` → note → `\midiPizz` | One-shot, manual revert |
+| `"o"` markup (open string, **arco** context) | `\midiArcoOpen` → note → `\midiArco` | One-shot, manual revert |
 | `\snappizzicato` | `\midiBartokPizz` → note → revert to base mode | One-shot (consecutive Bartók pizz: no revert needed) |
+| `"m.v."` markup (molto vibrato, **pizz** context) | `\midiMoltoVibPizz` → note → `\midiPizz` | One-shot, manual revert |
+| `"m.v."` markup (molto vibrato, **arco** context) | `\midiMoltoVibArco` → note → `\midiArco` | One-shot, manual revert |
 | Return to arco / sustained | `\midiArco` | Persistent |
+| `\glissando` (up ≤1 semitone) | `\midiGlissUp` → gliss notes → `\midiGlissReset` | Persistent, unset before destination |
+| `\glissando` (down ≤1 semitone) | `\midiGlissDown` → gliss notes → `\midiGlissReset` | Persistent, unset before destination |
 | `\sfz` dynamic | `\midiSfz` → note → `\midiVelReset` | One-shot, manual revert |
 
 ### Context Properties
@@ -89,6 +285,7 @@ Follow every time when writing or editing a `.ly` file:
 |---|---|---|---|
 | `Voice.midiCCZero` | integer (0–127) | Persistent until next `\set` | CC0 articulation mode |
 | `Voice.midiVelocity` | integer (0–127) | One-shot — must `\unset` after note | Velocity override |
+| `Voice.midiGliss` | number (semitones) | Persistent until `\unset` | Pitch bend glissando (+1=up, -1=down, fractional OK) |
 
 ### Example: Tagged Notation
 

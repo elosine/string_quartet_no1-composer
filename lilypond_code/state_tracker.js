@@ -10,7 +10,7 @@
  * Output: JSON map compatible with modify_midi.js --map format
  *
  * Each event log entry:
- *   { "moment": "0/1", "notes": ["fs'"], "midiCCZero": 95, "midiVelocity": null }
+ *   { "moment": "0/1", "notes": ["fs'"], "midiCCZero": 95, "midiVelocity": null, "midiGliss": null }
  *
  * Output format:
  *   {
@@ -18,7 +18,8 @@
  *     "inputFile": "...",
  *     "noteEvents": [
  *       { "noteIndex": 0, "cc": [{ "num": 0, "val": 95 }] },
- *       { "noteIndex": 7, "cc": [{ "num": 0, "val": 95 }], "vel": 127 }
+ *       { "noteIndex": 7, "cc": [{ "num": 0, "val": 95 }], "vel": 127 },
+ *       { "noteIndex": 3, "cc": [{ "num": 0, "val": 95 }], "gliss": { "semitones": 1 } }
  *     ]
  *   }
  */
@@ -82,8 +83,13 @@ for (let i = 0; i < eventLog.length; i++) {
         noteEvent.vel = entry.midiVelocity;
     }
 
-    // Only include entries that have CC or velocity data
-    if (noteEvent.cc || noteEvent.vel !== undefined) {
+    // Glissando pitch bend from midiGliss
+    if (entry.midiGliss !== null && entry.midiGliss !== undefined) {
+        noteEvent.gliss = { semitones: entry.midiGliss };
+    }
+
+    // Only include entries that have CC, velocity, or gliss data
+    if (noteEvent.cc || noteEvent.vel !== undefined || noteEvent.gliss) {
         noteEvents.push(noteEvent);
     }
 }
@@ -112,5 +118,7 @@ console.error(`  Output note events: ${noteEvents.length}`);
 
 const ccCount = noteEvents.filter(e => e.cc).length;
 const velCount = noteEvents.filter(e => e.vel !== undefined).length;
+const glissCount = noteEvents.filter(e => e.gliss).length;
 console.error(`  CC injections: ${ccCount}`);
 console.error(`  Velocity overrides: ${velCount}`);
+console.error(`  Glissando bends: ${glissCount}`);
