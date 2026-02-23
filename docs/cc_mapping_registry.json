@@ -68,6 +68,15 @@
       "revert_pattern": "\\midiArcoOpen → note → \\midiArco",
       "requires_mode": "arco",
       "notes": "Open string in arco context. One-shot: revert to arco base mode after the note."
+    },
+    "80": {
+      "technique": "Behind the bridge (b.b.) pizzicato",
+      "notation_symbol": "\"b.b.\" / X noteheads",
+      "shorthand": "\\midiBB",
+      "set_command": "\\set Voice.midiCCZero = #80",
+      "state_rule": "one-shot",
+      "revert_pattern": "\\midiBB → note → revert to base mode (e.g. \\midiPizz). Consecutive b.b. notes: no revert needed between them.",
+      "notes": "Behind-the-bridge pizzicato. X noteheads indicate indeterminate pitch on open strings. One-shot: revert to current base mode after the note or group."
     }
   },
 

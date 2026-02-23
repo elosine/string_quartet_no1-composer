@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Feb 22, 2026  
-**Current ASB Number:** ASB-091
+**Current ASB Number:** ASB-092
 
 ---
 
@@ -46,7 +46,7 @@ That's it. Everything else below is for Cascade.
 | Vibrato System | Complete | Maintenance only |
 | Crescendo-Decrescendo | Complete | Maintenance only |
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
-| Notation Fragment System | **In Progress** | Option E active: full pipeline proven (ASB-090/091). Glissando pitch bend (Phase 2) + tie-event fix. NF001+NF004 tested. Next: compose more fragments |
+| Notation Fragment System | **In Progress** | Option E active: full pipeline proven (ASB-090/091). NF005-Violin composed (b.b. pizz + Bartók pizz + Z-stem + X noteheads + TextSpanner bracket). New CC0=80 \midiBB tag. Next: pipeline test NF005, compose more fragments |
 | LilyPond Settings Registry | Active | Update when settings change |
 | Musical Material Workflow | Active | Expand as new material types are built |
 
@@ -95,15 +95,15 @@ That's it. Everything else below is for Cascade.
 
 ## Last Session Summary
 
-> **Notation Fragment System — Glissando Pitch Bend + Tie Fix.** Added 3 new multi-state CC0 tags (midiMoltoVibPizz=70, midiMoltoVibArco=2, midiArcoOpen=6). Implemented full glissando pitch bend pipeline: `midiGliss` context property in midi-tags.ily, midi-logger.ily reads it, state_tracker.js maps to `gliss` field, modify_midi.js Phase 2 inserts 20-step linear pitch bend ramps with center reset at Note Off. **Tie fix:** Added `tie-event` listener in midi-logger.ily to skip tie continuation entries (LilyPond ties merge into single MIDI Note On but engraver fires for each notation moment). NF004-Violin full pipeline test PASSED: 9 note groups, 4 gliss bends, CC0=70 molto vibrato correct. NF001-Cello regression PASSED. Documented X-Sample synth settings (§18 in MIDI_MUSIC_GENERATION.md). **Next session:** Compose new notation fragments.
+> **NotationFragment005-Violin — b.b. pizzicato + extended techniques.** Composed new notation fragment with behind-the-bridge (b.b.) pizzicato chords (X noteheads, open strings G3/D4/A4/E5), arpeggio strum symbols, Bartók pizzicato, quintuplet 5:4 + triplet 3:2 rhythmic structures, ties across tuplet boundaries, Z-stem calligraphic bar with fermata + hairpin, hidden MIDI voice (6:4 polyphonic block). **New features:** Independent X notehead size control (`x-notehead-size` Scheme variable + `\xHead`/`\xHeadOnce`/`\xHeadRevert` shorthands), 5 alternative X glyph options (cross/xcircle/bold×/sans×/slash), TextSpanner one-sided bracket ("b.b." text + horizontal line + perpendicular drop). **New MIDI tag:** `\midiBB` (CC0=80) for behind-the-bridge pizzicato — one-shot, added to midi-tags.ily + cc_mapping_registry.json. **Notation research:** Created `docs/NotationResearch.md` consolidating extended string techniques notation references. **Next:** Pipeline test NF005, compose more fragments.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 22, 2026  
-**Focus:** Notation Fragment System — Glissando pitch bend, multi-state modifiers, tie fix, NF004 pipeline test  
-**Tier 1 Count This Session:** 1 (ASB-091)  
+**Focus:** NotationFragment005-Violin — b.b. pizzicato + extended techniques + \midiBB tag  
+**Tier 1 Count This Session:** 1 (ASB-092)  
 **Tier 2 Threshold:** Committing now
 
 ### Session Log (prior sessions)
@@ -140,6 +140,7 @@ That's it. Everything else below is for Cascade.
 - ASB-089: Per-note velocity override in modify_midi.js (optional `vel` field). Enhancement Roadmap (§15) and State Tracker Strategy (§16) added to MIDI_MUSIC_GENERATION.md. Tested: group 7 sfz → vel=127 ✓.
 - ASB-090: Option E MIDI Tagging System — built `midi-tags.ily` (shorthand variables), `midi-logger.ily` (Scheme engraver → JSON event log), `state_tracker.js` (event log → CC map). Expanded `cc_mapping_registry.json` with `\set` property names. Rewrote Step 2C with tagging protocol + lookup table. Added §17 Debugging & Testing Protocols. Tagged NotationFragment001-Cello.ly. **First test:** compiles clean, event log created (8 entries, correct pitches/moments), BUT `midiCCZero`/`midiVelocity` all null — Scheme `ly:context-property` not reading `\set` values. **Bug to fix.**
 - ASB-091: Glissando pitch bend + multi-state CC0 tags + tie-event fix — `midiGliss` property (persistent, ±1 semitone), Phase 2 in modify_midi.js (20-step linear pitch bend ramp, center reset at Note Off), 3 new CC0 tags (midiMoltoVibPizz=70, midiMoltoVibArco=2, midiArcoOpen=6), tie-event listener in midi-logger.ily (skips tie continuations to match MIDI Note On count). NF004-Violin full pipeline test PASSED (9 groups, 4 gliss bends, CC0=70 correct). NF001-Cello regression PASSED. X-Sample synth docs (§18 MIDI_MUSIC_GENERATION.md).
+- ASB-092: NotationFragment005-Violin — b.b. pizzicato + Bartók pizz + Z-stem + X noteheads (5 glyph options, independent size control) + arpeggio strum + TextSpanner one-sided bracket + quintuplet 5:4 / triplet 3:2 / ties across tuplets + hidden MIDI voice (6:4 polyphonic). New `\midiBB` tag (CC0=80) in midi-tags.ily + cc_mapping_registry.json. NotationResearch.md created.
 
 ### Session Log — Bartók Pizzicato Workflow
 - ASB-075: Bartók Pizzicato automation — 3 test .ly files (B4, F¾#6, E¼♭3 with ledger lines + microtonal accidentals), Registry §28 (Microtonal Pitch Syntax) + §29 (Bartók Pizzicato) + "When to Engage the Registry" guide, workflow document (`docs/BARTOK_PIZZICATO_WORKFLOW.md`), standalone SVG cropper (`lilypond_code/crop_svg.js`), **bug fix** in Pass 3 crop logic (nested `<g>`/`<a>` groups with scale transforms were missed — dynamics like fff cut off), fix ported to both crop_svg.js and server.js. Output dir: `public/SVG_graphics/bartok_pizzicato/`, each clef generated fresh (no copy-transpose).
@@ -323,6 +324,7 @@ That's it. Everything else below is for Cascade.
 | ASB-089 | Per-note velocity override + Enhancement Roadmap (§15) + State Tracker Strategy (§16) | Complete |
 | ASB-090 | Option E MIDI Tagging System — midi-tags.ily, midi-logger.ily, state_tracker.js, docs updates, first test (context property bug found) | Complete |
 | ASB-091 | Glissando pitch bend (Phase 2 ramps) + multi-state CC0 tags + tie-event fix + NF004 pipeline test + X-Sample synth docs (§18) | Complete |
+| ASB-092 | NF005-Violin (b.b. pizz + Bartók + Z-stem + X noteheads + TextSpanner bracket) + \midiBB CC0=80 + NotationResearch.md | Complete |
 
 ---
 
@@ -347,6 +349,8 @@ That's it. Everything else below is for Cascade.
 | Feb 21, 2026 | b86008e | z-stem pizzicato tremolo: research, calligraphic polygon, parameterized controls, registry §30 (ASB-080 to ASB-081) |
 | Feb 21, 2026 | be6caa4 | pizzicato tremolo complete: full system, documentation wrap-up (ASB-082 to ASB-084) |
 | Feb 22, 2026 | 3c3f1bf | notation fragments: Option E MIDI tagging system + velocity override + CC registry (ASB-088 to ASB-090) |
+| Feb 22, 2026 | a2f0779 | glissando pitch bend ramps + multi-state CC0 tags + tie-event fix (ASB-091) |
+| Feb 22, 2026 | fd0f37e | NF005-Violin: b.b. pizzicato + extended techniques + \midiBB CC0=80 (ASB-092) |
 
 ---
 

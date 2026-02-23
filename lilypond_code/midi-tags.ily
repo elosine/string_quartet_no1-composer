@@ -57,6 +57,7 @@
 %%   \glissando (up ≤1 st)  | \midiGlissUp        | Persistent → reset
 %%   \glissando (dn ≤1 st)  | \midiGlissDown      | Persistent → reset
 %%   (after last gliss)     | \midiGlissReset     | Clears gliss flag
+%%   "b.b." / X noteheads   | \midiBB             | One-shot → revert
 %%   \sfz dynamic           | \midiSfz            | One-shot → reset
 %%   (after sfz note)       | \midiVelReset       | Clears override
 %%
@@ -113,6 +114,10 @@ midiMoltoVibArco = { \set Voice.midiCCZero = #2 }
 
 midiArcoOpen = { \set Voice.midiCCZero = #6 }
 %% CC0=6: Open string in arco context
+
+midiBB = { \set Voice.midiCCZero = #80 }
+%% CC0=80: Behind the bridge (b.b.) pizzicato. One-shot: revert to base mode after note.
+%% Consecutive b.b. notes: no revert needed between them; revert after last in group.
 
 
 %% === Velocity Overrides (one-shot — MUST \unset after the note) ===
