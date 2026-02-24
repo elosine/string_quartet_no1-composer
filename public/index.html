@@ -1183,6 +1183,58 @@
                 </div>
                 
                 <div class="section-divider"></div>
+                <div class="section-label" style="background: var(--clr-brightOrange); color: #000; padding: 3px 6px; border-radius: 2px; font-weight: bold;">Notation Fragments</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Frag</label>
+                    <select id="nfFragmentSelect" style="width: 170px; background: #333; color: #fff; border: 1px solid #555; font-size: 9px;">
+                        <option value="">-- Select --</option>
+                        <option value="NF001">NF001 — Cello</option>
+                        <option value="NF002">NF002 — Viola</option>
+                        <option value="NF003">NF003 — Violin</option>
+                        <option value="NF004">NF004 — Violin</option>
+                        <option value="NF005">NF005 — Violin</option>
+                        <option value="NF006">NF006 — Violin</option>
+                        <option value="NF007">NF007 — Viola</option>
+                        <option value="NF008">NF008 — Cello</option>
+                    </select>
+                </div>
+                <div id="nfPreviewContainer" style="margin: 4px 0; background: #fff; border: 1px solid #555; border-radius: 3px; min-height: 40px; max-height: 100px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    <span id="nfPreviewPlaceholder" style="font-size: 9px; color: #999;">Select a fragment</span>
+                    <img id="nfPreviewImg" style="display: none; max-width: 100%; max-height: 98px; object-fit: contain;">
+                </div>
+                <div id="nfViolinTrackRow" class="curve-input-row" style="display: none;">
+                    <label style="font-size: 9px; min-width: 28px;">Part</label>
+                    <select id="nfViolinSelect" style="width: 80px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="1">Violin 1</option>
+                        <option value="2" selected>Violin 2</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Time</label>
+                    <input type="number" id="nfTimeInput" class="curve-input" value="0" step="0.1" style="width: 65px; font-size: 10px;" title="GC impact time in seconds">
+                    <span style="font-size: 8px; color: #888; margin-left: 3px;">s</span>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Align</label>
+                    <select id="nfAlignSelect" style="width: 120px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="algorithmic" selected>Algorithmic</option>
+                        <option value="onImpact">On Impact</option>
+                        <option value="endOnImpact">End on Impact</option>
+                        <option value="justBefore">Just Before</option>
+                        <option value="justAfter">Just After</option>
+                        <option value="descendingCurve">Descending Curve</option>
+                        <option value="ascendingCurve">Ascending Curve</option>
+                        <option value="topOfCurve">Top of Curve</option>
+                        <option value="endOfCurve">End of Curve</option>
+                    </select>
+                </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="nfInsertBtn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 12px;">Insert</button>
+                    <span id="nfStatusLabel" style="font-size: 9px; color: #888; margin-left: 8px;"></span>
+                </div>
+                
+                <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-brightBlue); color: #fff; padding: 3px 6px; border-radius: 2px;">Pizzicato Tremolo</div>
                 
                 <div class="curve-input-row">
@@ -1235,6 +1287,99 @@
                 </div>
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="ptGoBtn" class="control-btn" style="font-size: 11px; background: var(--clr-brightBlue); color: #fff; font-weight: bold; padding: 4px 12px;">Go</button>
+                </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label" style="background: #2a8a8a; color: #fff; padding: 3px 6px; border-radius: 2px;">Pizz Tremolo Glissando</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Track</label>
+                    <input type="number" id="ptgTrackInput" class="curve-input" value="1" min="1" max="4" step="1" style="width: 35px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">Clef</label>
+                    <select id="ptgClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="treble" selected>Treble</option>
+                        <option value="alto">Alto</option>
+                        <option value="bass">Bass</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Start</label>
+                    <input type="number" id="ptgStartInput" class="curve-input" value="0" step="1" style="width: 50px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">End</label>
+                    <input type="number" id="ptgEndInput" class="curve-input" value="10" step="1" style="width: 50px; font-size: 10px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Y1</label>
+                    <input type="number" id="ptgY1Input" class="curve-input" value="10" step="0.5" min="0" max="10" style="width: 50px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">Y2</label>
+                    <input type="number" id="ptgY2Input" class="curve-input" value="0" step="0.5" min="0" max="10" style="width: 50px; font-size: 10px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Model</label>
+                    <select id="ptgModelSelect" style="width: 80px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="logarithmic" selected>Log</option>
+                        <option value="exponential">Exp</option>
+                        <option value="power">Power</option>
+                        <option value="sigmoid">S-Curve</option>
+                    </select>
+                    <label style="font-size: 7px; min-width: 18px; margin-left: 3px;">Slope</label>
+                    <input type="number" id="ptgSlopeInput" class="curve-input" value="-1" step="0.1" min="-3" max="3" style="width: 58px; font-size: 9px; padding: 1px 2px;" title="Curve slope (-3 to +3). Updates when curve is adjusted by mouse.">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Start</label>
+                    <input type="text" id="ptgStartPitch" class="curve-input" value="C4" style="width: 45px; font-size: 10px;" placeholder="C4" title="Pitch: C4, C#4, Bb3, C+4 (¼♯), Cd4 (¼♭), C#+4 (¾♯), Cbd4 (¾♭)">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">End</label>
+                    <input type="text" id="ptgEndPitch" class="curve-input" value="A+4" style="width: 45px; font-size: 10px;" placeholder="A+4" title="Pitch: C4, C#4, Bb3, C+4 (¼♯), Cd4 (¼♭), C#+4 (¾♯), Cbd4 (¾♭)">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Dyn1</label>
+                    <select id="ptgStartDynamic" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="ppp">ppp</option>
+                        <option value="pp" selected>pp</option>
+                        <option value="p">p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f">f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff">fff</option>
+                    </select>
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">Dyn2</label>
+                    <select id="ptgEndDynamic" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p">p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f">f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff" selected>fff</option>
+                    </select>
+                </div>
+                <div class="color-swatches" id="ptgColorSwatches" style="margin-top: 4px;">
+                    <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
+                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
+                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
+                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
+                    <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
+                    <div class="color-swatch selected" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
+                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
+                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
+                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
+                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
+                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
+                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                </div>
+                <div class="curve-fill-toggle" style="margin-top: 3px;">
+                    <input type="radio" id="ptgFillLine" name="ptgFill" value="line">
+                    <label for="ptgFillLine">Line</label>
+                    <input type="radio" id="ptgFillBottom" name="ptgFill" value="bottom" checked>
+                    <label for="ptgFillBottom">Fill ↓</label>
+                    <input type="radio" id="ptgFillTop" name="ptgFill" value="top">
+                    <label for="ptgFillTop">Fill ↑</label>
+                </div>
+                <div class="control-row" style="margin-top: 5px; gap: 5px;">
+                    <button id="ptgStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
+                    <button id="ptgStep2Btn" class="control-btn" style="font-size: 11px; background: #2a8a8a; color: #fff; font-weight: bold; padding: 4px 8px;">2: Generate</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -17639,6 +17784,472 @@
         window.LongToneUI = LongToneUI;
         
         // ============================================
+        // PIZZ TREMOLO GLISSANDO UI
+        // Z-stem pizzicato tremolo with glissando
+        // Pipeline: create curve → generate .ly → render SVG → crop → insert SVG
+        // ============================================
+        const PizzTremGlissUI = {
+            pendingCurve: null,
+            
+            init() {
+                const step1Btn = document.getElementById('ptgStep1Btn');
+                const step2Btn = document.getElementById('ptgStep2Btn');
+                
+                if (step1Btn) step1Btn.addEventListener('click', () => this.step1());
+                if (step2Btn) step2Btn.addEventListener('click', () => this.step2());
+                
+                // Color swatch handlers
+                document.querySelectorAll('#ptgColorSwatches .color-swatch').forEach(swatch => {
+                    swatch.addEventListener('click', (e) => {
+                        document.querySelectorAll('#ptgColorSwatches .color-swatch').forEach(s => s.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                    });
+                });
+                
+                console.log('PizzTremGlissUI initialized');
+            },
+            
+            // Step 1: Create curve — user can adjust before generating
+            // If called with params (e.g., from AI Command Bridge), populates UI fields
+            // so step2 can read them without needing params again
+            step1(params = null) {
+                console.log('PizzTremGlissUI.step1: Creating curve...');
+                
+                // Populate UI fields from params so step2 reads correct values
+                if (params) {
+                    if (params.track || params.gTrack) document.getElementById('ptgTrackInput').value = params.track || params.gTrack;
+                    if (params.clef) document.getElementById('ptgClefSelect').value = params.clef;
+                    if (params.startSeconds !== undefined) document.getElementById('ptgStartInput').value = params.startSeconds;
+                    if (params.endSeconds !== undefined) document.getElementById('ptgEndInput').value = params.endSeconds;
+                    if (params.y1 !== undefined) document.getElementById('ptgY1Input').value = params.y1;
+                    if (params.y2 !== undefined) document.getElementById('ptgY2Input').value = params.y2;
+                    if (params.model) document.getElementById('ptgModelSelect').value = params.model;
+                    if (params.slope !== undefined) document.getElementById('ptgSlopeInput').value = params.slope;
+                    if (params.startPitch) document.getElementById('ptgStartPitch').value = params.startPitch;
+                    if (params.endPitch) document.getElementById('ptgEndPitch').value = params.endPitch;
+                    if (params.startDynamic) document.getElementById('ptgStartDynamic').value = params.startDynamic;
+                    if (params.endDynamic) document.getElementById('ptgEndDynamic').value = params.endDynamic;
+                }
+                
+                const curve = this.createCurve(params);
+                if (!curve) {
+                    console.error('PizzTremGlissUI.step1: Failed to create curve');
+                    return null;
+                }
+                this.pendingCurve = curve;
+                console.log('PizzTremGlissUI.step1: Curve created:', curve.name, '— adjust shape, then click Generate');
+                return curve;
+            },
+            
+            // Step 2: Generate LilyPond, render SVG, crop, insert into score
+            async step2(params = null) {
+                const btn = document.getElementById('ptgStep2Btn');
+                const originalText = btn ? btn.textContent : '';
+                const originalBg = btn ? btn.style.background : '';
+                
+                let curve = this.pendingCurve;
+                if (!curve) {
+                    if (window.CurveMaker && CurveMaker.selectedCurve) {
+                        curve = CurveMaker.selectedCurve;
+                    } else {
+                        console.error('PizzTremGlissUI.step2: No curve. Run Step 1 first.');
+                        return null;
+                    }
+                }
+                
+                if (btn) { btn.textContent = 'Generating...'; btn.style.background = '#888'; btn.disabled = true; }
+                
+                let result = null;
+                try {
+                    result = await this.generateAll(curve, params);
+                } finally {
+                    if (btn) {
+                        btn.textContent = result ? '✓ Done' : '✗ Error';
+                        btn.style.background = result ? '#4a4' : '#a44';
+                        setTimeout(() => { btn.textContent = originalText; btn.style.background = originalBg; btn.disabled = false; }, 1500);
+                    }
+                }
+                if (result) this.pendingCurve = null;
+                return result;
+            },
+            
+            async generateAll(curve, params = null) {
+                // Read UI values
+                const clef = params?.clef ?? document.getElementById('ptgClefSelect').value;
+                const startPitchRaw = params?.startPitch ?? document.getElementById('ptgStartPitch').value.trim();
+                const endPitchRaw = params?.endPitch ?? document.getElementById('ptgEndPitch').value.trim();
+                const startDynamic = params?.startDynamic ?? document.getElementById('ptgStartDynamic').value;
+                const endDynamic = params?.endDynamic ?? document.getElementById('ptgEndDynamic').value;
+                
+                // Convert pitches to LilyPond
+                const startPitchLP = LongToneUI.pitchToLilyPond(startPitchRaw);
+                const endPitchLP = LongToneUI.pitchToLilyPond(endPitchRaw);
+                const lpClef = clef === 'cClef' ? 'alto' : clef;
+                
+                // Determine hairpin direction
+                const dynOrder = ['ppp','pp','p','mp','mf','f','ff','fff'];
+                const hairpin = dynOrder.indexOf(endDynamic) > dynOrder.indexOf(startDynamic) ? '\\<' : '\\>';
+                
+                // Check same staff line for gliss offset
+                const glissOffset = LongToneUI.sameStaffLine(startPitchRaw, endPitchRaw) ? '0.3' : '0';
+                
+                // Generate filename
+                const clefName = clef === 'cClef' ? 'alto' : clef;
+                const filename = `PizzTremGliss-${clefName}-${startPitchRaw}-${endPitchRaw}-${startDynamic}-${endDynamic}.ly`;
+                
+                // Step 3: Create LilyPond file from template
+                try {
+                    const createResp = await fetch('/api/lilypond/create-pizz-trem-gliss', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filename,
+                            clef: lpClef,
+                            startPitch: startPitchLP,
+                            endPitch: endPitchLP,
+                            startDynamic,
+                            endDynamic,
+                            hairpin,
+                            glissOffset
+                        })
+                    });
+                    const createResult = await createResp.json();
+                    if (!createResult.success) {
+                        console.error('PizzTremGlissUI: Failed to create .ly file:', createResult.error);
+                        return null;
+                    }
+                    console.log('PizzTremGlissUI: Created .ly file:', filename);
+                } catch (err) {
+                    console.error('PizzTremGlissUI: Error creating .ly file:', err);
+                    return null;
+                }
+                
+                // Step 4: Render LilyPond to SVG (reuse existing render endpoint)
+                let svgPath = null;
+                try {
+                    const renderResp = await fetch('/api/lilypond/render-glissando', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ filename })
+                    });
+                    const renderResult = await renderResp.json();
+                    if (renderResult.success) {
+                        svgPath = renderResult.svgPath;
+                        console.log('PizzTremGlissUI: SVG rendered:', svgPath);
+                    } else {
+                        console.error('PizzTremGlissUI: SVG render failed:', renderResult.error);
+                    }
+                } catch (err) {
+                    console.error('PizzTremGlissUI: SVG render error:', err);
+                }
+                
+                // Step 5: Insert SVG into score
+                let insertedSvg = null;
+                if (svgPath) {
+                    insertedSvg = await this.insertSvg(svgPath, curve);
+                    if (insertedSvg) {
+                        console.log('PizzTremGlissUI: SVG inserted:', insertedSvg.name);
+                    }
+                }
+                
+                // Step 6: Generate MIDI file via server
+                const durationSec = curve.endSeconds - curve.startSeconds;
+                const track = params?.track ?? (parseInt(document.getElementById('ptgTrackInput').value) || 1);
+                const model = params?.model ?? document.getElementById('ptgModelSelect').value;
+                const slope = params?.slope ?? (parseFloat(document.getElementById('ptgSlopeInput').value) || 0);
+                const y1 = params?.y1 ?? parseFloat(document.getElementById('ptgY1Input').value);
+                const y2 = params?.y2 ?? parseFloat(document.getElementById('ptgY2Input').value);
+                
+                let midiResult = null;
+                try {
+                    const midiResp = await fetch('/api/pizz-trem-gliss/generate-midi', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            startPitch: startPitchRaw,
+                            endPitch: endPitchRaw,
+                            startDynamic,
+                            endDynamic,
+                            clef: clefName,
+                            track,
+                            duration: durationSec,
+                            model,
+                            slope,
+                            y1: isNaN(y1) ? 10 : y1,
+                            y2: isNaN(y2) ? 0 : y2
+                        })
+                    });
+                    midiResult = await midiResp.json();
+                    if (midiResult.success) {
+                        console.log('PizzTremGlissUI: MIDI generated:', midiResult.midiPath);
+                    } else {
+                        console.error('PizzTremGlissUI: MIDI generation failed:', midiResult.error);
+                    }
+                } catch (err) {
+                    console.error('PizzTremGlissUI: MIDI generation error:', err);
+                }
+                
+                // Step 7: Insert MIDI into score
+                let midiInsertResult = null;
+                if (midiResult && midiResult.success && midiResult.midiPath) {
+                    midiInsertResult = await this.insertMidi(midiResult.midiPath, curve, track);
+                    if (midiInsertResult) {
+                        console.log('PizzTremGlissUI: MIDI inserted:', midiInsertResult.snippetId, 'events:', midiInsertResult.eventCount);
+                    }
+                }
+                
+                const result = {
+                    curve: { id: curve.id, name: curve.name, startSeconds: curve.startSeconds, endSeconds: curve.endSeconds },
+                    filename,
+                    svgPath,
+                    insertedSvg: insertedSvg ? { id: insertedSvg.id, name: insertedSvg.name } : null,
+                    midi: midiResult ? { path: midiResult.midiPath, filename: midiResult.midiFilename } : null,
+                    midiInserted: midiInsertResult
+                };
+                console.log('PizzTremGlissUI.generateAll: Complete', JSON.stringify(result, null, 2));
+                return result;
+            },
+            
+            // Convenience method for AI prompts
+            async go(params = null) {
+                const curve = this.step1(params);
+                if (!curve) return null;
+                const result = await this.generateAll(curve, params);
+                this.pendingCurve = null;
+                return result;
+            },
+            
+            createCurve(params = null) {
+                const startSeconds = params?.startSeconds ?? (parseFloat(document.getElementById('ptgStartInput').value) || 0);
+                const endSeconds = params?.endSeconds ?? (parseFloat(document.getElementById('ptgEndInput').value) || 10);
+                const y1 = params?.y1 ?? parseFloat(document.getElementById('ptgY1Input').value);
+                const y2 = params?.y2 ?? parseFloat(document.getElementById('ptgY2Input').value);
+                const gTrack = params?.gTrack ?? String(parseInt(document.getElementById('ptgTrackInput').value) || 1);
+                const slope = params?.slope ?? (parseFloat(document.getElementById('ptgSlopeInput').value) || 0);
+                const model = params?.model ?? document.getElementById('ptgModelSelect').value;
+                
+                const y1Val = isNaN(y1) ? 10 : y1;
+                const y2Val = isNaN(y2) ? 0 : y2;
+                
+                const ptgSwatch = document.querySelector('#ptgColorSwatches .color-swatch.selected');
+                const color = params?.color ?? (ptgSwatch ? ptgSwatch.dataset.color : 'limeGreen');
+                
+                const ptgFill = document.querySelector('input[name="ptgFill"]:checked');
+                const fillMode = params?.fillMode ?? (ptgFill ? ptgFill.value : 'bottom');
+                
+                const curve = CurveMaker.createCurve({
+                    startSeconds, endSeconds, y1: y1Val, y2: y2Val,
+                    gTrack, model, slope, color, fillMode
+                });
+                
+                if (curve) {
+                    // Wire up slope read/write: when this curve's slope changes, update UI
+                    this._watchCurveSlope(curve);
+                    console.log('PizzTremGlissUI: Curve created', curve.name);
+                }
+                return curve;
+            },
+            
+            // Watch for slope changes on the curve and update the slope input
+            _watchCurveSlope(curve) {
+                // Poll the curve's slope and update the input (CurveMaker modifies slope on drag)
+                const slopeInput = document.getElementById('ptgSlopeInput');
+                if (!slopeInput) return;
+                
+                this._slopeWatchInterval = setInterval(() => {
+                    if (!CurveMaker.selectedCurve || CurveMaker.selectedCurve !== curve) {
+                        clearInterval(this._slopeWatchInterval);
+                        return;
+                    }
+                    const curveSlope = curve.slope;
+                    if (curveSlope !== undefined && Math.abs(parseFloat(slopeInput.value) - curveSlope) > 0.01) {
+                        slopeInput.value = curveSlope.toFixed(2);
+                    }
+                }, 200);
+            },
+            
+            // Insert PizzTremGliss SVG into score (adapted from LongToneUI with tested scale/offset)
+            async insertSvg(svgPath, curve) {
+                if (!svgPath || !curve) return null;
+                
+                try {
+                    const response = await fetch(svgPath);
+                    const svgContent = await response.text();
+                    
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const svgEl = svgDoc.documentElement;
+                    
+                    let svgWidth = parseFloat(svgEl.getAttribute('width')) || 100;
+                    let svgHeight = parseFloat(svgEl.getAttribute('height')) || 100;
+                    const widthStr = svgEl.getAttribute('width') || '';
+                    const heightStr = svgEl.getAttribute('height') || '';
+                    if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
+                    if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
+                    
+                    svgEl.setAttribute('width', String(svgWidth));
+                    svgEl.setAttribute('height', String(svgHeight));
+                    
+                    const track = parseInt(curve.gTrack) || 1;
+                    const scoreEl = document.getElementById('ScoreTop');
+                    const scoreWidth = scoreEl.clientWidth;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(track), scoreEl);
+                    
+                    // Tested values: scale=0.75, offsetYFraction=0.05
+                    const scale = 0.75;
+                    const scaledContentWidth = svgWidth * scale;
+                    
+                    const secondsPerPage = window.GraphicTimeline 
+                        ? GraphicTimeline.getSecondsPerPage() 
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const secondsPerPixel = secondsPerPage / scoreWidth;
+                    const gap = 5;
+                    const offsetSeconds = -(gap + scaledContentWidth) * secondsPerPixel;
+                    
+                    const id = SVGElementManager.nextId++;
+                    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    wrapper.setAttribute('id', `svg-element-${id}`);
+                    wrapper.setAttribute('class', 'svg-element-wrapper');
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    let svgString = new XMLSerializer().serializeToString(svgEl);
+                    svgString = svgString.replace(/currentColor/g, '#000000');
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                    image.setAttribute('href', dataUrl);
+                    image.setAttribute('width', svgWidth);
+                    image.setAttribute('height', svgHeight);
+                    wrapper.appendChild(image);
+                    
+                    const elementData = {
+                        id,
+                        name: SVGElementManager.generateSvgName(decodeURIComponent(svgPath.split('/').pop())),
+                        wrapper,
+                        image,
+                        referenceSeconds: curve.startSeconds,
+                        offsetSeconds,
+                        offsetYFraction: 0.05,
+                        width: svgWidth,
+                        height: svgHeight,
+                        scale,
+                        heightFraction: 0.42,
+                        track
+                    };
+                    
+                    const pos = SVGElementManager.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
+                    
+                    SVGElementManager.elements.push(elementData);
+                    SVGElementManager.updateElementTransform(elementData);
+                    
+                    const targetContainer = pos.section === 'top' 
+                        ? SVGElementManager.containerTop 
+                        : SVGElementManager.containerBottom;
+                    targetContainer.appendChild(wrapper);
+                    
+                    wrapper.addEventListener('mousedown', (e) => 
+                        SVGElementManager.handleElementMouseDown(e, elementData));
+                    
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                    
+                    console.log('PizzTremGlissUI.insertSvg:', elementData.name, 
+                        'scale:', scale, 'offsetY:', 0.05, 'track:', track);
+                    
+                    return elementData;
+                } catch (err) {
+                    console.error('PizzTremGlissUI.insertSvg: Error:', err);
+                    return null;
+                }
+            },
+            
+            // Insert MIDI file into score as a snippet
+            // Fetches the generated .mid file, parses events, registers as snippet
+            async insertMidi(midiPath, curve, track) {
+                if (!midiPath || !curve) return null;
+                
+                try {
+                    // Fetch MIDI file
+                    const response = await fetch(midiPath);
+                    const arrayBuffer = await response.arrayBuffer();
+                    const midiData = new Uint8Array(arrayBuffer);
+                    
+                    // Parse MIDI using LongToneUI's parser
+                    const curveStartMs = curve.startSeconds * 1000;
+                    const events = LongToneUI.parseMidiFileToEvents(midiData, curveStartMs);
+                    
+                    if (!events || events.length === 0) {
+                        console.warn('PizzTremGlissUI.insertMidi: No events parsed from MIDI file');
+                        return null;
+                    }
+                    
+                    const trackIndex = (parseInt(track) || 1) - 1;
+                    const durationSec = curve.endSeconds - curve.startSeconds;
+                    const color = curve.color || 'limeGreen';
+                    
+                    // Register snippet in MidiSnippetDatabase
+                    let snippetId = null;
+                    if (window.MidiSnippetDatabase) {
+                        const snippet = MidiSnippetDatabase.add({
+                            name: `PizzTremGliss @ ${curve.name}`,
+                            trackIndex: trackIndex,
+                            startTimeMs: curveStartMs,
+                            durationMs: durationSec * 1000,
+                            startSeconds: curve.startSeconds,
+                            endSeconds: curve.endSeconds,
+                            events: events,
+                            color: color,
+                            sourceCurve: curve.id,
+                            sourceFile: midiPath.split('/').pop()
+                        });
+                        snippetId = snippet.id;
+                    }
+                    
+                    // Add events to MidiController track for playback
+                    const eventIds = [];
+                    if (window.MidiController && MidiController.tracks && MidiController.tracks[trackIndex]) {
+                        for (const event of events) {
+                            const eventId = `ptg_${curve.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                            const midiEvent = {
+                                id: eventId,
+                                timeMs: event.timeMs,
+                                type: event.type,
+                                data: [...event.data],
+                                sourceCurve: curve.id,
+                                snippetId: snippetId
+                            };
+                            MidiController.tracks[trackIndex].midiEvents.push(midiEvent);
+                            eventIds.push(eventId);
+                        }
+                        
+                        // Sort and re-render
+                        MidiController.tracks[trackIndex].midiEvents.sort((a, b) => a.timeMs - b.timeMs);
+                        MidiController.renderAllMidiDisplays();
+                        MidiController.updateMidiDisplayVisibility();
+                    }
+                    
+                    // Store snippet reference on curve
+                    if (!curve.pizzTremGlissMidiSnippets) curve.pizzTremGlissMidiSnippets = [];
+                    curve.pizzTremGlissMidiSnippets.push({ snippetId, eventIds });
+                    
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    if (window.MidiController) MidiController.reloadFromDatabase();
+                    
+                    console.log('PizzTremGlissUI.insertMidi:', events.length, 'events, snippet:', snippetId, 'track:', trackIndex + 1);
+                    
+                    return { snippetId, eventCount: events.length, eventIds, trackIndex };
+                } catch (err) {
+                    console.error('PizzTremGlissUI.insertMidi: Error:', err);
+                    return null;
+                }
+            }
+        };
+        PizzTremGlissUI.init();
+        window.PizzTremGlissUI = PizzTremGlissUI;
+        
+        // ============================================
         // VIBRATO UI - Generate vibrato notation SVGs from templates
         // Uses LilyPond vibrato templates (Wide-Narrow / Narrow-Wide)
         // Pipeline: read template → substitute params → render LilyPond → crop SVG → save to SVG_graphics
@@ -20060,6 +20671,617 @@
         };
         PizzTremUI.init();
         window.PizzTremUI = PizzTremUI;
+        
+        // ============================================
+        // NOTATION FRAGMENT SYSTEM
+        // Pre-generated notation fragments with GC-aligned MIDI playback
+        // Pipeline: select fragment → create orange GC → select alignment → place SVG + MIDI
+        // ============================================
+        const NotationFragmentSystem = {
+            db: null,
+            
+            // GC physics parameters for orange notation fragment GCs
+            // Reference model: GC_20260116_151414 (save score 284)
+            // timeFall = 1.1 × 0.55 = 0.605s, timeRise = 1.1 × 0.45 = 0.495s
+            GC_PARAMS: {
+                stiffness: 50,
+                damping: 80,
+                ictus: 120,
+                descentRatio: 55,
+                duration: 1.1,
+                color: 'brightOrange'
+            },
+            
+            // Alignment → tempo tier mapping
+            ALIGNMENT_TIERS: {
+                onImpact:        'core',
+                endOnImpact:     'core',
+                justBefore:      'mid',
+                justAfter:       'mid',
+                descendingCurve: 'midOuter',
+                ascendingCurve:  'midOuter',
+                topOfCurve:      'outer',
+                endOfCurve:      'outer'
+            },
+            
+            async init() {
+                try {
+                    const resp = await fetch('/midi_files/notation_fragment_db.json');
+                    this.db = await resp.json();
+                    console.log(`NotationFragmentSystem: loaded ${this.db.fragments.length} fragments`);
+                } catch (e) {
+                    console.error('NotationFragmentSystem: failed to load DB', e);
+                }
+            },
+            
+            getFragment(id) {
+                return this.db?.fragments.find(f => f.id === id) || null;
+            },
+            
+            getFragmentsByInstrument(instrument) {
+                return this.db?.fragments.filter(f => f.instrument === instrument) || [];
+            },
+            
+            // ── Weighted Random Alignment Selector ──
+            // Input: weights object { onImpact: 0.30, endOnImpact: 0.30, ... }
+            //        (uses fragment override if set, else DB defaults)
+            // Output: { alignment: 'onImpact', tier: 'core' }
+            selectAlignment(fragment = null) {
+                const weights = fragment?.alignmentWeights || this.db?.defaultAlignmentWeights;
+                if (!weights) {
+                    console.error('NotationFragmentSystem: no alignment weights available');
+                    return null;
+                }
+                
+                const entries = Object.entries(weights);
+                const totalWeight = entries.reduce((sum, [, w]) => sum + w, 0);
+                let roll = Math.random() * totalWeight;
+                
+                for (const [alignment, weight] of entries) {
+                    roll -= weight;
+                    if (roll <= 0) {
+                        return {
+                            alignment,
+                            tier: this.ALIGNMENT_TIERS[alignment]
+                        };
+                    }
+                }
+                
+                // Fallback (shouldn't reach here with valid weights)
+                const fallback = entries[entries.length - 1][0];
+                return { alignment: fallback, tier: this.ALIGNMENT_TIERS[fallback] };
+            },
+            
+            // ── Get tempo variant data for a fragment + tier ──
+            // Returns { file, bpm, noteOnSpanSec, fullDurationSec } from pre-computed DB
+            getTempoVariant(fragment, tier) {
+                return fragment.tempoVariants?.[tier] || null;
+            },
+            
+            // ── MIDI Onset Time Calculator ──
+            // Uses pre-computed offsets from DB (onsetOffsets table + per-fragment endOnImpactOffset)
+            // impactTime: the GC impact time in seconds (absolute score time)
+            // alignment: one of the 8 alignment strings
+            // fragment: fragment object (needed for endOnImpact per-fragment offset)
+            // Returns: absolute onset time in seconds
+            calculateOnsetTime(impactTime, alignment, fragment) {
+                const offsetDef = this.db.onsetOffsets[alignment];
+                if (!offsetDef) {
+                    console.warn(`NotationFragmentSystem: unknown alignment "${alignment}", defaulting to impact`);
+                    return impactTime;
+                }
+                
+                if (alignment === 'endOnImpact') {
+                    // Per-fragment: last noteOn lands at impact
+                    return impactTime + fragment.endOnImpactOffset;
+                }
+                
+                if (offsetDef.type === 'fixed') {
+                    return impactTime + offsetDef.offset;
+                }
+                
+                if (offsetDef.type === 'range') {
+                    const range = offsetDef.max - offsetDef.min;
+                    return impactTime + offsetDef.min + Math.random() * range;
+                }
+                
+                return impactTime;
+            },
+            
+            // ── Full placement logic (called by Go button) ──
+            // All data is pre-computed in DB; only random roll + addition happen at runtime
+            // impactTime: absolute score time of the GC impact (seconds)
+            // Returns: { alignment, tier, bpm, midiFile, noteOnSpanSec, fullDurationSec, onsetTime, svgFile }
+            computePlacement(fragment, impactTime, explicitAlignment = null) {
+                // 1. Select alignment (weighted random or explicit)
+                const selection = explicitAlignment
+                    ? { alignment: explicitAlignment, tier: this.ALIGNMENT_TIERS[explicitAlignment] }
+                    : this.selectAlignment(fragment);
+                
+                if (!selection) return null;
+                
+                // 2. Look up pre-computed tempo variant from DB
+                const variant = this.getTempoVariant(fragment, selection.tier);
+                if (!variant) {
+                    console.error(`NotationFragmentSystem: no variant for ${fragment.id} tier ${selection.tier}`);
+                    return null;
+                }
+                
+                // 3. Calculate onset time from pre-computed offsets
+                const onsetTime = this.calculateOnsetTime(impactTime, selection.alignment, fragment);
+                
+                return {
+                    alignment: selection.alignment,
+                    tier: selection.tier,
+                    bpm: variant.bpm,
+                    midiFile: variant.file,
+                    noteOnSpanSec: variant.noteOnSpanSec,
+                    fullDurationSec: variant.fullDurationSec,
+                    onsetTime,
+                    svgFile: fragment.svgFile
+                };
+            },
+            
+            // ── Create bright orange GC at impact time on a track ──
+            createFragmentGC(impactTime, track) {
+                if (!window.GCMaker) {
+                    console.error('NotationFragmentSystem: GCMaker not available');
+                    return null;
+                }
+                
+                // Save current GCMaker state
+                const saved = {
+                    stiffness: GCMaker.stiffness,
+                    damping: GCMaker.damping,
+                    ictus: GCMaker.ictus,
+                    descentRatio: GCMaker.descentRatio,
+                    duration: GCMaker.duration
+                };
+                
+                // Set notation fragment GC params
+                GCMaker.stiffness = this.GC_PARAMS.stiffness;
+                GCMaker.damping = this.GC_PARAMS.damping;
+                GCMaker.ictus = this.GC_PARAMS.ictus;
+                GCMaker.descentRatio = this.GC_PARAMS.descentRatio;
+                GCMaker.duration = this.GC_PARAMS.duration;
+                
+                if (GCMaker.impactInput) GCMaker.impactInput.value = impactTime;
+                if (GCMaker.trackSelect) GCMaker.trackSelect.value = String(track);
+                
+                GCMaker.createGC();
+                const gc = GCMaker.gcs[GCMaker.gcs.length - 1];
+                
+                if (gc) {
+                    gc.color = this.GC_PARAMS.color;
+                    gc.name = `NF_${gc.name}`;
+                    GCMaker.rerenderAllGCs();
+                    console.log('NotationFragmentSystem: GC created:', gc.name, 'impact:', impactTime, 'track:', track);
+                }
+                
+                // Restore GCMaker state
+                Object.assign(GCMaker, saved);
+                
+                return gc;
+            },
+            
+            // ── Instrument → track mapping ──
+            INSTRUMENT_TRACK: { 'Cello': 4, 'Viola': 3, 'Violin': 2 },
+            
+            // ── Insert fragment SVG into score ──
+            // Right-aligns SVG to referenceSeconds (right edge at anchor)
+            // Scales to full track height
+            // Clamps to page edges
+            async insertFragmentSvg(fragmentOrId, referenceSeconds, track) {
+                const fragment = typeof fragmentOrId === 'string' 
+                    ? this.getFragment(fragmentOrId) 
+                    : fragmentOrId;
+                if (!fragment) {
+                    console.error('NotationFragmentSystem: fragment not found');
+                    return null;
+                }
+                
+                const svgPath = `/${this.db.svgDir}/${fragment.svgFile}`;
+                
+                try {
+                    const response = await fetch(svgPath);
+                    const svgContent = await response.text();
+                    
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const svgEl = svgDoc.documentElement;
+                    
+                    let svgWidth = parseFloat(svgEl.getAttribute('width')) || 100;
+                    let svgHeight = parseFloat(svgEl.getAttribute('height')) || 100;
+                    const widthStr = svgEl.getAttribute('width') || '';
+                    const heightStr = svgEl.getAttribute('height') || '';
+                    if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
+                    if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
+                    
+                    svgEl.setAttribute('width', String(svgWidth));
+                    svgEl.setAttribute('height', String(svgHeight));
+                    
+                    const trackNum = parseInt(track) || 1;
+                    const scoreEl = document.getElementById('ScoreTop');
+                    const scoreWidth = scoreEl.clientWidth;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(trackNum), scoreEl);
+                    const trackHeight = trackDims.height;
+                    
+                    // Scale notation fragment to full track height
+                    const heightFraction = 1.0;
+                    const targetHeight = trackHeight * heightFraction;
+                    const scale = targetHeight / svgHeight;
+                    const scaledWidth = svgWidth * scale;
+                    
+                    // Right-align: SVG right edge at referenceSeconds
+                    const secondsPerPage = window.GraphicTimeline 
+                        ? GraphicTimeline.getSecondsPerPage() 
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const secondsPerPixel = secondsPerPage / scoreWidth;
+                    const offsetSeconds = -(scaledWidth * secondsPerPixel);
+                    
+                    const id = SVGElementManager.nextId++;
+                    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    wrapper.setAttribute('id', `svg-element-${id}`);
+                    wrapper.setAttribute('class', 'svg-element-wrapper');
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    let svgString = new XMLSerializer().serializeToString(svgEl);
+                    svgString = svgString.replace(/currentColor/g, '#000000');
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                    image.setAttribute('href', dataUrl);
+                    image.setAttribute('width', svgWidth);
+                    image.setAttribute('height', svgHeight);
+                    wrapper.appendChild(image);
+                    
+                    const elementData = {
+                        id,
+                        name: SVGElementManager.generateSvgName(fragment.svgFile),
+                        wrapper,
+                        image,
+                        referenceSeconds,
+                        offsetSeconds,
+                        offsetYFraction: 0.0,
+                        width: svgWidth,
+                        height: svgHeight,
+                        scale,
+                        heightFraction,
+                        track: trackNum
+                    };
+                    
+                    const pos = SVGElementManager.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
+                    
+                    // Edge clamping: keep SVG within page bounds
+                    const pageScoreEl = pos.section === 'top' 
+                        ? SVGElementManager.scoreTopEl 
+                        : SVGElementManager.scoreBottomEl;
+                    const pageWidth = pageScoreEl.clientWidth;
+                    // Left edge: clamp so SVG left edge >= 0
+                    if (elementData._x < 0) {
+                        elementData._x = 0;
+                    }
+                    // Right edge: clamp so SVG right edge <= page width
+                    if (elementData._x + scaledWidth > pageWidth) {
+                        elementData._x = pageWidth - scaledWidth;
+                    }
+                    
+                    SVGElementManager.elements.push(elementData);
+                    SVGElementManager.updateElementTransform(elementData);
+                    
+                    const targetContainer = pos.section === 'top'
+                        ? SVGElementManager.containerTop
+                        : SVGElementManager.containerBottom;
+                    targetContainer.appendChild(wrapper);
+                    
+                    // Bring SVG container to front (above GC arcs)
+                    const parentSvg = targetContainer.parentNode;
+                    if (parentSvg) parentSvg.appendChild(targetContainer);
+                    
+                    wrapper.addEventListener('mousedown', (e) =>
+                        SVGElementManager.handleElementMouseDown(e, elementData));
+                    
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                    
+                    console.log('NotationFragmentSystem: SVG inserted:', elementData.name,
+                        'ref:', referenceSeconds, 'offset:', offsetSeconds.toFixed(3),
+                        'track:', trackNum, 'scale:', scale.toFixed(3),
+                        'x:', elementData._x.toFixed(1), 'page:', pos.page);
+                    
+                    return elementData;
+                } catch (err) {
+                    console.error('NotationFragmentSystem.insertFragmentSvg error:', err);
+                    return null;
+                }
+            },
+            
+            // ── Insert fragment MIDI snippet at computed onset time ──
+            // Fetches the tempo variant MIDI, parses, offsets to onsetTime, remaps channel
+            async insertFragmentMidi(placement, track) {
+                if (!window.MidiController || !window.MidiSnippetDatabase) {
+                    console.error('NotationFragmentSystem: MidiController or MidiSnippetDatabase not available');
+                    return null;
+                }
+                
+                const midiPath = `/${this.db.midiDir}/${placement.midiFile}`;
+                const trackIndex = parseInt(track) - 1;
+                const channel = trackIndex; // 0-indexed channel
+                const onsetMs = placement.onsetTime * 1000;
+                
+                try {
+                    // Fetch MIDI file as ArrayBuffer
+                    const response = await fetch(midiPath);
+                    if (!response.ok) throw new Error(`Failed to fetch ${midiPath}: ${response.status}`);
+                    const arrayBuffer = await response.arrayBuffer();
+                    
+                    // Use MidiController's parser (writes to loadedFileEvents)
+                    const savedEvents = [...MidiController.loadedFileEvents];
+                    const savedFileName = MidiController.loadedFileName;
+                    
+                    MidiController.parseMidiFile(arrayBuffer);
+                    const parsedEvents = [...MidiController.loadedFileEvents];
+                    
+                    // Restore MidiController state
+                    MidiController.loadedFileEvents = savedEvents;
+                    MidiController.loadedFileName = savedFileName;
+                    
+                    if (parsedEvents.length === 0) {
+                        console.warn('NotationFragmentSystem: No events parsed from', midiPath);
+                        return null;
+                    }
+                    
+                    // Find max event time for snippet duration
+                    let maxEventTimeMs = 0;
+                    for (const ev of parsedEvents) {
+                        if (ev.timeMs > maxEventTimeMs) maxEventTimeMs = ev.timeMs;
+                    }
+                    const durationSec = maxEventTimeMs / 1000;
+                    
+                    // Offset events to onset time + remap channel
+                    const snippetEvents = [];
+                    for (const ev of parsedEvents) {
+                        const newEvent = {
+                            timeMs: ev.timeMs + onsetMs,
+                            relativeTimeMs: ev.timeMs,
+                            type: ev.type,
+                            data: [...ev.data]
+                        };
+                        
+                        // Remap channel for channel voice messages (0x80-0xEF)
+                        const statusByte = newEvent.data[0];
+                        if (statusByte >= 0x80 && statusByte < 0xF0) {
+                            newEvent.data[0] = (statusByte & 0xF0) | channel;
+                        }
+                        
+                        snippetEvents.push(newEvent);
+                    }
+                    
+                    // Get next color from MidiController palette
+                    const color = MidiController.snippetColors[MidiController.nextColorIndex % MidiController.snippetColors.length];
+                    MidiController.nextColorIndex++;
+                    
+                    // Register snippet in database
+                    const snippet = MidiSnippetDatabase.add({
+                        name: `NF_${placement.midiFile.replace('.mid', '')}_${placement.onsetTime.toFixed(1)}s`,
+                        trackIndex: trackIndex,
+                        startSeconds: placement.onsetTime,
+                        endSeconds: placement.onsetTime + durationSec,
+                        events: snippetEvents,
+                        color: color
+                    });
+                    
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    MidiController.reloadFromDatabase();
+                    
+                    console.log('NotationFragmentSystem: MIDI inserted:', snippet.id,
+                        placement.midiFile, 'onset:', placement.onsetTime.toFixed(3),
+                        'track:', track, 'events:', snippetEvents.length);
+                    
+                    return snippet.id;
+                } catch (err) {
+                    console.error('NotationFragmentSystem.insertFragmentMidi error:', err);
+                    return null;
+                }
+            },
+            
+            // ── Test placement: all 8 fragments, each with own GC, 3s apart ──
+            async testPlacement(startTime = 250, spacing = 3) {
+                if (!this.db) {
+                    console.error('NotationFragmentSystem: DB not loaded yet');
+                    return;
+                }
+                
+                const results = [];
+                for (let i = 0; i < this.db.fragments.length; i++) {
+                    const fragment = this.db.fragments[i];
+                    const impactTime = startTime + (i * spacing);
+                    const track = this.INSTRUMENT_TRACK[fragment.instrument] || 2;
+                    
+                    // Create orange GC first
+                    const gc = this.createFragmentGC(impactTime, track);
+                    
+                    // Place SVG right-aligned to impact
+                    const svg = await this.insertFragmentSvg(fragment, impactTime, track);
+                    
+                    results.push({ fragment: fragment.id, impactTime, track, gc: gc?.name, svg: svg?.name });
+                    console.log(`  ${fragment.id}: t=${impactTime}s track=${track} gc=${gc?.name} svg=${svg?.name}`);
+                }
+                
+                console.log('NotationFragmentSystem.testPlacement: Complete —', results.length, 'fragments placed');
+                return results;
+            }
+        };
+        NotationFragmentSystem.init();
+        window.NotationFragmentSystem = NotationFragmentSystem;
+        
+        // ============================================
+        // NOTATION FRAGMENT UI
+        // Panel controller: fragment selector, SVG preview, Insert workflow
+        // ============================================
+        const NotationFragmentUI = {
+            currentFragment: null,
+            
+            init() {
+                const sel = document.getElementById('nfFragmentSelect');
+                const btn = document.getElementById('nfInsertBtn');
+                
+                if (sel) sel.addEventListener('change', () => this.onFragmentChange(sel.value));
+                if (btn) btn.addEventListener('click', () => this.insert());
+                
+                console.log('NotationFragmentUI initialized');
+            },
+            
+            onFragmentChange(fragmentId) {
+                const preview = document.getElementById('nfPreviewImg');
+                const placeholder = document.getElementById('nfPreviewPlaceholder');
+                const violinRow = document.getElementById('nfViolinTrackRow');
+                
+                if (!fragmentId) {
+                    this.currentFragment = null;
+                    if (preview) preview.style.display = 'none';
+                    if (placeholder) { placeholder.style.display = ''; placeholder.textContent = 'Select a fragment'; }
+                    if (violinRow) violinRow.style.display = 'none';
+                    return;
+                }
+                
+                const nfs = window.NotationFragmentSystem;
+                if (!nfs || !nfs.db) {
+                    if (placeholder) { placeholder.style.display = ''; placeholder.textContent = 'DB not loaded'; }
+                    return;
+                }
+                
+                const fragment = nfs.getFragment(fragmentId);
+                if (!fragment) {
+                    if (placeholder) { placeholder.style.display = ''; placeholder.textContent = 'Fragment not found'; }
+                    return;
+                }
+                
+                this.currentFragment = fragment;
+                
+                // Show SVG preview
+                const svgPath = `/${nfs.db.svgDir}/${fragment.svgFile}`;
+                if (preview) {
+                    preview.src = svgPath;
+                    preview.style.display = '';
+                    preview.onload = () => this._updateSectionHeight();
+                    preview.onerror = () => {
+                        preview.style.display = 'none';
+                        if (placeholder) { placeholder.style.display = ''; placeholder.textContent = 'SVG not found'; }
+                        this._updateSectionHeight();
+                    };
+                }
+                if (placeholder) placeholder.style.display = 'none';
+                
+                // Show/hide violin track picker
+                if (violinRow) {
+                    violinRow.style.display = fragment.instrument === 'Violin' ? '' : 'none';
+                }
+                
+                this._updateSectionHeight();
+            },
+            
+            getTrack() {
+                if (!this.currentFragment) return 2;
+                const inst = this.currentFragment.instrument;
+                if (inst === 'Cello') return 4;
+                if (inst === 'Viola') return 3;
+                // Violin: use picker
+                const violinSel = document.getElementById('nfViolinSelect');
+                return violinSel ? parseInt(violinSel.value) : 2;
+            },
+            
+            async insert() {
+                const nfs = window.NotationFragmentSystem;
+                if (!nfs || !nfs.db) {
+                    console.error('NotationFragmentUI: System not ready');
+                    return null;
+                }
+                
+                if (!this.currentFragment) {
+                    this.setStatus('Select a fragment first', 'var(--clr-brightRed)');
+                    return null;
+                }
+                
+                const impactTime = parseFloat(document.getElementById('nfTimeInput')?.value) || 0;
+                const alignMode = document.getElementById('nfAlignSelect')?.value || 'algorithmic';
+                const track = this.getTrack();
+                
+                const btn = document.getElementById('nfInsertBtn');
+                const originalText = btn?.textContent;
+                if (btn) { btn.textContent = '...'; btn.disabled = true; }
+                
+                let result = null;
+                try {
+                    // Compute placement (alignment + onset time)
+                    const explicitAlignment = alignMode === 'algorithmic' ? null : alignMode;
+                    const placement = nfs.computePlacement(this.currentFragment, impactTime, explicitAlignment);
+                    
+                    if (!placement) {
+                        throw new Error('Placement computation failed');
+                    }
+                    
+                    console.log('NotationFragmentUI: placement:', placement);
+                    
+                    // Create orange GC
+                    const gc = nfs.createFragmentGC(impactTime, track);
+                    
+                    // Insert SVG (right-aligned to impact)
+                    const svg = await nfs.insertFragmentSvg(this.currentFragment, impactTime, track);
+                    
+                    // Insert MIDI snippet at computed onset time
+                    const midiSnippetId = await nfs.insertFragmentMidi(placement, track);
+                    
+                    result = { gc, svg, midiSnippetId, placement, track };
+                    this.setStatus(`${placement.alignment} @ ${impactTime}s`, 'var(--clr-limeGreen)');
+                    console.log('NotationFragmentUI: Insert complete',
+                        '\n  Fragment:', this.currentFragment.id,
+                        '\n  Alignment:', placement.alignment,
+                        '\n  Onset:', placement.onsetTime.toFixed(3),
+                        '\n  Track:', track);
+                    
+                } catch (err) {
+                    console.error('NotationFragmentUI.insert error:', err);
+                    this.setStatus('Error: ' + err.message, 'var(--clr-brightRed)');
+                } finally {
+                    if (btn) {
+                        if (result) {
+                            btn.textContent = '✓';
+                            btn.style.background = 'var(--clr-green)';
+                            setTimeout(() => { btn.textContent = originalText; btn.style.background = 'var(--clr-brightOrange)'; btn.disabled = false; }, 1500);
+                        } else {
+                            btn.textContent = '✗';
+                            btn.style.background = 'var(--clr-brightRed)';
+                            setTimeout(() => { btn.textContent = originalText; btn.style.background = 'var(--clr-brightOrange)'; btn.disabled = false; }, 2000);
+                        }
+                    }
+                }
+                return result;
+            },
+            
+            setStatus(text, color) {
+                const label = document.getElementById('nfStatusLabel');
+                if (label) {
+                    label.textContent = text;
+                    label.style.color = color || '#888';
+                }
+            },
+            
+            _updateSectionHeight() {
+                requestAnimationFrame(() => {
+                    const container = document.getElementById('nfPreviewContainer');
+                    if (!container) return;
+                    const sectionContent = container.closest('.section-content');
+                    if (sectionContent && !sectionContent.closest('.collapsed')) {
+                        sectionContent.style.maxHeight = 'none';
+                    }
+                });
+            }
+        };
+        NotationFragmentUI.init();
+        window.NotationFragmentUI = NotationFragmentUI;
         
         // ============================================
         // PANEL SECTION MANAGER - Draggable reordering of composition panel sections

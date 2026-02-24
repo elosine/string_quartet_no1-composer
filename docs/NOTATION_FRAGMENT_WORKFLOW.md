@@ -71,33 +71,32 @@ Tempo is the primary lever for simulating the gravitational feel of each curve p
 | Post-impact (just-after, ascending) | Rebound energy, dissipating | Moderate |
 | End of curve | Weightless, suspended | Slower |
 
-**Sliding tempo scale (per-motive max, 10 BPM decrements outward):**
+**Sliding tempo scale (per-fragment max, percentage reductions outward):**
 
-Each notation fragment has its own **max tempo** (set by the composer). The Core tier uses the max tempo; Mid and Outer tiers decrement by 10 BPM each.
+Each notation fragment has its own **max tempo** (set by the composer). The Core tier uses the max tempo; outer tiers reduce by a fixed percentage derived from the original 110 BPM reference (where 10 BPM steps = 9.1% per tier).
 
-| Tier | BPM Formula | Alignments |
-|---|---|---|
-| Core | `maxTempo` | On impact, End on impact |
-| Mid | `maxTempo − 10` | Just before impact, Just after impact |
-| Mid-Outer | `maxTempo − 20` | Along descending curve, Along ascending curve |
-| Outer | `maxTempo − 30` | Begin at top of curve, At end of curve |
+| Tier | BPM Formula | % of Max | Alignments |
+|---|---|---|---|
+| Core | `maxTempo` | 100% | On impact, End on impact |
+| Mid | `round(maxTempo × 0.909)` | 90.9% | Just before impact, Just after impact |
+| Mid-Outer | `round(maxTempo × 0.818)` | 81.8% | Along descending curve, Along ascending curve |
+| Outer | `round(maxTempo × 0.727)` | 72.7% | Begin at top of curve, At end of curve |
 
 **Examples:**
 
-| Fragment | Max Tempo | Core | Mid | Mid-Outer | Outer |
+| Fragment | Max Tempo | Core (100%) | Mid (90.9%) | Mid-Outer (81.8%) | Outer (72.7%) |
 |---|---|---|---|---|---|
-| NF001-Cello | 110 | 110 | 100 | 90 | 80 |
-| NF002-Viola | 110 | 110 | 100 | 90 | 80 |
-| NF003-Violin | 90 | 90 | 80 | 70 | 60 |
+| NF001 (maxTempo=110) | 110 | 110 | 100 | 90 | 80 |
+| NF003 (maxTempo=90) | 90 | 90 | 82 | 74 | 65 |
+| NF004 (maxTempo=130) | 130 | 130 | 118 | 106 | 95 |
 
-Pattern: 10 BPM decrements moving outward from impact. Max tempo is a per-fragment composer input (see Step 1).
+Pattern: percentage-based reductions moving outward from impact. Max tempo is a per-fragment composer input (see Step 1). Rounding to nearest integer BPM.
 
-> **TODO — Tempo implementation testing:**
-> When applying tempo to MIDI snippets, we need to test two approaches:
-> 1. **MIDI tempo meta-event only** — change the tempo in the MIDI file header
-> 2. **Delta-time compression** — scale all note durations and gap durations (as done in `rewrite_tempo.js`)
+> **✅ RESOLVED — Tempo implementation:**
+> `rewrite_tempo.js` uses **delta-time compression** — it scales every delta time in every track (`Math.round(delta * scaleFactor)`) AND updates the Set Tempo meta-event. Notes physically move in time, so playback works correctly in any DAW regardless of project tempo. All 32 tempo variants (8 fragments × 4 tiers) generated Feb 23, 2026.
 >
-> The DAW may ignore MIDI tempo meta-events when inserting snippets into a session at a fixed project tempo. If so, approach 2 (delta-time compression) is required. Test by playing back a snippet at different tempos in the DAW and comparing results.
+> Naming convention: `NotationFragment[NNN]-[Instrument]-[BPM]bpm.mid`
+> Output directory: `public/midi_files/notation_fragments/`
 
 #### Alignment Selection: Weighted Random
 
@@ -155,8 +154,8 @@ Weights are overridable per-fragment. For example, a rhythmically punchy fragmen
 | 1 | Decide tempo per alignment — listen to tempo variants in DAW, determine BPM ranges | Decision | ✅ Resolved — 110/100/90/80 BPM tiers |
 | 2 | Develop the weighted random alignment selector algorithm | Build | Pending |
 | 3 | Define default alignment weights | Decision | ✅ Resolved — 60/25/15% tiers |
-| 4 | Build the fragment object database (JSON registry of fragments with SVG/MIDI paths, instrument, duration, alignment weights) | Build | Pending |
-| 5 | Build clear pipeline/workflow for adding new fragments and incorporating into the system | Document | Pending |
+| 4 | Build the fragment object database (JSON registry of fragments with SVG/MIDI paths, instrument, duration, alignment weights) | Build | ✅ Done — `notation_fragment_db.json` |
+| 5 | Build clear pipeline/workflow for adding new fragments and incorporating into the system | Document | ✅ Done — "Adding a New Fragment" runsheet below |
 | 6 | Build MIDI onset time calculator (alignment + GC curve → onset time) | Build | Pending |
 | 7 | Build score integration (SVG placement, MIDI snippet loading, orange GC creation) | Build | Pending |
 | 8 | Build bright orange GC visual indicator (ref: `GC_20260116_151414`, save score 284) | Build | Pending |
@@ -677,6 +676,126 @@ Composer embeds MIDI metadata directly in the `.ly` file using `\set Staff.midiC
 | **Completed** | Option A (AI cognitive) + `cc_mapping_registry.json` | ✅ Proven (ASB-088/089) |
 | **Active** | Option E (`\set` properties + Scheme logger) | 🔧 Building |
 | **Fallback** | Option D (regex parser + config) | Backup if Scheme fails |
+
+---
+
+## Adding a New Fragment — Runsheet
+
+Every time a new notation fragment is created and needs to enter the system, follow this checklist **in order**. Items marked ⏳ are pending future implementation.
+
+### Phase 1: Compose (User + AI)
+
+- [ ] **1. Read `LILYPOND_SETTINGS_REGISTRY.md`** before creating or editing any `.ly` file. Check CURRENT DEFAULT values — do NOT copy settings from previous fragment files (they may have stale values).
+- [ ] **2. Create `.ly` file** in `lilypond_code/` following naming convention: `NotationFragment[NNN]-[Instrument].ly`
+  - Next available number: check existing files and increment
+  - Use `StartingTemplate.ly` + registry as source of truth (NOT `MasterTemplate.ly`)
+- [ ] **3. Add MIDI tagging** — follow the Tagging Checklist in Step 2 above:
+  - `\include "midi-tags.ily"` and `\include "midi-logger.ily"`
+  - `\consists \midiLogEngraver` in `\layout` Voice context
+  - `\midi {}` block in `\score`
+  - `\midiXxx` tags before every technique change (see Quick Lookup Table)
+- [ ] **4. Compose notation** in Frescobaldi, iterate until satisfied
+- [ ] **5. Decide on a base tempo** — while the material is fresh, listen and determine an appropriate `maxTempo` (BPM) for the fragment. Record it for Phase 4 step 16.
+- [ ] **6. Paste final version** back into the main `.ly` file in the IDE
+
+### Phase 2: Pipeline (AI / CLI)
+
+All commands run from `lilypond_code/`.
+
+- [ ] **7. Compile LilyPond** → SVG + MIDI + event log
+  ```powershell
+  lilypond --svg -dbackend=svg -o "NotationFragment[NNN]-[Instrument]" "NotationFragment[NNN]-[Instrument].ly"
+  ```
+  - **Dual-score files** (fragments with hidden MIDI voice using `\tag`): LilyPond outputs numbered SVGs (`-1.svg`, `-2.svg`). Copy the Score 1 SVG (layout) to the standard name:
+    ```powershell
+    Copy-Item "NotationFragment[NNN]-[Instrument]-1.svg" "NotationFragment[NNN]-[Instrument].svg" -Force
+    ```
+
+- [ ] **8. Verify event log** — Level 1 check: open `-midi-log.json`, confirm `midiCCZero` and `midiVelocity` values match the `\midiXxx` tags in the source
+
+- [ ] **9. Generate CC map** (`state_tracker.js`)
+  ```powershell
+  node state_tracker.js NotationFragment[NNN]-[Instrument]-midi-log.json --out fragment[NNN]_cc.json
+  ```
+
+- [ ] **10. Inject CCs** (`modify_midi.js`) → `-Mod.mid`
+  ```powershell
+  node modify_midi.js NotationFragment[NNN]-[Instrument].mid NotationFragment[NNN]-[Instrument]-Mod.mid [channel] --map fragment[NNN]_cc.json
+  ```
+  Channel: **0**=Violin 1, **1**=Violin 2, **2**=Viola, **3**=Cello
+
+- [ ] **11. Verify MIDI** — Level 2 (CC map) + Level 3 (modify_midi console output). See `MIDI_MUSIC_GENERATION.md` §17.
+
+- [ ] **12. Crop SVG**
+  ```powershell
+  node crop_svg.js NotationFragment[NNN]-[Instrument].svg
+  ```
+  SVG is modified **in-place**.
+
+### Phase 3: Deploy (AI / CLI)
+
+- [ ] **13. Copy cropped SVG** to output directory:
+  ```powershell
+  Copy-Item "NotationFragment[NNN]-[Instrument].svg" "..\public\SVG_graphics\notation_fragments\" -Force
+  ```
+
+- [ ] **14. Copy -Mod.mid** to output directory:
+  ```powershell
+  Copy-Item "NotationFragment[NNN]-[Instrument]-Mod.mid" "..\public\midi_files\notation_fragments\" -Force
+  ```
+
+- [ ] **15. Register in `notation_fragment_db.json`** — add a new entry to the `fragments` array:
+  ```json
+  {
+    "id": "NF[NNN]",
+    "name": "NotationFragment[NNN]-[Instrument]",
+    "instrument": "[Cello|Viola|Violin]",
+    "clef": "[bass|alto|treble]",
+    "timeSignature": "[4/4|2/4|...]",
+    "noteEvents": [count from state_tracker output],
+    "midiChannel": [0|1|2|3],
+    "svgFile": "NotationFragment[NNN]-[Instrument].svg",
+    "midiFile": "NotationFragment[NNN]-[Instrument]-Mod.mid",
+    "maxTempo": null,
+    "techniques": ["pizz", "bartokPizz", ...],
+    "description": "[brief musical content description]",
+    "alignmentWeights": null
+  }
+  ```
+  **Database location:** `public/midi_files/notation_fragment_db.json`
+
+### Phase 4: Tempo & Integration (User Decision + Future Build)
+
+- [ ] **16. Decide base tempo** — user listens to `-Mod.mid` in DAW, determines appropriate `maxTempo` (BPM). Update the `maxTempo` field in `notation_fragment_db.json`.
+- [ ] **17. Generate tempo variants** — use `rewrite_tempo.js` to create MIDI at each tier. Run from `lilypond_code/`:
+  ```powershell
+  # For each tier, calculate BPM = round(maxTempo × multiplier)
+  # Core (×1.0), Mid (×0.909), Mid-Outer (×0.818), Outer (×0.727)
+  node rewrite_tempo.js NotationFragment[NNN]-[Instrument]-Mod.mid ..\public\midi_files\notation_fragments\NotationFragment[NNN]-[Instrument]-[BPM]bpm.mid [BPM]
+  ```
+  This does **true delta-time compression** — physically scales all note durations and gaps, not just a tempo header change. Add `tempoVariants` object to the fragment's entry in `notation_fragment_db.json`.
+- [ ] ⏳ **18. Test in score** — insert fragment via UI, verify SVG display + MIDI playback + GC alignment. *Pending UI implementation.*
+
+### Output Directory Reference
+
+| Asset | Directory | Naming |
+|-------|-----------|--------|
+| Source `.ly` files | `lilypond_code/` | `NotationFragment[NNN]-[Instrument].ly` |
+| Pipeline intermediates | `lilypond_code/` | `.mid`, `-midi-log.json`, `fragment[NNN]_cc.json` |
+| **Cropped SVGs (final)** | `public/SVG_graphics/notation_fragments/` | `NotationFragment[NNN]-[Instrument].svg` |
+| **Enhanced MIDI (final)** | `public/midi_files/notation_fragments/` | `NotationFragment[NNN]-[Instrument]-Mod.mid` |
+| Fragment database | `public/midi_files/` | `notation_fragment_db.json` |
+| **Tempo variants** | `public/midi_files/notation_fragments/` | `NotationFragment[NNN]-[Instrument]-[BPM]bpm.mid` |
+
+### Quick Reference: Instrument → Channel
+
+| Instrument | Channel | Track |
+|------------|---------|-------|
+| Violin (1 or 2) | 0 or 1 | 0 or 1 |
+| Viola | 2 | 2 |
+| Cello | 3 | 3 |
+
+Violin fragments default to channel 0; user chooses Violin 1 vs 2 at insertion time.
 
 ---
 

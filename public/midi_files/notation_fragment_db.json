@@ -1,0 +1,220 @@
+{
+  "version": 1,
+  "description": "Pre-generated notation fragment database for the Notation Fragment System. Each fragment is a self-contained piece of musical notation with cropped SVG and enhanced MIDI (CC-injected). Tempo variants are generated from the base -Mod.mid using rewrite_tempo.js.",
+  "svgDir": "SVG_graphics/notation_fragments",
+  "midiDir": "midi_files/notation_fragments",
+  "defaultAlignmentWeights": {
+    "onImpact": 0.30,
+    "endOnImpact": 0.30,
+    "justBefore": 0.125,
+    "justAfter": 0.125,
+    "descendingCurve": 0.0375,
+    "ascendingCurve": 0.0375,
+    "topOfCurve": 0.0375,
+    "endOfCurve": 0.0375
+  },
+  "tempoTiers": {
+    "core": { "multiplier": 1.0, "alignments": ["onImpact", "endOnImpact"] },
+    "mid": { "multiplier": 0.909, "alignments": ["justBefore", "justAfter"] },
+    "midOuter": { "multiplier": 0.818, "alignments": ["descendingCurve", "ascendingCurve"] },
+    "outer": { "multiplier": 0.727, "alignments": ["topOfCurve", "endOfCurve"] }
+  },
+  "gcParams": {
+    "referenceModel": "GC_20260116_151414",
+    "stiffness": 50,
+    "damping": 80,
+    "ictus": 120,
+    "descentRatio": 55,
+    "duration": 1.1,
+    "timeFall": 0.605,
+    "timeRise": 0.495
+  },
+  "onsetOffsets": {
+    "onImpact":        { "type": "fixed", "offset": 0 },
+    "endOnImpact":     { "type": "perFragment", "note": "offset = -(core tier noteOnSpanSec); last noteOn lands at impact" },
+    "justBefore":      { "type": "range", "min": -0.5, "max": -0.1 },
+    "justAfter":       { "type": "range", "min": 0.1, "max": 0.5 },
+    "descendingCurve": { "type": "range", "min": -0.605, "max": 0 },
+    "ascendingCurve":  { "type": "range", "min": 0, "max": 0.495 },
+    "topOfCurve":      { "type": "fixed", "offset": -0.605 },
+    "endOfCurve":      { "type": "fixed", "offset": 0.495 }
+  },
+  "fragments": [
+    {
+      "id": "NF001",
+      "name": "NotationFragment001-Cello",
+      "instrument": "Cello",
+      "clef": "bass",
+      "timeSignature": "4/4",
+      "noteEvents": 8,
+      "midiChannel": 3,
+      "svgFile": "NotationFragment001-Cello.svg",
+      "midiFile": "NotationFragment001-Cello-Mod.mid",
+      "maxTempo": 110,
+      "tempoVariants": {
+        "core":     { "file": "NotationFragment001-Cello-110bpm.mid", "bpm": 110, "noteOnSpanSec": 0.9517, "fullDurationSec": 1.0099 },
+        "mid":      { "file": "NotationFragment001-Cello-100bpm.mid", "bpm": 100, "noteOnSpanSec": 1.1516, "fullDurationSec": 1.2234 },
+        "midOuter": { "file": "NotationFragment001-Cello-90bpm.mid",  "bpm": 90,  "noteOnSpanSec": 1.4219, "fullDurationSec": 1.5104 },
+        "outer":    { "file": "NotationFragment001-Cello-80bpm.mid",  "bpm": 80,  "noteOnSpanSec": 1.8047, "fullDurationSec": 1.916 }
+      },
+      "endOnImpactOffset": -0.9517,
+      "techniques": ["pizz", "pizzOpen", "sfz", "chords"],
+      "description": "Quintuplet 5:4 16ths (F#4 pizz ff, A4, Ab2), sextuplet 6:4 (G4 tenuto, C2 open string l.v.), quintuplet 5:4 8ths (two chords, sfz chord)",
+      "alignmentWeights": null
+    },
+    {
+      "id": "NF002",
+      "name": "NotationFragment002-Viola",
+      "instrument": "Viola",
+      "clef": "alto",
+      "timeSignature": "2/4",
+      "noteEvents": 6,
+      "midiChannel": 2,
+      "svgFile": "NotationFragment002-Viola.svg",
+      "midiFile": "NotationFragment002-Viola-Mod.mid",
+      "maxTempo": 100,
+      "tempoVariants": {
+        "core":     { "file": "NotationFragment002-Viola-100bpm.mid", "bpm": 100, "noteOnSpanSec": 0.5438, "fullDurationSec": 0.6344 },
+        "mid":      { "file": "NotationFragment002-Viola-91bpm.mid",  "bpm": 91,  "noteOnSpanSec": 0.6525, "fullDurationSec": 0.7606 },
+        "midOuter": { "file": "NotationFragment002-Viola-82bpm.mid",  "bpm": 82,  "noteOnSpanSec": 0.806,  "fullDurationSec": 0.9394 },
+        "outer":    { "file": "NotationFragment002-Viola-73bpm.mid",  "bpm": 73,  "noteOnSpanSec": 1.0124, "fullDurationSec": 1.1815 }
+      },
+      "endOnImpactOffset": -0.5438,
+      "techniques": ["pizz", "bartokPizz", "sfz", "chords", "ties"],
+      "description": "Quintuplet 5:4 (D#5 pizz fff, D3 Bartók, quad stop sfz tied), 4 16ths (tied chord, F#5 Bartók, Gb3 Bartók, rest)",
+      "alignmentWeights": null
+    },
+    {
+      "id": "NF003",
+      "name": "NotationFragment003-Violin",
+      "instrument": "Violin",
+      "clef": "treble",
+      "timeSignature": "4/4",
+      "noteEvents": 6,
+      "midiChannel": 0,
+      "svgFile": "NotationFragment003-Violin.svg",
+      "midiFile": "NotationFragment003-Violin-Mod.mid",
+      "maxTempo": 87,
+      "tempoVariants": {
+        "core":     { "file": "NotationFragment003-Violin-87bpm.mid", "bpm": 87, "noteOnSpanSec": 1.356,  "fullDurationSec": 1.4242 },
+        "mid":      { "file": "NotationFragment003-Violin-79bpm.mid", "bpm": 79, "noteOnSpanSec": 1.6495, "fullDurationSec": 1.7326 },
+        "midOuter": { "file": "NotationFragment003-Violin-71bpm.mid", "bpm": 71, "noteOnSpanSec": 2.0334, "fullDurationSec": 2.1347 },
+        "outer":    { "file": "NotationFragment003-Violin-63bpm.mid", "bpm": 63, "noteOnSpanSec": 2.5744, "fullDurationSec": 2.7034 }
+      },
+      "endOnImpactOffset": -1.356,
+      "techniques": ["pizz", "pizzOpen", "pizzTremolo", "fermata", "hairpin"],
+      "description": "Quintuplet 5:4 16ths (Ab3 pizz ff, C5, C#6, G4), sextuplet 6:4 (E4, D5, C#6, G3 open l.v.), Z-stem pizz tremolo D6 with fermata + hairpin (hidden septuplet)",
+      "alignmentWeights": null
+    },
+    {
+      "id": "NF004",
+      "name": "NotationFragment004-Violin",
+      "instrument": "Violin",
+      "clef": "treble",
+      "timeSignature": "4/4",
+      "noteEvents": 9,
+      "midiChannel": 0,
+      "svgFile": "NotationFragment004-Violin.svg",
+      "midiFile": "NotationFragment004-Violin-Mod.mid",
+      "maxTempo": 90,
+      "tempoVariants": {
+        "core":     { "file": "NotationFragment004-Violin-90bpm.mid", "bpm": 90, "noteOnSpanSec": 0.9201, "fullDurationSec": 1.3646 },
+        "mid":      { "file": "NotationFragment004-Violin-82bpm.mid", "bpm": 82, "noteOnSpanSec": 1.069,  "fullDurationSec": 1.6044 },
+        "midOuter": { "file": "NotationFragment004-Violin-74bpm.mid", "bpm": 74, "noteOnSpanSec": 1.269,  "fullDurationSec": 1.9257 },
+        "outer":    { "file": "NotationFragment004-Violin-65bpm.mid", "bpm": 65, "noteOnSpanSec": 1.7548, "fullDurationSec": 2.6058 }
+      },
+      "endOnImpactOffset": -0.9201,
+      "techniques": ["bartokPizz", "pizzOpen", "sfz", "glissando", "moltoVib", "ties"],
+      "description": "C6 Bartók ff, D4 open sfz l.v., D5 Bartók tied into 11:8 tuplet glissando chain (D#5→E5→F5→F#5→G5), quarter C4 molto vibrato",
+      "alignmentWeights": null
+    },
+    {
+      "id": "NF005",
+      "name": "NotationFragment005-Violin",
+      "instrument": "Violin",
+      "clef": "treble",
+      "timeSignature": "4/4",
+      "noteEvents": 15,
+      "midiChannel": 0,
+      "svgFile": "NotationFragment005-Violin.svg",
+      "midiFile": "NotationFragment005-Violin-Mod.mid",
+      "maxTempo": 85,
+      "tempoVariants": {
+        "core":     { "file": "NotationFragment005-Violin-85bpm.mid", "bpm": 85, "noteOnSpanSec": 1.9118, "fullDurationSec": 1.9945 },
+        "mid":      { "file": "NotationFragment005-Violin-77bpm.mid", "bpm": 77, "noteOnSpanSec": 2.3316, "fullDurationSec": 2.433 },
+        "midOuter": { "file": "NotationFragment005-Violin-70bpm.mid", "bpm": 70, "noteOnSpanSec": 2.8192, "fullDurationSec": 2.942 },
+        "outer":    { "file": "NotationFragment005-Violin-62bpm.mid", "bpm": 62, "noteOnSpanSec": 3.5938, "fullDurationSec": 3.75 }
+      },
+      "endOnImpactOffset": -1.9118,
+      "techniques": ["pizz", "behindBridge", "bartokPizz", "arpeggio", "zStem", "ties", "textSpanner"],
+      "description": "b.b. open strings chord arpeggio fff, Bartók Bb5, b.b. D string TextSpanner bracket into quintuplet 5:4 (b.b. notes, Bartók G3 tied), triplet 3:2 (tied G3, two b.b. arpeggio chords), Z-stem chord + hidden 6:4",
+      "alignmentWeights": null
+    },
+    {
+      "id": "NF006",
+      "name": "NotationFragment006-Violin",
+      "instrument": "Violin",
+      "clef": "treble",
+      "timeSignature": "4/4",
+      "noteEvents": 11,
+      "midiChannel": 0,
+      "svgFile": "NotationFragment006-Violin.svg",
+      "midiFile": "NotationFragment006-Violin-Mod.mid",
+      "maxTempo": 80,
+      "tempoVariants": {
+        "core":     { "file": "NotationFragment006-Violin-80bpm.mid", "bpm": 80, "noteOnSpanSec": 1.5762, "fullDurationSec": 1.6875 },
+        "mid":      { "file": "NotationFragment006-Violin-73bpm.mid", "bpm": 73, "noteOnSpanSec": 1.8964, "fullDurationSec": 2.0291 },
+        "midOuter": { "file": "NotationFragment006-Violin-65bpm.mid", "bpm": 65, "noteOnSpanSec": 2.387,  "fullDurationSec": 2.5553 },
+        "outer":    { "file": "NotationFragment006-Violin-58bpm.mid", "bpm": 58, "noteOnSpanSec": 2.993,  "fullDurationSec": 3.2058 }
+      },
+      "endOnImpactOffset": -1.5762,
+      "techniques": ["pizz", "bartokPizz", "chords"],
+      "description": "4 16ths (C#6 pizz ff, E4, Eb5 Bartók), sextuplet 6:4 (C4, D4 Bartók, Eb5, D5, chord D4/G4/C#6), quintuplet 5:4 (chord Eb4/Bb4/A5, Bb5, G3 Bartók)",
+      "alignmentWeights": null
+    },
+    {
+      "id": "NF007",
+      "name": "NotationFragment007-Viola",
+      "instrument": "Viola",
+      "clef": "alto",
+      "timeSignature": "4/4",
+      "noteEvents": 13,
+      "midiChannel": 2,
+      "svgFile": "NotationFragment007-Viola.svg",
+      "midiFile": "NotationFragment007-Viola-Mod.mid",
+      "maxTempo": 80,
+      "tempoVariants": {
+        "core":     { "file": "NotationFragment007-Viola-80bpm.mid", "bpm": 80, "noteOnSpanSec": 1.5977, "fullDurationSec": 1.6914 },
+        "mid":      { "file": "NotationFragment007-Viola-73bpm.mid", "bpm": 73, "noteOnSpanSec": 1.9157, "fullDurationSec": 2.0291 },
+        "midOuter": { "file": "NotationFragment007-Viola-65bpm.mid", "bpm": 65, "noteOnSpanSec": 2.4159, "fullDurationSec": 2.5577 },
+        "outer":    { "file": "NotationFragment007-Viola-58bpm.mid", "bpm": 58, "noteOnSpanSec": 3.028,  "fullDurationSec": 3.2058 }
+      },
+      "endOnImpactOffset": -1.5977,
+      "techniques": ["pizz", "behindBridge", "bartokPizz", "pizzOpen", "sfz", "zStem", "laissezVibrer", "chords"],
+      "description": "Triplet 3:4 (Db3/A3/G4 pizz chord ff), b.b. C3, Bartók Ab3, open C3 l.v. sfz, polyphonic b.b. pizz tremolo C3 (Z-stem + hidden quintuplet), open sfz, b.b., Bartók, b.b. mixed techniques",
+      "alignmentWeights": null
+    },
+    {
+      "id": "NF008",
+      "name": "NotationFragment008-Cello",
+      "instrument": "Cello",
+      "clef": "bass",
+      "timeSignature": "4/4",
+      "noteEvents": 18,
+      "midiChannel": 3,
+      "svgFile": "NotationFragment008-Cello.svg",
+      "midiFile": "NotationFragment008-Cello-Mod.mid",
+      "maxTempo": 90,
+      "tempoVariants": {
+        "core":     { "file": "NotationFragment008-Cello-90bpm.mid", "bpm": 90, "noteOnSpanSec": 1.7101, "fullDurationSec": 1.7847 },
+        "mid":      { "file": "NotationFragment008-Cello-82bpm.mid", "bpm": 82, "noteOnSpanSec": 2.1056, "fullDurationSec": 2.1951 },
+        "midOuter": { "file": "NotationFragment008-Cello-74bpm.mid", "bpm": 74, "noteOnSpanSec": 2.4916, "fullDurationSec": 2.6014 },
+        "outer":    { "file": "NotationFragment008-Cello-65bpm.mid", "bpm": 65, "noteOnSpanSec": 3.3606, "fullDurationSec": 3.5024 }
+      },
+      "endOnImpactOffset": -1.7101,
+      "techniques": ["pizz", "behindBridge", "bartokPizz", "glissando", "zStem", "arpeggio", "fermata", "hairpin", "chords"],
+      "description": "4×16ths pizz gliss ff (Db2→D2→Eb2→E2), b.b. A3 in 5:4 tuplet, 4×16ths pizz gliss (F2→Gb2→G2→Ab2), Bartók G2, b.b. G2, Bartók F#4, Z-stem b.b. open strings chord arpeggio + fermata + hairpin (hidden sextuplet)",
+      "alignmentWeights": null
+    }
+  ]
+}

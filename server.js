@@ -1460,7 +1460,7 @@ app.post('/api/lilypond/render-glissando', (req, res) => {
             res.json({ 
                 success: true, 
                 rendered: true,
-                svgPath: `/SVG_graphics/${baseName}.svg`,
+                svgPath: `/SVG_graphics/${encodeURIComponent(baseName + '.svg')}`,
                 fullPath: outputPath
             });
         } else {
@@ -1471,6 +1471,120 @@ app.post('/api/lilypond/render-glissando', (req, res) => {
                 stderr: stderr
             });
         }
+    });
+});
+
+// ============================================
+// PIZZ TREMOLO GLISSANDO - Create LilyPond file from template
+// ============================================
+
+app.post('/api/lilypond/create-pizz-trem-gliss', (req, res) => {
+    const { filename, clef, startPitch, endPitch, startDynamic, endDynamic, hairpin, glissOffset } = req.body;
+    
+    if (!filename || !clef || !startPitch || !endPitch || !startDynamic || !endDynamic) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters' });
+    }
+    
+    const templatePath = path.join(LILYPOND_DIR, 'PizzTremGliss-Template.ly');
+    const outputPath = path.join(LILYPOND_DIR, filename);
+    
+    if (!fs.existsSync(templatePath)) {
+        return res.status(404).json({ success: false, error: 'PizzTremGliss template not found' });
+    }
+    
+    try {
+        let template = fs.readFileSync(templatePath, 'utf8');
+        
+        // 1. Clef: replace "\clef treble"
+        template = template.replace(/\\clef treble/, `\\clef ${clef}`);
+        
+        // 2. Start pitch: replace "etqs4" (the template's placeholder start pitch)
+        template = template.replace(/^(\s*)etqs4/m, `$1${startPitch}`);
+        
+        // 3. End pitch: replace "atqf4" (the template's placeholder end pitch)
+        template = template.replace(/^(\s*)atqf4/m, `$1${endPitch}`);
+        
+        // 4. Gliss offset: replace the 0.3 in extra-offset for glissando
+        const offset = glissOffset || '0';
+        template = template.replace(
+            /(-\\tweak extra-offset #'\(0 \. )0\.3(\)\s*%gliss position)/,
+            `$1${offset}$2`
+        );
+        
+        // 5. Start dynamic: replace "\ppp"
+        template = template.replace(/\\ppp/, `\\${startDynamic}`);
+        
+        // 6. End dynamic: replace "\f" (at end of file, after end pitch)
+        // Match the \f that comes after the END_DYNAMIC comment context
+        template = template.replace(/(extra-offset #'\(0\.1 \. 0\)\s*\n\s*)\\f/, `$1\\${endDynamic}`);
+        
+        // 7. Hairpin: replace "\<" with appropriate direction
+        const hairpinDir = hairpin || '\\<';
+        template = template.replace(/\\</, hairpinDir.replace(/\\/g, '\\'));
+        
+        fs.writeFileSync(outputPath, template);
+        
+        console.log(`Created PizzTremGliss LilyPond file: ${filename}`);
+        res.json({ success: true, created: true, filename, path: outputPath });
+    } catch (err) {
+        console.error('Error creating PizzTremGliss file:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// ============================================
+// PIZZ TREMOLO GLISSANDO - Generate MIDI file
+// ============================================
+
+app.post('/api/pizz-trem-gliss/generate-midi', (req, res) => {
+    const { startPitch, endPitch, startDynamic, endDynamic, clef, track, duration, model, slope, y1, y2 } = req.body;
+    
+    if (!startPitch || !endPitch || !startDynamic || !endDynamic || !track || !duration) {
+        return res.status(400).json({ success: false, error: 'Missing required fields' });
+    }
+    
+    const scriptPath = path.join(LILYPOND_DIR, 'generate_pizz_trem_gliss_midi.js');
+    if (!fs.existsSync(scriptPath)) {
+        return res.status(404).json({ success: false, error: 'MIDI generator script not found' });
+    }
+    
+    // Output to public/midi_files/ for web access
+    const midiDir = path.join(__dirname, 'public', 'midi_files');
+    const clefName = clef || 'treble';
+    const midiFilename = `PizzTremGliss-${clefName}-${startPitch}-${endPitch}-${startDynamic}-${endDynamic}.mid`;
+    const outputPath = path.join(midiDir, midiFilename);
+    
+    // Build command
+    let command = `node "${scriptPath}" --startPitch "${startPitch}" --endPitch "${endPitch}" --startDynamic ${startDynamic} --endDynamic ${endDynamic} --track ${track} --duration ${duration} --clef ${clefName} --output "${outputPath}"`;
+    
+    if (model) command += ` --model ${model}`;
+    if (slope !== undefined && slope !== null) command += ` --slope ${slope}`;
+    if (y1 !== undefined && y1 !== null) command += ` --y1 ${y1}`;
+    if (y2 !== undefined && y2 !== null) command += ` --y2 ${y2}`;
+    
+    console.log('PizzTremGliss MIDI command:', command);
+    
+    exec(command, { cwd: LILYPOND_DIR, timeout: 30000 }, (err, stdout, stderr) => {
+        if (err) {
+            console.error('PizzTremGliss MIDI error:', err.message);
+            console.error('stderr:', stderr);
+            console.error('stdout:', stdout);
+            return res.status(500).json({ success: false, error: 'MIDI generation failed', details: stderr || err.message, stdout });
+        }
+        
+        if (!fs.existsSync(outputPath)) {
+            return res.status(500).json({ success: false, error: 'MIDI file not created', stdout, stderr });
+        }
+        
+        const midiWebPath = `/midi_files/${encodeURIComponent(midiFilename)}`;
+        console.log(`PizzTremGliss MIDI generated: ${midiFilename}`);
+        
+        res.json({
+            success: true,
+            midiPath: midiWebPath,
+            midiFilename,
+            stdout
+        });
     });
 });
 
