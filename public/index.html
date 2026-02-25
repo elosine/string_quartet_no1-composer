@@ -1187,6 +1187,11 @@
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="bpGoBtn" class="control-btn" style="font-size: 11px; background: var(--clr-neonMagenta); color: #fff; font-weight: bold; padding: 4px 12px;">Go</button>
                 </div>
+                <div id="bpBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px; color: var(--clr-neonMagenta);">Impact</label>
+                    <span id="bpBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
+                    <button id="bpDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                </div>
                 
                 <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-brightOrange); color: #000; padding: 3px 6px; border-radius: 2px; font-weight: bold;">Notation Fragments</div>
@@ -12608,6 +12613,16 @@
                     }
                 );
                 
+                // BartokPizzUI bundles - unified bartók pizz component groups (GC + SVG + MIDI)
+                this.registerSource('bpBundles',
+                    () => window.BartokPizzUI ? BartokPizzUI.exportBundles() : { bundles: [], nextBundleId: 1 },
+                    (data) => {
+                        if (window.BartokPizzUI) {
+                            BartokPizzUI.importBundles(data);
+                        }
+                    }
+                );
+                
                 // FlowchartConnector - connector lines between objects
                 this.registerSource('connectors',
                     () => window.FlowchartConnector ? FlowchartConnector.exportData() : [],
@@ -20674,11 +20689,17 @@
                 color: 'neonMagenta'
             },
             
+            // ============ BARTÓK PIZZ BUNDLE SYSTEM ============
+            bundles: [],
+            nextBundleId: 1,
+            selectedBundleId: null,
+            
             init() {
                 const goBtn = document.getElementById('bpGoBtn');
                 if (goBtn) {
                     goBtn.addEventListener('click', () => this.go());
                 }
+                this.initBundleUI();
                 console.log('BartokPizzUI initialized');
             },
             
@@ -20822,6 +20843,17 @@
                         if (midiSnippet) {
                             console.log('BartokPizzUI: MIDI inserted');
                         }
+                    }
+                    
+                    // Step 5: Register bundle (links GC + SVG + MIDI as a unit)
+                    if (gc || svgElement || midiSnippet) {
+                        this.registerBundle(
+                            gc ? gc.id : null,
+                            svgElement ? svgElement.id : null,
+                            midiSnippet,
+                            impactTime,
+                            track
+                        );
                     }
                     
                     result = { gc, svgElement, midiSnippet, pipelineResult };
@@ -21010,6 +21042,305 @@
                 MidiController.reloadFromDatabase();
                 
                 return snippet.id;
+            },
+            
+            // ── Bundle registry: unified drag/delete for BP components ──
+            registerBundle(gcId, svgId, midiSnippetId, impactTime, track) {
+                // Remove any existing bundles for same gcId (prevents duplicates)
+                const old = this.bundles.filter(b => b.gcId === gcId);
+                if (old.length > 0) {
+                    for (const ob of old) this.bundles = this.bundles.filter(b => b.id !== ob.id);
+                }
+                const bundle = {
+                    id: this.nextBundleId++,
+                    gcId,
+                    svgId,
+                    midiSnippetId,
+                    impactTime,
+                    track
+                };
+                this.bundles.push(bundle);
+                console.log('BartokPizzUI: bundle registered', bundle.id,
+                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId);
+                return bundle;
+            },
+            
+            lookupBundleBySvgId(svgId) {
+                const matches = this.bundles.filter(b => b.svgId === svgId);
+                return matches.length > 0 ? matches[matches.length - 1] : null;
+            },
+            
+            lookupBundleByGcId(gcId) {
+                const matches = this.bundles.filter(b => b.gcId === gcId);
+                return matches.length > 0 ? matches[matches.length - 1] : null;
+            },
+            
+            deleteBundle(bundleId) {
+                const idx = this.bundles.findIndex(b => b.id === bundleId);
+                if (idx === -1) return false;
+                const bundle = this.bundles[idx];
+                const systemsToReload = new Set();
+                
+                // Remove GC
+                if (window.GCMaker && bundle.gcId != null) {
+                    const gi = GCMaker.gcs.findIndex(gc => gc.id === bundle.gcId);
+                    if (gi !== -1) {
+                        const gc = GCMaker.gcs[gi];
+                        if (gc.elements && gc.elements.group) gc.elements.group.remove();
+                        GCMaker.gcs.splice(gi, 1);
+                        if (GCMaker.selectedGC && GCMaker.selectedGC.id === bundle.gcId) {
+                            GCMaker.deselectGC();
+                        }
+                        systemsToReload.add('gcs');
+                    }
+                }
+                
+                // Remove SVG
+                if (window.SVGElementManager && bundle.svgId != null) {
+                    const si = SVGElementManager.elements.findIndex(el => el.id === bundle.svgId);
+                    if (si !== -1) {
+                        const el = SVGElementManager.elements[si];
+                        if (el.wrapper) el.wrapper.remove();
+                        if (SVGElementManager.selectedElement && SVGElementManager.selectedElement.id === bundle.svgId) {
+                            SVGElementManager.deselectAll();
+                        }
+                        SVGElementManager.elements.splice(si, 1);
+                        systemsToReload.add('svgs');
+                    }
+                }
+                
+                // Remove MIDI snippet
+                if (bundle.midiSnippetId != null && window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.remove(bundle.midiSnippetId);
+                    systemsToReload.add('midi');
+                }
+                
+                // Remove bundle record
+                this.bundles.splice(idx, 1);
+                
+                // Reload affected systems
+                if (systemsToReload.has('gcs') && window.GCMaker) GCMaker.rerenderAllGCs();
+                if (systemsToReload.has('svgs') && window.SVGElementManager) {
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                }
+                if (systemsToReload.has('midi') && window.MidiController) MidiController.reloadFromDatabase();
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                console.log('BartokPizzUI: bundle deleted', bundleId);
+                return true;
+            },
+            
+            exportBundles() {
+                return {
+                    bundles: this.bundles.map(b => ({
+                        id: b.id,
+                        gcId: b.gcId,
+                        svgId: b.svgId,
+                        midiSnippetId: b.midiSnippetId,
+                        impactTime: b.impactTime,
+                        track: b.track
+                    })),
+                    nextBundleId: this.nextBundleId
+                };
+            },
+            
+            importBundles(data) {
+                if (!data || !data.bundles) return;
+                const raw = data.bundles.map(b => ({ ...b }));
+                // Dedup: for each gcId, keep only the bundle with the highest ID
+                const byGc = new Map();
+                for (const b of raw) {
+                    const existing = byGc.get(b.gcId);
+                    if (!existing || b.id > existing.id) byGc.set(b.gcId, b);
+                }
+                this.bundles = [...byGc.values()];
+                if (raw.length !== this.bundles.length) {
+                    console.warn('BartokPizzUI.importBundles: Deduped', raw.length, '\u2192', this.bundles.length, 'bundles');
+                }
+                this.nextBundleId = data.nextBundleId || (this.bundles.length > 0
+                    ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
+                console.log('BartokPizzUI: imported', this.bundles.length, 'bundles');
+            },
+            
+            // ── Bundle drag: shifts GC + SVG + MIDI by cumulative time delta ──
+            startBundleDrag(bundle, e) {
+                const zoomScale = window.ScoreZoom ? ScoreZoom.getZoom() : 1;
+                const startClientX = e.clientX;
+                
+                const gc = window.GCMaker ? GCMaker.gcs.find(g => g.id === bundle.gcId) : null;
+                if (!gc) return;
+                const scoreEl = gc.section === 'top' ? GCMaker.scoreTopEl : GCMaker.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = window.GraphicTimeline
+                    ? GraphicTimeline.getSecondsPerPage()
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                
+                // Capture originals at drag start
+                const origGc = {
+                    startSeconds: gc.startSeconds,
+                    endSeconds: gc.endSeconds,
+                    impactSeconds: gc.impactSeconds
+                };
+                const origImpactTime = bundle.impactTime;
+                
+                // SVG element
+                const svgEl = window.SVGElementManager
+                    ? SVGElementManager.elements.find(el => el.id === bundle.svgId)
+                    : null;
+                const origSvgRef = svgEl ? svgEl.referenceSeconds : null;
+                
+                // MIDI snippet
+                const sn = window.MidiSnippetDatabase ? MidiSnippetDatabase.get(bundle.midiSnippetId) : null;
+                const origMidi = sn ? {
+                    startSeconds: sn.startSeconds,
+                    endSeconds: sn.endSeconds,
+                    eventTimes: sn.events ? sn.events.map(ev => ev.timeMs) : []
+                } : null;
+                
+                // Show bundle row
+                const row = document.getElementById('bpBundleRow');
+                const readout = document.getElementById('bpBundleTime');
+                if (row) {
+                    row.style.display = 'flex';
+                    const sc = row.closest('.section-content');
+                    if (sc) requestAnimationFrame(() => { sc.style.maxHeight = sc.scrollHeight + 'px'; });
+                }
+                if (readout) readout.textContent = origImpactTime.toFixed(3) + 's';
+                
+                const onMouseMove = (moveE) => {
+                    const dx = (moveE.clientX - startClientX) / zoomScale;
+                    const timeDelta = dx * secondsPerPixel;
+                    
+                    // Shift GC
+                    gc.startSeconds = origGc.startSeconds + timeDelta;
+                    gc.endSeconds = origGc.endSeconds + timeDelta;
+                    gc.impactSeconds = origGc.impactSeconds + timeDelta;
+                    GCMaker.rerenderAllGCs();
+                    
+                    // Shift SVG
+                    if (svgEl && origSvgRef != null) {
+                        svgEl.referenceSeconds = origSvgRef + timeDelta;
+                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                        svgEl._x = pos.x;
+                        svgEl._y = pos.y;
+                        svgEl._page = pos.page;
+                        svgEl._section = pos.section;
+                        SVGElementManager.updateElementTransform(svgEl);
+                    }
+                    
+                    // Shift MIDI snippet
+                    if (sn && origMidi) {
+                        const deltaMs = timeDelta * 1000;
+                        sn.startSeconds = origMidi.startSeconds + timeDelta;
+                        sn.endSeconds = origMidi.endSeconds + timeDelta;
+                        if (sn.events && origMidi.eventTimes.length === sn.events.length) {
+                            for (let i = 0; i < sn.events.length; i++) {
+                                sn.events[i].timeMs = origMidi.eventTimes[i] + deltaMs;
+                            }
+                        }
+                    }
+                    
+                    // Update bundle impactTime + readout
+                    bundle.impactTime = origImpactTime + timeDelta;
+                    if (readout) readout.textContent = bundle.impactTime.toFixed(3) + 's';
+                };
+                
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    if (window.MidiController) MidiController.reloadFromDatabase();
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    if (window.FlowchartConnector) FlowchartConnector.updateAllConnectors();
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
+            // ── Bundle UI: selection, delete button, delete key, GC drag hook ──
+            initBundleUI() {
+                const self = this;
+                
+                // Delete Bundle button (dual-lookup: GC + SVG)
+                const delBtn = document.getElementById('bpDeleteBundleBtn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (this.selectedBundleId != null) {
+                            bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                        }
+                        if (!bundle && window.GCMaker && GCMaker.selectedGC) {
+                            bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle) {
+                            this.deleteBundle(bundle.id);
+                            this.selectedBundleId = null;
+                            const row = document.getElementById('bpBundleRow');
+                            if (row) row.style.display = 'none';
+                        }
+                    });
+                }
+                
+                // Delete key handler (dual-lookup: GC + SVG)
+                document.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Delete') return;
+                    const tag = document.activeElement?.tagName;
+                    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+                    
+                    let bundle = null;
+                    if (this.selectedBundleId != null) {
+                        bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                    }
+                    if (!bundle && window.GCMaker && GCMaker.selectedGC) {
+                        bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                    }
+                    if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                        bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                    }
+                    if (bundle) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.deleteBundle(bundle.id);
+                        this.selectedBundleId = null;
+                        const row = document.getElementById('bpBundleRow');
+                        if (row) row.style.display = 'none';
+                    }
+                });
+                
+                // Patch SVGElementManager.selectElement to show/hide BP bundle row
+                if (window.SVGElementManager) {
+                    const origSelect = SVGElementManager.selectElement;
+                    const origDeselect = SVGElementManager.deselectAll;
+                    
+                    SVGElementManager.selectElement = function(elementData) {
+                        origSelect.call(SVGElementManager, elementData);
+                        const bpBundle = self.lookupBundleBySvgId(elementData.id);
+                        const row = document.getElementById('bpBundleRow');
+                        const readout = document.getElementById('bpBundleTime');
+                        if (bpBundle) {
+                            self.selectedBundleId = bpBundle.id;
+                            if (row) {
+                                row.style.display = 'flex';
+                                const sc = row.closest('.section-content');
+                                if (sc) requestAnimationFrame(() => { sc.style.maxHeight = sc.scrollHeight + 'px'; });
+                            }
+                            if (readout) readout.textContent = bpBundle.impactTime.toFixed(3) + 's';
+                        }
+                    };
+                    
+                    const prevDeselect = SVGElementManager.deselectAll;
+                    SVGElementManager.deselectAll = function() {
+                        prevDeselect.call(SVGElementManager);
+                        self.selectedBundleId = null;
+                        const row = document.getElementById('bpBundleRow');
+                        if (row) row.style.display = 'none';
+                    };
+                }
             }
         };
         BartokPizzUI.init();
@@ -21788,6 +22119,11 @@
             
             // ── Bundle registry: unified drag/delete for NF components ──
             registerBundle(gcId, svgId, midiSnippetId, arrowEl, impactTime, track) {
+                // Remove any existing bundles for same gcId (prevents duplicates)
+                const old = this.bundles.filter(b => b.gcId === gcId);
+                if (old.length > 0) {
+                    for (const ob of old) this.bundles = this.bundles.filter(b => b.id !== ob.id);
+                }
                 const bundle = {
                     id: this.nextBundleId++,
                     gcId,
@@ -22011,10 +22347,20 @@
             
             importBundles(data) {
                 if (!data || !data.bundles) return;
-                this.bundles = data.bundles.map(b => ({
+                const raw = data.bundles.map(b => ({
                     ...b,
                     arrowEl: null  // re-created below
                 }));
+                // Dedup: for each gcId, keep only the bundle with the highest ID
+                const byGc = new Map();
+                for (const b of raw) {
+                    const existing = byGc.get(b.gcId);
+                    if (!existing || b.id > existing.id) byGc.set(b.gcId, b);
+                }
+                this.bundles = [...byGc.values()];
+                if (raw.length !== this.bundles.length) {
+                    console.warn('NotationFragmentSystem.importBundles: Deduped', raw.length, '→', this.bundles.length, 'bundles');
+                }
                 this.nextBundleId = data.nextBundleId || (this.bundles.length > 0
                     ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
                 // Re-create arrow DOM elements for bundles that had them
@@ -22314,7 +22660,16 @@
                 if (sel) sel.addEventListener('change', () => this.onFragmentChange(sel.value));
                 if (btn) btn.addEventListener('click', () => this.insert());
                 if (alignSel) alignSel.addEventListener('change', () => this.onAlignChange(alignSel.value));
-                if (deleteBtn) deleteBtn.addEventListener('click', () => this.deleteSelectedBundle());
+                if (deleteBtn) deleteBtn.addEventListener('click', () => {
+                    // Dual-lookup: try GC selection first, then SVG
+                    if (this.selectedBundleId == null && window.GCMaker && GCMaker.selectedGC) {
+                        const bundle = window.NotationFragmentSystem
+                            ? NotationFragmentSystem.lookupBundleByGcId(GCMaker.selectedGC.id)
+                            : null;
+                        if (bundle) this.selectedBundleId = bundle.id;
+                    }
+                    this.deleteSelectedBundle();
+                });
                 
                 // Listen for SVG selection changes to show/hide bundle row
                 const origSelect = SVGElementManager.selectElement.bind(SVGElementManager);
@@ -22333,12 +22688,20 @@
                 };
                 SVGElementManager.deselectAll = patchedDeselect;
                 
-                // Delete key handler for bundles
+                // Delete key handler for bundles (dual-lookup: GC or SVG selection)
                 document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Delete' && this.selectedBundleId != null) {
-                        // Only if no input/textarea is focused
-                        const tag = document.activeElement?.tagName;
-                        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+                    if (e.key !== 'Delete') return;
+                    // Only if no input/textarea is focused
+                    const tag = document.activeElement?.tagName;
+                    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+                    // Dual-lookup: try GC selection if no SVG-based selectedBundleId
+                    if (this.selectedBundleId == null && window.GCMaker && GCMaker.selectedGC) {
+                        const bundle = window.NotationFragmentSystem
+                            ? NotationFragmentSystem.lookupBundleByGcId(GCMaker.selectedGC.id)
+                            : null;
+                        if (bundle) this.selectedBundleId = bundle.id;
+                    }
+                    if (this.selectedBundleId != null) {
                         e.preventDefault();
                         this.deleteSelectedBundle();
                     }
@@ -24163,15 +24526,30 @@
                 hitPath.style.cursor = 'pointer';
                 group.appendChild(hitPath);
                 
-                // Bundle drag: mousedown initiates drag for NF bundle GCs
+                // Bundle drag: mousedown initiates drag for NF or BP bundle GCs
                 const handleGCMouseDown = (e) => {
-                    if (!window.NotationFragmentSystem) return;
-                    const bundle = NotationFragmentSystem.lookupBundleByGcId(gc.id);
-                    if (!bundle) return; // Not a bundle GC, let click handle selection
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.selectGC(gc);
-                    NotationFragmentSystem.startBundleDrag(bundle, e);
+                    // Check NF bundles
+                    if (window.NotationFragmentSystem) {
+                        const nfBundle = NotationFragmentSystem.lookupBundleByGcId(gc.id);
+                        if (nfBundle) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.selectGC(gc);
+                            NotationFragmentSystem.startBundleDrag(nfBundle, e);
+                            return;
+                        }
+                    }
+                    // Check BP bundles
+                    if (window.BartokPizzUI) {
+                        const bpBundle = BartokPizzUI.lookupBundleByGcId(gc.id);
+                        if (bpBundle) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.selectGC(gc);
+                            BartokPizzUI.startBundleDrag(bpBundle, e);
+                            return;
+                        }
+                    }
                 };
                 hitPath.addEventListener('mousedown', handleGCMouseDown);
                 trajectoryPath.addEventListener('mousedown', handleGCMouseDown);

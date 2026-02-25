@@ -107,7 +107,7 @@ When implementing bundles for another system (e.g., Bartók Pizz, Long Tones, Vi
 11. [ ] Test: drag within page, drag across page boundary, delete, save/load round-trip
 
 ### Systems Known to Need Bundling (Future)
-- Bartók Pizzicato (SVG + MIDI + GC?)
+- ~~Bartók Pizzicato (SVG + MIDI + GC)~~ — **DONE (ASB-109)**
 - Long Tones (SVG + MIDI + curve?)
 - Glissando fragments (SVG + MIDI + curve)
 - Custom notation insertions
@@ -421,6 +421,6 @@ Based on the NF and CD implementations, here's the proven pattern:
 |--------|------------|---------|---------------|----------|
 | Long Tone Glissando | SVG + MIDI + Curve | Curve | Yes (same as CD) | High |
 | Vibrato | SVG + MIDI + Curve | Curve | Yes (CC4 ramp) | High |
-| Bartók Pizzicato | SVG + MIDI | SVG | No (discrete events) | Medium |
+| ~~Bartók Pizzicato~~ | SVG + MIDI + GC | GC | No (discrete events) | **DONE (ASB-109)** |
 | Pizzicato Tremolo | SVG + MIDI + GC + Arrow | GC | Possible (timing DB) | Medium |
 | Pizz Trem Glissando | SVG + MIDI + Curve | Curve | Yes (pitch bend) | Medium |
