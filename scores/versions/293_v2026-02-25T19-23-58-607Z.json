@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "291-beginCompNewSection-246",
-    "created": "2026-02-25T15:06:37.177Z",
-    "modified": "2026-02-25T15:06:37.325Z",
+    "title": "293",
+    "created": "2026-02-25T19:17:46.462Z",
+    "modified": "2026-02-25T19:17:46.532Z",
     "author": ""
   },
   "tempoHistory": [
@@ -336110,25 +336110,32 @@
   "cdBundles": {
     "bundles": [
       {
-        "id": 1,
+        "id": 5,
         "curveId": 239,
-        "svgId": 232,
+        "svgId": 237,
         "midiSnippetIds": [
-          272
+          272,
+          273,
+          274,
+          275,
+          276
         ],
-        "startTime": 247.55507088331512,
-        "endTime": 249.55507088331512,
+        "startTime": 256,
+        "endTime": 258,
         "track": 1,
-        "pitchModel": "single",
+        "pitchModel": "glissando",
         "pitchInfo": {
-          "pitch": "A3",
-          "lpPitch": "a4"
+          "startPitch": "d4",
+          "endPitch": "c5",
+          "lpStartPitch": "d'4",
+          "lpEndPitch": "c''4",
+          "glissOffset": "0"
         },
-        "dynamic1": "p",
-        "dynamic2": "ff",
+        "dynamic1": "ppp",
+        "dynamic2": "fff",
         "clef": "treble",
         "velocity": 115,
-        "needsRegeneration": true
+        "needsRegeneration": false
       },
       {
         "id": 2,
@@ -336202,34 +336209,6 @@
         "clef": "treble",
         "velocity": 115,
         "needsRegeneration": false
-      },
-      {
-        "id": 5,
-        "curveId": 239,
-        "svgId": 237,
-        "midiSnippetIds": [
-          272,
-          273,
-          274,
-          275,
-          276
-        ],
-        "startTime": 256,
-        "endTime": 258,
-        "track": 1,
-        "pitchModel": "glissando",
-        "pitchInfo": {
-          "startPitch": "d4",
-          "endPitch": "c5",
-          "lpStartPitch": "d'4",
-          "lpEndPitch": "c''4",
-          "glissOffset": "0"
-        },
-        "dynamic1": "ppp",
-        "dynamic2": "fff",
-        "clef": "treble",
-        "velocity": 115,
-        "needsRegeneration": false
       }
     ],
     "nextBundleId": 6
@@ -336237,7 +336216,7 @@
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 222.25,
-    "gotoDisplaySeconds": 246,
+    "gotoDisplaySeconds": 254,
     "leadInSeconds": 2
   }
 }

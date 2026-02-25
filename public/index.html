@@ -2696,14 +2696,6 @@
                 this.goStopBtn.style.color = '';
                 this.goStopBtn.classList.add('active');
                 console.log(`Score GO - playing from ${data.currentScoreTimeMs}ms`);
-                
-                // Debug: Check curve state
-                if (window.CurveMaker) {
-                    console.log(`[onScoreGo] CurveMaker.curves.length=${CurveMaker.curves.length}`);
-                    CurveMaker.curves.forEach((c, i) => {
-                        console.log(`[onScoreGo] Curve ${i}: ${c.name}, group in DOM: ${c.elements?.group?.parentNode ? 'yes' : 'no'}, display: ${c.elements?.group?.style?.display}`);
-                    });
-                }
             },
             
             onScoreStop(data) {
@@ -7225,7 +7217,8 @@
                     for (const event of snippetData.events) {
                         this.tracks[trackIndex].midiEvents.push({
                             ...event,
-                            snippetId: snippetData.id
+                            snippetId: snippetData.id,
+                            sourceCurve: snippetData.sourceCurve || event.sourceCurve
                         });
                     }
                     
@@ -9012,7 +9005,7 @@
                         }
                     };
                     
-                    console.debug(`Playing audio clip: ${clipData.name} at offset ${startOffset.toFixed(2)}s`);
+                    // console.debug(`Playing audio clip: ${clipData.name} at offset ${startOffset.toFixed(2)}s`);
                 } catch (e) {
                     console.error('Error playing audio clip:', e);
                 }
@@ -14083,7 +14076,7 @@
                     page: curve.page,
                     section: curve.section
                 };
-                console.log('CurveMaker.createCurve:', JSON.stringify(curveParams, null, 2));
+                console.log('CurveMaker.createCurve:', curve.name, `${curve.startSeconds}-${curve.endSeconds}s gTrack:${curve.gTrack} model:${curve.model}`);
                 
                 // Return the curve for programmatic use
                 return curve;
@@ -14479,6 +14472,10 @@
                         row.style.display = '';
                         if (timeSpan) timeSpan.textContent = cdBundle.startTime.toFixed(3) + 's';
                         if (regenBtn) regenBtn.style.display = cdBundle.needsRegeneration ? '' : 'none';
+                        requestAnimationFrame(() => {
+                            const sc = row.closest('.section-content');
+                            if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                        });
                     }
                 }
             },
@@ -15253,6 +15250,14 @@
                 this.y2Input.value = Math.max(0, Math.min(10, y2)).toFixed(1);
                 if (this.slopeInput) this.slopeInput.value = curve.slope || 0;
                 
+                // Sync CD panel inputs if this curve belongs to a crescendo bundle
+                if (window.CrescendoUI && CrescendoUI.lookupBundleByCurveId && curve.id) {
+                    const cdSlope = document.getElementById('cdSlopeInput');
+                    const cdModel = document.getElementById('cdModelSelect');
+                    if (cdSlope) cdSlope.value = curve.slope || 0;
+                    if (cdModel) cdModel.value = curve.model || 'bezier';
+                }
+                
                 // Update curve data
                 curve.startSeconds = startSeconds;
                 curve.endSeconds = endSeconds;
@@ -15376,7 +15381,15 @@
                     const cdBundle = CrescendoUI.lookupBundleByCurveId(curve.id);
                     if (cdBundle) {
                         cdBundle.needsRegeneration = true;
+                        const bundleRow = document.getElementById('cdBundleRow');
                         const regenBtn = document.getElementById('cdRegenMidiBtn');
+                        if (bundleRow) {
+                            bundleRow.style.display = '';
+                            requestAnimationFrame(() => {
+                                const sc = bundleRow.closest('.section-content');
+                                if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                            });
+                        }
                         if (regenBtn) regenBtn.style.display = '';
                     }
                 }
@@ -19485,6 +19498,13 @@
                             }
                         }
                         
+                        // Remove any existing bundles for this curve (prevents duplicates)
+                        const oldBundles = this.bundles.filter(b => b.curveId === curve.id);
+                        for (const ob of oldBundles) {
+                            console.log('CrescendoUI.step2: Removing stale bundle', ob.id, 'pitchModel:', ob.pitchModel);
+                            this.bundles = this.bundles.filter(b => b.id !== ob.id);
+                        }
+                        
                         // Register crescendo bundle (links curve + SVG + MIDI as a unit)
                         const bundleSvgId = insertResult ? insertResult.id : null;
                         const bundleMidiIds = midiInsert ? midiInsert.snippetIds : [];
@@ -19607,10 +19627,17 @@
                 // Determine segments based on pitch model
                 let segments = [];
                 
+                console.log('CrescendoUI.generateCrescendoMidi: pitchModel=' + pitchModel,
+                    'pitchInfo=' + JSON.stringify(pitchInfo));
+                
                 if (pitchModel === 'glissando') {
                     // Glissando: generate pitch bend segments like LongToneUI
                     const startPitchObj = noteNameToPitch(pitchInfo.startPitch);
                     const endPitchObj = noteNameToPitch(pitchInfo.endPitch);
+                    
+                    console.log('  glissando path: startPitchObj=', startPitchObj, 'endPitchObj=', endPitchObj);
+                    console.log('  samples range: first=', samples[0], 'last=', samples[samples.length-1],
+                        'min=', Math.min(...samples.slice(0, 50)), 'max=', Math.max(...samples.slice(-50)));
                     
                     if (!startPitchObj || !endPitchObj) {
                         console.error('CrescendoUI.generateCrescendoMidi: Invalid pitch format');
@@ -19624,10 +19651,17 @@
                     const lowPitch = Math.min(startPitchMidi, endPitchMidi);
                     const pitchRange = highPitch - lowPitch;
                     
+                    console.log('  pitchCalc: startMidi=', startPitchMidi, 'endMidi=', endPitchMidi,
+                        'low=', lowPitch, 'high=', highPitch, 'range=', pitchRange);
+                    
                     // Map curve Y to pitch
                     const pitchAtSample = samples.map(normalizedY => 
                         lowPitch + normalizedY * pitchRange
                     );
+                    
+                    console.log('  pitchAtSample: first=', pitchAtSample[0].toFixed(2),
+                        'last=', pitchAtSample[pitchAtSample.length-1].toFixed(2),
+                        'totalPitchSpan=', (Math.max(...pitchAtSample) - Math.min(...pitchAtSample)).toFixed(2));
                     
                     // Create segments when pitch deviates > PITCH_BEND_RANGE
                     let segmentStartIndex = 0;
@@ -19952,7 +19986,7 @@
                 
                 for (const file of midiResult.files) {
                     try {
-                        const response = await fetch(file.path);
+                        const response = await fetch(file.path + '?t=' + Date.now());
                         const arrayBuffer = await response.arrayBuffer();
                         const midiData = new Uint8Array(arrayBuffer);
                         
@@ -19963,6 +19997,11 @@
                         const events = LongToneUI.parseMidiFileToEvents(midiData, segStartMs);
                         
                         if (!events || events.length === 0) continue;
+                        
+                        // Diagnostic: count event types
+                        const typeCounts = {};
+                        for (const ev of events) { typeCounts[ev.type] = (typeCounts[ev.type] || 0) + 1; }
+                        console.log(`  seg${file.segment} parsed: ${events.length} events, types:`, typeCounts);
                         
                         // Create snippet
                         const snippetData = {
@@ -20161,7 +20200,7 @@
                     needsRegeneration: false
                 };
                 this.bundles.push(bundle);
-                console.log('CrescendoUI.registerBundle:', bundle.id, 'curve:', curveId, 'svg:', svgId, 'midi:', midiSnippetIds);
+                console.log('CrescendoUI.registerBundle:', bundle.id, 'curve:', curveId, 'pitchModel:', bundle.pitchModel, 'pitchInfo:', JSON.stringify(bundle.pitchInfo));
                 return bundle;
             },
             
@@ -20170,7 +20209,13 @@
             },
             
             lookupBundleByCurveId(curveId) {
-                return this.bundles.find(b => b.curveId === curveId) || null;
+                const matches = this.bundles.filter(b => b.curveId === curveId);
+                if (matches.length > 1) {
+                    console.warn('CrescendoUI.lookupBundleByCurveId: DUPLICATE bundles for curve', curveId,
+                        matches.map(b => ({id: b.id, pitchModel: b.pitchModel})));
+                }
+                // Return latest (highest ID) to prefer most recent registration
+                return matches.length > 0 ? matches[matches.length - 1] : null;
             },
             
             deleteBundle(bundleId) {
@@ -20216,9 +20261,12 @@
                     }
                 }
                 
-                // Remove all MIDI snippets
-                if (window.MidiSnippetDatabase && bundle.midiSnippetIds) {
-                    for (const snippetId of bundle.midiSnippetIds) {
+                // Remove all MIDI snippets by sourceCurve (robust — doesn't rely on ID sync)
+                if (window.MidiSnippetDatabase) {
+                    const toRemove = MidiSnippetDatabase.getAll()
+                        .filter(s => s.sourceCurve === bundle.curveId)
+                        .map(s => s.id);
+                    for (const snippetId of toRemove) {
                         MidiSnippetDatabase.remove(snippetId);
                     }
                 }
@@ -20271,9 +20319,26 @@
             
             importBundles(data) {
                 if (!data || !data.bundles) return;
-                this.bundles = data.bundles.map(b => ({ ...b }));
+                const raw = data.bundles.map(b => ({ ...b }));
+                
+                // Dedup: for each curveId, keep only the bundle with the highest ID
+                const byCurve = new Map();
+                for (const b of raw) {
+                    const existing = byCurve.get(b.curveId);
+                    if (!existing || b.id > existing.id) {
+                        byCurve.set(b.curveId, b);
+                    }
+                }
+                this.bundles = [...byCurve.values()];
                 this.nextBundleId = data.nextBundleId || (this.bundles.length > 0 ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
+                
+                if (raw.length !== this.bundles.length) {
+                    console.warn('CrescendoUI.importBundles: Deduped', raw.length, '→', this.bundles.length, 'bundles');
+                }
                 console.log('CrescendoUI.importBundles: Loaded', this.bundles.length, 'bundles');
+                for (const b of this.bundles) {
+                    console.log('  imported bundle', b.id, 'curve:', b.curveId, 'pitchModel:', b.pitchModel);
+                }
             },
             
             // Standalone bundle drag initiated from Shift+curve mousedown
@@ -20318,6 +20383,8 @@
                                 endSeconds: sn.endSeconds,
                                 eventTimes: sn.events ? sn.events.map(ev => ev.timeMs) : []
                             });
+                        } else {
+                            console.warn('startBundleDrag: snippet NOT FOUND in DB:', snId);
                         }
                     }
                 }
@@ -20437,26 +20504,14 @@
                     curve.curveData = CurveMaker.generateCurveDataArray(curve);
                 }
                 
-                console.log('CrescendoUI.regenerateMidi: Starting for bundle', bundle.id,
-                    'curve:', bundle.curveId, 'old MIDI:', bundle.midiSnippetIds);
+                // Diagnostic: log bundle params for debugging
+                console.log('CrescendoUI.regenerateMidi: === START ===');
+                console.log('  bundle.id:', bundle.id, 'curveId:', bundle.curveId);
+                console.log('  bundle.pitchModel:', bundle.pitchModel);
+                console.log('  bundle.pitchInfo:', JSON.stringify(bundle.pitchInfo));
+                console.log('  curve:', curve.startSeconds + '-' + curve.endSeconds + 's');
                 
-                // 1. Delete old MIDI snippets
-                if (window.MidiSnippetDatabase && bundle.midiSnippetIds) {
-                    for (const snippetId of bundle.midiSnippetIds) {
-                        MidiSnippetDatabase.remove(snippetId);
-                    }
-                }
-                
-                // 2. Remove old MidiController events tagged with this curve
-                if (window.MidiController && MidiController.tracks) {
-                    for (const track of MidiController.tracks) {
-                        if (track && track.midiEvents) {
-                            track.midiEvents = track.midiEvents.filter(ev => ev.sourceCurve !== bundle.curveId);
-                        }
-                    }
-                }
-                
-                // 3. Re-generate MIDI from stored bundle params
+                // 1. Generate new MIDI FIRST (before deleting old, so failure is non-destructive)
                 const params = {
                     velocity: bundle.velocity || 115,
                     articulation: 89 // senza vibrato
@@ -20465,13 +20520,38 @@
                     curve, bundle.pitchModel, bundle.pitchInfo, params
                 );
                 
+                console.log('  generateCrescendoMidi result:', midiResult ? 
+                    `${midiResult.segments} segments, ${midiResult.files?.length} files` : 'NULL');
+                
+                if (!midiResult) {
+                    console.error('CrescendoUI.regenerateMidi: Generation failed! Old MIDI preserved.');
+                    return;
+                }
+                
+                // 2. Delete old MIDI snippets by sourceCurve (robust — doesn't rely on ID sync)
+                if (window.MidiSnippetDatabase) {
+                    const toRemove = MidiSnippetDatabase.getAll()
+                        .filter(s => s.sourceCurve === bundle.curveId)
+                        .map(s => s.id);
+                    for (const snippetId of toRemove) {
+                        MidiSnippetDatabase.remove(snippetId);
+                    }
+                }
+                
+                // 3. Remove old MidiController events tagged with this curve
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            track.midiEvents = track.midiEvents.filter(ev => ev.sourceCurve !== bundle.curveId);
+                        }
+                    }
+                }
+                
                 // 4. Insert new MIDI snippets
                 let newSnippetIds = [];
-                if (midiResult) {
-                    const midiInsert = await this.insertCrescendoMidi(midiResult, curve);
-                    if (midiInsert) {
-                        newSnippetIds = midiInsert.snippetIds;
-                    }
+                const midiInsert = await this.insertCrescendoMidi(midiResult, curve);
+                if (midiInsert) {
+                    newSnippetIds = midiInsert.snippetIds;
                 }
                 
                 // 5. Update bundle record
@@ -20488,7 +20568,7 @@
                 const regenBtn = document.getElementById('cdRegenMidiBtn');
                 if (regenBtn) regenBtn.style.display = 'none';
                 
-                console.log('CrescendoUI.regenerateMidi: Complete. New MIDI:', newSnippetIds);
+                console.log('CrescendoUI.regenerateMidi: === DONE === New MIDI:', newSnippetIds);
             },
             
             initBundleUI() {
@@ -20496,10 +20576,14 @@
                 const delBtn = document.getElementById('cdDeleteBundleBtn');
                 if (delBtn) {
                     delBtn.addEventListener('click', () => {
-                        if (window.SVGElementManager && SVGElementManager.selectedElement) {
-                            const bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
-                            if (bundle) this.deleteBundle(bundle.id);
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
                         }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle) this.deleteBundle(bundle.id);
                     });
                 }
                 
@@ -20553,13 +20637,18 @@
                 
                 // Delete key handler for bundles
                 document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Delete' && window.SVGElementManager && SVGElementManager.selectedElement) {
-                        const bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
-                        if (bundle) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            this.deleteBundle(bundle.id);
-                        }
+                    if (e.key !== 'Delete') return;
+                    let bundle = null;
+                    if (window.CurveMaker && CurveMaker.selectedCurve) {
+                        bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                    }
+                    if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                        bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                    }
+                    if (bundle) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.deleteBundle(bundle.id);
                     }
                 });
                 
@@ -23533,10 +23622,7 @@
             },
             
             setupSliderHandlers() {
-                console.debug('GCMaker: Setting up slider handlers');
-                console.debug('  stiffnessSlider:', this.stiffnessSlider);
-                console.debug('  dampingSlider:', this.dampingSlider);
-                console.debug('  ictusSlider:', this.ictusSlider);
+                // console.debug('GCMaker: Setting up slider handlers');
                 
                 // Float slider - controls ascent easing (-30 to 1000)
                 const stiffnessNum = document.getElementById('gcStiffnessNum');

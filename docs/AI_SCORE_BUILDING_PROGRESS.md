@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 24, 2026  
-**Current ASB Number:** ASB-105
+**Last Updated:** Feb 25, 2026  
+**Current ASB Number:** ASB-106
 
 ---
 
@@ -49,7 +49,7 @@ That's it. Everything else below is for Cascade.
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
 | Pizz Tremolo Glissando | **Complete** | Full system: UI + server + MIDI + SVG + AI Command Bridge (two-part/single go). Prompt guide: `AI_PIZZ_TREM_GLISS_PROMPT_GUIDE.md` |
 | Notation Fragment System | **Bundle System Complete** | Full pipeline + score insertion (GC + SVG + MIDI). UI panel built. Pre-computed timing DB. 8 fragments ready. Bundle system (drag/delete as unit) implemented. Next: compose more fragments, AI prompt guide |
-| Crescendo/Decrescendo Bundle | **Phase 3 Needs Troubleshooting** | Phases 1+2 working. Phase 3 (MIDI regeneration) code complete but has runtime issues. See `bundle-units.md` + troubleshooting section below |
+| Crescendo/Decrescendo Bundle | **Complete** | All 3 phases working. Phase 3 MIDI regeneration fully operational (9 bugs fixed across ASB-106/107). Bundle dedup, dual-lookup delete. See ASB-107 |
 | LilyPond Settings Registry | Active | Update when settings change |
 | Musical Material Workflow | Active | Expand as new material types are built |
 
@@ -99,15 +99,15 @@ That's it. Everything else below is for Cascade.
 
 ## Last Session Summary
 
-> **Crescendo/Decrescendo Bundle — Phase 3 code complete, needs troubleshooting.** Phases 1+2 working (bundle move/delete, curve duration drag). Phase 3 MIDI regeneration code written: `regenerateMidi(bundle)` method, `needsRegeneration` flag in `syncCurveToDatabase` with `_isBundleDragging` guard, Regen MIDI button wiring, bundle row visibility on curve select/deselect. User reports runtime issues — troubleshooting deferred to next session.
+> **Crescendo/Decrescendo Bundle — Phase 3 complete (ASB-106/107).** All 9 bugs fixed: sourceCurve propagation, browser cache-bust, CD slope sync, panel maxHeight, old MIDI deletion (sourceCurve-based), duplicate bundle dedup (step2 + importBundles + latest-ID lookup), delete handler dual-lookup (curve + SVG). Console cleanup done. User confirmed regen works correctly for both single and glissando pitch models.
 
 ---
 
 ## Current Session
 
-**Date:** [next session date]  
+**Date:** Feb 25, 2026  
 **Focus:** Troubleshoot Phase 3 MIDI Regeneration  
-**Tier 1 Count This Session:** 0  
+**Tier 1 Count This Session:** 1  
 **Tier 2 Threshold:** At 4
 
 ### ⚠️ TROUBLESHOOTING START POINT — Phase 3 MIDI Regeneration
@@ -202,6 +202,8 @@ That's it. Everything else below is for Cascade.
 ### Session Log — Bundle Systems
 - ASB-104: Notation Fragment Bundle System — bundle registry (bundles[], registerBundle, lookupBundleBySvgId, deleteBundle, exportBundles, importBundles), SVGElementManager drag hook (cumulative delta pattern for GC+MIDI+arrow shifting), handleMouseUp finalization, live impact time readout (#nfBundleRow), Delete key handler, ScoreManager persistence (databases.nfBundles), hasArrow flag for arrow DOM recreation on import
 - ASB-105: Bundle Units workflow doc + Crescendo/Decrescendo Bundle (all 3 phases). Workflow doc: `.windsurf/workflows/bundle-units.md` (architecture, drag pattern, delete handler, persistence, adaptation checklist). **Phase 1:** CrescendoUI bundle registry (bundles[], registerBundle, lookupBundleByCurveId, lookupBundleBySvgId, deleteBundle, exportBundles, importBundles), startBundleDrag (cumulative delta for curve+SVG+MIDI shifting), ScoreManager persistence (databases.cdBundles), live readout (#cdBundleRow). **Phase 2:** Curve endpoint X-drag (all curves) — start/end handle horizontal drag with cross-page support (page/section/container/trackDims updates), Shift+drag move with cross-page support. **Phase 3:** MIDI regeneration — `regenerateMidi(bundle)` method (delete old MIDI → re-generate from stored params → insert new → update bundle → reload display), `needsRegeneration` flag set in `syncCurveToDatabase` (guarded by `_isBundleDragging` to skip during bundle move), Regen MIDI button wired in `initBundleUI` with SVGElementManager.selectElement patch, bundle row visibility on curve select/deselect.
+- ASB-106: Phase 3 MIDI Regeneration troubleshooting. **Fixed:** (1) sourceCurve propagation in reloadFromDatabase, (2) browser cache-busting on MIDI file fetch, (3) CD panel slope/model input real-time sync, (4) panel maxHeight recalc for regen button visibility (requestAnimationFrame). **Structural:** regenerateMidi reordered to generate-before-delete (safe ordering). Diagnostic logging added for bugs 5/7/8.
+- ASB-107: Phase 3 MIDI Regeneration — final bug fixes. **Root cause found: duplicate bundles.** Multiple bundles accumulated for the same curveId (old saved bundles + new registrations). `lookupBundleByCurveId` returned the first (oldest) match with wrong pitchModel. **Fixed:** (1) Old MIDI deletion switched to `sourceCurve`-based filtering (robust, doesn't rely on ID sync), (2) Console cleanup — removed resolved Bug 5/7 diagnostics, condensed noisy logs, (3) Bundle dedup in `step2` — removes existing bundles for same curveId before registering new one, (4) Bundle dedup in `importBundles` — Map-based dedup keeps only highest-ID bundle per curveId on load, (5) `lookupBundleByCurveId` returns last match (highest ID = most recent) as safety fallback, (6) Delete handler dual-lookup — both Delete button and Delete key now try `CurveMaker.selectedCurve` first, fall back to `SVGElementManager.selectedElement` (matching regen button pattern). User confirmed: regen reproduces MIDI accurately, delete works from curve or SVG selection.
 
 ### Session Log — Notation Fragment Score Integration
 - ASB-096: Fragment asset audit — all 8 NFs verified, re-rendered NF008-Cello, cropped all SVGs, created output dirs + notation_fragment_db.json
@@ -301,7 +303,7 @@ That's it. Everything else below is for Cascade.
 - [ ] Investigate why Pass 2 regex fails on vibrato wave path (Pass 3 string-search fallback works)
 - [x] **Add Glissando capability to Pizzicato Tremolo system** ✔️ (ASB-094/095 — PizzTremGliss complete system with UI, MIDI, SVG, AI prompt)
 - [x] **Notation Fragment score integration** ✔️ (ASB-096–103 — pre-computed DB, GC+SVG+MIDI insertion, UI panel, end-to-end tested)
-- [ ] **Crescendo/Decrescendo Bundle System** — Phases 1+2 done (ASB-105). Phase 3 (MIDI regeneration) code complete but has runtime issues — needs troubleshooting. See `bundle-units.md` + troubleshooting section in Current Session
+- [x] **Crescendo/Decrescendo Bundle System** — All 3 phases complete (ASB-105/106/107). Phase 3 MIDI regeneration fully operational. 9 bugs fixed. Bundle dedup prevents duplicate accumulation. ✔️
 - [ ] **Notation Fragment AI prompt guide** — create prompt guide for AI-driven fragment insertion via Command Bridge
 - [ ] **MIDI snippet generating system** — longer-term goal: system that reads notation and/or instructions, knows what CC messages to add, and produces enhanced MIDI files automatically. Builds on modify_midi.js --map approach.
 - [ ] **Test modify_midi.js --map with NotationFragment002-Viola.ly** — render MIDI in Frescobaldi, create JSON map, run post-processing, verify CC0 at correct note positions
@@ -410,6 +412,10 @@ That's it. Everything else below is for Cascade.
 | ASB-101 | Pitch bend audit — glissando fragments confirmed reset to center (8192) | Complete |
 | ASB-102 | NF UI panel — fragment selector, SVG preview, violin picker, time, alignment, Insert button | Complete |
 | ASB-103 | MIDI snippet insertion — insertFragmentMidi, full Insert button wiring, end-to-end test | Complete |
+| ASB-104 | Notation Fragment Bundle System — registry, drag hook, delete handler, persistence, hasArrow import | Complete |
+| ASB-105 | CD Bundle System — 3 phases (registry+drag, curve X-drag, MIDI regen), bundle-units workflow doc | Complete |
+| ASB-106 | Phase 3 MIDI regen troubleshooting — 4 bugs fixed, safe regen ordering, diagnostic logging for 3 more | Complete |
+| ASB-107 | Phase 3 final fixes — bundle dedup (step2 + importBundles + latest-ID lookup), sourceCurve deletion, delete dual-lookup, console cleanup | Complete |
 
 ---
 

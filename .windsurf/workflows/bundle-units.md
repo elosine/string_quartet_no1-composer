@@ -116,8 +116,8 @@ When implementing bundles for another system (e.g., Bartók Pizz, Long Tones, Vi
 
 ## Crescendo/Decrescendo Bundle System
 
-**Status:** Phases 1+2 working. Phase 3 code complete, needs troubleshooting (runtime issues reported).
-**Date:** Feb 24, 2026
+**Status:** All 3 phases complete and working (ASB-105/106/107).
+**Date:** Feb 25, 2026
 
 ### Component Inventory
 
@@ -198,11 +198,11 @@ When curve shape or duration changes, MIDI data becomes stale.
 
 **UI:** "Regenerate MIDI" button in Crescendo panel (shown/enabled when `needsRegeneration` is true).
 
-**Flow:**
-1. Delete old MIDI snippets: `MidiSnippetDatabase.remove(id)` for each in `bundle.midiSnippetIds`
-2. Remove old MidiController events: filter out events with `sourceCurve: curveId`
-3. Re-run `generateCrescendoMidi()` with stored params from bundle record
-4. Re-run `insertCrescendoMidi()` to create new snippets
+**Flow (safe ordering — generate before delete):**
+1. Generate new MIDI first: `generateCrescendoMidi()` with stored params from bundle record
+2. If generation succeeds: delete old MIDI snippets by `sourceCurve` (not by ID — robust against ID desync)
+3. Remove old MidiController events: filter out events with `sourceCurve: curveId`
+4. Insert new MIDI: `insertCrescendoMidi()` to create new snippets
 5. Update `bundle.midiSnippetIds` with new IDs
 6. Clear `needsRegeneration` flag
 7. Reload MIDI display
@@ -264,3 +264,163 @@ Edge case: if curve starts very near page boundary, SVG's negative offset gets c
 | FlowchartConnector | Call `updateAllConnectors()` in drag handler |
 | ObjectSelector | Bundle selection coexists with ObjectSelector — just propagate drag |
 | Save/load round-trip | Export only IDs + times; re-link on import |
+
+---
+
+## Lessons Learned (ASB-106/107 — CD Bundle Debugging)
+
+### Critical Bug: Duplicate Bundles
+
+**Problem:** Multiple bundles accumulated for the same component ID (e.g., `curveId: 239` had 3 bundles — one with `pitchModel: single`, two with `pitchModel: glissando`). This happened because:
+1. `step2()` called `registerBundle()` without checking if a bundle already existed for that curveId
+2. `importBundles()` loaded all saved bundles verbatim, including stale duplicates
+3. `lookupBundleByCurveId()` used `.find()` which returns the **first** (oldest) match — often the wrong one
+
+**Symptoms:**
+- Regen button disappeared (old bundle had `needsRegeneration: false`)
+- Regen used wrong pitchModel (`single` instead of `glissando`)
+- Delete handler couldn't find the bundle
+
+**Fixes (apply to ALL bundle systems):**
+1. **Dedup at registration:** Before `registerBundle()`, remove any existing bundles for the same primary ID (curveId, gcId, etc.)
+2. **Dedup at import:** Use `Map` keyed by primary component ID, keeping only highest bundle ID (most recent)
+3. **Lookup returns latest:** If duplicates slip through, return `matches[matches.length - 1]` not `matches[0]`
+
+### Critical Bug: Delete Handler Only Checked One Selection Source
+
+**Problem:** Delete button and Delete key handler only checked `SVGElementManager.selectedElement`. When the user had the curve selected (not the SVG), the delete handler couldn't find the bundle.
+
+**Fix:** Use dual-lookup pattern (same as regen button already used):
+```js
+let bundle = null;
+if (primarySelection) bundle = lookupByPrimaryId(primarySelection.id);
+if (!bundle && svgSelection) bundle = lookupBySvgId(svgSelection.id);
+```
+
+### Safe MIDI Regeneration Ordering
+
+**Problem:** Original flow deleted old MIDI before generating new. If generation failed, the old MIDI was lost.
+
+**Fix:** Generate new MIDI first → only delete old if generation succeeds → insert new.
+
+### sourceCurve-Based Deletion (Robust)
+
+**Problem:** Deleting MIDI snippets by `bundle.midiSnippetIds` array failed when IDs got out of sync (e.g., after regen created new IDs but old IDs weren't updated).
+
+**Fix:** Delete by querying `MidiSnippetDatabase.getAll().filter(s => s.sourceCurve === bundle.curveId)`. This is robust because `sourceCurve` is set at snippet creation time and never changes.
+
+### Browser Cache-Busting for Regenerated Files
+
+**Problem:** When MIDI files are regenerated with the same filename, `fetch()` returns cached old version.
+
+**Fix:** Append cache-buster: `fetch(file.path + '?t=' + Date.now())`
+
+---
+
+## Comparative Analysis: NF vs CD Bundle Systems
+
+### Structural Comparison
+
+| Feature | NF Bundle | CD Bundle | Notes |
+|---------|-----------|-----------|-------|
+| Primary component | GC (gravitational conductor) | Curve (CurveMaker) | Different drag handles |
+| SVG notation | Yes (fragment SVG) | Yes (hairpin/dynamic) | Same SVGElementManager |
+| MIDI | Single snippet ID | Array of snippet IDs | CD has multi-segment glissando |
+| Visual indicator | Alignment arrow (DOM) | None | Arrow requires DOM recreation on import |
+| Stored params | impactTime, track | pitchModel, pitchInfo, dynamic1/2, clef, velocity | CD stores much more for regen |
+| Regeneration | None (MIDI is pre-computed) | Full MIDI regeneration | CD's unique Phase 3 |
+| Edit capabilities | Move only | Move + resize + shape change + regen | CD much more complex |
+| Drag initiation | GC mousedown | Shift+curve mousedown | Different trigger patterns |
+| Dedup protection | **None currently** | ✅ step2 + importBundles + latest-ID lookup | **NF should add this** |
+| Delete lookup | SVG only | Dual: curve + SVG | **NF could benefit from dual lookup** |
+
+### What NF Bundle Could Adopt from CD
+
+1. **Import dedup** — NF's `importBundles` does `data.bundles.map(b => ({...b}))` without dedup. If duplicate bundles for the same `gcId` accumulate in saved data, the same bug would occur. Low risk currently (NF inserts are less frequent), but the Map-based dedup pattern is a good safety net.
+
+2. **Dual-lookup delete** — NF's Delete key handler checks `this.selectedBundleId`, which is set from SVG selection (`onSvgSelected`). If the user selects the GC instead of the SVG, delete won't work. A dual lookup (GC selection → `lookupBundleByGcId`, then SVG → `lookupBundleBySvgId`) would be more robust.
+
+3. **Registration dedup** — NF's `registerBundle` blindly pushes to `bundles[]`. If `insert()` is called twice for the same GC, duplicates would accumulate. A pre-registration cleanup (like CD's `step2` dedup) would prevent this.
+
+### What CD Bundle Already Has That NF Doesn't Need
+
+- **MIDI regeneration** — NF uses pre-computed MIDI from timing DB; no need to regenerate
+- **needsRegeneration flag** — NF components don't change shape
+- **Multi-snippet arrays** — NF has exactly one MIDI snippet per bundle
+- **Curve endpoint X-drag** — NF doesn't have curves
+
+### Potential Impact of CD Changes on NF
+
+**No breaking changes.** All CD fixes were scoped to `CrescendoUI` methods. The shared infrastructure (`SVGElementManager`, `MidiSnippetDatabase`, `MidiController`, `ScoreManager`) was only touched in one place: `MidiController.reloadFromDatabase()` got `sourceCurve` propagation (ASB-106 Bug 1). This change is additive — it adds a property to events that wasn't there before. NF MIDI events don't use `sourceCurve`, so they're unaffected.
+
+---
+
+## Blueprint: Adding Bundling to a New System
+
+### Step-by-Step Implementation Guide
+
+Based on the NF and CD implementations, here's the proven pattern:
+
+#### Phase 0: Analysis
+1. **Identify components** — What gets created together? (SVG? MIDI? Curve? GC? Arrow? Audio clip?)
+2. **Identify primary component** — Which component is the "anchor"? (GC for NF, Curve for CD)
+3. **Identify drag handle** — What does the user click to drag? (SVG for both currently)
+4. **Identify stored params** — What parameters are needed for regeneration? (None for NF, many for CD)
+5. **Identify lookup keys** — How will you find a bundle? (By svgId? curveId? gcId?)
+
+#### Phase 1: Registry + Delete
+1. Add `bundles: []` and `nextBundleId: 1` to the system object
+2. Implement `registerBundle(componentIds..., params)` — include dedup:
+   ```js
+   // Remove existing bundles for same primary ID
+   this.bundles = this.bundles.filter(b => b.primaryId !== newPrimaryId);
+   const bundle = { id: this.nextBundleId++, ...componentIds, ...params };
+   this.bundles.push(bundle);
+   ```
+3. Implement lookup methods: `lookupBySvgId(id)`, `lookupByPrimaryId(id)` — return **last** match
+4. Implement `deleteBundle(bundleId)` — remove ALL components (DOM + arrays + databases)
+5. Implement `exportBundles()` / `importBundles(data)` — import includes Map-based dedup
+6. Register with ScoreManager: `registerSource('databases.XXBundles', export, import)`
+7. Call `registerBundle()` at the end of the creation flow (after all components exist)
+8. Wire Delete button + Delete key handler with **dual-lookup** pattern
+
+#### Phase 2: Drag
+1. Choose drag trigger: Shift+click on primary component, or direct mousedown on handle
+2. Implement `startBundleDrag(bundle, e)` — cumulative delta pattern:
+   - Capture originals at drag start
+   - Each frame: compute `timeDelta` from pixel delta
+   - Apply timeDelta to ALL sibling components from their original values
+   - Never accumulate — always `original + currentDelta`
+3. Wire mouseup: `reloadFromDatabase()`, `markDirty()`, clear drag state
+4. Add live readout field to panel HTML (time display during drag)
+5. Set `_isBundleDragging` flag to prevent regeneration triggers during drag
+
+#### Phase 3: Regeneration (if applicable)
+1. Add stored params to bundle record (pitchModel, dynamics, etc.)
+2. Add `needsRegeneration: false` flag to bundle
+3. Set flag in shape/duration change handlers (guarded by `_isBundleDragging`)
+4. Add Regen button to panel + wire with **dual-lookup** pattern
+5. Implement `regenerateMidi(bundle)` with **safe ordering** (generate → delete old → insert new)
+6. Delete old snippets by `sourceCurve` tag (robust, not by ID array)
+7. Use cache-buster on MIDI file fetch if files are regenerated with same filename
+
+#### Phase 4: Testing Checklist
+- [ ] Create bundle → verify all components linked
+- [ ] Drag within page → all components move together
+- [ ] Drag across page boundary → components re-render on correct page
+- [ ] Delete via button → all components removed
+- [ ] Delete via key → all components removed
+- [ ] Save → reload → bundle persists, all components linked
+- [ ] Duplicate creation → only one bundle per primary ID
+- [ ] (If regen) Change shape → regen button appears → regen produces correct MIDI
+- [ ] (If regen) Regen with different pitch model → verify correct branch taken
+
+### Systems That Could Use Bundling
+
+| System | Components | Primary | Regen Needed? | Priority |
+|--------|------------|---------|---------------|----------|
+| Long Tone Glissando | SVG + MIDI + Curve | Curve | Yes (same as CD) | High |
+| Vibrato | SVG + MIDI + Curve | Curve | Yes (CC4 ramp) | High |
+| Bartók Pizzicato | SVG + MIDI | SVG | No (discrete events) | Medium |
+| Pizzicato Tremolo | SVG + MIDI + GC + Arrow | GC | Possible (timing DB) | Medium |
+| Pizz Trem Glissando | SVG + MIDI + Curve | Curve | Yes (pitch bend) | Medium |

@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "291-beginCompNewSection-246",
-    "created": "2026-02-25T15:06:37.177Z",
-    "modified": "2026-02-25T15:06:37.325Z",
+    "title": "293",
+    "created": "2026-02-25T19:14:01.445Z",
+    "modified": "2026-02-25T19:14:01.522Z",
     "author": ""
   },
   "tempoHistory": [
@@ -43624,6 +43624,1554 @@
           "snippetId": 269,
           "sourceCurve": 236,
           "timestamp": 240410.41666666666
+        },
+        {
+          "timeMs": 258871.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            0,
+            89
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 258871.63029525033
+        },
+        {
+          "timeMs": 258871.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            0,
+            0
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 258871.63029525033
+        },
+        {
+          "timeMs": 258871.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            0
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 258871.63029525033
+        },
+        {
+          "timeMs": 258871.63029525033,
+          "type": "noteOn",
+          "data": [
+            152,
+            61,
+            127
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 258871.63029525033
+        },
+        {
+          "timeMs": 258921.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            3
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 258921.63029525033
+        },
+        {
+          "timeMs": 258923.71362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            31,
+            20
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 258923.71362858368
+        },
+        {
+          "timeMs": 258973.71362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            7
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 258973.71362858368
+        },
+        {
+          "timeMs": 258975.796961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            60,
+            40
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 258975.796961917
+        },
+        {
+          "timeMs": 259023.71362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            10
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259023.71362858368
+        },
+        {
+          "timeMs": 259025.796961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            89,
+            64
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259025.796961917
+        },
+        {
+          "timeMs": 259075.796961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            13
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259075.796961917
+        },
+        {
+          "timeMs": 259077.88029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            105,
+            84
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259077.88029525033
+        },
+        {
+          "timeMs": 259125.796961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            17
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259125.796961917
+        },
+        {
+          "timeMs": 259129.96362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            111,
+            104
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259129.96362858368
+        },
+        {
+          "timeMs": 259177.88029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            21
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259177.88029525033
+        },
+        {
+          "timeMs": 259182.046961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            106,
+            124
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259182.046961917
+        },
+        {
+          "timeMs": 259182.046961917,
+          "type": "noteOff",
+          "data": [
+            136,
+            61,
+            0
+          ],
+          "snippetId": 284,
+          "sourceCurve": 239,
+          "timestamp": 259182.046961917
+        },
+        {
+          "timeMs": 259191.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            0,
+            89
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259191.63029525033
+        },
+        {
+          "timeMs": 259191.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            0,
+            0
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259191.63029525033
+        },
+        {
+          "timeMs": 259191.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            24
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259191.63029525033
+        },
+        {
+          "timeMs": 259191.63029525033,
+          "type": "noteOn",
+          "data": [
+            152,
+            63,
+            127
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259191.63029525033
+        },
+        {
+          "timeMs": 259227.046961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            24
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259227.046961917
+        },
+        {
+          "timeMs": 259245.796961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            106,
+            19
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259245.796961917
+        },
+        {
+          "timeMs": 259279.13029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            27
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259279.13029525033
+        },
+        {
+          "timeMs": 259297.88029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            57,
+            43
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259297.88029525033
+        },
+        {
+          "timeMs": 259329.13029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            30
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259329.13029525033
+        },
+        {
+          "timeMs": 259352.046961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            124,
+            62
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259352.046961917
+        },
+        {
+          "timeMs": 259381.21362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            34
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259381.21362858368
+        },
+        {
+          "timeMs": 259404.13029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            42,
+            82
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259404.13029525033
+        },
+        {
+          "timeMs": 259431.21362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            37
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259431.21362858368
+        },
+        {
+          "timeMs": 259458.296961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            42,
+            105
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259458.296961917
+        },
+        {
+          "timeMs": 259481.21362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            40
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259481.21362858368
+        },
+        {
+          "timeMs": 259512.46362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            36,
+            124
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259512.46362858368
+        },
+        {
+          "timeMs": 259512.46362858368,
+          "type": "noteOff",
+          "data": [
+            136,
+            63,
+            0
+          ],
+          "snippetId": 285,
+          "sourceCurve": 239,
+          "timestamp": 259512.46362858368
+        },
+        {
+          "timeMs": 259521.6302952503,
+          "type": "pitchBend",
+          "data": [
+            232,
+            0,
+            0
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259521.6302952503
+        },
+        {
+          "timeMs": 259521.6302952503,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            43
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259521.6302952503
+        },
+        {
+          "timeMs": 259521.6302952503,
+          "type": "noteOn",
+          "data": [
+            152,
+            65,
+            127
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259521.6302952503
+        },
+        {
+          "timeMs": 259532.04696191696,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            43
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259532.04696191696
+        },
+        {
+          "timeMs": 259571.6302952503,
+          "type": "pitchBend",
+          "data": [
+            232,
+            90,
+            18
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259571.6302952503
+        },
+        {
+          "timeMs": 259584.1302952503,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            46
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259584.1302952503
+        },
+        {
+          "timeMs": 259621.6302952503,
+          "type": "pitchBend",
+          "data": [
+            232,
+            23,
+            37
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259621.6302952503
+        },
+        {
+          "timeMs": 259634.1302952503,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            49
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259634.1302952503
+        },
+        {
+          "timeMs": 259671.6302952503,
+          "type": "pitchBend",
+          "data": [
+            232,
+            54,
+            55
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259671.6302952503
+        },
+        {
+          "timeMs": 259686.21362858365,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            52
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259686.21362858365
+        },
+        {
+          "timeMs": 259721.6302952503,
+          "type": "pitchBend",
+          "data": [
+            232,
+            53,
+            73
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259721.6302952503
+        },
+        {
+          "timeMs": 259736.21362858365,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            55
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259736.21362858365
+        },
+        {
+          "timeMs": 259771.6302952503,
+          "type": "pitchBend",
+          "data": [
+            232,
+            20,
+            91
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259771.6302952503
+        },
+        {
+          "timeMs": 259788.29696191696,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            59
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259788.29696191696
+        },
+        {
+          "timeMs": 259821.6302952503,
+          "type": "pitchBend",
+          "data": [
+            232,
+            80,
+            108
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259821.6302952503
+        },
+        {
+          "timeMs": 259838.29696191696,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            62
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259838.29696191696
+        },
+        {
+          "timeMs": 259871.6302952503,
+          "type": "pitchBend",
+          "data": [
+            232,
+            105,
+            125
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259871.6302952503
+        },
+        {
+          "timeMs": 259871.6302952503,
+          "type": "noteOff",
+          "data": [
+            136,
+            65,
+            0
+          ],
+          "snippetId": 286,
+          "sourceCurve": 239,
+          "timestamp": 259871.6302952503
+        },
+        {
+          "timeMs": 259881.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            0,
+            0
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 259881.63029525033
+        },
+        {
+          "timeMs": 259881.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            64
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 259881.63029525033
+        },
+        {
+          "timeMs": 259881.63029525033,
+          "type": "noteOn",
+          "data": [
+            152,
+            67,
+            127
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 259881.63029525033
+        },
+        {
+          "timeMs": 259889.96362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            64
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 259889.96362858368
+        },
+        {
+          "timeMs": 259931.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            109,
+            16
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 259931.63029525033
+        },
+        {
+          "timeMs": 259939.96362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            67
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 259939.96362858368
+        },
+        {
+          "timeMs": 259981.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            53,
+            33
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 259981.63029525033
+        },
+        {
+          "timeMs": 259989.96362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            70
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 259989.96362858368
+        },
+        {
+          "timeMs": 260031.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            86,
+            49
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260031.63029525033
+        },
+        {
+          "timeMs": 260042.046961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            73
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260042.046961917
+        },
+        {
+          "timeMs": 260081.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            80,
+            65
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260081.63029525033
+        },
+        {
+          "timeMs": 260092.046961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            75
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260092.046961917
+        },
+        {
+          "timeMs": 260131.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            34,
+            81
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260131.63029525033
+        },
+        {
+          "timeMs": 260144.13029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            78
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260144.13029525033
+        },
+        {
+          "timeMs": 260181.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            76,
+            96
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260181.63029525033
+        },
+        {
+          "timeMs": 260194.13029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            80
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260194.13029525033
+        },
+        {
+          "timeMs": 260231.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            76,
+            111
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260231.63029525033
+        },
+        {
+          "timeMs": 260244.13029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            83
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260244.13029525033
+        },
+        {
+          "timeMs": 260281.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            36,
+            126
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260281.63029525033
+        },
+        {
+          "timeMs": 260281.63029525033,
+          "type": "noteOff",
+          "data": [
+            136,
+            67,
+            0
+          ],
+          "snippetId": 287,
+          "sourceCurve": 239,
+          "timestamp": 260281.63029525033
+        },
+        {
+          "timeMs": 260291.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            0,
+            0
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260291.63029525033
+        },
+        {
+          "timeMs": 260291.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            85
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260291.63029525033
+        },
+        {
+          "timeMs": 260291.63029525033,
+          "type": "noteOn",
+          "data": [
+            152,
+            69,
+            127
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260291.63029525033
+        },
+        {
+          "timeMs": 260295.796961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            85
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260295.796961917
+        },
+        {
+          "timeMs": 260345.796961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            38,
+            14
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260345.796961917
+        },
+        {
+          "timeMs": 260347.88029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            88
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260347.88029525033
+        },
+        {
+          "timeMs": 260397.88029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            90
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260397.88029525033
+        },
+        {
+          "timeMs": 260399.96362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            2,
+            31
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260399.96362858368
+        },
+        {
+          "timeMs": 260447.88029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            93
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260447.88029525033
+        },
+        {
+          "timeMs": 260454.13029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            76,
+            44
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260454.13029525033
+        },
+        {
+          "timeMs": 260499.96362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            95
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260499.96362858368
+        },
+        {
+          "timeMs": 260510.38029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            58,
+            60
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260510.38029525033
+        },
+        {
+          "timeMs": 260549.96362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            97
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260549.96362858368
+        },
+        {
+          "timeMs": 260564.546961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            40,
+            73
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260564.546961917
+        },
+        {
+          "timeMs": 260602.046961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            99
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260602.046961917
+        },
+        {
+          "timeMs": 260618.71362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            39,
+            88
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260618.71362858368
+        },
+        {
+          "timeMs": 260652.046961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            101
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260652.046961917
+        },
+        {
+          "timeMs": 260672.88029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            57,
+            100
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260672.88029525033
+        },
+        {
+          "timeMs": 260702.046961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            103
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260702.046961917
+        },
+        {
+          "timeMs": 260727.046961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            76,
+            114
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260727.046961917
+        },
+        {
+          "timeMs": 260754.13029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            105
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260754.13029525033
+        },
+        {
+          "timeMs": 260781.21362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            4,
+            126
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260781.21362858368
+        },
+        {
+          "timeMs": 260781.21362858368,
+          "type": "noteOff",
+          "data": [
+            136,
+            69,
+            0
+          ],
+          "snippetId": 288,
+          "sourceCurve": 239,
+          "timestamp": 260781.21362858368
+        },
+        {
+          "timeMs": 260791.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            0,
+            0
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260791.63029525033
+        },
+        {
+          "timeMs": 260791.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            107
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260791.63029525033
+        },
+        {
+          "timeMs": 260791.63029525033,
+          "type": "noteOn",
+          "data": [
+            152,
+            71,
+            127
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260791.63029525033
+        },
+        {
+          "timeMs": 260804.13029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            107
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260804.13029525033
+        },
+        {
+          "timeMs": 260843.71362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            8,
+            11
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260843.71362858368
+        },
+        {
+          "timeMs": 260856.21362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            109
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260856.21362858368
+        },
+        {
+          "timeMs": 260895.796961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            103,
+            21
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260895.796961917
+        },
+        {
+          "timeMs": 260906.21362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            110
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260906.21362858368
+        },
+        {
+          "timeMs": 260947.88029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            38,
+            34
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260947.88029525033
+        },
+        {
+          "timeMs": 260958.296961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            112
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260958.296961917
+        },
+        {
+          "timeMs": 260999.96362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            48,
+            44
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 260999.96362858368
+        },
+        {
+          "timeMs": 261008.296961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            114
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261008.296961917
+        },
+        {
+          "timeMs": 261054.13029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            20,
+            54
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261054.13029525033
+        },
+        {
+          "timeMs": 261058.296961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            116
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261058.296961917
+        },
+        {
+          "timeMs": 261106.21362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            82,
+            63
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261106.21362858368
+        },
+        {
+          "timeMs": 261110.38029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            117
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261110.38029525033
+        },
+        {
+          "timeMs": 261158.296961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            83,
+            74
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261158.296961917
+        },
+        {
+          "timeMs": 261160.38029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            119
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261160.38029525033
+        },
+        {
+          "timeMs": 261210.38029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            65,
+            83
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261210.38029525033
+        },
+        {
+          "timeMs": 261212.46362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            120
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261212.46362858368
+        },
+        {
+          "timeMs": 261262.46362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            12,
+            92
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261262.46362858368
+        },
+        {
+          "timeMs": 261262.46362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            122
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261262.46362858368
+        },
+        {
+          "timeMs": 261312.46362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            123
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261312.46362858368
+        },
+        {
+          "timeMs": 261314.546961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            52,
+            100
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261314.546961917
+        },
+        {
+          "timeMs": 261364.546961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            124
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261364.546961917
+        },
+        {
+          "timeMs": 261366.63029525033,
+          "type": "pitchBend",
+          "data": [
+            232,
+            4,
+            110
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261366.63029525033
+        },
+        {
+          "timeMs": 261414.546961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            126
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261414.546961917
+        },
+        {
+          "timeMs": 261418.71362858368,
+          "type": "pitchBend",
+          "data": [
+            232,
+            98,
+            117
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261418.71362858368
+        },
+        {
+          "timeMs": 261466.63029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            127
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261466.63029525033
+        },
+        {
+          "timeMs": 261470.796961917,
+          "type": "pitchBend",
+          "data": [
+            232,
+            53,
+            124
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261470.796961917
+        },
+        {
+          "timeMs": 261470.796961917,
+          "type": "noteOff",
+          "data": [
+            136,
+            71,
+            0
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261470.796961917
+        },
+        {
+          "timeMs": 261474.96362858368,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            84
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261474.96362858368
+        },
+        {
+          "timeMs": 261479.13029525033,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            42
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261479.13029525033
+        },
+        {
+          "timeMs": 261483.296961917,
+          "type": "cc",
+          "data": [
+            184,
+            7,
+            0
+          ],
+          "snippetId": 289,
+          "sourceCurve": 239,
+          "timestamp": 261483.296961917
         }
       ]
     },
@@ -215993,9 +217541,332 @@
               0
             ]
           }
+        },
+        {
+          "id": 239,
+          "name": "CRV_20260225_141133",
+          "startSeconds": 258.8716302952503,
+          "endSeconds": 261.46598202824134,
+          "y1": 0,
+          "y2": 10,
+          "gTrack": "1",
+          "color": "limeGreen",
+          "fillMode": "bottom",
+          "section": "top",
+          "page": 32,
+          "x1": 474.37500000000057,
+          "y1Pixel": 77,
+          "x2": 727.0000000000007,
+          "y2Pixel": 8,
+          "origY1Pixel": 77,
+          "origY2Pixel": 8,
+          "tension": 0,
+          "slope": -0.21805509459010108,
+          "model": "logarithmic",
+          "trackDims": {
+            "y": 8,
+            "height": 69
+          },
+          "curveData": {
+            "startTime": 258.8716302952503,
+            "endTime": 261.46598202824134,
+            "sampleInterval": 0.01,
+            "samples": [
+              0,
+              0.005273004400570794,
+              0.010545822553784395,
+              0.01581826823859639,
+              0.021090155286609985,
+              0.02636129760824526,
+              0.03163150921918433,
+              0.03690060426648537,
+              0.042168397054807016,
+              0.04743470207255544,
+              0.05269933401800664,
+              0.05796210782521569,
+              0.06322283869015524,
+              0.06848134209647593,
+              0.07373743384133082,
+              0.07899093006107592,
+              0.0842416472568997,
+              0.08948940232019435,
+              0.09473401255810937,
+              0.09997529571868305,
+              0.10521307001599228,
+              0.11044715415513384,
+              0.11567736735709054,
+              0.12090352938329545,
+              0.1261254605603341,
+              0.13134298180418252,
+              0.13655591464442027,
+              0.14176408124823345,
+              0.14696730444423037,
+              0.1521654077460933,
+              0.1573582153758817,
+              0.16254555228742476,
+              0.16772724418920482,
+              0.17290311756716936,
+              0.17807299970728843,
+              0.18323671871790936,
+              0.1883941035517279,
+              0.19354498402780945,
+              0.198689190853068,
+              0.2038265556436381,
+              0.20895691094595656,
+              0.2140800902576097,
+              0.21919592804776375,
+              0.22430425977761184,
+              0.2294049219202493,
+              0.23449775198041,
+              0.23958258851388414,
+              0.2446592711466702,
+              0.24972764059368543,
+              0.2547875386774612,
+              0.25983880834624423,
+              0.2648812936919299,
+              0.26991483996765486,
+              0.2749392936050688,
+              0.27995450223131507,
+              0.28496031468554406,
+              0.2899565810353815,
+              0.29494315259278353,
+              0.2999198819296975,
+              0.3048866228933593,
+              0.3098432306212785,
+              0.3147895615557413,
+              0.3197254734582503,
+              0.3246508254233372,
+              0.3295654778921669,
+              0.33446929266576353,
+              0.339362132917913,
+              0.34424386320757194,
+              0.34911434949120007,
+              0.3539734591344587,
+              0.3588210609236905,
+              0.36365702507701275,
+              0.3684812232550795,
+              0.3732935285713469,
+              0.37809381560225086,
+              0.3828819603967515,
+              0.38765784048565244,
+              0.39242133489053205,
+              0.39717232413231285,
+              0.4019106902394974,
+              0.4066363167559088,
+              0.41134908874834,
+              0.4160488928135735,
+              0.420735617085178,
+              0.42540915123991857,
+              0.4300693865038365,
+              0.434716215657841,
+              0.43934953304321056,
+              0.443969234566475,
+              0.44857521770407877,
+              0.45316738150666724,
+              0.45774562660304896,
+              0.4623098552036821,
+              0.46685997110407457,
+              0.47139587968758256,
+              0.47591748792799615,
+              0.480424704391761,
+              0.4849174392398908,
+              0.48939560422941436,
+              0.4938591127147511,
+              0.4983078796484988,
+              0.5027418215820251,
+              0.5071608566657101,
+              0.5115649046488675,
+              0.5159538868793754,
+              0.5203277263028669,
+              0.5246863474618603,
+              0.5290296764943303,
+              0.5333576411321029,
+              0.5376701706989214,
+              0.5419671961082411,
+              0.5462486498606074,
+              0.5505144660409895,
+              0.5547645803155816,
+              0.5589989299284434,
+              0.5632174536978395,
+              0.5674200920123256,
+              0.5716067868264454,
+              0.5757774816563984,
+              0.579932121575207,
+              0.5840706532077421,
+              0.5881930247254731,
+              0.5922991858409871,
+              0.596389087802147,
+              0.6004626833862415,
+              0.6045199268936614,
+              0.6085607741414605,
+              0.612585182456664,
+              0.6165931106693515,
+              0.620584519105542,
+              0.6245593695797506,
+              0.6285176253875577,
+              0.6324592512977486,
+              0.6363842135443571,
+              0.6402924798184968,
+              0.6441840192600118,
+              0.6480588024488346,
+              0.6519168013963758,
+              0.6557579895365152,
+              0.6595823417165264,
+              0.6633898341878073,
+              0.6671804445964675,
+              0.6709541519736444,
+              0.6747109367258766,
+              0.6784507806251098,
+              0.6821736667986609,
+              0.6858795797190161,
+              0.6895685051935115,
+              0.6932404303537714,
+              0.6968953436452264,
+              0.7005332348162966,
+              0.704154094907554,
+              0.7077579162407497,
+              0.7113446924077266,
+              0.7149144182592408,
+              0.718467089893581,
+              0.7220027046452858,
+              0.7255212610735663,
+              0.7290227589507324,
+              0.7325071992505175,
+              0.7359745841363325,
+              0.7394249169493459,
+              0.7428582021966846,
+              0.7462744455393633,
+              0.7496736537802487,
+              0.7530558348519382,
+              0.7564209978045955,
+              0.7597691527936414,
+              0.7631003110675763,
+              0.7664144849555679,
+              0.7697116878550881,
+              0.772991934219491,
+              0.7762552395455701,
+              0.7795016203609929,
+              0.7827310942118859,
+              0.7859436796502134,
+              0.7891393962212205,
+              0.7923182644508414,
+              0.7954803058330909,
+              0.7986255428174599,
+              0.8017539987962117,
+              0.8048656980918522,
+              0.8079606659444162,
+              0.8110389284988448,
+              0.8141005127923457,
+              0.8171454467417778,
+              0.8201737591309592,
+              0.8231854795981571,
+              0.8261806386234231,
+              0.8291592675160288,
+              0.8321213984019066,
+              0.8350670642111289,
+              0.8379962986653311,
+              0.8409091362653257,
+              0.8438056122785854,
+              0.8466857627268386,
+              0.8495496243736859,
+              0.8523972347122684,
+              0.8552286319528998,
+              0.8580438550108975,
+              0.8608429434943006,
+              0.863625937691713,
+              0.8663928785601813,
+              0.8691438077131236,
+              0.8718787674083243,
+              0.87459780053591,
+              0.8773009506065358,
+              0.8799882617394738,
+              0.882659778650843,
+              0.8853155466418825,
+              0.8879556115873068,
+              0.8905800199236497,
+              0.8931888186378263,
+              0.895782055255614,
+              0.8983597778302779,
+              0.9009220349312543,
+              0.9034688756329208,
+              0.9060003495033693,
+              0.9085165065933997,
+              0.9110173974254439,
+              0.9135030729826447,
+              0.9159735846979944,
+              0.9184289844435733,
+              0.9208693245197958,
+              0.9232946576448827,
+              0.9257050369442738,
+              0.928100515940197,
+              0.9304811485413106,
+              0.9328469890324286,
+              0.9351980920643489,
+              0.9375345126437029,
+              0.9398563061230274,
+              0.9421635281907899,
+              0.944456234861575,
+              0.9467344824663458,
+              0.9489983276428098,
+              0.9512478273258123,
+              0.953483038737953,
+              0.9557040193801629,
+              0.9579108270224428,
+              0.9601035196946807,
+              0.9622821556775765,
+              0.9644467934935987,
+              0.9665974918981605,
+              0.9687343098707658,
+              0.9708573066063152,
+              0.9729665415064915,
+              0.9750620741712557,
+              0.9771439643903783,
+              0.9792122721351852,
+              0.981267057550282,
+              0.9833083809454317,
+              0.9853363027875197,
+              0.987350883692612,
+              0.9893521844181229,
+              0.9913402658550214,
+              0.9933151890202473,
+              0.9952770150491088,
+              0.9972258051878347,
+              0.9991616207862087,
+              1
+            ]
+          },
+          "createdAt": 1772046693047,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "startPoint": {},
+            "endPoint": {},
+            "boundingBox": {},
+            "previewPath": {},
+            "previewHitPath": {},
+            "continuationGroupBottom": {},
+            "continuationPathBottom": {},
+            "continuationHitPathBottom": {},
+            "contEndPointBottom": {
+              "_dragOpts": {
+                "page": 33,
+                "section": "bottom",
+                "trackDims": {
+                  "y": 8,
+                  "height": 69
+                }
+              }
+            }
+          },
+          "continuationSegment": {
+            "page": 33,
+            "x1": 0,
+            "x2": 2.000000000001677
+          }
         }
       ],
-      "nextId": 239
+      "nextId": 240
     },
     "motives": {
       "motives": [
@@ -331781,9 +333652,1260 @@
           "color": "limeGreen",
           "sourceCurve": 238,
           "sourceFile": "CRV_20260219155648._seg01_A3_dn.mid"
+        },
+        {
+          "id": 284,
+          "name": "Cres @ CRV_20260225_141133 seg1",
+          "trackIndex": 0,
+          "startTimeMs": 258871.63029525033,
+          "durationMs": 310.0000000000023,
+          "startSeconds": 258.8716302952503,
+          "endSeconds": 259.18163029525033,
+          "events": [
+            {
+              "timeMs": 258871.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                0,
+                89
+              ]
+            },
+            {
+              "timeMs": 258871.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                0,
+                0
+              ]
+            },
+            {
+              "timeMs": 258871.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                0
+              ]
+            },
+            {
+              "timeMs": 258871.63029525033,
+              "type": "noteOn",
+              "data": [
+                152,
+                61,
+                127
+              ]
+            },
+            {
+              "timeMs": 258921.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                3
+              ]
+            },
+            {
+              "timeMs": 258923.71362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                31,
+                20
+              ]
+            },
+            {
+              "timeMs": 258973.71362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                7
+              ]
+            },
+            {
+              "timeMs": 258975.796961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                60,
+                40
+              ]
+            },
+            {
+              "timeMs": 259023.71362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                10
+              ]
+            },
+            {
+              "timeMs": 259025.796961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                89,
+                64
+              ]
+            },
+            {
+              "timeMs": 259075.796961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                13
+              ]
+            },
+            {
+              "timeMs": 259077.88029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                105,
+                84
+              ]
+            },
+            {
+              "timeMs": 259125.796961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                17
+              ]
+            },
+            {
+              "timeMs": 259129.96362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                111,
+                104
+              ]
+            },
+            {
+              "timeMs": 259177.88029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                21
+              ]
+            },
+            {
+              "timeMs": 259182.046961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                106,
+                124
+              ]
+            },
+            {
+              "timeMs": 259182.046961917,
+              "type": "noteOff",
+              "data": [
+                136,
+                61,
+                0
+              ]
+            }
+          ],
+          "color": "limeGreen",
+          "sourceCurve": 239,
+          "sourceFile": "Cres_CRV_20260225_141133_seg01_Cs4.mid",
+          "createdAt": 1772046837878
+        },
+        {
+          "id": 285,
+          "name": "Cres @ CRV_20260225_141133 seg2",
+          "trackIndex": 0,
+          "startTimeMs": 259191.63029525033,
+          "durationMs": 319.9999999999932,
+          "startSeconds": 259.1916302952503,
+          "endSeconds": 259.5116302952503,
+          "events": [
+            {
+              "timeMs": 259191.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                0,
+                89
+              ]
+            },
+            {
+              "timeMs": 259191.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                0,
+                0
+              ]
+            },
+            {
+              "timeMs": 259191.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                24
+              ]
+            },
+            {
+              "timeMs": 259191.63029525033,
+              "type": "noteOn",
+              "data": [
+                152,
+                63,
+                127
+              ]
+            },
+            {
+              "timeMs": 259227.046961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                24
+              ]
+            },
+            {
+              "timeMs": 259245.796961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                106,
+                19
+              ]
+            },
+            {
+              "timeMs": 259279.13029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                27
+              ]
+            },
+            {
+              "timeMs": 259297.88029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                57,
+                43
+              ]
+            },
+            {
+              "timeMs": 259329.13029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                30
+              ]
+            },
+            {
+              "timeMs": 259352.046961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                124,
+                62
+              ]
+            },
+            {
+              "timeMs": 259381.21362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                34
+              ]
+            },
+            {
+              "timeMs": 259404.13029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                42,
+                82
+              ]
+            },
+            {
+              "timeMs": 259431.21362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                37
+              ]
+            },
+            {
+              "timeMs": 259458.296961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                42,
+                105
+              ]
+            },
+            {
+              "timeMs": 259481.21362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                40
+              ]
+            },
+            {
+              "timeMs": 259512.46362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                36,
+                124
+              ]
+            },
+            {
+              "timeMs": 259512.46362858368,
+              "type": "noteOff",
+              "data": [
+                136,
+                63,
+                0
+              ]
+            }
+          ],
+          "color": "limeGreen",
+          "sourceCurve": 239,
+          "sourceFile": "Cres_CRV_20260225_141133_seg02_Ds4.mid",
+          "createdAt": 1772046837880
+        },
+        {
+          "id": 286,
+          "name": "Cres @ CRV_20260225_141133 seg3",
+          "trackIndex": 0,
+          "startTimeMs": 259521.6302952503,
+          "durationMs": 350.00000000002274,
+          "startSeconds": 259.5216302952503,
+          "endSeconds": 259.8716302952503,
+          "events": [
+            {
+              "timeMs": 259521.6302952503,
+              "type": "pitchBend",
+              "data": [
+                232,
+                0,
+                0
+              ]
+            },
+            {
+              "timeMs": 259521.6302952503,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                43
+              ]
+            },
+            {
+              "timeMs": 259521.6302952503,
+              "type": "noteOn",
+              "data": [
+                152,
+                65,
+                127
+              ]
+            },
+            {
+              "timeMs": 259532.04696191696,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                43
+              ]
+            },
+            {
+              "timeMs": 259571.6302952503,
+              "type": "pitchBend",
+              "data": [
+                232,
+                90,
+                18
+              ]
+            },
+            {
+              "timeMs": 259584.1302952503,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                46
+              ]
+            },
+            {
+              "timeMs": 259621.6302952503,
+              "type": "pitchBend",
+              "data": [
+                232,
+                23,
+                37
+              ]
+            },
+            {
+              "timeMs": 259634.1302952503,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                49
+              ]
+            },
+            {
+              "timeMs": 259671.6302952503,
+              "type": "pitchBend",
+              "data": [
+                232,
+                54,
+                55
+              ]
+            },
+            {
+              "timeMs": 259686.21362858365,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                52
+              ]
+            },
+            {
+              "timeMs": 259721.6302952503,
+              "type": "pitchBend",
+              "data": [
+                232,
+                53,
+                73
+              ]
+            },
+            {
+              "timeMs": 259736.21362858365,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                55
+              ]
+            },
+            {
+              "timeMs": 259771.6302952503,
+              "type": "pitchBend",
+              "data": [
+                232,
+                20,
+                91
+              ]
+            },
+            {
+              "timeMs": 259788.29696191696,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                59
+              ]
+            },
+            {
+              "timeMs": 259821.6302952503,
+              "type": "pitchBend",
+              "data": [
+                232,
+                80,
+                108
+              ]
+            },
+            {
+              "timeMs": 259838.29696191696,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                62
+              ]
+            },
+            {
+              "timeMs": 259871.6302952503,
+              "type": "pitchBend",
+              "data": [
+                232,
+                105,
+                125
+              ]
+            },
+            {
+              "timeMs": 259871.6302952503,
+              "type": "noteOff",
+              "data": [
+                136,
+                65,
+                0
+              ]
+            }
+          ],
+          "color": "limeGreen",
+          "sourceCurve": 239,
+          "sourceFile": "Cres_CRV_20260225_141133_seg03_F4.mid",
+          "createdAt": 1772046837885
+        },
+        {
+          "id": 287,
+          "name": "Cres @ CRV_20260225_141133 seg4",
+          "trackIndex": 0,
+          "startTimeMs": 259881.63029525033,
+          "durationMs": 400.0000000000341,
+          "startSeconds": 259.8816302952503,
+          "endSeconds": 260.28163029525035,
+          "events": [
+            {
+              "timeMs": 259881.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                0,
+                0
+              ]
+            },
+            {
+              "timeMs": 259881.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                64
+              ]
+            },
+            {
+              "timeMs": 259881.63029525033,
+              "type": "noteOn",
+              "data": [
+                152,
+                67,
+                127
+              ]
+            },
+            {
+              "timeMs": 259889.96362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                64
+              ]
+            },
+            {
+              "timeMs": 259931.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                109,
+                16
+              ]
+            },
+            {
+              "timeMs": 259939.96362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                67
+              ]
+            },
+            {
+              "timeMs": 259981.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                53,
+                33
+              ]
+            },
+            {
+              "timeMs": 259989.96362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                70
+              ]
+            },
+            {
+              "timeMs": 260031.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                86,
+                49
+              ]
+            },
+            {
+              "timeMs": 260042.046961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                73
+              ]
+            },
+            {
+              "timeMs": 260081.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                80,
+                65
+              ]
+            },
+            {
+              "timeMs": 260092.046961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                75
+              ]
+            },
+            {
+              "timeMs": 260131.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                34,
+                81
+              ]
+            },
+            {
+              "timeMs": 260144.13029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                78
+              ]
+            },
+            {
+              "timeMs": 260181.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                76,
+                96
+              ]
+            },
+            {
+              "timeMs": 260194.13029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                80
+              ]
+            },
+            {
+              "timeMs": 260231.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                76,
+                111
+              ]
+            },
+            {
+              "timeMs": 260244.13029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                83
+              ]
+            },
+            {
+              "timeMs": 260281.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                36,
+                126
+              ]
+            },
+            {
+              "timeMs": 260281.63029525033,
+              "type": "noteOff",
+              "data": [
+                136,
+                67,
+                0
+              ]
+            }
+          ],
+          "color": "limeGreen",
+          "sourceCurve": 239,
+          "sourceFile": "Cres_CRV_20260225_141133_seg04_G4.mid",
+          "createdAt": 1772046837887
+        },
+        {
+          "id": 288,
+          "name": "Cres @ CRV_20260225_141133 seg5",
+          "trackIndex": 0,
+          "startTimeMs": 260291.63029525033,
+          "durationMs": 490.0000000000091,
+          "startSeconds": 260.29163029525034,
+          "endSeconds": 260.78163029525035,
+          "events": [
+            {
+              "timeMs": 260291.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                0,
+                0
+              ]
+            },
+            {
+              "timeMs": 260291.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                85
+              ]
+            },
+            {
+              "timeMs": 260291.63029525033,
+              "type": "noteOn",
+              "data": [
+                152,
+                69,
+                127
+              ]
+            },
+            {
+              "timeMs": 260295.796961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                85
+              ]
+            },
+            {
+              "timeMs": 260345.796961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                38,
+                14
+              ]
+            },
+            {
+              "timeMs": 260347.88029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                88
+              ]
+            },
+            {
+              "timeMs": 260397.88029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                90
+              ]
+            },
+            {
+              "timeMs": 260399.96362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                2,
+                31
+              ]
+            },
+            {
+              "timeMs": 260447.88029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                93
+              ]
+            },
+            {
+              "timeMs": 260454.13029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                76,
+                44
+              ]
+            },
+            {
+              "timeMs": 260499.96362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                95
+              ]
+            },
+            {
+              "timeMs": 260510.38029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                58,
+                60
+              ]
+            },
+            {
+              "timeMs": 260549.96362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                97
+              ]
+            },
+            {
+              "timeMs": 260564.546961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                40,
+                73
+              ]
+            },
+            {
+              "timeMs": 260602.046961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                99
+              ]
+            },
+            {
+              "timeMs": 260618.71362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                39,
+                88
+              ]
+            },
+            {
+              "timeMs": 260652.046961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                101
+              ]
+            },
+            {
+              "timeMs": 260672.88029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                57,
+                100
+              ]
+            },
+            {
+              "timeMs": 260702.046961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                103
+              ]
+            },
+            {
+              "timeMs": 260727.046961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                76,
+                114
+              ]
+            },
+            {
+              "timeMs": 260754.13029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                105
+              ]
+            },
+            {
+              "timeMs": 260781.21362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                4,
+                126
+              ]
+            },
+            {
+              "timeMs": 260781.21362858368,
+              "type": "noteOff",
+              "data": [
+                136,
+                69,
+                0
+              ]
+            }
+          ],
+          "color": "limeGreen",
+          "sourceCurve": 239,
+          "sourceFile": "Cres_CRV_20260225_141133_seg05_A4.mid",
+          "createdAt": 1772046837889
+        },
+        {
+          "id": 289,
+          "name": "Cres @ CRV_20260225_141133 seg6",
+          "trackIndex": 0,
+          "startTimeMs": 260791.63029525033,
+          "durationMs": 680.0000000000068,
+          "startSeconds": 260.79163029525034,
+          "endSeconds": 261.47163029525035,
+          "events": [
+            {
+              "timeMs": 260791.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                0,
+                0
+              ]
+            },
+            {
+              "timeMs": 260791.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                107
+              ]
+            },
+            {
+              "timeMs": 260791.63029525033,
+              "type": "noteOn",
+              "data": [
+                152,
+                71,
+                127
+              ]
+            },
+            {
+              "timeMs": 260804.13029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                107
+              ]
+            },
+            {
+              "timeMs": 260843.71362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                8,
+                11
+              ]
+            },
+            {
+              "timeMs": 260856.21362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                109
+              ]
+            },
+            {
+              "timeMs": 260895.796961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                103,
+                21
+              ]
+            },
+            {
+              "timeMs": 260906.21362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                110
+              ]
+            },
+            {
+              "timeMs": 260947.88029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                38,
+                34
+              ]
+            },
+            {
+              "timeMs": 260958.296961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                112
+              ]
+            },
+            {
+              "timeMs": 260999.96362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                48,
+                44
+              ]
+            },
+            {
+              "timeMs": 261008.296961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                114
+              ]
+            },
+            {
+              "timeMs": 261054.13029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                20,
+                54
+              ]
+            },
+            {
+              "timeMs": 261058.296961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                116
+              ]
+            },
+            {
+              "timeMs": 261106.21362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                82,
+                63
+              ]
+            },
+            {
+              "timeMs": 261110.38029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                117
+              ]
+            },
+            {
+              "timeMs": 261158.296961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                83,
+                74
+              ]
+            },
+            {
+              "timeMs": 261160.38029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                119
+              ]
+            },
+            {
+              "timeMs": 261210.38029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                65,
+                83
+              ]
+            },
+            {
+              "timeMs": 261212.46362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                120
+              ]
+            },
+            {
+              "timeMs": 261262.46362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                12,
+                92
+              ]
+            },
+            {
+              "timeMs": 261262.46362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                122
+              ]
+            },
+            {
+              "timeMs": 261312.46362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                123
+              ]
+            },
+            {
+              "timeMs": 261314.546961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                52,
+                100
+              ]
+            },
+            {
+              "timeMs": 261364.546961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                124
+              ]
+            },
+            {
+              "timeMs": 261366.63029525033,
+              "type": "pitchBend",
+              "data": [
+                232,
+                4,
+                110
+              ]
+            },
+            {
+              "timeMs": 261414.546961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                126
+              ]
+            },
+            {
+              "timeMs": 261418.71362858368,
+              "type": "pitchBend",
+              "data": [
+                232,
+                98,
+                117
+              ]
+            },
+            {
+              "timeMs": 261466.63029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                127
+              ]
+            },
+            {
+              "timeMs": 261470.796961917,
+              "type": "pitchBend",
+              "data": [
+                232,
+                53,
+                124
+              ]
+            },
+            {
+              "timeMs": 261470.796961917,
+              "type": "noteOff",
+              "data": [
+                136,
+                71,
+                0
+              ]
+            },
+            {
+              "timeMs": 261474.96362858368,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                84
+              ]
+            },
+            {
+              "timeMs": 261479.13029525033,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                42
+              ]
+            },
+            {
+              "timeMs": 261483.296961917,
+              "type": "cc",
+              "data": [
+                184,
+                7,
+                0
+              ]
+            }
+          ],
+          "color": "limeGreen",
+          "sourceCurve": 239,
+          "sourceFile": "Cres_CRV_20260225_141133_seg06_B4.mid",
+          "createdAt": 1772046837890
         }
       ],
-      "nextId": 272
+      "nextId": 290
     },
     "audioClips": {
       "clips": [
@@ -336101,6 +339223,19 @@
       "heightFraction": 0.40975609756097564,
       "track": 4,
       "svgDataUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjIiIHdpZHRoPSIxMy43MW1tIiBoZWlnaHQ9IjEzLjI4bW0iIHZpZXdCb3g9Ii0wLjQ0MzEgMC41MDAwIDcuODAzMCA3LjU1NjEiPg0KPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCjwhW0NEQVRBWw0KdHNwYW4geyB3aGl0ZS1zcGFjZTogcHJlOyB9DQpdXT4NCjwvc3R5bGU+DQo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjA1NjksIDMuNzUwMCkiPg0KPGxpbmUgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjAuMTAwMCIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHgxPSIwIiB5MT0iMi4wMDAwIiB4Mj0iNi44MDMwIiB5Mj0iMi4wMDAwIi8+DQo8L2c+DQo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjA1NjksIDMuNzUwMCkiPg0KPGxpbmUgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjAuMTAwMCIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHgxPSIwIiB5MT0iMS4wMDAwIiB4Mj0iNi44MDMwIiB5Mj0iMS4wMDAwIi8+DQo8L2c+DQo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjA1NjksIDMuNzUwMCkiPg0KPGxpbmUgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjAuMTAwMCIgc3Ryb2tlPSJjdXJyZW50Q29sb3IiIHgxPSIwIiB5MT0iLTAuMDAwMCIgeDI9IjYuODAzMCIgeTI9Ii0wLjAwMDAiLz4NCjwvZz4NCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDU2OSwgMy43NTAwKSI+DQo8bGluZSBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iMC4xMDAwIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgeDE9IjAiIHkxPSItMS4wMDAwIiB4Mj0iNi44MDMwIiB5Mj0iLTEuMDAwMCIvPg0KPC9nPg0KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wNTY5LCAzLjc1MDApIj4NCjxsaW5lIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjEwMDAiIHN0cm9rZT0iY3VycmVudENvbG9yIiB4MT0iMCIgeTE9Ii0yLjAwMDAiIHgyPSI2LjgwMzAiIHkyPSItMi4wMDAwIi8+DQo8L2c+DQo8YSBzdHlsZT0iY29sb3I6aW5oZXJpdDsiIHhsaW5rOmhyZWY9InRleHRlZGl0Oi8vQzovVXNlcnMvandsb3kvT25lRHJpdmUvRG9jdW1lbnRzL0dpdEh1Yi9zdHJpbmdfcXVhcnRldF9ubzEtY29tcG9zZXIvbGlseXBvbmRfY29kZS9HbGlzcy1iYXNzLUFzMy1HczMtZi5seTo2ODo0OjUiPg0KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC41NjkxLCAzLjc1MDApIj4NCjxsaW5lIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjEwMDAiIHN0cm9rZT0iY3VycmVudENvbG9yIiB4MT0iMi4wMTM3IiB5MT0iLTEuOTQ5MCIgeDI9IjMuODEyMSIgeTI9Ii0xLjQ3NDUiLz4NCjwvZz4NCjwvYT4NCjxhIHN0eWxlPSJjb2xvcjppbmhlcml0OyIgeGxpbms6aHJlZj0idGV4dGVkaXQ6Ly9DOi9Vc2Vycy9qd2xveS9PbmVEcml2ZS9Eb2N1bWVudHMvR2l0SHViL3N0cmluZ19xdWFydGV0X25vMS1jb21wb3Nlci9saWx5cG9uZF9jb2RlL0dsaXNzLWJhc3MtQXMzLUdzMy1mLmx5Ojc2OjQ6NSI+DQo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1LjE4NDUsIDIuMjUwMCkiPg0KPHBhdGggdHJhbnNmb3JtPSJzY2FsZSgwLjAwMzIsIC0wLjAwMzIpIiBkPSJNMjEyIDEzOGM1OSAwIDExMyAtMzEgMTEzIC05NWMwIC03MSAtNTIgLTEyMCAtOTkgLTE0OGMtMzQgLTIxIC03MyAtMzMgLTExMyAtMzNjLTU5IDAgLTExMyAzMSAtMTEzIDk1YzAgNzEgNTMgMTIwIDEwMCAxNDhjMzQgMjEgNzIgMzMgMTEyIDMzeiIgZmlsbD0iY3VycmVudENvbG9yIi8+DQo8L2c+DQo8L2E+DQo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0LjU4NDUsIDIuMjUwMCkiPg0KPHBhdGggdHJhbnNmb3JtPSJzY2FsZSgwLjAwMjAsIC0wLjAwMjApIiBkPSJNNTIgMzdjLTUgLTIgLTEwIC00IC0xNiAtNGMtMTkgMCAtMzYgMTYgLTM2IDM2djQxYzAgMTQgOSAyOCAyMiAzM2wzMCAxM3YxNDRjMCAxNCAxMSAyNiAyNSAyNnMyNiAtMTIgMjYgLTI2di0xMjRsNjkgMjl2MTQ1YzAgMTQgMTIgMjUgMjYgMjVzMjUgLTExIDI1IC0yNXYtMTI0YzUgMiAxMCA0IDE2IDRjMTkgMCAzNiAtMTYgMzYgLTM2di00MmMwIC0xNCAtOSAtMjggLTIyIC0zM2wtMzAgLTEydi0xNDRjNSAyIDEwIDQgMTYgNA0KYzE5IDAgMzYgLTE2IDM2IC0zNnYtNDFjMCAtMTQgLTkgLTI4IC0yMiAtMzNsLTMwIC0xM3YtMTQ0YzAgLTE0IC0xMSAtMjYgLTI1IC0yNnMtMjYgMTIgLTI2IDI2djEyNGwtNjkgLTI5di0xNDVjMCAtMTQgLTEyIC0yNSAtMjYgLTI1cy0yNSAxMSAtMjUgMjV2MTI0Yy01IC0yIC0xMCAtNCAtMTYgLTRjLTE5IDAgLTM2IDE2IC0zNiAzNnY0MmMwIDE0IDkgMjggMjIgMzNsMzAgMTJ2MTQ0ek0xNzIgODZsLTY5IC0yOHYtMTQ0bDY5IDI4djE0NHoNCiIgZmlsbD0iY3VycmVudENvbG9yIi8+DQo8L2c+DQo8YSBzdHlsZT0iY29sb3I6aW5oZXJpdDsiIHhsaW5rOmhyZWY9InRleHRlZGl0Oi8vQzovVXNlcnMvandsb3kvT25lRHJpdmUvRG9jdW1lbnRzL0dpdEh1Yi9zdHJpbmdfcXVhcnRldF9ubzEtY29tcG9zZXIvbGlseXBvbmRfY29kZS9HbGlzcy1iYXNzLUFzMy1HczMtZi5seTo2NDo0OjUiPg0KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMS4zNTY5LCAxLjc1MDApIj4NCjxwYXRoIHRyYW5zZm9ybT0ic2NhbGUoMC4wMDMyLCAtMC4wMDMyKSIgZD0iTTIxMiAxMzhjNTkgMCAxMTMgLTMxIDExMyAtOTVjMCAtNzEgLTUyIC0xMjAgLTk5IC0xNDhjLTM0IC0yMSAtNzMgLTMzIC0xMTMgLTMzYy01OSAwIC0xMTMgMzEgLTExMyA5NWMwIDcxIDUzIDEyMCAxMDAgMTQ4YzM0IDIxIDcyIDMzIDExMiAzM3oiIGZpbGw9ImN1cnJlbnRDb2xvciIvPg0KPC9nPg0KPC9hPg0KPGEgc3R5bGU9ImNvbG9yOmluaGVyaXQ7IiB4bGluazpocmVmPSJ0ZXh0ZWRpdDovL0M6L1VzZXJzL2p3bG95L09uZURyaXZlL0RvY3VtZW50cy9HaXRIdWIvc3RyaW5nX3F1YXJ0ZXRfbm8xLWNvbXBvc2VyL2xpbHlwb25kX2NvZGUvR2xpc3MtYmFzcy1BczMtR3MzLWYubHk6NjQ6Nzo4Ij4NCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEuNTgyOSwgNy4yMTk1KSI+DQo8cGF0aCB0cmFuc2Zvcm09InNjYWxlKDAuMDAxOCwgLTAuMDAxOCkiIGQ9Ik0yNTAgMjIxbC00NyAtMTUzYy0zMCAtOTkgLTEyMSAtMjU1IC0yMTggLTI1NWMtNDggMCAtODcgMzkgLTg3IDg4YzAgMzkgMTcgNzcgNTIgNzdjMjQgMCA0NCAtMTkgNDQgLTQzYzAgLTMwIC0zOCAtMjUgLTM4IC01NWMwIC0xMCAxMSAtMTEgMjMgLTExaDZjNDIgMCA2MiA0NSA3MyA4OWw2NiAyNjNoLTM3Yy0xNiAwIC0yOSAxMyAtMjkgMjlzMTMgMjkgMjkgMjloNTNjMzQgOTIgMTE5IDE4MSAyMTAgMTgxYzQ4IDAgODcgLTQwIDg3IC04OQ0KYzAgLTM5IC0xNyAtNzcgLTUyIC03N2MtMjQgMCAtNDQgMjAgLTQ0IDQ0YzAgMzAgMzggMjUgMzggNTVjMCAxMCAtMTAgMTAgLTIyIDEwaC03Yy01MiAwIC02OCAtNjcgLTgzIC0xMjRoNDJjMTYgMCAyOSAtMTMgMjkgLTI5cy0xMyAtMjkgLTI5IC0yOWgtNTl6IiBmaWxsPSJjdXJyZW50Q29sb3IiLz4NCjwvZz4NCjwvYT4NCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuNDU2OSwgMS43NTAwKSI+DQo8cGF0aCB0cmFuc2Zvcm09InNjYWxlKDAuMDAyMCwgLTAuMDAyMCkiIGQ9Ik01MiAzN2MtNSAtMiAtMTAgLTQgLTE2IC00Yy0xOSAwIC0zNiAxNiAtMzYgMzZ2NDFjMCAxNCA5IDI4IDIyIDMzbDMwIDEzdjE0NGMwIDE0IDExIDI2IDI1IDI2czI2IC0xMiAyNiAtMjZ2LTEyNGw2OSAyOXYxNDVjMCAxNCAxMiAyNSAyNiAyNXMyNSAtMTEgMjUgLTI1di0xMjRjNSAyIDEwIDQgMTYgNGMxOSAwIDM2IC0xNiAzNiAtMzZ2LTQyYzAgLTE0IC05IC0yOCAtMjIgLTMzbC0zMCAtMTJ2LTE0NGM1IDIgMTAgNCAxNiA0DQpjMTkgMCAzNiAtMTYgMzYgLTM2di00MWMwIC0xNCAtOSAtMjggLTIyIC0zM2wtMzAgLTEzdi0xNDRjMCAtMTQgLTExIC0yNiAtMjUgLTI2cy0yNiAxMiAtMjYgMjZ2MTI0bC02OSAtMjl2LTE0NWMwIC0xNCAtMTIgLTI1IC0yNiAtMjVzLTI1IDExIC0yNSAyNXYxMjRjLTUgLTIgLTEwIC00IC0xNiAtNGMtMTkgMCAtMzYgMTYgLTM2IDM2djQyYzAgMTQgOSAyOCAyMiAzM2wzMCAxMnYxNDR6TTE3MiA4NmwtNjkgLTI4di0xNDRsNjkgMjh2MTQ0eg0KIiBmaWxsPSJjdXJyZW50Q29sb3IiLz4NCjwvZz4NCjwvc3ZnPg0K"
+    },
+    {
+      "id": 232,
+      "name": "SVG_20260225_141142_221_Cres-Gliss-treble-c4-c5-p-ffff",
+      "referenceSeconds": 258.87163029525027,
+      "offsetSeconds": -0.32107199572807027,
+      "offsetYFraction": 0.05,
+      "width": 73.93679999999999,
+      "height": 87.0534,
+      "scale": 0.5310533534589115,
+      "heightFraction": 0.67,
+      "track": 1,
+      "svgDataUrl": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjIiIHdpZHRoPSI3My45MzY3OTk5OTk5OTk5OSIgaGVpZ2h0PSI4Ny4wNTM0IiB2aWV3Qm94PSItMC40NDMxIDAuMTQ0MyAxMS4xMjg4IDEzLjEwNzYiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgo8IVtDREFUQVsKdHNwYW4geyB3aGl0ZS1zcGFjZTogcHJlOyB9Cl1dPgo8L3N0eWxlPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjA1NjksIDUuMjEyNykiPgo8bGluZSBzdHJva2UtbGluZWpvaW49InJvdW5kIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS13aWR0aD0iMC4xMDAwIiBzdHJva2U9IiMwMDAwMDAiIHgxPSIwIiB5MT0iMi4wMDAwIiB4Mj0iNi44MDMwIiB5Mj0iMi4wMDAwIi8+CjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wNTY5LCA1LjIxMjcpIj4KPGxpbmUgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjAuMTAwMCIgc3Ryb2tlPSIjMDAwMDAwIiB4MT0iMCIgeTE9IjEuMDAwMCIgeDI9IjYuODAzMCIgeTI9IjEuMDAwMCIvPgo8L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDU2OSwgNS4yMTI3KSI+CjxsaW5lIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjEwMDAiIHN0cm9rZT0iIzAwMDAwMCIgeDE9IjAiIHkxPSItMC4wMDAwIiB4Mj0iNi44MDMwIiB5Mj0iLTAuMDAwMCIvPgo8L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDU2OSwgNS4yMTI3KSI+CjxsaW5lIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjEwMDAiIHN0cm9rZT0iIzAwMDAwMCIgeDE9IjAiIHkxPSItMS4wMDAwIiB4Mj0iNi44MDMwIiB5Mj0iLTEuMDAwMCIvPgo8L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDU2OSwgNS4yMTI3KSI+CjxsaW5lIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjEwMDAiIHN0cm9rZT0iIzAwMDAwMCIgeDE9IjAiIHkxPSItMi4wMDAwIiB4Mj0iNi44MDMwIiB5Mj0iLTIuMDAwMCIvPgo8L2c+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuNTY5MSwgOC4yMTI3KSI+CjxyZWN0IHg9Ii0wLjI3MDMiIHk9Ii0wLjEwMDAiIHdpZHRoPSIxLjU0ODciIGhlaWdodD0iMC4yMDAwIiByeT0iMC4xMDAwIiBmaWxsPSIjMDAwMDAwIi8+CjwvZz4KPGEgc3R5bGU9ImNvbG9yOmluaGVyaXQ7IiB4bGluazpocmVmPSJ0ZXh0ZWRpdDovL0M6L1VzZXJzL2p3bG95L09uZURyaXZlL0RvY3VtZW50cy9HaXRIdWIvc3RyaW5nX3F1YXJ0ZXRfbm8xLWNvbXBvc2VyL2xpbHlwb25kX2NvZGUvQ3Jlcy1HbGlzcy10cmVibGUtYzQtYzUtcC1mZmZmLmx5OjEwNTo0OjUiPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1LjUzNjIsIDQuNzEyNykiPgo8cGF0aCB0cmFuc2Zvcm09InNjYWxlKDAuMDAzMiwgLTAuMDAzMikiIGQ9Ik0yMTIgMTM4YzU5IDAgMTEzIC0zMSAxMTMgLTk1YzAgLTcxIC01MiAtMTIwIC05OSAtMTQ4Yy0zNCAtMjEgLTczIC0zMyAtMTEzIC0zM2MtNTkgMCAtMTEzIDMxIC0xMTMgOTVjMCA3MSA1MyAxMjAgMTAwIDE0OGMzNCAyMSA3MiAzMyAxMTIgMzN6IiBmaWxsPSIjMDAwMDAwIi8+CjwvZz4KPC9hPgo8YSBzdHlsZT0iY29sb3I6aW5oZXJpdDsiIHhsaW5rOmhyZWY9InRleHRlZGl0Oi8vQzovVXNlcnMvandsb3kvT25lRHJpdmUvRG9jdW1lbnRzL0dpdEh1Yi9zdHJpbmdfcXVhcnRldF9ubzEtY29tcG9zZXIvbGlseXBvbmRfY29kZS9DcmVzLUdsaXNzLXRyZWJsZS1jNC1jNS1wLWZmZmYubHk6Nzk6NDo1Ij4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC41NjkxLCA0LjkxMjcpIj4KPGxpbmUgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjAuMTAwMCIgc3Ryb2tlPSIjMDAwMDAwIiB4MT0iMS4zMTk2IiB5MT0iMi43MzQ2IiB4Mj0iNS4wNDE5IiB5Mj0iLTAuNTY2MyIvPgo8L2c+CjwvYT4KPGEgc3R5bGU9ImNvbG9yOmluaGVyaXQ7IiB4bGluazpocmVmPSJ0ZXh0ZWRpdDovL0M6L1VzZXJzL2p3bG95L09uZURyaXZlL0RvY3VtZW50cy9HaXRIdWIvc3RyaW5nX3F1YXJ0ZXRfbm8xLWNvbXBvc2VyL2xpbHlwb25kX2NvZGUvQ3Jlcy1HbGlzcy10cmVibGUtYzQtYzUtcC1mZmZmLmx5OjExMjo0OjUiPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3LjQzNjIsIDEyLjI3OTYpIj4KPHRleHQgZm9udC1mYW1pbHk9IkNyaW1zb24gUHJvIExpZ2h0IiBmb250LXN0eWxlPSJpdGFsaWMiIGZvbnQtc2l6ZT0iMS4wOTk4IiB0ZXh0LWFuY2hvcj0ic3RhcnQiIGZpbGw9IiMwMDAwMDAiPgo8dHNwYW4+c2VjY288L3RzcGFuPgo8L3RleHQ+CjwvZz4KPC9hPgo8YSBzdHlsZT0iY29sb3I6aW5oZXJpdDsiIHhsaW5rOmhyZWY9InRleHRlZGl0Oi8vQzovVXNlcnMvandsb3kvT25lRHJpdmUvRG9jdW1lbnRzL0dpdEh1Yi9zdHJpbmdfcXVhcnRldF9ubzEtY29tcG9zZXIvbGlseXBvbmRfY29kZS9DcmVzLUdsaXNzLXRyZWJsZS1jNC1jNS1wLWZmZmYubHk6MTA4OjQ6NSI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDUuNzk4OCwgMTIuMTc2NikiPgo8Zz4KPHBhdGggdHJhbnNmb3JtPSJzY2FsZSgwLjAwMTUsIC0wLjAwMTUpIiBkPSJNMjUwIDIyMWwtNDcgLTE1M2MtMzAgLTk5IC0xMjEgLTI1NSAtMjE4IC0yNTVjLTQ4IDAgLTg3IDM5IC04NyA4OGMwIDM5IDE3IDc3IDUyIDc3YzI0IDAgNDQgLTE5IDQ0IC00M2MwIC0zMCAtMzggLTI1IC0zOCAtNTVjMCAtMTAgMTEgLTExIDIzIC0xMWg2YzQyIDAgNjIgNDUgNzMgODlsNjYgMjYzaC0zN2MtMTYgMCAtMjkgMTMgLTI5IDI5czEzIDI5IDI5IDI5aDUzYzM0IDkyIDExOSAxODEgMjEwIDE4MWM0OCAwIDg3IC00MCA4NyAtODkgYzAgLTM5IC0xNyAtNzcgLTUyIC03N2MtMjQgMCAtNDQgMjAgLTQ0IDQ0YzAgMzAgMzggMjUgMzggNTVjMCAxMCAtMTAgMTAgLTIyIDEwaC03Yy01MiAwIC02OCAtNjcgLTgzIC0xMjRoNDJjMTYgMCAyOSAtMTMgMjkgLTI5cy0xMyAtMjkgLTI5IC0yOWgtNTl6IiBmaWxsPSIjMDAwMDAwIi8+Cgo8cGF0aCB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLjQwOTcsIDAuMDAwMCkgc2NhbGUoMC4wMDE1LCAtMC4wMDE1KSIgZD0iTTI1MCAyMjFsLTQ3IC0xNTNjLTMwIC05OSAtMTIxIC0yNTUgLTIxOCAtMjU1Yy00OCAwIC04NyAzOSAtODcgODhjMCAzOSAxNyA3NyA1MiA3N2MyNCAwIDQ0IC0xOSA0NCAtNDNjMCAtMzAgLTM4IC0yNSAtMzggLTU1YzAgLTEwIDExIC0xMSAyMyAtMTFoNmM0MiAwIDYyIDQ1IDczIDg5bDY2IDI2M2gtMzdjLTE2IDAgLTI5IDEzIC0yOSAyOXMxMyAyOSAyOSAyOWg1M2MzNCA5MiAxMTkgMTgxIDIxMCAxODFjNDggMCA4NyAtNDAgODcgLTg5IGMwIC0zOSAtMTcgLTc3IC01MiAtNzdjLTI0IDAgLTQ0IDIwIC00NCA0NGMwIDMwIDM4IDI1IDM4IDU1YzAgMTAgLTEwIDEwIC0yMiAxMGgtN2MtNTIgMCAtNjggLTY3IC04MyAtMTI0aDQyYzE2IDAgMjkgLTEzIDI5IC0yOXMtMTMgLTI5IC0yOSAtMjloLTU5eiIgZmlsbD0iIzAwMDAwMCIvPgoKPHBhdGggdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC44MTk0LCAwLjAwMDApIHNjYWxlKDAuMDAxNSwgLTAuMDAxNSkiIGQ9Ik0yNTAgMjIxbC00NyAtMTUzYy0zMCAtOTkgLTEyMSAtMjU1IC0yMTggLTI1NWMtNDggMCAtODcgMzkgLTg3IDg4YzAgMzkgMTcgNzcgNTIgNzdjMjQgMCA0NCAtMTkgNDQgLTQzYzAgLTMwIC0zOCAtMjUgLTM4IC01NWMwIC0xMCAxMSAtMTEgMjMgLTExaDZjNDIgMCA2MiA0NSA3MyA4OWw2NiAyNjNoLTM3Yy0xNiAwIC0yOSAxMyAtMjkgMjlzMTMgMjkgMjkgMjloNTNjMzQgOTIgMTE5IDE4MSAyMTAgMTgxYzQ4IDAgODcgLTQwIDg3IC04OSBjMCAtMzkgLTE3IC03NyAtNTIgLTc3Yy0yNCAwIC00NCAyMCAtNDQgNDRjMCAzMCAzOCAyNSAzOCA1NWMwIDEwIC0xMCAxMCAtMjIgMTBoLTdjLTUyIDAgLTY4IC02NyAtODMgLTEyNGg0MmMxNiAwIDI5IC0xMyAyOSAtMjlzLTEzIC0yOSAtMjkgLTI5aC01OXoiIGZpbGw9IiMwMDAwMDAiLz4KCjxwYXRoIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEuMjI5MiwgMC4wMDAwKSBzY2FsZSgwLjAwMTUsIC0wLjAwMTUpIiBkPSJNMjUwIDIyMWwtNDcgLTE1M2MtMzAgLTk5IC0xMjEgLTI1NSAtMjE4IC0yNTVjLTQ4IDAgLTg3IDM5IC04NyA4OGMwIDM5IDE3IDc3IDUyIDc3YzI0IDAgNDQgLTE5IDQ0IC00M2MwIC0zMCAtMzggLTI1IC0zOCAtNTVjMCAtMTAgMTEgLTExIDIzIC0xMWg2YzQyIDAgNjIgNDUgNzMgODlsNjYgMjYzaC0zN2MtMTYgMCAtMjkgMTMgLTI5IDI5czEzIDI5IDI5IDI5aDUzYzM0IDkyIDExOSAxODEgMjEwIDE4MWM0OCAwIDg3IC00MCA4NyAtODkgYzAgLTM5IC0xNyAtNzcgLTUyIC03N2MtMjQgMCAtNDQgMjAgLTQ0IDQ0YzAgMzAgMzggMjUgMzggNTVjMCAxMCAtMTAgMTAgLTIyIDEwaC03Yy01MiAwIC02OCAtNjcgLTgzIC0xMjRoNDJjMTYgMCAyOSAtMTMgMjkgLTI5cy0xMyAtMjkgLTI5IC0yOWgtNTl6IiBmaWxsPSIjMDAwMDAwIi8+CjwvZz4KPC9nPgo8L2E+CjxhIHN0eWxlPSJjb2xvcjppbmhlcml0OyIgeGxpbms6aHJlZj0idGV4dGVkaXQ6Ly9DOi9Vc2Vycy9qd2xveS9PbmVEcml2ZS9Eb2N1bWVudHMvR2l0SHViL3N0cmluZ19xdWFydGV0X25vMS1jb21wb3Nlci9saWx5cG9uZF9jb2RlL0NyZXMtR2xpc3MtdHJlYmxlLWM0LWM1LXAtZmZmZi5seTo4OTo0OjUiPgo8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxLjU0NjMsIDEyLjA1MTkpIj4KPGxpbmUgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjAuMTAwMCIgc3Ryb2tlPSIjMDAwMDAwIiB4MT0iMC4wMDAwIiB5MT0iMC4wMDAwIiB4Mj0iMy42NTI1IiB5Mj0iMC42NTAwIi8+CjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMS41NDYzLCAxMi4wNTE5KSI+CjxsaW5lIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIwLjEwMDAiIHN0cm9rZT0iIzAwMDAwMCIgeDE9IjAuMDAwMCIgeTE9Ii0wLjAwMDAiIHgyPSIzLjY1MjUiIHkyPSItMC42NTAwIi8+CjwvZz4KPC9hPgo8YSBzdHlsZT0iY29sb3I6aW5oZXJpdDsiIHhsaW5rOmhyZWY9InRleHRlZGl0Oi8vQzovVXNlcnMvandsb3kvT25lRHJpdmUvRG9jdW1lbnRzL0dpdEh1Yi9zdHJpbmdfcXVhcnRldF9ubzEtY29tcG9zZXIvbGlseXBvbmRfY29kZS9DcmVzLUdsaXNzLXRyZWJsZS1jNC1jNS1wLWZmZmYubHk6NzU6NDo1Ij4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC41NTY5LCA4LjIxMjcpIj4KPHBhdGggdHJhbnNmb3JtPSJzY2FsZSgwLjAwMzIsIC0wLjAwMzIpIiBkPSJNMjEyIDEzOGM1OSAwIDExMyAtMzEgMTEzIC05NWMwIC03MSAtNTIgLTEyMCAtOTkgLTE0OGMtMzQgLTIxIC03MyAtMzMgLTExMyAtMzNjLTU5IDAgLTExMyAzMSAtMTEzIDk1YzAgNzEgNTMgMTIwIDEwMCAxNDhjMzQgMjEgNzIgMzMgMTEyIDMzeiIgZmlsbD0iIzAwMDAwMCIvPgo8L2c+CjwvYT4KPGEgc3R5bGU9ImNvbG9yOmluaGVyaXQ7IiB4bGluazpocmVmPSJ0ZXh0ZWRpdDovL0M6L1VzZXJzL2p3bG95L09uZURyaXZlL0RvY3VtZW50cy9HaXRIdWIvc3RyaW5nX3F1YXJ0ZXRfbm8xLWNvbXBvc2VyL2xpbHlwb25kX2NvZGUvQ3Jlcy1HbGlzcy10cmVibGUtYzQtYzUtcC1mZmZmLmx5Ojk0OjQ6NSI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuNTU2OSwgMS43NDQxKSI+Cjx0ZXh0IGZvbnQtZmFtaWx5PSJDcmltc29uIFBybyBMaWdodCIgZm9udC1zdHlsZT0iaXRhbGljIiBmb250LXNpemU9IjEuMDk5OCIgdGV4dC1hbmNob3I9InN0YXJ0IiBmaWxsPSIjMDAwMDAwIj4KPHRzcGFuPk5vbi1WaWI8L3RzcGFuPgo8L3RleHQ+CjwvZz4KPC9hPgo8YSBzdHlsZT0iY29sb3I6aW5oZXJpdDsiIHhsaW5rOmhyZWY9InRleHRlZGl0Oi8vQzovVXNlcnMvandsb3kvT25lRHJpdmUvRG9jdW1lbnRzL0dpdEh1Yi9zdHJpbmdfcXVhcnRldF9ubzEtY29tcG9zZXIvbGlseXBvbmRfY29kZS9DcmVzLUdsaXNzLXRyZWJsZS1jNC1jNS1wLWZmZmYubHk6ODU6NDo1Ij4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC44MDAwLCAxMi4xNzY2KSI+CjxwYXRoIHRyYW5zZm9ybT0ic2NhbGUoMC4wMDE1LCAtMC4wMDE1KSIgZD0iTTIzMyAyNDNjLTU3IDAgLTEwNCAtMTEyIC0xMDQgLTE3OGMwIC0yMiA5IC0zOCAzMSAtMzhjMTcgMCAzNSAxMiA0NyAyOGMyNCAzMyA1MSAxMTggNTEgMTU1YzAgMTggLTcgMzMgLTI1IDMzek03MCAyNDNjLTUyIDAgLTQ0IC0xMjMgLTEwMSAtMTIzYy0xMiAwIC0yMSA2IC0yMSAxOGMwIDQgMSA4IDMgMTNjMzAgNjggNzUgMTQxIDEzNiAxNDFjMzMgMCA1MyAtMjMgNjAgLTUyYzI5IDMxIDY3IDUyIDEwMyA1MiBjNjkgMCAxMDcgLTQ5IDEwNyAtMTE0YzAgLTk0IC04MiAtMTkwIC0xNjAgLTE5MGMtMjcgMCAtNTIgNSAtNzMgMTdjLTEwIDYgLTI0IDUgLTI3IC00bC0xNyAtNTFjLTMgLTggLTQgLTE2IC00IC0yM2MwIC0yNCAxMCAtMjkgMzIgLTMxYzEzIC0xIDE5IC0xMSAxOSAtMjFzLTcgLTIxIC0yMCAtMjFjLTM1IDAgLTcyIDUgLTEwOCA1Yy0zNyAwIC03NCAtNSAtMTA5IC01Yy0xMyAwIC0yMCAxMSAtMjAgMjFjMCAyMyAyOSAyMiA1MiAyMyBjMjUgMiA0OSAxNSA1NyAzOWw5MiAyNzJjMyA5IDcgMTggNyAyNWMwIDUgLTIgOSAtOCA5eiIgZmlsbD0iIzAwMDAwMCIvPgo8L2c+CjwvYT4KPC9zdmc+"
     }
   ],
   "nfBundles": {
@@ -336109,27 +339244,6 @@
   },
   "cdBundles": {
     "bundles": [
-      {
-        "id": 1,
-        "curveId": 239,
-        "svgId": 232,
-        "midiSnippetIds": [
-          272
-        ],
-        "startTime": 247.55507088331512,
-        "endTime": 249.55507088331512,
-        "track": 1,
-        "pitchModel": "single",
-        "pitchInfo": {
-          "pitch": "A3",
-          "lpPitch": "a4"
-        },
-        "dynamic1": "p",
-        "dynamic2": "ff",
-        "clef": "treble",
-        "velocity": 115,
-        "needsRegeneration": true
-      },
       {
         "id": 2,
         "curveId": 240,
@@ -336204,40 +339318,41 @@
         "needsRegeneration": false
       },
       {
-        "id": 5,
+        "id": 6,
         "curveId": 239,
-        "svgId": 237,
+        "svgId": 232,
         "midiSnippetIds": [
-          272,
-          273,
-          274,
-          275,
-          276
+          284,
+          285,
+          286,
+          287,
+          288,
+          289
         ],
-        "startTime": 256,
-        "endTime": 258,
+        "startTime": 258.8716302952503,
+        "endTime": 261.46598202824134,
         "track": 1,
         "pitchModel": "glissando",
         "pitchInfo": {
-          "startPitch": "d4",
+          "startPitch": "c4",
           "endPitch": "c5",
-          "lpStartPitch": "d'4",
+          "lpStartPitch": "c'4",
           "lpEndPitch": "c''4",
-          "glissOffset": "0"
+          "glissOffset": "0.3"
         },
-        "dynamic1": "ppp",
-        "dynamic2": "fff",
+        "dynamic1": "p",
+        "dynamic2": "ffff",
         "clef": "treble",
-        "velocity": 115,
+        "velocity": 127,
         "needsRegeneration": false
       }
     ],
-    "nextBundleId": 6
+    "nextBundleId": 7
   },
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 222.25,
-    "gotoDisplaySeconds": 246,
+    "gotoDisplaySeconds": 259,
     "leadInSeconds": 2
   }
 }
