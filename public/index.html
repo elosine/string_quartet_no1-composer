@@ -1144,6 +1144,12 @@
                     <button id="cdStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
                     <button id="cdStep2Btn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 8px;">2: Generate</button>
                 </div>
+                <div id="cdBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px; color: var(--clr-darkRed);">Start</label>
+                    <span id="cdBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
+                    <button id="cdRegenMidiBtn" class="control-btn" style="font-size: 9px; background: var(--clr-limeGreen); color: #000; padding: 2px 8px; display: none;">Regen MIDI</button>
+                    <button id="cdDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                </div>
                 
                 <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-neonMagenta); color: #fff; padding: 3px 6px; border-radius: 2px;">Bartók Pizzicato</div>
@@ -1229,9 +1235,24 @@
                         <option value="endOfCurve">End of Curve</option>
                     </select>
                 </div>
+                <div id="nfTempoRow" class="curve-input-row" style="display: none;">
+                    <label style="font-size: 9px; min-width: 28px;">Tempo</label>
+                    <select id="nfTempoSelect" style="width: 120px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="auto" selected>Auto (per alignment)</option>
+                        <option value="core">Core (fastest)</option>
+                        <option value="mid">Mid</option>
+                        <option value="midOuter">Mid-Outer</option>
+                        <option value="outer">Outer (slowest)</option>
+                    </select>
+                </div>
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="nfInsertBtn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 12px;">Insert</button>
                     <span id="nfStatusLabel" style="font-size: 9px; color: #888; margin-left: 8px;"></span>
+                </div>
+                <div id="nfBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px; color: var(--clr-neonMagenta);">Impact</label>
+                    <span id="nfBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
+                    <button id="nfDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -6835,8 +6856,10 @@
                     
                     topGroup.setAttribute('id', `midi-display-t${trackIndex + 1}-top`);
                     topGroup.setAttribute('class', 'midi-display-layer');
+                    topGroup.style.pointerEvents = 'none';
                     bottomGroup.setAttribute('id', `midi-display-t${trackIndex + 1}-bottom`);
                     bottomGroup.setAttribute('class', 'midi-display-layer');
+                    bottomGroup.style.pointerEvents = 'none';
                     
                     this.scoreTopEl.appendChild(topGroup);
                     this.scoreBottomEl.appendChild(bottomGroup);
@@ -7747,6 +7770,32 @@
                 this.renderSnippetOverlays();
                 // Apply visibility after rendering
                 this.updateMidiDisplayVisibility();
+                // Ensure interactive layers (curves, SVG elements, GCs) stay on top
+                // of MIDI display in DOM order so they receive mouse events first
+                this.bringInteractiveLayersToFront();
+            },
+            
+            // Re-append interactive layers so they sit above MIDI display in the SVG DOM
+            bringInteractiveLayersToFront() {
+                if (window.CurveMaker) {
+                    if (CurveMaker.topCurveGroup && this.scoreTopEl) {
+                        this.scoreTopEl.appendChild(CurveMaker.topCurveGroup);
+                    }
+                    if (CurveMaker.bottomCurveGroup && this.scoreBottomEl) {
+                        this.scoreBottomEl.appendChild(CurveMaker.bottomCurveGroup);
+                    }
+                }
+                if (window.GCMaker) {
+                    if (GCMaker.gcGroup && GCMaker.gcGroup.parentNode) {
+                        GCMaker.gcGroup.parentNode.appendChild(GCMaker.gcGroup);
+                    }
+                    if (GCMaker.gcGroupBottom && GCMaker.gcGroupBottom.parentNode) {
+                        GCMaker.gcGroupBottom.parentNode.appendChild(GCMaker.gcGroupBottom);
+                    }
+                }
+                if (window.SVGElementManager) {
+                    SVGElementManager.bringToFront();
+                }
             },
             
             // Render snippet overlays with colored boundaries and selection highlights
@@ -7874,6 +7923,7 @@
                     hitArea.setAttribute('class', 'midi-snippet-hit');
                     hitArea.setAttribute('data-page', startPage);
                     hitArea.style.cursor = 'pointer';
+                    hitArea.style.pointerEvents = 'all';
                     hitArea.addEventListener('click', (e) => {
                         e.stopPropagation();
                         this.selectSnippet(snippet);
@@ -7947,6 +7997,7 @@
                 hitArea.setAttribute('class', 'midi-snippet-hit');
                 hitArea.setAttribute('data-page', page);
                 hitArea.style.cursor = 'pointer';
+                hitArea.style.pointerEvents = 'all';
                 hitArea.addEventListener('click', (e) => {
                     e.stopPropagation();
                     this.selectSnippet(snippet);
@@ -8005,6 +8056,9 @@
                         el.style.display = (elPage === currentBottomPage) ? '' : 'none';
                     });
                 }
+                
+                // Keep interactive layers on top of MIDI display
+                this.bringInteractiveLayersToFront();
             },
             
             // Debug function to check state
@@ -12541,6 +12595,26 @@
                     }
                 );
                 
+                // NotationFragmentSystem bundles - unified NF component groups
+                this.registerSource('nfBundles',
+                    () => window.NotationFragmentSystem ? NotationFragmentSystem.exportBundles() : { bundles: [], nextBundleId: 1 },
+                    (data) => {
+                        if (window.NotationFragmentSystem) {
+                            NotationFragmentSystem.importBundles(data);
+                        }
+                    }
+                );
+                
+                // CrescendoUI bundles - unified crescendo component groups (curve + SVG + MIDI)
+                this.registerSource('cdBundles',
+                    () => window.CrescendoUI ? CrescendoUI.exportBundles() : { bundles: [], nextBundleId: 1 },
+                    (data) => {
+                        if (window.CrescendoUI) {
+                            CrescendoUI.importBundles(data);
+                        }
+                    }
+                );
+                
                 // FlowchartConnector - connector lines between objects
                 this.registerSource('connectors',
                     () => window.FlowchartConnector ? FlowchartConnector.exportData() : [],
@@ -14067,7 +14141,7 @@
                 startPoint.setAttribute('fill', color);
                 startPoint.setAttribute('stroke', '#fff');
                 startPoint.setAttribute('stroke-width', '2');
-                startPoint.style.cursor = 'ns-resize';
+                startPoint.style.cursor = 'move';
                 startPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'start'));
                 group.appendChild(startPoint);
                 
@@ -14079,7 +14153,7 @@
                 endPoint.setAttribute('fill', color);
                 endPoint.setAttribute('stroke', '#fff');
                 endPoint.setAttribute('stroke-width', '2');
-                endPoint.style.cursor = 'ns-resize';
+                endPoint.style.cursor = 'move';
                 endPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'end'));
                 group.appendChild(endPoint);
                 
@@ -14106,7 +14180,7 @@
                 this.updateBoundingBox(curve);
             },
             
-            handleCurveMouseDown(e, curve, target) {
+            handleCurveMouseDown(e, curve, target, dragOpts) {
                 e.preventDefault();
                 e.stopPropagation();
                 
@@ -14116,22 +14190,48 @@
                 // If clicking on bounding box (not on curve/endpoints), just select, don't drag
                 if (target === 'bbox') return;
                 
+                // Shift+drag on curve middle: move entire curve (or bundle) instead of adjusting slope
+                if (target === 'curve' && e.shiftKey) {
+                    // If part of a crescendo bundle, move the whole bundle
+                    if (window.CrescendoUI) {
+                        const bundle = CrescendoUI.lookupBundleByCurveId(curve.id);
+                        if (bundle) {
+                            CrescendoUI.startBundleDrag(bundle, e);
+                            return;
+                        }
+                    }
+                    // Standalone curve: enter 'move' mode (handled in switch below)
+                    target = 'move';
+                }
+                
                 // Start dragging
                 this.isDragging = true;
                 this.dragTarget = target;
                 this.dragStartX = e.clientX;
                 this.dragStartY = e.clientY;
                 
-                // All controls are on the first segment, so use its section
-                const scoreEl = curve.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                // Use overrides if provided (for continuation page handles)
+                const dragSection = (dragOpts && dragOpts.section) || curve.section;
+                const dragPage = (dragOpts && dragOpts.page != null) ? dragOpts.page : curve.page;
+                const scoreEl = dragSection === 'top' ? this.scoreTopEl : this.scoreBottomEl;
                 const rect = scoreEl.getBoundingClientRect();
-                const trackDims = curve.trackDims;
+                const trackDims = (dragOpts && dragOpts.trackDims) || curve.trackDims;
                 
                 // Store initial curve state for curve drag
                 const initialTension = curve.tension;
                 const initialSlope = curve.slope || 0;  // slope: shifts the apex left/right
                 const initialY1 = curve.y1Pixel;
                 const initialY2 = curve.y2Pixel;
+                
+                // Time conversion for endpoint X-drag (duration stretching)
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+                const zoomScale = window.ScoreZoom ? ScoreZoom.getZoom() : 1;
+                const minDuration = 0.1; // Minimum curve duration in seconds
+                
+                // Store originals for 'move' mode (cumulative delta from drag start)
+                const moveOrigStart = curve.startSeconds;
+                const moveOrigEnd = curve.endSeconds;
                 
                 const onMouseMove = (e) => {
                     if (!this.isDragging) return;
@@ -14145,22 +14245,126 @@
                     const clampedY = Math.max(trackDims.y, Math.min(trackDims.y + trackDims.height, y));
                     
                     switch (this.dragTarget) {
-                        case 'start':
-                            // Vertical only - X stays fixed
-                            // Update both current and original Y values for multi-page support
+                        case 'start': {
+                            // X+Y drag: stretch start point horizontally, adjust Y vertically
                             curve.y1Pixel = clampedY;
                             curve.origY1Pixel = clampedY;
-                            // Also update normalized y1 value
                             curve.y1 = ((trackDims.y + trackDims.height - clampedY) / trackDims.height) * 10;
+                            // X: convert pixel to seconds (no pixel clamp — allows cross-page drag left)
+                            const xFrac = x / scoreWidth;
+                            const newStartSec = (dragPage + xFrac) * secondsPerPage - leadInSeconds;
+                            // Clamp: start must be before end by minDuration, and >= 0
+                            curve.startSeconds = Math.max(0, Math.min(newStartSec, curve.endSeconds - minDuration));
+                            const startActual = curve.startSeconds + leadInSeconds;
+                            // Update page/section based on new start position
+                            const startNewPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                            curve.page = startNewPage;
+                            curve.section = startNewPage % 2 === 0 ? 'top' : 'bottom';
+                            const startScoreEl = curve.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                            const startSW = startScoreEl.clientWidth;
+                            // Recalculate BOTH x1 and x2 relative to new page
+                            curve.x1 = ((startActual / secondsPerPage) - startNewPage) * startSW;
+                            const endActualForStart = curve.endSeconds + leadInSeconds;
+                            curve.x2 = ((endActualForStart / secondsPerPage) - startNewPage) * startSW;
+                            // Move SVG group to correct container if section changed
+                            const startContainer = curve.section === 'top' ? this.topCurveGroup : this.bottomCurveGroup;
+                            if (curve.elements.group.parentNode !== startContainer) {
+                                startContainer.appendChild(curve.elements.group);
+                            }
+                            // Refresh trackDims + Y pixel positions for new section
+                            if (window.CompositionPanel && curve.gTrack) {
+                                const startTD = CompositionPanel.getTrackDimensions(curve.gTrack, startScoreEl);
+                                if (startTD) {
+                                    curve.trackDims = startTD;
+                                    const startTB = startTD.y + startTD.height;
+                                    curve.y1Pixel = startTB - (curve.y1 / 10) * startTD.height;
+                                    curve.y2Pixel = startTB - (curve.y2 / 10) * startTD.height;
+                                    curve.origY1Pixel = curve.y1Pixel;
+                                    curve.origY2Pixel = curve.y2Pixel;
+                                }
+                            }
+                            // Propagate to bundled SVG anchor (dotted line tracks curve start)
+                            if (window.CrescendoUI && window.SVGElementManager) {
+                                const cdBundle = CrescendoUI.lookupBundleByCurveId(curve.id);
+                                if (cdBundle) {
+                                    const svgEl = SVGElementManager.elements.find(el => el.id === cdBundle.svgId);
+                                    if (svgEl) {
+                                        svgEl.referenceSeconds = curve.startSeconds;
+                                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                                        svgEl._x = pos.x;
+                                        svgEl._y = pos.y;
+                                        svgEl._page = pos.page;
+                                        svgEl._section = pos.section;
+                                        const tgtContainer = pos.section === 'top' ? SVGElementManager.containerTop : SVGElementManager.containerBottom;
+                                        if (svgEl.wrapper.parentNode !== tgtContainer) {
+                                            tgtContainer.appendChild(svgEl.wrapper);
+                                        }
+                                        SVGElementManager.updateElementTransform(svgEl);
+                                    }
+                                    cdBundle.startTime = curve.startSeconds;
+                                }
+                            }
                             break;
-                        case 'end':
-                            // Vertical only - X stays fixed
-                            // Update both current and original Y values for multi-page support
+                        }
+                        case 'end': {
+                            // X+Y drag: stretch end point horizontally, adjust Y vertically
                             curve.y2Pixel = clampedY;
                             curve.origY2Pixel = clampedY;
-                            // Also update normalized y2 value
                             curve.y2 = ((trackDims.y + trackDims.height - clampedY) / trackDims.height) * 10;
+                            // X: convert pixel to seconds (no pixel clamp — allows cross-page drag)
+                            const xFracEnd = x / scoreWidth;
+                            const newEndSec = (dragPage + xFracEnd) * secondsPerPage - leadInSeconds;
+                            // Clamp: end must be after start by minDuration, and >= minDuration
+                            curve.endSeconds = Math.max(newEndSec, curve.startSeconds + minDuration);
+                            const endActual = curve.endSeconds + leadInSeconds;
+                            curve.x2 = ((endActual / secondsPerPage) - curve.page) * scoreWidth;
+                            // Update bundle endTime if this curve belongs to a CD bundle
+                            if (window.CrescendoUI) {
+                                const cdBundle = CrescendoUI.lookupBundleByCurveId(curve.id);
+                                if (cdBundle) {
+                                    cdBundle.endTime = curve.endSeconds;
+                                }
+                            }
                             break;
+                        }
+                        case 'move': {
+                            // Shift+drag: translate entire curve (preserving duration)
+                            // Use cumulative pixel delta → time delta (same pattern as bundle drag)
+                            const moveDx = (e.clientX - this.dragStartX) / (window.ScoreZoom ? ScoreZoom.getZoom() : 1);
+                            const moveTimeDelta = moveDx * (secondsPerPage / scoreWidth);
+                            const moveDuration = moveOrigEnd - moveOrigStart;
+                            const newMoveStart = Math.max(0, moveOrigStart + moveTimeDelta);
+                            curve.startSeconds = newMoveStart;
+                            curve.endSeconds = newMoveStart + moveDuration;
+                            // Update page/section (same as startBundleDrag)
+                            const moveStartActual = curve.startSeconds + leadInSeconds;
+                            const moveEndActual = curve.endSeconds + leadInSeconds;
+                            const newPage = Math.floor(Math.max(0, moveStartActual) / secondsPerPage);
+                            curve.page = newPage;
+                            curve.section = newPage % 2 === 0 ? 'top' : 'bottom';
+                            const moveScoreEl = curve.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                            const moveSW = moveScoreEl.clientWidth;
+                            curve.x1 = ((moveStartActual / secondsPerPage) - newPage) * moveSW;
+                            curve.x2 = ((moveEndActual / secondsPerPage) - newPage) * moveSW;
+                            // Move SVG group to correct container if section changed
+                            const moveContainer = curve.section === 'top' ? this.topCurveGroup : this.bottomCurveGroup;
+                            if (curve.elements.group.parentNode !== moveContainer) {
+                                moveContainer.appendChild(curve.elements.group);
+                            }
+                            // Refresh trackDims + Y pixel positions for new section
+                            if (window.CompositionPanel && curve.gTrack) {
+                                const moveTD = CompositionPanel.getTrackDimensions(curve.gTrack, moveScoreEl);
+                                if (moveTD) {
+                                    curve.trackDims = moveTD;
+                                    const moveTB = moveTD.y + moveTD.height;
+                                    curve.y1Pixel = moveTB - (curve.y1 / 10) * moveTD.height;
+                                    curve.y2Pixel = moveTB - (curve.y2 / 10) * moveTD.height;
+                                    curve.origY1Pixel = curve.y1Pixel;
+                                    curve.origY2Pixel = curve.y2Pixel;
+                                }
+                            }
+                            break;
+                        }
                         case 'curve':
                         case 'preview':
                             // DAW-style curve shaping - horizontal drag only
@@ -14264,6 +14468,19 @@
                 if (window.MidiModelSystem && MidiModelSystem.selectedModelKey === 'longTone') {
                     MidiModelSystem.updateLongToneCurveIndicator();
                 }
+                
+                // Show crescendo bundle row if this curve belongs to a bundle
+                if (window.CrescendoUI) {
+                    const cdBundle = CrescendoUI.lookupBundleByCurveId(curve.id);
+                    const row = document.getElementById('cdBundleRow');
+                    const timeSpan = document.getElementById('cdBundleTime');
+                    const regenBtn = document.getElementById('cdRegenMidiBtn');
+                    if (cdBundle && row) {
+                        row.style.display = '';
+                        if (timeSpan) timeSpan.textContent = cdBundle.startTime.toFixed(3) + 's';
+                        if (regenBtn) regenBtn.style.display = cdBundle.needsRegeneration ? '' : 'none';
+                    }
+                }
             },
             
             deselectCurve() {
@@ -14284,6 +14501,10 @@
                 if (window.MidiModelSystem && MidiModelSystem.selectedModelKey === 'longTone') {
                     MidiModelSystem.updateLongToneCurveIndicator();
                 }
+                
+                // Hide crescendo bundle row
+                const cdRow = document.getElementById('cdBundleRow');
+                if (cdRow) cdRow.style.display = 'none';
             },
             
             // Create/update preview curve showing entire curve shape within the first segment
@@ -14420,14 +14641,26 @@
                     if (!isMultiPage) {
                         // Single-page curve: simple show/hide
                         curve.elements.group.style.display = visible ? '' : 'none';
-                        // Hide continuation segment if it exists
+                        // Show main endpoints (they may have been hidden for multi-page)
+                        if (curve.elements.endPoint) curve.elements.endPoint.style.display = '';
+                        if (curve.elements.startPoint) curve.elements.startPoint.style.display = '';
+                        // Hide ALL continuation segments (legacy + top/bottom)
                         if (curve.elements.continuationGroup) {
                             curve.elements.continuationGroup.style.display = 'none';
                         }
+                        if (curve.elements.continuationGroupTop) {
+                            curve.elements.continuationGroupTop.style.display = 'none';
+                        }
+                        if (curve.elements.continuationGroupBottom) {
+                            curve.elements.continuationGroupBottom.style.display = 'none';
+                        }
                     } else {
+                        // Multi-page: hide the main end point (it's off-screen past page edge)
+                        // The continuation page will show its own end handle instead
+                        if (curve.elements.endPoint) curve.elements.endPoint.style.display = 'none';
                         // Multi-page curve: show segments on each visible page
                         // Original segment on original page (clipped to page end)
-                        if (overlapsTop && topPage === curveStartPage) {
+                        if (overlapsTop && topPage === curveStartPage) {  
                             curve.elements.group.style.display = '';
                             this.clipCurveToPageEnd(curve, curveStartPage, secondsPerPage, leadInSec);
                         } else if (overlapsBottom && bottomPage === curveStartPage) {
@@ -14690,6 +14923,67 @@
                     x1: x1Pixel,
                     x2: x2Pixel
                 };
+                
+                // Edge handles: add draggable endpoint circles on the page where the
+                // curve's actual end (or start) falls, so endpoints remain reachable
+                const curveEndPage = Math.floor(Math.max(0, endActual) / secondsPerPage);
+                const curveStartPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                const hasEndPoint = (page === curveEndPage);
+                const hasStartPoint = (page === curveStartPage);
+                const endPointKey = section === 'top' ? 'contEndPointTop' : 'contEndPointBottom';
+                const startPointKey = section === 'top' ? 'contStartPointTop' : 'contStartPointBottom';
+                const pointRadius = 6;
+                const trackBottom = trackDimsForSection.y + trackDimsForSection.height;
+                
+                // End point handle on the page where the curve actually ends
+                if (hasEndPoint) {
+                    if (!curve.elements[endPointKey]) {
+                        const ep = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        ep.setAttribute('r', pointRadius);
+                        ep.setAttribute('stroke', '#fff');
+                        ep.setAttribute('stroke-width', '2');
+                        ep.style.cursor = 'move';
+                        ep.addEventListener('mousedown', (e) => {
+                            this.handleCurveMouseDown(e, curve, 'end', ep._dragOpts);
+                        });
+                        curve.elements[endPointKey] = ep;
+                        curve.elements[groupKey].appendChild(ep);
+                    }
+                    const ep = curve.elements[endPointKey];
+                    const y2Pixel = trackBottom - (curve.y2 / 10) * trackDimsForSection.height;
+                    ep.setAttribute('cx', x2Pixel);
+                    ep.setAttribute('cy', y2Pixel);
+                    ep.setAttribute('fill', color);
+                    ep._dragOpts = { page, section, trackDims: trackDimsForSection };
+                    ep.style.display = '';
+                } else if (curve.elements[endPointKey]) {
+                    curve.elements[endPointKey].style.display = 'none';
+                }
+                
+                // Start point handle (for cases where curve start falls on a continuation page)
+                if (hasStartPoint) {
+                    if (!curve.elements[startPointKey]) {
+                        const sp = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        sp.setAttribute('r', pointRadius);
+                        sp.setAttribute('stroke', '#fff');
+                        sp.setAttribute('stroke-width', '2');
+                        sp.style.cursor = 'move';
+                        sp.addEventListener('mousedown', (e) => {
+                            this.handleCurveMouseDown(e, curve, 'start', sp._dragOpts);
+                        });
+                        curve.elements[startPointKey] = sp;
+                        curve.elements[groupKey].appendChild(sp);
+                    }
+                    const sp = curve.elements[startPointKey];
+                    const y1Pixel = trackBottom - (curve.y1 / 10) * trackDimsForSection.height;
+                    sp.setAttribute('cx', x1Pixel);
+                    sp.setAttribute('cy', y1Pixel);
+                    sp.setAttribute('fill', color);
+                    sp._dragOpts = { page, section, trackDims: trackDimsForSection };
+                    sp.style.display = '';
+                } else if (curve.elements[startPointKey]) {
+                    curve.elements[startPointKey].style.display = 'none';
+                }
             },
             
             // Restore original rendering when returning to curve's original page
@@ -15076,6 +15370,17 @@
                 const curveDataArray = this.generateCurveDataArray(curve);
                 curve.curveData = curveDataArray;
                 
+                // Flag associated crescendo bundle for MIDI regeneration
+                // Skip during bundle drag (MIDI is time-shifted, not shape-changed)
+                if (window.CrescendoUI && !CrescendoUI._isBundleDragging) {
+                    const cdBundle = CrescendoUI.lookupBundleByCurveId(curve.id);
+                    if (cdBundle) {
+                        cdBundle.needsRegeneration = true;
+                        const regenBtn = document.getElementById('cdRegenMidiBtn');
+                        if (regenBtn) regenBtn.style.display = '';
+                    }
+                }
+                
                 // Mark score as dirty (has unsaved changes)
                 if (window.ScoreManager) ScoreManager.markDirty();
                 
@@ -15278,11 +15583,11 @@
                     hitPath.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'curve'));
                     path.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'curve'));
                     
-                    // Add drag handlers for endpoints (makes curves editable)
-                    startPoint.style.cursor = 'ns-resize';
+                    // Add drag handlers for endpoints (X+Y drag for duration stretching)
+                    startPoint.style.cursor = 'move';
                     startPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'start'));
                     
-                    endPoint.style.cursor = 'ns-resize';
+                    endPoint.style.cursor = 'move';
                     endPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'end'));
                     
                     // Add handler for bounding box (select only, no drag)
@@ -19180,6 +19485,17 @@
                             }
                         }
                         
+                        // Register crescendo bundle (links curve + SVG + MIDI as a unit)
+                        const bundleSvgId = insertResult ? insertResult.id : null;
+                        const bundleMidiIds = midiInsert ? midiInsert.snippetIds : [];
+                        if (bundleSvgId) {
+                            this.registerBundle(curve.id, bundleSvgId, bundleMidiIds,
+                                startSeconds, curve.endSeconds, track, {
+                                    pitchModel, pitchInfo, dynamic1: dyn1, dynamic2: dyn2,
+                                    clef: lpClef, velocity: params?.velocity ?? (parseInt(document.getElementById('cdVelocityInput').value) || 115)
+                                });
+                        }
+                        
                         result = {
                             curve: { id: curve.id, name: curve.name, startSeconds, endSeconds: curve.endSeconds },
                             filename,
@@ -19820,9 +20136,438 @@
                     console.error('CrescendoUI.insertCrescendoSvg: Error:', err);
                     return null;
                 }
+            },
+            
+            // ============ CRESCENDO BUNDLE SYSTEM ============
+            bundles: [],
+            nextBundleId: 1,
+            _isBundleDragging: false,
+            
+            registerBundle(curveId, svgId, midiSnippetIds, startTime, endTime, track, params) {
+                const bundle = {
+                    id: this.nextBundleId++,
+                    curveId,
+                    svgId,
+                    midiSnippetIds: midiSnippetIds || [],
+                    startTime,
+                    endTime,
+                    track,
+                    pitchModel: params.pitchModel || 'single',
+                    pitchInfo: params.pitchInfo || {},
+                    dynamic1: params.dynamic1 || 'pp',
+                    dynamic2: params.dynamic2 || 'ff',
+                    clef: params.clef || 'treble',
+                    velocity: params.velocity || 115,
+                    needsRegeneration: false
+                };
+                this.bundles.push(bundle);
+                console.log('CrescendoUI.registerBundle:', bundle.id, 'curve:', curveId, 'svg:', svgId, 'midi:', midiSnippetIds);
+                return bundle;
+            },
+            
+            lookupBundleBySvgId(svgId) {
+                return this.bundles.find(b => b.svgId === svgId) || null;
+            },
+            
+            lookupBundleByCurveId(curveId) {
+                return this.bundles.find(b => b.curveId === curveId) || null;
+            },
+            
+            deleteBundle(bundleId) {
+                const idx = this.bundles.findIndex(b => b.id === bundleId);
+                if (idx === -1) return;
+                const bundle = this.bundles[idx];
+                
+                // Remove curve from CurveMaker + CurveDatabase
+                if (window.CurveMaker) {
+                    const curveIdx = CurveMaker.curves.findIndex(c => c.id === bundle.curveId);
+                    if (curveIdx !== -1) {
+                        const curve = CurveMaker.curves[curveIdx];
+                        if (curve.elements && curve.elements.group) {
+                            curve.elements.group.remove();
+                        }
+                        if (curve.elements && curve.elements.continuationGroupTop) {
+                            curve.elements.continuationGroupTop.remove();
+                        }
+                        if (curve.elements && curve.elements.continuationGroupBottom) {
+                            curve.elements.continuationGroupBottom.remove();
+                        }
+                        CurveMaker.curves.splice(curveIdx, 1);
+                        if (CurveMaker.selectedCurve && CurveMaker.selectedCurve.id === bundle.curveId) {
+                            CurveMaker.deselectCurve();
+                        }
+                    }
+                }
+                if (window.CurveDatabase) {
+                    CurveDatabase.remove(bundle.curveId);
+                }
+                
+                // Remove SVG element
+                if (window.SVGElementManager) {
+                    const svgIdx = SVGElementManager.elements.findIndex(el => el.id === bundle.svgId);
+                    if (svgIdx !== -1) {
+                        const el = SVGElementManager.elements[svgIdx];
+                        if (el.wrapper) el.wrapper.remove();
+                        SVGElementManager.elements.splice(svgIdx, 1);
+                        if (SVGElementManager.selectedElement && SVGElementManager.selectedElement.id === bundle.svgId) {
+                            SVGElementManager.deselectAll();
+                        }
+                        SVGElementManager.updateElementList();
+                    }
+                }
+                
+                // Remove all MIDI snippets
+                if (window.MidiSnippetDatabase && bundle.midiSnippetIds) {
+                    for (const snippetId of bundle.midiSnippetIds) {
+                        MidiSnippetDatabase.remove(snippetId);
+                    }
+                }
+                
+                // Remove tagged MidiController events
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            track.midiEvents = track.midiEvents.filter(ev => ev.sourceCurve !== bundle.curveId);
+                        }
+                    }
+                }
+                
+                // Remove bundle record
+                this.bundles.splice(idx, 1);
+                
+                // Reload affected systems
+                if (window.MidiController) MidiController.reloadFromDatabase();
+                if (window.CurveMaker) CurveMaker.updateVisibility();
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // Hide bundle row
+                const row = document.getElementById('cdBundleRow');
+                if (row) row.style.display = 'none';
+                
+                console.log('CrescendoUI.deleteBundle:', bundleId, 'removed curve:', bundle.curveId, 'svg:', bundle.svgId, 'midi:', bundle.midiSnippetIds);
+            },
+            
+            exportBundles() {
+                return {
+                    bundles: this.bundles.map(b => ({
+                        id: b.id,
+                        curveId: b.curveId,
+                        svgId: b.svgId,
+                        midiSnippetIds: [...b.midiSnippetIds],
+                        startTime: b.startTime,
+                        endTime: b.endTime,
+                        track: b.track,
+                        pitchModel: b.pitchModel,
+                        pitchInfo: b.pitchInfo,
+                        dynamic1: b.dynamic1,
+                        dynamic2: b.dynamic2,
+                        clef: b.clef,
+                        velocity: b.velocity,
+                        needsRegeneration: b.needsRegeneration
+                    })),
+                    nextBundleId: this.nextBundleId
+                };
+            },
+            
+            importBundles(data) {
+                if (!data || !data.bundles) return;
+                this.bundles = data.bundles.map(b => ({ ...b }));
+                this.nextBundleId = data.nextBundleId || (this.bundles.length > 0 ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
+                console.log('CrescendoUI.importBundles: Loaded', this.bundles.length, 'bundles');
+            },
+            
+            // Standalone bundle drag initiated from Shift+curve mousedown
+            // Shifts curve + SVG + MIDI snippets + MidiController events by cumulative time delta
+            startBundleDrag(bundle, e) {
+                const zoomScale = window.ScoreZoom ? ScoreZoom.getZoom() : 1;
+                const startClientX = e.clientX;
+                
+                // Find curve and score dimensions
+                const curve = window.CurveMaker ? CurveMaker.curves.find(c => c.id === bundle.curveId) : null;
+                if (!curve) return;
+                const scoreEl = curve.section === 'top' ? CurveMaker.scoreTopEl : CurveMaker.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = window.GraphicTimeline
+                    ? GraphicTimeline.getSecondsPerPage()
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                
+                // Capture originals at drag start
+                const origCurve = {
+                    startSeconds: curve.startSeconds,
+                    endSeconds: curve.endSeconds
+                };
+                const origBundleStart = bundle.startTime;
+                
+                // SVG element
+                const svgEl = window.SVGElementManager
+                    ? SVGElementManager.elements.find(el => el.id === bundle.svgId)
+                    : null;
+                const origSvgRef = svgEl ? svgEl.referenceSeconds : null;
+                
+                // MIDI snippets (multiple)
+                const origMidiSnippets = [];
+                if (window.MidiSnippetDatabase && bundle.midiSnippetIds) {
+                    for (const snId of bundle.midiSnippetIds) {
+                        const sn = MidiSnippetDatabase.get(snId);
+                        if (sn) {
+                            origMidiSnippets.push({
+                                id: snId,
+                                snippet: sn,
+                                startSeconds: sn.startSeconds,
+                                endSeconds: sn.endSeconds,
+                                eventTimes: sn.events ? sn.events.map(ev => ev.timeMs) : []
+                            });
+                        }
+                    }
+                }
+                
+                // MidiController events tagged with this curve
+                const origMidiCtrlEvents = [];
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            for (const ev of track.midiEvents) {
+                                if (ev.sourceCurve === bundle.curveId) {
+                                    origMidiCtrlEvents.push({ event: ev, origTimeMs: ev.timeMs });
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Guard: bundle drag should not trigger needsRegeneration
+                this._isBundleDragging = true;
+                
+                // Show bundle row
+                const row = document.getElementById('cdBundleRow');
+                const readout = document.getElementById('cdBundleTime');
+                if (row) row.style.display = '';
+                if (readout) readout.textContent = origBundleStart.toFixed(3) + 's';
+                
+                const onMouseMove = (moveE) => {
+                    const dx = (moveE.clientX - startClientX) / zoomScale;
+                    const timeDelta = dx * secondsPerPixel;
+                    
+                    // Shift curve times
+                    const newStart = origCurve.startSeconds + timeDelta;
+                    const newEnd = origCurve.endSeconds + timeDelta;
+                    curve.startSeconds = newStart;
+                    curve.endSeconds = newEnd;
+                    
+                    // Recalculate curve pixel positions
+                    const cLeadIn = leadInSeconds;
+                    const startActual = newStart + cLeadIn;
+                    const endActual = newEnd + cLeadIn;
+                    const cSecondsPerPage = secondsPerPage;
+                    const curvePage = Math.floor(Math.max(0, startActual) / cSecondsPerPage);
+                    curve.page = curvePage;
+                    curve.section = curvePage % 2 === 0 ? 'top' : 'bottom';
+                    const cScoreEl = curve.section === 'top' ? CurveMaker.scoreTopEl : CurveMaker.scoreBottomEl;
+                    const cScoreWidth = cScoreEl ? cScoreEl.clientWidth : scoreWidth;
+                    curve.x1 = ((startActual / cSecondsPerPage) - curvePage) * cScoreWidth;
+                    curve.x2 = ((endActual / cSecondsPerPage) - curvePage) * cScoreWidth;
+                    
+                    // Re-render curve
+                    CurveMaker.updateCurveRendering(curve);
+                    CurveMaker.updateBoundingBox(curve);
+                    CurveMaker.syncCurveToDatabase(curve);
+                    CurveMaker.updateVisibility();
+                    
+                    // Shift SVG
+                    if (svgEl && origSvgRef != null) {
+                        svgEl.referenceSeconds = origSvgRef + timeDelta;
+                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                        svgEl._x = pos.x;
+                        svgEl._y = pos.y;
+                        svgEl._page = pos.page;
+                        svgEl._section = pos.section;
+                        SVGElementManager.updateElementTransform(svgEl);
+                    }
+                    
+                    // Shift MIDI snippets
+                    const deltaMs = timeDelta * 1000;
+                    for (const orig of origMidiSnippets) {
+                        orig.snippet.startSeconds = orig.startSeconds + timeDelta;
+                        orig.snippet.endSeconds = orig.endSeconds + timeDelta;
+                        if (orig.snippet.events && orig.eventTimes.length === orig.snippet.events.length) {
+                            for (let i = 0; i < orig.snippet.events.length; i++) {
+                                orig.snippet.events[i].timeMs = orig.eventTimes[i] + deltaMs;
+                            }
+                        }
+                    }
+                    
+                    // Shift MidiController events
+                    for (const orig of origMidiCtrlEvents) {
+                        orig.event.timeMs = orig.origTimeMs + deltaMs;
+                    }
+                    
+                    // Update bundle times + readout
+                    bundle.startTime = origBundleStart + timeDelta;
+                    bundle.endTime = bundle.startTime + (origCurve.endSeconds - origCurve.startSeconds);
+                    if (readout) readout.textContent = bundle.startTime.toFixed(3) + 's';
+                };
+                
+                const onMouseUp = () => {
+                    this._isBundleDragging = false;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    if (window.MidiController) MidiController.reloadFromDatabase();
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
+            // Phase 3: Regenerate MIDI for a bundle after curve shape/duration changes
+            async regenerateMidi(bundle) {
+                if (!bundle) return;
+                
+                const curve = window.CurveMaker
+                    ? CurveMaker.curves.find(c => c.id === bundle.curveId)
+                    : null;
+                if (!curve) {
+                    console.error('CrescendoUI.regenerateMidi: Curve not found for bundle', bundle.id);
+                    return;
+                }
+                
+                // Ensure curveData is fresh
+                if (window.CurveMaker) {
+                    curve.curveData = CurveMaker.generateCurveDataArray(curve);
+                }
+                
+                console.log('CrescendoUI.regenerateMidi: Starting for bundle', bundle.id,
+                    'curve:', bundle.curveId, 'old MIDI:', bundle.midiSnippetIds);
+                
+                // 1. Delete old MIDI snippets
+                if (window.MidiSnippetDatabase && bundle.midiSnippetIds) {
+                    for (const snippetId of bundle.midiSnippetIds) {
+                        MidiSnippetDatabase.remove(snippetId);
+                    }
+                }
+                
+                // 2. Remove old MidiController events tagged with this curve
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            track.midiEvents = track.midiEvents.filter(ev => ev.sourceCurve !== bundle.curveId);
+                        }
+                    }
+                }
+                
+                // 3. Re-generate MIDI from stored bundle params
+                const params = {
+                    velocity: bundle.velocity || 115,
+                    articulation: 89 // senza vibrato
+                };
+                const midiResult = await this.generateCrescendoMidi(
+                    curve, bundle.pitchModel, bundle.pitchInfo, params
+                );
+                
+                // 4. Insert new MIDI snippets
+                let newSnippetIds = [];
+                if (midiResult) {
+                    const midiInsert = await this.insertCrescendoMidi(midiResult, curve);
+                    if (midiInsert) {
+                        newSnippetIds = midiInsert.snippetIds;
+                    }
+                }
+                
+                // 5. Update bundle record
+                bundle.midiSnippetIds = newSnippetIds;
+                bundle.startTime = curve.startSeconds;
+                bundle.endTime = curve.endSeconds;
+                bundle.needsRegeneration = false;
+                
+                // 6. Reload MIDI display
+                if (window.MidiController) MidiController.reloadFromDatabase();
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // 7. Update UI
+                const regenBtn = document.getElementById('cdRegenMidiBtn');
+                if (regenBtn) regenBtn.style.display = 'none';
+                
+                console.log('CrescendoUI.regenerateMidi: Complete. New MIDI:', newSnippetIds);
+            },
+            
+            initBundleUI() {
+                // Delete bundle button
+                const delBtn = document.getElementById('cdDeleteBundleBtn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', () => {
+                        if (window.SVGElementManager && SVGElementManager.selectedElement) {
+                            const bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                            if (bundle) this.deleteBundle(bundle.id);
+                        }
+                    });
+                }
+                
+                // Regen MIDI button
+                const regenBtn = document.getElementById('cdRegenMidiBtn');
+                if (regenBtn) {
+                    regenBtn.addEventListener('click', async () => {
+                        // Find bundle from selected curve or SVG
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle) {
+                            regenBtn.textContent = 'Regenerating...';
+                            regenBtn.disabled = true;
+                            await this.regenerateMidi(bundle);
+                            regenBtn.textContent = 'Regen MIDI';
+                            regenBtn.disabled = false;
+                        }
+                    });
+                }
+                
+                // Patch SVGElementManager.selectElement to show/hide bundle row + regen button
+                if (window.SVGElementManager) {
+                    const origSelect = SVGElementManager.selectElement.bind(SVGElementManager);
+                    SVGElementManager.selectElement = (elData) => {
+                        origSelect(elData);
+                        const bundle = this.lookupBundleBySvgId(elData.id);
+                        const row = document.getElementById('cdBundleRow');
+                        const timeSpan = document.getElementById('cdBundleTime');
+                        const regenBtn = document.getElementById('cdRegenMidiBtn');
+                        if (bundle && row) {
+                            row.style.display = '';
+                            if (timeSpan) timeSpan.textContent = bundle.startTime.toFixed(3) + 's';
+                            if (regenBtn) regenBtn.style.display = bundle.needsRegeneration ? '' : 'none';
+                        } else if (row) {
+                            row.style.display = 'none';
+                        }
+                    };
+                    
+                    const origDeselect = SVGElementManager.deselectAll.bind(SVGElementManager);
+                    SVGElementManager.deselectAll = () => {
+                        origDeselect();
+                        const row = document.getElementById('cdBundleRow');
+                        if (row) row.style.display = 'none';
+                    };
+                }
+                
+                // Delete key handler for bundles
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Delete' && window.SVGElementManager && SVGElementManager.selectedElement) {
+                        const bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        if (bundle) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.deleteBundle(bundle.id);
+                        }
+                    }
+                });
+                
+                console.log('CrescendoUI: Bundle UI initialized');
             }
         };
         CrescendoUI.init();
+        CrescendoUI.initBundleUI();
         window.CrescendoUI = CrescendoUI;
         
         // ============================================
@@ -20679,6 +21424,8 @@
         // ============================================
         const NotationFragmentSystem = {
             db: null,
+            bundles: [],
+            nextBundleId: 1,
             
             // GC physics parameters for orange notation fragment GCs
             // Reference model: GC_20260116_151414 (save score 284)
@@ -20792,13 +21539,18 @@
             // All data is pre-computed in DB; only random roll + addition happen at runtime
             // impactTime: absolute score time of the GC impact (seconds)
             // Returns: { alignment, tier, bpm, midiFile, noteOnSpanSec, fullDurationSec, onsetTime, svgFile }
-            computePlacement(fragment, impactTime, explicitAlignment = null) {
+            computePlacement(fragment, impactTime, explicitAlignment = null, explicitTier = null) {
                 // 1. Select alignment (weighted random or explicit)
                 const selection = explicitAlignment
                     ? { alignment: explicitAlignment, tier: this.ALIGNMENT_TIERS[explicitAlignment] }
                     : this.selectAlignment(fragment);
                 
                 if (!selection) return null;
+                
+                // Override tier if explicitly chosen (non-algorithmic + specific tempo)
+                if (explicitTier && explicitTier !== 'auto') {
+                    selection.tier = explicitTier;
+                }
                 
                 // 2. Look up pre-computed tempo variant from DB
                 const variant = this.getTempoVariant(fragment, selection.tier);
@@ -20864,14 +21616,335 @@
                 return gc;
             },
             
+            // ── Compute the visual anchor time for a given alignment + GC ──
+            // Returns absolute seconds where the arrow-line should be drawn
+            getAlignmentAnchorTime(alignment, gc) {
+                const timeFall = gc.timeFall || this.db.gcParams.timeFall;
+                const timeRise = gc.timeRise || this.db.gcParams.timeRise;
+                switch (alignment) {
+                    case 'onImpact':        return gc.impactSeconds;
+                    case 'endOnImpact':     return gc.impactSeconds;
+                    case 'justBefore':      return gc.impactSeconds - 0.3;
+                    case 'justAfter':       return gc.impactSeconds + 0.3;
+                    case 'descendingCurve': return gc.impactSeconds - timeFall / 2;
+                    case 'ascendingCurve':  return gc.impactSeconds + timeRise / 2;
+                    case 'topOfCurve':      return gc.startSeconds;
+                    case 'endOfCurve':      return gc.endSeconds;
+                    default:                return gc.impactSeconds;
+                }
+            },
+            
+            // ── Draw persistent alignment arrow-line on the score ──
+            // Dotted line spanning track height with small downward arrow at bottom
+            insertAlignmentArrow(anchorTime, track) {
+                const scoreEl = document.getElementById('ScoreTop');
+                if (!scoreEl) return null;
+                const scoreWidth = scoreEl.clientWidth;
+                const trackNum = parseInt(track) || 1;
+                const trackDims = CompositionPanel.getTrackDimensions(String(trackNum), scoreEl);
+                
+                const secondsPerPage = window.GraphicTimeline
+                    ? GraphicTimeline.getSecondsPerPage()
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const leadIn = window.GraphicTimeline ? GraphicTimeline.leadInSeconds : 0;
+                const displayTime = anchorTime + leadIn;
+                const page = Math.floor(Math.max(0, displayTime) / secondsPerPage);
+                const section = page % 2 === 0 ? 'top' : 'bottom';
+                const xPercent = ((displayTime / secondsPerPage) - page) * 100;
+                const xPixel = (xPercent / 100) * scoreWidth;
+                
+                const y1 = trackDims.y;
+                const y2 = trackDims.y + trackDims.height;
+                const arrowSize = 6;
+                
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('class', 'nf-alignment-arrow');
+                
+                // Dotted line spanning track height
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', xPixel);
+                line.setAttribute('y1', y1);
+                line.setAttribute('x2', xPixel);
+                line.setAttribute('y2', y2 - arrowSize);
+                line.setAttribute('stroke', '#ff00ff');
+                line.setAttribute('stroke-width', '1.8');
+                line.setAttribute('stroke-dasharray', '5,3');
+                line.setAttribute('opacity', '0.85');
+                group.appendChild(line);
+                
+                // Small downward arrow at bottom
+                const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                const ax = xPixel;
+                const ay = y2;
+                arrow.setAttribute('points',
+                    `${ax},${ay} ${ax - arrowSize/2},${ay - arrowSize} ${ax + arrowSize/2},${ay - arrowSize}`);
+                arrow.setAttribute('fill', '#ff00ff');
+                arrow.setAttribute('opacity', '0.85');
+                group.appendChild(arrow);
+                
+                const container = section === 'top'
+                    ? SVGElementManager.containerTop
+                    : SVGElementManager.containerBottom;
+                if (container) {
+                    container.appendChild(group);
+                    // Bring to front
+                    const parentSvg = container.parentNode;
+                    if (parentSvg) parentSvg.appendChild(container);
+                }
+                
+                console.log('NotationFragmentSystem: alignment arrow at', anchorTime.toFixed(3) + 's,',
+                    'track:', track, 'x:', xPixel.toFixed(1));
+                return group;
+            },
+            
+            // ── Bundle registry: unified drag/delete for NF components ──
+            registerBundle(gcId, svgId, midiSnippetId, arrowEl, impactTime, track) {
+                const bundle = {
+                    id: this.nextBundleId++,
+                    gcId,
+                    svgId,
+                    midiSnippetId,
+                    arrowEl,
+                    hasArrow: !!arrowEl,
+                    impactTime,
+                    track
+                };
+                this.bundles.push(bundle);
+                console.log('NotationFragmentSystem: bundle registered', bundle.id,
+                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId);
+                return bundle;
+            },
+            
+            lookupBundleBySvgId(svgId) {
+                return this.bundles.find(b => b.svgId === svgId) || null;
+            },
+            
+            lookupBundleByGcId(gcId) {
+                return this.bundles.find(b => b.gcId === gcId) || null;
+            },
+            
+            // Standalone bundle drag initiated from GC mousedown
+            // Shifts GC + SVG + MIDI + arrow by cumulative time delta
+            startBundleDrag(bundle, e) {
+                const zoomScale = window.ScoreZoom ? ScoreZoom.getZoom() : 1;
+                const startClientX = e.clientX;
+                
+                // Determine score element and time scale
+                const gc = window.GCMaker ? GCMaker.gcs.find(g => g.id === bundle.gcId) : null;
+                if (!gc) return;
+                const scoreEl = gc.section === 'top' ? GCMaker.scoreTopEl : GCMaker.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = window.GraphicTimeline
+                    ? GraphicTimeline.getSecondsPerPage()
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                
+                // Capture originals at drag start
+                const origGc = {
+                    startSeconds: gc.startSeconds,
+                    endSeconds: gc.endSeconds,
+                    impactSeconds: gc.impactSeconds
+                };
+                const origImpactTime = bundle.impactTime;
+                
+                // SVG element
+                const svgEl = window.SVGElementManager
+                    ? SVGElementManager.elements.find(el => el.id === bundle.svgId)
+                    : null;
+                const origSvgRef = svgEl ? svgEl.referenceSeconds : null;
+                
+                // MIDI snippet
+                const sn = window.MidiSnippetDatabase ? MidiSnippetDatabase.get(bundle.midiSnippetId) : null;
+                const origMidi = sn ? {
+                    startSeconds: sn.startSeconds,
+                    endSeconds: sn.endSeconds,
+                    eventTimes: sn.events ? sn.events.map(ev => ev.timeMs) : []
+                } : null;
+                
+                // Arrow
+                let origArrowX = null;
+                if (bundle.arrowEl) {
+                    const arrowLine = bundle.arrowEl.querySelector('line');
+                    if (arrowLine) origArrowX = parseFloat(arrowLine.getAttribute('x1'));
+                }
+                
+                // Show bundle row
+                const row = document.getElementById('nfBundleRow');
+                const readout = document.getElementById('nfBundleTime');
+                if (row) row.style.display = 'flex';
+                if (readout) readout.textContent = origImpactTime.toFixed(3) + 's';
+                
+                const onMouseMove = (moveE) => {
+                    const dx = (moveE.clientX - startClientX) / zoomScale;
+                    const timeDelta = dx * secondsPerPixel;
+                    
+                    // Shift GC
+                    gc.startSeconds = origGc.startSeconds + timeDelta;
+                    gc.endSeconds = origGc.endSeconds + timeDelta;
+                    gc.impactSeconds = origGc.impactSeconds + timeDelta;
+                    GCMaker.rerenderAllGCs();
+                    
+                    // Shift SVG
+                    if (svgEl && origSvgRef != null) {
+                        svgEl.referenceSeconds = origSvgRef + timeDelta;
+                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                        svgEl._x = pos.x;
+                        svgEl._y = pos.y;
+                        svgEl._page = pos.page;
+                        svgEl._section = pos.section;
+                        SVGElementManager.updateElementTransform(svgEl);
+                    }
+                    
+                    // Shift MIDI snippet
+                    if (sn && origMidi) {
+                        const deltaMs = timeDelta * 1000;
+                        sn.startSeconds = origMidi.startSeconds + timeDelta;
+                        sn.endSeconds = origMidi.endSeconds + timeDelta;
+                        if (sn.events && origMidi.eventTimes.length === sn.events.length) {
+                            for (let i = 0; i < sn.events.length; i++) {
+                                sn.events[i].timeMs = origMidi.eventTimes[i] + deltaMs;
+                            }
+                        }
+                    }
+                    
+                    // Shift arrow
+                    if (bundle.arrowEl && origArrowX != null) {
+                        const pxDelta = timeDelta * scoreWidth / secondsPerPage;
+                        const newX = origArrowX + pxDelta;
+                        const arrowLine = bundle.arrowEl.querySelector('line');
+                        const arrowPoly = bundle.arrowEl.querySelector('polygon');
+                        if (arrowLine) {
+                            arrowLine.setAttribute('x1', newX);
+                            arrowLine.setAttribute('x2', newX);
+                        }
+                        if (arrowPoly) {
+                            const arrowSize = 6;
+                            const y2 = parseFloat(arrowLine?.getAttribute('y2') || 0) + arrowSize;
+                            arrowPoly.setAttribute('points',
+                                `${newX},${y2} ${newX - arrowSize/2},${y2 - arrowSize} ${newX + arrowSize/2},${y2 - arrowSize}`);
+                        }
+                    }
+                    
+                    // Update bundle impactTime + readout
+                    bundle.impactTime = origImpactTime + timeDelta;
+                    if (readout) readout.textContent = bundle.impactTime.toFixed(3) + 's';
+                };
+                
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    if (window.MidiController) MidiController.reloadFromDatabase();
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    if (window.FlowchartConnector) FlowchartConnector.updateAllConnectors();
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
+            deleteBundle(bundleId) {
+                const idx = this.bundles.findIndex(b => b.id === bundleId);
+                if (idx === -1) return false;
+                const bundle = this.bundles[idx];
+                
+                const systemsToReload = new Set();
+                
+                // Remove GC
+                if (window.GCMaker) {
+                    const gi = GCMaker.gcs.findIndex(gc => gc.id === bundle.gcId);
+                    if (gi !== -1) {
+                        const gc = GCMaker.gcs[gi];
+                        if (gc.elements && gc.elements.group) gc.elements.group.remove();
+                        GCMaker.gcs.splice(gi, 1);
+                        if (GCMaker.selectedGC && GCMaker.selectedGC.id === bundle.gcId) {
+                            GCMaker.deselectGC();
+                        }
+                        systemsToReload.add('gcs');
+                    }
+                }
+                
+                // Remove SVG
+                if (window.SVGElementManager) {
+                    const si = SVGElementManager.elements.findIndex(el => el.id === bundle.svgId);
+                    if (si !== -1) {
+                        const el = SVGElementManager.elements[si];
+                        if (el.wrapper) el.wrapper.remove();
+                        if (SVGElementManager.selectedElement && SVGElementManager.selectedElement.id === bundle.svgId) {
+                            SVGElementManager.deselectAll();
+                        }
+                        SVGElementManager.elements.splice(si, 1);
+                        systemsToReload.add('svgs');
+                    }
+                }
+                
+                // Remove MIDI snippet
+                if (bundle.midiSnippetId != null && window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.remove(bundle.midiSnippetId);
+                    systemsToReload.add('midi');
+                }
+                
+                // Remove arrow element
+                if (bundle.arrowEl) {
+                    bundle.arrowEl.remove();
+                }
+                
+                // Remove bundle record
+                this.bundles.splice(idx, 1);
+                
+                // Reload affected systems
+                if (systemsToReload.has('gcs') && window.GCMaker) GCMaker.rerenderAllGCs();
+                if (systemsToReload.has('svgs') && window.SVGElementManager) {
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                }
+                if (systemsToReload.has('midi') && window.MidiController) MidiController.reloadFromDatabase();
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                console.log('NotationFragmentSystem: bundle deleted', bundleId);
+                return true;
+            },
+            
+            exportBundles() {
+                return {
+                    bundles: this.bundles.map(b => ({
+                        id: b.id,
+                        gcId: b.gcId,
+                        svgId: b.svgId,
+                        midiSnippetId: b.midiSnippetId,
+                        hasArrow: b.hasArrow || false,
+                        impactTime: b.impactTime,
+                        track: b.track
+                    })),
+                    nextBundleId: this.nextBundleId
+                };
+            },
+            
+            importBundles(data) {
+                if (!data || !data.bundles) return;
+                this.bundles = data.bundles.map(b => ({
+                    ...b,
+                    arrowEl: null  // re-created below
+                }));
+                this.nextBundleId = data.nextBundleId || (this.bundles.length > 0
+                    ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
+                // Re-create arrow DOM elements for bundles that had them
+                this.bundles.forEach(b => {
+                    if (b.hasArrow && b.impactTime != null && b.track != null) {
+                        b.arrowEl = this.insertAlignmentArrow(b.impactTime, b.track);
+                    }
+                });
+                console.log('NotationFragmentSystem: imported', this.bundles.length, 'bundles');
+            },
+            
             // ── Instrument → track mapping ──
             INSTRUMENT_TRACK: { 'Cello': 4, 'Viola': 3, 'Violin': 2 },
             
             // ── Insert fragment SVG into score ──
-            // Right-aligns SVG to referenceSeconds (right edge at anchor)
-            // Scales to full track height
-            // Clamps to page edges
-            async insertFragmentSvg(fragmentOrId, referenceSeconds, track) {
+            // Default (algorithmic): right-aligns SVG to referenceSeconds (right edge at anchor)
+            // Explicit alignment: positions SVG left edge at anchorTime (or right edge for endOnImpact)
+            // opts: { alignment, anchorTime } — optional; when absent, uses right-align default
+            async insertFragmentSvg(fragmentOrId, referenceSeconds, track, opts = {}) {
                 const fragment = typeof fragmentOrId === 'string' 
                     ? this.getFragment(fragmentOrId) 
                     : fragmentOrId;
@@ -20912,12 +21985,28 @@
                     const scale = targetHeight / svgHeight;
                     const scaledWidth = svgWidth * scale;
                     
-                    // Right-align: SVG right edge at referenceSeconds
                     const secondsPerPage = window.GraphicTimeline 
                         ? GraphicTimeline.getSecondsPerPage() 
                         : (beatsPerPage / beatsPerMinute) * 60;
                     const secondsPerPixel = secondsPerPage / scoreWidth;
-                    const offsetSeconds = -(scaledWidth * secondsPerPixel);
+                    
+                    // Determine SVG positioning based on alignment mode
+                    let svgRefSeconds = referenceSeconds;
+                    let offsetSeconds;
+                    if (opts.alignment && opts.anchorTime != null) {
+                        // Explicit alignment: anchor the SVG relative to anchorTime
+                        svgRefSeconds = opts.anchorTime;
+                        if (opts.alignment === 'endOnImpact') {
+                            // Right edge of SVG at anchor
+                            offsetSeconds = -(scaledWidth * secondsPerPixel);
+                        } else {
+                            // Left edge of SVG at anchor
+                            offsetSeconds = 0;
+                        }
+                    } else {
+                        // Algorithmic (default): right-align SVG right edge at referenceSeconds
+                        offsetSeconds = -(scaledWidth * secondsPerPixel);
+                    }
                     
                     const id = SVGElementManager.nextId++;
                     const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -20938,7 +22027,7 @@
                         name: SVGElementManager.generateSvgName(fragment.svgFile),
                         wrapper,
                         image,
-                        referenceSeconds,
+                        referenceSeconds: svgRefSeconds,
                         offsetSeconds,
                         offsetYFraction: 0.0,
                         width: svgWidth,
@@ -20987,9 +22076,10 @@
                     SVGElementManager.updateVisibility();
                     
                     console.log('NotationFragmentSystem: SVG inserted:', elementData.name,
-                        'ref:', referenceSeconds, 'offset:', offsetSeconds.toFixed(3),
+                        'ref:', svgRefSeconds, 'offset:', offsetSeconds.toFixed(3),
                         'track:', trackNum, 'scale:', scale.toFixed(3),
-                        'x:', elementData._x.toFixed(1), 'page:', pos.page);
+                        'x:', elementData._x.toFixed(1), 'page:', pos.page,
+                        opts.alignment ? 'align:' + opts.alignment : 'algorithmic');
                     
                     return elementData;
                 } catch (err) {
@@ -21124,14 +22214,86 @@
         const NotationFragmentUI = {
             currentFragment: null,
             
+            selectedBundleId: null,
+            
             init() {
                 const sel = document.getElementById('nfFragmentSelect');
                 const btn = document.getElementById('nfInsertBtn');
+                const alignSel = document.getElementById('nfAlignSelect');
+                const deleteBtn = document.getElementById('nfDeleteBundleBtn');
                 
                 if (sel) sel.addEventListener('change', () => this.onFragmentChange(sel.value));
                 if (btn) btn.addEventListener('click', () => this.insert());
+                if (alignSel) alignSel.addEventListener('change', () => this.onAlignChange(alignSel.value));
+                if (deleteBtn) deleteBtn.addEventListener('click', () => this.deleteSelectedBundle());
+                
+                // Listen for SVG selection changes to show/hide bundle row
+                const origSelect = SVGElementManager.selectElement.bind(SVGElementManager);
+                const origDeselect = SVGElementManager.deselectAll.bind(SVGElementManager);
+                const self = this;
+                
+                const patchedSelect = function(elementData) {
+                    origSelect(elementData);
+                    self.onSvgSelected(elementData);
+                };
+                SVGElementManager.selectElement = patchedSelect;
+                
+                const patchedDeselect = function() {
+                    origDeselect();
+                    self.onSvgDeselected();
+                };
+                SVGElementManager.deselectAll = patchedDeselect;
+                
+                // Delete key handler for bundles
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Delete' && this.selectedBundleId != null) {
+                        // Only if no input/textarea is focused
+                        const tag = document.activeElement?.tagName;
+                        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+                        e.preventDefault();
+                        this.deleteSelectedBundle();
+                    }
+                });
                 
                 console.log('NotationFragmentUI initialized');
+            },
+            
+            onSvgSelected(elementData) {
+                if (!window.NotationFragmentSystem) return;
+                const bundle = NotationFragmentSystem.lookupBundleBySvgId(elementData.id);
+                const row = document.getElementById('nfBundleRow');
+                const readout = document.getElementById('nfBundleTime');
+                if (bundle) {
+                    this.selectedBundleId = bundle.id;
+                    if (row) row.style.display = 'flex';
+                    if (readout) readout.textContent = bundle.impactTime.toFixed(3) + 's';
+                } else {
+                    this.selectedBundleId = null;
+                    if (row) row.style.display = 'none';
+                }
+            },
+            
+            onSvgDeselected() {
+                this.selectedBundleId = null;
+                const row = document.getElementById('nfBundleRow');
+                if (row) row.style.display = 'none';
+            },
+            
+            deleteSelectedBundle() {
+                if (this.selectedBundleId == null) return;
+                if (!window.NotationFragmentSystem) return;
+                NotationFragmentSystem.deleteBundle(this.selectedBundleId);
+                this.selectedBundleId = null;
+                const row = document.getElementById('nfBundleRow');
+                if (row) row.style.display = 'none';
+                this.setStatus('Bundle deleted', 'var(--clr-brightRed)');
+            },
+            
+            onAlignChange(value) {
+                const tempoRow = document.getElementById('nfTempoRow');
+                if (tempoRow) {
+                    tempoRow.style.display = value === 'algorithmic' ? 'none' : 'flex';
+                }
             },
             
             onFragmentChange(fragmentId) {
@@ -21215,9 +22377,13 @@
                 
                 let result = null;
                 try {
-                    // Compute placement (alignment + onset time)
-                    const explicitAlignment = alignMode === 'algorithmic' ? null : alignMode;
-                    const placement = nfs.computePlacement(this.currentFragment, impactTime, explicitAlignment);
+                    // Compute placement (alignment + onset time + optional tempo tier)
+                    const isExplicit = alignMode !== 'algorithmic';
+                    const explicitAlignment = isExplicit ? alignMode : null;
+                    const tempoChoice = isExplicit
+                        ? (document.getElementById('nfTempoSelect')?.value || 'auto')
+                        : null;
+                    const placement = nfs.computePlacement(this.currentFragment, impactTime, explicitAlignment, tempoChoice);
                     
                     if (!placement) {
                         throw new Error('Placement computation failed');
@@ -21225,20 +22391,43 @@
                     
                     console.log('NotationFragmentUI: placement:', placement);
                     
-                    // Create orange GC
+                    // Create GC — neonMagenta for explicit alignment, brightOrange for algorithmic
                     const gc = nfs.createFragmentGC(impactTime, track);
+                    if (isExplicit && gc) {
+                        gc.color = 'neonMagenta';
+                        GCMaker.rerenderAllGCs();
+                    }
                     
-                    // Insert SVG (right-aligned to impact)
-                    const svg = await nfs.insertFragmentSvg(this.currentFragment, impactTime, track);
+                    // Insert SVG — alignment-aware positioning for explicit, right-align for algorithmic
+                    let svgOpts = {};
+                    let arrowEl = null;
+                    if (isExplicit && gc) {
+                        const anchorTime = nfs.getAlignmentAnchorTime(alignMode, gc);
+                        svgOpts = { alignment: alignMode, anchorTime };
+                        // Draw persistent alignment arrow-line
+                        arrowEl = nfs.insertAlignmentArrow(anchorTime, track);
+                    }
+                    const svg = await nfs.insertFragmentSvg(this.currentFragment, impactTime, track, svgOpts);
                     
                     // Insert MIDI snippet at computed onset time
                     const midiSnippetId = await nfs.insertFragmentMidi(placement, track);
                     
-                    result = { gc, svg, midiSnippetId, placement, track };
+                    // Register bundle for unified drag/delete
+                    const bundle = nfs.registerBundle(
+                        gc ? gc.id : null,
+                        svg ? svg.id : null,
+                        midiSnippetId,
+                        arrowEl,
+                        impactTime,
+                        track
+                    );
+                    
+                    result = { gc, svg, midiSnippetId, placement, track, bundleId: bundle.id };
                     this.setStatus(`${placement.alignment} @ ${impactTime}s`, 'var(--clr-limeGreen)');
                     console.log('NotationFragmentUI: Insert complete',
                         '\n  Fragment:', this.currentFragment.id,
                         '\n  Alignment:', placement.alignment,
+                        '\n  Explicit:', isExplicit,
                         '\n  Onset:', placement.onsetTime.toFixed(3),
                         '\n  Track:', track);
                     
@@ -22887,6 +24076,20 @@
                 hitPath.setAttribute('fill', 'none');
                 hitPath.style.cursor = 'pointer';
                 group.appendChild(hitPath);
+                
+                // Bundle drag: mousedown initiates drag for NF bundle GCs
+                const handleGCMouseDown = (e) => {
+                    if (!window.NotationFragmentSystem) return;
+                    const bundle = NotationFragmentSystem.lookupBundleByGcId(gc.id);
+                    if (!bundle) return; // Not a bundle GC, let click handle selection
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectGC(gc);
+                    NotationFragmentSystem.startBundleDrag(bundle, e);
+                };
+                hitPath.addEventListener('mousedown', handleGCMouseDown);
+                trajectoryPath.addEventListener('mousedown', handleGCMouseDown);
+                impactMarker.addEventListener('mousedown', handleGCMouseDown);
                 
                 // Add click handler for selection
                 hitPath.addEventListener('click', (e) => {

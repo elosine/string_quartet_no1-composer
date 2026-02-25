@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 23, 2026  
-**Current ASB Number:** ASB-103
+**Last Updated:** Feb 24, 2026  
+**Current ASB Number:** ASB-105
 
 ---
 
@@ -48,7 +48,8 @@ That's it. Everything else below is for Cascade.
 | Crescendo-Decrescendo | Complete | Maintenance only |
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
 | Pizz Tremolo Glissando | **Complete** | Full system: UI + server + MIDI + SVG + AI Command Bridge (two-part/single go). Prompt guide: `AI_PIZZ_TREM_GLISS_PROMPT_GUIDE.md` |
-| Notation Fragment System | **Score Integration Complete** | Full pipeline + score insertion (GC + SVG + MIDI). UI panel built. Pre-computed timing DB. 8 fragments ready. Next: compose more fragments, AI prompt guide |
+| Notation Fragment System | **Bundle System Complete** | Full pipeline + score insertion (GC + SVG + MIDI). UI panel built. Pre-computed timing DB. 8 fragments ready. Bundle system (drag/delete as unit) implemented. Next: compose more fragments, AI prompt guide |
+| Crescendo/Decrescendo Bundle | **Phase 3 Needs Troubleshooting** | Phases 1+2 working. Phase 3 (MIDI regeneration) code complete but has runtime issues. See `bundle-units.md` + troubleshooting section below |
 | LilyPond Settings Registry | Active | Update when settings change |
 | Musical Material Workflow | Active | Expand as new material types are built |
 
@@ -98,16 +99,64 @@ That's it. Everything else below is for Cascade.
 
 ## Last Session Summary
 
-> **Notation Fragment System — Score Integration Complete.** Built full NF insertion pipeline: pre-computed timing DB (32 MIDI files parsed for exact durations), GC physics from reference model, SVG placement (full track height, right-aligned to impact, edge-clamped, z-order above GCs), MIDI snippet insertion (fetch → parse → offset → channel remap → MidiSnippetDatabase). Built UI panel (fragment selector with SVG preview, violin 1/2 picker, start time, alignment mode, Insert button). Pitch bend audit confirmed glissando fragments reset correctly. End-to-end tested: select fragment → set time → Insert → GC + SVG + MIDI all appear on correct track.
+> **Crescendo/Decrescendo Bundle — Phase 3 code complete, needs troubleshooting.** Phases 1+2 working (bundle move/delete, curve duration drag). Phase 3 MIDI regeneration code written: `regenerateMidi(bundle)` method, `needsRegeneration` flag in `syncCurveToDatabase` with `_isBundleDragging` guard, Regen MIDI button wiring, bundle row visibility on curve select/deselect. User reports runtime issues — troubleshooting deferred to next session.
 
 ---
 
 ## Current Session
 
-**Date:** Feb 23, 2026  
-**Focus:** Notation Fragment System — score integration (DB, GC, SVG, MIDI, UI)  
-**Tier 1 Count This Session:** 8 (ASB-096 through ASB-103)  
-**Tier 2 Threshold:** Committing now
+**Date:** [next session date]  
+**Focus:** Troubleshoot Phase 3 MIDI Regeneration  
+**Tier 1 Count This Session:** 0  
+**Tier 2 Threshold:** At 4
+
+### ⚠️ TROUBLESHOOTING START POINT — Phase 3 MIDI Regeneration
+
+**What was implemented (code complete, needs debugging):**
+
+1. **`CrescendoUI.regenerateMidi(bundle)`** — line ~20424 in `public/index.html`
+   - Finds curve by `bundle.curveId` → refreshes `curveData` → deletes old MIDI snippets → removes old MidiController events → calls `generateCrescendoMidi()` with stored bundle params → calls `insertCrescendoMidi()` → updates bundle record → reloads MIDI display
+
+2. **`needsRegeneration` flag** — set in `CurveMaker.syncCurveToDatabase()` (line ~15375)
+   - Looks up bundle via `CrescendoUI.lookupBundleByCurveId(curve.id)`
+   - Guarded by `CrescendoUI._isBundleDragging` to skip during bundle move
+   - Shows `#cdRegenMidiBtn` when flag is set
+
+3. **Regen MIDI button wiring** — in `CrescendoUI.initBundleUI()` (line ~20494)
+   - Click handler: finds bundle from selected curve or SVG → calls `regenerateMidi(bundle)` → "Regenerating..." feedback
+   - `SVGElementManager.selectElement` patched to show/hide button based on `needsRegeneration`
+
+4. **Bundle row on curve select** — in `CurveMaker.selectCurve()` (line ~14472) and `deselectCurve()` (line ~14505)
+   - Shows `#cdBundleRow` + time readout + regen button when curve belongs to a bundle
+   - Hides on deselect
+
+**Known param flow (potential issue area):**
+- `step2()` calls `registerBundle()` with: `{ pitchModel, pitchInfo, dynamic1, dynamic2, clef, velocity }`
+- `regenerateMidi()` calls `generateCrescendoMidi(curve, bundle.pitchModel, bundle.pitchInfo, { velocity, articulation: 89 })`
+- Verify: are `bundle.pitchModel` and `bundle.pitchInfo` stored correctly? Is `pitchInfo` a full object or is it missing fields after save/load?
+
+**Debugging approach:**
+1. Open browser console
+2. Create a crescendo bundle (Step 1 + Step 2)
+3. Select the curve, change slope or drag endpoint
+4. Check console: does `needsRegeneration` get set? Does the Regen button appear?
+5. Click Regen MIDI — check console for the `regenerateMidi: Starting/Complete` logs
+6. If MIDI doesn't regenerate: inspect `bundle.pitchModel`, `bundle.pitchInfo`, `curve.curveData` in console
+7. If button doesn't appear: check if `lookupBundleByCurveId` returns the bundle
+
+**Key code locations for troubleshooting:**
+| What | Location (line ~) |
+|------|-------------------|
+| `regenerateMidi()` | 20424 |
+| `syncCurveToDatabase()` flag | 15373–15382 |
+| `initBundleUI()` button wiring | 20494–20545 |
+| `selectCurve()` bundle row | 14472–14483 |
+| `deselectCurve()` bundle row | 14505–14507 |
+| `registerBundle()` params | 20146–20165 |
+| `generateCrescendoMidi()` | 19547 |
+| `insertCrescendoMidi()` | ~19940 |
+| `_isBundleDragging` guard | 20143 (property), 20340 (set), 20412 (clear) |
+| `startBundleDrag()` | ~20298 |
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -149,6 +198,10 @@ That's it. Everything else below is for Cascade.
 ### Session Log — Pizzicato Tremolo Glissando
 - ASB-094: PizzTremGliss complete system — UI panel (teal header, slope read/write, 9 input rows, color swatches, fill mode), server endpoints (`/api/lilypond/create-pizz-trem-gliss` template substitution, `/api/pizz-trem-gliss/generate-midi` runs generate_pizz_trem_gliss_midi.js), `PizzTremGlissUI` JS object (step1/step2/go/generateAll/createCurve/insertSvg/insertMidi/_watchCurveSlope), URL encoding fix (`encodeURIComponent` on server paths for `#` and `+` in filenames)
 - ASB-095: PizzTremGliss AI prompt — two-part workflow (step1 populates all UI fields from params, step2 reads from UI), single go option (`go()` does both), AI Command Bridge tested (track 3 alto G5→Bbd4 pp→fff 247–252s on score 289), `AI_PIZZ_TREM_GLISS_PROMPT_GUIDE.md` created, slope UI fix (smaller font, wider box)
+
+### Session Log — Bundle Systems
+- ASB-104: Notation Fragment Bundle System — bundle registry (bundles[], registerBundle, lookupBundleBySvgId, deleteBundle, exportBundles, importBundles), SVGElementManager drag hook (cumulative delta pattern for GC+MIDI+arrow shifting), handleMouseUp finalization, live impact time readout (#nfBundleRow), Delete key handler, ScoreManager persistence (databases.nfBundles), hasArrow flag for arrow DOM recreation on import
+- ASB-105: Bundle Units workflow doc + Crescendo/Decrescendo Bundle (all 3 phases). Workflow doc: `.windsurf/workflows/bundle-units.md` (architecture, drag pattern, delete handler, persistence, adaptation checklist). **Phase 1:** CrescendoUI bundle registry (bundles[], registerBundle, lookupBundleByCurveId, lookupBundleBySvgId, deleteBundle, exportBundles, importBundles), startBundleDrag (cumulative delta for curve+SVG+MIDI shifting), ScoreManager persistence (databases.cdBundles), live readout (#cdBundleRow). **Phase 2:** Curve endpoint X-drag (all curves) — start/end handle horizontal drag with cross-page support (page/section/container/trackDims updates), Shift+drag move with cross-page support. **Phase 3:** MIDI regeneration — `regenerateMidi(bundle)` method (delete old MIDI → re-generate from stored params → insert new → update bundle → reload display), `needsRegeneration` flag set in `syncCurveToDatabase` (guarded by `_isBundleDragging` to skip during bundle move), Regen MIDI button wired in `initBundleUI` with SVGElementManager.selectElement patch, bundle row visibility on curve select/deselect.
 
 ### Session Log — Notation Fragment Score Integration
 - ASB-096: Fragment asset audit — all 8 NFs verified, re-rendered NF008-Cello, cropped all SVGs, created output dirs + notation_fragment_db.json
@@ -248,6 +301,7 @@ That's it. Everything else below is for Cascade.
 - [ ] Investigate why Pass 2 regex fails on vibrato wave path (Pass 3 string-search fallback works)
 - [x] **Add Glissando capability to Pizzicato Tremolo system** ✔️ (ASB-094/095 — PizzTremGliss complete system with UI, MIDI, SVG, AI prompt)
 - [x] **Notation Fragment score integration** ✔️ (ASB-096–103 — pre-computed DB, GC+SVG+MIDI insertion, UI panel, end-to-end tested)
+- [ ] **Crescendo/Decrescendo Bundle System** — Phases 1+2 done (ASB-105). Phase 3 (MIDI regeneration) code complete but has runtime issues — needs troubleshooting. See `bundle-units.md` + troubleshooting section in Current Session
 - [ ] **Notation Fragment AI prompt guide** — create prompt guide for AI-driven fragment insertion via Command Bridge
 - [ ] **MIDI snippet generating system** — longer-term goal: system that reads notation and/or instructions, knows what CC messages to add, and produces enhanced MIDI files automatically. Builds on modify_midi.js --map approach.
 - [ ] **Test modify_midi.js --map with NotationFragment002-Viola.ly** — render MIDI in Frescobaldi, create JSON map, run post-processing, verify CC0 at correct note positions
