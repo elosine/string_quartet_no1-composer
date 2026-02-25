@@ -1023,6 +1023,12 @@
                     <button id="vibStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
                     <button id="vibStep2Btn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 8px;">2: Generate</button>
                 </div>
+                <div id="vibBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px; color: var(--clr-brightRed);">Start</label>
+                    <span id="vibBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
+                    <button id="vibRegenMidiBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; display: none;">Regen MIDI</button>
+                    <button id="vibDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                </div>
                 
                 <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-darkRed); color: #fff; padding: 3px 6px; border-radius: 2px;">Crescendo / Decrescendo System</div>
@@ -1314,6 +1320,11 @@
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="ptGoBtn" class="control-btn" style="font-size: 11px; background: var(--clr-brightBlue); color: #fff; font-weight: bold; padding: 4px 12px;">Go</button>
                 </div>
+                <div id="ptBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px; color: var(--clr-brightBlue);">Start</label>
+                    <span id="ptBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
+                    <button id="ptDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                </div>
                 
                 <div class="section-divider"></div>
                 <div class="section-label" style="background: #2a8a8a; color: #fff; padding: 3px 6px; border-radius: 2px;">Pizz Tremolo Glissando</div>
@@ -1406,6 +1417,12 @@
                 <div class="control-row" style="margin-top: 5px; gap: 5px;">
                     <button id="ptgStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
                     <button id="ptgStep2Btn" class="control-btn" style="font-size: 11px; background: #2a8a8a; color: #fff; font-weight: bold; padding: 4px 8px;">2: Generate</button>
+                </div>
+                <div id="ptgBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px; color: #2a8a8a;">Start</label>
+                    <span id="ptgBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
+                    <button id="ptgRegenMidiBtn" class="control-btn" style="font-size: 9px; background: #2a8a8a; color: #fff; padding: 2px 8px; display: none;">Regen MIDI</button>
+                    <button id="ptgDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -12623,6 +12640,36 @@
                     }
                 );
                 
+                // PizzTremUI bundles - unified pizz tremolo component groups (GC + SVG + MIDI)
+                this.registerSource('ptBundles',
+                    () => window.PizzTremUI ? PizzTremUI.exportBundles() : { bundles: [], nextBundleId: 1 },
+                    (data) => {
+                        if (window.PizzTremUI) {
+                            PizzTremUI.importBundles(data);
+                        }
+                    }
+                );
+                
+                // PizzTremGlissUI bundles - unified pizz trem glissando component groups (curve + SVG + MIDI)
+                this.registerSource('ptgBundles',
+                    () => window.PizzTremGlissUI ? PizzTremGlissUI.exportBundles() : { bundles: [], nextBundleId: 1 },
+                    (data) => {
+                        if (window.PizzTremGlissUI) {
+                            PizzTremGlissUI.importBundles(data);
+                        }
+                    }
+                );
+                
+                // VibratoUI bundles - unified vibrato component groups (curve + SVG + MIDI)
+                this.registerSource('vibBundles',
+                    () => window.VibratoUI ? VibratoUI.exportBundles() : { bundles: [], nextBundleId: 1 },
+                    (data) => {
+                        if (window.VibratoUI) {
+                            VibratoUI.importBundles(data);
+                        }
+                    }
+                );
+                
                 // FlowchartConnector - connector lines between objects
                 this.registerSource('connectors',
                     () => window.FlowchartConnector ? FlowchartConnector.exportData() : [],
@@ -14208,6 +14255,22 @@
                             return;
                         }
                     }
+                    // If part of a PTG bundle, move the whole bundle
+                    if (window.PizzTremGlissUI) {
+                        const ptgBundle = PizzTremGlissUI.lookupBundleByCurveId(curve.id);
+                        if (ptgBundle) {
+                            PizzTremGlissUI.startBundleDrag(ptgBundle, e);
+                            return;
+                        }
+                    }
+                    // If part of a vibrato bundle, move the whole bundle
+                    if (window.VibratoUI) {
+                        const vibBundle = VibratoUI.lookupBundleByCurveId(curve.id);
+                        if (vibBundle) {
+                            VibratoUI.startBundleDrag(vibBundle, e);
+                            return;
+                        }
+                    }
                     // Standalone curve: enter 'move' mode (handled in switch below)
                     target = 'move';
                 }
@@ -14312,6 +14375,27 @@
                                     cdBundle.startTime = curve.startSeconds;
                                 }
                             }
+                            // Propagate to vibrato bundled SVG anchor
+                            if (window.VibratoUI && window.SVGElementManager) {
+                                const vibBundle = VibratoUI.lookupBundleByCurveId(curve.id);
+                                if (vibBundle) {
+                                    const svgEl = SVGElementManager.elements.find(el => el.id === vibBundle.svgId);
+                                    if (svgEl) {
+                                        svgEl.referenceSeconds = curve.startSeconds;
+                                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                                        svgEl._x = pos.x;
+                                        svgEl._y = pos.y;
+                                        svgEl._page = pos.page;
+                                        svgEl._section = pos.section;
+                                        const tgtContainer = pos.section === 'top' ? SVGElementManager.containerTop : SVGElementManager.containerBottom;
+                                        if (svgEl.wrapper.parentNode !== tgtContainer) {
+                                            tgtContainer.appendChild(svgEl.wrapper);
+                                        }
+                                        SVGElementManager.updateElementTransform(svgEl);
+                                    }
+                                    vibBundle.startTime = curve.startSeconds;
+                                }
+                            }
                             break;
                         }
                         case 'end': {
@@ -14331,6 +14415,14 @@
                                 const cdBundle = CrescendoUI.lookupBundleByCurveId(curve.id);
                                 if (cdBundle) {
                                     cdBundle.endTime = curve.endSeconds;
+                                }
+                            }
+                            // Update bundle endTime if this curve belongs to a vibrato bundle
+                            if (window.VibratoUI) {
+                                const vibBundle = VibratoUI.lookupBundleByCurveId(curve.id);
+                                if (vibBundle) {
+                                    vibBundle.endTime = curve.endSeconds;
+                                    vibBundle.needsRegeneration = true;
                                 }
                             }
                             break;
@@ -14493,6 +14585,40 @@
                         });
                     }
                 }
+                
+                // Show PTG bundle row if this curve belongs to a PTG bundle
+                if (window.PizzTremGlissUI) {
+                    const ptgBundle = PizzTremGlissUI.lookupBundleByCurveId(curve.id);
+                    const ptgRow = document.getElementById('ptgBundleRow');
+                    const ptgTime = document.getElementById('ptgBundleTime');
+                    const ptgRegen = document.getElementById('ptgRegenMidiBtn');
+                    if (ptgBundle && ptgRow) {
+                        ptgRow.style.display = '';
+                        if (ptgTime) ptgTime.textContent = ptgBundle.startTime.toFixed(3) + 's';
+                        if (ptgRegen) ptgRegen.style.display = ptgBundle.needsRegeneration ? '' : 'none';
+                        requestAnimationFrame(() => {
+                            const sc = ptgRow.closest('.section-content');
+                            if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                        });
+                    }
+                }
+                
+                // Show vibrato bundle row if this curve belongs to a vibrato bundle
+                if (window.VibratoUI) {
+                    const vibBundle = VibratoUI.lookupBundleByCurveId(curve.id);
+                    const vibRow = document.getElementById('vibBundleRow');
+                    const vibTime = document.getElementById('vibBundleTime');
+                    const vibRegen = document.getElementById('vibRegenMidiBtn');
+                    if (vibBundle && vibRow) {
+                        vibRow.style.display = 'flex';
+                        if (vibTime) vibTime.textContent = vibBundle.startTime.toFixed(3) + 's';
+                        if (vibRegen) vibRegen.style.display = vibBundle.needsRegeneration ? 'inline-block' : 'none';
+                        requestAnimationFrame(() => {
+                            const sc = vibRow.closest('.section-content');
+                            if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                        });
+                    }
+                }
             },
             
             deselectCurve() {
@@ -14517,6 +14643,14 @@
                 // Hide crescendo bundle row
                 const cdRow = document.getElementById('cdBundleRow');
                 if (cdRow) cdRow.style.display = 'none';
+                
+                // Hide PTG bundle row
+                const ptgRow = document.getElementById('ptgBundleRow');
+                if (ptgRow) ptgRow.style.display = 'none';
+                
+                // Hide vibrato bundle row
+                const vibRow = document.getElementById('vibBundleRow');
+                if (vibRow) vibRow.style.display = 'none';
             },
             
             // Create/update preview curve showing entire curve shape within the first segment
@@ -15406,6 +15540,25 @@
                             });
                         }
                         if (regenBtn) regenBtn.style.display = '';
+                    }
+                }
+                
+                // Flag associated PTG bundle for MIDI regeneration
+                // Skip during bundle drag (MIDI is time-shifted, not shape-changed)
+                if (window.PizzTremGlissUI && !PizzTremGlissUI._isBundleDragging) {
+                    const ptgBundle = PizzTremGlissUI.lookupBundleByCurveId(curve.id);
+                    if (ptgBundle) {
+                        ptgBundle.needsRegeneration = true;
+                        const ptgRow = document.getElementById('ptgBundleRow');
+                        const ptgRegen = document.getElementById('ptgRegenMidiBtn');
+                        if (ptgRow) {
+                            ptgRow.style.display = '';
+                            requestAnimationFrame(() => {
+                                const sc = ptgRow.closest('.section-content');
+                                if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                            });
+                        }
+                        if (ptgRegen) ptgRegen.style.display = '';
                     }
                 }
                 
@@ -18124,6 +18277,11 @@
         const PizzTremGlissUI = {
             pendingCurve: null,
             
+            // ============ PIZZ TREM GLISS BUNDLE SYSTEM ============
+            bundles: [],
+            nextBundleId: 1,
+            _isBundleDragging: false,
+            
             init() {
                 const step1Btn = document.getElementById('ptgStep1Btn');
                 const step2Btn = document.getElementById('ptgStep2Btn');
@@ -18139,6 +18297,7 @@
                     });
                 });
                 
+                this.initBundleUI();
                 console.log('PizzTremGlissUI initialized');
             },
             
@@ -18329,6 +18488,24 @@
                     if (midiInsertResult) {
                         console.log('PizzTremGlissUI: MIDI inserted:', midiInsertResult.snippetId, 'events:', midiInsertResult.eventCount);
                     }
+                }
+                
+                // Step 8: Register bundle (links curve + SVG + MIDI as a unit)
+                // Remove any existing bundles for this curve (prevents duplicates)
+                const oldBundles = this.bundles.filter(b => b.curveId === curve.id);
+                for (const ob of oldBundles) {
+                    this.bundles = this.bundles.filter(b => b.id !== ob.id);
+                }
+                
+                const bundleSvgId = insertedSvg ? insertedSvg.id : null;
+                const bundleMidiId = midiInsertResult ? midiInsertResult.snippetId : null;
+                if (bundleSvgId || bundleMidiId) {
+                    this.registerBundle(curve.id, bundleSvgId, bundleMidiId,
+                        curve.startSeconds, curve.endSeconds, track, {
+                            startPitch: startPitchRaw, endPitch: endPitchRaw,
+                            startDynamic, endDynamic, clef,
+                            model, slope, y1, y2
+                        });
                 }
                 
                 const result = {
@@ -18577,6 +18754,465 @@
                     console.error('PizzTremGlissUI.insertMidi: Error:', err);
                     return null;
                 }
+            },
+            
+            // ── Bundle registry: unified drag/delete/regen for PTG components ──
+            registerBundle(curveId, svgId, midiSnippetId, startTime, endTime, track, params) {
+                // Registration dedup: remove existing bundles for same curveId
+                const old = this.bundles.filter(b => b.curveId === curveId);
+                if (old.length > 0) {
+                    for (const ob of old) this.bundles = this.bundles.filter(b => b.id !== ob.id);
+                }
+                const bundle = {
+                    id: this.nextBundleId++,
+                    curveId,
+                    svgId,
+                    midiSnippetId,
+                    startTime,
+                    endTime,
+                    track,
+                    startPitch: params.startPitch || '',
+                    endPitch: params.endPitch || '',
+                    startDynamic: params.startDynamic || 'mf',
+                    endDynamic: params.endDynamic || 'mf',
+                    clef: params.clef || 'treble',
+                    model: params.model || 'logarithmic',
+                    slope: params.slope ?? 0,
+                    y1: params.y1 ?? 10,
+                    y2: params.y2 ?? 0,
+                    needsRegeneration: false
+                };
+                this.bundles.push(bundle);
+                console.log('PizzTremGlissUI.registerBundle:', bundle.id, 'curve:', curveId, 'svg:', svgId, 'midi:', midiSnippetId);
+                return bundle;
+            },
+            
+            lookupBundleBySvgId(svgId) {
+                return this.bundles.find(b => b.svgId === svgId) || null;
+            },
+            
+            lookupBundleByCurveId(curveId) {
+                const matches = this.bundles.filter(b => b.curveId === curveId);
+                if (matches.length > 1) {
+                    console.warn('PizzTremGlissUI.lookupBundleByCurveId: DUPLICATE bundles for curve', curveId);
+                }
+                return matches.length > 0 ? matches[matches.length - 1] : null;
+            },
+            
+            deleteBundle(bundleId) {
+                const idx = this.bundles.findIndex(b => b.id === bundleId);
+                if (idx === -1) return;
+                const bundle = this.bundles[idx];
+                
+                // Remove curve from CurveMaker + CurveDatabase
+                if (window.CurveMaker) {
+                    const curveIdx = CurveMaker.curves.findIndex(c => c.id === bundle.curveId);
+                    if (curveIdx !== -1) {
+                        const curve = CurveMaker.curves[curveIdx];
+                        if (curve.elements && curve.elements.group) curve.elements.group.remove();
+                        if (curve.elements && curve.elements.continuationGroupTop) curve.elements.continuationGroupTop.remove();
+                        if (curve.elements && curve.elements.continuationGroupBottom) curve.elements.continuationGroupBottom.remove();
+                        CurveMaker.curves.splice(curveIdx, 1);
+                        if (CurveMaker.selectedCurve && CurveMaker.selectedCurve.id === bundle.curveId) {
+                            CurveMaker.deselectCurve();
+                        }
+                    }
+                }
+                if (window.CurveDatabase) CurveDatabase.remove(bundle.curveId);
+                
+                // Remove SVG element
+                if (window.SVGElementManager) {
+                    const svgIdx = SVGElementManager.elements.findIndex(el => el.id === bundle.svgId);
+                    if (svgIdx !== -1) {
+                        const el = SVGElementManager.elements[svgIdx];
+                        if (el.wrapper) el.wrapper.remove();
+                        SVGElementManager.elements.splice(svgIdx, 1);
+                        if (SVGElementManager.selectedElement && SVGElementManager.selectedElement.id === bundle.svgId) {
+                            SVGElementManager.deselectAll();
+                        }
+                        SVGElementManager.updateElementList();
+                    }
+                }
+                
+                // Remove MIDI snippets by sourceCurve (robust)
+                if (window.MidiSnippetDatabase) {
+                    const toRemove = MidiSnippetDatabase.getAll()
+                        .filter(s => s.sourceCurve === bundle.curveId)
+                        .map(s => s.id);
+                    for (const snippetId of toRemove) MidiSnippetDatabase.remove(snippetId);
+                }
+                
+                // Remove tagged MidiController events
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            track.midiEvents = track.midiEvents.filter(ev => ev.sourceCurve !== bundle.curveId);
+                        }
+                    }
+                }
+                
+                // Remove bundle record
+                this.bundles.splice(idx, 1);
+                
+                // Reload affected systems
+                if (window.MidiController) MidiController.reloadFromDatabase();
+                if (window.CurveMaker) CurveMaker.updateVisibility();
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // Hide bundle row
+                const row = document.getElementById('ptgBundleRow');
+                if (row) row.style.display = 'none';
+                
+                console.log('PizzTremGlissUI.deleteBundle:', bundleId, 'removed curve:', bundle.curveId, 'svg:', bundle.svgId, 'midi:', bundle.midiSnippetId);
+            },
+            
+            exportBundles() {
+                return {
+                    bundles: this.bundles.map(b => ({
+                        id: b.id, curveId: b.curveId, svgId: b.svgId, midiSnippetId: b.midiSnippetId,
+                        startTime: b.startTime, endTime: b.endTime, track: b.track,
+                        startPitch: b.startPitch, endPitch: b.endPitch,
+                        startDynamic: b.startDynamic, endDynamic: b.endDynamic,
+                        clef: b.clef, model: b.model, slope: b.slope, y1: b.y1, y2: b.y2,
+                        needsRegeneration: b.needsRegeneration
+                    })),
+                    nextBundleId: this.nextBundleId
+                };
+            },
+            
+            importBundles(data) {
+                if (!data || !data.bundles) return;
+                const raw = data.bundles.map(b => ({ ...b }));
+                
+                // Import dedup: for each curveId, keep only the bundle with the highest ID
+                const byCurve = new Map();
+                for (const b of raw) {
+                    const existing = byCurve.get(b.curveId);
+                    if (!existing || b.id > existing.id) byCurve.set(b.curveId, b);
+                }
+                this.bundles = [...byCurve.values()];
+                this.nextBundleId = data.nextBundleId || (this.bundles.length > 0 ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
+                
+                if (raw.length !== this.bundles.length) {
+                    console.warn('PizzTremGlissUI.importBundles: Deduped', raw.length, '→', this.bundles.length, 'bundles');
+                }
+                console.log('PizzTremGlissUI.importBundles: Loaded', this.bundles.length, 'bundles');
+            },
+            
+            // Standalone bundle drag initiated from Shift+curve mousedown
+            // Shifts curve + SVG + MIDI snippet + MidiController events by cumulative time delta
+            startBundleDrag(bundle, e) {
+                const zoomScale = window.ScoreZoom ? ScoreZoom.getZoom() : 1;
+                const startClientX = e.clientX;
+                
+                const curve = window.CurveMaker ? CurveMaker.curves.find(c => c.id === bundle.curveId) : null;
+                if (!curve) return;
+                const scoreEl = curve.section === 'top' ? CurveMaker.scoreTopEl : CurveMaker.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = window.GraphicTimeline
+                    ? GraphicTimeline.getSecondsPerPage()
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                
+                // Capture originals at drag start
+                const origCurve = { startSeconds: curve.startSeconds, endSeconds: curve.endSeconds };
+                const origBundleStart = bundle.startTime;
+                
+                // SVG element
+                const svgEl = window.SVGElementManager
+                    ? SVGElementManager.elements.find(el => el.id === bundle.svgId) : null;
+                const origSvgRef = svgEl ? svgEl.referenceSeconds : null;
+                
+                // MIDI snippet (single)
+                let origSnippet = null;
+                if (window.MidiSnippetDatabase && bundle.midiSnippetId) {
+                    const sn = MidiSnippetDatabase.get(bundle.midiSnippetId);
+                    if (sn) {
+                        origSnippet = {
+                            snippet: sn,
+                            startSeconds: sn.startSeconds,
+                            endSeconds: sn.endSeconds,
+                            eventTimes: sn.events ? sn.events.map(ev => ev.timeMs) : []
+                        };
+                    }
+                }
+                
+                // MidiController events tagged with this curve
+                const origMidiCtrlEvents = [];
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            for (const ev of track.midiEvents) {
+                                if (ev.sourceCurve === bundle.curveId) {
+                                    origMidiCtrlEvents.push({ event: ev, origTimeMs: ev.timeMs });
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Guard: bundle drag should not trigger needsRegeneration
+                this._isBundleDragging = true;
+                
+                // Show bundle row
+                const row = document.getElementById('ptgBundleRow');
+                const readout = document.getElementById('ptgBundleTime');
+                if (row) row.style.display = '';
+                if (readout) readout.textContent = origBundleStart.toFixed(3) + 's';
+                
+                const onMouseMove = (moveE) => {
+                    const dx = (moveE.clientX - startClientX) / zoomScale;
+                    const timeDelta = dx * secondsPerPixel;
+                    
+                    // Shift curve times
+                    const newStart = origCurve.startSeconds + timeDelta;
+                    const newEnd = origCurve.endSeconds + timeDelta;
+                    curve.startSeconds = newStart;
+                    curve.endSeconds = newEnd;
+                    
+                    // Recalculate curve pixel positions
+                    const cLeadIn = leadInSeconds;
+                    const startActual = newStart + cLeadIn;
+                    const endActual = newEnd + cLeadIn;
+                    const curvePage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    curve.page = curvePage;
+                    curve.section = curvePage % 2 === 0 ? 'top' : 'bottom';
+                    const cScoreEl = curve.section === 'top' ? CurveMaker.scoreTopEl : CurveMaker.scoreBottomEl;
+                    const cScoreWidth = cScoreEl ? cScoreEl.clientWidth : scoreWidth;
+                    curve.x1 = ((startActual / secondsPerPage) - curvePage) * cScoreWidth;
+                    curve.x2 = ((endActual / secondsPerPage) - curvePage) * cScoreWidth;
+                    
+                    // Re-render curve
+                    CurveMaker.updateCurveRendering(curve);
+                    CurveMaker.updateBoundingBox(curve);
+                    CurveMaker.syncCurveToDatabase(curve);
+                    CurveMaker.updateVisibility();
+                    
+                    // Shift SVG
+                    if (svgEl && origSvgRef != null) {
+                        svgEl.referenceSeconds = origSvgRef + timeDelta;
+                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                        svgEl._x = pos.x; svgEl._y = pos.y;
+                        svgEl._page = pos.page; svgEl._section = pos.section;
+                        SVGElementManager.updateElementTransform(svgEl);
+                    }
+                    
+                    // Shift MIDI snippet
+                    const deltaMs = timeDelta * 1000;
+                    if (origSnippet) {
+                        origSnippet.snippet.startSeconds = origSnippet.startSeconds + timeDelta;
+                        origSnippet.snippet.endSeconds = origSnippet.endSeconds + timeDelta;
+                        if (origSnippet.snippet.events && origSnippet.eventTimes.length === origSnippet.snippet.events.length) {
+                            for (let i = 0; i < origSnippet.snippet.events.length; i++) {
+                                origSnippet.snippet.events[i].timeMs = origSnippet.eventTimes[i] + deltaMs;
+                            }
+                        }
+                    }
+                    
+                    // Shift MidiController events
+                    for (const orig of origMidiCtrlEvents) {
+                        orig.event.timeMs = orig.origTimeMs + deltaMs;
+                    }
+                    
+                    // Update bundle times + readout
+                    bundle.startTime = origBundleStart + timeDelta;
+                    bundle.endTime = bundle.startTime + (origCurve.endSeconds - origCurve.startSeconds);
+                    if (readout) readout.textContent = bundle.startTime.toFixed(3) + 's';
+                };
+                
+                const onMouseUp = () => {
+                    this._isBundleDragging = false;
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    if (window.MidiController) MidiController.reloadFromDatabase();
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
+            // Regenerate MIDI for a bundle after curve shape/duration changes
+            // Server-side generation: calls /api/pizz-trem-gliss/generate-midi then re-inserts
+            async regenerateMidi(bundle) {
+                if (!bundle) return;
+                
+                const curve = window.CurveMaker
+                    ? CurveMaker.curves.find(c => c.id === bundle.curveId) : null;
+                if (!curve) {
+                    console.error('PizzTremGlissUI.regenerateMidi: Curve not found for bundle', bundle.id);
+                    return;
+                }
+                
+                // Ensure curveData is fresh
+                if (window.CurveMaker) {
+                    curve.curveData = CurveMaker.generateCurveDataArray(curve);
+                }
+                
+                console.log('PizzTremGlissUI.regenerateMidi: === START ===');
+                console.log('  bundle.id:', bundle.id, 'curveId:', bundle.curveId);
+                console.log('  pitches:', bundle.startPitch, '→', bundle.endPitch);
+                console.log('  dynamics:', bundle.startDynamic, '→', bundle.endDynamic);
+                
+                // 1. Generate new MIDI via server (before deleting old — failure is non-destructive)
+                const durationSec = curve.endSeconds - curve.startSeconds;
+                const clefName = bundle.clef === 'alto' ? 'alto' : bundle.clef;
+                
+                let midiResult = null;
+                try {
+                    const midiResp = await fetch('/api/pizz-trem-gliss/generate-midi', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            startPitch: bundle.startPitch,
+                            endPitch: bundle.endPitch,
+                            startDynamic: bundle.startDynamic,
+                            endDynamic: bundle.endDynamic,
+                            clef: clefName,
+                            track: bundle.track,
+                            duration: durationSec,
+                            model: curve.model || bundle.model,
+                            slope: curve.slope ?? bundle.slope,
+                            y1: curve.y1 ?? bundle.y1,
+                            y2: curve.y2 ?? bundle.y2
+                        })
+                    });
+                    midiResult = await midiResp.json();
+                    if (!midiResult.success) {
+                        console.error('PizzTremGlissUI.regenerateMidi: Server generation failed:', midiResult.error);
+                        return;
+                    }
+                } catch (err) {
+                    console.error('PizzTremGlissUI.regenerateMidi: Server error:', err);
+                    return;
+                }
+                
+                // 2. Delete old MIDI snippets by sourceCurve (robust)
+                if (window.MidiSnippetDatabase) {
+                    const toRemove = MidiSnippetDatabase.getAll()
+                        .filter(s => s.sourceCurve === bundle.curveId)
+                        .map(s => s.id);
+                    for (const snippetId of toRemove) MidiSnippetDatabase.remove(snippetId);
+                }
+                
+                // 3. Remove old MidiController events tagged with this curve
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            track.midiEvents = track.midiEvents.filter(ev => ev.sourceCurve !== bundle.curveId);
+                        }
+                    }
+                }
+                
+                // 4. Insert new MIDI
+                let newSnippetId = null;
+                if (midiResult.midiPath) {
+                    const insertResult = await this.insertMidi(midiResult.midiPath, curve, bundle.track);
+                    if (insertResult) {
+                        newSnippetId = insertResult.snippetId;
+                    }
+                }
+                
+                // 5. Update bundle record
+                bundle.midiSnippetId = newSnippetId;
+                bundle.startTime = curve.startSeconds;
+                bundle.endTime = curve.endSeconds;
+                bundle.needsRegeneration = false;
+                
+                // 6. Reload MIDI display
+                if (window.MidiController) MidiController.reloadFromDatabase();
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // 7. Update UI
+                const regenBtn = document.getElementById('ptgRegenMidiBtn');
+                if (regenBtn) regenBtn.style.display = 'none';
+                
+                console.log('PizzTremGlissUI.regenerateMidi: === DONE === New MIDI:', newSnippetId);
+            },
+            
+            initBundleUI() {
+                // Delete bundle button
+                const delBtn = document.getElementById('ptgDeleteBundleBtn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle) this.deleteBundle(bundle.id);
+                    });
+                }
+                
+                // Regen MIDI button
+                const regenBtn = document.getElementById('ptgRegenMidiBtn');
+                if (regenBtn) {
+                    regenBtn.addEventListener('click', async () => {
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle) {
+                            regenBtn.textContent = 'Regenerating...';
+                            regenBtn.disabled = true;
+                            await this.regenerateMidi(bundle);
+                            regenBtn.textContent = 'Regen MIDI';
+                            regenBtn.disabled = false;
+                        }
+                    });
+                }
+                
+                // Patch SVGElementManager.selectElement to show/hide PTG bundle row
+                if (window.SVGElementManager) {
+                    const origSelect = SVGElementManager.selectElement.bind(SVGElementManager);
+                    SVGElementManager.selectElement = (elData) => {
+                        origSelect(elData);
+                        const bundle = this.lookupBundleBySvgId(elData.id);
+                        const row = document.getElementById('ptgBundleRow');
+                        const timeSpan = document.getElementById('ptgBundleTime');
+                        const regenBtn = document.getElementById('ptgRegenMidiBtn');
+                        if (bundle && row) {
+                            row.style.display = '';
+                            if (timeSpan) timeSpan.textContent = bundle.startTime.toFixed(3) + 's';
+                            if (regenBtn) regenBtn.style.display = bundle.needsRegeneration ? '' : 'none';
+                            requestAnimationFrame(() => {
+                                const sc = row.closest('.section-content');
+                                if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                            });
+                        } else if (row) {
+                            row.style.display = 'none';
+                        }
+                    };
+                    
+                    const origDeselect = SVGElementManager.deselectAll.bind(SVGElementManager);
+                    SVGElementManager.deselectAll = () => {
+                        origDeselect();
+                        const row = document.getElementById('ptgBundleRow');
+                        if (row) row.style.display = 'none';
+                    };
+                }
+                
+                // Delete key handler for PTG bundles
+                document.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Delete') return;
+                    let bundle = null;
+                    if (window.CurveMaker && CurveMaker.selectedCurve) {
+                        bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                    }
+                    if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                        bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                    }
+                    if (bundle) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.deleteBundle(bundle.id);
+                    }
+                });
             }
         };
         PizzTremGlissUI.init();
@@ -18589,6 +19225,11 @@
         // ============================================
         const VibratoUI = {
             pendingCurve: null, // Stores curve from Step 1 for use in Step 2
+            
+            // ============ VIBRATO BUNDLE SYSTEM ============
+            bundles: [],
+            nextBundleId: 1,
+            _isBundleDragging: false,
             
             init() {
                 const step1Btn = document.getElementById('vibStep1Btn');
@@ -18609,6 +19250,7 @@
                     });
                 });
                 
+                this.initBundleUI();
                 console.log('VibratoUI initialized (two-phase workflow)');
             },
             
@@ -18777,13 +19419,31 @@
                         }
                         
                         // Generate and insert MIDI
-                        const midiResult = await this.generateVibratoMidi(curve);
+                        const midiResult = await this.generateVibratoMidi(curve, { track });
                         let midiInsert = null;
                         if (midiResult) {
                             midiInsert = await this.insertVibratoMidi(midiResult, curve);
                             if (midiInsert) {
                                 console.log('VibratoUI.step2: MIDI inserted into score');
                             }
+                        }
+                        
+                        // Step 3: Register bundle (links curve + SVG + MIDI as a unit)
+                        const bundleSvgId = insertResult ? insertResult.id : null;
+                        const bundleMidiId = midiInsert ? midiInsert.snippetId : null;
+                        if (bundleSvgId || bundleMidiId) {
+                            this.registerBundle(curve.id, bundleSvgId, bundleMidiId,
+                                curve.startSeconds, curve.endSeconds, track, {
+                                    pitch: pitch,
+                                    velocity: parseInt(document.getElementById('vibVelocityInput').value) || 115,
+                                    clef,
+                                    startDynamic,
+                                    endDynamic,
+                                    model: curve.model,
+                                    slope: curve.slope,
+                                    y1: curve.y1,
+                                    y2: curve.y2
+                                });
                         }
                         
                         result = {
@@ -18839,7 +19499,8 @@
             },
             
             // Generate vibrato MIDI: single pitch, CC0=89, CC4 + channel pressure following curve Y
-            async generateVibratoMidi(curve) {
+            // params: optional { pitch, velocity, track } for regen from bundle data
+            async generateVibratoMidi(curve, params = null) {
                 const CC_SAMPLE_INTERVAL = 50; // ms between CC/aftertouch messages (20/sec)
                 const TICKS_PER_BEAT = 480;
                 const CC0_ARTICULATION = 89; // senza vibrato / vibrato articulation
@@ -18849,9 +19510,11 @@
                     return null;
                 }
                 
-                // Read pitch from UI
-                const pitchStr = document.getElementById('vibPitchInput').value.trim();
-                const velocity = parseInt(document.getElementById('vibVelocityInput').value) || 115;
+                // Read pitch from params or UI
+                const pitchStr = (params?.pitch ?? document.getElementById('vibPitchInput').value).trim();
+                const velocity = params?.velocity ?? (parseInt(document.getElementById('vibVelocityInput').value) || 115);
+                const track = params?.track ?? (parseInt(document.getElementById('vibTrackInput').value) || 1);
+                const channel = track + 3; // Vibrato bank: channels 4-7
                 
                 // Convert pitch string to MIDI note number (reuse LongToneUI helper)
                 const noteMap = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
@@ -18922,19 +19585,19 @@
                 
                 // CC0 = 89 (articulation) at tick 0
                 trackEvents.push(...writeVarInt(0));
-                trackEvents.push(0xB0, 0x00, CC0_ARTICULATION);
+                trackEvents.push(0xB0 | channel, 0x00, CC0_ARTICULATION);
                 
                 // Quarter-tone pitch bend before Note On (±1 semitone range: 8192 per semitone)
                 const needsQTBend = quarterTone === '+' || quarterTone === 'D';
                 if (needsQTBend) {
                     const bendValue = quarterTone === '+' ? 12288 : 4096; // +50 cents or -50 cents
                     trackEvents.push(...writeVarInt(0));
-                    trackEvents.push(0xE0, bendValue & 0x7F, (bendValue >> 7) & 0x7F);
+                    trackEvents.push(0xE0 | channel, bendValue & 0x7F, (bendValue >> 7) & 0x7F);
                 }
                 
                 // Note On at tick 0
                 trackEvents.push(...writeVarInt(0));
-                trackEvents.push(0x90, midiNote, velocity);
+                trackEvents.push(0x90 | channel, midiNote, velocity);
                 
                 // CC4 + Channel Pressure samples following curve Y
                 let prevTick = 0;
@@ -18946,11 +19609,11 @@
                     
                     // CC4 (controller 4)
                     trackEvents.push(...writeVarInt(deltaTick));
-                    trackEvents.push(0xB0, 0x04, sample.value);
+                    trackEvents.push(0xB0 | channel, 0x04, sample.value);
                     
                     // Channel Pressure (aftertouch) - 0xD0, 1 data byte - delta=0 (same time)
                     trackEvents.push(...writeVarInt(0));
-                    trackEvents.push(0xD0, sample.value);
+                    trackEvents.push(0xD0 | channel, sample.value);
                     
                     prevTick = tick;
                 }
@@ -18960,12 +19623,12 @@
                 const endTick = secondsToTicks(duration);
                 const noteOffDelta = Math.max(0, endTick - lastTick);
                 trackEvents.push(...writeVarInt(noteOffDelta));
-                trackEvents.push(0x80, midiNote, 0);
+                trackEvents.push(0x80 | channel, midiNote, 0);
                 
                 // Reset quarter-tone pitch bend after Note Off
                 if (needsQTBend) {
                     trackEvents.push(...writeVarInt(0));
-                    trackEvents.push(0xE0, 0x00, 0x40); // 8192 = center
+                    trackEvents.push(0xE0 | channel, 0x00, 0x40); // 8192 = center
                 }
                 
                 // End of track
@@ -19241,6 +19904,406 @@
                 } catch (err) {
                     console.error('VibratoUI.insertVibratoSvg: Error:', err);
                     return null;
+                }
+            },
+            
+            // ── Bundle registry: unified drag/delete/regen for Vibrato components ──
+            registerBundle(curveId, svgId, midiSnippetId, startTime, endTime, track, params) {
+                // Registration dedup: remove existing bundles for same curveId
+                const old = this.bundles.filter(b => b.curveId === curveId);
+                if (old.length > 0) {
+                    for (const ob of old) this.bundles = this.bundles.filter(b => b.id !== ob.id);
+                }
+                const bundle = {
+                    id: this.nextBundleId++,
+                    curveId,
+                    svgId,
+                    midiSnippetId,
+                    startTime,
+                    endTime,
+                    track,
+                    pitch: params.pitch || '',
+                    velocity: params.velocity ?? 115,
+                    clef: params.clef || 'treble',
+                    startDynamic: params.startDynamic || 'f',
+                    endDynamic: params.endDynamic || 'f',
+                    model: params.model || 'logarithmic',
+                    slope: params.slope ?? 0,
+                    y1: params.y1 ?? 10,
+                    y2: params.y2 ?? 0,
+                    needsRegeneration: false
+                };
+                this.bundles.push(bundle);
+                console.log('VibratoUI.registerBundle:', bundle.id, 'curve:', curveId, 'svg:', svgId, 'midi:', midiSnippetId);
+                return bundle;
+            },
+            
+            lookupBundleBySvgId(svgId) {
+                return this.bundles.find(b => b.svgId === svgId) || null;
+            },
+            
+            lookupBundleByCurveId(curveId) {
+                const matches = this.bundles.filter(b => b.curveId === curveId);
+                if (matches.length > 1) {
+                    console.warn('VibratoUI.lookupBundleByCurveId: DUPLICATE bundles for curve', curveId);
+                }
+                return matches.length > 0 ? matches[matches.length - 1] : null;
+            },
+            
+            deleteBundle(bundleId) {
+                const bundle = this.bundles.find(b => b.id === bundleId);
+                if (!bundle) return;
+                
+                // Delete curve
+                if (window.CurveMaker) {
+                    const curve = CurveMaker.curves.find(c => c.id === bundle.curveId);
+                    if (curve) {
+                        CurveMaker.curves = CurveMaker.curves.filter(c => c.id !== bundle.curveId);
+                        if (curve.path) curve.path.remove();
+                        if (curve.fillPath) curve.fillPath.remove();
+                        if (curve.startHandle) curve.startHandle.remove();
+                        if (curve.endHandle) curve.endHandle.remove();
+                        if (CurveMaker.selectedCurve === curve) CurveMaker.selectedCurve = null;
+                    }
+                }
+                
+                // Delete SVG element
+                if (bundle.svgId != null && window.SVGElementManager) {
+                    const el = SVGElementManager.elements.find(e => e.id === bundle.svgId);
+                    if (el) {
+                        if (el.wrapper) el.wrapper.remove();
+                        SVGElementManager.elements = SVGElementManager.elements.filter(e => e.id !== bundle.svgId);
+                        SVGElementManager.updateElementList();
+                    }
+                }
+                
+                // Delete MIDI snippet + events
+                if (window.MidiSnippetDatabase) {
+                    const toRemove = MidiSnippetDatabase.getAll()
+                        .filter(s => s.sourceCurve === bundle.curveId)
+                        .map(s => s.id);
+                    for (const sid of toRemove) MidiSnippetDatabase.remove(sid);
+                }
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            track.midiEvents = track.midiEvents.filter(ev => ev.sourceCurve !== bundle.curveId);
+                        }
+                    }
+                    MidiController.renderAllMidiDisplays();
+                    MidiController.updateMidiDisplayVisibility();
+                    MidiController.reloadFromDatabase();
+                }
+                
+                // Remove bundle record
+                this.bundles = this.bundles.filter(b => b.id !== bundleId);
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // Hide bundle row
+                const row = document.getElementById('vibBundleRow');
+                if (row) row.style.display = 'none';
+                
+                console.log('VibratoUI.deleteBundle:', bundleId, 'removed curve:', bundle.curveId, 'svg:', bundle.svgId, 'midi:', bundle.midiSnippetId);
+            },
+            
+            exportBundles() {
+                return {
+                    bundles: this.bundles.map(b => ({ ...b })),
+                    nextBundleId: this.nextBundleId
+                };
+            },
+            
+            importBundles(data) {
+                if (!data || !data.bundles) return;
+                // Map-based dedup: keep only highest-ID bundle per curveId
+                const raw = data.bundles;
+                const byKey = new Map();
+                for (const b of raw) {
+                    const existing = byKey.get(b.curveId);
+                    if (!existing || b.id > existing.id) byKey.set(b.curveId, b);
+                }
+                this.bundles = Array.from(byKey.values());
+                this.nextBundleId = data.nextBundleId || (this.bundles.length > 0 ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
+                
+                if (raw.length !== this.bundles.length) {
+                    console.warn('VibratoUI.importBundles: Deduped', raw.length, '→', this.bundles.length, 'bundles');
+                }
+                console.log('VibratoUI.importBundles: Loaded', this.bundles.length, 'bundles');
+            },
+            
+            // Standalone bundle drag initiated from Shift+curve mousedown
+            startBundleDrag(bundle, e) {
+                if (!bundle) return;
+                
+                this._isBundleDragging = true;
+                const startX = e.clientX;
+                const startY = e.clientY;
+                let cumDeltaX = 0;
+                
+                const scoreEl = document.getElementById('ScoreTop');
+                const scoreWidth = scoreEl ? scoreEl.clientWidth : 1000;
+                const secondsPerPage = window.GraphicTimeline
+                    ? GraphicTimeline.getSecondsPerPage()
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                
+                const onMove = (ev) => {
+                    const dx = ev.clientX - startX - cumDeltaX;
+                    cumDeltaX = ev.clientX - startX;
+                    const deltaSec = dx * secondsPerPixel;
+                    
+                    // Move curve
+                    const curve = window.CurveMaker
+                        ? CurveMaker.curves.find(c => c.id === bundle.curveId) : null;
+                    if (curve) {
+                        curve.startSeconds += deltaSec;
+                        curve.endSeconds += deltaSec;
+                        if (curve.curveData) curve.curveData.startTime += deltaSec;
+                        CurveMaker.renderCurve(curve);
+                    }
+                    
+                    // Move SVG element
+                    if (bundle.svgId != null && window.SVGElementManager) {
+                        const el = SVGElementManager.elements.find(e => e.id === bundle.svgId);
+                        if (el) {
+                            el.referenceSeconds += deltaSec;
+                            const pos = SVGElementManager.calcPixelPosition(el);
+                            el._x = pos.x; el._y = pos.y;
+                            el._page = pos.page; el._section = pos.section;
+                            SVGElementManager.updateElementTransform(el);
+                        }
+                    }
+                    
+                    // Shift MIDI events
+                    if (window.MidiController && MidiController.tracks) {
+                        const deltaMs = deltaSec * 1000;
+                        for (const track of MidiController.tracks) {
+                            if (track && track.midiEvents) {
+                                for (const ev of track.midiEvents) {
+                                    if (ev.sourceCurve === bundle.curveId) {
+                                        ev.timeMs += deltaMs;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (window.MidiSnippetDatabase) {
+                        for (const s of MidiSnippetDatabase.getAll()) {
+                            if (s.sourceCurve === bundle.curveId) {
+                                const deltaMs = deltaSec * 1000;
+                                s.startTimeMs += deltaMs;
+                                s.startSeconds += deltaSec;
+                                s.endSeconds += deltaSec;
+                                if (s.events) {
+                                    for (const ev of s.events) ev.timeMs += deltaMs;
+                                }
+                            }
+                        }
+                    }
+                };
+                
+                const onUp = () => {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                    this._isBundleDragging = false;
+                    
+                    // Update bundle times
+                    const curve = window.CurveMaker
+                        ? CurveMaker.curves.find(c => c.id === bundle.curveId) : null;
+                    if (curve) {
+                        bundle.startTime = curve.startSeconds;
+                        bundle.endTime = curve.endSeconds;
+                    }
+                    
+                    // Finalize
+                    if (window.CurveMaker) CurveMaker.syncCurveToDatabase(curve || { id: bundle.curveId });
+                    if (window.MidiController) {
+                        MidiController.renderAllMidiDisplays();
+                        MidiController.updateMidiDisplayVisibility();
+                        MidiController.reloadFromDatabase();
+                    }
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    
+                    // Update readout
+                    const timeEl = document.getElementById('vibBundleTime');
+                    if (timeEl && curve) timeEl.textContent = curve.startSeconds.toFixed(2) + 's';
+                };
+                
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            },
+            
+            // Regenerate MIDI from stored bundle params + current curve shape
+            async regenerateMidi(bundle) {
+                if (!bundle) return;
+                
+                const curve = window.CurveMaker
+                    ? CurveMaker.curves.find(c => c.id === bundle.curveId) : null;
+                if (!curve) {
+                    console.error('VibratoUI.regenerateMidi: Curve not found for bundle', bundle.id);
+                    return;
+                }
+                
+                // Ensure curveData is fresh
+                if (window.CurveMaker) {
+                    curve.curveData = CurveMaker.generateCurveDataArray(curve);
+                }
+                
+                console.log('VibratoUI.regenerateMidi: === START ===');
+                console.log('  bundle.id:', bundle.id, 'curveId:', bundle.curveId);
+                console.log('  pitch:', bundle.pitch, 'velocity:', bundle.velocity, 'track:', bundle.track);
+                
+                // 1. Generate new MIDI (client-side, before deleting old)
+                const midiResult = await this.generateVibratoMidi(curve, {
+                    pitch: bundle.pitch,
+                    velocity: bundle.velocity,
+                    track: bundle.track
+                });
+                
+                if (!midiResult) {
+                    console.error('VibratoUI.regenerateMidi: MIDI generation failed');
+                    return;
+                }
+                
+                // 2. Delete old MIDI snippets by sourceCurve (robust)
+                if (window.MidiSnippetDatabase) {
+                    const toRemove = MidiSnippetDatabase.getAll()
+                        .filter(s => s.sourceCurve === bundle.curveId)
+                        .map(s => s.id);
+                    for (const snippetId of toRemove) MidiSnippetDatabase.remove(snippetId);
+                }
+                
+                // 3. Remove old MidiController events tagged with this curve
+                if (window.MidiController && MidiController.tracks) {
+                    for (const track of MidiController.tracks) {
+                        if (track && track.midiEvents) {
+                            track.midiEvents = track.midiEvents.filter(ev => ev.sourceCurve !== bundle.curveId);
+                        }
+                    }
+                }
+                
+                // 4. Insert new MIDI
+                const midiInsert = await this.insertVibratoMidi(midiResult, curve);
+                
+                if (midiInsert) {
+                    // Update bundle with new snippet ID
+                    const newSnippetId = midiInsert.snippetId;
+                    bundle.midiSnippetId = newSnippetId;
+                    bundle.startTime = curve.startSeconds;
+                    bundle.endTime = curve.endSeconds;
+                    bundle.needsRegeneration = false;
+                    
+                    // Update model/slope from curve (may have been adjusted)
+                    bundle.model = curve.model || bundle.model;
+                    bundle.slope = curve.slope ?? bundle.slope;
+                    bundle.y1 = curve.y1 ?? bundle.y1;
+                    bundle.y2 = curve.y2 ?? bundle.y2;
+                }
+                
+                // Reload display
+                if (window.MidiController) {
+                    MidiController.renderAllMidiDisplays();
+                    MidiController.updateMidiDisplayVisibility();
+                    MidiController.reloadFromDatabase();
+                }
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                // Hide regen button
+                const regenBtn = document.getElementById('vibRegenMidiBtn');
+                if (regenBtn) regenBtn.style.display = 'none';
+                
+                console.log('VibratoUI.regenerateMidi: === DONE === New MIDI:', midiInsert?.snippetId);
+            },
+            
+            initBundleUI() {
+                // Delete Bundle button
+                const deleteBtn = document.getElementById('vibDeleteBundleBtn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        // Dual-lookup: try selectedCurve first, then SVGElementManager.selectedElement
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle) this.deleteBundle(bundle.id);
+                    });
+                }
+                
+                // Regen MIDI button
+                const regenBtn = document.getElementById('vibRegenMidiBtn');
+                if (regenBtn) {
+                    regenBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (bundle) this.regenerateMidi(bundle);
+                    });
+                }
+                
+                // Delete key handler
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Delete' || e.key === 'Backspace') {
+                        // Only handle if vibBundleRow is visible
+                        const row = document.getElementById('vibBundleRow');
+                        if (!row || row.style.display === 'none') return;
+                        
+                        // Don't intercept if focused on an input
+                        if (document.activeElement && 
+                            (document.activeElement.tagName === 'INPUT' || 
+                             document.activeElement.tagName === 'TEXTAREA' || 
+                             document.activeElement.tagName === 'SELECT')) return;
+                        
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.deleteBundle(bundle.id);
+                        }
+                    }
+                });
+                
+                // Patch SVGElementManager.selectElement to show bundle row
+                if (window.SVGElementManager) {
+                    const origSelect = SVGElementManager.selectElement.bind(SVGElementManager);
+                    SVGElementManager.selectElement = (el) => {
+                        origSelect(el);
+                        const bundle = this.lookupBundleBySvgId(el.id);
+                        const row = document.getElementById('vibBundleRow');
+                        const timeEl = document.getElementById('vibBundleTime');
+                        if (bundle && row) {
+                            row.style.display = 'flex';
+                            if (timeEl) timeEl.textContent = (bundle.startTime || 0).toFixed(2) + 's';
+                            // Show regen button if needed
+                            const regenBtn = document.getElementById('vibRegenMidiBtn');
+                            if (regenBtn) regenBtn.style.display = bundle.needsRegeneration ? 'inline-block' : 'none';
+                            // Panel maxHeight recalc
+                            requestAnimationFrame(() => {
+                                const section = row.closest('.collapsible-section');
+                                if (section) {
+                                    const content = section.querySelector('.section-content');
+                                    if (content) content.style.maxHeight = content.scrollHeight + 'px';
+                                }
+                            });
+                        }
+                    };
+                    
+                    // Patch deselectAll to hide bundle row
+                    const origDeselect = SVGElementManager.deselectAll.bind(SVGElementManager);
+                    SVGElementManager.deselectAll = () => {
+                        origDeselect();
+                        const row = document.getElementById('vibBundleRow');
+                        if (row) row.style.display = 'none';
+                    };
                 }
             }
         };
@@ -21368,11 +22431,17 @@
             
             timingDb: null,  // cached timing database
             
+            // ============ PIZZ TREM BUNDLE SYSTEM ============
+            bundles: [],
+            nextBundleId: 1,
+            selectedBundleId: null,
+            
             init() {
                 const goBtn = document.getElementById('ptGoBtn');
                 if (goBtn) {
                     goBtn.addEventListener('click', () => this.go());
                 }
+                this.initBundleUI();
                 console.log('PizzTremUI initialized');
             },
             
@@ -21813,6 +22882,17 @@
                         );
                     }
                     
+                    // Step 5: Register bundle (links GC + SVG + MIDI as a unit)
+                    if (gc || svgElement || midiSnippet) {
+                        this.registerBundle(
+                            gc ? gc.id : null,
+                            svgElement ? svgElement.id : null,
+                            midiSnippet,
+                            inputs.start,
+                            inputs.track
+                        );
+                    }
+                    
                     result = { gc, svgElement, midiSnippet, pipelineResult };
                     console.log('PizzTremUI: Complete');
                     
@@ -21832,6 +22912,285 @@
                     }
                 }
                 return result;
+            },
+            // ── Bundle registry: unified drag/delete for PT components ──
+            registerBundle(gcId, svgId, midiSnippetId, startTime, track) {
+                const old = this.bundles.filter(b => b.gcId === gcId);
+                if (old.length > 0) {
+                    for (const ob of old) this.bundles = this.bundles.filter(b => b.id !== ob.id);
+                }
+                const bundle = {
+                    id: this.nextBundleId++,
+                    gcId,
+                    svgId,
+                    midiSnippetId,
+                    startTime,
+                    track
+                };
+                this.bundles.push(bundle);
+                console.log('PizzTremUI: bundle registered', bundle.id,
+                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId);
+                return bundle;
+            },
+            
+            lookupBundleBySvgId(svgId) {
+                const matches = this.bundles.filter(b => b.svgId === svgId);
+                return matches.length > 0 ? matches[matches.length - 1] : null;
+            },
+            
+            lookupBundleByGcId(gcId) {
+                const matches = this.bundles.filter(b => b.gcId === gcId);
+                return matches.length > 0 ? matches[matches.length - 1] : null;
+            },
+            
+            deleteBundle(bundleId) {
+                const idx = this.bundles.findIndex(b => b.id === bundleId);
+                if (idx === -1) return false;
+                const bundle = this.bundles[idx];
+                const systemsToReload = new Set();
+                
+                if (window.GCMaker && bundle.gcId != null) {
+                    const gi = GCMaker.gcs.findIndex(gc => gc.id === bundle.gcId);
+                    if (gi !== -1) {
+                        const gc = GCMaker.gcs[gi];
+                        if (gc.elements && gc.elements.group) gc.elements.group.remove();
+                        GCMaker.gcs.splice(gi, 1);
+                        if (GCMaker.selectedGC && GCMaker.selectedGC.id === bundle.gcId) {
+                            GCMaker.deselectGC();
+                        }
+                        systemsToReload.add('gcs');
+                    }
+                }
+                
+                if (window.SVGElementManager && bundle.svgId != null) {
+                    const si = SVGElementManager.elements.findIndex(el => el.id === bundle.svgId);
+                    if (si !== -1) {
+                        const el = SVGElementManager.elements[si];
+                        if (el.wrapper) el.wrapper.remove();
+                        if (SVGElementManager.selectedElement && SVGElementManager.selectedElement.id === bundle.svgId) {
+                            SVGElementManager.deselectAll();
+                        }
+                        SVGElementManager.elements.splice(si, 1);
+                        systemsToReload.add('svgs');
+                    }
+                }
+                
+                if (bundle.midiSnippetId != null && window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.remove(bundle.midiSnippetId);
+                    systemsToReload.add('midi');
+                }
+                
+                this.bundles.splice(idx, 1);
+                
+                if (systemsToReload.has('gcs') && window.GCMaker) GCMaker.rerenderAllGCs();
+                if (systemsToReload.has('svgs') && window.SVGElementManager) {
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                }
+                if (systemsToReload.has('midi') && window.MidiController) MidiController.reloadFromDatabase();
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                console.log('PizzTremUI: bundle deleted', bundleId);
+                return true;
+            },
+            
+            exportBundles() {
+                return {
+                    bundles: this.bundles.map(b => ({
+                        id: b.id,
+                        gcId: b.gcId,
+                        svgId: b.svgId,
+                        midiSnippetId: b.midiSnippetId,
+                        startTime: b.startTime,
+                        track: b.track
+                    })),
+                    nextBundleId: this.nextBundleId
+                };
+            },
+            
+            importBundles(data) {
+                if (!data || !data.bundles) return;
+                const raw = data.bundles.map(b => ({ ...b }));
+                const byGc = new Map();
+                for (const b of raw) {
+                    const existing = byGc.get(b.gcId);
+                    if (!existing || b.id > existing.id) byGc.set(b.gcId, b);
+                }
+                this.bundles = [...byGc.values()];
+                if (raw.length !== this.bundles.length) {
+                    console.warn('PizzTremUI.importBundles: Deduped', raw.length, '\u2192', this.bundles.length, 'bundles');
+                }
+                this.nextBundleId = data.nextBundleId || (this.bundles.length > 0
+                    ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
+                console.log('PizzTremUI: imported', this.bundles.length, 'bundles');
+            },
+            
+            // ── Bundle drag: shifts GC + SVG + MIDI by cumulative time delta ──
+            startBundleDrag(bundle, e) {
+                const zoomScale = window.ScoreZoom ? ScoreZoom.getZoom() : 1;
+                const startClientX = e.clientX;
+                
+                const gc = window.GCMaker ? GCMaker.gcs.find(g => g.id === bundle.gcId) : null;
+                if (!gc) return;
+                const scoreEl = gc.section === 'top' ? GCMaker.scoreTopEl : GCMaker.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = window.GraphicTimeline
+                    ? GraphicTimeline.getSecondsPerPage()
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                
+                const origGc = {
+                    startSeconds: gc.startSeconds,
+                    endSeconds: gc.endSeconds,
+                    impactSeconds: gc.impactSeconds
+                };
+                const origStartTime = bundle.startTime;
+                
+                const svgEl = window.SVGElementManager
+                    ? SVGElementManager.elements.find(el => el.id === bundle.svgId)
+                    : null;
+                const origSvgRef = svgEl ? svgEl.referenceSeconds : null;
+                
+                const sn = window.MidiSnippetDatabase ? MidiSnippetDatabase.get(bundle.midiSnippetId) : null;
+                const origMidi = sn ? {
+                    startSeconds: sn.startSeconds,
+                    endSeconds: sn.endSeconds,
+                    eventTimes: sn.events ? sn.events.map(ev => ev.timeMs) : []
+                } : null;
+                
+                const row = document.getElementById('ptBundleRow');
+                const readout = document.getElementById('ptBundleTime');
+                if (row) {
+                    row.style.display = 'flex';
+                    const sc = row.closest('.section-content');
+                    if (sc) requestAnimationFrame(() => { sc.style.maxHeight = sc.scrollHeight + 'px'; });
+                }
+                if (readout) readout.textContent = origStartTime.toFixed(3) + 's';
+                
+                const onMouseMove = (moveE) => {
+                    const dx = (moveE.clientX - startClientX) / zoomScale;
+                    const timeDelta = dx * secondsPerPixel;
+                    
+                    gc.startSeconds = origGc.startSeconds + timeDelta;
+                    gc.endSeconds = origGc.endSeconds + timeDelta;
+                    gc.impactSeconds = origGc.impactSeconds + timeDelta;
+                    GCMaker.rerenderAllGCs();
+                    
+                    if (svgEl && origSvgRef != null) {
+                        svgEl.referenceSeconds = origSvgRef + timeDelta;
+                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                        svgEl._x = pos.x;
+                        svgEl._y = pos.y;
+                        svgEl._page = pos.page;
+                        svgEl._section = pos.section;
+                        SVGElementManager.updateElementTransform(svgEl);
+                    }
+                    
+                    if (sn && origMidi) {
+                        const deltaMs = timeDelta * 1000;
+                        sn.startSeconds = origMidi.startSeconds + timeDelta;
+                        sn.endSeconds = origMidi.endSeconds + timeDelta;
+                        if (sn.events && origMidi.eventTimes.length === sn.events.length) {
+                            for (let i = 0; i < sn.events.length; i++) {
+                                sn.events[i].timeMs = origMidi.eventTimes[i] + deltaMs;
+                            }
+                        }
+                    }
+                    
+                    bundle.startTime = origStartTime + timeDelta;
+                    if (readout) readout.textContent = bundle.startTime.toFixed(3) + 's';
+                };
+                
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    if (window.MidiController) MidiController.reloadFromDatabase();
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    if (window.FlowchartConnector) FlowchartConnector.updateAllConnectors();
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
+            // ── Bundle UI: selection, delete button, delete key, SVG select hook ──
+            initBundleUI() {
+                const self = this;
+                
+                const delBtn = document.getElementById('ptDeleteBundleBtn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (this.selectedBundleId != null) {
+                            bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                        }
+                        if (!bundle && window.GCMaker && GCMaker.selectedGC) {
+                            bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle) {
+                            this.deleteBundle(bundle.id);
+                            this.selectedBundleId = null;
+                            const row = document.getElementById('ptBundleRow');
+                            if (row) row.style.display = 'none';
+                        }
+                    });
+                }
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Delete') return;
+                    const tag = document.activeElement?.tagName;
+                    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+                    
+                    let bundle = null;
+                    if (this.selectedBundleId != null) {
+                        bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                    }
+                    if (!bundle && window.GCMaker && GCMaker.selectedGC) {
+                        bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                    }
+                    if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                        bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                    }
+                    if (bundle) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.deleteBundle(bundle.id);
+                        this.selectedBundleId = null;
+                        const row = document.getElementById('ptBundleRow');
+                        if (row) row.style.display = 'none';
+                    }
+                });
+                
+                if (window.SVGElementManager) {
+                    const origSelect = SVGElementManager.selectElement;
+                    const origDeselect = SVGElementManager.deselectAll;
+                    
+                    SVGElementManager.selectElement = function(elementData) {
+                        origSelect.call(SVGElementManager, elementData);
+                        const ptBundle = self.lookupBundleBySvgId(elementData.id);
+                        const row = document.getElementById('ptBundleRow');
+                        const readout = document.getElementById('ptBundleTime');
+                        if (ptBundle) {
+                            self.selectedBundleId = ptBundle.id;
+                            if (row) {
+                                row.style.display = 'flex';
+                                const sc = row.closest('.section-content');
+                                if (sc) requestAnimationFrame(() => { sc.style.maxHeight = sc.scrollHeight + 'px'; });
+                            }
+                            if (readout) readout.textContent = ptBundle.startTime.toFixed(3) + 's';
+                        }
+                    };
+                    
+                    SVGElementManager.deselectAll = function() {
+                        origDeselect.call(SVGElementManager);
+                        self.selectedBundleId = null;
+                        const row = document.getElementById('ptBundleRow');
+                        if (row) row.style.display = 'none';
+                    };
+                }
             }
         };
         PizzTremUI.init();
@@ -24547,6 +25906,17 @@
                             e.stopPropagation();
                             this.selectGC(gc);
                             BartokPizzUI.startBundleDrag(bpBundle, e);
+                            return;
+                        }
+                    }
+                    // Check PT bundles
+                    if (window.PizzTremUI) {
+                        const ptBundle = PizzTremUI.lookupBundleByGcId(gc.id);
+                        if (ptBundle) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.selectGC(gc);
+                            PizzTremUI.startBundleDrag(ptBundle, e);
                             return;
                         }
                     }

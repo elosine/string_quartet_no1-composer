@@ -44,7 +44,7 @@ That's it. Everything else below is for Cascade.
 |----------|--------|-----------|
 | Bartók Pizzicato | Complete (Pattern 4 — AI Direct) | Maintenance only |
 | Glissando System | Complete | Maintenance only |
-| Vibrato System | Complete | Maintenance only |
+| Vibrato System | **Bundle Complete** | Bundle system (curve-based, like CD/PTG). MIDI ch fix, params regen, CurveMaker hooks, ScoreManager persistence. See ASB-112 |
 | Crescendo-Decrescendo | Complete | Maintenance only |
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
 | Pizz Tremolo Glissando | **Complete** | Full system: UI + server + MIDI + SVG + AI Command Bridge (two-part/single go). Prompt guide: `AI_PIZZ_TREM_GLISS_PROMPT_GUIDE.md` |
@@ -84,7 +84,7 @@ That's it. Everything else below is for Cascade.
 | Thread | Context | When Relevant |
 |--------|---------|---------------|
 | `modify_midi.js` enhanced with `--map` | Now supports per-note CC injection via JSON map file. Note groups (chords = one group) get CC just before first Note On. Expandable: any CC 0–127 per note (CC0 for articulation, CC7 for volume, etc.). `--cc` still works for tick-0 insertion. | Any notation fragment MIDI post-processing, future articulation systems |
-| Bartók pizz shares MIDI channels 1–4 with glissando | Both systems use track→channel 1:1 mapping. OK for now because Bartók events are discrete (single 16th notes). | If a 3rd system needs channels 1–4, address potential conflicts |
+| MIDI channel bank architecture | Three banks: Base (0–3), Vibrato (4–7), Volume (8–11). Each bank isolates a category of persistent MIDI control state. See **🎹 MIDI Channel Designation** section below. | When building any new musical material system — must choose correct bank |
 | Synth pitch bend range is ±1 semitone | All quarter-tone pitch bends use 8192 per semitone. Quarter sharp = 12288, quarter flat = 4096, center = 8192. Applied in Bartók pizz, Crescendo single-pitch, Vibrato. Glissando systems use their own segment-based approach (untouched). | If pitch bend sounds wrong or if synth config changes |
 | Registry §28 microtonal pitch syntax | Full suffix reference for quarter/three-quarter tones. Used by `render_bartok_pizz.js` pitch parser. | Any new pitch-input automation |
 | `crop_svg.js` Pass 3 fix | Handles nested `<g>`/`<a>` groups with scale transforms. Fix ported to both standalone and server.js. | If SVG cropping bugs reappear — check Pass 3 first |
@@ -94,69 +94,54 @@ That's it. Everything else below is for Cascade.
 | Musical Material Workflow doc | `docs/MUSICAL_MATERIAL_WORKFLOW.md` — general process for multi-component musical objects. Includes 4 insertion patterns (Console→Save/Reload→Direct Live→AI Direct). | When building any new musical material system |
 | **TODO: GC logic for Pizzicato Tremolo** | Add Gravitational Conductor alignment system to pizz tremolo workflow. Composer-driven choice (not performer-decides): composer explicitly selects an alignment (e.g., "begin along descending curve"), which determines notation placement, MIDI snippet tempo, and MIDI onset time. See `NOTATION_FRAGMENT_WORKFLOW.md` Overview → Gravitational Conductor System for alignment definitions. | Next pizz tremolo enhancement session |
 | **TODO: MIDI State Reset Problem** | CC state (CC7 volume, CC4/channel pressure) persists after snippet ends — next snippet on same channel inherits final value. CC120/CC123 don't work with synth. Current workaround: dedicated channel banks per modification type. Need to investigate: micro-fade, inter-snippet gaps, channel rotation, or multi-port expansion (16 ch per port limit). See `MIDI_MUSIC_GENERATION.md` §13 "MIDI State Reset Problem." | When adding volume/vibrato to notation fragments or when channel count becomes limiting |
+| **TODO: Long Tone Glissando System + Bundle** | The Long Tone Glissando system (UI section at line ~823) and the GlissandoSystem object (line ~16387, attaches pitch tracking to curves) exist separately. Need to: (1) combine into a unified pipeline with proper SVG + MIDI generation, (2) implement bundle system (curve-based, like CD/Vibrato). Pipeline may need significant work — GlissandoSystem currently only attaches pitch metadata to curves, no standalone MIDI/SVG generation. | When user wants to compose with long tone glissandi as bundled units |
+| **TODO: XLD Cell System + Bundle** | XLD Cell exists only in pieces — no unified system or pipeline yet. Need to: (1) inventory existing XLD Cell components, (2) create a proper system with UI/pipeline, (3) implement bundle system. Scope TBD — may be GC-based or curve-based depending on XLD Cell semantics. | When user wants to compose with XLD Cells as bundled units |
+
+---
+
+## 🎹 MIDI Channel Designation
+
+Four tracks (instruments) × three channel banks = 12 channels total. Each bank isolates a category of MIDI control signals that persist after a snippet ends and are difficult to reset mid-stream.
+
+| Channel Bank | MIDI Channels | Tracks | Purpose | Control Signals Used |
+|--------------|---------------|--------|---------|---------------------|
+| **Base (everything else)** | 0–3 | Track 1→Ch 0, Track 2→Ch 1, Track 3→Ch 2, Track 4→Ch 3 | Systems that use only note-on/off, velocity, pitch bend, and CC0 articulation tags. No persistent control state that could bleed into subsequent snippets. | CC0 (articulation ID), pitch bend (reset to center at snippet end), per-note velocity |
+| **Vibrato** | 4–7 | Track 1→Ch 4, Track 2→Ch 5, Track 3→Ch 6, Track 4→Ch 7 | Vibrato effect via CC4 modulation depth and channel pressure (aftertouch). These values persist and would affect non-vibrato material if shared on the same channel. | CC4 (modulation), channel pressure (aftertouch) |
+| **Volume (cresc/decresc)** | 8–11 | Track 1→Ch 8, Track 2→Ch 9, Track 3→Ch 10, Track 4→Ch 11 | Crescendo, decrescendo, and hairpin dynamics via CC7 volume ramp. CC7 persists at its final value — a crescendo ending at CC7=127 would make all subsequent notes on that channel fortissimo. | CC7 (volume) |
+
+### Channel Bank Assignments by System
+
+| System | Channel Bank | Formula | Justification |
+|--------|-------------|---------|---------------|
+| Bartók Pizzicato | Base (0–3) | `track - 1` | Discrete single notes, CC0=97 only |
+| Pizzicato Tremolo | Volume (8–11) | `track + 7` | Uses CC7 volume ramp for cres/decres/hp shapes |
+| Pizz Trem Glissando | Base (0–3) | `track - 1` | Pitch bend + per-note velocity only, no CC7 |
+| Long Tone / Glissando | Volume (8–11) | `track + 7` | Uses CC7 for dynamics |
+| Crescendo / Decrescendo | Volume (8–11) | `track + 7` | CC7 volume ramp is core function |
+| Vibrato | Vibrato (4–7) | `track + 3` | CC4 + channel pressure |
+| Notation Fragments | Varies | Per-fragment | Depends on fragment content (see fragment DB) |
+
+### Why Separate Banks?
+
+The synth does not reliably respond to CC120 (All Sound Off) or CC123 (All Notes Off) for resetting control state. A crescendo snippet ending at CC7=127 leaves that channel permanently loud; a vibrato snippet ending with CC4 active leaves modulation running. Rather than attempting unreliable resets, each control signal category gets its own isolated channel bank so snippets on one bank cannot contaminate another.
+
+See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI State Reset Problem).
 
 ---
 
 ## Last Session Summary
 
-> **Crescendo/Decrescendo Bundle — Phase 3 complete (ASB-106/107).** All 9 bugs fixed: sourceCurve propagation, browser cache-bust, CD slope sync, panel maxHeight, old MIDI deletion (sourceCurve-based), duplicate bundle dedup (step2 + importBundles + latest-ID lookup), delete handler dual-lookup (curve + SVG). Console cleanup done. User confirmed regen works correctly for both single and glissando pitch models.
+> **Vibrato Bundle System complete (ASB-112).** Full curve-based bundle: MIDI channel fix (hardcoded ch0 → track+3 for vibrato bank 4–7), params support for regeneration, SVG ID capture in step2, bundle row HTML, all bundle methods (register/lookup/delete/export/import/startBundleDrag/regenerateMidi/initBundleUI), CurveMaker hooks (select/deselect/shift-drag/endpoint sync), ScoreManager persistence. Also added PTG MIDI channel fix (CHANNEL_OFFSET -1 → base bank 0–3). Two future TODOs added: Long Tone Glissando System + Bundle, XLD Cell System + Bundle.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 25, 2026  
-**Focus:** Troubleshoot Phase 3 MIDI Regeneration  
-**Tier 1 Count This Session:** 1  
+**Focus:** Vibrato Bundle System + PTG MIDI Channel Fix  
+**ASB:** ASB-112  
+**Tier 1 Count This Session:** 5 (Tier 2 commit done)  
 **Tier 2 Threshold:** At 4
-
-### ⚠️ TROUBLESHOOTING START POINT — Phase 3 MIDI Regeneration
-
-**What was implemented (code complete, needs debugging):**
-
-1. **`CrescendoUI.regenerateMidi(bundle)`** — line ~20424 in `public/index.html`
-   - Finds curve by `bundle.curveId` → refreshes `curveData` → deletes old MIDI snippets → removes old MidiController events → calls `generateCrescendoMidi()` with stored bundle params → calls `insertCrescendoMidi()` → updates bundle record → reloads MIDI display
-
-2. **`needsRegeneration` flag** — set in `CurveMaker.syncCurveToDatabase()` (line ~15375)
-   - Looks up bundle via `CrescendoUI.lookupBundleByCurveId(curve.id)`
-   - Guarded by `CrescendoUI._isBundleDragging` to skip during bundle move
-   - Shows `#cdRegenMidiBtn` when flag is set
-
-3. **Regen MIDI button wiring** — in `CrescendoUI.initBundleUI()` (line ~20494)
-   - Click handler: finds bundle from selected curve or SVG → calls `regenerateMidi(bundle)` → "Regenerating..." feedback
-   - `SVGElementManager.selectElement` patched to show/hide button based on `needsRegeneration`
-
-4. **Bundle row on curve select** — in `CurveMaker.selectCurve()` (line ~14472) and `deselectCurve()` (line ~14505)
-   - Shows `#cdBundleRow` + time readout + regen button when curve belongs to a bundle
-   - Hides on deselect
-
-**Known param flow (potential issue area):**
-- `step2()` calls `registerBundle()` with: `{ pitchModel, pitchInfo, dynamic1, dynamic2, clef, velocity }`
-- `regenerateMidi()` calls `generateCrescendoMidi(curve, bundle.pitchModel, bundle.pitchInfo, { velocity, articulation: 89 })`
-- Verify: are `bundle.pitchModel` and `bundle.pitchInfo` stored correctly? Is `pitchInfo` a full object or is it missing fields after save/load?
-
-**Debugging approach:**
-1. Open browser console
-2. Create a crescendo bundle (Step 1 + Step 2)
-3. Select the curve, change slope or drag endpoint
-4. Check console: does `needsRegeneration` get set? Does the Regen button appear?
-5. Click Regen MIDI — check console for the `regenerateMidi: Starting/Complete` logs
-6. If MIDI doesn't regenerate: inspect `bundle.pitchModel`, `bundle.pitchInfo`, `curve.curveData` in console
-7. If button doesn't appear: check if `lookupBundleByCurveId` returns the bundle
-
-**Key code locations for troubleshooting:**
-| What | Location (line ~) |
-|------|-------------------|
-| `regenerateMidi()` | 20424 |
-| `syncCurveToDatabase()` flag | 15373–15382 |
-| `initBundleUI()` button wiring | 20494–20545 |
-| `selectCurve()` bundle row | 14472–14483 |
-| `deselectCurve()` bundle row | 14505–14507 |
-| `registerBundle()` params | 20146–20165 |
-| `generateCrescendoMidi()` | 19547 |
-| `insertCrescendoMidi()` | ~19940 |
-| `_isBundleDragging` guard | 20143 (property), 20340 (set), 20412 (clear) |
-| `startBundleDrag()` | ~20298 |
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -206,6 +191,9 @@ That's it. Everything else below is for Cascade.
 - ASB-107: Phase 3 MIDI Regeneration — final bug fixes. See ASB-107 entry for full details.
 - ASB-108: NF Bundle defensive hardening — 3 patterns ported from CD bug fixes. **Root cause found: duplicate bundles.** Multiple bundles accumulated for the same curveId (old saved bundles + new registrations). `lookupBundleByCurveId` returned the first (oldest) match with wrong pitchModel. **Fixed:** (1) Old MIDI deletion switched to `sourceCurve`-based filtering (robust, doesn't rely on ID sync), (2) Console cleanup — removed resolved Bug 5/7 diagnostics, condensed noisy logs, (3) Bundle dedup in `step2` — removes existing bundles for same curveId before registering new one, (4) Bundle dedup in `importBundles` — Map-based dedup keeps only highest-ID bundle per curveId on load, (5) `lookupBundleByCurveId` returns last match (highest ID = most recent) as safety fallback, (6) Delete handler dual-lookup — both Delete button and Delete key now try `CurveMaker.selectedCurve` first, fall back to `SVGElementManager.selectedElement` (matching regen button pattern). User confirmed: regen reproduces MIDI accurately, delete works from curve or SVG selection.
 - ASB-109: Bartók Pizzicato Bundle System — full implementation. Bundle registry (bundles[], registerBundle with gcId dedup, lookupBySvgId/ByGcId, deleteBundle, exportBundles, importBundles with Map dedup). startBundleDrag (cumulative delta for GC+SVG+MIDI). initBundleUI (delete button + Delete key with dual-lookup, selectElement/deselectAll patches, panel maxHeight recalc). GC mousedown handler expanded for NF+BP. ScoreManager persistence (databases.bpBundles). UI: #bpBundleRow with impact readout + Delete Bundle button.
+- ASB-110: Pizzicato Tremolo Bundle System — full implementation (identical pattern to BP). Bundle registry with all 3 defensive patterns (registration dedup, import Map dedup, dual-lookup delete). startBundleDrag (cumulative delta for GC+SVG+MIDI, arrow embedded in SVG). initBundleUI (delete button + Delete key, selectElement/deselectAll patches, panel maxHeight recalc). GC mousedown handler expanded for NF+BP+PT. ScoreManager persistence (databases.ptBundles). UI: #ptBundleRow with start time readout + Delete Bundle button.
+- ASB-111: Pizz Trem Glissando Bundle System — curve-based bundle (like CD, not GC-based like NF/BP/PT). Bundle registry with registration dedup + import Map dedup + dual-lookup delete. registerBundle stores curveId/svgId/midiSnippetId + all regen params (startPitch, endPitch, startDynamic, endDynamic, clef, model, slope, y1, y2). startBundleDrag (cumulative delta for curve+SVG+MIDI). regenerateMidi (server-side async: delete old MIDI → re-generate via /api/pizz-trem-gliss/generate-midi → re-insert). CurveMaker hooks: selectCurve/deselectCurve (bundle row show/hide), syncCurveToDatabase (needsRegeneration flag), handleCurveMouseDown (Shift+drag bundle move). ScoreManager persistence (databases.ptgBundles). UI: #ptgBundleRow with start time readout + Regen MIDI + Delete Bundle buttons.
+- ASB-112: Vibrato Bundle System — curve-based bundle (same pattern as CD/PTG). **MIDI channel fix:** hardcoded ch0 → `track + 3` (vibrato bank 4–7). **Params support:** `generateVibratoMidi` accepts `params` object for regeneration (pitch, velocity, track). **Bundle registry:** bundles[], registerBundle with curveId dedup, lookupByCurveId/BySvgId (last-match), deleteBundle (sourceCurve-based MIDI deletion), exportBundles/importBundles (Map dedup). **startBundleDrag:** cumulative delta for curve+SVG+MIDI. **regenerateMidi:** client-side async (delete old → re-generate via generateVibratoMidi → re-insert → update bundle). **CurveMaker hooks:** selectCurve/deselectCurve (vibBundleRow show/hide), handleCurveMouseDown (Shift+drag), start endpoint drag (SVG anchor sync), end endpoint drag (endTime + needsRegeneration sync). **initBundleUI:** delete button + Delete key dual-lookup, selectElement/deselectAll patches, regen button wiring. **ScoreManager:** `vibBundles` source. **UI:** `#vibBundleRow` with start time readout + Regen MIDI + Delete Bundle buttons. **Also:** PTG MIDI channel fix (CHANNEL_OFFSET from 7 to -1 → base bank 0–3). **Future TODOs added:** Long Tone Glissando System + Bundle, XLD Cell System + Bundle.
 
 ### Session Log — Notation Fragment Score Integration
 - ASB-096: Fragment asset audit — all 8 NFs verified, re-rendered NF008-Cello, cropped all SVGs, created output dirs + notation_fragment_db.json
@@ -420,6 +408,7 @@ That's it. Everything else below is for Cascade.
 | ASB-107 | Phase 3 final fixes — bundle dedup (step2 + importBundles + latest-ID lookup), sourceCurve deletion, delete dual-lookup, console cleanup | Complete |
 | ASB-108 | NF Bundle defensive hardening — registration dedup (gcId), import dedup (Map by gcId), dual-lookup delete (GC + SVG) | Complete |
 | ASB-109 | Bartók Pizzicato Bundle System — registry, drag, delete, persistence, UI row, GC mousedown hook, all defensive patterns | Complete |
+| ASB-110 | Pizzicato Tremolo Bundle System — same pattern as BP, all defensive patterns, GC mousedown NF+BP+PT, ptBundles persistence | Complete |
 
 ---
 
@@ -448,6 +437,7 @@ That's it. Everything else below is for Cascade.
 | Feb 22, 2026 | fd0f37e | NF005-Violin: b.b. pizzicato + extended techniques + \midiBB CC0=80 (ASB-092) |
 | Feb 23, 2026 | 07cf5da | notation fragment score integration: pre-computed timing DB, GC+SVG+MIDI insertion, UI panel (ASB-096 to ASB-103) |
 | Feb 25, 2026 | c873292 | CD bundle system complete: bundle dedup, delete dual-lookup, MIDI regen fixes, documentation (ASB-106/107) |
+| Feb 25, 2026 | — | BP + PT + PTG bundle systems (ASB-109/110/111) |
 
 ---
 

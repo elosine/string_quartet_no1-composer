@@ -31,7 +31,7 @@ const MICROSECONDS_PER_BEAT = 1000000; // 60 BPM → 1 beat = 1 second
 const MS_TO_TICKS = TICKS_PER_BEAT / 1000; // 0.48 ticks per ms
 
 const CC0_PIZZ_TREMOLO = 95;
-const CHANNEL_OFFSET = 7; // channel = track + 7 (track is 1-based)
+const CHANNEL_OFFSET = -1; // channel = track - 1 (channels 0-3: no CC7/CC4 conflicts)
 
 const BEND_CENTER = 8192;
 const BEND_PER_SEMITONE = 8192;
@@ -334,7 +334,7 @@ Required:
   --endPitch      Ending pitch
   --startDynamic  ppp|pp|p|mp|mf|f|ff|fff
   --endDynamic    ppp|pp|p|mp|mf|f|ff|fff
-  --track         1-4 (maps to MIDI channels 8-11)
+  --track         1-4 (maps to MIDI channels 0-3)
   --duration      seconds (decimal OK)
 
 Optional (curve shape — defaults to linear if omitted):

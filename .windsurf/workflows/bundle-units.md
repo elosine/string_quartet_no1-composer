@@ -108,8 +108,10 @@ When implementing bundles for another system (e.g., Bartók Pizz, Long Tones, Vi
 
 ### Systems Known to Need Bundling (Future)
 - ~~Bartók Pizzicato (SVG + MIDI + GC)~~ — **DONE (ASB-109)**
-- Long Tones (SVG + MIDI + curve?)
-- Glissando fragments (SVG + MIDI + curve)
+- ~~Pizzicato Tremolo (SVG + MIDI + GC, arrow embedded in SVG)~~ — **DONE (ASB-110)**
+- ~~Pizz Trem Glissando (SVG + MIDI + curve, server-side MIDI regen)~~ — **DONE (ASB-111)**
+- Long Tone Glissando (SVG + MIDI + curve — needs pipeline creation first)
+- XLD Cell (components TBD — needs system creation first)
 - Custom notation insertions
 
 ---
@@ -252,6 +254,23 @@ Edge case: if curve starts very near page boundary, SVG's negative offset gets c
 | UI elements | `#cdBundleRow`, `#cdRegenMidiBtn`, `#cdDeleteBundleBtn` |
 | ScoreManager registration | `registerBuiltInSources()` — `databases.cdBundles` |
 
+### Vibrato
+
+| Component | Location in `public/index.html` |
+|-----------|-------------------------------|
+| Bundle registry + CRUD | `VibratoUI.bundles[]`, `registerBundle()`, `lookupBundleByCurveId()`, `lookupBundleBySvgId()`, `deleteBundle()`, `exportBundles()`, `importBundles()` |
+| Bundle drag | `VibratoUI.startBundleDrag()` — shifts curve, SVG, MIDI snippets, MidiController events by cumulative timeDelta |
+| MIDI regeneration | `VibratoUI.regenerateMidi(bundle)` — client-side: deletes old MIDI, re-generates via `generateVibratoMidi` with stored bundle params, inserts new MIDI, clears flag |
+| Regen button wiring | `VibratoUI.initBundleUI()` — click handler + SVGElementManager.selectElement patch for show/hide |
+| needsRegeneration trigger | `CurveMaker.syncCurveToDatabase()` — sets flag on associated bundle (guarded by `_isBundleDragging`) |
+| Bundle row on curve select | `CurveMaker.selectCurve()` / `deselectCurve()` — shows/hides `#vibBundleRow` + regen button |
+| Endpoint drag sync | `CurveMaker` 'start' case (SVG anchor sync) + 'end' case (endTime + needsRegeneration) |
+| Shift+drag | `CurveMaker.handleCurveMouseDown` — checks `VibratoUI.lookupBundleByCurveId` |
+| Live readout | `#vibBundleTime` in Vibrato panel HTML |
+| UI elements | `#vibBundleRow`, `#vibRegenMidiBtn`, `#vibDeleteBundleBtn` |
+| ScoreManager registration | `registerBuiltInSources()` — `vibBundles` |
+| MIDI channel | Vibrato bank: `track + 3` → channels 4–7 (CC4 + channel pressure) |
+
 ---
 
 ## Potential Side Effects Checklist
@@ -355,6 +374,80 @@ if (!bundle && svgSelection) bundle = lookupBySvgId(svgSelection.id);
 
 ---
 
+## Two Bundle Variants: GC-Based vs Curve-Based
+
+All bundle systems follow the same core pattern (registry, drag, delete, persistence), but there are two distinct variants depending on the primary component type.
+
+### Variant A: GC-Based Bundles (no curve)
+
+**Systems:** Notation Fragment, Bartók Pizzicato, Pizzicato Tremolo
+
+| Aspect | Details |
+|--------|---------|
+| Primary component | Gravitational Conductor (GC) |
+| Drag trigger | SVG mousedown (via `SVGElementManager.handleMouseMove`) |
+| Drag propagation | SVG drag shifts GC + MIDI snippet + optional arrow by time delta |
+| Anchor time | GC `impactTime` or `startSeconds` |
+| Lookup keys | `lookupBySvgId`, `lookupByGcId` |
+| MIDI regeneration | Not needed (MIDI is pre-computed or user-triggered) |
+| CurveMaker hooks | None — no curve involvement |
+| Delete key handler | In `initBundleUI` — checks GC selection, falls back to SVG |
+
+**Key code pattern:**
+```js
+// In SVGElementManager.handleMouseMove (drag propagation)
+const bundle = SystemUI.lookupBundleBySvgId(draggedElement.id);
+if (bundle) {
+    // Shift GC, MIDI, arrow by timeDelta
+}
+```
+
+### Variant B: Curve-Based Bundles (with CurveMaker)
+
+**Systems:** Crescendo/Decrescendo, Pizz Trem Glissando, Vibrato
+
+| Aspect | Details |
+|--------|---------|
+| Primary component | CurveMaker curve |
+| Drag trigger | Shift+click on curve (via `CurveMaker.handleCurveMouseDown`) |
+| Drag propagation | `startBundleDrag` shifts curve + SVG + MIDI by cumulative time delta |
+| Anchor time | `curve.startSeconds` |
+| Lookup keys | `lookupByCurveId`, `lookupBySvgId` |
+| MIDI regeneration | Yes — `regenerateMidi(bundle)` with stored params, safe ordering (generate → delete old → insert new) |
+| CurveMaker hooks | `selectCurve` (show bundle row), `deselectCurve` (hide), `handleCurveMouseDown` (Shift+drag), endpoint drag (SVG anchor sync + endTime sync) |
+| Delete key handler | In `initBundleUI` — dual-lookup: curve selection first, then SVG fallback |
+
+**Key code patterns (4 CurveMaker hook points):**
+```js
+// 1. handleCurveMouseDown — Shift+drag bundle move
+if (target === 'curve' && e.shiftKey) {
+    const bundle = SystemUI.lookupBundleByCurveId(curve.id);
+    if (bundle) { SystemUI.startBundleDrag(bundle, e); return; }
+}
+
+// 2. selectCurve — show bundle row
+const bundle = SystemUI.lookupBundleByCurveId(curve.id);
+if (bundle && row) { row.style.display = ''; /* update time + regen btn */ }
+
+// 3. deselectCurve — hide bundle row
+const row = document.getElementById('xxxBundleRow');
+if (row) row.style.display = 'none';
+
+// 4. Endpoint drag — sync SVG anchor + bundle times
+// In 'start' case: update svgEl.referenceSeconds, bundle.startTime
+// In 'end' case: update bundle.endTime, set needsRegeneration
+```
+
+**MIDI regeneration flow (safe ordering):**
+1. Generate new MIDI first (from stored bundle params)
+2. If success: delete old MIDI by `sourceCurve` tag (robust, not by ID array)
+3. Remove old MidiController events (filter by `sourceCurve`)
+4. Insert new MIDI
+5. Update `bundle.midiSnippetIds`, clear `needsRegeneration`
+6. Reload MIDI display
+
+---
+
 ## Blueprint: Adding Bundling to a New System
 
 ### Step-by-Step Implementation Guide
@@ -419,8 +512,9 @@ Based on the NF and CD implementations, here's the proven pattern:
 
 | System | Components | Primary | Regen Needed? | Priority |
 |--------|------------|---------|---------------|----------|
-| Long Tone Glissando | SVG + MIDI + Curve | Curve | Yes (same as CD) | High |
-| Vibrato | SVG + MIDI + Curve | Curve | Yes (CC4 ramp) | High |
+| Long Tone Glissando | SVG + MIDI + Curve | Curve | Yes (same as CD) | High — needs pipeline first |
+| XLD Cell | TBD | TBD | TBD | High — needs system creation first |
+| ~~Vibrato~~ | SVG + MIDI + Curve | Curve | Yes (CC4 ramp, client-side) | **DONE (ASB-112)** |
 | ~~Bartók Pizzicato~~ | SVG + MIDI + GC | GC | No (discrete events) | **DONE (ASB-109)** |
-| Pizzicato Tremolo | SVG + MIDI + GC + Arrow | GC | Possible (timing DB) | Medium |
-| Pizz Trem Glissando | SVG + MIDI + Curve | Curve | Yes (pitch bend) | Medium |
+| ~~Pizzicato Tremolo~~ | SVG + MIDI + GC (arrow in SVG) | GC | No (user regenerates) | **DONE (ASB-110)** |
+| ~~Pizz Trem Glissando~~ | SVG + MIDI + Curve | Curve | Yes (server-side regen) | **DONE (ASB-111)** |
