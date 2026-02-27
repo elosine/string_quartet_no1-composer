@@ -45,7 +45,7 @@ That's it. Everything else below is for Cascade.
 | Bartók Pizzicato | Complete (Pattern 4 — AI Direct) | Maintenance only |
 | Glissando System | Complete | Maintenance only |
 | Vibrato System | **Bundle Complete** | Bundle system (curve-based, like CD/PTG). MIDI ch fix, params regen, CurveMaker hooks, ScoreManager persistence. See ASB-112 |
-| Crescendo-Decrescendo | Complete | Maintenance only |
+| Crescendo-Decrescendo | **Volume Mode added** | ASB-112: Curve/Steady/Linear CC7 modes. Maintenance otherwise |
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
 | Pizz Tremolo Glissando | **Complete** | Full system: UI + server + MIDI + SVG + AI Command Bridge (two-part/single go). Prompt guide: `AI_PIZZ_TREM_GLISS_PROMPT_GUIDE.md` |
 | Notation Fragment System | **Bundle System Complete** | Full pipeline + score insertion (GC + SVG + MIDI). UI panel built. Pre-computed timing DB. 8 fragments ready. Bundle system (drag/delete as unit) implemented. Next: compose more fragments, AI prompt guide |
@@ -131,16 +131,16 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **Vibrato Bundle System complete (ASB-112).** Full curve-based bundle: MIDI channel fix (hardcoded ch0 → track+3 for vibrato bank 4–7), params support for regeneration, SVG ID capture in step2, bundle row HTML, all bundle methods (register/lookup/delete/export/import/startBundleDrag/regenerateMidi/initBundleUI), CurveMaker hooks (select/deselect/shift-drag/endpoint sync), ScoreManager persistence. Also added PTG MIDI channel fix (CHANNEL_OFFSET -1 → base bank 0–3). Two future TODOs added: Long Tone Glissando System + Bundle, XLD Cell System + Bundle.
+> **ASB-112/113: CrescendoUI Volume Mode + Pie Dial for Curves.** Added Volume Mode dropdown (Curve/Steady/Linear) to Cresc/Decresc panel — three CC7 behaviors with dynamicToCC7 helper, full bundle persistence (register/export/import/regen). Extended pie dial clock (updateMotivePie) to track CurveMaker curves in addition to motives — motives take priority, read-only change.
 
 ---
 
 ## Current Session
 
-**Date:** Feb 25, 2026  
-**Focus:** Vibrato Bundle System + PTG MIDI Channel Fix  
-**ASB:** ASB-112  
-**Tier 1 Count This Session:** 5 (Tier 2 commit done)  
+**Date:** Feb 26, 2026  
+**Focus:** CrescendoUI Volume Mode + Pie Dial for Curves  
+**ASB:** ASB-113  
+**Tier 1 Count This Session:** 2 (Tier 2 commit done)  
 **Tier 2 Threshold:** At 4
 
 ### Session Log (prior sessions)
