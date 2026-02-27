@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="8.70mm" height="30.09mm" viewBox="0.0691 0.1109 4.9495 17.1237">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.5691, 12.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="3.7200" y2="2.0000"/>
+</g>
+<g transform="translate(0.5691, 12.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="3.7200" y2="1.0000"/>
+</g>
+<g transform="translate(0.5691, 12.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="3.7200" y2="-0.0000"/>
+</g>
+<g transform="translate(0.5691, 12.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="3.7200" y2="-1.0000"/>
+</g>
+<g transform="translate(0.5691, 12.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="3.7200" y2="-2.0000"/>
+</g>
+<g transform="translate(0.5691, 7.8793)">
+<rect x="1.0250" y="-0.1000" width="1.2833" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 8.8793)">
+<rect x="0.9783" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 9.8793)">
+<rect x="0.9783" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTrem-treble-FQS6-fff-cres.ly:157:4:5">
+<g transform="translate(2.5611, 16.2293)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="0.0000" x2="1.9487" y2="0.4000"/>
+</g>
+<g transform="translate(2.5611, 16.2293)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="-0.0000" x2="1.9487" y2="-0.4000"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTrem-treble-FQS6-fff-cres.ly:142:4:5">
+<g transform="translate(1.7691, 7.3793)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTrem-treble-FQS6-fff-cres.ly:145:4:5">
+<g transform="translate(1.7691, 1.7107)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="1.0998" text-anchor="start" fill="currentColor">
+<tspan>pizz.</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTrem-treble-FQS6-fff-cres.ly:153:4:5">
+<g transform="translate(0.8636, 16.4541)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.4097, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.8194, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<g transform="translate(2.5907, 12.8793)">
+<rect x="-0.0650" y="-10.7000" width="0.1300" height="5.0895" ry="0.0400" fill="currentColor"/>
+</g>
+<g transform="translate(2.5907, 4.7241)">
+<path stroke-width="0.0100" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="currentColor" d="M-0.6550 0.5500L-0.5650 0.5500L0.6550 -2.2500L0.5650 -2.2500z"/>
+</g>
+<g transform="translate(2.5907, 4.7241)">
+<path stroke-width="0.0100" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="currentColor" d="M-0.4300 0.1500L-0.6700 0.5500L0.4300 0.5500L0.6700 0.1500zM-0.6700 -1.8500L-0.4300 -2.2500L0.6700 -2.2500L0.4300 -1.8500z"/>
+</g>
+<g transform="translate(0.9781, 7.3793)">
+<path transform="scale(0.0025, -0.0025)" d="M88 -333c-13 0 -24 11 -24 24v102l-15 -9c-5 -3 -11 -5 -17 -5c-17 0 -32 13 -32 32v46c0 11 6 21 15 27l49 31v141l-15 -10c-5 -3 -11 -5 -17 -5c-17 0 -32 13 -32 32v46c0 11 6 21 15 27l49 31v132c0 13 11 24 24 24s23 -11 23 -24v-102l15 9c5 3 11 5 17 5
+c17 0 32 -13 32 -32v-46c0 -11 -6 -21 -15 -27l-49 -31v-141l15 10c5 3 11 5 17 5c17 0 32 -13 32 -32v-46c0 -11 -6 -21 -15 -27l-49 -31v-132c0 -13 -10 -24 -23 -24z" fill="currentColor"/>
+</g>
+</svg>

@@ -1031,7 +1031,7 @@
                 </div>
                 
                 <div class="section-divider"></div>
-                <div class="section-label" style="background: var(--clr-darkRed); color: #fff; padding: 3px 6px; border-radius: 2px;">Crescendo / Decrescendo System</div>
+                <div class="section-label" style="background: var(--clr-darkRed); color: #fff; padding: 3px 6px; border-radius: 2px;">Sustained Tone System</div>
                 
                 <div class="curve-input-row">
                     <label style="font-size: 9px; min-width: 28px;">Track</label>
@@ -1114,6 +1114,14 @@
                         <option value="ff">ff</option>
                         <option value="fff">fff</option>
                         <option value="ffff">ffff</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Vol</label>
+                    <select id="cdVolumeMode" style="width: 80px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;" title="Volume mode: how CC7 volume behaves">
+                        <option value="curve" selected>Curve</option>
+                        <option value="steady">Steady</option>
+                        <option value="linear">Linear</option>
                     </select>
                 </div>
                 <div class="curve-input-row">
@@ -5481,26 +5489,35 @@
                 // Get gTrack for this staff
                 const gTrack = String(staffIndex + 1);
                 
-                // Check if we're within a motive
-                if (!window.MotiveMaker) {
+                // Find active motive or curve at current time for this track
+                let activeItem = null;
+                
+                // Check motives first (take priority)
+                if (window.MotiveMaker) {
+                    const motives = MotiveMaker.motives.filter(m => 
+                        m.gTrack === gTrack && 
+                        currentTimeSec >= m.startSeconds && 
+                        currentTimeSec <= m.endSeconds
+                    );
+                    if (motives.length > 0) activeItem = motives[0];
+                }
+                
+                // Check curves if no motive found
+                if (!activeItem && window.CurveMaker) {
+                    const curves = CurveMaker.curves.filter(c =>
+                        c.gTrack === gTrack &&
+                        currentTimeSec >= c.startSeconds &&
+                        currentTimeSec <= c.endSeconds
+                    );
+                    if (curves.length > 0) activeItem = curves[0];
+                }
+                
+                if (!activeItem) {
                     pie.group.style.display = 'none';
                     return;
                 }
                 
-                // Find active motive at current time for this track
-                const motives = MotiveMaker.motives.filter(m => 
-                    m.gTrack === gTrack && 
-                    currentTimeSec >= m.startSeconds && 
-                    currentTimeSec <= m.endSeconds
-                );
-                
-                if (motives.length === 0) {
-                    pie.group.style.display = 'none';
-                    return;
-                }
-                
-                const motive = motives[0];
-                const progress = (currentTimeSec - motive.startSeconds) / (motive.endSeconds - motive.startSeconds);
+                const progress = (currentTimeSec - activeItem.startSeconds) / (activeItem.endSeconds - activeItem.startSeconds);
                 
                 // Get track dimensions
                 const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
@@ -5523,8 +5540,8 @@
                 pie.border.setAttribute('width', pieSize);
                 pie.border.setAttribute('height', pieSize);
                 
-                // Set pie color to motive color
-                const color = ColorMap[motive.color] || motive.color;
+                // Set pie color to active item color
+                const color = ColorMap[activeItem.color] || activeItem.color;
                 pie.arc.setAttribute('fill', color);
                 
                 // Calculate pie arc (starts full, empties clockwise)
@@ -14197,6 +14214,7 @@
                 startPoint.setAttribute('stroke', '#fff');
                 startPoint.setAttribute('stroke-width', '2');
                 startPoint.style.cursor = 'move';
+                startPoint.style.display = 'none';
                 startPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'start'));
                 group.appendChild(startPoint);
                 
@@ -14209,6 +14227,7 @@
                 endPoint.setAttribute('stroke', '#fff');
                 endPoint.setAttribute('stroke-width', '2');
                 endPoint.style.cursor = 'move';
+                endPoint.style.display = 'none';
                 endPoint.addEventListener('mousedown', (e) => this.handleCurveMouseDown(e, curve, 'end'));
                 group.appendChild(endPoint);
                 
@@ -14539,6 +14558,12 @@
                     if (curve.elements.startPoint) curve.elements.startPoint.style.display = 'block';
                     if (curve.elements.endPoint) curve.elements.endPoint.style.display = 'block';
                     
+                    // Show continuation endpoint handles for multi-page curves
+                    if (curve.elements.contEndPointTop) curve.elements.contEndPointTop.style.display = '';
+                    if (curve.elements.contEndPointBottom) curve.elements.contEndPointBottom.style.display = '';
+                    if (curve.elements.contStartPointTop) curve.elements.contStartPointTop.style.display = '';
+                    if (curve.elements.contStartPointBottom) curve.elements.contStartPointBottom.style.display = '';
+                    
                     // Show preview curve for multi-page curves
                     this.updatePreviewCurve(curve);
                 }
@@ -14627,6 +14652,11 @@
                     if (this.selectedCurve.elements.boundingBox) this.selectedCurve.elements.boundingBox.style.display = 'none';
                     if (this.selectedCurve.elements.startPoint) this.selectedCurve.elements.startPoint.style.display = 'none';
                     if (this.selectedCurve.elements.endPoint) this.selectedCurve.elements.endPoint.style.display = 'none';
+                    // Hide continuation endpoint handles
+                    if (this.selectedCurve.elements.contEndPointTop) this.selectedCurve.elements.contEndPointTop.style.display = 'none';
+                    if (this.selectedCurve.elements.contEndPointBottom) this.selectedCurve.elements.contEndPointBottom.style.display = 'none';
+                    if (this.selectedCurve.elements.contStartPointTop) this.selectedCurve.elements.contStartPointTop.style.display = 'none';
+                    if (this.selectedCurve.elements.contStartPointBottom) this.selectedCurve.elements.contStartPointBottom.style.display = 'none';
                     // Hide preview curve and hit path
                     if (this.selectedCurve.elements.previewPath) this.selectedCurve.elements.previewPath.style.display = 'none';
                     if (this.selectedCurve.elements.previewHitPath) this.selectedCurve.elements.previewHitPath.style.display = 'none';
@@ -14787,9 +14817,10 @@
                     if (!isMultiPage) {
                         // Single-page curve: simple show/hide
                         curve.elements.group.style.display = visible ? '' : 'none';
-                        // Show main endpoints (they may have been hidden for multi-page)
-                        if (curve.elements.endPoint) curve.elements.endPoint.style.display = '';
-                        if (curve.elements.startPoint) curve.elements.startPoint.style.display = '';
+                        // Show main endpoints only if this curve is selected (they may have been hidden for multi-page)
+                        const isSelected = this.selectedCurve && this.selectedCurve.id === curve.id;
+                        if (curve.elements.endPoint) curve.elements.endPoint.style.display = isSelected ? '' : 'none';
+                        if (curve.elements.startPoint) curve.elements.startPoint.style.display = isSelected ? '' : 'none';
                         // Hide ALL continuation segments (legacy + top/bottom)
                         if (curve.elements.continuationGroup) {
                             curve.elements.continuationGroup.style.display = 'none';
@@ -15101,7 +15132,8 @@
                     ep.setAttribute('cy', y2Pixel);
                     ep.setAttribute('fill', color);
                     ep._dragOpts = { page, section, trackDims: trackDimsForSection };
-                    ep.style.display = '';
+                    const isSelected = this.selectedCurve && this.selectedCurve.id === curve.id;
+                    ep.style.display = isSelected ? '' : 'none';
                 } else if (curve.elements[endPointKey]) {
                     curve.elements[endPointKey].style.display = 'none';
                 }
@@ -15126,7 +15158,8 @@
                     sp.setAttribute('cy', y1Pixel);
                     sp.setAttribute('fill', color);
                     sp._dragOpts = { page, section, trackDims: trackDimsForSection };
-                    sp.style.display = '';
+                    const isSelected = this.selectedCurve && this.selectedCurve.id === curve.id;
+                    sp.style.display = isSelected ? '' : 'none';
                 } else if (curve.elements[startPointKey]) {
                     curve.elements[startPointKey].style.display = 'none';
                 }
@@ -20566,8 +20599,10 @@
                             console.log('CrescendoUI.step2: SVG inserted into score');
                         }
                         
-                        // Generate and insert MIDI (pitch bend segments + CC7 volume ramp)
-                        const midiResult = await this.generateCrescendoMidi(curve, pitchModel, pitchInfo, params);
+                        // Generate and insert MIDI (pitch bend segments + CC7 volume)
+                        const volumeMode = params?.volumeMode ?? document.getElementById('cdVolumeMode').value;
+                        const midiParams = { ...params, volumeMode, dynamic1: dyn1, dynamic2: dyn2 };
+                        const midiResult = await this.generateCrescendoMidi(curve, pitchModel, pitchInfo, midiParams);
                         let midiInsert = null;
                         if (midiResult) {
                             midiInsert = await this.insertCrescendoMidi(midiResult, curve);
@@ -20590,7 +20625,8 @@
                             this.registerBundle(curve.id, bundleSvgId, bundleMidiIds,
                                 startSeconds, curve.endSeconds, track, {
                                     pitchModel, pitchInfo, dynamic1: dyn1, dynamic2: dyn2,
-                                    clef: lpClef, velocity: params?.velocity ?? (parseInt(document.getElementById('cdVelocityInput').value) || 115)
+                                    clef: lpClef, velocity: params?.velocity ?? (parseInt(document.getElementById('cdVelocityInput').value) || 115),
+                                    volumeMode: params?.volumeMode ?? document.getElementById('cdVolumeMode').value
                                 });
                         }
                         
@@ -20688,19 +20724,48 @@
                 const startTime = curveData.startTime;
                 const duration = curve.endSeconds - curve.startSeconds;
                 
-                // Build CC7 volume ramp samples from curve Y
-                // normalizedY (0-1) maps to CC7 value (0-127)
+                // Dynamic name to CC7 value mapping
+                const dynamicToCC7 = (dyn) => {
+                    const map = { pppp: 10, ppp: 20, pp: 35, p: 50, mp: 65, mf: 80, f: 95, ff: 110, fff: 120, ffff: 127 };
+                    return map[dyn] ?? 80;
+                };
+                
+                // Build CC7 volume samples based on volume mode
+                const volumeMode = params?.volumeMode ?? 'curve';
                 const cc7Samples = [];
                 const numCC7Samples = Math.max(2, Math.ceil(duration * 1000 / CC_SAMPLE_INTERVAL));
                 
-                for (let i = 0; i < numCC7Samples; i++) {
-                    const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
-                    const curveIdx = Math.round((t - startTime) / sampleInterval);
-                    const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
-                    const normalizedY = samples[clampedIdx];
-                    const ccValue = Math.round(Math.max(0, Math.min(127, normalizedY * 127)));
-                    cc7Samples.push({ time: t, value: ccValue });
+                if (volumeMode === 'steady') {
+                    // Steady: flat CC7 at Dyn1 level throughout
+                    const steadyValue = dynamicToCC7(params?.dynamic1 ?? 'mf');
+                    for (let i = 0; i < numCC7Samples; i++) {
+                        const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
+                        cc7Samples.push({ time: t, value: steadyValue });
+                    }
+                } else if (volumeMode === 'linear') {
+                    // Linear: ramp from Dyn1 CC7 to Dyn2 CC7, independent of curve shape
+                    const startCC7 = dynamicToCC7(params?.dynamic1 ?? 'p');
+                    const endCC7 = dynamicToCC7(params?.dynamic2 ?? 'f');
+                    for (let i = 0; i < numCC7Samples; i++) {
+                        const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
+                        const progress = i / (numCC7Samples - 1);
+                        const ccValue = Math.round(startCC7 + progress * (endCC7 - startCC7));
+                        cc7Samples.push({ time: t, value: Math.max(0, Math.min(127, ccValue)) });
+                    }
+                } else {
+                    // Curve (default): CC7 follows curve Y shape (normalizedY 0-1 → CC7 0-127)
+                    for (let i = 0; i < numCC7Samples; i++) {
+                        const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
+                        const curveIdx = Math.round((t - startTime) / sampleInterval);
+                        const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
+                        const normalizedY = samples[clampedIdx];
+                        const ccValue = Math.round(Math.max(0, Math.min(127, normalizedY * 127)));
+                        cc7Samples.push({ time: t, value: ccValue });
+                    }
                 }
+                
+                console.log('CrescendoUI.generateCrescendoMidi: volumeMode=' + volumeMode,
+                    'cc7 range:', cc7Samples[0]?.value, '→', cc7Samples[cc7Samples.length - 1]?.value);
                 
                 // Determine segments based on pitch model
                 let segments = [];
@@ -21275,10 +21340,11 @@
                     dynamic2: params.dynamic2 || 'ff',
                     clef: params.clef || 'treble',
                     velocity: params.velocity || 115,
+                    volumeMode: params.volumeMode || 'curve',
                     needsRegeneration: false
                 };
                 this.bundles.push(bundle);
-                console.log('CrescendoUI.registerBundle:', bundle.id, 'curve:', curveId, 'pitchModel:', bundle.pitchModel, 'pitchInfo:', JSON.stringify(bundle.pitchInfo));
+                console.log('CrescendoUI.registerBundle:', bundle.id, 'curve:', curveId, 'pitchModel:', bundle.pitchModel, 'volumeMode:', bundle.volumeMode);
                 return bundle;
             },
             
@@ -21389,6 +21455,7 @@
                         dynamic2: b.dynamic2,
                         clef: b.clef,
                         velocity: b.velocity,
+                        volumeMode: b.volumeMode || 'curve',
                         needsRegeneration: b.needsRegeneration
                     })),
                     nextBundleId: this.nextBundleId
@@ -21592,7 +21659,10 @@
                 // 1. Generate new MIDI FIRST (before deleting old, so failure is non-destructive)
                 const params = {
                     velocity: bundle.velocity || 115,
-                    articulation: 89 // senza vibrato
+                    articulation: 89, // senza vibrato
+                    volumeMode: bundle.volumeMode || 'curve',
+                    dynamic1: bundle.dynamic1 || 'pp',
+                    dynamic2: bundle.dynamic2 || 'ff'
                 };
                 const midiResult = await this.generateCrescendoMidi(
                     curve, bundle.pitchModel, bundle.pitchInfo, params
