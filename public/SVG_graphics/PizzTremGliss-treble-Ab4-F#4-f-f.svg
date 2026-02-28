@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="13.88mm" height="21.21mm" viewBox="-0.4431 0.1109 7.9000 12.0684">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0569, 7.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="6.9000" y2="2.0000"/>
+</g>
+<g transform="translate(0.0569, 7.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="6.9000" y2="1.0000"/>
+</g>
+<g transform="translate(0.0569, 7.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="6.9000" y2="-0.0000"/>
+</g>
+<g transform="translate(0.0569, 7.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="6.9000" y2="-1.0000"/>
+</g>
+<g transform="translate(0.0569, 7.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="6.9000" y2="-2.0000"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTremGliss-treble-Ab4-F%234-f-f.ly:159:4:5">
+<g transform="translate(0.5691, 7.8793)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="2.2698" y1="0.7162" x2="3.5744" y2="1.5540"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTremGliss-treble-Ab4-F%234-f-f.ly:186:4:5">
+<g transform="translate(5.1023, 9.3793)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTremGliss-treble-Ab4-F%234-f-f.ly:188:4:5">
+<g transform="translate(5.4066, 11.3541)">
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(5.9239, 7.8793)">
+<rect x="-0.0650" y="-4.7000" width="0.1300" height="6.0895" ry="0.0400" fill="currentColor"/>
+</g>
+<g transform="translate(5.9239, 6.2241)">
+<path stroke-width="0.0100" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="currentColor" d="M-0.6550 0.5500L-0.5650 0.5500L0.6550 -2.2500L0.5650 -2.2500z"/>
+</g>
+<g transform="translate(5.9239, 6.2241)">
+<path stroke-width="0.0100" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="currentColor" d="M-0.4300 0.1500L-0.6700 0.5500L0.4300 0.5500L0.6700 0.1500zM-0.6700 -1.8500L-0.4300 -2.2500L0.6700 -2.2500L0.4300 -1.8500z"/>
+</g>
+<g transform="translate(4.3593, 9.3793)">
+<path transform="scale(0.0025, -0.0025)" d="M0 112c0 13 8 25 20 30l34 13v148c0 13 10 24 23 24s24 -11 24 -24v-129l73 29v148c0 13 11 24 24 24s23 -11 23 -24v-129l10 4c4 2 8 2 12 2c17 0 32 -14 32 -32v-46c0 -13 -8 -24 -20 -29l-34 -14v-148l10 4c4 2 8 3 12 3c17 0 32 -14 32 -32v-46c0 -13 -8 -25 -20 -30
+l-34 -13v-148c0 -13 -10 -24 -23 -24s-24 11 -24 24v129l-73 -29v-148c0 -13 -11 -24 -24 -24s-23 11 -23 24v129l-10 -4c-4 -2 -8 -2 -12 -2c-17 0 -32 14 -32 32v46c0 13 8 24 20 29l34 14v148l-10 -4c-4 -2 -8 -3 -12 -3c-17 0 -32 14 -32 32v46zM174 89l-73 -30v-148
+l73 30v148z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTremGliss-treble-Ab4-F%234-f-f.ly:177:4:5">
+<g transform="translate(2.5784, 11.2293)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="0.0000" x2="2.2282" y2="0.4000"/>
+</g>
+<g transform="translate(2.5784, 11.2293)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="-0.0000" x2="2.2282" y2="-0.4000"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTremGliss-treble-Ab4-F%234-f-f.ly:155:4:5">
+<g transform="translate(1.6156, 8.3793)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTremGliss-treble-Ab4-F%234-f-f.ly:165:4:5">
+<g transform="translate(1.6156, 1.7107)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="1.0998" text-anchor="start" fill="currentColor">
+<tspan>pizz.</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/PizzTremGliss-treble-Ab4-F%234-f-f.ly:173:4:5">
+<g transform="translate(0.5395, 11.4541)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M233 243c-57 0 -104 -112 -104 -178c0 -22 9 -38 31 -38c17 0 35 12 47 28c24 33 51 118 51 155c0 18 -7 33 -25 33zM70 243c-52 0 -44 -123 -101 -123c-12 0 -21 6 -21 18c0 4 1 8 3 13c30 68 75 141 136 141c33 0 53 -23 60 -52c29 31 67 52 103 52
+c69 0 107 -49 107 -114c0 -94 -82 -190 -160 -190c-27 0 -52 5 -73 17c-10 6 -24 5 -27 -4l-17 -51c-3 -8 -4 -16 -4 -23c0 -24 10 -29 32 -31c13 -1 19 -11 19 -21s-7 -21 -20 -21c-35 0 -72 5 -108 5c-37 0 -74 -5 -109 -5c-13 0 -20 11 -20 21c0 23 29 22 52 23
+c25 2 49 15 57 39l92 272c3 9 7 18 7 25c0 5 -2 9 -8 9z" fill="currentColor"/>
+
+<path transform="translate(0.5463, 0.0000) scale(0.0015, -0.0015)" d="M233 243c-57 0 -104 -112 -104 -178c0 -22 9 -38 31 -38c17 0 35 12 47 28c24 33 51 118 51 155c0 18 -7 33 -25 33zM70 243c-52 0 -44 -123 -101 -123c-12 0 -21 6 -21 18c0 4 1 8 3 13c30 68 75 141 136 141c33 0 53 -23 60 -52c29 31 67 52 103 52
+c69 0 107 -49 107 -114c0 -94 -82 -190 -160 -190c-27 0 -52 5 -73 17c-10 6 -24 5 -27 -4l-17 -51c-3 -8 -4 -16 -4 -23c0 -24 10 -29 32 -31c13 -1 19 -11 19 -21s-7 -21 -20 -21c-35 0 -72 5 -108 5c-37 0 -74 -5 -109 -5c-13 0 -20 11 -20 21c0 23 29 22 52 23
+c25 2 49 15 57 39l92 272c3 9 7 18 7 25c0 5 -2 9 -8 9z" fill="currentColor"/>
+
+<path transform="translate(1.0926, 0.0000) scale(0.0015, -0.0015)" d="M233 243c-57 0 -104 -112 -104 -178c0 -22 9 -38 31 -38c17 0 35 12 47 28c24 33 51 118 51 155c0 18 -7 33 -25 33zM70 243c-52 0 -44 -123 -101 -123c-12 0 -21 6 -21 18c0 4 1 8 3 13c30 68 75 141 136 141c33 0 53 -23 60 -52c29 31 67 52 103 52
+c69 0 107 -49 107 -114c0 -94 -82 -190 -160 -190c-27 0 -52 5 -73 17c-10 6 -24 5 -27 -4l-17 -51c-3 -8 -4 -16 -4 -23c0 -24 10 -29 32 -31c13 -1 19 -11 19 -21s-7 -21 -20 -21c-35 0 -72 5 -108 5c-37 0 -74 -5 -109 -5c-13 0 -20 11 -20 21c0 23 29 22 52 23
+c25 2 49 15 57 39l92 272c3 9 7 18 7 25c0 5 -2 9 -8 9z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<g transform="translate(2.4373, 7.8793)">
+<rect x="-0.0650" y="-5.7000" width="0.1300" height="6.0895" ry="0.0400" fill="currentColor"/>
+</g>
+<g transform="translate(2.4373, 5.2241)">
+<path stroke-width="0.0100" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="currentColor" d="M-0.6550 0.5500L-0.5650 0.5500L0.6550 -2.2500L0.5650 -2.2500z"/>
+</g>
+<g transform="translate(2.4373, 5.2241)">
+<path stroke-width="0.0100" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="currentColor" d="M-0.4300 0.1500L-0.6700 0.5500L0.4300 0.5500L0.6700 0.1500zM-0.6700 -1.8500L-0.4300 -2.2500L0.6700 -2.2500L0.4300 -1.8500z"/>
+</g>
+<g transform="translate(0.7617, 8.3793)">
+<path transform="scale(0.0025, -0.0025)" d="M34 33l-1 -58v-10c0 -21 2 -43 5 -64c41 38 85 80 85 136c0 31 -13 63 -40 63c-31 0 -48 -33 -49 -67zM32 441l-8 -333c25 27 60 42 97 42c49 0 79 -52 79 -106c0 -76 -78 -117 -133 -169c-19 -18 -27 -52 -55 -52c-17 0 -30 17 -30 35l-14 583c10 6 21 9 32 9
+s22 -3 32 -9z" fill="currentColor"/>
+</g>
+</svg>

@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 25, 2026  
-**Current ASB Number:** ASB-106
+**Last Updated:** Feb 26, 2026  
+**Current ASB Number:** ASB-116
 
 ---
 
@@ -131,17 +131,17 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-112/113: CrescendoUI Volume Mode + Pie Dial for Curves.** Added Volume Mode dropdown (Curve/Steady/Linear) to Cresc/Decresc panel — three CC7 behaviors with dynamicToCC7 helper, full bundle persistence (register/export/import/regen). Extended pie dial clock (updateMotivePie) to track CurveMaker curves in addition to motives — motives take priority, read-only change.
+> **ASB-112–116: Volume Mode, Pie Dial, Hairpin/Secco, Sequence Generator.** Added Volume Mode dropdown (Curve/Steady/Linear) to CD panel. Extended pie dial to track curves. Hairpin notation varies by volume mode + secco text conditional. Built standalone Sequence Generator tool (HTML page) with documentation and programmatic insertion analysis.
 
 ---
 
 ## Current Session
 
 **Date:** Feb 26, 2026  
-**Focus:** CrescendoUI Volume Mode + Pie Dial for Curves  
-**ASB:** ASB-113  
-**Tier 1 Count This Session:** 2 (Tier 2 commit done)  
-**Tier 2 Threshold:** At 4
+**Focus:** Sequence Generator Tool + Documentation  
+**ASB:** ASB-116  
+**Tier 1 Count This Session:** 6 (ASB-111 through ASB-116)  
+**Tier 2 Threshold:** At 4 — EXCEEDED, committing now
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -194,6 +194,15 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 - ASB-110: Pizzicato Tremolo Bundle System — full implementation (identical pattern to BP). Bundle registry with all 3 defensive patterns (registration dedup, import Map dedup, dual-lookup delete). startBundleDrag (cumulative delta for GC+SVG+MIDI, arrow embedded in SVG). initBundleUI (delete button + Delete key, selectElement/deselectAll patches, panel maxHeight recalc). GC mousedown handler expanded for NF+BP+PT. ScoreManager persistence (databases.ptBundles). UI: #ptBundleRow with start time readout + Delete Bundle button.
 - ASB-111: Pizz Trem Glissando Bundle System — curve-based bundle (like CD, not GC-based like NF/BP/PT). Bundle registry with registration dedup + import Map dedup + dual-lookup delete. registerBundle stores curveId/svgId/midiSnippetId + all regen params (startPitch, endPitch, startDynamic, endDynamic, clef, model, slope, y1, y2). startBundleDrag (cumulative delta for curve+SVG+MIDI). regenerateMidi (server-side async: delete old MIDI → re-generate via /api/pizz-trem-gliss/generate-midi → re-insert). CurveMaker hooks: selectCurve/deselectCurve (bundle row show/hide), syncCurveToDatabase (needsRegeneration flag), handleCurveMouseDown (Shift+drag bundle move). ScoreManager persistence (databases.ptgBundles). UI: #ptgBundleRow with start time readout + Regen MIDI + Delete Bundle buttons.
 - ASB-112: Vibrato Bundle System — curve-based bundle (same pattern as CD/PTG). **MIDI channel fix:** hardcoded ch0 → `track + 3` (vibrato bank 4–7). **Params support:** `generateVibratoMidi` accepts `params` object for regeneration (pitch, velocity, track). **Bundle registry:** bundles[], registerBundle with curveId dedup, lookupByCurveId/BySvgId (last-match), deleteBundle (sourceCurve-based MIDI deletion), exportBundles/importBundles (Map dedup). **startBundleDrag:** cumulative delta for curve+SVG+MIDI. **regenerateMidi:** client-side async (delete old → re-generate via generateVibratoMidi → re-insert → update bundle). **CurveMaker hooks:** selectCurve/deselectCurve (vibBundleRow show/hide), handleCurveMouseDown (Shift+drag), start endpoint drag (SVG anchor sync), end endpoint drag (endTime + needsRegeneration sync). **initBundleUI:** delete button + Delete key dual-lookup, selectElement/deselectAll patches, regen button wiring. **ScoreManager:** `vibBundles` source. **UI:** `#vibBundleRow` with start time readout + Regen MIDI + Delete Bundle buttons. **Also:** PTG MIDI channel fix (CHANNEL_OFFSET from 7 to -1 → base bank 0–3). **Future TODOs added:** Long Tone Glissando System + Bundle, XLD Cell System + Bundle.
+
+### Session Log — Crescendo Enhancements
+- ASB-112: CrescendoUI Volume Mode — CC7 Behavior Selector (Curve/Steady/Linear), dynamicToCC7 helper, full bundle persistence
+- ASB-113: Pie Dial Clock now tracks CurveMaker curves (not just motives) — motives take priority, read-only change
+- ASB-114: Hairpin notation varies by volume mode (Curve/Steady/Linear) + secco text conditional (`#cdSeccoCheckbox`), server-side LilyPond template modification
+
+### Session Log — Sequence Generator
+- ASB-115: Standalone HTML sequence generator (`tools/sequence_generator.html`) — configurable gap buckets, instruments, pitch sets, octave rules, dynamics. Three output formats: TSV, JSON, Console Script (BartokPizzUI.go() loop)
+- ASB-116: Documentation (`docs/Sequence_Generator_Guide.md`) — architecture, expansion guide, programmatic score insertion analysis (JSON → BartokPizzUI.go() loop)
 
 ### Session Log — Notation Fragment Score Integration
 - ASB-096: Fragment asset audit — all 8 NFs verified, re-rendered NF008-Cello, cropped all SVGs, created output dirs + notation_fragment_db.json
@@ -409,6 +418,12 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-108 | NF Bundle defensive hardening — registration dedup (gcId), import dedup (Map by gcId), dual-lookup delete (GC + SVG) | Complete |
 | ASB-109 | Bartók Pizzicato Bundle System — registry, drag, delete, persistence, UI row, GC mousedown hook, all defensive patterns | Complete |
 | ASB-110 | Pizzicato Tremolo Bundle System — same pattern as BP, all defensive patterns, GC mousedown NF+BP+PT, ptBundles persistence | Complete |
+| ASB-111 | Pizz Trem Glissando Bundle System — curve-based, regen MIDI, CurveMaker hooks, ptgBundles persistence | Complete |
+| ASB-112 | CrescendoUI Volume Mode — CC7 Behavior Selector (Curve/Steady/Linear), dynamicToCC7, bundle persistence | Complete |
+| ASB-113 | Pie Dial Clock tracks CurveMaker curves (not just motives), motives take priority | Complete |
+| ASB-114 | Hairpin notation varies by volume mode + secco text conditional, server-side LilyPond template modification | Complete |
+| ASB-115 | Sequence Generator Tool — standalone HTML page, gap buckets, instruments, pitch sets, 3 output formats (TSV/JSON/Console Script) | Complete |
+| ASB-116 | Sequence Generator Documentation — architecture, expansion guide, programmatic score insertion analysis | Complete |
 
 ---
 
@@ -438,6 +453,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Feb 23, 2026 | 07cf5da | notation fragment score integration: pre-computed timing DB, GC+SVG+MIDI insertion, UI panel (ASB-096 to ASB-103) |
 | Feb 25, 2026 | c873292 | CD bundle system complete: bundle dedup, delete dual-lookup, MIDI regen fixes, documentation (ASB-106/107) |
 | Feb 25, 2026 | — | BP + PT + PTG bundle systems (ASB-109/110/111) |
+| Feb 28, 2026 | 4aee777 | volume mode, hairpin/secco, pie dial, sequence generator tool + docs (ASB-111 to ASB-116) |
 
 ---
 

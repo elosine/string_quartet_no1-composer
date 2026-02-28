@@ -14,7 +14,7 @@
 
 \paper{
   tagline = ##f
-  paper-width = 22\mm
+  paper-width = 14\mm
   paper-height = 25\mm
   top-margin = 0\mm
   bottom-margin = 0\mm
@@ -75,11 +75,6 @@
     -\tweak extra-offset #'(0 . -0.2)  % X,Y offset in staff spaces
     \mf
 
-    % === HAIRPIN ===
-    -\tweak extra-offset #'(-0.8 . 0)  % X,Y offset in staff spaces
-    -\tweak shorten-pair #'(0 . 4)    % (left . right) - positive=shorter
-    \>
-
     % Non-Vib Text
     -\tweak extra-offset #'(0 . 2.4)  % X,Y offset in staff spaces
     ^\markup {
@@ -87,24 +82,6 @@
       \fontsize #-6
       "Non-Vib"
     }
-
-    % Spacer for hairpin end
-    s2
-
-    % === DYNAMIC_2 ===
-    -\tweak extra-offset #'(-5.3 . -0.2)  % X,Y offset in staff spaces
-    \mf
-
-    % Secco Text
-    -\tweak extra-offset #'(-4.6 . -2.9)
-    _\markup {
-      \override #'(font-name . "Crimson Pro Light Italic")
-      \fontsize #-6
-      "secco"
-    }
-
-    \!
-    
     % NOTATION HERE /////////////////////////////////////////////////////
 
   }

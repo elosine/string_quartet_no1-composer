@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequence Generator — String Quartet No. 1</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #1a1a2e; color: #e0e0e0;
+            padding: 20px; line-height: 1.5;
+        }
+        h1 { color: #f0a050; font-size: 22px; margin-bottom: 4px; }
+        h2 { color: #d08040; font-size: 16px; margin: 16px 0 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+        .subtitle { color: #888; font-size: 12px; margin-bottom: 16px; }
+
+        .config-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+            max-width: 900px; margin-bottom: 16px;
+        }
+        .config-section {
+            background: #222244; border: 1px solid #444; border-radius: 6px; padding: 12px;
+        }
+        label { font-size: 12px; color: #aaa; display: block; margin-bottom: 2px; }
+        input, select, textarea {
+            background: #2a2a4a; color: #fff; border: 1px solid #555;
+            border-radius: 4px; padding: 4px 8px; font-size: 12px; width: 100%;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #f0a050; }
+        textarea { font-family: 'Consolas', 'Courier New', monospace; resize: vertical; }
+        .row { display: flex; gap: 8px; align-items: end; margin-bottom: 6px; }
+        .row > div { flex: 1; }
+        .row-tight { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+
+        /* Gap bucket styling */
+        .gap-bucket {
+            background: #1e1e3a; border: 1px solid #555; border-radius: 4px;
+            padding: 8px; margin-bottom: 6px; position: relative;
+        }
+        .gap-bucket .bucket-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+        }
+        .gap-bucket .bucket-label { font-size: 11px; font-weight: bold; color: #f0a050; }
+        .remove-bucket {
+            background: #933; color: #fff; border: none; border-radius: 3px;
+            font-size: 10px; padding: 1px 6px; cursor: pointer;
+        }
+        .remove-bucket:hover { background: #b44; }
+        #addBucketBtn {
+            background: #2a6040; color: #fff; border: none; border-radius: 4px;
+            padding: 4px 12px; font-size: 11px; cursor: pointer; margin-top: 4px;
+        }
+        #addBucketBtn:hover { background: #3a7050; }
+
+        /* Instrument rows */
+        .inst-row {
+            display: flex; gap: 6px; align-items: center; margin-bottom: 4px;
+            background: #1e1e3a; padding: 4px 8px; border-radius: 4px;
+        }
+        .inst-row input[type="checkbox"] { width: auto; }
+        .inst-row label { display: inline; margin: 0; color: #ddd; }
+
+        button.generate {
+            background: #f0a050; color: #000; font-weight: bold; border: none;
+            border-radius: 6px; padding: 10px 28px; font-size: 14px; cursor: pointer;
+            margin: 12px 0;
+        }
+        button.generate:hover { background: #ffc080; }
+
+        .output-section { max-width: 900px; margin-top: 12px; }
+        .output-tabs { display: flex; gap: 4px; margin-bottom: 0; }
+        .output-tab {
+            background: #333; color: #aaa; border: 1px solid #555;
+            border-bottom: none; border-radius: 6px 6px 0 0;
+            padding: 6px 16px; font-size: 12px; cursor: pointer;
+        }
+        .output-tab.active { background: #222244; color: #fff; border-color: #f0a050; }
+        .output-content {
+            background: #222244; border: 1px solid #555; border-radius: 0 6px 6px 6px;
+            padding: 12px; position: relative;
+        }
+        .output-content pre {
+            font-family: 'Consolas', 'Courier New', monospace; font-size: 12px;
+            white-space: pre; overflow-x: auto; max-height: 500px; overflow-y: auto;
+        }
+        .copy-btn {
+            position: absolute; top: 8px; right: 8px;
+            background: #555; color: #fff; border: none; border-radius: 4px;
+            padding: 4px 10px; font-size: 11px; cursor: pointer;
+        }
+        .copy-btn:hover { background: #777; }
+        .copy-btn.copied { background: #4a8; }
+
+        .info { font-size: 11px; color: #888; margin-top: 4px; }
+        .stat { font-size: 12px; color: #adf; margin: 4px 0; }
+    </style>
+</head>
+<body>
+    <h1>Sequence Generator</h1>
+    <div class="subtitle">Generates timed note sequences for String Quartet No. 1 — configurable instruments, pitches, gap patterns, octave rules</div>
+
+    <div class="config-grid">
+        <!-- LEFT COLUMN -->
+        <div>
+            <div class="config-section">
+                <h2>Timing</h2>
+                <div class="row">
+                    <div>
+                        <label>Start Time (s)</label>
+                        <input type="number" id="startTime" value="323.000" step="0.001">
+                    </div>
+                    <div>
+                        <label>Note Count</label>
+                        <input type="number" id="noteCount" value="21" min="1" max="200">
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h2>Gap Buckets</h2>
+                <div class="info">Define gap types. Each has a range and a count rule for how many appear in the sequence.</div>
+                <div id="gapBuckets"></div>
+                <button id="addBucketBtn" onclick="addGapBucket()">+ Add Bucket</button>
+            </div>
+
+            <div class="config-section">
+                <h2>Gap Distribution</h2>
+                <div class="row">
+                    <div>
+                        <label>Min shorts between longs</label>
+                        <input type="number" id="minShortsBetween" value="2" min="1" max="10">
+                    </div>
+                    <div>
+                        <label>Max shorts between longs</label>
+                        <input type="number" id="maxShortsBetween" value="5" min="1" max="10">
+                    </div>
+                </div>
+                <div class="info">"Short" = the first bucket. "Long" = every other bucket combined. Longs are distributed with this many shorts between them.</div>
+            </div>
+
+            <div class="config-section">
+                <h2>First Note Override</h2>
+                <div class="row">
+                    <div>
+                        <label>Instrument</label>
+                        <select id="firstInst">
+                            <option value="">— Auto —</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Pitch (e.g. A2)</label>
+                        <input type="text" id="firstPitch" value="A2" placeholder="e.g. A2">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+            <div class="config-section">
+                <h2>Instruments</h2>
+                <div class="info">Check to include. Track number maps to score tracks. Clef and octave rules control notation.</div>
+                <div id="instruments"></div>
+                <button id="addBucketBtn" onclick="addInstrument()" style="margin-top: 6px; background: #2a4060;">+ Add Instrument</button>
+            </div>
+
+            <div class="config-section">
+                <h2>Pitch Set</h2>
+                <label>Pitches (comma-separated, English notation)</label>
+                <textarea id="pitchSet" rows="3">G, G+, G#, Ad, A, Bbd, Bb, B, Cd, C</textarea>
+                <div class="info">Use: C, C#, Cb, C+, Cd, C#+, Cbd, Bb, etc. Octave is auto-assigned per instrument rules.</div>
+            </div>
+
+            <div class="config-section">
+                <h2>Output Options</h2>
+                <div class="row-tight">
+                    <input type="checkbox" id="showIncrement" checked style="width: auto;">
+                    <label for="showIncrement" style="display: inline;">Show INCREMENT column</label>
+                </div>
+                <div class="row-tight">
+                    <input type="checkbox" id="showGapType" checked style="width: auto;">
+                    <label for="showGapType" style="display: inline;">Show GAP TYPE column</label>
+                </div>
+                <div class="row-tight">
+                    <input type="checkbox" id="showClef" style="width: auto;">
+                    <label for="showClef" style="display: inline;">Show CLEF column</label>
+                </div>
+                <div class="row-tight">
+                    <label style="display: inline; margin-right: 4px;">Dynamic:</label>
+                    <select id="dynamicMode" style="width: auto;">
+                        <option value="fixed">Fixed</option>
+                        <option value="random">Random from set</option>
+                        <option value="none">None (omit)</option>
+                    </select>
+                    <input type="text" id="dynamicValue" value="fff" style="width: 50px; margin-left: 4px;" placeholder="fff">
+                </div>
+                <div class="info" id="dynamicInfo">All notes get the same dynamic.</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="generate" onclick="generate()">⚡ Generate Sequence</button>
+
+    <div class="output-section" id="outputSection" style="display: none;">
+        <div id="stats"></div>
+        <div class="output-tabs">
+            <div class="output-tab active" onclick="switchTab('tsv')">TSV (Google Sheets)</div>
+            <div class="output-tab" onclick="switchTab('json')">JSON (Programmatic)</div>
+            <div class="output-tab" onclick="switchTab('console')">Console Script</div>
+        </div>
+        <div class="output-content">
+            <button class="copy-btn" onclick="copyOutput()">Copy</button>
+            <pre id="outputPre"></pre>
+        </div>
+    </div>
+
+    <script>
+    // ============================================
+    // STATE
+    // ============================================
+    let gapBuckets = [];
+    let instrumentDefs = [];
+    let generatedData = null;
+    let currentTab = 'tsv';
+
+    // ============================================
+    // DEFAULT CONFIGURATION
+    // ============================================
+    const DEFAULT_GAP_BUCKETS = [
+        { name: 'Short', min: 0.06, max: 0.14, countMin: null, countMax: null, isDefault: true },
+        { name: 'Long', min: 0.23, max: 0.27, countMin: 4, countMax: 6, isDefault: false }
+    ];
+
+    const DEFAULT_INSTRUMENTS = [
+        { abbrev: 'VC', fullName: 'Cello', track: 1, clef: 'bass', enabled: true,
+          octaveRule: 'lowest', rangeBottom: 'C2', rangeTop: 'A5' },
+        { abbrev: 'VLA', fullName: 'Viola', track: 2, clef: 'alto', enabled: true,
+          octaveRule: 'lowest', rangeBottom: 'C3', rangeTop: 'A5' },
+        { abbrev: 'V1', fullName: 'Violin 1', track: 3, clef: 'treble', enabled: true,
+          octaveRule: 'highest', rangeBottom: 'G3', rangeTop: 'E5' },
+        { abbrev: 'V2', fullName: 'Violin 2', track: 4, clef: 'treble', enabled: true,
+          octaveRule: 'highest', rangeBottom: 'G3', rangeTop: 'E5' }
+    ];
+
+    // ============================================
+    // PITCH UTILITIES
+    // ============================================
+    const NOTE_ORDER = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    const SEMITONE_MAP = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+
+    function parsePitchClass(str) {
+        // Parse pitch class without octave: G, G#, G+, Gb, Gd, Bbd, etc.
+        str = str.trim();
+        const m = str.match(/^([A-Ga-g])([#b]?)([+d]?)$/);
+        if (!m) return null;
+        return { letter: m[1].toUpperCase(), accidental: m[2], quarterTone: m[3] };
+    }
+
+    function parsePitchWithOctave(str) {
+        // Parse full pitch: G2, G#3, Bb4, Cd5, Bbd2, G+3
+        str = str.trim();
+        const m = str.match(/^([A-Ga-g])([#b]?)([+d]?)(\d)$/);
+        if (!m) return null;
+        return {
+            letter: m[1].toUpperCase(), accidental: m[2],
+            quarterTone: m[3], octave: parseInt(m[4])
+        };
+    }
+
+    function pitchToMidiApprox(p) {
+        // Approximate MIDI number for range comparison (ignoring quarter tones)
+        let semi = SEMITONE_MAP[p.letter] || 0;
+        if (p.accidental === '#') semi += 1;
+        else if (p.accidental === 'b') semi -= 1;
+        return (p.octave + 1) * 12 + semi;
+    }
+
+    function formatPitchClass(pc) {
+        return pc.letter + pc.accidental + pc.quarterTone;
+    }
+
+    function assignOctave(pitchClass, instrument) {
+        // Assign octave based on instrument's rule and range
+        const bottom = parsePitchWithOctave(instrument.rangeBottom);
+        const top = parsePitchWithOctave(instrument.rangeTop);
+        if (!bottom || !top) return pitchClass.letter + pitchClass.accidental + pitchClass.quarterTone + '4';
+
+        const bottomMidi = pitchToMidiApprox(bottom);
+        const topMidi = pitchToMidiApprox(top);
+
+        if (instrument.octaveRule === 'lowest') {
+            // Find the lowest octave where this pitch is within range
+            for (let oct = 0; oct <= 8; oct++) {
+                const test = { ...pitchClass, octave: oct };
+                const midi = pitchToMidiApprox(test);
+                if (midi >= bottomMidi && midi <= topMidi) {
+                    return formatPitchClass(pitchClass) + oct;
+                }
+            }
+        } else {
+            // 'highest' — find the highest octave within range
+            for (let oct = 8; oct >= 0; oct--) {
+                const test = { ...pitchClass, octave: oct };
+                const midi = pitchToMidiApprox(test);
+                if (midi >= bottomMidi && midi <= topMidi) {
+                    return formatPitchClass(pitchClass) + oct;
+                }
+            }
+        }
+
+        // Fallback: middle of range
+        return formatPitchClass(pitchClass) + '4';
+    }
+
+    // Convert our notation to BartokPizzUI English notation
+    // Our format: G+3, Cd5, Bbd2 etc.
+    // BartokPizz format: G+3, Cd5, Bbd2 — same!
+    function toEnglishNotation(pitch) {
+        return pitch; // They use the same format
+    }
+
+    // ============================================
+    // RANDOM UTILITIES
+    // ============================================
+    function randRange(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // ============================================
+    // GAP DISTRIBUTION ALGORITHM
+    // ============================================
+    function generateGapSequence(totalGaps) {
+        const buckets = gapBuckets.filter(b => document.getElementById(`bucket_enabled_${b._id}`)?.checked !== false);
+        if (buckets.length === 0) return [];
+
+        // If only one bucket, all gaps come from it
+        if (buckets.length === 1) {
+            return Array.from({ length: totalGaps }, () => ({
+                value: randRange(buckets[0].min, buckets[0].max),
+                type: buckets[0].name
+            }));
+        }
+
+        // Multi-bucket: bucket[0] is "short" (default/filler), rest are "long" types
+        const shortBucket = buckets[0];
+        const longBuckets = buckets.slice(1);
+
+        // Determine how many long gaps total
+        let totalLong = 0;
+        const longCounts = [];
+        for (const lb of longBuckets) {
+            const count = randInt(lb.countMin || 0, lb.countMax || 0);
+            longCounts.push(count);
+            totalLong += count;
+        }
+
+        // Ensure we don't exceed total gaps
+        totalLong = Math.min(totalLong, totalGaps - 1);
+        const totalShort = totalGaps - totalLong;
+
+        // Build list of long gaps with their bucket info
+        const longGaps = [];
+        for (let i = 0; i < longBuckets.length; i++) {
+            for (let j = 0; j < longCounts[i]; j++) {
+                longGaps.push(longBuckets[i]);
+            }
+        }
+        const shuffledLongs = shuffle(longGaps).slice(0, totalLong);
+
+        // Distribute shorts between longs
+        const minBetween = parseInt(document.getElementById('minShortsBetween').value) || 1;
+        const maxBetween = parseInt(document.getElementById('maxShortsBetween').value) || 5;
+
+        // Create groups: (numLong + 1) groups of shorts
+        const numGroups = shuffledLongs.length + 1;
+        const groups = new Array(numGroups).fill(0);
+
+        // Assign minimum shorts to each group (except we need at least 1 in first and last)
+        let remaining = totalShort;
+        for (let i = 0; i < numGroups; i++) {
+            const min = Math.min(minBetween, remaining);
+            groups[i] = min;
+            remaining -= min;
+        }
+
+        // Distribute remaining shorts randomly
+        while (remaining > 0) {
+            const idx = randInt(0, numGroups - 1);
+            if (groups[idx] < maxBetween) {
+                groups[idx]++;
+                remaining--;
+            } else {
+                // If all groups are at max, just add wherever
+                const anyIdx = randInt(0, numGroups - 1);
+                groups[anyIdx]++;
+                remaining--;
+            }
+        }
+
+        // Build final gap sequence
+        const result = [];
+        for (let g = 0; g < numGroups; g++) {
+            // Add short gaps for this group
+            for (let s = 0; s < groups[g]; s++) {
+                result.push({
+                    value: randRange(shortBucket.min, shortBucket.max),
+                    type: shortBucket.name
+                });
+            }
+            // Add the long gap (if not the last group)
+            if (g < shuffledLongs.length) {
+                const lb = shuffledLongs[g];
+                result.push({
+                    value: randRange(lb.min, lb.max),
+                    type: lb.name
+                });
+            }
+        }
+
+        return result;
+    }
+
+    // ============================================
+    // INSTRUMENT DISTRIBUTION
+    // ============================================
+    function distributeInstruments(noteCount, firstInst) {
+        const enabled = instrumentDefs.filter(inst => {
+            const el = document.getElementById(`inst_enabled_${inst._id}`);
+            return el ? el.checked : inst.enabled;
+        });
+        if (enabled.length === 0) return [];
+
+        const result = [];
+
+        // First note override
+        if (firstInst) {
+            const match = enabled.find(i => i.abbrev === firstInst);
+            if (match) result.push(match);
+            else result.push(enabled[0]);
+        }
+
+        // Cycle through instruments in groups, shuffled within each group
+        const remaining = noteCount - result.length;
+        let pool = [];
+        for (let i = 0; i < remaining; i++) {
+            if (pool.length === 0) pool = shuffle([...enabled]);
+            result.push(pool.shift());
+        }
+
+        return result;
+    }
+
+    // ============================================
+    // PITCH DISTRIBUTION
+    // ============================================
+    function distributePitches(noteCount, firstPitch, instruments) {
+        const pitchSetStr = document.getElementById('pitchSet').value;
+        let pitchClasses = pitchSetStr.split(',').map(s => parsePitchClass(s.trim())).filter(Boolean);
+        if (pitchClasses.length === 0) return [];
+
+        const result = [];
+
+        // First note override
+        if (firstPitch) {
+            const parsed = parsePitchWithOctave(firstPitch);
+            if (parsed) {
+                result.push(firstPitch);
+                // Remove this pitch class from the pool for the first cycle
+                const firstPC = formatPitchClass(parsed);
+                pitchClasses = pitchClasses.filter(pc => formatPitchClass(pc) !== firstPC);
+            }
+        }
+
+        // Cycle through pitch set, shuffled each cycle
+        const remaining = noteCount - result.length;
+        let pool = [];
+        for (let i = 0; i < remaining; i++) {
+            if (pool.length === 0) {
+                pool = shuffle([...pitchClasses]);
+                // Restore full set for subsequent cycles
+                if (i > 0 || result.length > 0) {
+                    const fullSet = pitchSetStr.split(',').map(s => parsePitchClass(s.trim())).filter(Boolean);
+                    pool = shuffle([...fullSet]);
+                }
+            }
+            const pc = pool.shift();
+            const inst = instruments[result.length];
+            const fullPitch = assignOctave(pc, inst);
+            result.push(fullPitch);
+        }
+
+        return result;
+    }
+
+    // ============================================
+    // MAIN GENERATE FUNCTION
+    // ============================================
+    function generate() {
+        const noteCount = parseInt(document.getElementById('noteCount').value) || 21;
+        const startTime = parseFloat(document.getElementById('startTime').value) || 0;
+        const firstInstVal = document.getElementById('firstInst').value;
+        const firstPitchVal = document.getElementById('firstPitch').value.trim();
+
+        // Read current bucket state from DOM
+        readBucketsFromDOM();
+        readInstrumentsFromDOM();
+
+        // 1. Distribute instruments
+        const instruments = distributeInstruments(noteCount, firstInstVal || null);
+
+        // 2. Distribute pitches (with octave assignment)
+        const pitches = distributePitches(noteCount, firstPitchVal || null, instruments);
+
+        // 3. Generate gap sequence
+        const totalGaps = noteCount - 1;
+        const gaps = generateGapSequence(totalGaps);
+
+        // 4. Build timed sequence
+        const dynamicMode = document.getElementById('dynamicMode').value;
+        const dynamicValue = document.getElementById('dynamicValue').value.trim();
+        const dynamicSet = dynamicValue.split(',').map(s => s.trim()).filter(Boolean);
+
+        let time = startTime;
+        const rows = [];
+        for (let i = 0; i < noteCount; i++) {
+            const inst = instruments[i];
+            let dynamic = null;
+            if (dynamicMode === 'fixed') dynamic = dynamicSet[0] || 'fff';
+            else if (dynamicMode === 'random') dynamic = dynamicSet[randInt(0, dynamicSet.length - 1)];
+
+            const gap = i === 0 ? null : gaps[i - 1];
+            rows.push({
+                index: i + 1,
+                instrument: inst.abbrev,
+                pitch: pitches[i],
+                time: parseFloat(time.toFixed(3)),
+                gap: gap ? parseFloat(gap.value.toFixed(3)) : null,
+                gapType: gap ? gap.type : null,
+                dynamic: dynamic,
+                clef: inst.clef,
+                track: inst.track
+            });
+            if (gap) time += gap.value;
+        }
+
+        generatedData = rows;
+
+        // Stats
+        const instCounts = {};
+        rows.forEach(r => { instCounts[r.instrument] = (instCounts[r.instrument] || 0) + 1; });
+        const gapTypeCounts = {};
+        rows.forEach(r => { if (r.gapType) gapTypeCounts[r.gapType] = (gapTypeCounts[r.gapType] || 0) + 1; });
+
+        let statsHtml = `<div class="stat"><strong>${rows.length} notes</strong> | Time span: ${rows[0].time.toFixed(3)}s → ${rows[rows.length - 1].time.toFixed(3)}s (${(rows[rows.length - 1].time - rows[0].time).toFixed(3)}s total)</div>`;
+        statsHtml += `<div class="stat">Instruments: ${Object.entries(instCounts).map(([k, v]) => `${k}: ${v}`).join(', ')}</div>`;
+        statsHtml += `<div class="stat">Gap types: ${Object.entries(gapTypeCounts).map(([k, v]) => `${k}: ${v}`).join(', ')}</div>`;
+        document.getElementById('stats').innerHTML = statsHtml;
+
+        // Render current tab
+        renderOutput();
+        document.getElementById('outputSection').style.display = 'block';
+    }
+
+    // ============================================
+    // OUTPUT RENDERING
+    // ============================================
+    function renderOutput() {
+        if (!generatedData) return;
+        const pre = document.getElementById('outputPre');
+
+        if (currentTab === 'tsv') {
+            pre.textContent = renderTSV();
+        } else if (currentTab === 'json') {
+            pre.textContent = renderJSON();
+        } else if (currentTab === 'console') {
+            pre.textContent = renderConsoleScript();
+        }
+    }
+
+    function renderTSV() {
+        const showInc = document.getElementById('showIncrement').checked;
+        const showType = document.getElementById('showGapType').checked;
+        const showClef = document.getElementById('showClef').checked;
+        const dynMode = document.getElementById('dynamicMode').value;
+
+        let headers = ['#', 'INST', 'PITCH'];
+        if (dynMode !== 'none') headers.push('DYN');
+        if (showClef) headers.push('CLEF');
+        headers.push('TIME');
+        if (showInc) headers.push('INCREMENT');
+        if (showType) headers.push('TYPE');
+
+        const lines = [headers.join('\t')];
+        for (const r of generatedData) {
+            let cols = [r.index, r.instrument, r.pitch];
+            if (dynMode !== 'none') cols.push(r.dynamic || '');
+            if (showClef) cols.push(r.clef);
+            cols.push(r.time.toFixed(3));
+            if (showInc) cols.push(r.gap ? `+${r.gap.toFixed(3)}` : '—');
+            if (showType) cols.push(r.gapType || '—');
+            lines.push(cols.join('\t'));
+        }
+        return lines.join('\n');
+    }
+
+    function renderJSON() {
+        // JSON output for programmatic insertion
+        const output = {
+            _meta: {
+                generator: 'Sequence Generator v1.0',
+                generatedAt: new Date().toISOString(),
+                noteCount: generatedData.length,
+                timeSpan: {
+                    start: generatedData[0].time,
+                    end: generatedData[generatedData.length - 1].time
+                }
+            },
+            targetSystem: 'BartokPizzUI',
+            notes: generatedData.map(r => ({
+                pitch: r.pitch,
+                dynamic: r.dynamic,
+                clef: r.clef,
+                track: r.track,
+                time: r.time,
+                instrument: r.instrument
+            }))
+        };
+        return JSON.stringify(output, null, 2);
+    }
+
+    function renderConsoleScript() {
+        // Generate a console-pasteable script that calls BartokPizzUI.go() for each note
+        let script = '// Paste this into the browser console of your score app\n';
+        script += '// It will call BartokPizzUI.go() for each note with a delay between calls\n';
+        script += '(async function() {\n';
+        script += '    const notes = ' + JSON.stringify(generatedData.map(r => ({
+            pitch: r.pitch, dynamic: r.dynamic, clef: r.clef, track: r.track, time: r.time
+        })), null, 4).split('\n').map((line, i) => i === 0 ? '    ' + line.trim() : '    ' + line).join('\n') + ';\n\n';
+        script += '    console.log(`Inserting ${notes.length} Bartók pizzicatos...`);\n';
+        script += '    for (let i = 0; i < notes.length; i++) {\n';
+        script += '        const n = notes[i];\n';
+        script += '        console.log(`[${i + 1}/${notes.length}] ${n.pitch} @ ${n.time}s (track ${n.track})`);\n';
+        script += '        await BartokPizzUI.go({ pitch: n.pitch, dynamic: n.dynamic, clef: n.clef, track: n.track, time: n.time });\n';
+        script += '        // Small delay to let the server process each pipeline call\n';
+        script += '        await new Promise(r => setTimeout(r, 1500));\n';
+        script += '    }\n';
+        script += '    console.log("Done! All notes inserted.");\n';
+        script += '    if (window.ScoreManager) ScoreManager.markDirty();\n';
+        script += '})();\n';
+        return script;
+    }
+
+    // ============================================
+    // UI: GAP BUCKETS
+    // ============================================
+    let bucketIdCounter = 0;
+
+    function addGapBucket(config = null) {
+        const id = bucketIdCounter++;
+        const b = config || { name: 'New', min: 0.10, max: 0.20, countMin: 2, countMax: 4, isDefault: false };
+        b._id = id;
+        gapBuckets.push(b);
+        renderGapBuckets();
+        return b;
+    }
+
+    function removeGapBucket(id) {
+        gapBuckets = gapBuckets.filter(b => b._id !== id);
+        renderGapBuckets();
+    }
+
+    function renderGapBuckets() {
+        const container = document.getElementById('gapBuckets');
+        container.innerHTML = '';
+        for (const b of gapBuckets) {
+            const div = document.createElement('div');
+            div.className = 'gap-bucket';
+            const isFirst = gapBuckets.indexOf(b) === 0;
+            div.innerHTML = `
+                <div class="bucket-header">
+                    <span class="bucket-label">
+                        <input type="checkbox" id="bucket_enabled_${b._id}" checked style="width:auto; margin-right:4px;">
+                        <input type="text" id="bucket_name_${b._id}" value="${b.name}" style="width:60px; font-weight:bold; background: transparent; border: none; color: #f0a050; font-size: 11px;">
+                        ${isFirst ? '<span style="color:#888; font-size:10px;">(default/filler)</span>' : ''}
+                    </span>
+                    ${gapBuckets.length > 1 ? `<button class="remove-bucket" onclick="removeGapBucket(${b._id})">×</button>` : ''}
+                </div>
+                <div class="row" style="margin-bottom:0;">
+                    <div>
+                        <label>Min (s)</label>
+                        <input type="number" id="bucket_min_${b._id}" value="${b.min}" step="0.01" min="0">
+                    </div>
+                    <div>
+                        <label>Max (s)</label>
+                        <input type="number" id="bucket_max_${b._id}" value="${b.max}" step="0.01" min="0">
+                    </div>
+                    ${!isFirst ? `
+                    <div>
+                        <label>Count min</label>
+                        <input type="number" id="bucket_cmin_${b._id}" value="${b.countMin || 0}" min="0">
+                    </div>
+                    <div>
+                        <label>Count max</label>
+                        <input type="number" id="bucket_cmax_${b._id}" value="${b.countMax || 0}" min="0">
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            container.appendChild(div);
+        }
+    }
+
+    function readBucketsFromDOM() {
+        for (const b of gapBuckets) {
+            b.name = document.getElementById(`bucket_name_${b._id}`)?.value || b.name;
+            b.min = parseFloat(document.getElementById(`bucket_min_${b._id}`)?.value) || b.min;
+            b.max = parseFloat(document.getElementById(`bucket_max_${b._id}`)?.value) || b.max;
+            const cminEl = document.getElementById(`bucket_cmin_${b._id}`);
+            const cmaxEl = document.getElementById(`bucket_cmax_${b._id}`);
+            if (cminEl) b.countMin = parseInt(cminEl.value) || 0;
+            if (cmaxEl) b.countMax = parseInt(cmaxEl.value) || 0;
+        }
+    }
+
+    // ============================================
+    // UI: INSTRUMENTS
+    // ============================================
+    let instIdCounter = 0;
+
+    function addInstrument(config = null) {
+        const id = instIdCounter++;
+        const inst = config || {
+            abbrev: 'NEW', fullName: 'New Instrument', track: 1, clef: 'treble',
+            enabled: true, octaveRule: 'lowest', rangeBottom: 'C3', rangeTop: 'C6'
+        };
+        inst._id = id;
+        instrumentDefs.push(inst);
+        renderInstruments();
+        return inst;
+    }
+
+    function removeInstrument(id) {
+        instrumentDefs = instrumentDefs.filter(i => i._id !== id);
+        renderInstruments();
+    }
+
+    function renderInstruments() {
+        const container = document.getElementById('instruments');
+        container.innerHTML = '';
+        for (const inst of instrumentDefs) {
+            const div = document.createElement('div');
+            div.className = 'inst-row';
+            div.style.flexWrap = 'wrap';
+            div.innerHTML = `
+                <input type="checkbox" id="inst_enabled_${inst._id}" ${inst.enabled ? 'checked' : ''} style="width:auto;">
+                <input type="text" id="inst_abbrev_${inst._id}" value="${inst.abbrev}" style="width:36px; font-weight:bold; font-size:11px; text-align:center;">
+                <input type="text" id="inst_name_${inst._id}" value="${inst.fullName}" style="width:80px; font-size:10px;">
+                <label style="font-size:9px; width:14px;">Tk</label>
+                <input type="number" id="inst_track_${inst._id}" value="${inst.track}" min="1" max="16" style="width:32px; font-size:10px;">
+                <select id="inst_clef_${inst._id}" style="width:56px; font-size:10px;">
+                    <option value="treble" ${inst.clef === 'treble' ? 'selected' : ''}>Treble</option>
+                    <option value="alto" ${inst.clef === 'alto' ? 'selected' : ''}>Alto</option>
+                    <option value="tenor" ${inst.clef === 'tenor' ? 'selected' : ''}>Tenor</option>
+                    <option value="bass" ${inst.clef === 'bass' ? 'selected' : ''}>Bass</option>
+                </select>
+                <select id="inst_oct_${inst._id}" style="width:60px; font-size:10px;">
+                    <option value="lowest" ${inst.octaveRule === 'lowest' ? 'selected' : ''}>Lowest</option>
+                    <option value="highest" ${inst.octaveRule === 'highest' ? 'selected' : ''}>Highest</option>
+                </select>
+                <input type="text" id="inst_bottom_${inst._id}" value="${inst.rangeBottom}" style="width:30px; font-size:10px;" title="Range bottom">
+                <span style="color:#666; font-size:10px;">→</span>
+                <input type="text" id="inst_top_${inst._id}" value="${inst.rangeTop}" style="width:30px; font-size:10px;" title="Range top">
+                <button class="remove-bucket" onclick="removeInstrument(${inst._id})" style="margin-left:auto;">×</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // Update first-note instrument dropdown
+        const firstInstSelect = document.getElementById('firstInst');
+        const current = firstInstSelect.value;
+        firstInstSelect.innerHTML = '<option value="">— Auto —</option>';
+        for (const inst of instrumentDefs) {
+            firstInstSelect.innerHTML += `<option value="${inst.abbrev}" ${inst.abbrev === current ? 'selected' : ''}>${inst.abbrev}</option>`;
+        }
+    }
+
+    function readInstrumentsFromDOM() {
+        for (const inst of instrumentDefs) {
+            inst.abbrev = document.getElementById(`inst_abbrev_${inst._id}`)?.value || inst.abbrev;
+            inst.fullName = document.getElementById(`inst_name_${inst._id}`)?.value || inst.fullName;
+            inst.track = parseInt(document.getElementById(`inst_track_${inst._id}`)?.value) || inst.track;
+            inst.clef = document.getElementById(`inst_clef_${inst._id}`)?.value || inst.clef;
+            inst.octaveRule = document.getElementById(`inst_oct_${inst._id}`)?.value || inst.octaveRule;
+            inst.rangeBottom = document.getElementById(`inst_bottom_${inst._id}`)?.value || inst.rangeBottom;
+            inst.rangeTop = document.getElementById(`inst_top_${inst._id}`)?.value || inst.rangeTop;
+            inst.enabled = document.getElementById(`inst_enabled_${inst._id}`)?.checked !== false;
+        }
+    }
+
+    // ============================================
+    // UI: OUTPUT TABS
+    // ============================================
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.output-tab').forEach(t => {
+            if ((tab === 'tsv' && t.textContent.includes('TSV')) ||
+                (tab === 'json' && t.textContent.includes('JSON')) ||
+                (tab === 'console' && t.textContent.includes('Console')))
+                t.classList.add('active');
+        });
+        renderOutput();
+    }
+
+    function copyOutput() {
+        const pre = document.getElementById('outputPre');
+        navigator.clipboard.writeText(pre.textContent).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+        });
+    }
+
+    // ============================================
+    // UI: DYNAMIC MODE
+    // ============================================
+    document.getElementById('dynamicMode').addEventListener('change', function() {
+        const info = document.getElementById('dynamicInfo');
+        const valInput = document.getElementById('dynamicValue');
+        if (this.value === 'fixed') {
+            info.textContent = 'All notes get the same dynamic.';
+            valInput.style.display = '';
+            valInput.placeholder = 'fff';
+        } else if (this.value === 'random') {
+            info.textContent = 'Random pick from comma-separated set.';
+            valInput.style.display = '';
+            valInput.placeholder = 'pp, mp, f, fff';
+        } else {
+            info.textContent = 'Dynamic column omitted from output.';
+            valInput.style.display = 'none';
+        }
+    });
+
+    // ============================================
+    // INIT
+    // ============================================
+    function init() {
+        // Load default gap buckets
+        for (const b of DEFAULT_GAP_BUCKETS) addGapBucket({ ...b });
+        // Load default instruments
+        for (const inst of DEFAULT_INSTRUMENTS) addInstrument({ ...inst });
+    }
+
+    init();
+    </script>
+</body>
+</html>

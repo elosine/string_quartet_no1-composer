@@ -20513,11 +20513,24 @@
                 const track = params?.track ?? (parseInt(document.getElementById('cdTrackInput').value) || 1);
                 const startSeconds = curve.startSeconds;
                 
-                // Determine hairpin direction based on curve Y
+                // Read volumeMode early (needed for hairpin determination)
+                const volumeMode = params?.volumeMode ?? document.getElementById('cdVolumeMode').value;
+                
+                // Determine hairpin direction based on volumeMode
                 const y1 = params?.y1 ?? (parseFloat(document.getElementById('cdY1Input').value) || 0);
                 const y2 = params?.y2 ?? (parseFloat(document.getElementById('cdY2Input').value) || 0);
-                // Y goes up = crescendo, Y goes down = decrescendo
-                const hairpin = y2 > y1 ? '\\<' : '\\>';
+                let hairpin;
+                if (volumeMode === 'steady') {
+                    hairpin = 'none';
+                } else if (volumeMode === 'linear') {
+                    const dynOrder = ['pppp','ppp','pp','p','mp','mf','f','ff','fff','ffff'];
+                    const d1Idx = dynOrder.indexOf(dyn1);
+                    const d2Idx = dynOrder.indexOf(dyn2);
+                    hairpin = (d1Idx === d2Idx) ? 'none' : (d2Idx > d1Idx ? '\\<' : '\\>');
+                } else {
+                    // curve mode (default): Y goes up = crescendo, Y goes down = decrescendo
+                    hairpin = y2 > y1 ? '\\<' : '\\>';
+                }
                 
                 let startPitch, endPitch, singlePitch;
                 if (pitchModel === 'glissando') {
@@ -20570,7 +20583,8 @@
                             pitchInfo,
                             dynamic1: dyn1,
                             dynamic2: dyn2,
-                            hairpin: y2 > y1 ? '<' : '>'
+                            hairpin: hairpin === 'none' ? 'none' : (hairpin === '\\<' ? '<' : '>'),
+                            secco: params?.secco ?? (document.getElementById('cdSeccoCheckbox')?.checked !== false)
                         })
                     });
                     const createResult = await createResp.json();
@@ -20600,7 +20614,6 @@
                         }
                         
                         // Generate and insert MIDI (pitch bend segments + CC7 volume)
-                        const volumeMode = params?.volumeMode ?? document.getElementById('cdVolumeMode').value;
                         const midiParams = { ...params, volumeMode, dynamic1: dyn1, dynamic2: dyn2 };
                         const midiResult = await this.generateCrescendoMidi(curve, pitchModel, pitchInfo, midiParams);
                         let midiInsert = null;
@@ -20626,7 +20639,8 @@
                                 startSeconds, curve.endSeconds, track, {
                                     pitchModel, pitchInfo, dynamic1: dyn1, dynamic2: dyn2,
                                     clef: lpClef, velocity: params?.velocity ?? (parseInt(document.getElementById('cdVelocityInput').value) || 115),
-                                    volumeMode: params?.volumeMode ?? document.getElementById('cdVolumeMode').value
+                                    volumeMode: params?.volumeMode ?? document.getElementById('cdVolumeMode').value,
+                                    secco: params?.secco ?? (document.getElementById('cdSeccoCheckbox')?.checked !== false)
                                 });
                         }
                         
@@ -21341,6 +21355,7 @@
                     clef: params.clef || 'treble',
                     velocity: params.velocity || 115,
                     volumeMode: params.volumeMode || 'curve',
+                    secco: params.secco !== undefined ? params.secco : true,
                     needsRegeneration: false
                 };
                 this.bundles.push(bundle);
@@ -21456,6 +21471,7 @@
                         clef: b.clef,
                         velocity: b.velocity,
                         volumeMode: b.volumeMode || 'curve',
+                        secco: b.secco !== undefined ? b.secco : true,
                         needsRegeneration: b.needsRegeneration
                     })),
                     nextBundleId: this.nextBundleId

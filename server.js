@@ -1052,10 +1052,13 @@ app.post('/api/lilypond/create-vibrato', (req, res) => {
 
 // Create crescendo LilyPond file from template
 app.post('/api/lilypond/create-crescendo', (req, res) => {
-    const { filename, pitchModel, clef, pitchInfo, dynamic1, dynamic2, hairpin } = req.body;
+    const { filename, pitchModel, clef, pitchInfo, dynamic1, dynamic2, hairpin, secco } = req.body;
     
-    if (!filename || !pitchModel || !clef || !pitchInfo || !dynamic1 || !dynamic2 || !hairpin) {
+    if (!filename || !pitchModel || !clef || !pitchInfo || !dynamic1 || !hairpin) {
         return res.status(400).json({ success: false, error: 'Missing required parameters' });
+    }
+    if (hairpin !== 'none' && !dynamic2) {
+        return res.status(400).json({ success: false, error: 'Missing dynamic2 (required unless hairpin is none)' });
     }
     
     // Select template based on pitch model
@@ -1117,20 +1120,66 @@ app.post('/api/lilypond/create-crescendo', (req, res) => {
             `$1\\${dynamic1}`
         );
         
-        // 6. Substitute dynamic 2
-        template = template.replace(
-            /(% === DYNAMIC_2 ===\n\s*-\\tweak extra-offset[^\n]*\n\s*)\\f/,
-            `$1\\${dynamic2}`
-        );
+        // 6 & 7. Substitute dynamic 2 and hairpin direction
+        if (hairpin === 'none') {
+            // Steady mode: remove hairpin, spacer, dynamic 2, secco text entirely
+            // This produces a compact SVG with just note + dynamic 1 + Non-Vib text
+            
+            // 6a. Remove HAIRPIN block (comment + tweaks + \< or \>)
+            template = template.replace(
+                /\s*% === HAIRPIN ===\n\s*-\\tweak extra-offset[^\n]*\n\s*-\\tweak shorten-pair[^\n]*\n\s*\\[<>]/,
+                ''
+            );
+            
+            // 6b. Remove spacer (single pitch: "s2", glissando: "s2\!")
+            template = template.replace(/\s*% Spacer[^\n]*\n\s*s2\\!/, '');
+            template = template.replace(/\s*% Spacer[^\n]*\n\s*s2/, '');
+            
+            // 6c. Remove DYNAMIC_2 block (comment + tweak + dynamic command)
+            template = template.replace(
+                /\s*% === DYNAMIC_2 ===\n\s*-\\tweak extra-offset[^\n]*\n\s*\\[a-z]+/,
+                ''
+            );
+            
+            // 6d. Remove Secco text block (comment + tweak + markup)
+            template = template.replace(
+                /\s*% Secco Text\n\s*-\\tweak extra-offset[^\n]*\n\s*_\\markup \{[^}]*"secco"[^}]*\}/,
+                ''
+            );
+            
+            // 6e. Remove standalone hairpin terminator \! (if any remains)
+            template = template.replace(/\n\s*\\!\s*\n/, '\n');
+            
+            // 6f. Reduce paper-width for compact steady-mode SVG
+            if (pitchModel === 'glissando') {
+                template = template.replace(/paper-width = \d+\\mm/, 'paper-width = 18\\mm');
+            } else {
+                template = template.replace(/paper-width = \d+\\mm/, 'paper-width = 14\\mm');
+            }
+        } else {
+            // Normal mode: substitute dynamic 2 and hairpin direction
+            if (dynamic2) {
+                template = template.replace(
+                    /(% === DYNAMIC_2 ===\n\s*-\\tweak extra-offset[^\n]*\n\s*)\\f/,
+                    `$1\\${dynamic2}`
+                );
+            }
+            const hairpinCmd = hairpin === '<' ? '\\<' : '\\>';
+            template = template.replace(
+                /(% === HAIRPIN ===\n\s*-\\tweak extra-offset[^\n]*\n\s*-\\tweak shorten-pair[^\n]*\n\s*)\\</,
+                `$1${hairpinCmd}`
+            );
+        }
         
-        // 7. Substitute hairpin direction
-        const hairpinCmd = hairpin === '<' ? '\\<' : '\\>';
-        template = template.replace(
-            /(% === HAIRPIN ===\n\s*-\\tweak extra-offset[^\n]*\n\s*-\\tweak shorten-pair[^\n]*\n\s*)\\</,
-            `$1${hairpinCmd}`
-        );
+        // 8. Conditionally remove Secco text when checkbox is unchecked
+        if (secco === false) {
+            template = template.replace(
+                /\s*% Secco Text\n\s*-\\tweak extra-offset[^\n]*\n\s*_\\markup \{[^}]*"secco"[^}]*\}/,
+                ''
+            );
+        }
         
-        // 8. Pitch-register-based positioning adjustments
+        // 9. Pitch-register-based positioning adjustments
         //    Analyze highest pitch to determine if ledger lines exist above/below staff
         //    Then adjust dynamics (below) and Non-Vib text (above) accordingly
         const noteLetters = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];

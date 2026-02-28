@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="7.73mm" height="19.94mm" viewBox="0.0691 0.5000 4.4015 11.3483">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.5691, 5.0347)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="3.4015" y2="2.0000"/>
+</g>
+<g transform="translate(0.5691, 5.0347)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="3.4015" y2="1.0000"/>
+</g>
+<g transform="translate(0.5691, 5.0347)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="3.4015" y2="-0.0000"/>
+</g>
+<g transform="translate(0.5691, 5.0347)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="3.4015" y2="-1.0000"/>
+</g>
+<g transform="translate(0.5691, 5.0347)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="3.4015" y2="-2.0000"/>
+</g>
+<g transform="translate(1.8991, 9.4947)">
+<path transform="scale(0.0040, -0.0040)" d="M0 205c91 51 211 131 211 233c0 24 -5 48 -14 70c-79 -89 -197 -160 -197 -282v-21zM267 663c0 -44 -16 -82 -39 -116c16 -35 25 -71 25 -109c0 -181 -253 -257 -253 -438h-16v500h16v-70c97 49 224 128 224 233c0 21 -5 42 -13 62c-3 16 10 27 23 27c30 0 33 -63 33 -89
+z" fill="currentColor"/>
+</g>
+<g transform="translate(1.8341, 5.0347)">
+<rect x="-0.0650" y="-1.8640" width="0.1300" height="6.3640" ry="0.0400" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/BartokPizz-treble-F5-fff.ly:53:9:10">
+<g transform="translate(2.2853, 1.8640)">
+<path transform="scale(0.0040, -0.0040)" d="M16 0c0 -9 -7 -16 -16 -16s-16 7 -16 16v100c-48 -8 -85 -50 -85 -100c0 -56 45 -101 101 -101s101 45 101 101c0 50 -37 92 -85 100v-100zM-16 132v68c0 9 7 16 16 16s16 -7 16 -16v-68c66 -8 117 -64 117 -132c0 -74 -59 -133 -133 -133s-133 59 -133 133
+c0 68 51 124 117 132z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/BartokPizz-treble-F5-fff.ly:53:23:24">
+<g transform="translate(1.3805, 10.9743)">
+<g>
+<path transform="scale(0.0020, -0.0020)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.5804, 0.0000) scale(0.0020, -0.0020)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(1.1609, 0.0000) scale(0.0020, -0.0020)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/BartokPizz-treble-F5-fff.ly:53:4:5">
+<g transform="translate(1.7691, 3.0347)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+</svg>
