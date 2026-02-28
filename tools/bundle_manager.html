@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bundle Manager — Score Bundle Inspector & Deleter</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 20px; }
+h1 { color: #00d4ff; margin-bottom: 4px; font-size: 1.4em; }
+.subtitle { color: #888; font-size: 0.85em; margin-bottom: 16px; }
+
+/* Layout */
+.top-bar { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.top-bar label { font-size: 0.85em; color: #aaa; }
+.top-bar input[type="file"] { font-size: 0.85em; }
+
+/* Stats bar */
+.stats-bar { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; padding: 8px 12px; background: #16213e; border-radius: 6px; font-size: 0.82em; }
+.stats-bar .stat { color: #aaa; }
+.stats-bar .stat b { color: #e0e0e0; }
+.stats-bar .stat.warn b { color: #ff6b6b; }
+
+/* Filters */
+.filter-bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; padding: 8px 12px; background: #16213e; border-radius: 6px; }
+.filter-bar label { font-size: 0.8em; color: #aaa; }
+.filter-bar select, .filter-bar input { font-size: 0.8em; padding: 3px 6px; background: #0f3460; color: #e0e0e0; border: 1px solid #333; border-radius: 3px; }
+.filter-bar input[type="number"] { width: 70px; }
+
+/* Action bar */
+.action-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.action-bar button { font-size: 0.8em; padding: 5px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+.btn-select { background: #0f3460; color: #00d4ff; }
+.btn-select:hover { background: #1a4a7a; }
+.btn-deselect { background: #0f3460; color: #aaa; }
+.btn-deselect:hover { background: #1a4a7a; }
+.btn-delete { background: #c0392b; color: #fff; }
+.btn-delete:hover { background: #e74c3c; }
+.btn-delete:disabled { background: #555; color: #888; cursor: not-allowed; }
+.btn-save { background: #27ae60; color: #fff; }
+.btn-save:hover { background: #2ecc71; }
+.btn-save:disabled { background: #555; color: #888; cursor: not-allowed; }
+.btn-undo { background: #8e44ad; color: #fff; }
+.btn-undo:hover { background: #9b59b6; }
+.btn-undo:disabled { background: #555; color: #888; cursor: not-allowed; }
+.selection-info { font-size: 0.8em; color: #f39c12; margin-left: 8px; }
+
+/* Save controls */
+.save-row { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+.save-row label { font-size: 0.8em; color: #aaa; }
+.save-row input[type="text"] { font-size: 0.85em; padding: 4px 8px; background: #0f3460; color: #e0e0e0; border: 1px solid #333; border-radius: 3px; width: 200px; }
+
+/* Table */
+.table-wrap { max-height: 65vh; overflow-y: auto; border: 1px solid #333; border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.8em; }
+thead { position: sticky; top: 0; z-index: 2; }
+th { background: #0f3460; color: #00d4ff; padding: 7px 8px; text-align: left; cursor: pointer; user-select: none; white-space: nowrap; }
+th:hover { background: #1a4a7a; }
+th.sort-asc::after { content: ' ▲'; font-size: 0.7em; }
+th.sort-desc::after { content: ' ▼'; font-size: 0.7em; }
+td { padding: 5px 8px; border-bottom: 1px solid #222; white-space: nowrap; }
+tr { background: #1a1a2e; }
+tr:nth-child(even) { background: #16213e; }
+tr:hover { background: #1e3a5f; }
+tr.selected { background: #2d1b4e !important; }
+tr.deleted { background: #3d1111 !important; opacity: 0.5; text-decoration: line-through; }
+td.cb { text-align: center; width: 30px; }
+input[type="checkbox"] { cursor: pointer; accent-color: #00d4ff; }
+
+/* Type badges */
+.type-badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 0.75em; font-weight: 700; letter-spacing: 0.5px; }
+.type-BP { background: #e91e8a; color: #fff; }
+.type-PT { background: #e74c3c; color: #fff; }
+.type-NF { background: #e67e22; color: #fff; }
+.type-CD { background: #3498db; color: #fff; }
+.type-PTG { background: #9b59b6; color: #fff; }
+.type-VIB { background: #1abc9c; color: #fff; }
+
+/* Range selection highlight */
+tr.range-preview { outline: 2px solid #f39c12; outline-offset: -1px; }
+
+/* Status */
+.status { font-size: 0.82em; padding: 8px; margin-top: 8px; border-radius: 4px; }
+.status.info { background: #16213e; color: #00d4ff; }
+.status.success { background: #1a3d2a; color: #2ecc71; }
+.status.error { background: #3d1a1a; color: #e74c3c; }
+
+/* Empty state */
+.empty { text-align: center; padding: 40px; color: #666; font-size: 1.1em; }
+</style>
+</head>
+<body>
+
+<h1>Bundle Manager</h1>
+<p class="subtitle">Load a saved score, inspect bundles by time & track, select and delete, save as new score.</p>
+
+<div class="top-bar">
+    <label>Load Score JSON:</label>
+    <input type="file" id="fileInput" accept=".json">
+    <span id="fileName" style="font-size:0.82em; color:#888;"></span>
+</div>
+
+<div id="statsBar" class="stats-bar" style="display:none;"></div>
+
+<div id="controls" style="display:none;">
+    <div class="filter-bar">
+        <label>Type:</label>
+        <select id="filterType">
+            <option value="all">All</option>
+            <option value="BP">BP (Bartók Pizz)</option>
+            <option value="PT">PT (Pizz Tremolo)</option>
+            <option value="NF">NF (Notation Fragment)</option>
+            <option value="CD">CD (Crescendo/Decresc)</option>
+            <option value="PTG">PTG (Pizz Trem Gliss)</option>
+            <option value="VIB">VIB (Vibrato)</option>
+        </select>
+        <label>Track:</label>
+        <select id="filterTrack">
+            <option value="all">All</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+        <label>Time from:</label>
+        <input type="number" id="filterTimeFrom" step="0.1" placeholder="min">
+        <label>to:</label>
+        <input type="number" id="filterTimeTo" step="0.1" placeholder="max">
+        <button class="btn-select" onclick="applyFilters()" style="margin-left:8px;">Apply</button>
+        <button class="btn-deselect" onclick="clearFilters()">Clear</button>
+    </div>
+
+    <div class="action-bar">
+        <button class="btn-select" onclick="selectAll()">Select All Visible</button>
+        <button class="btn-deselect" onclick="deselectAll()">Deselect All</button>
+        <button class="btn-select" onclick="selectFiltered()">Select Filtered Range</button>
+        <button class="btn-delete" id="deleteBtn" onclick="deleteSelected()" disabled>Delete Selected (0)</button>
+        <button class="btn-undo" id="undoBtn" onclick="undoDelete()" disabled>Undo Last Delete</button>
+        <span class="selection-info" id="selectionInfo"></span>
+    </div>
+
+    <div class="save-row">
+        <label>Save as:</label>
+        <input type="text" id="saveFileName" placeholder="e.g. 332-cleaned">
+        <button class="btn-save" id="saveBtn" onclick="saveScore()" disabled>Save New Score</button>
+    </div>
+</div>
+
+<div id="tableArea">
+    <div class="empty" id="emptyState">Load a score JSON file to begin.</div>
+</div>
+
+<div id="statusArea"></div>
+
+<script>
+// ── State ──
+let scoreData = null;          // Original parsed JSON
+let workingData = null;        // Working copy (mutations happen here)
+let allBundles = [];           // Unified bundle list
+let filteredBundles = [];      // After filters
+let selectedIds = new Set();   // Selected bundle unique keys
+let deletedIds = new Set();    // Deleted bundle unique keys
+let undoStack = [];            // For undo
+let lastClickIdx = -1;         // For shift-click range
+let sortCol = 'time';
+let sortDir = 'asc';
+let originalFileName = '';
+
+// ── File Loading ──
+document.getElementById('fileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    originalFileName = file.name.replace('.json', '');
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('saveFileName').value = originalFileName + '-cleaned';
+    
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        try {
+            scoreData = JSON.parse(ev.target.result);
+            workingData = JSON.parse(ev.target.result); // deep copy
+            parseBundles();
+            showStats();
+            renderTable();
+            document.getElementById('controls').style.display = '';
+            document.getElementById('emptyState').style.display = 'none';
+            selectedIds.clear();
+            deletedIds.clear();
+            undoStack = [];
+            updateButtons();
+            setStatus('Loaded ' + file.name + ' — ' + allBundles.length + ' bundles found.', 'info');
+        } catch (err) {
+            setStatus('Error parsing JSON: ' + err.message, 'error');
+        }
+    };
+    reader.readAsText(file);
+});
+
+// ── Parse all bundle types into unified list ──
+function parseBundles() {
+    allBundles = [];
+    
+    // BP bundles
+    const bpArr = workingData.bpBundles?.bundles || [];
+    for (const b of bpArr) {
+        allBundles.push({
+            uid: 'BP-' + b.id,
+            type: 'BP',
+            id: b.id,
+            time: b.impactTime,
+            endTime: null,
+            track: b.track,
+            detail: 'GC:' + b.gcId + ' SVG:' + b.svgId,
+            refs: { gcId: b.gcId, svgId: b.svgId, midiSnippetId: b.midiSnippetId },
+            source: 'bpBundles',
+            raw: b
+        });
+    }
+    
+    // PT bundles
+    const ptArr = workingData.ptBundles?.bundles || [];
+    for (const b of ptArr) {
+        allBundles.push({
+            uid: 'PT-' + b.id,
+            type: 'PT',
+            id: b.id,
+            time: b.startTime,
+            endTime: null,
+            track: b.track,
+            detail: 'GC:' + b.gcId + ' SVG:' + b.svgId,
+            refs: { gcId: b.gcId, svgId: b.svgId, midiSnippetId: b.midiSnippetId },
+            source: 'ptBundles',
+            raw: b
+        });
+    }
+    
+    // NF bundles
+    const nfArr = workingData.nfBundles?.bundles || [];
+    for (const b of nfArr) {
+        allBundles.push({
+            uid: 'NF-' + b.id,
+            type: 'NF',
+            id: b.id,
+            time: b.impactTime,
+            endTime: null,
+            track: b.track,
+            detail: 'GC:' + b.gcId + ' SVG:' + b.svgId + (b.hasArrow ? ' +arrow' : ''),
+            refs: { gcId: b.gcId, svgId: b.svgId, midiSnippetId: b.midiSnippetId },
+            source: 'nfBundles',
+            raw: b
+        });
+    }
+    
+    // CD bundles
+    const cdArr = workingData.cdBundles?.bundles || [];
+    for (const b of cdArr) {
+        const pitchStr = b.pitchModel === 'glissando' 
+            ? (b.pitchInfo?.startPitch || '?') + '→' + (b.pitchInfo?.endPitch || '?')
+            : (b.pitchInfo?.pitch || b.pitchInfo?.lpPitch || '?');
+        allBundles.push({
+            uid: 'CD-' + b.id,
+            type: 'CD',
+            id: b.id,
+            time: b.startTime,
+            endTime: b.endTime,
+            track: b.track,
+            detail: pitchStr + ' ' + (b.dynamic1||'') + '→' + (b.dynamic2||'') + ' vol:' + (b.volumeMode||'curve'),
+            refs: { curveId: b.curveId, svgId: b.svgId, midiSnippetIds: b.midiSnippetIds || [] },
+            source: 'cdBundles',
+            raw: b
+        });
+    }
+    
+    // PTG bundles
+    const ptgArr = workingData.ptgBundles?.bundles || [];
+    for (const b of ptgArr) {
+        allBundles.push({
+            uid: 'PTG-' + b.id,
+            type: 'PTG',
+            id: b.id,
+            time: b.startTime,
+            endTime: b.endTime,
+            track: b.track,
+            detail: (b.startPitch||'?') + '→' + (b.endPitch||'?') + ' ' + (b.startDynamic||'') + '→' + (b.endDynamic||''),
+            refs: { curveId: b.curveId, svgId: b.svgId, midiSnippetId: b.midiSnippetId },
+            source: 'ptgBundles',
+            raw: b
+        });
+    }
+    
+    // VIB bundles
+    const vibArr = workingData.vibBundles?.bundles || [];
+    for (const b of vibArr) {
+        allBundles.push({
+            uid: 'VIB-' + b.id,
+            type: 'VIB',
+            id: b.id,
+            time: b.startTime,
+            endTime: b.endTime,
+            track: b.track,
+            detail: (b.pitch||'?') + ' ' + (b.startDynamic||'') + '→' + (b.endDynamic||''),
+            refs: { curveId: b.curveId, svgId: b.svgId, midiSnippetId: b.midiSnippetId },
+            source: 'vibBundles',
+            raw: b
+        });
+    }
+    
+    // Sort by time initially
+    sortBundles();
+    filteredBundles = [...allBundles];
+}
+
+function sortBundles() {
+    allBundles.sort((a, b) => {
+        let va, vb;
+        switch (sortCol) {
+            case 'type': va = a.type; vb = b.type; break;
+            case 'time': va = a.time; vb = b.time; break;
+            case 'endTime': va = a.endTime || 9999; vb = b.endTime || 9999; break;
+            case 'track': va = a.track; vb = b.track; break;
+            case 'detail': va = a.detail; vb = b.detail; break;
+            default: va = a.time; vb = b.time;
+        }
+        if (va < vb) return sortDir === 'asc' ? -1 : 1;
+        if (va > vb) return sortDir === 'asc' ? 1 : -1;
+        // Secondary sort by time if primary is equal
+        if (sortCol !== 'time') return a.time - b.time;
+        return 0;
+    });
+}
+
+// ── Stats ──
+function showStats() {
+    const counts = { BP: 0, PT: 0, NF: 0, CD: 0, PTG: 0, VIB: 0 };
+    for (const b of allBundles) counts[b.type]++;
+    
+    const gcs = workingData.databases?.gcs?.gcs?.length || 0;
+    const svgs = workingData.svgElements?.length || 0;
+    const snippets = workingData.databases?.midiSnippets?.snippets?.length || 0;
+    const curves = workingData.databases?.curves?.curves?.length || 0;
+    
+    const bar = document.getElementById('statsBar');
+    bar.style.display = '';
+    bar.innerHTML = `
+        <span class="stat"><b>${allBundles.length}</b> bundles total</span>
+        <span class="stat">BP:<b>${counts.BP}</b></span>
+        <span class="stat">PT:<b>${counts.PT}</b></span>
+        <span class="stat">NF:<b>${counts.NF}</b></span>
+        <span class="stat">CD:<b>${counts.CD}</b></span>
+        <span class="stat">PTG:<b>${counts.PTG}</b></span>
+        <span class="stat">VIB:<b>${counts.VIB}</b></span>
+        <span class="stat" style="margin-left:12px;">GCs:<b>${gcs}</b></span>
+        <span class="stat">SVGs:<b>${svgs}</b></span>
+        <span class="stat">Curves:<b>${curves}</b></span>
+        <span class="stat">MIDI:<b>${snippets}</b></span>
+        <span class="stat ${deletedIds.size > 0 ? 'warn' : ''}" style="margin-left:12px;">Pending deletes:<b>${deletedIds.size}</b></span>
+    `;
+}
+
+// ── Filters ──
+function applyFilters() {
+    const typeF = document.getElementById('filterType').value;
+    const trackF = document.getElementById('filterTrack').value;
+    const fromF = parseFloat(document.getElementById('filterTimeFrom').value);
+    const toF = parseFloat(document.getElementById('filterTimeTo').value);
+    
+    filteredBundles = allBundles.filter(b => {
+        if (typeF !== 'all' && b.type !== typeF) return false;
+        if (trackF !== 'all' && String(b.track) !== trackF) return false;
+        if (!isNaN(fromF) && b.time < fromF) return false;
+        if (!isNaN(toF) && b.time > toF) return false;
+        return true;
+    });
+    
+    lastClickIdx = -1;
+    renderTable();
+}
+
+function clearFilters() {
+    document.getElementById('filterType').value = 'all';
+    document.getElementById('filterTrack').value = 'all';
+    document.getElementById('filterTimeFrom').value = '';
+    document.getElementById('filterTimeTo').value = '';
+    filteredBundles = [...allBundles];
+    lastClickIdx = -1;
+    renderTable();
+}
+
+// ── Table Rendering ──
+function renderTable() {
+    const area = document.getElementById('tableArea');
+    if (filteredBundles.length === 0) {
+        area.innerHTML = '<div class="empty">No bundles match current filters.</div>';
+        return;
+    }
+    
+    let html = '<div class="table-wrap"><table><thead><tr>';
+    html += '<th class="cb"><input type="checkbox" id="headerCb" onchange="toggleAllVisible(this.checked)"></th>';
+    const cols = [
+        { key: 'type', label: 'Type' },
+        { key: 'id', label: 'ID' },
+        { key: 'time', label: 'Time (s)' },
+        { key: 'endTime', label: 'End (s)' },
+        { key: 'track', label: 'Track' },
+        { key: 'detail', label: 'Details' },
+    ];
+    for (const col of cols) {
+        let cls = '';
+        if (col.key === sortCol) cls = sortDir === 'asc' ? 'sort-asc' : 'sort-desc';
+        html += `<th class="${cls}" onclick="changeSort('${col.key}')">${col.label}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+    
+    for (let i = 0; i < filteredBundles.length; i++) {
+        const b = filteredBundles[i];
+        const isSelected = selectedIds.has(b.uid);
+        const isDeleted = deletedIds.has(b.uid);
+        let cls = '';
+        if (isDeleted) cls = 'deleted';
+        else if (isSelected) cls = 'selected';
+        
+        html += `<tr class="${cls}" data-idx="${i}" data-uid="${b.uid}">`;
+        html += `<td class="cb"><input type="checkbox" ${isSelected ? 'checked' : ''} ${isDeleted ? 'disabled' : ''} onclick="handleCheck(event, ${i})"></td>`;
+        html += `<td><span class="type-badge type-${b.type}">${b.type}</span></td>`;
+        html += `<td>${b.id}</td>`;
+        html += `<td>${b.time != null ? b.time.toFixed(2) : '—'}</td>`;
+        html += `<td>${b.endTime != null ? b.endTime.toFixed(2) : '—'}</td>`;
+        html += `<td>${b.track}</td>`;
+        html += `<td>${b.detail}</td>`;
+        html += '</tr>';
+    }
+    
+    html += '</tbody></table></div>';
+    area.innerHTML = html;
+}
+
+function changeSort(col) {
+    if (sortCol === col) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortCol = col;
+        sortDir = 'asc';
+    }
+    sortBundles();
+    filteredBundles = filteredBundles.sort((a, b) => allBundles.indexOf(a) - allBundles.indexOf(b));
+    applyFilters(); // re-filter and re-render in new sort order
+}
+
+// ── Selection ──
+function handleCheck(event, idx) {
+    const b = filteredBundles[idx];
+    if (deletedIds.has(b.uid)) return;
+    
+    // Shift-click range selection
+    if (event.shiftKey && lastClickIdx >= 0 && lastClickIdx !== idx) {
+        const from = Math.min(lastClickIdx, idx);
+        const to = Math.max(lastClickIdx, idx);
+        for (let i = from; i <= to; i++) {
+            const fb = filteredBundles[i];
+            if (!deletedIds.has(fb.uid)) selectedIds.add(fb.uid);
+        }
+    } else {
+        if (selectedIds.has(b.uid)) {
+            selectedIds.delete(b.uid);
+        } else {
+            selectedIds.add(b.uid);
+        }
+    }
+    
+    lastClickIdx = idx;
+    renderTable();
+    updateButtons();
+}
+
+function toggleAllVisible(checked) {
+    for (const b of filteredBundles) {
+        if (deletedIds.has(b.uid)) continue;
+        if (checked) selectedIds.add(b.uid);
+        else selectedIds.delete(b.uid);
+    }
+    renderTable();
+    updateButtons();
+}
+
+function selectAll() {
+    for (const b of filteredBundles) {
+        if (!deletedIds.has(b.uid)) selectedIds.add(b.uid);
+    }
+    renderTable();
+    updateButtons();
+}
+
+function deselectAll() {
+    selectedIds.clear();
+    lastClickIdx = -1;
+    renderTable();
+    updateButtons();
+}
+
+function selectFiltered() {
+    // Select all currently visible (filtered) bundles
+    for (const b of filteredBundles) {
+        if (!deletedIds.has(b.uid)) selectedIds.add(b.uid);
+    }
+    renderTable();
+    updateButtons();
+}
+
+function updateButtons() {
+    const activeSelected = [...selectedIds].filter(uid => !deletedIds.has(uid));
+    const deleteBtn = document.getElementById('deleteBtn');
+    deleteBtn.textContent = `Delete Selected (${activeSelected.length})`;
+    deleteBtn.disabled = activeSelected.length === 0;
+    
+    document.getElementById('undoBtn').disabled = undoStack.length === 0;
+    document.getElementById('saveBtn').disabled = deletedIds.size === 0;
+    
+    const info = document.getElementById('selectionInfo');
+    if (activeSelected.length > 0) {
+        info.textContent = `${activeSelected.length} selected · Shift+click for range`;
+    } else {
+        info.textContent = 'Click to select, Shift+click for range';
+    }
+}
+
+// ── Deletion ──
+function deleteSelected() {
+    const toDelete = [...selectedIds].filter(uid => !deletedIds.has(uid));
+    if (toDelete.length === 0) return;
+    
+    if (!confirm(`Delete ${toDelete.length} bundle(s) and their associated GCs, SVGs, curves, and MIDI snippets?\n\nThis marks them for deletion. Use "Save New Score" to write the cleaned file.`)) return;
+    
+    // Push to undo stack
+    undoStack.push([...toDelete]);
+    
+    for (const uid of toDelete) {
+        deletedIds.add(uid);
+        selectedIds.delete(uid);
+    }
+    
+    // Actually remove from workingData
+    applyDeletions(toDelete);
+    
+    showStats();
+    renderTable();
+    updateButtons();
+    setStatus(`Marked ${toDelete.length} bundle(s) for deletion. ${deletedIds.size} total pending. Save to write cleaned score.`, 'info');
+}
+
+function applyDeletions(uids) {
+    for (const uid of uids) {
+        const bundle = allBundles.find(b => b.uid === uid);
+        if (!bundle) continue;
+        
+        const refs = bundle.refs;
+        const source = bundle.source;
+        
+        // Remove from bundle array in workingData
+        const bundleArr = workingData[source]?.bundles;
+        if (bundleArr) {
+            const idx = bundleArr.findIndex(b => b.id === bundle.id);
+            if (idx >= 0) bundleArr.splice(idx, 1);
+        }
+        
+        // Remove referenced GC (for GC-based bundles: BP, PT, NF)
+        if (refs.gcId != null) {
+            const gcs = workingData.databases?.gcs?.gcs;
+            if (gcs) {
+                const idx = gcs.findIndex(g => g.id === refs.gcId);
+                if (idx >= 0) gcs.splice(idx, 1);
+            }
+        }
+        
+        // Remove referenced Curve (for curve-based bundles: CD, PTG, VIB)
+        if (refs.curveId != null) {
+            const curves = workingData.databases?.curves?.curves;
+            if (curves) {
+                const idx = curves.findIndex(c => c.id === refs.curveId);
+                if (idx >= 0) curves.splice(idx, 1);
+            }
+        }
+        
+        // Remove referenced SVG element
+        if (refs.svgId != null) {
+            const svgs = workingData.svgElements;
+            if (svgs) {
+                const idx = svgs.findIndex(s => s.id === refs.svgId);
+                if (idx >= 0) svgs.splice(idx, 1);
+            }
+        }
+        
+        // Remove referenced MIDI snippet(s)
+        const snippets = workingData.databases?.midiSnippets?.snippets;
+        if (snippets) {
+            if (refs.midiSnippetIds) {
+                // CD bundles have array of snippet IDs
+                for (const sid of refs.midiSnippetIds) {
+                    const idx = snippets.findIndex(s => s.id === sid);
+                    if (idx >= 0) snippets.splice(idx, 1);
+                }
+            }
+            if (refs.midiSnippetId != null) {
+                const idx = snippets.findIndex(s => s.id === refs.midiSnippetId);
+                if (idx >= 0) snippets.splice(idx, 1);
+            }
+        }
+    }
+}
+
+function undoDelete() {
+    if (undoStack.length === 0) return;
+    
+    // Undo by reloading from original and re-applying all non-undone deletions
+    const lastBatch = undoStack.pop();
+    for (const uid of lastBatch) {
+        deletedIds.delete(uid);
+    }
+    
+    // Rebuild workingData from original, then re-apply remaining deletions
+    workingData = JSON.parse(JSON.stringify(scoreData));
+    const stillDeleted = [...deletedIds];
+    // Re-apply remaining deletions
+    if (stillDeleted.length > 0) {
+        // Re-parse to get fresh bundle refs from workingData
+        const tempBundles = [];
+        parseBundlesInto(workingData, tempBundles);
+        const toReDelete = stillDeleted.map(uid => tempBundles.find(b => b.uid === uid)).filter(Boolean);
+        for (const bundle of toReDelete) {
+            removeBundleFromData(workingData, bundle);
+        }
+    }
+    
+    // Re-parse the unified list
+    parseBundles();
+    filteredBundles = [...allBundles];
+    applyFilters();
+    showStats();
+    updateButtons();
+    setStatus(`Undid deletion of ${lastBatch.length} bundle(s). ${deletedIds.size} pending.`, 'info');
+}
+
+// Helper: parse bundles from a given data object into a target array
+function parseBundlesInto(data, target) {
+    const bpArr = data.bpBundles?.bundles || [];
+    for (const b of bpArr) target.push({ uid: 'BP-' + b.id, type: 'BP', id: b.id, refs: { gcId: b.gcId, svgId: b.svgId, midiSnippetId: b.midiSnippetId }, source: 'bpBundles' });
+    const ptArr = data.ptBundles?.bundles || [];
+    for (const b of ptArr) target.push({ uid: 'PT-' + b.id, type: 'PT', id: b.id, refs: { gcId: b.gcId, svgId: b.svgId, midiSnippetId: b.midiSnippetId }, source: 'ptBundles' });
+    const nfArr = data.nfBundles?.bundles || [];
+    for (const b of nfArr) target.push({ uid: 'NF-' + b.id, type: 'NF', id: b.id, refs: { gcId: b.gcId, svgId: b.svgId, midiSnippetId: b.midiSnippetId }, source: 'nfBundles' });
+    const cdArr = data.cdBundles?.bundles || [];
+    for (const b of cdArr) target.push({ uid: 'CD-' + b.id, type: 'CD', id: b.id, refs: { curveId: b.curveId, svgId: b.svgId, midiSnippetIds: b.midiSnippetIds || [] }, source: 'cdBundles' });
+    const ptgArr = data.ptgBundles?.bundles || [];
+    for (const b of ptgArr) target.push({ uid: 'PTG-' + b.id, type: 'PTG', id: b.id, refs: { curveId: b.curveId, svgId: b.svgId, midiSnippetId: b.midiSnippetId }, source: 'ptgBundles' });
+    const vibArr = data.vibBundles?.bundles || [];
+    for (const b of vibArr) target.push({ uid: 'VIB-' + b.id, type: 'VIB', id: b.id, refs: { curveId: b.curveId, svgId: b.svgId, midiSnippetId: b.midiSnippetId }, source: 'vibBundles' });
+}
+
+// Helper: remove a single bundle and its refs from data
+function removeBundleFromData(data, bundle) {
+    const refs = bundle.refs;
+    const bundleArr = data[bundle.source]?.bundles;
+    if (bundleArr) {
+        const idx = bundleArr.findIndex(b => b.id === bundle.id);
+        if (idx >= 0) bundleArr.splice(idx, 1);
+    }
+    if (refs.gcId != null) {
+        const gcs = data.databases?.gcs?.gcs;
+        if (gcs) { const i = gcs.findIndex(g => g.id === refs.gcId); if (i >= 0) gcs.splice(i, 1); }
+    }
+    if (refs.curveId != null) {
+        const curves = data.databases?.curves?.curves;
+        if (curves) { const i = curves.findIndex(c => c.id === refs.curveId); if (i >= 0) curves.splice(i, 1); }
+    }
+    if (refs.svgId != null) {
+        const svgs = data.svgElements;
+        if (svgs) { const i = svgs.findIndex(s => s.id === refs.svgId); if (i >= 0) svgs.splice(i, 1); }
+    }
+    const snippets = data.databases?.midiSnippets?.snippets;
+    if (snippets) {
+        if (refs.midiSnippetIds) {
+            for (const sid of refs.midiSnippetIds) { const i = snippets.findIndex(s => s.id === sid); if (i >= 0) snippets.splice(i, 1); }
+        }
+        if (refs.midiSnippetId != null) { const i = snippets.findIndex(s => s.id === refs.midiSnippetId); if (i >= 0) snippets.splice(i, 1); }
+    }
+}
+
+// ── Save ──
+function saveScore() {
+    const fileName = document.getElementById('saveFileName').value.trim();
+    if (!fileName) {
+        setStatus('Please enter a filename.', 'error');
+        return;
+    }
+    
+    const jsonStr = JSON.stringify(workingData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    setStatus(`Saved ${fileName}.json (${deletedIds.size} bundles removed, ${(jsonStr.length / 1024).toFixed(0)} KB). Move to scores/ folder to use.`, 'success');
+}
+
+// ── Status ──
+function setStatus(msg, type) {
+    const area = document.getElementById('statusArea');
+    area.innerHTML = `<div class="status ${type}">${msg}</div>`;
+}
+</script>
+</body>
+</html>

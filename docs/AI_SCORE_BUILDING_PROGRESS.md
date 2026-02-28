@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 26, 2026  
-**Current ASB Number:** ASB-116
+**Last Updated:** Feb 28, 2026  
+**Current ASB Number:** ASB-118
 
 ---
 
@@ -131,17 +131,17 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-112–116: Volume Mode, Pie Dial, Hairpin/Secco, Sequence Generator.** Added Volume Mode dropdown (Curve/Steady/Linear) to CD panel. Extended pie dial to track curves. Hairpin notation varies by volume mode + secco text conditional. Built standalone Sequence Generator tool (HTML page) with documentation and programmatic insertion analysis.
+> **ASB-117–118: Bundle Manager + Sequence Generator Enhancements.** Built Bundle Manager tool (inspect/select/delete bundles from saved scores, 6 types, filters, range select, undo, save-as). Added settings persistence to Sequence Generator (localStorage auto-save, named presets with export/import, built-in preset). Bug fixes: track assignments (V1=1,V2=2,VLA=3,VC=4), gap timing after first note override, instrument row layout, "any" octave rule.
 
 ---
 
 ## Current Session
 
-**Date:** Feb 26, 2026  
-**Focus:** Sequence Generator Tool + Documentation  
-**ASB:** ASB-116  
-**Tier 1 Count This Session:** 6 (ASB-111 through ASB-116)  
-**Tier 2 Threshold:** At 4 — EXCEEDED, committing now
+**Date:** Feb 28, 2026  
+**Focus:** Bundle Manager Tool + Sequence Generator Presets  
+**ASB:** ASB-118  
+**Tier 1 Count This Session:** 2 (ASB-117, ASB-118)  
+**Tier 2 Threshold:** At 2 — committing now
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -203,6 +203,10 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 ### Session Log — Sequence Generator
 - ASB-115: Standalone HTML sequence generator (`tools/sequence_generator.html`) — configurable gap buckets, instruments, pitch sets, octave rules, dynamics. Three output formats: TSV, JSON, Console Script (BartokPizzUI.go() loop)
 - ASB-116: Documentation (`docs/Sequence_Generator_Guide.md`) — architecture, expansion guide, programmatic score insertion analysis (JSON → BartokPizzUI.go() loop)
+- ASB-118: Settings persistence — localStorage auto-save/restore, named presets (save/load/delete/export/import), built-in preset "18 Bartok pizzicatos at 333 seconds"
+
+### Session Log — Bundle Manager
+- ASB-117: Bundle Manager Tool (`tools/bundle_manager.html`) — standalone HTML page to inspect, select, and delete bundles from saved score JSON files. Unified table of all 6 bundle types (BP/PT/NF/CD/PTG/VIB) sorted by time. Filters by type/track/time range. Shift+click range selection. Deletes bundle + associated GC/curve/SVG/MIDI snippets. Undo support. Save-as-new-score. Documentation: `docs/Bundle_Manager_Guide.md`
 
 ### Session Log — Notation Fragment Score Integration
 - ASB-096: Fragment asset audit — all 8 NFs verified, re-rendered NF008-Cello, cropped all SVGs, created output dirs + notation_fragment_db.json
@@ -424,6 +428,8 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-114 | Hairpin notation varies by volume mode + secco text conditional, server-side LilyPond template modification | Complete |
 | ASB-115 | Sequence Generator Tool — standalone HTML page, gap buckets, instruments, pitch sets, 3 output formats (TSV/JSON/Console Script) | Complete |
 | ASB-116 | Sequence Generator Documentation — architecture, expansion guide, programmatic score insertion analysis | Complete |
+| ASB-117 | Bundle Manager Tool — standalone HTML, inspect/select/delete bundles from saved scores, 6 types, filters, range select, undo, save-as | Complete |
+| ASB-118 | Sequence Generator presets — auto-persist localStorage, named presets (save/load/delete/export/import), built-in preset | Complete |
 
 ---
 
@@ -454,6 +460,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Feb 25, 2026 | c873292 | CD bundle system complete: bundle dedup, delete dual-lookup, MIDI regen fixes, documentation (ASB-106/107) |
 | Feb 25, 2026 | — | BP + PT + PTG bundle systems (ASB-109/110/111) |
 | Feb 28, 2026 | 4aee777 | volume mode, hairpin/secco, pie dial, sequence generator tool + docs (ASB-111 to ASB-116) |
+| Feb 28, 2026 | — | bundle manager tool, sequence generator presets + bug fixes (ASB-117 to ASB-118) |
 
 ---
 

@@ -58,6 +58,7 @@
         .inst-row {
             display: flex; gap: 6px; align-items: center; margin-bottom: 4px;
             background: #1e1e3a; padding: 4px 8px; border-radius: 4px;
+            min-width: 520px; flex-wrap: nowrap;
         }
         .inst-row input[type="checkbox"] { width: auto; }
         .inst-row label { display: inline; margin: 0; color: #ddd; }
@@ -95,6 +96,33 @@
 
         .info { font-size: 11px; color: #888; margin-top: 4px; }
         .stat { font-size: 12px; color: #adf; margin: 4px 0; }
+
+        /* Preset bar */
+        .preset-bar {
+            max-width: 900px; margin-bottom: 12px; padding: 10px 14px;
+            background: #1e1e3a; border: 1px solid #444; border-radius: 6px;
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .preset-bar label { margin: 0; font-size: 11px; color: #aaa; white-space: nowrap; }
+        .preset-bar select, .preset-bar input[type="text"] {
+            font-size: 11px; padding: 3px 6px; background: #2a2a4a; color: #fff;
+            border: 1px solid #555; border-radius: 3px;
+        }
+        .preset-bar select { width: 220px; }
+        .preset-bar input[type="text"] { width: 200px; }
+        .preset-bar button {
+            font-size: 11px; padding: 4px 10px; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600;
+        }
+        .preset-btn-save { background: #2a6040; color: #fff; }
+        .preset-btn-save:hover { background: #3a7050; }
+        .preset-btn-load { background: #2a4060; color: #8cf; }
+        .preset-btn-load:hover { background: #3a5080; }
+        .preset-btn-del { background: #933; color: #fff; }
+        .preset-btn-del:hover { background: #b44; }
+        .preset-btn-file { background: #555; color: #ddd; }
+        .preset-btn-file:hover { background: #777; }
+        .preset-sep { width: 1px; height: 22px; background: #555; }
     </style>
 </head>
 <body>
@@ -201,6 +229,22 @@
         </div>
     </div>
 
+    <div class="preset-bar">
+        <label>Preset:</label>
+        <select id="presetSelect"><option value="">— Select —</option></select>
+        <button class="preset-btn-load" onclick="loadPreset()">Load</button>
+        <button class="preset-btn-del" onclick="deletePreset()">×</button>
+        <div class="preset-sep"></div>
+        <input type="text" id="presetName" placeholder="Preset name...">
+        <button class="preset-btn-save" onclick="savePreset()">Save Current</button>
+        <div class="preset-sep"></div>
+        <button class="preset-btn-file" onclick="exportPresets()">Export All</button>
+        <button class="preset-btn-file" onclick="document.getElementById('presetFileInput').click()">Import</button>
+        <input type="file" id="presetFileInput" accept=".json" style="display:none;" onchange="importPresets(event)">
+        <div class="preset-sep"></div>
+        <button class="preset-btn-file" onclick="resetToDefaults()" style="background:#933;">Reset to Defaults</button>
+    </div>
+
     <button class="generate" onclick="generate()">⚡ Generate Sequence</button>
 
     <div class="output-section" id="outputSection" style="display: none;">
@@ -234,14 +278,14 @@
     ];
 
     const DEFAULT_INSTRUMENTS = [
-        { abbrev: 'VC', fullName: 'Cello', track: 1, clef: 'bass', enabled: true,
-          octaveRule: 'lowest', rangeBottom: 'C2', rangeTop: 'A5' },
-        { abbrev: 'VLA', fullName: 'Viola', track: 2, clef: 'alto', enabled: true,
-          octaveRule: 'lowest', rangeBottom: 'C3', rangeTop: 'A5' },
-        { abbrev: 'V1', fullName: 'Violin 1', track: 3, clef: 'treble', enabled: true,
+        { abbrev: 'V1', fullName: 'Violin 1', track: 1, clef: 'treble', enabled: true,
           octaveRule: 'highest', rangeBottom: 'G3', rangeTop: 'E5' },
-        { abbrev: 'V2', fullName: 'Violin 2', track: 4, clef: 'treble', enabled: true,
-          octaveRule: 'highest', rangeBottom: 'G3', rangeTop: 'E5' }
+        { abbrev: 'V2', fullName: 'Violin 2', track: 2, clef: 'treble', enabled: true,
+          octaveRule: 'highest', rangeBottom: 'G3', rangeTop: 'E5' },
+        { abbrev: 'VLA', fullName: 'Viola', track: 3, clef: 'alto', enabled: true,
+          octaveRule: 'lowest', rangeBottom: 'C3', rangeTop: 'A5' },
+        { abbrev: 'VC', fullName: 'Cello', track: 4, clef: 'bass', enabled: true,
+          octaveRule: 'lowest', rangeBottom: 'C2', rangeTop: 'A5' }
     ];
 
     // ============================================
@@ -299,14 +343,25 @@
                     return formatPitchClass(pitchClass) + oct;
                 }
             }
-        } else {
-            // 'highest' — find the highest octave within range
+        } else if (instrument.octaveRule === 'highest') {
+            // Find the highest octave within range
             for (let oct = 8; oct >= 0; oct--) {
                 const test = { ...pitchClass, octave: oct };
                 const midi = pitchToMidiApprox(test);
                 if (midi >= bottomMidi && midi <= topMidi) {
                     return formatPitchClass(pitchClass) + oct;
                 }
+            }
+        } else {
+            // 'any' — collect all valid octaves and pick one randomly
+            const valid = [];
+            for (let oct = 0; oct <= 8; oct++) {
+                const test = { ...pitchClass, octave: oct };
+                const midi = pitchToMidiApprox(test);
+                if (midi >= bottomMidi && midi <= topMidi) valid.push(oct);
+            }
+            if (valid.length > 0) {
+                return formatPitchClass(pitchClass) + valid[randInt(0, valid.length - 1)];
             }
         }
 
@@ -544,6 +599,7 @@
             else if (dynamicMode === 'random') dynamic = dynamicSet[randInt(0, dynamicSet.length - 1)];
 
             const gap = i === 0 ? null : gaps[i - 1];
+            if (gap) time += gap.value;
             rows.push({
                 index: i + 1,
                 instrument: inst.abbrev,
@@ -555,7 +611,6 @@
                 clef: inst.clef,
                 track: inst.track
             });
-            if (gap) time += gap.value;
         }
 
         generatedData = rows;
@@ -574,6 +629,9 @@
         // Render current tab
         renderOutput();
         document.getElementById('outputSection').style.display = 'block';
+
+        // Auto-save settings after each generation
+        autoSave();
     }
 
     // ============================================
@@ -765,7 +823,7 @@
         for (const inst of instrumentDefs) {
             const div = document.createElement('div');
             div.className = 'inst-row';
-            div.style.flexWrap = 'wrap';
+            div.style.flexWrap = 'nowrap';
             div.innerHTML = `
                 <input type="checkbox" id="inst_enabled_${inst._id}" ${inst.enabled ? 'checked' : ''} style="width:auto;">
                 <input type="text" id="inst_abbrev_${inst._id}" value="${inst.abbrev}" style="width:36px; font-weight:bold; font-size:11px; text-align:center;">
@@ -778,9 +836,10 @@
                     <option value="tenor" ${inst.clef === 'tenor' ? 'selected' : ''}>Tenor</option>
                     <option value="bass" ${inst.clef === 'bass' ? 'selected' : ''}>Bass</option>
                 </select>
-                <select id="inst_oct_${inst._id}" style="width:60px; font-size:10px;">
+                <select id="inst_oct_${inst._id}" style="width:54px; font-size:10px;">
                     <option value="lowest" ${inst.octaveRule === 'lowest' ? 'selected' : ''}>Lowest</option>
                     <option value="highest" ${inst.octaveRule === 'highest' ? 'selected' : ''}>Highest</option>
+                    <option value="any" ${inst.octaveRule === 'any' ? 'selected' : ''}>Any</option>
                 </select>
                 <input type="text" id="inst_bottom_${inst._id}" value="${inst.rangeBottom}" style="width:30px; font-size:10px;" title="Range bottom">
                 <span style="color:#666; font-size:10px;">→</span>
@@ -858,13 +917,281 @@
     });
 
     // ============================================
+    // SETTINGS COLLECT / RESTORE
+    // ============================================
+    const STORAGE_KEY = 'seqgen_autosave';
+    const PRESETS_KEY = 'seqgen_presets';
+
+    function collectAllSettings() {
+        readBucketsFromDOM();
+        readInstrumentsFromDOM();
+        return {
+            startTime: parseFloat(document.getElementById('startTime').value) || 0,
+            noteCount: parseInt(document.getElementById('noteCount').value) || 21,
+            minShortsBetween: parseInt(document.getElementById('minShortsBetween').value) || 2,
+            maxShortsBetween: parseInt(document.getElementById('maxShortsBetween').value) || 5,
+            firstInst: document.getElementById('firstInst').value,
+            firstPitch: document.getElementById('firstPitch').value,
+            pitchSet: document.getElementById('pitchSet').value,
+            dynamicMode: document.getElementById('dynamicMode').value,
+            dynamicValue: document.getElementById('dynamicValue').value,
+            showIncrement: document.getElementById('showIncrement').checked,
+            showGapType: document.getElementById('showGapType').checked,
+            showClef: document.getElementById('showClef').checked,
+            gapBuckets: gapBuckets.map(b => ({
+                name: b.name, min: b.min, max: b.max,
+                countMin: b.countMin, countMax: b.countMax, isDefault: b.isDefault
+            })),
+            instruments: instrumentDefs.map(inst => ({
+                abbrev: inst.abbrev, fullName: inst.fullName, track: inst.track,
+                clef: inst.clef, enabled: inst.enabled, octaveRule: inst.octaveRule,
+                rangeBottom: inst.rangeBottom, rangeTop: inst.rangeTop
+            }))
+        };
+    }
+
+    function restoreAllSettings(cfg) {
+        if (!cfg) return;
+
+        // Clear existing dynamic arrays
+        gapBuckets = [];
+        bucketIdCounter = 0;
+        instrumentDefs = [];
+        instIdCounter = 0;
+
+        // Restore gap buckets
+        if (cfg.gapBuckets && cfg.gapBuckets.length > 0) {
+            for (const b of cfg.gapBuckets) addGapBucket({ ...b });
+        } else {
+            for (const b of DEFAULT_GAP_BUCKETS) addGapBucket({ ...b });
+        }
+
+        // Restore instruments
+        if (cfg.instruments && cfg.instruments.length > 0) {
+            for (const inst of cfg.instruments) addInstrument({ ...inst });
+        } else {
+            for (const inst of DEFAULT_INSTRUMENTS) addInstrument({ ...inst });
+        }
+
+        // Restore simple fields
+        if (cfg.startTime != null) document.getElementById('startTime').value = cfg.startTime;
+        if (cfg.noteCount != null) document.getElementById('noteCount').value = cfg.noteCount;
+        if (cfg.minShortsBetween != null) document.getElementById('minShortsBetween').value = cfg.minShortsBetween;
+        if (cfg.maxShortsBetween != null) document.getElementById('maxShortsBetween').value = cfg.maxShortsBetween;
+        if (cfg.firstPitch != null) document.getElementById('firstPitch').value = cfg.firstPitch;
+        if (cfg.pitchSet != null) document.getElementById('pitchSet').value = cfg.pitchSet;
+        if (cfg.dynamicMode != null) {
+            document.getElementById('dynamicMode').value = cfg.dynamicMode;
+            document.getElementById('dynamicMode').dispatchEvent(new Event('change'));
+        }
+        if (cfg.dynamicValue != null) document.getElementById('dynamicValue').value = cfg.dynamicValue;
+        if (cfg.showIncrement != null) document.getElementById('showIncrement').checked = cfg.showIncrement;
+        if (cfg.showGapType != null) document.getElementById('showGapType').checked = cfg.showGapType;
+        if (cfg.showClef != null) document.getElementById('showClef').checked = cfg.showClef;
+
+        // Restore first instrument dropdown (after instruments are rendered)
+        if (cfg.firstInst) {
+            document.getElementById('firstInst').value = cfg.firstInst;
+        }
+    }
+
+    // ============================================
+    // AUTO-PERSIST (localStorage)
+    // ============================================
+    function autoSave() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(collectAllSettings()));
+        } catch (e) { /* quota exceeded — ignore */ }
+    }
+
+    function autoRestore() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                restoreAllSettings(JSON.parse(saved));
+                return true;
+            }
+        } catch (e) { /* corrupt data — ignore */ }
+        return false;
+    }
+
+    // ============================================
+    // NAMED PRESETS
+    // ============================================
+    const BUILT_IN_PRESETS = {
+        '18 Bartok pizzicatos at 333 seconds': {
+            startTime: 333,
+            noteCount: 18,
+            minShortsBetween: 2,
+            maxShortsBetween: 5,
+            firstInst: 'VC',
+            firstPitch: 'A2',
+            pitchSet: 'G, G+, G#, Ad, A, Bbd, Bb, B, Cd, C',
+            dynamicMode: 'fixed',
+            dynamicValue: 'fff',
+            showIncrement: true,
+            showGapType: true,
+            showClef: false,
+            gapBuckets: [
+                { name: 'Short', min: 0.06, max: 0.14, countMin: null, countMax: null, isDefault: true },
+                { name: 'Long', min: 0.23, max: 0.27, countMin: 4, countMax: 6, isDefault: false }
+            ],
+            instruments: [
+                { abbrev: 'V1', fullName: 'Violin 1', track: 1, clef: 'treble', enabled: true, octaveRule: 'highest', rangeBottom: 'G3', rangeTop: 'E5' },
+                { abbrev: 'V2', fullName: 'Violin 2', track: 2, clef: 'treble', enabled: true, octaveRule: 'highest', rangeBottom: 'G3', rangeTop: 'E5' },
+                { abbrev: 'VLA', fullName: 'Viola', track: 3, clef: 'alto', enabled: true, octaveRule: 'lowest', rangeBottom: 'C3', rangeTop: 'A5' },
+                { abbrev: 'VC', fullName: 'Cello', track: 4, clef: 'bass', enabled: true, octaveRule: 'lowest', rangeBottom: 'C2', rangeTop: 'A5' }
+            ]
+        }
+    };
+
+    function getAllPresets() {
+        let presets = {};
+        try {
+            const stored = localStorage.getItem(PRESETS_KEY);
+            if (stored) presets = JSON.parse(stored);
+        } catch (e) { /* ignore */ }
+        // Merge built-ins (built-ins can be overridden by user presets with same name)
+        return { ...BUILT_IN_PRESETS, ...presets };
+    }
+
+    function getUserPresets() {
+        try {
+            const stored = localStorage.getItem(PRESETS_KEY);
+            return stored ? JSON.parse(stored) : {};
+        } catch (e) { return {}; }
+    }
+
+    function saveUserPresets(presets) {
+        try {
+            localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+        } catch (e) { /* ignore */ }
+    }
+
+    function refreshPresetDropdown() {
+        const sel = document.getElementById('presetSelect');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">— Select —</option>';
+        const all = getAllPresets();
+        for (const name of Object.keys(all).sort()) {
+            const isBuiltIn = BUILT_IN_PRESETS[name] && !getUserPresets()[name];
+            sel.innerHTML += `<option value="${name}">${name}${isBuiltIn ? ' (built-in)' : ''}</option>`;
+        }
+        if (current && all[current]) sel.value = current;
+    }
+
+    function savePreset() {
+        const name = document.getElementById('presetName').value.trim();
+        if (!name) { alert('Enter a preset name first.'); return; }
+        const presets = getUserPresets();
+        presets[name] = collectAllSettings();
+        saveUserPresets(presets);
+        refreshPresetDropdown();
+        document.getElementById('presetSelect').value = name;
+        document.getElementById('presetName').value = '';
+    }
+
+    function loadPreset() {
+        const name = document.getElementById('presetSelect').value;
+        if (!name) { alert('Select a preset first.'); return; }
+        const all = getAllPresets();
+        if (!all[name]) { alert('Preset not found.'); return; }
+        restoreAllSettings(all[name]);
+        autoSave();
+    }
+
+    function deletePreset() {
+        const name = document.getElementById('presetSelect').value;
+        if (!name) { alert('Select a preset first.'); return; }
+        if (BUILT_IN_PRESETS[name] && !getUserPresets()[name]) {
+            alert('Cannot delete a built-in preset.');
+            return;
+        }
+        if (!confirm(`Delete preset "${name}"?`)) return;
+        const presets = getUserPresets();
+        delete presets[name];
+        saveUserPresets(presets);
+        refreshPresetDropdown();
+    }
+
+    function exportPresets() {
+        const all = getAllPresets();
+        const json = JSON.stringify(all, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sequence_generator_presets.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importPresets(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const imported = JSON.parse(ev.target.result);
+                const presets = getUserPresets();
+                let count = 0;
+                for (const [name, cfg] of Object.entries(imported)) {
+                    if (cfg && typeof cfg === 'object' && cfg.noteCount != null) {
+                        presets[name] = cfg;
+                        count++;
+                    }
+                }
+                saveUserPresets(presets);
+                refreshPresetDropdown();
+                alert(`Imported ${count} preset(s).`);
+            } catch (e) {
+                alert('Error reading preset file: ' + e.message);
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; // reset for re-import
+    }
+
+    // ============================================
+    // RESET TO DEFAULTS
+    // ============================================
+    function resetToDefaults() {
+        if (!confirm('Reset all settings to defaults? This clears your auto-saved settings.')) return;
+        localStorage.removeItem(STORAGE_KEY);
+        // Rebuild from defaults
+        gapBuckets = [];
+        bucketIdCounter = 0;
+        instrumentDefs = [];
+        instIdCounter = 0;
+        for (const b of DEFAULT_GAP_BUCKETS) addGapBucket({ ...b });
+        for (const inst of DEFAULT_INSTRUMENTS) addInstrument({ ...inst });
+        // Reset simple fields to HTML defaults
+        document.getElementById('startTime').value = '323.000';
+        document.getElementById('noteCount').value = '21';
+        document.getElementById('minShortsBetween').value = '2';
+        document.getElementById('maxShortsBetween').value = '5';
+        document.getElementById('firstInst').value = '';
+        document.getElementById('firstPitch').value = 'A2';
+        document.getElementById('pitchSet').value = 'G, G+, G#, Ad, A, Bbd, Bb, B, Cd, C';
+        document.getElementById('dynamicMode').value = 'fixed';
+        document.getElementById('dynamicMode').dispatchEvent(new Event('change'));
+        document.getElementById('dynamicValue').value = 'fff';
+        document.getElementById('showIncrement').checked = true;
+        document.getElementById('showGapType').checked = true;
+        document.getElementById('showClef').checked = false;
+    }
+
+    // ============================================
     // INIT
     // ============================================
     function init() {
-        // Load default gap buckets
-        for (const b of DEFAULT_GAP_BUCKETS) addGapBucket({ ...b });
-        // Load default instruments
-        for (const inst of DEFAULT_INSTRUMENTS) addInstrument({ ...inst });
+        // Try to restore from localStorage first
+        if (!autoRestore()) {
+            // No saved state — load defaults
+            for (const b of DEFAULT_GAP_BUCKETS) addGapBucket({ ...b });
+            for (const inst of DEFAULT_INSTRUMENTS) addInstrument({ ...inst });
+        }
+        refreshPresetDropdown();
     }
 
     init();
