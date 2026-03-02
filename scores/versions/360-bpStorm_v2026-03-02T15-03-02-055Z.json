@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "created": "2026-03-01T04:30:36.256Z",
+    "modified": "2026-03-01T04:30:36.399Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369963,10 +369963,6 @@
       ],
       "nextId": 55
     },
-    "lineWedges": {
-      "lineWedges": [],
-      "nextId": 2
-    },
     "motiveGroups": {
       "groups": [
         {
@@ -596943,7 +596939,7 @@
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 344.4406814786855,
-    "gotoDisplaySeconds": 379,
+    "gotoDisplaySeconds": 370,
     "leadInSeconds": 2
   }
 }

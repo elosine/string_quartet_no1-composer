@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "title": "362",
+    "created": "2026-03-02T19:11:23.894Z",
+    "modified": "2026-03-02T19:11:24.028Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369964,8 +369964,55 @@
       "nextId": 55
     },
     "lineWedges": {
-      "lineWedges": [],
-      "nextId": 2
+      "lineWedges": [
+        {
+          "id": 3,
+          "name": "LW_20260302_141041",
+          "startSeconds": 380,
+          "endSeconds": 394,
+          "gTrack": "1",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 687.75,
+          "x2": 2292.5,
+          "trackDims": {
+            "y": 8,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 5
+            },
+            {
+              "pos": 1,
+              "thickness": 5
+            }
+          ],
+          "createdAt": 1772478641185,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {}
+            ],
+            "continuationNodeHandlesTop": [],
+            "continuationNodeHandlesBottom": [],
+            "continuationGroupTop": {
+              "_contPage": 48,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathTop": {},
+            "continuationHitPathTop": {}
+          }
+        }
+      ],
+      "nextId": 4
     },
     "motiveGroups": {
       "groups": [
@@ -596942,7 +596989,7 @@
   },
   "connectors": [],
   "cursorState": {
-    "editCursorSeconds": 344.4406814786855,
+    "editCursorSeconds": 379.97580071534605,
     "gotoDisplaySeconds": 379,
     "leadInSeconds": 2
   }

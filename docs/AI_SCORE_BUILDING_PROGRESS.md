@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 1, 2026  
-**Current ASB Number:** ASB-119
+**Last Updated:** Mar 2, 2026  
+**Current ASB Number:** ASB-126
 
 ---
 
@@ -46,7 +46,7 @@ That's it. Everything else below is for Cascade.
 | Glissando System | Complete | Maintenance only |
 | Vibrato System | **Bundle Complete** | Bundle system (curve-based, like CD/PTG). MIDI ch fix, params regen, CurveMaker hooks, ScoreManager persistence. See ASB-112 |
 | Crescendo-Decrescendo | **Volume Mode added** | ASB-112: Curve/Steady/Linear CC7 modes. Maintenance otherwise |
-| Line-Wedge Maker | **Implementation Complete** | ASB-119: Database, HTML panel, JS object, meter, integration hooks. Awaiting user testing |
+| Line-Wedge Maker | **Duplicate + ObjectSelector** | ASB-119: Full system. ASB-120: Multi-page fix. ASB-121: Node time display + analysis. ASB-122: Ctrl+Alt+D duplicate, updateSelectedTrack, ObjectSelector integration. ASB-123: Transient Grouping System. Awaiting user testing |
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
 | Pizz Tremolo Glissando | **Complete** | Full system: UI + server + MIDI + SVG + AI Command Bridge (two-part/single go). Prompt guide: `AI_PIZZ_TREM_GLISS_PROMPT_GUIDE.md` |
 | Notation Fragment System | **Bundle System Complete** | Full pipeline + score insertion (GC + SVG + MIDI). UI panel built. Pre-computed timing DB. 8 fragments ready. Bundle system (drag/delete as unit) implemented. Next: compose more fragments, AI prompt guide |
@@ -97,6 +97,7 @@ That's it. Everything else below is for Cascade.
 | **TODO: MIDI State Reset Problem** | CC state (CC7 volume, CC4/channel pressure) persists after snippet ends — next snippet on same channel inherits final value. CC120/CC123 don't work with synth. Current workaround: dedicated channel banks per modification type. Need to investigate: micro-fade, inter-snippet gaps, channel rotation, or multi-port expansion (16 ch per port limit). See `MIDI_MUSIC_GENERATION.md` §13 "MIDI State Reset Problem." | When adding volume/vibrato to notation fragments or when channel count becomes limiting |
 | **TODO: Long Tone Glissando System + Bundle** | The Long Tone Glissando system (UI section at line ~823) and the GlissandoSystem object (line ~16387, attaches pitch tracking to curves) exist separately. Need to: (1) combine into a unified pipeline with proper SVG + MIDI generation, (2) implement bundle system (curve-based, like CD/Vibrato). Pipeline may need significant work — GlissandoSystem currently only attaches pitch metadata to curves, no standalone MIDI/SVG generation. | When user wants to compose with long tone glissandi as bundled units |
 | **TODO: XLD Cell System + Bundle** | XLD Cell exists only in pieces — no unified system or pipeline yet. Need to: (1) inventory existing XLD Cell components, (2) create a proper system with UI/pipeline, (3) implement bundle system. Scope TBD — may be GC-based or curve-based depending on XLD Cell semantics. | When user wants to compose with XLD Cells as bundled units |
+| **Transient Grouping System (v1)** | ObjectRegistry + MultiSelect implemented (ASB-123). Shift+Click multi-select, Shift+Ctrl+Win+Click for overlapping objects, per-object cyan highlights + dashed bounding box, floating mini-toolbar (Dup/Del/Track/Time), keyboard shortcuts (Ctrl+Alt+D/Delete/Escape). Adapters: Curve, LineWedge, SVG, Motive. **Future:** Rubber-band selection (Option 1), Temporal Range Grouping (Option 4), persistent groups. | When extending grouping features or adding new object types |
 
 ---
 
@@ -132,17 +133,17 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-119: Line-Wedge Maker.** Full implementation of variable-thickness horizontal line system. LineWedgeDatabase (CRUD + ScoreManager persistence as `databases.lineWedges`). HTML panel (start/end inputs, track select, node thickness, 12 dedicated color swatches, draw/delete/delete-node buttons). LineWedgeMaker JS object (filled SVG path rendering, node system with add/delete/drag, shift+drag move, multi-page visibility with clip+continuation). Line-Wedge Meter in StaffCursors (donut ring for time progress + center bar for thickness). Integration hooks: GraphicTimeline visibility, bringInteractiveLayersToFront, debounced resize. Bug fixes: duplicate class attr on color swatch, null guards for panel elements.
+> **ASB-124/125/126: LilyPond dynamic/articulation controls + MultiSelect bug fixes.** Added independent piano dynamic controls (fontsize + X/Y) to Two-Handed Pizzicato Clusters.ly. Added independent down-bow positioning (\overlay markup fix), NoteColumn X-offset, staff lines removed to short_accented_overpressure.ly. Fixed MultiSelect: Shift+Click overlap (ObjectSelector menu), stale highlights (DOM fallback), hit test !0 bug (null check).
 
 ---
 
 ## Current Session
 
-**Date:** Mar 1, 2026  
-**Focus:** Line-Wedge Maker  
-**ASB:** ASB-119  
-**Tier 1 Count This Session:** 1 (ASB-119)  
-**Tier 2 Threshold:** At 1 — committing with feature (large scope)
+**Date:** Mar 2, 2026  
+**Focus:** LilyPond notation adjustments + MultiSelect bug fixes  
+**ASB:** ASB-126  
+**Tier 1 Count This Session:** 3 (ASB-124, ASB-125, ASB-126)  
+**Tier 2 Threshold:** At 3 — committing now
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -211,6 +212,40 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ### Session Log — Line-Wedge Maker
 - ASB-119: Line-Wedge Maker — full implementation of variable-thickness horizontal line system in `public/index.html`. **LineWedgeDatabase** (~line 9596): CRUD (add/get/update/remove/getAll/exportData/importData), registered with ScoreManager as `databases.lineWedges` (~line 12630). **HTML Panel** (~line 1710): Start/End inputs, Track select (1-4), Node Thickness input (hidden until node selected), 12 dedicated color swatches in `#lwColorSwatches` (default: brightBlue), Draw/Delete/Delete Node buttons (blue theme `#1a3a5c`). **LineWedgeMaker JS Object** (~line 25532): init (refs UI elements, creates SVG groups, attaches event listeners, debounced resize), createLineWedge (timestamped name, position calc, 2-node default at thickness 3), generatePath (top edge L→R, bottom edge R→L, closed; center Y = `trackDims.y + trackDims.height/6`), renderLineWedge (yellow highlight, filled path, 15px transparent hit path, circle node handles), node system (dblclick add with interpolated thickness, delete with min-2 guard, drag horizontal position + vertical thickness), shift+drag move, updateVisibility (page-based show/hide with clipToPageEnd + showContinuationSegment), reloadFromDatabase, syncToDatabase. **Line-Wedge Meter** (~line 5669 in StaffCursors): donut ring (stroke arc emptying clockwise for time progress) + center bar (rect growing/shrinking from midline for current thickness) + border rect; size = staffHeight/3, positioned left of motive pie. **Integration hooks**: GraphicTimeline.updateGraphicObjectsVisibility → LineWedgeMaker.updateVisibility(), MidiController.bringInteractiveLayersToFront → append LW groups, window resize → debounced reloadFromDatabase(). **Bug fixes**: duplicate class attribute on brightBlue swatch (browser ignored second `class=`), null guards for nodeRow/deleteNodeBtn in selectLineWedge/selectNode/deselectLineWedge/deleteSelectedNode. **Key design decisions**: dedicated color swatches (not shared), max thickness = trackDims.height/3, node handles visible only when selected, continuation segments use simplified 2-point path. **Git**: revert point tag `milestone-pre-line-wedge` (commit `6c0355e`), implementation commit `a679a18`, bugfix commit `0ad42ea`. **Status**: awaiting user testing.
+
+- ASB-120: **Multi-page rendering fix** — 6 changes in `public/index.html`. **Root cause:** `x2` was computed via `calcPositionFromTime(endSeconds)` which returns coordinates in the END page's coordinate system, but path generation assumes x1/x2 are in the SAME (start page) coordinate system. For multi-page lines, x2 wrapped to a small value on page 2. **Fixes:** (1) x2 formula: `startPos.x + ((endSeconds - startSeconds) / secondsPerPage) * scoreWidth` — always start-page coords. (2) Removed unused `calcX2OnStartPage` helper. (3) `updateVisibility()` rewritten to CurveMaker pattern: single-page (show/hide) vs multi-page (clip main segment on start page, show continuations on subsequent pages). (4) `clipToPageEnd()` rewritten: calls new `generateClippedPath(lw, maxX)` instead of squishing nodes via `lw.x2 = scoreWidth`. (5) New `generateClippedPath()`: uses full x1/x2 for correct node placement, interpolates thickness at clip boundary. (6) `showContinuationSegment()` rewritten: includes ALL intermediate nodes in page time range, not just start/end trapezoid. Status: pre-test.
+
+- ASB-121: **Node time display + design analysis.** Node time display: `getNodeTime()`, `updateNodeTimeDisplay()`, HTML row `#lwNodeTimeRow`/`#lwNodeTimeDisplay`, wired into selectNode/drag/deselect. **Design analysis (documented below):** 4 options for copy/repeat line-wedges, 4 options for improved grouping UX, universal ObjectRegistry architecture insight.
+
+- ASB-122: **Line-Wedge Duplicate + Track Change + ObjectSelector integration.** (1) `duplicateSelectedLineWedge()` method — copies startSeconds, endSeconds, gTrack, color, and full node array from selected LW, calls `createLineWedge(dupData)`, auto-selects duplicate. (2) `createLineWedge()` updated — accepts `params.nodes` for custom node structures (preserves node count + positions + thicknesses on duplicate), falls back to default 2-node. (3) `updateSelectedTrack()` method — changes selected LW's track via UI dropdown, recalculates position/trackDims, re-renders + syncs to DB. (4) Ctrl+Alt+D keyboard handler in `init()`. (5) ObjectSelector integration — line-wedges added to `getObjectsAtPoint()` (track/section/page filtering), `isPointInLineWedge()` hit test method added. Ctrl+Win+Alt+Click menu now includes line-wedges for overlapping object selection.
+
+- ASB-123: **Transient Grouping System — ObjectRegistry + MultiSelect.** (1) **ObjectRegistry** (~line 30846): universal adapter layer with `register()`, `getPosition()`, `setTime()`, `setTrack()`, `deleteObj()`, `cloneObj()`, `getElement()`, `getBounds()`. Four adapters: Curve (CurveDatabase persist + reloadFromDatabase), LineWedge (calcPositionFromTime + render + sync + updateVisibility), SVG (calcPixelPosition + container swap + updateElementTransform), Motive (UI input bridge + updateSelectedFromInputs). (2) **MultiSelect** (~line 31081): `selected[]` array of `{system, obj}`, `toggleObject()`, `addObject()`, `clearSelection()`. Visual feedback: per-object cyan dashed overlays (`fill-opacity:0.08`, `stroke-opacity:0.5`) + dashed bounding box (`#4af`, `stroke-dasharray:8,4`). Floating mini-toolbar (`#multiSelectToolbar`): count label, Dup button, Del button, Track dropdown (1-4), Δt input + Move button. Toolbar auto-positions above bounding box. (3) **Shift+Click handler** (capture phase on score elements): uses `ObjectSelector.getObjectsAtPoint()` to find top-most object, maps type to registry system name, calls `toggleObject()`. (4) **Shift+Ctrl+Win+Click**: ObjectSelector `showMenuAtPoint()` extended with `multiSelectMode` flag — menu items toggle objects in MultiSelect (blue left-border indicator), menu stays open for multiple selections. (5) **Keyboard shortcuts**: Delete (deleteAll, input-aware), Ctrl+Alt+D (duplicateAll, `stopImmediatePropagation` prevents LineWedgeMaker conflict), Escape (clearSelection). (6) **Group actions**: `duplicateAll()` (clones via ObjectRegistry, replaces selection with clones), `deleteAll()` (reverse-order delete via ObjectRegistry), `moveTimeAll(deltaSec)` (shifts all positions), `changeTrackAll(newTrack)`. (7) **Click-to-clear**: only on score background (SVG element check), not on objects or toolbar. (8) **Bug fixes**: Curve adapter `setTime` now persists to CurveDatabase before reloadFromDatabase.
+
+### Line-Wedge Copy/Repeat Analysis (ASB-121)
+
+*Four options analyzed for duplicating/copying line-wedges. Option A implemented as ASB-122.*
+
+| Option | Description | Steps | Complexity | Status |
+|--------|-------------|-------|------------|--------|
+| **A: Ctrl+Alt+D Duplicate** | Duplicate selected LW at same position, auto-select duplicate. User changes track/time via UI. | 1 (hotkey) + optional UI edits | ~50 lines | **Implemented (ASB-122)** |
+| **B: Ctrl+Shift+D Duplicate to Track** | Duplicate + prompt for target track in one step | 2 | ~70 lines | Future option |
+| **C: Save/Recall Library** | CurveMaker pattern — save LW params to library, recall with time/track inputs | 4–5 | ~150 lines | Future (cross-session reuse) |
+| **D: AI Command Bridge** | `LineWedgeMaker.duplicate()` callable from AI command system | 0 (AI-driven) | ~20 lines | Future (batch composition) |
+
+### Grouping System Analysis (ASB-121)
+
+*Four options analyzed for improved multi-object selection and grouping UX. Option 2 implemented as ASB-123.*
+
+| Option | Description | Complexity | Key Benefit |
+|--------|-------------|------------|-------------|
+| **1: Rubber-Band Selection + Ctrl+G** | Click-drag rectangle to select all objects inside, then Ctrl+G to group. Illustrator/Figma pattern. | Medium-High | Most intuitive for spatial selection |
+| **2: Shift+Click Multi-Select** | Shift+click individual objects to add to selection. Uses ObjectSelector for overlapping objects (Shift+Ctrl+Win+Click). Transient groups with floating toolbar. | Medium | **Implemented (ASB-123)** |
+| **3: Quick-Bundle Hotkey** | Ctrl+Shift+Click to add objects to current group one at a time. No explicit "create group" step. | Low-Medium | Fastest for small groups |
+| **4: Temporal Range Grouping** | Group all objects within a time range on specified tracks. Dialog-based. | Low | Covers most common case (everything at time X) |
+
+**Key architecture insight:** All grouping options require a **universal ObjectRegistry** adapter — a thin abstraction layer each system (CurveMaker, LineWedgeMaker, SVGElementManager, etc.) registers with, providing `getPosition()`, `setPosition()`, `delete()`, `clone()` callbacks. Current GroupManager and per-system bundle registries don't provide this cross-system interface.
+
+**Recommendation:** Start with Option 2 (Shift+Click + Ctrl+G) + ObjectRegistry adapter. Add Option 4 (Temporal Range) for quick practical value. Add rubber-band (Option 1) later.
 
 ### Session Log — Notation Fragment Score Integration
 - ASB-096: Fragment asset audit — all 8 NFs verified, re-rendered NF008-Cello, cropped all SVGs, created output dirs + notation_fragment_db.json
@@ -436,6 +471,13 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-117 | Bundle Manager Tool — standalone HTML, inspect/select/delete bundles from saved scores, 6 types, filters, range select, undo, save-as | Complete |
 | ASB-118 | Sequence Generator presets — auto-persist localStorage, named presets (save/load/delete/export/import), built-in preset | Complete |
 | ASB-119 | Line-Wedge Maker — full system: LineWedgeDatabase, HTML panel, LineWedgeMaker JS (render/select/node ops/multi-page), LW meter (donut ring + center bar), integration hooks, bug fixes | Complete |
+| ASB-120 | LineWedge multi-page fix — x2 coord system (start-page), updateVisibility rewrite (CurveMaker pattern), generateClippedPath (correct node positions), showContinuationSegment (intermediate nodes) | Pre-test |
+| ASB-121 | Line-Wedge node time display (getNodeTime, updateNodeTimeDisplay, HTML row, wired into selectNode/drag/deselect). Analysis: 4 options for copy/repeat line-wedges (Ctrl+Alt+D recommended), 4 options for improved grouping UX (Shift+Click+Ctrl+G + ObjectRegistry recommended) | Complete |
+| ASB-122 | Line-Wedge duplicate (Ctrl+Alt+D) + updateSelectedTrack + createLineWedge custom nodes + ObjectSelector integration (getObjectsAtPoint + isPointInLineWedge) | Complete |
+| ASB-123 | Transient Grouping System — ObjectRegistry (universal adapter layer, 4 system adapters), MultiSelect (Shift+Click, highlights, bounding box, floating toolbar, group actions), Shift+Ctrl+Win+Click ObjectSelector integration | Pre-test |
+| ASB-124 | Two-Handed Pizzicato Clusters — independent piano dynamic controls (fontsize + X/Y for each \p, -\tweak outside-staff-priority + font-size + extra-offset) | Complete |
+| ASB-125 | Short Accented Overpressure — independent down-bow positioning (\overlay fix), NoteColumn X-offset, staff lines removed | Complete |
+| ASB-126 | MultiSelect/ObjectSelector bug fixes — Shift+Click overlap menu, stale highlight DOM fallback, hit test !0→null check | Complete |
 
 ---
 

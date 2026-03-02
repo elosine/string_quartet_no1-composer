@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "title": "364-1",
+    "created": "2026-03-02T19:56:58.278Z",
+    "modified": "2026-03-02T19:56:58.409Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369964,8 +369964,76 @@
       "nextId": 55
     },
     "lineWedges": {
-      "lineWedges": [],
-      "nextId": 2
+      "lineWedges": [
+        {
+          "id": 3,
+          "name": "LW_20260302_145455",
+          "startSeconds": 380,
+          "endSeconds": 394,
+          "gTrack": "1",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 687.75,
+          "x2": 2292.5,
+          "trackDims": {
+            "y": 8,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 1
+            },
+            {
+              "pos": 0.7408418930251023,
+              "thickness": 1
+            },
+            {
+              "pos": 0.9016145990540759,
+              "thickness": 10
+            },
+            {
+              "pos": 1,
+              "thickness": 10
+            }
+          ],
+          "createdAt": 1772481295203,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {},
+              {},
+              {}
+            ],
+            "continuationNodeHandlesTop": [],
+            "continuationNodeHandlesBottom": [
+              {},
+              {},
+              {}
+            ],
+            "continuationGroupTop": {
+              "_contPage": 48,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathTop": {},
+            "continuationHitPathTop": {},
+            "continuationGroupBottom": {
+              "_contPage": 49,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathBottom": {},
+            "continuationHitPathBottom": {}
+          }
+        }
+      ],
+      "nextId": 4
     },
     "motiveGroups": {
       "groups": [
@@ -596943,7 +597011,7 @@
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 344.4406814786855,
-    "gotoDisplaySeconds": 379,
+    "gotoDisplaySeconds": 390,
     "leadInSeconds": 2
   }
 }

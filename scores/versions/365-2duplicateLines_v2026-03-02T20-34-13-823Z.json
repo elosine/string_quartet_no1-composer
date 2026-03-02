@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "title": "365-2duplicateLines",
+    "created": "2026-03-02T20:32:47.874Z",
+    "modified": "2026-03-02T20:32:48.021Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369964,8 +369964,244 @@
       "nextId": 55
     },
     "lineWedges": {
-      "lineWedges": [],
-      "nextId": 2
+      "lineWedges": [
+        {
+          "id": 3,
+          "name": "LW_20260302_145455",
+          "startSeconds": 380,
+          "endSeconds": 394,
+          "gTrack": "1",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 687.75,
+          "x2": 2292.5,
+          "trackDims": {
+            "y": 8,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 1
+            },
+            {
+              "pos": 0.7408418930251023,
+              "thickness": 1
+            },
+            {
+              "pos": 0.9016145990540759,
+              "thickness": 10
+            },
+            {
+              "pos": 1,
+              "thickness": 10
+            }
+          ],
+          "createdAt": 1772481295203,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {},
+              {},
+              {}
+            ],
+            "continuationNodeHandlesTop": [],
+            "continuationNodeHandlesBottom": [
+              {},
+              {},
+              {}
+            ],
+            "continuationGroupTop": {
+              "_contPage": 48,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathTop": {},
+            "continuationHitPathTop": {},
+            "continuationGroupBottom": {
+              "_contPage": 49,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathBottom": {},
+            "continuationHitPathBottom": {}
+          }
+        },
+        {
+          "id": 4,
+          "name": "LW_20260302_153217",
+          "startSeconds": 380,
+          "endSeconds": 394,
+          "gTrack": "2",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 687.75,
+          "x2": 2292.5,
+          "trackDims": {
+            "y": 90,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 1
+            },
+            {
+              "pos": 0.7408418930251023,
+              "thickness": 1
+            },
+            {
+              "pos": 0.9016145990540759,
+              "thickness": 10
+            },
+            {
+              "pos": 1,
+              "thickness": 10
+            }
+          ],
+          "createdAt": 1772483537074,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {},
+              {},
+              {}
+            ],
+            "continuationNodeHandlesTop": [],
+            "continuationNodeHandlesBottom": [],
+            "continuationGroupTop": {
+              "_contPage": 48,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathTop": {},
+            "continuationHitPathTop": {}
+          }
+        },
+        {
+          "id": 5,
+          "name": "LW_20260302_153226",
+          "startSeconds": 380,
+          "endSeconds": 394,
+          "gTrack": "3",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 687.75,
+          "x2": 2292.5,
+          "trackDims": {
+            "y": 172,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 1
+            },
+            {
+              "pos": 0.7408418930251023,
+              "thickness": 1
+            },
+            {
+              "pos": 0.9016145990540759,
+              "thickness": 10
+            },
+            {
+              "pos": 1,
+              "thickness": 10
+            }
+          ],
+          "createdAt": 1772483546741,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {},
+              {},
+              {}
+            ],
+            "continuationNodeHandlesTop": [],
+            "continuationNodeHandlesBottom": [],
+            "continuationGroupTop": {
+              "_contPage": 48,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathTop": {},
+            "continuationHitPathTop": {}
+          }
+        },
+        {
+          "id": 6,
+          "name": "LW_20260302_153235",
+          "startSeconds": 380,
+          "endSeconds": 394,
+          "gTrack": "4",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 687.75,
+          "x2": 2292.5,
+          "trackDims": {
+            "y": 254,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 1
+            },
+            {
+              "pos": 0.7408418930251023,
+              "thickness": 1
+            },
+            {
+              "pos": 0.9016145990540759,
+              "thickness": 10
+            },
+            {
+              "pos": 1,
+              "thickness": 10
+            }
+          ],
+          "createdAt": 1772483555075,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {},
+              {},
+              {}
+            ],
+            "continuationNodeHandlesTop": [],
+            "continuationNodeHandlesBottom": [],
+            "continuationGroupTop": {
+              "_contPage": 48,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathTop": {},
+            "continuationHitPathTop": {}
+          }
+        }
+      ],
+      "nextId": 7
     },
     "motiveGroups": {
       "groups": [
@@ -596943,7 +597179,7 @@
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 344.4406814786855,
-    "gotoDisplaySeconds": 379,
+    "gotoDisplaySeconds": 290,
     "leadInSeconds": 2
   }
 }

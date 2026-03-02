@@ -30,9 +30,9 @@
 
 % Vertical distance between staves (in staff spaces, independent per pair)
 % Staff 1 (L.H. Pluck) → Staff 2 (L.H. Fingering)
-#(define staff-1-to-2-distance 6.5)
+#(define staff-1-to-2-distance 7.5)
 % Staff 2 (L.H. Fingering) → Staff 3 (R.H.)
-#(define staff-2-to-3-distance 8.5)
+#(define staff-2-to-3-distance 10)
 
 % Stem length for standalone 8th notes with tremolo (in staff spaces)
 #(define pluck-stem-length 12)
@@ -72,6 +72,16 @@
 
 % Independent size control for X noteheads (change without affecting regular noteheads)
 #(define x-notehead-size -4.5)
+
+% Dynamic marking (piano) controls — independent per staff
+% L.H. Pluck staff piano (top staff, grace notes)
+#(define lh-pluck-piano-fontsize -4)
+#(define lh-pluck-piano-x-offset -1)
+#(define lh-pluck-piano-y-offset -0.7)
+% L.H. Fingering staff piano (middle staff, down-arrow note)
+#(define lh-fingering-piano-fontsize -4)
+#(define lh-fingering-piano-x-offset 0.6)
+#(define lh-fingering-piano-y-offset 0)
 
 xHeadOnce = {
   \once \override NoteHead.style = #'cross
@@ -176,7 +186,11 @@ xHeadRevert = {
                               (lineto  0 3.5) ;G H
                               (closepath))
           }
-          d'' b' d'' g']
+          d''
+          -\tweak outside-staff-priority ##f
+          -\tweak font-size #lh-pluck-piano-fontsize
+          -\tweak extra-offset #(cons lh-pluck-piano-x-offset lh-pluck-piano-y-offset)
+          _\p b' d'' g']
           \revert NoteColumn.X-offset
           }
         }
@@ -223,6 +237,10 @@ xHeadRevert = {
         \tweak NoteHead.extra-offset #'(0.45 . 0.3)
         \tweak NoteColumn.X-offset #-10
         c'4
+        -\tweak outside-staff-priority ##f
+        -\tweak font-size #lh-fingering-piano-fontsize
+        -\tweak extra-offset #(cons lh-fingering-piano-x-offset lh-fingering-piano-y-offset)
+        _\p
         \glissando
 
         % UP ARROW NOTEHEAD
@@ -294,6 +312,7 @@ xHeadRevert = {
                               (closepath))
           }
           e'' c'' a']
+          
           \revert NoteColumn.X-offset
           }
         }

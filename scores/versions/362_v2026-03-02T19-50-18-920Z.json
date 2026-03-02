@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "title": "362",
+    "created": "2026-03-02T19:49:18.823Z",
+    "modified": "2026-03-02T19:49:18.983Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369964,8 +369964,64 @@
       "nextId": 55
     },
     "lineWedges": {
-      "lineWedges": [],
-      "nextId": 2
+      "lineWedges": [
+        {
+          "id": 3,
+          "name": "LW_20260302_144825",
+          "startSeconds": 380.00872410032713,
+          "endSeconds": 394.74154852780805,
+          "gTrack": "1",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 688.7499999999972,
+          "x2": 2377.4999999999977,
+          "trackDims": {
+            "y": 8,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 5
+            },
+            {
+              "pos": 1,
+              "thickness": 2
+            }
+          ],
+          "createdAt": 1772480905319,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {}
+            ],
+            "continuationNodeHandlesTop": [],
+            "continuationNodeHandlesBottom": [
+              {}
+            ],
+            "continuationGroupTop": {
+              "_contPage": 48,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathTop": {},
+            "continuationHitPathTop": {},
+            "continuationGroupBottom": {
+              "_contPage": 49,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathBottom": {},
+            "continuationHitPathBottom": {}
+          }
+        }
+      ],
+      "nextId": 4
     },
     "motiveGroups": {
       "groups": [
@@ -596943,7 +596999,7 @@
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 344.4406814786855,
-    "gotoDisplaySeconds": 379,
+    "gotoDisplaySeconds": 390,
     "leadInSeconds": 2
   }
 }

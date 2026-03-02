@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "title": "362",
+    "created": "2026-03-02T19:16:23.885Z",
+    "modified": "2026-03-02T19:16:24.039Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369964,8 +369964,83 @@
       "nextId": 55
     },
     "lineWedges": {
-      "lineWedges": [],
-      "nextId": 2
+      "lineWedges": [
+        {
+          "id": 3,
+          "name": "LW_20260302_141041",
+          "startSeconds": 380,
+          "endSeconds": 394.453653217012,
+          "gTrack": "1",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 687.75,
+          "x2": 2344.500000000001,
+          "trackDims": {
+            "y": 8,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 1
+            },
+            {
+              "pos": 0.4924496923688124,
+              "thickness": 10
+            },
+            {
+              "pos": 0.7869549947543419,
+              "thickness": 1
+            },
+            {
+              "pos": 0.9608138512740497,
+              "thickness": 10
+            },
+            {
+              "pos": 1,
+              "thickness": 8
+            }
+          ],
+          "createdAt": 1772478641185,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {},
+              {},
+              {},
+              {}
+            ],
+            "continuationNodeHandlesTop": [
+              {}
+            ],
+            "continuationNodeHandlesBottom": [
+              {},
+              {},
+              {}
+            ],
+            "continuationGroupTop": {
+              "_contPage": 48,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathTop": {},
+            "continuationHitPathTop": {},
+            "continuationGroupBottom": {
+              "_contPage": 49,
+              "_contSecondsPerPage": 8,
+              "_contLeadInSec": 2
+            },
+            "continuationPathBottom": {},
+            "continuationHitPathBottom": {}
+          }
+        }
+      ],
+      "nextId": 4
     },
     "motiveGroups": {
       "groups": [
@@ -596942,8 +597017,8 @@
   },
   "connectors": [],
   "cursorState": {
-    "editCursorSeconds": 344.4406814786855,
-    "gotoDisplaySeconds": 379,
+    "editCursorSeconds": 379.97580071534605,
+    "gotoDisplaySeconds": 380,
     "leadInSeconds": 2
   }
 }

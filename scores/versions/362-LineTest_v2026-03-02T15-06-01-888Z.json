@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "title": "362-LineTest",
+    "created": "2026-03-02T15:05:01.769Z",
+    "modified": "2026-03-02T15:05:01.906Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369964,8 +369964,46 @@
       "nextId": 55
     },
     "lineWedges": {
-      "lineWedges": [],
-      "nextId": 2
+      "lineWedges": [
+        {
+          "id": 2,
+          "name": "LW_20260302_100456",
+          "startSeconds": 383,
+          "endSeconds": 389,
+          "gTrack": "1",
+          "color": "brightGreen",
+          "section": "top",
+          "page": 48,
+          "x1": 114.625,
+          "x2": 802.375,
+          "trackDims": {
+            "y": 8,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 3
+            },
+            {
+              "pos": 1,
+              "thickness": 3
+            }
+          ],
+          "createdAt": 1772463896174,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {}
+            ]
+          }
+        }
+      ],
+      "nextId": 3
     },
     "motiveGroups": {
       "groups": [

@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "created": "2026-03-02T15:03:01.845Z",
+    "modified": "2026-03-02T15:03:02.054Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369964,7 +369964,45 @@
       "nextId": 55
     },
     "lineWedges": {
-      "lineWedges": [],
+      "lineWedges": [
+        {
+          "id": 1,
+          "name": "LW_20260302_100259",
+          "startSeconds": 380,
+          "endSeconds": 394,
+          "gTrack": "1",
+          "color": "brightGreen",
+          "section": "bottom",
+          "page": 47,
+          "x1": 687.75,
+          "x2": 458.5,
+          "trackDims": {
+            "y": 8,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 3
+            },
+            {
+              "pos": 1,
+              "thickness": 3
+            }
+          ],
+          "createdAt": 1772463779375,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {}
+            ]
+          }
+        }
+      ],
       "nextId": 2
     },
     "motiveGroups": {
@@ -596943,7 +596981,7 @@
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 344.4406814786855,
-    "gotoDisplaySeconds": 379,
+    "gotoDisplaySeconds": 370,
     "leadInSeconds": 2
   }
 }

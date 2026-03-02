@@ -1,9 +1,9 @@
 {
   "version": "1.0",
   "metadata": {
-    "title": "360-bpStorm",
-    "created": "2026-03-02T15:04:01.769Z",
-    "modified": "2026-03-02T15:04:01.884Z",
+    "title": "362-LineTest",
+    "created": "2026-03-02T15:12:01.770Z",
+    "modified": "2026-03-02T15:12:01.894Z",
     "author": ""
   },
   "tempoHistory": [
@@ -369964,8 +369964,51 @@
       "nextId": 55
     },
     "lineWedges": {
-      "lineWedges": [],
-      "nextId": 2
+      "lineWedges": [
+        {
+          "id": 4,
+          "name": "LW_20260302_100906",
+          "startSeconds": 382,
+          "endSeconds": 389,
+          "gTrack": "3",
+          "color": "brightGreen",
+          "section": "top",
+          "page": 48,
+          "x1": 0,
+          "x2": 802.375,
+          "trackDims": {
+            "y": 172,
+            "height": 82
+          },
+          "nodes": [
+            {
+              "pos": 0,
+              "thickness": 7
+            },
+            {
+              "pos": 0.2338258642555304,
+              "thickness": 1
+            },
+            {
+              "pos": 1,
+              "thickness": 27.333333333333332
+            }
+          ],
+          "createdAt": 1772464146304,
+          "elements": {
+            "group": {},
+            "path": {},
+            "hitPath": {},
+            "highlight": {},
+            "nodeHandles": [
+              {},
+              {},
+              {}
+            ]
+          }
+        }
+      ],
+      "nextId": 5
     },
     "motiveGroups": {
       "groups": [
@@ -596943,7 +596986,7 @@
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 344.4406814786855,
-    "gotoDisplaySeconds": 379,
+    "gotoDisplaySeconds": 382,
     "leadInSeconds": 2
   }
 }
