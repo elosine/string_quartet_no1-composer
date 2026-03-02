@@ -1734,7 +1734,7 @@
                 
                 <div class="color-swatches" id="lwColorSwatches" style="margin-top: 6px;">
                     <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
-                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px; outline: 2px solid white;" class="selected"></div>
+                    <div class="color-swatch selected" data-color="brightBlue" style="background: var(--clr-brightBlue); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px; outline: 2px solid white;"></div>
                     <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
                     <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
                     <div class="color-swatch" data-color="green" style="background: var(--clr-green); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
@@ -25868,8 +25868,8 @@
                     });
                 }
                 
-                this.nodeRow.style.display = 'none';
-                this.deleteNodeBtn.style.display = 'none';
+                if (this.nodeRow) this.nodeRow.style.display = 'none';
+                if (this.deleteNodeBtn) this.deleteNodeBtn.style.display = 'none';
             },
             
             selectNode(nodeIndex) {
@@ -25885,8 +25885,8 @@
                 if (this.nodeThicknessInput) {
                     this.nodeThicknessInput.value = Math.round(node.thickness);
                 }
-                this.nodeRow.style.display = '';
-                this.deleteNodeBtn.style.display = lw.nodes.length > 2 ? '' : 'none';
+                if (this.nodeRow) this.nodeRow.style.display = '';
+                if (this.deleteNodeBtn) this.deleteNodeBtn.style.display = lw.nodes.length > 2 ? '' : 'none';
             },
             
             deselectLineWedge() {
@@ -25896,8 +25896,8 @@
                 }
                 this.selectedLineWedge = null;
                 this.selectedNode = null;
-                this.nodeRow.style.display = 'none';
-                this.deleteNodeBtn.style.display = 'none';
+                if (this.nodeRow) this.nodeRow.style.display = 'none';
+                if (this.deleteNodeBtn) this.deleteNodeBtn.style.display = 'none';
             },
             
             handleScoreClick(e) {
@@ -25936,8 +25936,8 @@
                 if (lw.nodes[lw.nodes.length - 1].pos !== 1) lw.nodes[lw.nodes.length - 1].pos = 1;
                 
                 this.selectedNode = null;
-                this.nodeRow.style.display = 'none';
-                this.deleteNodeBtn.style.display = 'none';
+                if (this.nodeRow) this.nodeRow.style.display = 'none';
+                if (this.deleteNodeBtn) this.deleteNodeBtn.style.display = 'none';
                 
                 this.updateLineWedgeRendering(lw);
                 this.syncToDatabase(lw);
