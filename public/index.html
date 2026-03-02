@@ -1708,6 +1708,50 @@
                 -->
                 
                 <div class="section-divider"></div>
+                <div class="section-label" style="background: var(--clr-brightBlue); color: #fff; padding: 3px 6px; border-radius: 2px;">Line-Wedge Maker</div>
+                
+                <div class="curve-input-row">
+                    <label>Start</label>
+                    <input type="text" id="lwStartInput" class="curve-input" value="0.000">
+                </div>
+                <div class="curve-input-row">
+                    <label>End</label>
+                    <input type="text" id="lwEndInput" class="curve-input" value="1.000">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 10px;">Track</label>
+                    <select id="lwTrackSelect" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div id="lwNodeRow" class="curve-input-row" style="display: none;">
+                    <label style="font-size: 10px;">Node Thick</label>
+                    <input type="number" id="lwNodeThicknessInput" class="curve-input" value="3" min="1" max="100" step="1" style="width: 50px;">
+                </div>
+                
+                <div class="color-swatches" id="lwColorSwatches" style="margin-top: 6px;">
+                    <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px; outline: 2px solid white;" class="selected"></div>
+                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="green" style="background: var(--clr-green); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="limeGreen" style="background: var(--clr-limeGreen); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                </div>
+                
+                <button id="lwDrawBtn" class="curve-draw-btn" style="margin-top: 6px; background: #1a3a5c; border-color: #2a5a8c;">Draw</button>
+                <button id="lwDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: #1a3a5c; border-color: #2a5a8c;">Delete</button>
+                <button id="lwDeleteNodeBtn" class="curve-draw-btn" style="margin-top: 5px; background: #1a3a5c; border-color: #2a5a8c; display: none;">Delete Node</button>
+                
+                <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-mustard); color: #000; padding: 3px 6px; border-radius: 2px;">MIDI Model</div>
                 
                 <div class="curve-input-row">
@@ -5048,6 +5092,36 @@
                 const motivePieTop = createMotivePie();
                 const motivePieBottom = createMotivePie();
                 
+                // Create line-wedge meter (donut ring for duration + center bar for thickness)
+                const createLWMeter = () => {
+                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.style.display = 'none';
+                    
+                    // Donut ring arc (time progress, empties clockwise)
+                    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    ring.setAttribute('fill', 'none');
+                    ring.setAttribute('stroke-width', '3');
+                    ring.setAttribute('opacity', '0.7');
+                    group.appendChild(ring);
+                    
+                    // Center bar (thickness indicator, grows/shrinks from midline)
+                    const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    bar.setAttribute('opacity', '0.9');
+                    group.appendChild(bar);
+                    
+                    // Square border
+                    const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    border.setAttribute('fill', 'none');
+                    border.setAttribute('stroke', '#555');
+                    border.setAttribute('stroke-width', '0.5');
+                    group.appendChild(border);
+                    
+                    return { group, ring, bar, border };
+                };
+                
+                const lwMeterTop = createLWMeter();
+                const lwMeterBottom = createLWMeter();
+                
                 // Add to SVG elements
                 this.scoreTopEl.appendChild(meterOutlineTop);
                 this.scoreBottomEl.appendChild(meterOutlineBottom);
@@ -5055,6 +5129,8 @@
                 this.scoreBottomEl.appendChild(cursorBottom);
                 this.scoreTopEl.appendChild(motivePieTop.group);
                 this.scoreBottomEl.appendChild(motivePieBottom.group);
+                this.scoreTopEl.appendChild(lwMeterTop.group);
+                this.scoreBottomEl.appendChild(lwMeterBottom.group);
                 this.scoreTopEl.appendChild(curveFollowerTop);
                 this.scoreBottomEl.appendChild(curveFollowerBottom);
                 
@@ -5068,6 +5144,8 @@
                     meterOutlineBottom: meterOutlineBottom,
                     motivePieTop: motivePieTop,
                     motivePieBottom: motivePieBottom,
+                    lwMeterTop: lwMeterTop,
+                    lwMeterBottom: lwMeterBottom,
                     currentSection: 'top',  // 'top' or 'bottom'
                     xPosition: 0,           // Current x position in pixels
                     currentCurveValue: null, // Current normalized Y value from curve
@@ -5473,6 +5551,9 @@
                     
                     // Update motive pie for this track
                     this.updateMotivePie(cursor, staffIndex, xPixel, currentSection, currentDisplayTimeSec);
+                    
+                    // Update line-wedge meter for this track
+                    this.updateLineWedgeMeter(cursor, staffIndex, xPixel, currentSection, currentDisplayTimeSec);
                 });
             },
             
@@ -5583,6 +5664,117 @@
                 pie.hand.setAttribute('y2', handY);
                 
                 pie.group.style.display = '';
+            },
+            
+            // Update line-wedge meter - donut ring (time progress) + center bar (thickness)
+            updateLineWedgeMeter(cursor, staffIndex, xPixel, section, currentTimeSec) {
+                const meter = section === 'top' ? cursor.lwMeterTop : cursor.lwMeterBottom;
+                const otherMeter = section === 'top' ? cursor.lwMeterBottom : cursor.lwMeterTop;
+                
+                if (!meter || !meter.group) return;
+                
+                // Hide on inactive section
+                if (otherMeter && otherMeter.group) otherMeter.group.style.display = 'none';
+                
+                const gTrack = String(staffIndex + 1);
+                
+                // Find active line-wedge at current time for this track
+                let activeLW = null;
+                if (window.LineWedgeMaker) {
+                    const lws = LineWedgeMaker.lineWedges.filter(lw =>
+                        lw.gTrack === gTrack &&
+                        currentTimeSec >= lw.startSeconds &&
+                        currentTimeSec <= lw.endSeconds
+                    );
+                    if (lws.length > 0) activeLW = lws[0];
+                }
+                
+                if (!activeLW) {
+                    meter.group.style.display = 'none';
+                    return;
+                }
+                
+                const duration = activeLW.endSeconds - activeLW.startSeconds;
+                const progress = duration > 0 ? (currentTimeSec - activeLW.startSeconds) / duration : 0;
+                
+                // Get current thickness at this time
+                const currentThickness = window.LineWedgeMaker
+                    ? LineWedgeMaker.getThicknessAtTime(activeLW, currentTimeSec)
+                    : 0;
+                const maxThickness = activeLW.trackDims ? activeLW.trackDims.height / 3 : 50;
+                const thicknessNorm = maxThickness > 0 ? Math.min(1, currentThickness / maxThickness) : 0;
+                
+                // Get track dimensions
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreHeight = scoreEl.clientHeight;
+                const availableHeight = scoreHeight - this.timelineHeight;
+                const staffHeight = availableHeight / 4;
+                const yPosition = this.timelineHeight + (staffIndex * staffHeight);
+                
+                // Meter size: staffHeight/3
+                const meterSize = staffHeight / 3;
+                
+                // Position: left of motive pie (which is at xPixel - 11 - pieSize - 2)
+                const pieSize = staffHeight / 4;
+                const meterX = xPixel - 11 - pieSize - 2 - meterSize - 2;
+                const meterY = yPosition;
+                
+                const color = ColorMap[activeLW.color] || activeLW.color;
+                
+                // Update border
+                meter.border.setAttribute('x', meterX);
+                meter.border.setAttribute('y', meterY);
+                meter.border.setAttribute('width', meterSize);
+                meter.border.setAttribute('height', meterSize);
+                
+                // Donut ring - empties clockwise
+                const centerX = meterX + meterSize / 2;
+                const centerY = meterY + meterSize / 2;
+                const outerR = meterSize / 2 - 1;
+                const ringWidth = outerR * 0.35;
+                const midR = outerR - ringWidth / 2;
+                
+                meter.ring.setAttribute('stroke', color);
+                meter.ring.setAttribute('stroke-width', String(ringWidth));
+                
+                const remaining = 1 - progress;
+                
+                if (remaining <= 0) {
+                    meter.ring.setAttribute('d', '');
+                } else if (remaining >= 1) {
+                    // Full circle as stroke arc
+                    meter.ring.setAttribute('d',
+                        `M ${centerX} ${centerY - midR} A ${midR} ${midR} 0 1 1 ${centerX - 0.001} ${centerY - midR}`
+                    );
+                } else {
+                    const startAngle = -Math.PI / 2 + (progress * 2 * Math.PI);
+                    const endAngle = -Math.PI / 2 + (2 * Math.PI);
+                    
+                    const x1 = centerX + midR * Math.cos(startAngle);
+                    const y1 = centerY + midR * Math.sin(startAngle);
+                    const x2 = centerX + midR * Math.cos(endAngle);
+                    const y2 = centerY + midR * Math.sin(endAngle);
+                    
+                    const largeArc = remaining > 0.5 ? 1 : 0;
+                    
+                    meter.ring.setAttribute('d',
+                        `M ${x1} ${y1} A ${midR} ${midR} 0 ${largeArc} 1 ${x2} ${y2}`
+                    );
+                }
+                
+                // Center bar - grows/shrinks from midline
+                const innerR = outerR - ringWidth - 1;
+                const barWidth = innerR * 1.2;
+                const barMaxHeight = innerR * 1.6;
+                const barHeight = barMaxHeight * thicknessNorm;
+                
+                meter.bar.setAttribute('x', centerX - barWidth / 2);
+                meter.bar.setAttribute('y', centerY - barHeight / 2);
+                meter.bar.setAttribute('width', barWidth);
+                meter.bar.setAttribute('height', Math.max(1, barHeight));
+                meter.bar.setAttribute('fill', color);
+                
+                meter.group.style.display = '';
             },
             
             /* DISABLED: updateMotiveFollower - motive system disabled (code kept for future reference)
@@ -6630,6 +6822,7 @@
                 if (window.SVGElementManager) SVGElementManager.updateVisibility();
                 if (window.CurveMaker) CurveMaker.updateVisibility();
                 if (window.MotiveMaker) MotiveMaker.updateVisibility();
+                if (window.LineWedgeMaker) LineWedgeMaker.updateVisibility();
                 if (window.FlowchartConnector) FlowchartConnector.updateVisibility();
                 if (window.GCMaker) GCMaker.updateVisibility();
                 if (window.MidiController) MidiController.updateMidiDisplayVisibility();
@@ -7815,6 +8008,14 @@
                     }
                     if (CurveMaker.bottomCurveGroup && this.scoreBottomEl) {
                         this.scoreBottomEl.appendChild(CurveMaker.bottomCurveGroup);
+                    }
+                }
+                if (window.LineWedgeMaker) {
+                    if (LineWedgeMaker.topLWGroup && this.scoreTopEl) {
+                        this.scoreTopEl.appendChild(LineWedgeMaker.topLWGroup);
+                    }
+                    if (LineWedgeMaker.bottomLWGroup && this.scoreBottomEl) {
+                        this.scoreBottomEl.appendChild(LineWedgeMaker.bottomLWGroup);
                     }
                 }
                 if (window.GCMaker) {
@@ -9593,6 +9794,62 @@
             }
         };
         window.MotiveDatabase = MotiveDatabase;
+        
+        // Line-Wedge Database - stores all line-wedges with their node attributes
+        const LineWedgeDatabase = {
+            lineWedges: [],
+            nextId: 1,
+            
+            add(lwData) {
+                const lw = {
+                    id: this.nextId++,
+                    ...lwData,
+                    createdAt: Date.now()
+                };
+                this.lineWedges.push(lw);
+                return lw;
+            },
+            
+            get(id) {
+                return this.lineWedges.find(lw => lw.id === id);
+            },
+            
+            update(id, updates) {
+                const lw = this.get(id);
+                if (lw) {
+                    Object.assign(lw, updates);
+                }
+                return lw;
+            },
+            
+            remove(id) {
+                const index = this.lineWedges.findIndex(lw => lw.id === id);
+                if (index !== -1) {
+                    this.lineWedges.splice(index, 1);
+                    return true;
+                }
+                return false;
+            },
+            
+            getAll() {
+                return this.lineWedges;
+            },
+            
+            exportData() {
+                return {
+                    lineWedges: this.lineWedges,
+                    nextId: this.nextId
+                };
+            },
+            
+            importData(data) {
+                if (data && data.lineWedges) {
+                    this.lineWedges = data.lineWedges;
+                    this.nextId = data.nextId || (this.lineWedges.length > 0 ? Math.max(...this.lineWedges.map(lw => lw.id)) + 1 : 1);
+                }
+            }
+        };
+        window.LineWedgeDatabase = LineWedgeDatabase;
         
         // Group Database - groups of objects (curves, GCs, motives, SVGs, MIDI snippets, audio clips)
         const GroupDatabase = {
@@ -12567,6 +12824,18 @@
                         // Re-render motives if MotiveMaker exists
                         if (window.MotiveMaker) {
                             MotiveMaker.reloadFromDatabase();
+                        }
+                    }
+                );
+                
+                // LineWedgeDatabase
+                this.registerSource('databases.lineWedges',
+                    () => LineWedgeDatabase.exportData(),
+                    (data) => {
+                        LineWedgeDatabase.importData(data);
+                        // Re-render line-wedges if LineWedgeMaker exists
+                        if (window.LineWedgeMaker) {
+                            LineWedgeMaker.reloadFromDatabase();
                         }
                     }
                 );
@@ -25256,7 +25525,791 @@
         MotiveMaker.init();
         window.MotiveMaker = MotiveMaker;
         
-        // Bring SVG elements containers to front (after motives are initialized)
+        // ============================================
+        // LINE-WEDGE MAKER - Variable-thickness horizontal lines
+        // Rendered as filled SVG paths with control-point nodes
+        // ============================================
+        const LineWedgeMaker = {
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            topLWGroup: null,
+            bottomLWGroup: null,
+            lineWedges: [],
+            selectedLineWedge: null,
+            selectedNode: null,
+            selectedColor: 'brightBlue',
+            isDragging: false,
+            dragType: null,
+            dragStartX: 0,
+            dragStartY: 0,
+            dragOrigData: null,
+            
+            startInput: null,
+            endInput: null,
+            trackSelect: null,
+            drawBtn: null,
+            deleteBtn: null,
+            deleteNodeBtn: null,
+            nodeRow: null,
+            nodeThicknessInput: null,
+            colorSwatches: null,
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                this.startInput = document.getElementById('lwStartInput');
+                this.endInput = document.getElementById('lwEndInput');
+                this.trackSelect = document.getElementById('lwTrackSelect');
+                this.drawBtn = document.getElementById('lwDrawBtn');
+                this.deleteBtn = document.getElementById('lwDeleteBtn');
+                this.deleteNodeBtn = document.getElementById('lwDeleteNodeBtn');
+                this.nodeRow = document.getElementById('lwNodeRow');
+                this.nodeThicknessInput = document.getElementById('lwNodeThicknessInput');
+                this.colorSwatches = document.getElementById('lwColorSwatches');
+                
+                this.topLWGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.bottomLWGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                this.topLWGroup.setAttribute('class', 'linewedge-container');
+                this.bottomLWGroup.setAttribute('class', 'linewedge-container');
+                this.scoreTopEl.appendChild(this.topLWGroup);
+                this.scoreBottomEl.appendChild(this.bottomLWGroup);
+                
+                if (this.drawBtn) this.drawBtn.addEventListener('click', () => this.createLineWedge());
+                if (this.deleteBtn) this.deleteBtn.addEventListener('click', () => this.deleteSelectedLineWedge());
+                if (this.deleteNodeBtn) this.deleteNodeBtn.addEventListener('click', () => this.deleteSelectedNode());
+                
+                if (this.startInput) this.startInput.addEventListener('change', () => this.updateSelectedFromInputs());
+                if (this.endInput) this.endInput.addEventListener('change', () => this.updateSelectedFromInputs());
+                
+                if (this.nodeThicknessInput) {
+                    this.nodeThicknessInput.addEventListener('change', () => this.updateSelectedNodeThickness());
+                }
+                
+                if (this.colorSwatches) {
+                    this.colorSwatches.querySelectorAll('.color-swatch').forEach(swatch => {
+                        swatch.addEventListener('click', () => {
+                            this.colorSwatches.querySelectorAll('.color-swatch').forEach(s => {
+                                s.classList.remove('selected');
+                                s.style.outline = '';
+                            });
+                            swatch.classList.add('selected');
+                            swatch.style.outline = '2px solid white';
+                            this.selectedColor = swatch.dataset.color;
+                            if (this.selectedLineWedge) {
+                                this.selectedLineWedge.color = this.selectedColor;
+                                this.updateLineWedgeRendering(this.selectedLineWedge);
+                                this.syncToDatabase(this.selectedLineWedge);
+                            }
+                        });
+                    });
+                }
+                
+                this.scoreTopEl.addEventListener('click', (e) => this.handleScoreClick(e));
+                this.scoreBottomEl.addEventListener('click', (e) => this.handleScoreClick(e));
+                
+                this.scoreTopEl.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                this.scoreBottomEl.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+                
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => this.reloadFromDatabase(), 100);
+                });
+                
+                console.debug('LineWedgeMaker initialized');
+            },
+            
+            getSecondsPerPage() {
+                return window.GraphicTimeline 
+                    ? GraphicTimeline.getSecondsPerPage() 
+                    : (beatsPerPage / beatsPerMinute) * 60;
+            },
+            
+            calcPositionFromTime(seconds) {
+                const secondsPerPage = this.getSecondsPerPage();
+                const displayTime = seconds + leadInSeconds;
+                const page = Math.floor(Math.max(0, displayTime) / secondsPerPage);
+                const section = page % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const xPercent = ((displayTime / secondsPerPage) - page) * 100;
+                const x = (xPercent / 100) * scoreWidth;
+                return { x, page, section, scoreEl, scoreWidth, secondsPerPage };
+            },
+            
+            createLineWedge(params) {
+                const startSeconds = params?.startSeconds ?? (parseFloat(this.startInput.value) || 0);
+                const endSeconds = params?.endSeconds ?? (parseFloat(this.endInput.value) || 1);
+                const gTrack = params?.gTrack ?? (this.trackSelect?.value || CompositionPanel.getSelectedGTrack());
+                const actualGTrack = gTrack === 'A' ? '1' : gTrack;
+                
+                const pos = this.calcPositionFromTime(startSeconds);
+                const endPos = this.calcPositionFromTime(endSeconds);
+                const scoreEl = pos.scoreEl;
+                const lwGroup = pos.section === 'top' ? this.topLWGroup : this.bottomLWGroup;
+                
+                const trackDims = window.CompositionPanel
+                    ? CompositionPanel.getTrackDimensions(actualGTrack, scoreEl)
+                    : null;
+                
+                const selectedSwatch = this.colorSwatches?.querySelector('.color-swatch.selected');
+                const color = params?.color ?? (selectedSwatch?.dataset.color || 'brightBlue');
+                
+                const now = new Date();
+                const pad = (n, l) => String(n).padStart(l, '0');
+                const name = `LW_${now.getFullYear()}${pad(now.getMonth()+1,2)}${pad(now.getDate(),2)}_${pad(now.getHours(),2)}${pad(now.getMinutes(),2)}${pad(now.getSeconds(),2)}`;
+                
+                const defaultThickness = params?.thickness ?? 3;
+                
+                const lwData = {
+                    name,
+                    startSeconds,
+                    endSeconds,
+                    gTrack: actualGTrack,
+                    color,
+                    section: pos.section,
+                    page: pos.page,
+                    x1: pos.x,
+                    x2: endPos.x,
+                    trackDims,
+                    nodes: [
+                        { pos: 0, thickness: defaultThickness },
+                        { pos: 1, thickness: defaultThickness }
+                    ]
+                };
+                
+                const lw = LineWedgeDatabase.add(lwData);
+                if (window.ScoreManager) ScoreManager.markDirty();
+                
+                this.renderLineWedge(lw, lwGroup, scoreEl);
+                this.lineWedges.push(lw);
+                this.updateVisibility();
+                this.selectLineWedge(lw);
+                
+                console.debug(`LineWedge created (ID: ${lw.id}, name: ${lw.name})`);
+                return lw;
+            },
+            
+            generatePath(lw) {
+                const trackDims = lw.trackDims;
+                if (!trackDims) return '';
+                
+                const centerY = trackDims.y + trackDims.height / 6;
+                const nodes = lw.nodes;
+                if (!nodes || nodes.length < 2) return '';
+                
+                const totalWidth = lw.x2 - lw.x1;
+                
+                let topEdge = 'M';
+                let bottomEdge = '';
+                
+                for (let i = 0; i < nodes.length; i++) {
+                    const x = lw.x1 + nodes[i].pos * totalWidth;
+                    const halfThick = nodes[i].thickness / 2;
+                    const yTop = centerY - halfThick;
+                    if (i === 0) {
+                        topEdge += ` ${x} ${yTop}`;
+                    } else {
+                        topEdge += ` L ${x} ${yTop}`;
+                    }
+                }
+                
+                for (let i = nodes.length - 1; i >= 0; i--) {
+                    const x = lw.x1 + nodes[i].pos * totalWidth;
+                    const halfThick = nodes[i].thickness / 2;
+                    const yBottom = centerY + halfThick;
+                    bottomEdge += ` L ${x} ${yBottom}`;
+                }
+                
+                return topEdge + bottomEdge + ' Z';
+            },
+            
+            renderLineWedge(lw, lwGroup, scoreEl) {
+                const color = ColorMap[lw.color] || lw.color;
+                const trackDims = lw.trackDims;
+                
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('data-lw-id', lw.id);
+                group.setAttribute('class', 'linewedge-element');
+                
+                const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                highlight.setAttribute('fill', 'yellow');
+                highlight.setAttribute('fill-opacity', '0.3');
+                highlight.setAttribute('stroke', 'yellow');
+                highlight.setAttribute('stroke-width', '4');
+                highlight.setAttribute('stroke-opacity', '0.5');
+                highlight.style.display = 'none';
+                group.appendChild(highlight);
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('fill', color);
+                path.setAttribute('stroke', color);
+                path.setAttribute('stroke-width', '0.5');
+                path.setAttribute('stroke-linejoin', 'round');
+                group.appendChild(path);
+                
+                const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                hitPath.setAttribute('fill', 'transparent');
+                hitPath.setAttribute('stroke', 'transparent');
+                hitPath.setAttribute('stroke-width', '15');
+                hitPath.style.cursor = 'pointer';
+                hitPath.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.selectLineWedge(lw);
+                });
+                hitPath.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    this.addNodeAtClick(lw, e);
+                });
+                group.appendChild(hitPath);
+                
+                const nodeHandles = [];
+                
+                lw.elements = { group, path, hitPath, highlight, nodeHandles };
+                
+                const pathD = this.generatePath(lw);
+                path.setAttribute('d', pathD);
+                hitPath.setAttribute('d', pathD);
+                highlight.setAttribute('d', pathD);
+                
+                this.renderNodeHandles(lw);
+                
+                lwGroup.appendChild(group);
+            },
+            
+            renderNodeHandles(lw) {
+                if (!lw.elements) return;
+                const group = lw.elements.group;
+                const trackDims = lw.trackDims;
+                if (!trackDims) return;
+                
+                const centerY = trackDims.y + trackDims.height / 6;
+                const totalWidth = lw.x2 - lw.x1;
+                
+                lw.elements.nodeHandles.forEach(h => h.remove());
+                lw.elements.nodeHandles = [];
+                
+                const isSelected = this.selectedLineWedge === lw;
+                
+                for (let i = 0; i < lw.nodes.length; i++) {
+                    const node = lw.nodes[i];
+                    const x = lw.x1 + node.pos * totalWidth;
+                    
+                    const handle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    handle.setAttribute('cx', x);
+                    handle.setAttribute('cy', centerY);
+                    handle.setAttribute('r', '4');
+                    handle.setAttribute('fill', this.selectedNode === i && isSelected ? '#fff' : '#888');
+                    handle.setAttribute('stroke', '#fff');
+                    handle.setAttribute('stroke-width', '1');
+                    handle.style.cursor = 'grab';
+                    handle.style.display = isSelected ? '' : 'none';
+                    handle.setAttribute('data-node-index', i);
+                    
+                    handle.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        this.selectLineWedge(lw);
+                        this.selectNode(i);
+                        this.startNodeDrag(lw, i, e);
+                    });
+                    
+                    group.appendChild(handle);
+                    lw.elements.nodeHandles.push(handle);
+                }
+            },
+            
+            updateLineWedgeRendering(lw) {
+                if (!lw.elements) return;
+                const color = ColorMap[lw.color] || lw.color;
+                const pathD = this.generatePath(lw);
+                
+                lw.elements.path.setAttribute('d', pathD);
+                lw.elements.path.setAttribute('fill', color);
+                lw.elements.path.setAttribute('stroke', color);
+                lw.elements.hitPath.setAttribute('d', pathD);
+                lw.elements.highlight.setAttribute('d', pathD);
+                
+                this.renderNodeHandles(lw);
+            },
+            
+            selectLineWedge(lw) {
+                if (this.selectedLineWedge && this.selectedLineWedge !== lw && this.selectedLineWedge.elements) {
+                    this.selectedLineWedge.elements.highlight.style.display = 'none';
+                    this.selectedLineWedge.elements.nodeHandles.forEach(h => h.style.display = 'none');
+                }
+                
+                this.selectedLineWedge = lw;
+                this.selectedNode = null;
+                
+                if (lw.elements) {
+                    lw.elements.highlight.style.display = '';
+                    lw.elements.nodeHandles.forEach(h => {
+                        h.style.display = '';
+                        h.setAttribute('fill', '#888');
+                    });
+                }
+                
+                if (this.startInput) this.startInput.value = lw.startSeconds.toFixed(3);
+                if (this.endInput) this.endInput.value = lw.endSeconds.toFixed(3);
+                if (this.trackSelect) this.trackSelect.value = lw.gTrack;
+                
+                if (this.colorSwatches) {
+                    this.colorSwatches.querySelectorAll('.color-swatch').forEach(s => {
+                        s.classList.remove('selected');
+                        s.style.outline = '';
+                        if (s.dataset.color === lw.color) {
+                            s.classList.add('selected');
+                            s.style.outline = '2px solid white';
+                        }
+                    });
+                }
+                
+                this.nodeRow.style.display = 'none';
+                this.deleteNodeBtn.style.display = 'none';
+            },
+            
+            selectNode(nodeIndex) {
+                this.selectedNode = nodeIndex;
+                const lw = this.selectedLineWedge;
+                if (!lw || !lw.elements) return;
+                
+                lw.elements.nodeHandles.forEach((h, i) => {
+                    h.setAttribute('fill', i === nodeIndex ? '#fff' : '#888');
+                });
+                
+                const node = lw.nodes[nodeIndex];
+                if (this.nodeThicknessInput) {
+                    this.nodeThicknessInput.value = Math.round(node.thickness);
+                }
+                this.nodeRow.style.display = '';
+                this.deleteNodeBtn.style.display = lw.nodes.length > 2 ? '' : 'none';
+            },
+            
+            deselectLineWedge() {
+                if (this.selectedLineWedge && this.selectedLineWedge.elements) {
+                    this.selectedLineWedge.elements.highlight.style.display = 'none';
+                    this.selectedLineWedge.elements.nodeHandles.forEach(h => h.style.display = 'none');
+                }
+                this.selectedLineWedge = null;
+                this.selectedNode = null;
+                this.nodeRow.style.display = 'none';
+                this.deleteNodeBtn.style.display = 'none';
+            },
+            
+            handleScoreClick(e) {
+                const target = e.target;
+                const lwEl = target.closest('.linewedge-element');
+                if (!lwEl) {
+                    this.deselectLineWedge();
+                }
+            },
+            
+            deleteSelectedLineWedge() {
+                if (!this.selectedLineWedge) return;
+                const lw = this.selectedLineWedge;
+                
+                if (lw.elements && lw.elements.group) lw.elements.group.remove();
+                if (lw.elements && lw.elements.continuationGroupTop) lw.elements.continuationGroupTop.remove();
+                if (lw.elements && lw.elements.continuationGroupBottom) lw.elements.continuationGroupBottom.remove();
+                
+                LineWedgeDatabase.remove(lw.id);
+                const index = this.lineWedges.findIndex(l => l.id === lw.id);
+                if (index !== -1) this.lineWedges.splice(index, 1);
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                this.deselectLineWedge();
+                console.debug(`LineWedge deleted (ID: ${lw.id})`);
+            },
+            
+            deleteSelectedNode() {
+                const lw = this.selectedLineWedge;
+                if (!lw || this.selectedNode === null) return;
+                if (lw.nodes.length <= 2) return;
+                
+                lw.nodes.splice(this.selectedNode, 1);
+                
+                if (lw.nodes[0].pos !== 0) lw.nodes[0].pos = 0;
+                if (lw.nodes[lw.nodes.length - 1].pos !== 1) lw.nodes[lw.nodes.length - 1].pos = 1;
+                
+                this.selectedNode = null;
+                this.nodeRow.style.display = 'none';
+                this.deleteNodeBtn.style.display = 'none';
+                
+                this.updateLineWedgeRendering(lw);
+                this.syncToDatabase(lw);
+            },
+            
+            addNodeAtClick(lw, e) {
+                const scoreEl = lw.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const rect = scoreEl.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                
+                const totalWidth = lw.x2 - lw.x1;
+                if (totalWidth <= 0) return;
+                
+                const normalizedPos = Math.max(0.01, Math.min(0.99, (clickX - lw.x1) / totalWidth));
+                
+                let insertIndex = 1;
+                for (let i = 0; i < lw.nodes.length - 1; i++) {
+                    if (normalizedPos >= lw.nodes[i].pos && normalizedPos <= lw.nodes[i + 1].pos) {
+                        insertIndex = i + 1;
+                        break;
+                    }
+                }
+                
+                const leftNode = lw.nodes[insertIndex - 1];
+                const rightNode = lw.nodes[insertIndex];
+                const t = (normalizedPos - leftNode.pos) / (rightNode.pos - leftNode.pos);
+                const interpolatedThickness = leftNode.thickness + t * (rightNode.thickness - leftNode.thickness);
+                
+                lw.nodes.splice(insertIndex, 0, { pos: normalizedPos, thickness: interpolatedThickness });
+                
+                this.updateLineWedgeRendering(lw);
+                this.selectNode(insertIndex);
+                this.syncToDatabase(lw);
+            },
+            
+            startNodeDrag(lw, nodeIndex, e) {
+                this.isDragging = true;
+                this.dragType = 'node';
+                this.dragStartX = e.clientX;
+                this.dragStartY = e.clientY;
+                this.dragOrigData = {
+                    lw,
+                    nodeIndex,
+                    origPos: lw.nodes[nodeIndex].pos,
+                    origThickness: lw.nodes[nodeIndex].thickness,
+                    totalWidth: lw.x2 - lw.x1
+                };
+            },
+            
+            handleMouseDown(e) {
+                if (e.target.closest('.linewedge-element') && this.selectedLineWedge && e.shiftKey) {
+                    e.preventDefault();
+                    this.isDragging = true;
+                    this.dragType = 'move';
+                    this.dragStartX = e.clientX;
+                    this.dragOrigData = {
+                        lw: this.selectedLineWedge,
+                        origStart: this.selectedLineWedge.startSeconds,
+                        origEnd: this.selectedLineWedge.endSeconds
+                    };
+                }
+            },
+            
+            handleMouseMove(e) {
+                if (!this.isDragging || !this.dragOrigData) return;
+                
+                const { lw } = this.dragOrigData;
+                
+                if (this.dragType === 'node') {
+                    const { nodeIndex, origPos, origThickness, totalWidth } = this.dragOrigData;
+                    const node = lw.nodes[nodeIndex];
+                    const isEndpoint = nodeIndex === 0 || nodeIndex === lw.nodes.length - 1;
+                    
+                    const deltaX = e.clientX - this.dragStartX;
+                    const deltaY = -(e.clientY - this.dragStartY);
+                    
+                    if (!isEndpoint) {
+                        const minPos = lw.nodes[nodeIndex - 1].pos + 0.005;
+                        const maxPos = lw.nodes[nodeIndex + 1].pos - 0.005;
+                        node.pos = Math.max(minPos, Math.min(maxPos, origPos + deltaX / totalWidth));
+                    }
+                    
+                    const maxThickness = lw.trackDims ? lw.trackDims.height / 3 : 50;
+                    node.thickness = Math.max(1, Math.min(maxThickness, origThickness + deltaY));
+                    
+                    if (this.nodeThicknessInput) {
+                        this.nodeThicknessInput.value = Math.round(node.thickness);
+                    }
+                    
+                    this.updateLineWedgeRendering(lw);
+                    
+                } else if (this.dragType === 'move') {
+                    const deltaX = e.clientX - this.dragStartX;
+                    const { origStart, origEnd } = this.dragOrigData;
+                    const scoreEl = lw.section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                    const scoreWidth = scoreEl.clientWidth;
+                    const secondsPerPage = this.getSecondsPerPage();
+                    const deltaSec = (deltaX / scoreWidth) * secondsPerPage;
+                    
+                    lw.startSeconds = origStart + deltaSec;
+                    lw.endSeconds = origEnd + deltaSec;
+                    
+                    const startPos = this.calcPositionFromTime(lw.startSeconds);
+                    const endPos = this.calcPositionFromTime(lw.endSeconds);
+                    lw.x1 = startPos.x;
+                    lw.x2 = endPos.x;
+                    lw.page = startPos.page;
+                    lw.section = startPos.section;
+                    
+                    if (lw.gTrack && window.CompositionPanel) {
+                        lw.trackDims = CompositionPanel.getTrackDimensions(lw.gTrack, startPos.scoreEl);
+                    }
+                    
+                    if (this.startInput) this.startInput.value = lw.startSeconds.toFixed(3);
+                    if (this.endInput) this.endInput.value = lw.endSeconds.toFixed(3);
+                    
+                    this.updateLineWedgeRendering(lw);
+                }
+            },
+            
+            handleMouseUp(e) {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+                
+                if (this.dragOrigData && this.dragOrigData.lw) {
+                    this.syncToDatabase(this.dragOrigData.lw);
+                    this.updateVisibility();
+                }
+                
+                this.dragType = null;
+                this.dragOrigData = null;
+            },
+            
+            updateSelectedFromInputs() {
+                if (!this.selectedLineWedge) return;
+                const lw = this.selectedLineWedge;
+                
+                lw.startSeconds = parseFloat(this.startInput.value) || 0;
+                lw.endSeconds = parseFloat(this.endInput.value) || 1;
+                
+                const startPos = this.calcPositionFromTime(lw.startSeconds);
+                const endPos = this.calcPositionFromTime(lw.endSeconds);
+                lw.x1 = startPos.x;
+                lw.x2 = endPos.x;
+                lw.page = startPos.page;
+                lw.section = startPos.section;
+                
+                if (lw.gTrack && window.CompositionPanel) {
+                    lw.trackDims = CompositionPanel.getTrackDimensions(lw.gTrack, startPos.scoreEl);
+                }
+                
+                this.updateLineWedgeRendering(lw);
+                this.syncToDatabase(lw);
+                this.updateVisibility();
+            },
+            
+            updateSelectedNodeThickness() {
+                const lw = this.selectedLineWedge;
+                if (!lw || this.selectedNode === null) return;
+                
+                const newThick = parseInt(this.nodeThicknessInput.value) || 3;
+                const maxThickness = lw.trackDims ? lw.trackDims.height / 3 : 50;
+                lw.nodes[this.selectedNode].thickness = Math.max(1, Math.min(maxThickness, newThick));
+                
+                this.updateLineWedgeRendering(lw);
+                this.syncToDatabase(lw);
+            },
+            
+            syncToDatabase(lw) {
+                if (window.ScoreManager) ScoreManager.markDirty();
+                LineWedgeDatabase.update(lw.id, {
+                    startSeconds: lw.startSeconds,
+                    endSeconds: lw.endSeconds,
+                    gTrack: lw.gTrack,
+                    color: lw.color,
+                    nodes: lw.nodes.map(n => ({ pos: n.pos, thickness: n.thickness }))
+                });
+            },
+            
+            getThicknessAtTime(lw, timeSec) {
+                if (!lw.nodes || lw.nodes.length < 2) return 0;
+                const duration = lw.endSeconds - lw.startSeconds;
+                if (duration <= 0) return lw.nodes[0].thickness;
+                
+                const t = Math.max(0, Math.min(1, (timeSec - lw.startSeconds) / duration));
+                
+                for (let i = 0; i < lw.nodes.length - 1; i++) {
+                    if (t >= lw.nodes[i].pos && t <= lw.nodes[i + 1].pos) {
+                        const segT = (t - lw.nodes[i].pos) / (lw.nodes[i + 1].pos - lw.nodes[i].pos);
+                        return lw.nodes[i].thickness + segT * (lw.nodes[i + 1].thickness - lw.nodes[i].thickness);
+                    }
+                }
+                return lw.nodes[lw.nodes.length - 1].thickness;
+            },
+            
+            updateVisibility() {
+                if (!window.GraphicTimeline) return;
+                
+                const topPage = GraphicTimeline.currentTopPage ?? 0;
+                const bottomPage = GraphicTimeline.currentBottomPage ?? 1;
+                const secondsPerPage = this.getSecondsPerPage();
+                const leadInSec = leadInSeconds;
+                
+                for (const lw of this.lineWedges) {
+                    if (!lw.elements) continue;
+                    
+                    const startActual = lw.startSeconds + leadInSec;
+                    const endActual = lw.endSeconds + leadInSec;
+                    const startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                    const endPage = Math.floor(Math.max(0, endActual - 0.001) / secondsPerPage);
+                    
+                    const onTop = (startPage === topPage);
+                    const onBottom = (startPage === bottomPage);
+                    
+                    if (onTop) {
+                        lw.elements.group.style.display = '';
+                        if (lw.elements.group.parentNode !== this.topLWGroup) {
+                            this.topLWGroup.appendChild(lw.elements.group);
+                        }
+                        if (endPage > startPage) {
+                            this.clipToPageEnd(lw, startPage, secondsPerPage, leadInSec);
+                            if (endPage === bottomPage) {
+                                this.showContinuationSegment(lw, bottomPage, secondsPerPage, leadInSec, 'bottom');
+                            }
+                        }
+                    } else if (onBottom) {
+                        lw.elements.group.style.display = '';
+                        if (lw.elements.group.parentNode !== this.bottomLWGroup) {
+                            this.bottomLWGroup.appendChild(lw.elements.group);
+                        }
+                        if (endPage > startPage) {
+                            this.clipToPageEnd(lw, startPage, secondsPerPage, leadInSec);
+                        }
+                    } else {
+                        lw.elements.group.style.display = 'none';
+                    }
+                    
+                    if (lw.elements.continuationGroupTop && startPage !== topPage) {
+                        lw.elements.continuationGroupTop.style.display = 'none';
+                    }
+                    if (lw.elements.continuationGroupBottom && startPage !== bottomPage) {
+                        lw.elements.continuationGroupBottom.style.display = 'none';
+                    }
+                }
+            },
+            
+            clipToPageEnd(lw, page, secondsPerPage, leadInSec) {
+                if (!lw.elements || !lw.elements.path) return;
+                
+                const endActual = lw.endSeconds + leadInSec;
+                const pageEndTime = (page + 1) * secondsPerPage;
+                if (endActual <= pageEndTime) return;
+                
+                const section = page % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                const origX2 = lw.x2;
+                lw.x2 = scoreWidth;
+                const pathD = this.generatePath(lw);
+                lw.elements.path.setAttribute('d', pathD);
+                lw.elements.hitPath.setAttribute('d', pathD);
+                lw.elements.highlight.setAttribute('d', pathD);
+                lw.x2 = origX2;
+            },
+            
+            showContinuationSegment(lw, page, secondsPerPage, leadInSec, sectionHint) {
+                const startActual = lw.startSeconds + leadInSec;
+                const endActual = lw.endSeconds + leadInSec;
+                const pageStartTime = page * secondsPerPage;
+                const pageEndTime = (page + 1) * secondsPerPage;
+                
+                const clippedStart = Math.max(startActual, pageStartTime);
+                const clippedEnd = Math.min(endActual, pageEndTime);
+                
+                const section = sectionHint || (page % 2 === 0 ? 'top' : 'bottom');
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const targetGroup = section === 'top' ? this.topLWGroup : this.bottomLWGroup;
+                const scoreWidth = scoreEl.clientWidth;
+                
+                const startX = ((clippedStart / secondsPerPage) - page) / 1 * scoreWidth;
+                const endX = ((clippedEnd / secondsPerPage) - page) / 1 * scoreWidth;
+                
+                let trackDims = lw.trackDims;
+                if (lw.gTrack && window.CompositionPanel) {
+                    trackDims = CompositionPanel.getTrackDimensions(lw.gTrack, scoreEl) || lw.trackDims;
+                }
+                
+                const groupKey = section === 'top' ? 'continuationGroupTop' : 'continuationGroupBottom';
+                const pathKey = section === 'top' ? 'continuationPathTop' : 'continuationPathBottom';
+                
+                if (!lw.elements[groupKey]) {
+                    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    g.classList.add('linewedge-continuation');
+                    g.setAttribute('data-lw-id', lw.id);
+                    
+                    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    p.setAttribute('stroke-width', '0.5');
+                    p.setAttribute('stroke-linejoin', 'round');
+                    p.style.cursor = 'pointer';
+                    p.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectLineWedge(lw);
+                    });
+                    g.appendChild(p);
+                    
+                    lw.elements[groupKey] = g;
+                    lw.elements[pathKey] = p;
+                }
+                
+                const color = ColorMap[lw.color] || lw.color;
+                const centerY = trackDims.y + trackDims.height / 6;
+                
+                const duration = lw.endSeconds - lw.startSeconds;
+                const tStart = (clippedStart - leadInSec - lw.startSeconds) / duration;
+                const tEnd = (clippedEnd - leadInSec - lw.startSeconds) / duration;
+                const thickStart = this.getThicknessAtTime(lw, lw.startSeconds + tStart * duration);
+                const thickEnd = this.getThicknessAtTime(lw, lw.startSeconds + tEnd * duration);
+                
+                const halfS = thickStart / 2;
+                const halfE = thickEnd / 2;
+                
+                const d = `M ${startX} ${centerY - halfS} L ${endX} ${centerY - halfE} L ${endX} ${centerY + halfE} L ${startX} ${centerY + halfS} Z`;
+                
+                lw.elements[pathKey].setAttribute('d', d);
+                lw.elements[pathKey].setAttribute('fill', color);
+                lw.elements[pathKey].setAttribute('stroke', color);
+                lw.elements[groupKey].style.display = '';
+                
+                if (lw.elements[groupKey].parentNode !== targetGroup) {
+                    targetGroup.appendChild(lw.elements[groupKey]);
+                }
+            },
+            
+            reloadFromDatabase() {
+                if (this.topLWGroup) this.topLWGroup.innerHTML = '';
+                if (this.bottomLWGroup) this.bottomLWGroup.innerHTML = '';
+                this.lineWedges = [];
+                this.selectedLineWedge = null;
+                this.selectedNode = null;
+                
+                const dbItems = LineWedgeDatabase.getAll();
+                const secondsPerPage = this.getSecondsPerPage();
+                
+                for (const dbLW of dbItems) {
+                    const lw = { ...dbLW };
+                    
+                    const startPos = this.calcPositionFromTime(lw.startSeconds);
+                    const endPos = this.calcPositionFromTime(lw.endSeconds);
+                    lw.x1 = startPos.x;
+                    lw.x2 = endPos.x;
+                    lw.section = startPos.section;
+                    lw.page = startPos.page;
+                    
+                    if (lw.gTrack && window.CompositionPanel) {
+                        lw.trackDims = CompositionPanel.getTrackDimensions(lw.gTrack, startPos.scoreEl);
+                    }
+                    
+                    const lwGroup = startPos.section === 'top' ? this.topLWGroup : this.bottomLWGroup;
+                    this.renderLineWedge(lw, lwGroup, startPos.scoreEl);
+                    this.lineWedges.push(lw);
+                }
+                
+                console.debug(`LineWedgeMaker: Reloaded ${this.lineWedges.length} line-wedges from database`);
+                this.updateVisibility();
+            }
+        };
+        
+        LineWedgeMaker.init();
+        window.LineWedgeMaker = LineWedgeMaker;
+        
+        // Bring SVG elements containers to front (after motives and line-wedges are initialized)
         if (window.SVGElementManager) {
             SVGElementManager.bringToFront();
         }
