@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Feb 28, 2026  
-**Current ASB Number:** ASB-118
+**Last Updated:** Mar 1, 2026  
+**Current ASB Number:** ASB-119
 
 ---
 
@@ -46,6 +46,7 @@ That's it. Everything else below is for Cascade.
 | Glissando System | Complete | Maintenance only |
 | Vibrato System | **Bundle Complete** | Bundle system (curve-based, like CD/PTG). MIDI ch fix, params regen, CurveMaker hooks, ScoreManager persistence. See ASB-112 |
 | Crescendo-Decrescendo | **Volume Mode added** | ASB-112: Curve/Steady/Linear CC7 modes. Maintenance otherwise |
+| Line-Wedge Maker | **Implementation Complete** | ASB-119: Database, HTML panel, JS object, meter, integration hooks. Awaiting user testing |
 | Pizzicato Tremolo | **Complete** | All 10 steps done — Pattern 4 (AI Direct) + Pattern 3 (Direct Live Insertion) |
 | Pizz Tremolo Glissando | **Complete** | Full system: UI + server + MIDI + SVG + AI Command Bridge (two-part/single go). Prompt guide: `AI_PIZZ_TREM_GLISS_PROMPT_GUIDE.md` |
 | Notation Fragment System | **Bundle System Complete** | Full pipeline + score insertion (GC + SVG + MIDI). UI panel built. Pre-computed timing DB. 8 fragments ready. Bundle system (drag/delete as unit) implemented. Next: compose more fragments, AI prompt guide |
@@ -131,17 +132,17 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-117–118: Bundle Manager + Sequence Generator Enhancements.** Built Bundle Manager tool (inspect/select/delete bundles from saved scores, 6 types, filters, range select, undo, save-as). Added settings persistence to Sequence Generator (localStorage auto-save, named presets with export/import, built-in preset). Bug fixes: track assignments (V1=1,V2=2,VLA=3,VC=4), gap timing after first note override, instrument row layout, "any" octave rule.
+> **ASB-119: Line-Wedge Maker.** Full implementation of variable-thickness horizontal line system. LineWedgeDatabase (CRUD + ScoreManager persistence as `databases.lineWedges`). HTML panel (start/end inputs, track select, node thickness, 12 dedicated color swatches, draw/delete/delete-node buttons). LineWedgeMaker JS object (filled SVG path rendering, node system with add/delete/drag, shift+drag move, multi-page visibility with clip+continuation). Line-Wedge Meter in StaffCursors (donut ring for time progress + center bar for thickness). Integration hooks: GraphicTimeline visibility, bringInteractiveLayersToFront, debounced resize. Bug fixes: duplicate class attr on color swatch, null guards for panel elements.
 
 ---
 
 ## Current Session
 
-**Date:** Feb 28, 2026  
-**Focus:** Bundle Manager Tool + Sequence Generator Presets  
-**ASB:** ASB-118  
-**Tier 1 Count This Session:** 2 (ASB-117, ASB-118)  
-**Tier 2 Threshold:** At 2 — committing now
+**Date:** Mar 1, 2026  
+**Focus:** Line-Wedge Maker  
+**ASB:** ASB-119  
+**Tier 1 Count This Session:** 1 (ASB-119)  
+**Tier 2 Threshold:** At 1 — committing with feature (large scope)
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -207,6 +208,9 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ### Session Log — Bundle Manager
 - ASB-117: Bundle Manager Tool (`tools/bundle_manager.html`) — standalone HTML page to inspect, select, and delete bundles from saved score JSON files. Unified table of all 6 bundle types (BP/PT/NF/CD/PTG/VIB) sorted by time. Filters by type/track/time range. Shift+click range selection. Deletes bundle + associated GC/curve/SVG/MIDI snippets. Undo support. Save-as-new-score. Documentation: `docs/Bundle_Manager_Guide.md`
+
+### Session Log — Line-Wedge Maker
+- ASB-119: Line-Wedge Maker — full implementation of variable-thickness horizontal line system in `public/index.html`. **LineWedgeDatabase** (~line 9596): CRUD (add/get/update/remove/getAll/exportData/importData), registered with ScoreManager as `databases.lineWedges` (~line 12630). **HTML Panel** (~line 1710): Start/End inputs, Track select (1-4), Node Thickness input (hidden until node selected), 12 dedicated color swatches in `#lwColorSwatches` (default: brightBlue), Draw/Delete/Delete Node buttons (blue theme `#1a3a5c`). **LineWedgeMaker JS Object** (~line 25532): init (refs UI elements, creates SVG groups, attaches event listeners, debounced resize), createLineWedge (timestamped name, position calc, 2-node default at thickness 3), generatePath (top edge L→R, bottom edge R→L, closed; center Y = `trackDims.y + trackDims.height/6`), renderLineWedge (yellow highlight, filled path, 15px transparent hit path, circle node handles), node system (dblclick add with interpolated thickness, delete with min-2 guard, drag horizontal position + vertical thickness), shift+drag move, updateVisibility (page-based show/hide with clipToPageEnd + showContinuationSegment), reloadFromDatabase, syncToDatabase. **Line-Wedge Meter** (~line 5669 in StaffCursors): donut ring (stroke arc emptying clockwise for time progress) + center bar (rect growing/shrinking from midline for current thickness) + border rect; size = staffHeight/3, positioned left of motive pie. **Integration hooks**: GraphicTimeline.updateGraphicObjectsVisibility → LineWedgeMaker.updateVisibility(), MidiController.bringInteractiveLayersToFront → append LW groups, window resize → debounced reloadFromDatabase(). **Bug fixes**: duplicate class attribute on brightBlue swatch (browser ignored second `class=`), null guards for nodeRow/deleteNodeBtn in selectLineWedge/selectNode/deselectLineWedge/deleteSelectedNode. **Key design decisions**: dedicated color swatches (not shared), max thickness = trackDims.height/3, node handles visible only when selected, continuation segments use simplified 2-point path. **Git**: revert point tag `milestone-pre-line-wedge` (commit `6c0355e`), implementation commit `a679a18`, bugfix commit `0ad42ea`. **Status**: awaiting user testing.
 
 ### Session Log — Notation Fragment Score Integration
 - ASB-096: Fragment asset audit — all 8 NFs verified, re-rendered NF008-Cello, cropped all SVGs, created output dirs + notation_fragment_db.json
@@ -310,6 +314,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 - [ ] **Notation Fragment AI prompt guide** — create prompt guide for AI-driven fragment insertion via Command Bridge
 - [ ] **MIDI snippet generating system** — longer-term goal: system that reads notation and/or instructions, knows what CC messages to add, and produces enhanced MIDI files automatically. Builds on modify_midi.js --map approach.
 - [ ] **Test modify_midi.js --map with NotationFragment002-Viola.ly** — render MIDI in Frescobaldi, create JSON map, run post-processing, verify CC0 at correct note positions
+- [ ] **Test Line-Wedge Maker** — draw line-wedges, verify rendering/selection/node ops/shift+drag/multi-page/meter/persistence
 
 ---
 
@@ -430,6 +435,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-116 | Sequence Generator Documentation — architecture, expansion guide, programmatic score insertion analysis | Complete |
 | ASB-117 | Bundle Manager Tool — standalone HTML, inspect/select/delete bundles from saved scores, 6 types, filters, range select, undo, save-as | Complete |
 | ASB-118 | Sequence Generator presets — auto-persist localStorage, named presets (save/load/delete/export/import), built-in preset | Complete |
+| ASB-119 | Line-Wedge Maker — full system: LineWedgeDatabase, HTML panel, LineWedgeMaker JS (render/select/node ops/multi-page), LW meter (donut ring + center bar), integration hooks, bug fixes | Complete |
 
 ---
 
@@ -461,6 +467,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Feb 25, 2026 | — | BP + PT + PTG bundle systems (ASB-109/110/111) |
 | Feb 28, 2026 | 4aee777 | volume mode, hairpin/secco, pie dial, sequence generator tool + docs (ASB-111 to ASB-116) |
 | Feb 28, 2026 | 1ede3f3 | bundle manager tool, sequence generator presets + bug fixes (ASB-117 to ASB-118) |
+| Mar 1, 2026 | — | line-wedge maker: database, panel, JS object, meter, integration hooks (ASB-119) |
 
 ---
 
