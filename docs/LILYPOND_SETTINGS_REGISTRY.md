@@ -91,6 +91,11 @@ When this registry is updated, follow these rules:
 31. [Hidden MIDI Voice (Dual-Score Pattern)](#31-hidden-midi-voice-dual-score-pattern)
 32. [Behind-the-Bridge (b.b.) Convention](#32-behind-the-bridge-bb-convention)
 33. [Default Independent Positioning Rule](#33-default-independent-positioning-rule)
+34. [Rectangle / Box Path Markup](#34-rectangle--box-path-markup)
+35. [Scheme Comment Syntax](#35-scheme-comment-syntax)
+36. [Independent Horizontal Staff Spacing](#36-independent-horizontal-staff-spacing)
+37. [Vertical Staff Spacing (Independent)](#37-vertical-staff-spacing-independent)
+38. [Grace Note Sizing](#38-grace-note-sizing)
 
 ---
 
@@ -710,6 +715,9 @@ The vibrato system uses a custom Scheme function `build-vibrato-stencil` that ge
 | Value | Context | Source Files |
 |-------|---------|-------------|
 | #1 | Single-line staff (percussion, pluck) | PizzicatoStorm, Huebler (R.H.) |
+| #2 | Two-line staff (R.H. pluck, original) | Two-Handed Pizzicato Clusters (earlier version) |
+| #3 | Three-line staff (L.H. pluck) | Two-Handed Pizzicato Clusters |
+| #4 | Four-line staff (R.H. pluck) | Two-Handed Pizzicato Clusters |
 | #5 | Standard 5-line staff (explicit) | Huebler (L.H.), PizzicatoStorm (fingering) |
 
 ### StaffSymbol.stencil (custom staff lines)
@@ -734,6 +742,8 @@ Three implementations found:
 | 50-60 | Hardcoded in older inline lambdas | Crumb (55), Lachenmann (60), QuasiGuitarra (50) |
 
 > **Note:** Older files used raw unitless values in the inline lambda. Current files use the parameterized `staff-line-width-mm` Scheme variable. The multiplier `2.8346` converts mm to staff spaces.
+
+> **⚠️ Staff-space interaction:** The `make-custom-staff-stencil` function converts mm to staff-space units internally. Staves with different `staff-space` values (e.g., `#1.4` vs default) will render the same mm value at different visual lengths. Use independent width parameters per staff and adjust visually. *(Discovered Mar 1, 2026 — Two-Handed Pizzicato Clusters.ly)*
 
 ### StaffSymbol.transparent
 
@@ -854,6 +864,23 @@ Three implementations found:
 | #-1.8 | Far left (notecolumn 2) | Various |
 | #-2 | Very far left | Various |
 | #-2.5 | Extreme left | Various |
+| #-3.4 to #-5.7 | Grace note group shift (entire beamed figure) | Two-Handed Pizzicato Clusters |
+| #-10 to #-15.5 | Large shift (independent arrow noteheads) | Two-Handed Pizzicato Clusters (middle staff) |
+
+### NoteColumn.X-offset Scoping Rules ⚠️
+
+**Critical:** `NoteColumn` is a Staff-level grob. Overrides behave differently depending on context:
+
+| Context | `\override` works? | `\tweak` works? | Notes |
+|---------|---------------------|-------------------|-------|
+| Staff level | ✅ Yes | ✅ Yes | Normal behavior |
+| Inside `\grace { }` (single voice) | ✅ Yes | ✅ Yes | Override at grace level is fine |
+| Inside `\grace { << \\  >> }` (multi-voice) | ❌ No | ✅ Yes | `\\` creates new Voice contexts that reset overrides |
+| Outside `\grace` targeting grace notes | ❌ No effect | N/A | Grace notes have their own spacing context |
+
+**Rule:** For grace notes inside `<< \\ >>`, use `\tweak NoteColumn.X-offset` on **every individual note**. For single-voice grace notes, `\override`/`\revert` inside the `\grace` block works fine.
+
+*(Discovered Mar 1, 2026 — Two-Handed Pizzicato Clusters.ly)*
 
 ### NoteColumn via \tweak (chord spreading)
 
@@ -962,6 +989,15 @@ bottom-margin = 0\mm (or 10)
 left-margin = 1\mm (or 0)
 right-margin = 0\mm (or 1)
 ```
+
+### ragged-bottom
+
+| Value | Context | Source Files |
+|-------|---------|-------------|
+| **##t** | Prevents LilyPond from stretching staves to fill page height | Two-Handed Pizzicato Clusters |
+| ##f | Default — LilyPond stretches vertically to fill page | Most files |
+
+> **Rule:** Always set `ragged-bottom = ##t` when using independent vertical staff spacing parameters. Without it, LilyPond overrides your spacing by stretching to fill the page. *(Discovered Mar 1, 2026)*
 
 ### system-system-spacing
 
@@ -1137,6 +1173,23 @@ Found in: `M3_vla_accented_long_tone_bowpressure.ly`
 
 > Use `\revert NoteHead.style` to return to default after changing style.
 
+### \xHead / \xHeadOnce Scoping Rules ⚠️
+
+The `\xHead` command uses `\override NoteHead.style` and `\override NoteHead.font-size`. Like all overrides, these are **reset by `\\` voice separators** inside `<< ... \\ ... >>` blocks.
+
+**Rule:** When using `\xHead` inside simultaneous voice blocks (`<< \\ >>`), place `\xHead` inside **each voice separately**, not before the `<<`.
+
+```lilypond
+% WRONG — xHead only applies to first voice, reset by \\
+\xHead
+\grace { << { c''16 c'' } \\ { a'16 a' } >> }
+
+% CORRECT — xHead inside each voice
+\grace { << { \xHead c''16 c'' } \\ { \xHead a'16 a' } >> }
+```
+
+*(Discovered Mar 1, 2026 — Two-Handed Pizzicato Clusters.ly)*
+
 ---
 
 ## 25. Arpeggio
@@ -1163,6 +1216,9 @@ Found in: `M3_vla_accented_long_tone_bowpressure.ly`
 | `stem-with-z` | Z-stem calligraphic polygon overlay (bars + diagonal) | ZstemPizzTrem-treble-B4-fff-test.ly |
 | `arrow-down-notehead` | Custom down-arrow notehead | PizzicatoStorm |
 | `arrow-up-notehead` | Custom up-arrow notehead | PizzicatoStorm |
+| `xHead` | Persistent X notehead override (style + font-size) | Two-Handed Pizzicato Clusters |
+| `xHeadOnce` | Single-note X notehead override | Two-Handed Pizzicato Clusters |
+| `xHeadRevert` | Revert xHead overrides | Two-Handed Pizzicato Clusters |
 
 ### Variables
 
@@ -1178,7 +1234,17 @@ Found in: `M3_vla_accented_long_tone_bowpressure.ly`
 | `arrow-notehead-y-offset` | 0.5 | PizzicatoStorm |
 | `lh-pluck-staff-width` | 2.9 | PizzicatoStorm |
 | `lh-fingering-staff-width` | 2.9 | PizzicatoStorm |
-| `rh-pluck-staff-width` | 2.9 | PizzicatoStorm |
+| `rh-pluck-staff-width` | 2.3, 2.9 | PizzicatoStorm, Two-Handed Pizzicato Clusters |
+| `arrow-stem-length` | 6 | Two-Handed Pizzicato Clusters |
+| `arrow-head-fontsize` | 2 | Two-Handed Pizzicato Clusters |
+| `fb-text-fontsize` | -2.5 | Two-Handed Pizzicato Clusters |
+| `bb-text-fontsize` | -8 | Two-Handed Pizzicato Clusters |
+| `rh-grace-x-offset` | -3.2 to -5.7 | Two-Handed Pizzicato Clusters |
+| `grace-note-magnification` | 0.63 | Two-Handed Pizzicato Clusters |
+| `grace-spacing-increment` | 0, 0.4 | Two-Handed Pizzicato Clusters |
+| `x-notehead-size` | -4.5 | Two-Handed Pizzicato Clusters, NotationFragment005 |
+| `staff-1-to-2-distance` | 6.5 | Two-Handed Pizzicato Clusters |
+| `staff-2-to-3-distance` | 8.5 | Two-Handed Pizzicato Clusters |
 | `z-bar-width` | 1.1 | ZstemPizzTrem-treble-B4-fff-test.ly |
 | `z-bar-height` | 0.4 | ZstemPizzTrem-treble-B4-fff-test.ly |
 | `z-y-offset` | -0.7 | ZstemPizzTrem-treble-B4-fff-test.ly |
@@ -1637,6 +1703,381 @@ In proportional notation with dense, mixed-technique passages, LilyPond's automa
 - The AI should include these by default when writing new notation. The user adjusts the values during rendering.
 
 *(Section added: Feb 23, 2026)*
+
+---
+
+## 34. Rectangle / Box Path Markup
+
+Draw a rectangle (box) around any notation element using `\markup { \path ... }`. Attach to a note via `^\markup` with `\with-dimensions` set to zero so the box doesn't affect spacing.
+
+### Full Pattern
+
+```lilypond
+-\tweak outside-staff-priority ##f
+-\tweak extra-offset #'(0 . 0)
+^\markup {
+  \with-dimensions #'(0 . 0) #'(0 . 0)
+  \translate #'(-0.5 . -1.5)
+  \override #'(thickness . 0.8)
+  \path #0.15
+  #'((moveto  0 -3) ;A B
+     (lineto  5 -3) ;C D
+     (lineto  5  5) ;E F
+     (lineto  0  5) ;G H
+     (closepath))
+}
+```
+
+### Coordinate Guide (A–H)
+
+Each vertex of the rectangle has two coordinates (X, Y). The labels A–H map to:
+
+| Vertex | Code | X label | Y label |
+|--------|------|---------|---------|
+| Bottom-left | `(moveto  A B)` | A | B |
+| Bottom-right | `(lineto  C D)` | C | D |
+| Top-right | `(lineto  E F)` | E | F |
+| Top-left | `(lineto  G H)` | G | H |
+
+### Size Adjustment Guide
+
+| You want to… | Change these | Direction |
+|---|---|---|
+| **Increase height from bottom** | Decrease B and D | Lower values = box extends downward |
+| **Increase height from top** | Increase F and H | Higher values = box extends upward |
+| **Increase width from right** | Increase C and E | Higher values = box extends rightward |
+| **Increase width from left** | Decrease A and G | Lower values = box extends leftward |
+
+### Position Adjustment
+
+- `\translate #'(X . Y)` — shifts the entire box (X = right, Y = up)
+- `-\tweak extra-offset #'(X . Y)` — shifts the markup attachment point
+
+### Parameters
+
+| Parameter | Purpose | Typical Value |
+|-----------|---------|---------------|
+| `\path #0.15` | Stroke width of the lines | 0.15 |
+| `thickness . 0.8` | Overall thickness scaling | 0.8 |
+| `\with-dimensions #'(0 . 0) #'(0 . 0)` | Makes box take zero layout space | Always use |
+| `outside-staff-priority ##f` | Prevents LilyPond from repositioning | Always use |
+
+> **Important:** Comments inside the `#'((...))` Scheme list must use semicolons (`;`), not percent signs (`%`). See Section 35.
+
+**Source files:** m8_vla_CLBflutter_3rdG4_4thC5_7thBb-5_9thD6_final.ly, Two-Handed Pizzicato Clusters.ly
+
+*(Section added: Mar 1, 2026)*
+
+---
+
+## 35. Scheme Comment Syntax
+
+**Rule:** Inside any Scheme expression in LilyPond, comments MUST use semicolons (`;`), NOT percent signs (`%`).
+
+| Context | Comment Character | Example |
+|---------|------------------|---------|
+| LilyPond code (outside Scheme) | `%` | `% This is a LilyPond comment` |
+| Inside Scheme expressions (`#(...)`, `#'(...)`) | `;` | `#'((moveto 0 0) ;this is a Scheme comment` |
+
+Using `%` inside a Scheme expression causes a Guile parse error ("mismatched close paren" or "wrong type for argument").
+
+```lilypond
+% CORRECT:
+#'((moveto  0 -3) ;A B
+   (lineto  5 -3) ;C D
+   (closepath))
+
+% WRONG — will cause parse error:
+#'((moveto  0 -3)
+   % This breaks Scheme
+   (lineto  5 -3))
+```
+
+*(Section added: Mar 1, 2026)*
+
+---
+
+## 36. Independent Horizontal Staff Spacing
+
+LilyPond's spacing engine is **column-based** — all staves in a `<<...>>` block share the same horizontal timeline. Musical moments at the same beat align vertically across all staves. Grace notes, for example, create a column *before* beat 1 that pushes content rightward on every staff, even staves with no grace notes.
+
+This section documents strategies for achieving horizontal independence between staves.
+
+### Strategy 1: Separate `\score` Blocks (Most Independent)
+
+Put each staff in its own `\score {}` block inside the same `\book {}`. Each score has completely independent horizontal spacing — no shared columns.
+
+#### Minimal Example
+
+```lilypond
+\book {
+  \score { \new Staff { ... } \layout { } }  % Staff 1
+  \score { \new Staff { ... } \layout { } }  % Staff 2
+  \score { \new Staff { ... } \layout { } }  % Staff 3
+}
+```
+
+#### Full Implementation Pattern (Tested)
+
+Extract shared layout into a variable to avoid duplication:
+
+```lilypond
+% Define once, reference in each \score
+sharedLayout = \layout {
+  \context {
+    \Score
+    \override BarNumber.break-visibility = ##(#f #f #f)
+    proportionalNotationDuration = #(ly:make-moment 1/24)
+    \override Beam.damping = #+inf.0
+    \override Beam.breakable = ##t
+    \override Glissando.breakable = ##t
+    \override TextSpanner.breakable = ##t
+  }
+  \context {
+    \Staff
+    \override InstrumentName.padding = #instrument-name-padding
+  }
+  indent = 18\mm
+  line-width = 55\mm
+  #(layout-set-staff-size 18)
+}
+
+\paper {
+  % Control vertical gaps between the independent staves
+  system-system-spacing.basic-distance = #8
+  system-system-spacing.padding = #0
+}
+
+\book {
+  \header { tagline = ##f }
+
+  \score {
+    \new Staff \with { ... } { ... }
+    \sharedLayout
+  }
+  \score {
+    \new Staff \with { ... } { ... }
+    \sharedLayout
+  }
+  \score {
+    \new Staff \with { ... } { ... }
+    \sharedLayout
+  }
+}
+```
+
+#### Key Implementation Notes
+
+- `NoteColumn.X-offset` hacks can be **removed** — no longer needed since staves are independent
+- `InstrumentName.extra-offset` hacks can be **removed** — each score calculates indent independently
+- Vertical spacing: adjust `system-system-spacing.basic-distance` in `\paper` (lower = closer)
+- The `sharedLayout` variable keeps settings DRY across all scores
+
+| Pro | Con |
+|-----|-----|
+| True independence — grace notes in one staff have zero effect on others | Lose vertical alignment entirely |
+| Each staff has its own spacing engine | Vertical spacing controlled by `\paper` `system-system-spacing`, not staff-group spacing |
+| NoteColumn.X-offset hacks become unnecessary | Visual grouping as a single system is lost |
+
+**Best for:** Staves that are truly independent fragments on the same page.
+
+**Tested in:** Two-Handed Pizzicato Clusters.ly (converted and reverted — saved for future use).
+
+### Strategy 2: `NoteColumn.X-offset` Tweaks (Visual Override)
+
+Keep the shared timeline but visually override where each note column renders.
+
+```lilypond
+\tweak NoteColumn.X-offset #-4  % negative = left, positive = right
+f4
+```
+
+| Pro | Con |
+|-----|-----|
+| Simple, per-note control | Space is still allocated — you're moving the visual rendering only |
+| Glissandos and spanners follow the note column | Staff lines still extend to accommodate the full timeline |
+
+**Best for:** Small adjustments (a few staff-spaces). Used in Two-Handed Pizzicato Clusters.ly.
+
+### Strategy 3: Transparent Spacer Grace Notes (Synchronization)
+
+Add invisible grace notes to other staves so they participate in the grace column without showing anything. Aligns beat 1 correctly.
+
+```lilypond
+% In a staff that has no grace notes but needs to align with one that does:
+\grace { \hideNotes g'16 \unHideNotes } f4
+```
+
+| Pro | Con |
+|-----|-----|
+| Beat 1 aligns cleanly across all staves | Doesn't give independence — gives synchronization |
+| Least code for most natural result | Must match the grace note duration/count |
+
+**Best for:** When you *want* alignment but grace notes in one staff are causing drift in others.
+
+### Strategy 4: `\markup { \score { } }` (Full Graphical Freedom)
+
+Render each staff as a separate `\markup { \score { ... } }` and position them manually within a larger markup.
+
+| Pro | Con |
+|-----|-----|
+| Complete independence — each sub-score has its own spacing engine | Complex to set up |
+| Full control over positioning | No automatic vertical staff spacing — manual page layout |
+
+**Best for:** Graphic-score-like situations where spatial notation matters more than rhythmic alignment.
+
+### Strategy 5: `GraceSpacing.spacing-increment`
+
+Controls how much horizontal space grace notes consume.
+
+```lilypond
+\override Score.GraceSpacing.spacing-increment = #0.2  % smaller = less space
+```
+
+| Pro | Con |
+|-----|-----|
+| Simple one-line override | May compress grace notes too much visually |
+| Reduces (but may not eliminate) the drift | Affects all staves equally |
+
+**Note:** Setting to `#0` was tested in Two-Handed Pizzicato Clusters.ly and pushed the grace notes themselves too far over. Use with caution.
+
+### Decision Guide
+
+| Situation | Recommended Strategy |
+|-----------|---------------------|
+| Staves share a performer/temporal relationship, small drift | **Strategy 2** (NoteColumn.X-offset) |
+| Grace notes causing drift, you want alignment | **Strategy 3** (transparent spacer grace notes) |
+| Staves are truly independent, no shared timeline | **Strategy 1** (separate \score blocks) |
+| Full graphical/spatial control needed | **Strategy 4** (markup score blocks) |
+| Minor grace note spacing tweak | **Strategy 5** (GraceSpacing.spacing-increment) |
+
+**Source files:** Two-Handed Pizzicato Clusters.ly
+
+*(Section added: Mar 1, 2026)*
+
+---
+
+## 37. Vertical Staff Spacing (Independent)
+
+Controls vertical distance between staves within a single system. Uses `VerticalAxisGroup` properties on each staff's `\with` block for independent per-pair control.
+
+### Property: `default-staff-staff-spacing`
+
+**Use `default-staff-staff-spacing`** (not `staff-staff-spacing`) when staves are NOT inside an explicit `\new StaffGroup`. The `<<>>` at Score level does not create a StaffGroup.
+
+| Sub-property | Purpose | Recommended Value |
+|---|---|---|
+| `basic-distance` | Target distance between staves (staff spaces) | Set via parameter |
+| `minimum-distance` | Floor — prevents staves getting closer | `#0` (remove floor) |
+| `padding` | Extra skyline padding | `#0` (remove) |
+| `stretchability` | How much LilyPond can stretch beyond basic-distance | `#0` (lock to basic-distance) |
+
+### Implementation Pattern
+
+Define per-pair Scheme variables:
+```lilypond
+#(define staff-1-to-2-distance 6.5)
+#(define staff-2-to-3-distance 8.5)
+```
+
+Apply in each staff's `\with` block:
+```lilypond
+\new Staff \with {
+  \override VerticalAxisGroup.default-staff-staff-spacing.basic-distance = #staff-1-to-2-distance
+  \override VerticalAxisGroup.default-staff-staff-spacing.minimum-distance = #0
+  \override VerticalAxisGroup.default-staff-staff-spacing.padding = #0
+  \override VerticalAxisGroup.default-staff-staff-spacing.stretchability = #0
+}
+```
+
+### Required Companion Setting
+
+**`ragged-bottom = ##t`** must be set in `\paper` — otherwise LilyPond stretches staves to fill the page height, overriding your spacing values.
+
+### Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| Values have no effect | Using `staff-staff-spacing` instead of `default-staff-staff-spacing` | Switch to `default-staff-staff-spacing` |
+| Staves won't get closer than ~8-9 units | `minimum-distance` default is non-zero | Set `minimum-distance = #0` |
+| Staves stretch to fill page | Missing `ragged-bottom = ##t` | Add to `\paper` block |
+| Strange layout when value is very small | `stretchability` allows LilyPond to override | Set `stretchability = #0` |
+
+**Source files:** Two-Handed Pizzicato Clusters.ly
+
+*(Section added: Mar 1, 2026)*
+
+---
+
+## 38. Grace Note Sizing
+
+Two methods for scaling grace note figures, with different effects:
+
+### Method 1: `\magnifyMusic` (Recommended)
+
+Scales **everything** proportionally: noteheads, stems, beams, flags, AND spacing between notes.
+
+```lilypond
+#(define grace-note-magnification 0.63)
+
+\grace {
+  \magnifyMusic #grace-note-magnification {
+    c''16[ c'' c'' c'']
+  }
+}
+```
+
+| Factor | Effect |
+|--------|--------|
+| 0.63 | Standard grace note size (2/3) |
+| 0.5 | Half size |
+| 0.75 | Three-quarter size |
+| 1.0 | Full size (no scaling) |
+
+### Method 2: `\set fontSize` (Grobs Only)
+
+Scales grob sizes (noteheads, stems) but does **NOT** scale spacing between notes or beam thickness.
+
+```lilypond
+\set fontSize = #-3  % equivalent to ~0.63 magnification for grob sizes only
+```
+
+| Value | Approximate Scale |
+|-------|-------------------|
+| -3 | ~2/3 (standard grace size) |
+| -4 | ~0.58 |
+| -5 | ~0.5 |
+
+### Key Difference
+
+| | `\magnifyMusic` | `\set fontSize` |
+|---|---|---|
+| Notehead size | ✅ Scales | ✅ Scales |
+| Stem thickness | ✅ Scales | ✅ Scales |
+| Beam thickness | ✅ Scales | ❌ No effect |
+| Note spacing | ✅ Scales | ❌ No effect |
+| Interaction with explicit `NoteHead.font-size` | Overridden by explicit value | Overridden by explicit value |
+
+> **Note:** If `\xHead` sets an explicit `NoteHead.font-size`, neither method affects notehead size — the explicit override wins. But `\magnifyMusic` still scales stems, beams, and spacing.
+
+### Grace Note Horizontal Spacing
+
+Controlled separately via `GraceSpacing.spacing-increment` (see Section 36, Strategy 5).
+
+```lilypond
+#(define grace-spacing-increment 0.4)  % default 0.8, smaller = tighter
+\override Score.GraceSpacing.spacing-increment = #grace-spacing-increment
+```
+
+| Value | Effect |
+|-------|--------|
+| 0.8 | LilyPond default |
+| 0.4 | Half-spacing (good starting point) |
+| 0 | No spacing — tested, causes layout issues |
+
+**Source files:** Two-Handed Pizzicato Clusters.ly
+
+*(Section added: Mar 1, 2026)*
 
 ---
 

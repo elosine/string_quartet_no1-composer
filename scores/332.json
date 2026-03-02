@@ -2,8 +2,8 @@
   "version": "1.0",
   "metadata": {
     "title": "332",
-    "created": "2026-02-28T18:55:17.882Z",
-    "modified": "2026-02-28T18:55:18.008Z",
+    "created": "2026-02-28T19:05:41.286Z",
+    "modified": "2026-02-28T19:05:41.400Z",
     "author": ""
   },
   "tempoHistory": [
@@ -167467,7 +167467,6 @@
           "timestamp": 325788.4
         },
         {
-          "id": "cres_292_1772304401524_t07fmlthd",
           "timeMs": 329000,
           "type": "cc",
           "data": [
@@ -167475,12 +167474,11 @@
             0,
             89
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329000
         },
         {
-          "id": "cres_292_1772304401524_0z4w7epks",
           "timeMs": 329000,
           "type": "pitchBend",
           "data": [
@@ -167488,12 +167486,11 @@
             0,
             0
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329000
         },
         {
-          "id": "cres_292_1772304401524_19ytmnt5d",
           "timeMs": 329000,
           "type": "cc",
           "data": [
@@ -167501,12 +167498,11 @@
             7,
             80
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329000
         },
         {
-          "id": "cres_292_1772304401524_ttbhpr38r",
           "timeMs": 329000,
           "type": "noteOn",
           "data": [
@@ -167514,12 +167510,11 @@
             67,
             115
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329000
         },
         {
-          "id": "cres_292_1772304401524_4hkn80ici",
           "timeMs": 329050,
           "type": "pitchBend",
           "data": [
@@ -167527,12 +167522,11 @@
             26,
             1
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329050
         },
         {
-          "id": "cres_292_1772304401524_wgmdc3mjr",
           "timeMs": 329050,
           "type": "cc",
           "data": [
@@ -167540,12 +167534,11 @@
             7,
             80
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329050
         },
         {
-          "id": "cres_292_1772304401524_1d6ije9l3",
           "timeMs": 329102.0833333333,
           "type": "pitchBend",
           "data": [
@@ -167553,12 +167546,11 @@
             51,
             2
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329102.0833333333
         },
         {
-          "id": "cres_292_1772304401524_z2bztwsyy",
           "timeMs": 329102.0833333333,
           "type": "cc",
           "data": [
@@ -167566,12 +167558,11 @@
             7,
             80
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329102.0833333333
         },
         {
-          "id": "cres_292_1772304401524_q093efvbq",
           "timeMs": 329152.0833333333,
           "type": "pitchBend",
           "data": [
@@ -167579,12 +167570,11 @@
             77,
             3
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329152.0833333333
         },
         {
-          "id": "cres_292_1772304401524_y5cs7vbyi",
           "timeMs": 329152.0833333333,
           "type": "cc",
           "data": [
@@ -167592,12 +167582,11 @@
             7,
             81
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329152.0833333333
         },
         {
-          "id": "cres_292_1772304401524_stgn710ms",
           "timeMs": 329202.0833333333,
           "type": "pitchBend",
           "data": [
@@ -167605,12 +167594,11 @@
             102,
             4
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329202.0833333333
         },
         {
-          "id": "cres_292_1772304401524_c0h4p1krd",
           "timeMs": 329202.0833333333,
           "type": "cc",
           "data": [
@@ -167618,12 +167606,11 @@
             7,
             81
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329202.0833333333
         },
         {
-          "id": "cres_292_1772304401524_3f55pvfms",
           "timeMs": 329254.1666666667,
           "type": "pitchBend",
           "data": [
@@ -167631,12 +167618,11 @@
             0,
             6
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329254.1666666667
         },
         {
-          "id": "cres_292_1772304401524_fbth3mnzy",
           "timeMs": 329254.1666666667,
           "type": "cc",
           "data": [
@@ -167644,12 +167630,11 @@
             7,
             81
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329254.1666666667
         },
         {
-          "id": "cres_292_1772304401524_9s4fp780k",
           "timeMs": 329304.1666666667,
           "type": "pitchBend",
           "data": [
@@ -167657,12 +167642,11 @@
             26,
             7
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329304.1666666667
         },
         {
-          "id": "cres_292_1772304401524_kocu546jj",
           "timeMs": 329304.1666666667,
           "type": "cc",
           "data": [
@@ -167670,12 +167654,11 @@
             7,
             81
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329304.1666666667
         },
         {
-          "id": "cres_292_1772304401524_afok7kw4a",
           "timeMs": 329354.1666666667,
           "type": "pitchBend",
           "data": [
@@ -167683,12 +167666,11 @@
             51,
             8
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329354.1666666667
         },
         {
-          "id": "cres_292_1772304401524_fjcreqr42",
           "timeMs": 329354.1666666667,
           "type": "cc",
           "data": [
@@ -167696,12 +167678,11 @@
             7,
             81
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329354.1666666667
         },
         {
-          "id": "cres_292_1772304401524_8ccyneupk",
           "timeMs": 329404.1666666667,
           "type": "pitchBend",
           "data": [
@@ -167709,12 +167690,11 @@
             107,
             9
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329404.1666666667
         },
         {
-          "id": "cres_292_1772304401524_fzk2vurze",
           "timeMs": 329404.1666666667,
           "type": "cc",
           "data": [
@@ -167722,12 +167702,11 @@
             7,
             82
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329404.1666666667
         },
         {
-          "id": "cres_292_1772304401524_zhkapv6zh",
           "timeMs": 329456.25,
           "type": "pitchBend",
           "data": [
@@ -167735,12 +167714,11 @@
             5,
             11
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329456.25
         },
         {
-          "id": "cres_292_1772304401524_1j4ooo0l2",
           "timeMs": 329456.25,
           "type": "cc",
           "data": [
@@ -167748,12 +167726,11 @@
             7,
             82
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329456.25
         },
         {
-          "id": "cres_292_1772304401524_35yg6hqxl",
           "timeMs": 329506.25,
           "type": "pitchBend",
           "data": [
@@ -167761,12 +167738,11 @@
             31,
             12
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329506.25
         },
         {
-          "id": "cres_292_1772304401524_9zsenjupd",
           "timeMs": 329506.25,
           "type": "cc",
           "data": [
@@ -167774,12 +167750,11 @@
             7,
             82
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329506.25
         },
         {
-          "id": "cres_292_1772304401524_w7840agfi",
           "timeMs": 329556.25,
           "type": "pitchBend",
           "data": [
@@ -167787,12 +167762,11 @@
             56,
             13
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329556.25
         },
         {
-          "id": "cres_292_1772304401524_gqxrevj6g",
           "timeMs": 329556.25,
           "type": "cc",
           "data": [
@@ -167800,12 +167774,11 @@
             7,
             82
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329556.25
         },
         {
-          "id": "cres_292_1772304401524_oar48eya1",
           "timeMs": 329608.3333333333,
           "type": "pitchBend",
           "data": [
@@ -167813,12 +167786,11 @@
             82,
             14
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329608.3333333333
         },
         {
-          "id": "cres_292_1772304401524_khurv55r7",
           "timeMs": 329608.3333333333,
           "type": "cc",
           "data": [
@@ -167826,12 +167798,11 @@
             7,
             82
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329608.3333333333
         },
         {
-          "id": "cres_292_1772304401524_90znbxach",
           "timeMs": 329658.3333333333,
           "type": "pitchBend",
           "data": [
@@ -167839,12 +167810,11 @@
             107,
             15
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329658.3333333333
         },
         {
-          "id": "cres_292_1772304401524_07y2ju0hr",
           "timeMs": 329658.3333333333,
           "type": "cc",
           "data": [
@@ -167852,12 +167822,11 @@
             7,
             82
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329658.3333333333
         },
         {
-          "id": "cres_292_1772304401524_suaevzwdl",
           "timeMs": 329708.3333333333,
           "type": "pitchBend",
           "data": [
@@ -167865,12 +167834,11 @@
             5,
             17
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329708.3333333333
         },
         {
-          "id": "cres_292_1772304401524_zyad4yzov",
           "timeMs": 329708.3333333333,
           "type": "cc",
           "data": [
@@ -167878,12 +167846,11 @@
             7,
             83
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329708.3333333333
         },
         {
-          "id": "cres_292_1772304401524_birz9kzpc",
           "timeMs": 329760.4166666667,
           "type": "pitchBend",
           "data": [
@@ -167891,12 +167858,11 @@
             31,
             18
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329760.4166666667
         },
         {
-          "id": "cres_292_1772304401524_1yzu3j6gm",
           "timeMs": 329760.4166666667,
           "type": "cc",
           "data": [
@@ -167904,12 +167870,11 @@
             7,
             83
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329760.4166666667
         },
         {
-          "id": "cres_292_1772304401524_upj2cuyf3",
           "timeMs": 329810.4166666667,
           "type": "pitchBend",
           "data": [
@@ -167917,12 +167882,11 @@
             56,
             19
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329810.4166666667
         },
         {
-          "id": "cres_292_1772304401524_aneujmj6a",
           "timeMs": 329810.4166666667,
           "type": "cc",
           "data": [
@@ -167930,12 +167894,11 @@
             7,
             83
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329810.4166666667
         },
         {
-          "id": "cres_292_1772304401524_tcokepjmn",
           "timeMs": 329860.4166666667,
           "type": "pitchBend",
           "data": [
@@ -167943,12 +167906,11 @@
             82,
             20
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329860.4166666667
         },
         {
-          "id": "cres_292_1772304401524_ilgdk6lw3",
           "timeMs": 329860.4166666667,
           "type": "cc",
           "data": [
@@ -167956,12 +167918,11 @@
             7,
             83
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329860.4166666667
         },
         {
-          "id": "cres_292_1772304401524_wm6anxww5",
           "timeMs": 329910.4166666667,
           "type": "pitchBend",
           "data": [
@@ -167969,12 +167930,11 @@
             107,
             21
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329910.4166666667
         },
         {
-          "id": "cres_292_1772304401524_lt3sjzlqh",
           "timeMs": 329910.4166666667,
           "type": "cc",
           "data": [
@@ -167982,12 +167942,11 @@
             7,
             83
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329910.4166666667
         },
         {
-          "id": "cres_292_1772304401524_hnkat2geo",
           "timeMs": 329962.5,
           "type": "pitchBend",
           "data": [
@@ -167995,12 +167954,11 @@
             5,
             23
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329962.5
         },
         {
-          "id": "cres_292_1772304401524_gikvlizfs",
           "timeMs": 329962.5,
           "type": "cc",
           "data": [
@@ -168008,12 +167966,11 @@
             7,
             84
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 329962.5
         },
         {
-          "id": "cres_292_1772304401524_zevfbb7vq",
           "timeMs": 330012.5,
           "type": "pitchBend",
           "data": [
@@ -168021,12 +167978,11 @@
             30,
             24
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330012.5
         },
         {
-          "id": "cres_292_1772304401524_venz8z9um",
           "timeMs": 330012.5,
           "type": "cc",
           "data": [
@@ -168034,12 +167990,11 @@
             7,
             84
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330012.5
         },
         {
-          "id": "cres_292_1772304401524_8nvnyo31a",
           "timeMs": 330062.5,
           "type": "pitchBend",
           "data": [
@@ -168047,12 +168002,11 @@
             56,
             25
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330062.5
         },
         {
-          "id": "cres_292_1772304401524_n0ioio6we",
           "timeMs": 330062.5,
           "type": "cc",
           "data": [
@@ -168060,12 +168014,11 @@
             7,
             84
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330062.5
         },
         {
-          "id": "cres_292_1772304401524_z4arl7s0c",
           "timeMs": 330114.5833333333,
           "type": "pitchBend",
           "data": [
@@ -168073,12 +168026,11 @@
             82,
             26
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330114.5833333333
         },
         {
-          "id": "cres_292_1772304401524_dup7rl044",
           "timeMs": 330114.5833333333,
           "type": "cc",
           "data": [
@@ -168086,12 +168038,11 @@
             7,
             84
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330114.5833333333
         },
         {
-          "id": "cres_292_1772304401524_wryka42sg",
           "timeMs": 330164.5833333333,
           "type": "pitchBend",
           "data": [
@@ -168099,12 +168050,11 @@
             107,
             27
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330164.5833333333
         },
         {
-          "id": "cres_292_1772304401524_b2tw5uvm7",
           "timeMs": 330164.5833333333,
           "type": "cc",
           "data": [
@@ -168112,12 +168062,11 @@
             7,
             84
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330164.5833333333
         },
         {
-          "id": "cres_292_1772304401524_mnyur22mg",
           "timeMs": 330214.5833333333,
           "type": "pitchBend",
           "data": [
@@ -168125,12 +168074,11 @@
             36,
             29
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330214.5833333333
         },
         {
-          "id": "cres_292_1772304401524_lbbqd3i3l",
           "timeMs": 330214.5833333333,
           "type": "cc",
           "data": [
@@ -168138,12 +168086,11 @@
             7,
             85
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330214.5833333333
         },
         {
-          "id": "cres_292_1772304401524_4rbmcudin",
           "timeMs": 330266.6666666667,
           "type": "pitchBend",
           "data": [
@@ -168151,12 +168098,11 @@
             61,
             30
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330266.6666666667
         },
         {
-          "id": "cres_292_1772304401524_ou834suwd",
           "timeMs": 330266.6666666667,
           "type": "cc",
           "data": [
@@ -168164,12 +168110,11 @@
             7,
             85
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330266.6666666667
         },
         {
-          "id": "cres_292_1772304401524_ei7eohozq",
           "timeMs": 330316.6666666667,
           "type": "pitchBend",
           "data": [
@@ -168177,12 +168122,11 @@
             87,
             31
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330316.6666666667
         },
         {
-          "id": "cres_292_1772304401524_zybvn0v51",
           "timeMs": 330316.6666666667,
           "type": "cc",
           "data": [
@@ -168190,12 +168134,11 @@
             7,
             85
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330316.6666666667
         },
         {
-          "id": "cres_292_1772304401524_zq49od15i",
           "timeMs": 330366.6666666667,
           "type": "pitchBend",
           "data": [
@@ -168203,12 +168146,11 @@
             112,
             32
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330366.6666666667
         },
         {
-          "id": "cres_292_1772304401524_bfjep2ufb",
           "timeMs": 330366.6666666667,
           "type": "cc",
           "data": [
@@ -168216,12 +168158,11 @@
             7,
             85
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330366.6666666667
         },
         {
-          "id": "cres_292_1772304401524_t3mau62da",
           "timeMs": 330418.75,
           "type": "pitchBend",
           "data": [
@@ -168229,12 +168170,11 @@
             10,
             34
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330418.75
         },
         {
-          "id": "cres_292_1772304401524_3nd5p58dw",
           "timeMs": 330418.75,
           "type": "cc",
           "data": [
@@ -168242,12 +168182,11 @@
             7,
             85
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330418.75
         },
         {
-          "id": "cres_292_1772304401524_a1omoy2wp",
           "timeMs": 330468.75,
           "type": "pitchBend",
           "data": [
@@ -168255,12 +168194,11 @@
             35,
             35
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330468.75
         },
         {
-          "id": "cres_292_1772304401524_6zv6kilfz",
           "timeMs": 330468.75,
           "type": "cc",
           "data": [
@@ -168268,12 +168206,11 @@
             7,
             86
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330468.75
         },
         {
-          "id": "cres_292_1772304401524_kt0hslhtu",
           "timeMs": 330518.75,
           "type": "pitchBend",
           "data": [
@@ -168281,12 +168218,11 @@
             61,
             36
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330518.75
         },
         {
-          "id": "cres_292_1772304401524_dmplvyhz0",
           "timeMs": 330518.75,
           "type": "cc",
           "data": [
@@ -168294,12 +168230,11 @@
             7,
             86
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330518.75
         },
         {
-          "id": "cres_292_1772304401524_sj6w9unmi",
           "timeMs": 330568.75,
           "type": "pitchBend",
           "data": [
@@ -168307,12 +168242,11 @@
             87,
             37
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330568.75
         },
         {
-          "id": "cres_292_1772304401524_x185tg0ac",
           "timeMs": 330568.75,
           "type": "cc",
           "data": [
@@ -168320,12 +168254,11 @@
             7,
             86
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330568.75
         },
         {
-          "id": "cres_292_1772304401524_kdd09530r",
           "timeMs": 330620.8333333333,
           "type": "pitchBend",
           "data": [
@@ -168333,12 +168266,11 @@
             112,
             38
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330620.8333333333
         },
         {
-          "id": "cres_292_1772304401524_70hldnhys",
           "timeMs": 330620.8333333333,
           "type": "cc",
           "data": [
@@ -168346,12 +168278,11 @@
             7,
             86
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330620.8333333333
         },
         {
-          "id": "cres_292_1772304401524_8sol10idn",
           "timeMs": 330670.8333333333,
           "type": "pitchBend",
           "data": [
@@ -168359,12 +168290,11 @@
             10,
             40
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330670.8333333333
         },
         {
-          "id": "cres_292_1772304401524_eszltaelz",
           "timeMs": 330670.8333333333,
           "type": "cc",
           "data": [
@@ -168372,12 +168302,11 @@
             7,
             86
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330670.8333333333
         },
         {
-          "id": "cres_292_1772304401524_yg1h9rryd",
           "timeMs": 330720.8333333333,
           "type": "pitchBend",
           "data": [
@@ -168385,12 +168314,11 @@
             35,
             41
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330720.8333333333
         },
         {
-          "id": "cres_292_1772304401524_5sy2p78ww",
           "timeMs": 330720.8333333333,
           "type": "cc",
           "data": [
@@ -168398,12 +168326,11 @@
             7,
             86
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330720.8333333333
         },
         {
-          "id": "cres_292_1772304401524_z5q1pjjnh",
           "timeMs": 330772.9166666667,
           "type": "pitchBend",
           "data": [
@@ -168411,12 +168338,11 @@
             61,
             42
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330772.9166666667
         },
         {
-          "id": "cres_292_1772304401524_skvwqwmpc",
           "timeMs": 330772.9166666667,
           "type": "cc",
           "data": [
@@ -168424,12 +168350,11 @@
             7,
             87
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330772.9166666667
         },
         {
-          "id": "cres_292_1772304401524_hmp9an765",
           "timeMs": 330822.9166666667,
           "type": "pitchBend",
           "data": [
@@ -168437,12 +168362,11 @@
             87,
             43
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330822.9166666667
         },
         {
-          "id": "cres_292_1772304401524_7wt4epqqb",
           "timeMs": 330822.9166666667,
           "type": "cc",
           "data": [
@@ -168450,12 +168374,11 @@
             7,
             87
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330822.9166666667
         },
         {
-          "id": "cres_292_1772304401524_ew9o1ioaf",
           "timeMs": 330872.9166666667,
           "type": "pitchBend",
           "data": [
@@ -168463,12 +168386,11 @@
             112,
             44
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330872.9166666667
         },
         {
-          "id": "cres_292_1772304401524_0iv88r7t4",
           "timeMs": 330872.9166666667,
           "type": "cc",
           "data": [
@@ -168476,12 +168398,11 @@
             7,
             87
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330872.9166666667
         },
         {
-          "id": "cres_292_1772304401524_uqncdikbf",
           "timeMs": 330925,
           "type": "pitchBend",
           "data": [
@@ -168489,12 +168410,11 @@
             10,
             46
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330925
         },
         {
-          "id": "cres_292_1772304401524_e92l8i6fn",
           "timeMs": 330925,
           "type": "cc",
           "data": [
@@ -168502,12 +168422,11 @@
             7,
             87
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330925
         },
         {
-          "id": "cres_292_1772304401524_mxomx0173",
           "timeMs": 330975,
           "type": "pitchBend",
           "data": [
@@ -168515,12 +168434,11 @@
             35,
             47
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330975
         },
         {
-          "id": "cres_292_1772304401524_gmlspcar7",
           "timeMs": 330975,
           "type": "cc",
           "data": [
@@ -168528,12 +168446,11 @@
             7,
             87
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 330975
         },
         {
-          "id": "cres_292_1772304401524_byabufsrm",
           "timeMs": 331025,
           "type": "pitchBend",
           "data": [
@@ -168541,12 +168458,11 @@
             92,
             48
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331025
         },
         {
-          "id": "cres_292_1772304401524_gsjl740pl",
           "timeMs": 331025,
           "type": "cc",
           "data": [
@@ -168554,12 +168470,11 @@
             7,
             88
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331025
         },
         {
-          "id": "cres_292_1772304401524_1731zi6ps",
           "timeMs": 331075,
           "type": "pitchBend",
           "data": [
@@ -168567,12 +168482,11 @@
             117,
             49
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331075
         },
         {
-          "id": "cres_292_1772304401524_l1i6h5ano",
           "timeMs": 331075,
           "type": "cc",
           "data": [
@@ -168580,12 +168494,11 @@
             7,
             88
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331075
         },
         {
-          "id": "cres_292_1772304401524_odn2hwil4",
           "timeMs": 331127.0833333333,
           "type": "pitchBend",
           "data": [
@@ -168593,12 +168506,11 @@
             15,
             51
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331127.0833333333
         },
         {
-          "id": "cres_292_1772304401524_f1rlsnco0",
           "timeMs": 331127.0833333333,
           "type": "cc",
           "data": [
@@ -168606,12 +168518,11 @@
             7,
             88
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331127.0833333333
         },
         {
-          "id": "cres_292_1772304401524_c6wfl3atn",
           "timeMs": 331177.0833333333,
           "type": "pitchBend",
           "data": [
@@ -168619,12 +168530,11 @@
             40,
             52
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331177.0833333333
         },
         {
-          "id": "cres_292_1772304401524_ovt0vvx27",
           "timeMs": 331177.0833333333,
           "type": "cc",
           "data": [
@@ -168632,12 +168542,11 @@
             7,
             88
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331177.0833333333
         },
         {
-          "id": "cres_292_1772304401524_n7i45adht",
           "timeMs": 331227.0833333333,
           "type": "pitchBend",
           "data": [
@@ -168645,12 +168554,11 @@
             66,
             53
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331227.0833333333
         },
         {
-          "id": "cres_292_1772304401524_8ndrn588z",
           "timeMs": 331227.0833333333,
           "type": "cc",
           "data": [
@@ -168658,12 +168566,11 @@
             7,
             88
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331227.0833333333
         },
         {
-          "id": "cres_292_1772304401524_8sqqgqr6z",
           "timeMs": 331279.1666666667,
           "type": "pitchBend",
           "data": [
@@ -168671,12 +168578,11 @@
             92,
             54
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331279.1666666667
         },
         {
-          "id": "cres_292_1772304401524_relxwj2up",
           "timeMs": 331279.1666666667,
           "type": "cc",
           "data": [
@@ -168684,12 +168590,11 @@
             7,
             89
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331279.1666666667
         },
         {
-          "id": "cres_292_1772304401524_2lrcfuho1",
           "timeMs": 331329.1666666667,
           "type": "pitchBend",
           "data": [
@@ -168697,12 +168602,11 @@
             117,
             55
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331329.1666666667
         },
         {
-          "id": "cres_292_1772304401524_j3kkvx37k",
           "timeMs": 331329.1666666667,
           "type": "cc",
           "data": [
@@ -168710,12 +168614,11 @@
             7,
             89
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331329.1666666667
         },
         {
-          "id": "cres_292_1772304401524_g4tw7pqip",
           "timeMs": 331379.1666666667,
           "type": "pitchBend",
           "data": [
@@ -168723,12 +168626,11 @@
             15,
             57
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331379.1666666667
         },
         {
-          "id": "cres_292_1772304401524_ntdrepw1y",
           "timeMs": 331379.1666666667,
           "type": "cc",
           "data": [
@@ -168736,12 +168638,11 @@
             7,
             89
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331379.1666666667
         },
         {
-          "id": "cres_292_1772304401524_7t2rghphz",
           "timeMs": 331431.25,
           "type": "pitchBend",
           "data": [
@@ -168749,12 +168650,11 @@
             40,
             58
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331431.25
         },
         {
-          "id": "cres_292_1772304401524_jjefkl7gj",
           "timeMs": 331431.25,
           "type": "cc",
           "data": [
@@ -168762,12 +168662,11 @@
             7,
             89
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331431.25
         },
         {
-          "id": "cres_292_1772304401524_myr35eduv",
           "timeMs": 331481.25,
           "type": "pitchBend",
           "data": [
@@ -168775,12 +168674,11 @@
             66,
             59
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331481.25
         },
         {
-          "id": "cres_292_1772304401524_daaity0fu",
           "timeMs": 331481.25,
           "type": "cc",
           "data": [
@@ -168788,12 +168686,11 @@
             7,
             89
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331481.25
         },
         {
-          "id": "cres_292_1772304401524_160wq6a6m",
           "timeMs": 331531.25,
           "type": "pitchBend",
           "data": [
@@ -168801,12 +168698,11 @@
             92,
             60
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331531.25
         },
         {
-          "id": "cres_292_1772304401524_2ilkwvh65",
           "timeMs": 331531.25,
           "type": "cc",
           "data": [
@@ -168814,12 +168710,11 @@
             7,
             89
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331531.25
         },
         {
-          "id": "cres_292_1772304401524_s8dzfmyrp",
           "timeMs": 331581.25,
           "type": "pitchBend",
           "data": [
@@ -168827,12 +168722,11 @@
             117,
             61
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331581.25
         },
         {
-          "id": "cres_292_1772304401524_5wm8pczbg",
           "timeMs": 331581.25,
           "type": "cc",
           "data": [
@@ -168840,12 +168734,11 @@
             7,
             90
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331581.25
         },
         {
-          "id": "cres_292_1772304401524_7v7ek7ldo",
           "timeMs": 331633.3333333333,
           "type": "pitchBend",
           "data": [
@@ -168853,12 +168746,11 @@
             15,
             63
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331633.3333333333
         },
         {
-          "id": "cres_292_1772304401524_37lvzksuv",
           "timeMs": 331633.3333333333,
           "type": "cc",
           "data": [
@@ -168866,12 +168758,11 @@
             7,
             90
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331633.3333333333
         },
         {
-          "id": "cres_292_1772304401524_lyxvhb7e8",
           "timeMs": 331683.3333333333,
           "type": "pitchBend",
           "data": [
@@ -168879,12 +168770,11 @@
             40,
             64
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331683.3333333333
         },
         {
-          "id": "cres_292_1772304401524_q6wgpfubk",
           "timeMs": 331683.3333333333,
           "type": "cc",
           "data": [
@@ -168892,12 +168782,11 @@
             7,
             90
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331683.3333333333
         },
         {
-          "id": "cres_292_1772304401524_x7c6gy7kr",
           "timeMs": 331733.3333333333,
           "type": "pitchBend",
           "data": [
@@ -168905,12 +168794,11 @@
             66,
             65
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331733.3333333333
         },
         {
-          "id": "cres_292_1772304401524_yym0ss4fg",
           "timeMs": 331733.3333333333,
           "type": "cc",
           "data": [
@@ -168918,12 +168806,11 @@
             7,
             90
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331733.3333333333
         },
         {
-          "id": "cres_292_1772304401524_0rek9vmrd",
           "timeMs": 331785.4166666667,
           "type": "pitchBend",
           "data": [
@@ -168931,12 +168818,11 @@
             91,
             66
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331785.4166666667
         },
         {
-          "id": "cres_292_1772304401524_ne917muhz",
           "timeMs": 331785.4166666667,
           "type": "cc",
           "data": [
@@ -168944,12 +168830,11 @@
             7,
             90
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331785.4166666667
         },
         {
-          "id": "cres_292_1772304401524_8liqr0r46",
           "timeMs": 331835.4166666667,
           "type": "pitchBend",
           "data": [
@@ -168957,12 +168842,11 @@
             20,
             68
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331835.4166666667
         },
         {
-          "id": "cres_292_1772304401524_ma1sdekjk",
           "timeMs": 331835.4166666667,
           "type": "cc",
           "data": [
@@ -168970,12 +168854,11 @@
             7,
             91
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331835.4166666667
         },
         {
-          "id": "cres_292_1772304401524_84cci41m7",
           "timeMs": 331885.4166666667,
           "type": "pitchBend",
           "data": [
@@ -168983,12 +168866,11 @@
             45,
             69
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331885.4166666667
         },
         {
-          "id": "cres_292_1772304401524_xrqgi6d69",
           "timeMs": 331885.4166666667,
           "type": "cc",
           "data": [
@@ -168996,12 +168878,11 @@
             7,
             91
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331885.4166666667
         },
         {
-          "id": "cres_292_1772304401524_imff0q0tb",
           "timeMs": 331937.5,
           "type": "pitchBend",
           "data": [
@@ -169009,12 +168890,11 @@
             71,
             70
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331937.5
         },
         {
-          "id": "cres_292_1772304401524_1cw8ypp3b",
           "timeMs": 331937.5,
           "type": "cc",
           "data": [
@@ -169022,12 +168902,11 @@
             7,
             91
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331937.5
         },
         {
-          "id": "cres_292_1772304401524_uaa20akpl",
           "timeMs": 331987.5,
           "type": "pitchBend",
           "data": [
@@ -169035,12 +168914,11 @@
             97,
             71
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331987.5
         },
         {
-          "id": "cres_292_1772304401524_mkx6t07ex",
           "timeMs": 331987.5,
           "type": "cc",
           "data": [
@@ -169048,12 +168926,11 @@
             7,
             91
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 331987.5
         },
         {
-          "id": "cres_292_1772304401524_xrzpgucbu",
           "timeMs": 332037.5,
           "type": "pitchBend",
           "data": [
@@ -169061,12 +168938,11 @@
             122,
             72
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332037.5
         },
         {
-          "id": "cres_292_1772304401524_7h4nsfsmn",
           "timeMs": 332037.5,
           "type": "cc",
           "data": [
@@ -169074,12 +168950,11 @@
             7,
             91
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332037.5
         },
         {
-          "id": "cres_292_1772304401524_g2r8d764m",
           "timeMs": 332089.5833333333,
           "type": "pitchBend",
           "data": [
@@ -169087,12 +168962,11 @@
             20,
             74
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332089.5833333333
         },
         {
-          "id": "cres_292_1772304401524_sapmzv33q",
           "timeMs": 332089.5833333333,
           "type": "cc",
           "data": [
@@ -169100,12 +168974,11 @@
             7,
             92
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332089.5833333333
         },
         {
-          "id": "cres_292_1772304401524_fya0pkqjj",
           "timeMs": 332139.5833333333,
           "type": "pitchBend",
           "data": [
@@ -169113,12 +168986,11 @@
             45,
             75
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332139.5833333333
         },
         {
-          "id": "cres_292_1772304401524_0ftagvubf",
           "timeMs": 332139.5833333333,
           "type": "cc",
           "data": [
@@ -169126,12 +168998,11 @@
             7,
             92
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332139.5833333333
         },
         {
-          "id": "cres_292_1772304401524_9pyllmh7j",
           "timeMs": 332189.5833333333,
           "type": "pitchBend",
           "data": [
@@ -169139,12 +169010,11 @@
             71,
             76
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332189.5833333333
         },
         {
-          "id": "cres_292_1772304401524_mfxkw879g",
           "timeMs": 332189.5833333333,
           "type": "cc",
           "data": [
@@ -169152,12 +169022,11 @@
             7,
             92
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332189.5833333333
         },
         {
-          "id": "cres_292_1772304401524_iexj1kzce",
           "timeMs": 332239.5833333333,
           "type": "pitchBend",
           "data": [
@@ -169165,12 +169034,11 @@
             96,
             77
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332239.5833333333
         },
         {
-          "id": "cres_292_1772304401524_9itk1ckij",
           "timeMs": 332239.5833333333,
           "type": "cc",
           "data": [
@@ -169178,12 +169046,11 @@
             7,
             92
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332239.5833333333
         },
         {
-          "id": "cres_292_1772304401524_0bgq7hd0q",
           "timeMs": 332291.6666666667,
           "type": "pitchBend",
           "data": [
@@ -169191,12 +169058,11 @@
             122,
             78
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332291.6666666667
         },
         {
-          "id": "cres_292_1772304401524_tpy3r4ek1",
           "timeMs": 332291.6666666667,
           "type": "cc",
           "data": [
@@ -169204,12 +169070,11 @@
             7,
             92
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332291.6666666667
         },
         {
-          "id": "cres_292_1772304401524_9p6xprd4n",
           "timeMs": 332341.6666666667,
           "type": "pitchBend",
           "data": [
@@ -169217,12 +169082,11 @@
             20,
             80
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332341.6666666667
         },
         {
-          "id": "cres_292_1772304401524_8xbp13moy",
           "timeMs": 332341.6666666667,
           "type": "cc",
           "data": [
@@ -169230,12 +169094,11 @@
             7,
             93
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332341.6666666667
         },
         {
-          "id": "cres_292_1772304401524_8f3qi4crs",
           "timeMs": 332391.6666666667,
           "type": "pitchBend",
           "data": [
@@ -169243,12 +169106,11 @@
             45,
             81
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332391.6666666667
         },
         {
-          "id": "cres_292_1772304401524_60xg5kv45",
           "timeMs": 332391.6666666667,
           "type": "cc",
           "data": [
@@ -169256,12 +169118,11 @@
             7,
             93
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332391.6666666667
         },
         {
-          "id": "cres_292_1772304401524_ob954qzja",
           "timeMs": 332443.75,
           "type": "pitchBend",
           "data": [
@@ -169269,12 +169130,11 @@
             71,
             82
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332443.75
         },
         {
-          "id": "cres_292_1772304401524_j1puj1wi2",
           "timeMs": 332443.75,
           "type": "cc",
           "data": [
@@ -169282,12 +169142,11 @@
             7,
             93
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332443.75
         },
         {
-          "id": "cres_292_1772304401524_nnba890tp",
           "timeMs": 332493.75,
           "type": "pitchBend",
           "data": [
@@ -169295,12 +169154,11 @@
             96,
             83
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332493.75
         },
         {
-          "id": "cres_292_1772304401524_7ujd1cpxy",
           "timeMs": 332493.75,
           "type": "cc",
           "data": [
@@ -169308,12 +169166,11 @@
             7,
             93
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332493.75
         },
         {
-          "id": "cres_292_1772304401524_twu9i9da0",
           "timeMs": 332543.75,
           "type": "pitchBend",
           "data": [
@@ -169321,12 +169178,11 @@
             122,
             84
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332543.75
         },
         {
-          "id": "cres_292_1772304401524_w69n4nnbh",
           "timeMs": 332543.75,
           "type": "cc",
           "data": [
@@ -169334,12 +169190,11 @@
             7,
             93
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332543.75
         },
         {
-          "id": "cres_292_1772304401524_y1w6r5cuo",
           "timeMs": 332595.8333333333,
           "type": "pitchBend",
           "data": [
@@ -169347,12 +169202,11 @@
             20,
             86
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332595.8333333333
         },
         {
-          "id": "cres_292_1772304401524_df6ieg0u6",
           "timeMs": 332595.8333333333,
           "type": "cc",
           "data": [
@@ -169360,12 +169214,11 @@
             7,
             93
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332595.8333333333
         },
         {
-          "id": "cres_292_1772304401524_ih7qlgui7",
           "timeMs": 332645.8333333333,
           "type": "pitchBend",
           "data": [
@@ -169373,12 +169226,11 @@
             76,
             87
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332645.8333333333
         },
         {
-          "id": "cres_292_1772304401524_hsgnjyufy",
           "timeMs": 332645.8333333333,
           "type": "cc",
           "data": [
@@ -169386,12 +169238,11 @@
             7,
             94
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332645.8333333333
         },
         {
-          "id": "cres_292_1772304401524_knu4ropx0",
           "timeMs": 332695.8333333333,
           "type": "pitchBend",
           "data": [
@@ -169399,12 +169250,11 @@
             101,
             88
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332695.8333333333
         },
         {
-          "id": "cres_292_1772304401524_4biwp05wz",
           "timeMs": 332695.8333333333,
           "type": "cc",
           "data": [
@@ -169412,12 +169262,11 @@
             7,
             94
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332695.8333333333
         },
         {
-          "id": "cres_292_1772304401524_wvc5e2zqg",
           "timeMs": 332745.8333333333,
           "type": "pitchBend",
           "data": [
@@ -169425,12 +169274,11 @@
             127,
             89
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332745.8333333333
         },
         {
-          "id": "cres_292_1772304401524_hd7u6om4g",
           "timeMs": 332745.8333333333,
           "type": "cc",
           "data": [
@@ -169438,12 +169286,11 @@
             7,
             94
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332745.8333333333
         },
         {
-          "id": "cres_292_1772304401524_mhk9jtvpr",
           "timeMs": 332797.9166666667,
           "type": "pitchBend",
           "data": [
@@ -169451,12 +169298,11 @@
             25,
             91
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332797.9166666667
         },
         {
-          "id": "cres_292_1772304401524_0lozopgsu",
           "timeMs": 332797.9166666667,
           "type": "cc",
           "data": [
@@ -169464,12 +169310,11 @@
             7,
             94
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332797.9166666667
         },
         {
-          "id": "cres_292_1772304401524_s90gig4nv",
           "timeMs": 332847.9166666667,
           "type": "pitchBend",
           "data": [
@@ -169477,12 +169322,11 @@
             50,
             92
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332847.9166666667
         },
         {
-          "id": "cres_292_1772304401524_vfn44d4yc",
           "timeMs": 332847.9166666667,
           "type": "cc",
           "data": [
@@ -169490,12 +169334,11 @@
             7,
             94
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332847.9166666667
         },
         {
-          "id": "cres_292_1772304401524_zxps14ef9",
           "timeMs": 332897.9166666667,
           "type": "pitchBend",
           "data": [
@@ -169503,12 +169346,11 @@
             76,
             93
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332897.9166666667
         },
         {
-          "id": "cres_292_1772304401524_aoqmy8d7s",
           "timeMs": 332897.9166666667,
           "type": "cc",
           "data": [
@@ -169516,12 +169358,11 @@
             7,
             95
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332897.9166666667
         },
         {
-          "id": "cres_292_1772304401524_8hxc9nw8k",
           "timeMs": 332950,
           "type": "pitchBend",
           "data": [
@@ -169529,12 +169370,11 @@
             101,
             94
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332950
         },
         {
-          "id": "cres_292_1772304401524_0hb5dnwfx",
           "timeMs": 332950,
           "type": "cc",
           "data": [
@@ -169542,12 +169382,11 @@
             7,
             95
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 332950
         },
         {
-          "id": "cres_292_1772304401524_kn6m60mgc",
           "timeMs": 333000,
           "type": "pitchBend",
           "data": [
@@ -169555,12 +169394,11 @@
             127,
             95
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 333000
         },
         {
-          "id": "cres_292_1772304401524_h6ylc3i9n",
           "timeMs": 333000,
           "type": "cc",
           "data": [
@@ -169568,12 +169406,11 @@
             7,
             95
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 333000
         },
         {
-          "id": "cres_292_1772304401524_kmpdw421k",
           "timeMs": 333000,
           "type": "noteOff",
           "data": [
@@ -169581,8 +169418,8 @@
             67,
             0
           ],
-          "sourceCurve": 292,
           "snippetId": 409,
+          "sourceCurve": 292,
           "timestamp": 333000
         }
       ]
@@ -527066,7 +526903,7 @@
   "connectors": [],
   "cursorState": {
     "editCursorSeconds": 314.17769068385945,
-    "gotoDisplaySeconds": 300,
+    "gotoDisplaySeconds": 332,
     "leadInSeconds": 2
   }
 }

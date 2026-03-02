@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="19.97mm" height="19.96mm" viewBox="-0.9104 0.1443 11.3655 11.3582">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0569, 4.2941)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="6.8030" y2="2.0000"/>
+</g>
+<g transform="translate(0.0569, 4.2941)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="6.8030" y2="1.0000"/>
+</g>
+<g transform="translate(0.0569, 4.2941)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="6.8030" y2="-0.0000"/>
+</g>
+<g transform="translate(0.0569, 4.2941)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="6.8030" y2="-1.0000"/>
+</g>
+<g transform="translate(0.0569, 4.2941)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="6.8030" y2="-2.0000"/>
+</g>
+<g transform="translate(0.5691, 7.2941)">
+<rect x="4.4784" y="-0.1000" width="1.5487" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 8.2941)">
+<rect x="4.4784" y="-0.1000" width="1.5487" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 7.2941)">
+<rect x="-0.2703" y="-0.1000" width="1.5487" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 8.2941)">
+<rect x="-0.1871" y="-0.1000" width="1.4656" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-Gs3-A3-f-fff.ly:79:4:5">
+<g transform="translate(0.5691, 4.2941)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="1.4168" y1="4.4467" x2="4.8356" y2="3.9867"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-Gs3-A3-f-fff.ly:105:4:5">
+<g transform="translate(5.3056, 8.2941)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-Gs3-A3-f-fff.ly:112:4:5">
+<g transform="translate(7.2056, 10.5249)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="1.0998" text-anchor="start" fill="currentColor">
+<tspan>secco</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-Gs3-A3-f-fff.ly:108:4:5">
+<g transform="translate(5.7731, 10.7220)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.4097, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.8194, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-Gs3-A3-f-fff.ly:89:4:5">
+<g transform="translate(1.5121, 10.2972)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="0.0000" x2="3.6610" y2="0.6500"/>
+</g>
+<g transform="translate(1.5121, 10.2972)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="-0.0000" x2="3.6610" y2="-0.6500"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-Gs3-A3-f-fff.ly:75:4:5">
+<g transform="translate(0.5569, 8.7941)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-Gs3-A3-f-fff.ly:94:4:5">
+<g transform="translate(0.5569, 1.7441)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="1.0998" text-anchor="start" fill="currentColor">
+<tspan>Non-Vib</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-Gs3-A3-f-fff.ly:85:4:5">
+<g transform="translate(0.8341, 10.7220)">
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(-0.4104, 8.7941)">
+<path transform="scale(0.0022, -0.0022)" d="M52 37c-5 -2 -10 -4 -16 -4c-19 0 -36 16 -36 36v41c0 14 9 28 22 33l30 13v144c0 14 11 26 25 26s26 -12 26 -26v-124l69 29v145c0 14 12 25 26 25s25 -11 25 -25v-124c5 2 10 4 16 4c19 0 36 -16 36 -36v-42c0 -14 -9 -28 -22 -33l-30 -12v-144c5 2 10 4 16 4
+c19 0 36 -16 36 -36v-41c0 -14 -9 -28 -22 -33l-30 -13v-144c0 -14 -11 -26 -25 -26s-26 12 -26 26v124l-69 -29v-145c0 -14 -12 -25 -26 -25s-25 11 -25 25v124c-5 -2 -10 -4 -16 -4c-19 0 -36 16 -36 36v42c0 14 9 28 22 33l30 12v144zM172 86l-69 -28v-144l69 28v144z
+" fill="currentColor"/>
+</g>
+</svg>

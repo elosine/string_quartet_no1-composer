@@ -460,7 +460,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Feb 25, 2026 | c873292 | CD bundle system complete: bundle dedup, delete dual-lookup, MIDI regen fixes, documentation (ASB-106/107) |
 | Feb 25, 2026 | — | BP + PT + PTG bundle systems (ASB-109/110/111) |
 | Feb 28, 2026 | 4aee777 | volume mode, hairpin/secco, pie dial, sequence generator tool + docs (ASB-111 to ASB-116) |
-| Feb 28, 2026 | — | bundle manager tool, sequence generator presets + bug fixes (ASB-117 to ASB-118) |
+| Feb 28, 2026 | 1ede3f3 | bundle manager tool, sequence generator presets + bug fixes (ASB-117 to ASB-118) |
 
 ---
 

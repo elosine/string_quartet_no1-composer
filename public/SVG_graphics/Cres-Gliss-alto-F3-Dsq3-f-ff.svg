@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="13.71mm" height="21.11mm" viewBox="-0.4431 0.1443 7.8030 12.0123">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0569, 6.2127)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="6.8030" y2="2.0000"/>
+</g>
+<g transform="translate(0.0569, 6.2127)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="6.8030" y2="1.0000"/>
+</g>
+<g transform="translate(0.0569, 6.2127)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="6.8030" y2="-0.0000"/>
+</g>
+<g transform="translate(0.0569, 6.2127)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="6.8030" y2="-1.0000"/>
+</g>
+<g transform="translate(0.0569, 6.2127)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="6.8030" y2="-2.0000"/>
+</g>
+<g transform="translate(0.5691, 9.2127)">
+<rect x="4.5615" y="-0.1000" width="1.4656" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Dsq3-f-ff.ly:105:4:5">
+<g transform="translate(5.3056, 9.2127)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Dsq3-f-ff.ly:79:4:5">
+<g transform="translate(0.5691, 6.2127)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="1.3911" y1="2.1502" x2="3.5813" y2="3.0375"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Dsq3-f-ff.ly:108:4:5">
+<g transform="translate(5.9780, 11.3761)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.4097, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<g transform="translate(4.3576, 9.2127)">
+<path transform="scale(0.0022, -0.0022)" d="M200 -343c-14 0 -25 11 -25 25v122l-62 -18v-136c0 -14 -11 -25 -25 -25s-26 11 -26 25v122l-17 -5c-3 -1 -6 -1 -9 -1c-19 0 -36 16 -36 36v41c0 16 11 30 26 34l36 11v147l-17 -5c-3 -1 -6 -2 -9 -2c-19 0 -36 16 -36 36v42c0 16 11 30 26 34l36 10v136
+c0 14 12 26 26 26s25 -12 25 -26v-122l62 18v136c0 14 11 25 25 25s25 -11 25 -25v-122l62 18v136c0 14 12 25 26 25s25 -11 25 -25v-122l17 5c3 1 6 1 9 1c19 0 36 -16 36 -36v-41c0 -16 -11 -30 -26 -34l-36 -11v-147l17 5c3 1 6 2 9 2c19 0 36 -16 36 -36v-42
+c0 -16 -11 -30 -26 -34l-36 -10v-136c0 -14 -11 -26 -25 -26s-26 12 -26 26v122l-62 -18v-136c0 -14 -11 -25 -25 -25zM113 49v-147l62 17v147zM287 98l-62 -17v-147l62 17v147z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Dsq3-f-ff.ly:89:4:5">
+<g transform="translate(1.5121, 10.9514)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="0.0000" x2="3.8658" y2="0.6500"/>
+</g>
+<g transform="translate(1.5121, 10.9514)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="-0.0000" x2="3.8658" y2="-0.6500"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Dsq3-f-ff.ly:75:4:5">
+<g transform="translate(0.5569, 8.2127)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Dsq3-f-ff.ly:94:4:5">
+<g transform="translate(0.5569, 1.7441)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="1.0998" text-anchor="start" fill="currentColor">
+<tspan>Non-Vib</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Dsq3-f-ff.ly:85:4:5">
+<g transform="translate(0.8341, 11.3761)">
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</a>
+</svg>
