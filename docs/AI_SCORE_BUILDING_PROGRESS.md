@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 2, 2026  
-**Current ASB Number:** ASB-126
+**Current ASB Number:** ASB-127
 
 ---
 
@@ -133,17 +133,17 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-124/125/126: LilyPond dynamic/articulation controls + MultiSelect bug fixes.** Added independent piano dynamic controls (fontsize + X/Y) to Two-Handed Pizzicato Clusters.ly. Added independent down-bow positioning (\overlay markup fix), NoteColumn X-offset, staff lines removed to short_accented_overpressure.ly. Fixed MultiSelect: Shift+Click overlap (ObjectSelector menu), stale highlights (DOM fallback), hit test !0 bug (null check).
+> **ASB-124–127: LilyPond notation controls + MultiSelect/ObjectSelector fixes + GC grouping support.** Independent piano dynamic controls (Two-Handed Pizzicato Clusters). Independent down-bow positioning + NoteColumn X-offset + staff lines removed (short_accented_overpressure). MultiSelect bug fixes (Shift+Click overlap, stale highlights, hit test !0). GC support in Transient Grouping System (hit test data fix, typeMap, ObjectRegistry adapter).
 
 ---
 
 ## Current Session
 
 **Date:** Mar 2, 2026  
-**Focus:** LilyPond notation adjustments + MultiSelect bug fixes  
-**ASB:** ASB-126  
-**Tier 1 Count This Session:** 3 (ASB-124, ASB-125, ASB-126)  
-**Tier 2 Threshold:** At 3 — committing now
+**Focus:** LilyPond notation adjustments + MultiSelect bug fixes + GC grouping support  
+**ASB:** ASB-127  
+**Tier 1 Count This Session:** 4 (ASB-124, ASB-125, ASB-126, ASB-127)  
+**Tier 2 Threshold:** At 4 — committed
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -478,6 +478,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-124 | Two-Handed Pizzicato Clusters — independent piano dynamic controls (fontsize + X/Y for each \p, -\tweak outside-staff-priority + font-size + extra-offset) | Complete |
 | ASB-125 | Short Accented Overpressure — independent down-bow positioning (\overlay fix), NoteColumn X-offset, staff lines removed | Complete |
 | ASB-126 | MultiSelect/ObjectSelector bug fixes — Shift+Click overlap menu, stale highlight DOM fallback, hit test !0→null check | Complete |
+| ASB-127 | GC support in Transient Grouping System — hit test data fix (x1/x2/trackDims in renderGC), typeMap entries, ObjectRegistry adapter (setTime/setTrack/delete/clone/getBounds) | Complete |
 
 ---
 
@@ -510,6 +511,8 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Feb 28, 2026 | 4aee777 | volume mode, hairpin/secco, pie dial, sequence generator tool + docs (ASB-111 to ASB-116) |
 | Feb 28, 2026 | 1ede3f3 | bundle manager tool, sequence generator presets + bug fixes (ASB-117 to ASB-118) |
 | Mar 1, 2026 | — | line-wedge maker: database, panel, JS object, meter, integration hooks (ASB-119) |
+| Mar 2, 2026 | d6c84c9 | LilyPond notation controls + MultiSelect bug fixes (ASB-124/125/126) |
+| Mar 2, 2026 | e63eaae | GC grouping support + LilyPond notation controls + MultiSelect fixes (ASB-124-127) |
 
 ---
 

@@ -27507,6 +27507,9 @@
                 gc.trackBottom = trackBottom;
                 gc.staffHeight = staffHeight;
                 gc.timeScale = timeScale;
+                gc.x1 = minX;
+                gc.x2 = maxX;
+                gc.trackDims = { y: trackY, height: staffHeight };
             },
             
             // Calculate ball position at current time using trajectory data
@@ -30836,7 +30839,7 @@
                 this.menuEl.innerHTML = html;
                 
                 // Add click handlers
-                const typeMap = { 'Curve': 'Curve', 'LineWedge': 'LineWedge', 'SVG': 'SVG', 'Motive': 'Motive' };
+                const typeMap = { 'Curve': 'Curve', 'LineWedge': 'LineWedge', 'SVG': 'SVG', 'Motive': 'Motive', 'GC': 'GC' };
                 this.menuEl.querySelectorAll('.obj-selector-item').forEach((item, idx) => {
                     item.addEventListener('click', () => {
                         if (msMode && typeMap[objects[idx].type]) {
@@ -31066,6 +31069,60 @@
             }
         });
         
+        ObjectRegistry.register('GC', {
+            getAll: () => GCMaker.gcs,
+            getPosition: (gc) => ({ startSeconds: gc.startSeconds, endSeconds: gc.endSeconds, track: gc.gTrack }),
+            setTime: (gc, start, end) => {
+                const delta = start - gc.startSeconds;
+                gc.startSeconds = start;
+                gc.endSeconds = end;
+                gc.impactSeconds = (gc.impactSeconds || 0) + delta;
+                GCMaker.rerenderAllGCs();
+            },
+            setTrack: (gc, newTrack) => {
+                gc.gTrack = newTrack;
+                GCMaker.rerenderAllGCs();
+            },
+            delete: (gc) => {
+                if (gc.elements) {
+                    if (gc.elements.group) gc.elements.group.remove();
+                    if (gc.elements.continuationGroupTop) gc.elements.continuationGroupTop.remove();
+                    if (gc.elements.continuationGroupBottom) gc.elements.continuationGroupBottom.remove();
+                }
+                const index = GCMaker.gcs.indexOf(gc);
+                if (index > -1) GCMaker.gcs.splice(index, 1);
+                if (GCMaker.selectedGC === gc) GCMaker.selectedGC = null;
+            },
+            clone: (gc) => {
+                // Set UI inputs to match source GC, then create
+                if (GCMaker.impactInput) GCMaker.impactInput.value = gc.impactSeconds;
+                if (GCMaker.trackSelect) GCMaker.trackSelect.value = gc.gTrack;
+                GCMaker.stiffness = gc.stiffness;
+                GCMaker.damping = gc.damping;
+                GCMaker.ictus = gc.ictus;
+                GCMaker.descentRatio = gc.descentRatio;
+                GCMaker.duration = gc.duration;
+                GCMaker.createGC();
+                const newGC = GCMaker.gcs[GCMaker.gcs.length - 1];
+                if (newGC) {
+                    newGC.color = gc.color;
+                    GCMaker.deselectGC();
+                }
+                return newGC || null;
+            },
+            select: (gc) => GCMaker.selectGC(gc),
+            deselect: () => GCMaker.deselectGC(),
+            getElement: (gc) => gc.elements ? gc.elements.group : null,
+            getBounds: (gc) => {
+                if (gc.x1 == null || gc.x2 == null || !gc.trackDims) return null;
+                return {
+                    x: gc.x1, y: gc.trackDims.y,
+                    width: gc.x2 - gc.x1, height: gc.trackDims.height,
+                    section: gc.section, page: gc.page
+                };
+            }
+        });
+        
         ObjectRegistry.register('Motive', {
             getAll: () => MotiveMaker.motives,
             getPosition: (m) => ({ startSeconds: m.startSeconds, endSeconds: m.endSeconds, track: m.gTrack }),
@@ -31192,7 +31249,7 @@
                     const topObj = objects[0];
                     
                     // Map ObjectSelector type names to registry system names
-                    const typeMap = { 'Curve': 'Curve', 'LineWedge': 'LineWedge', 'SVG': 'SVG', 'Motive': 'Motive' };
+                    const typeMap = { 'Curve': 'Curve', 'LineWedge': 'LineWedge', 'SVG': 'SVG', 'Motive': 'Motive', 'GC': 'GC' };
                     const systemName = typeMap[topObj.type];
                     if (!systemName) return;
                     
