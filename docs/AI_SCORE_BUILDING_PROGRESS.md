@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 2, 2026  
-**Current ASB Number:** ASB-127
+**Last Updated:** Mar 5, 2026  
+**Current ASB Number:** ASB-129
 
 ---
 
@@ -43,6 +43,7 @@ That's it. Everything else below is for Cascade.
 | Workflow | Status | Next Step |
 |----------|--------|-----------|
 | Bartók Pizzicato | Complete (Pattern 4 — AI Direct) | Maintenance only |
+| Bow Overpressure | **Intermediary** | MIDI model complete (CC0=53, random pitch, quarter-tone bend). No SVG, no bundle, no server pipeline yet. Pitch model TBD. See ASB-128 |
 | Glissando System | Complete | Maintenance only |
 | Vibrato System | **Bundle Complete** | Bundle system (curve-based, like CD/PTG). MIDI ch fix, params regen, CurveMaker hooks, ScoreManager persistence. See ASB-112 |
 | Crescendo-Decrescendo | **Volume Mode added** | ASB-112: Curve/Steady/Linear CC7 modes. Maintenance otherwise |
@@ -116,6 +117,7 @@ Four tracks (instruments) × three channel banks = 12 channels total. Each bank 
 | System | Channel Bank | Formula | Justification |
 |--------|-------------|---------|---------------|
 | Bartók Pizzicato | Base (0–3) | `track - 1` | Discrete single notes, CC0=97 only |
+| Bow Overpressure | Base (0–3) | `track - 1` | Discrete single notes, CC0=53, pitch bend for quarter tones |
 | Pizzicato Tremolo | Volume (8–11) | `track + 7` | Uses CC7 volume ramp for cres/decres/hp shapes |
 | Pizz Trem Glissando | Base (0–3) | `track - 1` | Pitch bend + per-note velocity only, no CC7 |
 | Long Tone / Glissando | Volume (8–11) | `track + 7` | Uses CC7 for dynamics |
@@ -139,11 +141,11 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Current Session
 
-**Date:** Mar 2, 2026  
-**Focus:** LilyPond notation adjustments + MultiSelect bug fixes + GC grouping support  
-**ASB:** ASB-127  
-**Tier 1 Count This Session:** 4 (ASB-124, ASB-125, ASB-126, ASB-127)  
-**Tier 2 Threshold:** At 4 — committed
+**Date:** Mar 4, 2026  
+**Focus:** Bow Overpressure MIDI model + Sustained Tone quarter-tone fix  
+**ASB:** ASB-129  
+**Tier 1 Count This Session:** 2 (ASB-128, ASB-129)  
+**Tier 2 Threshold:** 2 of 3-4
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -479,6 +481,8 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-125 | Short Accented Overpressure — independent down-bow positioning (\overlay fix), NoteColumn X-offset, staff lines removed | Complete |
 | ASB-126 | MultiSelect/ObjectSelector bug fixes — Shift+Click overlap menu, stale highlight DOM fallback, hit test !0→null check | Complete |
 | ASB-127 | GC support in Transient Grouping System — hit test data fix (x1/x2/trackDims in renderGC), typeMap entries, ObjectRegistry adapter (setTime/setTrack/delete/clone/getBounds) | Complete |
+| ASB-128 | Bow Overpressure MIDI Model — MidiModelSystem model def (CC0=53, randomPitch, pitchRanges), dropdown option, generateRandomPitch + pitchToNoteNameWithQuarter helpers, attachToSelectedGC (random pitch + quarter-tone pitch bend), previewPlay (random pitch + bend), onModelSelect/updatePitchModeUI/updateInfo (hide pitch input, show random info) | Complete (intermediary) |
+| ASB-129 | Sustained Tone quarter-tone pitch bend fix — single pitch mode in CrescendoUI.generateCrescendoMidi() was ignoring quarterTone offset (hardcoded startBend=8192). Fixed: calculate bend from quarterToneOffset * 8192 (±1 semitone range). Added pitch bend reset to center after note off. Key insight: PITCH_BEND_RANGE=2 is segment threshold, not synth range. | Complete |
 
 ---
 
@@ -512,7 +516,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Feb 28, 2026 | 1ede3f3 | bundle manager tool, sequence generator presets + bug fixes (ASB-117 to ASB-118) |
 | Mar 1, 2026 | — | line-wedge maker: database, panel, JS object, meter, integration hooks (ASB-119) |
 | Mar 2, 2026 | d6c84c9 | LilyPond notation controls + MultiSelect bug fixes (ASB-124/125/126) |
-| Mar 2, 2026 | e63eaae | GC grouping support + LilyPond notation controls + MultiSelect fixes (ASB-124-127) |
+| Mar 2, 2026 | 555a212 | GC grouping support + LilyPond notation controls + MultiSelect fixes (ASB-124-127) |
 
 ---
 

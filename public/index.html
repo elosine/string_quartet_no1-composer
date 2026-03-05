@@ -1763,6 +1763,7 @@
                     <select id="midiModelSelect" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
                         <option value="">-- Select Model --</option>
                         <option value="bartokPizz">Bartok Pizzicato</option>
+                        <option value="bowOverpressure">Bow Overpressure</option>
                         <option value="accelDecel">Accel/Decel (Curve)</option>
                         <option value="crescDecresc">Crescendo/Decrescendo</option>
                         <option value="longTone">Long Tone</option>
@@ -10538,6 +10539,23 @@
                     tempo: 763307,              // Microseconds per quarter note (~78.6 BPM)
                     description: 'Bartok pizzicato snap articulation'
                 },
+                bowOverpressure: {
+                    name: 'Bow Overpressure',
+                    type: 'single',             // Single note articulation (random pitch)
+                    cc0: 53,                    // Bank select value for bow overpressure
+                    defaultVelocity: 127,       // Default velocity
+                    durationTicks: 240,         // Note duration in ticks (same as bartok pizz)
+                    ticksPerQuarter: 1920,      // From original file
+                    tempo: 763307,              // Microseconds per quarter note (~78.6 BPM)
+                    randomPitch: true,          // Pitch is randomly selected per track range
+                    pitchRanges: {              // MIDI note ranges per track (including quarter tones)
+                        1: { low: 55, high: 89 },  // G3–F6
+                        2: { low: 55, high: 89 },  // G3–F6
+                        3: { low: 48, high: 83 },  // C3–B5
+                        4: { low: 36, high: 71 }   // C2–B4
+                    },
+                    description: 'Bow overpressure articulation (random pitch per track range)'
+                },
                 accelDecel: {
                     name: 'Accel/Decel (Curve)',
                     type: 'curve',              // Curve-based articulation pattern
@@ -10853,12 +10871,6 @@
                     return;
                 }
                 
-                const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
-                if (pitch === null) {
-                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
-                    return;
-                }
-                
                 const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 127));
                 const model = this.selectedModel;
                 
@@ -10872,10 +10884,45 @@
                     return;
                 }
                 
-                // Single note models (Bartok Pizz, etc.)
+                // Determine pitch — random for randomPitch models, UI input otherwise
+                let pitch, quarterToneOffset = 0, pitchDisplayName;
+                if (model.randomPitch) {
+                    // For preview, use track 1 range as default (no GC selected)
+                    const previewTrack = 1;
+                    const randomResult = this.generateRandomPitch(previewTrack);
+                    if (!randomResult) {
+                        alert('No pitch range defined for preview.');
+                        return;
+                    }
+                    pitch = randomResult.pitch;
+                    quarterToneOffset = randomResult.quarterTone;
+                    pitchDisplayName = randomResult.displayName;
+                } else {
+                    pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
+                    if (pitch === null) {
+                        alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                        return;
+                    }
+                    pitchDisplayName = this.pitchToNoteName(pitch);
+                }
+                
+                // Single note models (Bartok Pizz, Bow Overpressure, etc.)
                 // Calculate duration
                 const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
                 const durationMs = model.durationTicks * msPerTick;
+                
+                // Quarter-tone pitch bend
+                const needsBend = quarterToneOffset !== 0;
+                const bendValue = quarterToneOffset > 0 ? 12288 : quarterToneOffset < 0 ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
+                
+                // Send pitch bend before note (if quarter-tone)
+                if (needsBend) {
+                    for (let ch = 0; ch < 16; ch++) {
+                        this.selectedOutput.send([0xE0 | ch, bendLSB, bendMSB]);
+                    }
+                }
                 
                 // Send CC0 (Bank Select) on all channels (omni)
                 for (let ch = 0; ch < 16; ch++) {
@@ -10892,14 +10939,20 @@
                     this.selectedOutput.send([0x90 | ch, pitch, velocity]);
                 }
                 
-                // Schedule Note Off after duration
+                // Schedule Note Off after duration + reset pitch bend
                 setTimeout(() => {
                     for (let ch = 0; ch < 16; ch++) {
                         this.selectedOutput.send([0x80 | ch, pitch, 0]);
                     }
+                    // Reset pitch bend to center after note off
+                    if (needsBend) {
+                        for (let ch = 0; ch < 16; ch++) {
+                            this.selectedOutput.send([0xE0 | ch, 0x00, 0x40]);
+                        }
+                    }
                 }, durationMs);
                 
-                console.debug(`Preview: ${this.pitchToNoteName(pitch)} vel=${velocity} dur=${durationMs.toFixed(0)}ms`);
+                console.debug(`Preview: ${pitchDisplayName} vel=${velocity} dur=${durationMs.toFixed(0)}ms${needsBend ? ' (quarter-tone bend)' : ''}`);
             },
             
             // Preview play for Accel/Decel - plays all events omni
@@ -10979,7 +11032,9 @@
                 const isAccelDecel = modelKey === 'accelDecel';
                 const isCrescDecresc = modelKey === 'crescDecresc';
                 const isBartokPizz = modelKey === 'bartokPizz';
+                const isBowOverpressure = modelKey === 'bowOverpressure';
                 const isLongTone = modelKey === 'longTone';
+                const isSingleNote = isBartokPizz || isBowOverpressure;
                 const isCurveBased = isAccelDecel || isCrescDecresc;
                 
                 // Long Tone: hide shared params, show Long Tone specific UI
@@ -11017,8 +11072,12 @@
                 if (this.crescDecrescParamsDiv) {
                     this.crescDecrescParamsDiv.style.display = isCrescDecresc ? 'block' : 'none';
                 }
+                // Hide pitch input for random-pitch models (bow overpressure)
+                if (this.singlePitchRow) {
+                    this.singlePitchRow.style.display = isBowOverpressure ? 'none' : (this.pitchMode === 'glissando' && isCurveBased ? 'none' : 'flex');
+                }
                 if (this.attachGCBtn) {
-                    this.attachGCBtn.style.display = isBartokPizz ? 'block' : 'none';
+                    this.attachGCBtn.style.display = isSingleNote ? 'block' : 'none';
                 }
                 if (this.attachCurveBtn) {
                     this.attachCurveBtn.style.display = isCurveBased ? 'block' : 'none';
@@ -11516,10 +11575,12 @@
             // Update pitch mode UI - show single pitch or glissando inputs
             updatePitchModeUI() {
                 const isCurveBased = this.selectedModelKey === 'accelDecel' || this.selectedModelKey === 'crescDecresc';
+                const isRandomPitch = this.selectedModel && this.selectedModel.randomPitch;
                 // For non-curve-based models (like Bartok Pizz), always show single pitch
+                // For random-pitch models (like Bow Overpressure), always hide single pitch
                 const isGlissando = isCurveBased && this.pitchMode === 'glissando';
                 if (this.singlePitchRow) {
-                    this.singlePitchRow.style.display = isGlissando ? 'none' : 'flex';
+                    this.singlePitchRow.style.display = (isGlissando || isRandomPitch) ? 'none' : 'flex';
                 }
                 if (this.glissandoParamsDiv) {
                     this.glissandoParamsDiv.style.display = isGlissando ? 'block' : 'none';
@@ -12221,10 +12282,31 @@
                 return noteName + suffix + octave;
             },
             
+            // Generate random pitch (with quarter tones) for models with randomPitch flag
+            // Returns { pitch: MIDI note number, quarterTone: -0.5 | 0 | +0.5, displayName: string }
+            generateRandomPitch(trackNum) {
+                const model = this.selectedModel;
+                if (!model || !model.randomPitch || !model.pitchRanges) return null;
+                
+                const range = model.pitchRanges[trackNum];
+                if (!range) return null;
+                
+                // Total quarter-tone steps in range: (high - low) * 2 + 1
+                // e.g. G3(55) to F6(89) = 34 semitones = 69 quarter-tone steps
+                const quarterToneSteps = (range.high - range.low) * 2;
+                const randomStep = Math.floor(Math.random() * (quarterToneSteps + 1));
+                
+                // Convert quarter-tone step to MIDI note + quarter-tone offset
+                const midiNote = range.low + Math.floor(randomStep / 2);
+                const quarterTone = (randomStep % 2 === 1) ? 0.5 : 0; // odd steps = quarter sharp
+                
+                const displayName = this.pitchToNoteNameWithQuarter(midiNote, quarterTone);
+                return { pitch: midiNote, quarterTone, displayName };
+            },
+            
             updateInfo() {
                 if (!this.selectedModel || !this.infoDisplay) return;
                 
-                const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
                 const velocity = parseInt(this.velocityInput?.value) || 127;
                 const model = this.selectedModel;
                 
@@ -12232,7 +12314,13 @@
                 const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
                 const durationMs = model.durationTicks * msPerTick;
                 
-                const pitchDisplay = pitch !== null ? this.pitchToNoteName(pitch) : '(invalid)';
+                let pitchDisplay;
+                if (model.randomPitch) {
+                    pitchDisplay = 'Random (per track range)';
+                } else {
+                    const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
+                    pitchDisplay = pitch !== null ? this.pitchToNoteName(pitch) : '(invalid)';
+                }
                 
                 this.infoDisplay.innerHTML = `
                     <div style="color: #adf;"><strong>${model.name}</strong></div>
@@ -12316,15 +12404,34 @@
                     return;
                 }
                 
-                const pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
-                if (pitch === null) {
-                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
-                    return;
-                }
-                
                 const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 127));
                 const model = this.selectedModel;
                 const gc = GCMaker.selectedGC;
+                
+                // Get the track index from GC's gTrack (1-4 -> 0-3)
+                const trackIndex = parseInt(gc.gTrack) - 1;
+                const trackNum = trackIndex + 1;
+                const channel = trackIndex; // MIDI channel 0-3 for tracks 1-4
+                
+                // Determine pitch — random for randomPitch models, UI input otherwise
+                let pitch, quarterToneOffset = 0, pitchDisplayName;
+                if (model.randomPitch) {
+                    const randomResult = this.generateRandomPitch(trackNum);
+                    if (!randomResult) {
+                        alert(`No pitch range defined for track ${trackNum}.`);
+                        return;
+                    }
+                    pitch = randomResult.pitch;
+                    quarterToneOffset = randomResult.quarterTone;
+                    pitchDisplayName = randomResult.displayName;
+                } else {
+                    pitch = this.noteNameToPitch(this.pitchInput?.value || 'C4');
+                    if (pitch === null) {
+                        alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                        return;
+                    }
+                    pitchDisplayName = this.pitchToNoteName(pitch);
+                }
                 
                 // Calculate duration
                 const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
@@ -12335,13 +12442,28 @@
                 const impactSeconds = gc.impactSeconds;
                 const impactMs = impactSeconds * 1000;
                 
-                // Get the track index from GC's gTrack (1-4 -> 0-3)
-                const trackIndex = parseInt(gc.gTrack) - 1;
-                const channel = trackIndex; // MIDI channel 0-3 for tracks 1-4
+                // Quarter-tone pitch bend (±1 semitone range, 8192 per semitone)
+                // Quarter sharp (+0.5): bend = 12288, Quarter flat (-0.5): bend = 4096, None: 8192 (center)
+                const needsBend = quarterToneOffset !== 0;
+                const bendValue = quarterToneOffset > 0 ? 12288 : quarterToneOffset < 0 ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
                 
                 // Create MIDI events with absolute times and proper channel
                 // Channel is embedded in the status byte (lower 4 bits)
-                const snippetEvents = [
+                const snippetEvents = [];
+                
+                // Pitch bend before note (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: impactMs,
+                        relativeTimeMs: 0,
+                        type: 0xE0,
+                        data: [0xE0 | channel, bendLSB, bendMSB]
+                    });
+                }
+                
+                snippetEvents.push(
                     { 
                         timeMs: impactMs, 
                         relativeTimeMs: 0,
@@ -12360,7 +12482,17 @@
                         type: 'noteOff', 
                         data: [0x80 | channel, pitch, 0] 
                     }
-                ];
+                );
+                
+                // Reset pitch bend after note off (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: impactMs + durationMs,
+                        relativeTimeMs: durationMs,
+                        type: 0xE0,
+                        data: [0xE0 | channel, 0x00, 0x40] // bend = 8192 (center)
+                    });
+                }
                 
                 // Remove any previous snippet from MidiSnippetDatabase for this GC
                 if (gc.midiSnippetId && window.MidiSnippetDatabase) {
@@ -12422,20 +12554,21 @@
                 gc.midiSnippet = {
                     modelName: model.name,
                     pitch: pitch,
-                    pitchName: this.pitchToNoteName(pitch),
+                    pitchName: pitchDisplayName,
+                    quarterTone: quarterToneOffset,
                     velocity: velocity,
                     cc0: model.cc0,
                     durationMs: durationMs,
                     impactSeconds: impactSeconds
                 };
                 
-                console.debug(`MIDI snippet attached to GC "${gc.name}" at impact ${impactSeconds}s on track ${trackIndex + 1}:`, gc.midiSnippet);
+                console.debug(`MIDI snippet attached to GC "${gc.name}" at impact ${impactSeconds}s on track ${trackNum}:`, gc.midiSnippet);
                 
                 // Update info display
                 if (this.infoDisplay) {
                     this.infoDisplay.innerHTML = `
                         <div style="color: #adf;"><strong>${model.name}</strong></div>
-                        <div>Pitch: ${this.pitchToNoteName(pitch)} | Vel: ${velocity} | Track: ${trackIndex + 1}</div>
+                        <div>Pitch: ${pitchDisplayName} | Vel: ${velocity} | Track: ${trackNum}</div>
                         <div style="color: #8f8; margin-top: 4px;">✓ Attached to GC "${gc.name}" at ${impactSeconds.toFixed(2)}s</div>
                     `;
                 }
@@ -21230,6 +21363,10 @@
                         return null;
                     }
                     const midiNote = pitchObj.pitch;
+                    const quarterToneOffset = pitchObj.quarterTone || 0;
+                    const singlePitchBend = quarterToneOffset !== 0
+                        ? Math.round(8192 + (quarterToneOffset * 8192))
+                        : 8192;
                     
                     segments.push({
                         index: 0,
@@ -21237,8 +21374,8 @@
                         endTime: curve.endSeconds,
                         duration: duration,
                         midiNote: midiNote,
-                        startBend: 8192, // center (no bend)
-                        endBend: 8192,
+                        startBend: singlePitchBend,
+                        endBend: singlePitchBend,
                         pitchBendSamples: [],
                         cc0Value: articulationValue,
                         velocity: velocity,
@@ -21361,6 +21498,12 @@
                     const noteOffDelta = Math.max(0, endTick - prevTick);
                     trackEvents.push(...writeVarInt(noteOffDelta));
                     trackEvents.push(0x80 | midiChannel, seg.midiNote, 0);
+                    
+                    // Reset pitch bend to center after note off (prevents stale quarter-tone bend)
+                    if (seg.startBend !== 8192 || seg.endBend !== 8192) {
+                        trackEvents.push(...writeVarInt(0));
+                        trackEvents.push(0xE0 | midiChannel, 0x00, 0x40); // 8192 = center
+                    }
                     
                     // Secco: CC7 ramp-down after last segment's note-off
                     // Wait 5ms, then ramp CC7 to 0 over 10ms (3 steps)
