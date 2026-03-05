@@ -135,7 +135,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-124–127: LilyPond notation controls + MultiSelect/ObjectSelector fixes + GC grouping support.** Independent piano dynamic controls (Two-Handed Pizzicato Clusters). Independent down-bow positioning + NoteColumn X-offset + staff lines removed (short_accented_overpressure). MultiSelect bug fixes (Shift+Click overlap, stale highlights, hit test !0). GC support in Transient Grouping System (hit test data fix, typeMap, ObjectRegistry adapter).
+> **ASB-128–129 + v1.0-composition milestone.** Bow Overpressure MIDI model (CC0=53, random pitch, quarter-tone pitch bend). Sustained Tone quarter-tone pitch bend fix (single pitch mode was ignoring quarterTone offset). Composition phase milestone tagged `v1.0-composition` — 129 ASB increments, 434 score versions.
 
 ---
 
@@ -517,6 +517,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Mar 1, 2026 | — | line-wedge maker: database, panel, JS object, meter, integration hooks (ASB-119) |
 | Mar 2, 2026 | d6c84c9 | LilyPond notation controls + MultiSelect bug fixes (ASB-124/125/126) |
 | Mar 2, 2026 | 555a212 | GC grouping support + LilyPond notation controls + MultiSelect fixes (ASB-124-127) |
+| Mar 5, 2026 | 2b68ff4 | Bow Overpressure MIDI model + Sustained Tone quarter-tone pitch bend fix (ASB-128-129) |
 
 ---
 
@@ -528,6 +529,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Feb 15, 2026 | `milestone-glissando-ui-prompt-good` | Glissando System UI Prompt Good. Caveat: SVG notation manual reposition may vary with different size SVGs |
 | Feb 15, 2026 | `milestone-ai-prompt-validated-copy-paste` | AI prompt tested with validation checklist + copy-paste workflow clarified |
 | Feb 19, 2026 | `beating-section-complete` | Beating section composition complete (scores 233–255), SVG page-boundary clamp fix (ASB-063) |
+| Mar 5, 2026 | `v1.0-composition` | **String Quartet No. 1 — Composition Phase Complete.** 129 ASB increments, 434 score versions, full composer toolkit: GC system, curve/motive rendering, notation fragment pipeline, sustained tone system, vibrato system, bartók pizz/bow overpressure/pizz tremolo models, line-wedge maker, bundle system, sequence generator, multi-select/grouping. Marks the end of the initial composition phase and beginning of revision. |
 
 ---
 
