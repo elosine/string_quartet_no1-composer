@@ -1027,7 +1027,8 @@
                     <label style="font-size: 9px; min-width: 28px; color: var(--clr-brightRed);">Start</label>
                     <span id="vibBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
                     <button id="vibRegenMidiBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; display: none;">Regen MIDI</button>
-                    <button id="vibDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                    <button id="vibReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
+                    <button id="vibDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1118,8 +1119,9 @@
                 </div>
                 <div class="curve-input-row">
                     <label style="font-size: 9px; min-width: 28px;">Vol</label>
-                    <select id="cdVolumeMode" style="width: 80px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;" title="Volume mode: how CC7 volume behaves">
+                    <select id="cdVolumeMode" style="width: 100px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;" title="Volume mode: how CC7 volume behaves">
                         <option value="curve" selected>Curve</option>
+                        <option value="inverseCurve">Inv. Curve</option>
                         <option value="steady">Steady</option>
                         <option value="linear">Linear</option>
                     </select>
@@ -1158,11 +1160,39 @@
                     <button id="cdStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
                     <button id="cdStep2Btn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 8px;">2: Generate</button>
                 </div>
+                <div id="cdCurveAdjustSection" style="display: none; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 4px;">
+                    <div style="font-size: 9px; color: #f90; font-weight: bold; margin-bottom: 3px;">Curve Adjust</div>
+                    <div class="curve-input-row" style="margin-bottom: 2px;">
+                        <label style="font-size: 9px; min-width: 28px;">Start</label>
+                        <input type="text" id="cdAdjStart" class="curve-input" value="0.000" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                        <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">End</label>
+                        <input type="text" id="cdAdjEnd" class="curve-input" value="1.000" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    </div>
+                    <div class="curve-input-row" style="margin-bottom: 2px;">
+                        <label style="font-size: 9px; min-width: 28px;">Y1</label>
+                        <input type="text" id="cdAdjY1" class="curve-input" value="0.0" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                        <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">Y2</label>
+                        <input type="text" id="cdAdjY2" class="curve-input" value="10.0" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    </div>
+                    <div class="curve-input-row" style="margin-bottom: 2px; gap: 2px;">
+                        <label style="font-size: 8px; min-width: 14px;">Md</label>
+                        <select id="cdAdjModel" style="font-size: 8px; padding: 1px 2px; background: #333; color: #fff; border: 1px solid #555; width: 52px;">
+                            <option value="logarithmic">Log</option>
+                            <option value="exponential">Exp</option>
+                            <option value="power">Power</option>
+                            <option value="sigmoid">S-Curve</option>
+                            <option value="bezier">Bezier</option>
+                        </select>
+                        <label style="font-size: 8px; min-width: 14px; margin-left: 2px;">Slp</label>
+                        <input type="number" id="cdAdjSlope" class="curve-input" value="-0.65" step="0.05" min="-3" max="3" style="width: 48px; font-size: 8px; padding: 1px 2px;">
+                    </div>
+                </div>
                 <div id="cdBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
                     <label style="font-size: 9px; min-width: 28px; color: var(--clr-darkRed);">Start</label>
                     <span id="cdBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
                     <button id="cdRegenMidiBtn" class="control-btn" style="font-size: 9px; background: var(--clr-limeGreen); color: #000; padding: 2px 8px; display: none;">Regen MIDI</button>
-                    <button id="cdDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                    <button id="cdReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
+                    <button id="cdDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1204,7 +1234,8 @@
                 <div id="bpBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
                     <label style="font-size: 9px; min-width: 28px; color: var(--clr-neonMagenta);">Impact</label>
                     <span id="bpBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
-                    <button id="bpDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                    <button id="bpReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
+                    <button id="bpDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1271,7 +1302,8 @@
                 <div id="nfBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
                     <label style="font-size: 9px; min-width: 28px; color: var(--clr-neonMagenta);">Impact</label>
                     <span id="nfBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
-                    <button id="nfDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                    <button id="nfReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
+                    <button id="nfDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1331,7 +1363,8 @@
                 <div id="ptBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
                     <label style="font-size: 9px; min-width: 28px; color: var(--clr-brightBlue);">Start</label>
                     <span id="ptBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
-                    <button id="ptDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                    <button id="ptReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
+                    <button id="ptDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1430,7 +1463,8 @@
                     <label style="font-size: 9px; min-width: 28px; color: #2a8a8a;">Start</label>
                     <span id="ptgBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
                     <button id="ptgRegenMidiBtn" class="control-btn" style="font-size: 9px; background: #2a8a8a; color: #fff; padding: 2px 8px; display: none;">Regen MIDI</button>
-                    <button id="ptgDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
+                    <button id="ptgReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
+                    <button id="ptgDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1754,6 +1788,38 @@
                 <button id="lwDrawBtn" class="curve-draw-btn" style="margin-top: 6px; background: #1a3a5c; border-color: #2a5a8c;">Draw</button>
                 <button id="lwDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: #1a3a5c; border-color: #2a5a8c;">Delete</button>
                 <button id="lwDeleteNodeBtn" class="curve-draw-btn" style="margin-top: 5px; background: #1a3a5c; border-color: #2a5a8c; display: none;">Delete Node</button>
+                
+                <div class="section-divider"></div>
+                <div class="section-label" style="background: #8a5cf5; color: #fff; padding: 3px 6px; border-radius: 2px; font-weight: bold;">Musical Materials</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Name</label>
+                    <input type="text" id="mmNameInput" class="curve-input" value="" style="width: 120px; font-size: 10px;" placeholder="MM001">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Desc</label>
+                    <input type="text" id="mmDescInput" class="curve-input" value="" style="width: 120px; font-size: 10px;" placeholder="Description...">
+                </div>
+                <div class="control-row" style="margin-top: 5px; gap: 4px;">
+                    <button id="mmCaptureBtn" class="control-btn" style="font-size: 10px; background: #8a5cf5; color: #fff; padding: 4px 8px;">Capture</button>
+                    <button id="mmUpdateBtn" class="control-btn" style="font-size: 10px; background: #6a3cd5; color: #fff; padding: 4px 8px;">Update</button>
+                    <button id="mmDeleteBtn" class="control-btn" style="font-size: 10px; background: var(--clr-brightRed); color: #fff; padding: 4px 8px;">Delete</button>
+                </div>
+                <div class="curve-input-row" style="margin-top: 6px;">
+                    <label style="font-size: 9px; min-width: 28px;">List</label>
+                    <select id="mmListSelect" style="flex: 1; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                        <option value="">-- No Materials --</option>
+                    </select>
+                </div>
+                <div id="mmDetailPanel" style="display: none; margin-top: 6px; padding: 6px; background: rgba(30,30,40,0.7); border: 1px solid #555; border-radius: 3px; font-size: 9px; color: #ccc; max-height: 200px; overflow-y: auto;">
+                    <div id="mmDetailContent"></div>
+                </div>
+                <div id="mmVersionRow" class="curve-input-row" style="display: none; margin-top: 4px;">
+                    <label style="font-size: 9px; min-width: 28px; color: #8a5cf5;">Ver</label>
+                    <select id="mmVersionSelect" style="flex: 1; font-size: 9px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                    </select>
+                </div>
+                <span id="mmStatusLabel" style="font-size: 9px; color: #888; margin-top: 4px; display: block;"></span>
                 
                 <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-mustard); color: #000; padding: 3px 6px; border-radius: 2px;">MIDI Model</div>
@@ -3601,6 +3667,57 @@
                     
                     el.wrapper.style.display = visible ? '' : 'none';
                 });
+            },
+            
+            // Replace an SVG element's visual content from a local file, preserving placement
+            replaceSvgFromFile(svgId) {
+                const el = this.elements.find(e => e.id === svgId);
+                if (!el) { console.error('replaceSvgFromFile: element not found:', svgId); return; }
+                
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.svg';
+                input.style.display = 'none';
+                document.body.appendChild(input);
+                
+                input.addEventListener('change', () => {
+                    const file = input.files[0];
+                    if (!file) { input.remove(); return; }
+                    
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const svgText = e.target.result;
+                        
+                        // Parse SVG to extract natural dimensions
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(svgText, 'image/svg+xml');
+                        const svgRoot = doc.querySelector('svg');
+                        let newW = el.width, newH = el.height;
+                        if (svgRoot) {
+                            const w = parseFloat(svgRoot.getAttribute('width'));
+                            const h = parseFloat(svgRoot.getAttribute('height'));
+                            if (w && h) { newW = w; newH = h; }
+                        }
+                        
+                        // Convert to data URL and update element
+                        const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgText)));
+                        el.image.setAttribute('href', dataUrl);
+                        el.image.setAttribute('width', newW);
+                        el.image.setAttribute('height', newH);
+                        el.width = newW;
+                        el.height = newH;
+                        
+                        // Recalculate position with existing placement props
+                        this.updateElementTransform(el);
+                        
+                        if (window.ScoreManager) ScoreManager.markDirty();
+                        console.log('replaceSvgFromFile: replaced', svgId, 'with', file.name, `(${newW}x${newH})`);
+                    };
+                    reader.readAsText(file);
+                    input.remove();
+                });
+                
+                input.click();
             },
             
             // Export data for saving — only anchor-based properties
@@ -13147,6 +13264,16 @@
                     }
                 );
                 
+                // MusicalMaterialSystem - musical material catalog with versioned snapshots
+                this.registerSource('musicalMaterials',
+                    () => window.MusicalMaterialSystem ? MusicalMaterialSystem.exportData() : { materials: [], nextId: 1 },
+                    (data) => {
+                        if (window.MusicalMaterialSystem) {
+                            MusicalMaterialSystem.importData(data);
+                        }
+                    }
+                );
+                
                 // FlowchartConnector - connector lines between objects
                 this.registerSource('connectors',
                     () => window.FlowchartConnector ? FlowchartConnector.exportData() : [],
@@ -15056,6 +15183,9 @@
                 
                 // Show crescendo bundle row if this curve belongs to a bundle
                 if (window.CrescendoUI) {
+                    // Always show Curve Adjust section for any selected curve
+                    CrescendoUI.showCurveAdjust(curve);
+                    
                     const cdBundle = CrescendoUI.lookupBundleByCurveId(curve.id);
                     const row = document.getElementById('cdBundleRow');
                     const timeSpan = document.getElementById('cdBundleTime');
@@ -15130,7 +15260,8 @@
                     MidiModelSystem.updateLongToneCurveIndicator();
                 }
                 
-                // Hide crescendo bundle row
+                // Hide crescendo bundle row and Curve Adjust section
+                if (window.CrescendoUI) CrescendoUI.hideCurveAdjust();
                 const cdRow = document.getElementById('cdBundleRow');
                 if (cdRow) cdRow.style.display = 'none';
                 
@@ -15899,6 +16030,9 @@
                     if (cdSlope) cdSlope.value = curve.slope || 0;
                     if (cdModel) cdModel.value = curve.model || 'bezier';
                 }
+                
+                // Sync Curve Adjust section in ST panel
+                if (window.CrescendoUI) CrescendoUI.syncCurveAdjustFromCurve(curve);
                 
                 // Update curve data
                 curve.startSeconds = startSeconds;
@@ -17889,6 +18023,35 @@
                 return clef; // treble, bass already match
             },
             
+            // ── Canonical naming utilities (see docs/LY_NAMING_CONVENTION.md) ──
+            // Shared pitch encoder for content-addressable .ly filenames.
+            // Input: UI pitch string (e.g. "C#4", "Bb3", "C+4", "Cd4", "C#+4", "Cbd4")
+            // Output: canonical form (e.g. "Cs4", "Bf3", "Cqs4", "Cqf4", "Ctqs4", "Ctqf4")
+            canonicalPitch(pitch) {
+                if (!pitch) return 'C4';
+                const m = pitch.trim().match(/^([A-Ga-g])([#b+d]*)?(\d)$/);
+                if (!m) return pitch.replace(/[^A-Za-z0-9]/g, '');
+                const note = m[1].toUpperCase();
+                const acc = m[2] || '';
+                const oct = m[3];
+                let canon = '';
+                if (acc === '#')       canon = 's';
+                else if (acc === 'b')  canon = 'f';
+                else if (acc === '+')  canon = 'qs';
+                else if (acc === 'd')  canon = 'qf';
+                else if (acc === '#+') canon = 'tqs';
+                else if (acc === 'bd') canon = 'tqf';
+                else if (acc === '##') canon = 'ss';
+                else if (acc === 'bb') canon = 'ff';
+                return note + canon + oct;
+            },
+            
+            // Shared clef encoder for filenames
+            canonicalClef(clef) {
+                if (clef === 'cClef') return 'alto';
+                return clef; // treble, bass already match
+            },
+            
             // Generate standardized filename for glissando LilyPond file
             // Format: Gliss-{clef}-{startPitch}-{endPitch}[-{dynamic}].ly
             // Example: Gliss-alto-A4-Ab4-p.ly
@@ -18878,9 +19041,9 @@
                 // Check same staff line for gliss offset
                 const glissOffset = LongToneUI.sameStaffLine(startPitchRaw, endPitchRaw) ? '0.3' : '0';
                 
-                // Generate filename
-                const clefName = clef === 'cClef' ? 'alto' : clef;
-                const filename = `PizzTremGliss-${clefName}-${startPitchRaw}-${endPitchRaw}-${startDynamic}-${endDynamic}.ly`;
+                // Generate filename (see docs/LY_NAMING_CONVENTION.md)
+                const clefName = LongToneUI.canonicalClef(clef);
+                const filename = `PTG-${clefName}-${LongToneUI.canonicalPitch(startPitchRaw)}-${LongToneUI.canonicalPitch(endPitchRaw)}-${startDynamic}-${endDynamic}.ly`;
                 
                 // Step 3: Create LilyPond file from template
                 try {
@@ -18997,7 +19160,8 @@
                         curve.startSeconds, curve.endSeconds, track, {
                             startPitch: startPitchRaw, endPitch: endPitchRaw,
                             startDynamic, endDynamic, clef,
-                            model, slope, y1, y2
+                            model, slope, y1, y2,
+                            lyFilename: filename
                         });
                 }
                 
@@ -19273,10 +19437,11 @@
                     slope: params.slope ?? 0,
                     y1: params.y1 ?? 10,
                     y2: params.y2 ?? 0,
+                    lyFilename: params.lyFilename || null,
                     needsRegeneration: false
                 };
                 this.bundles.push(bundle);
-                console.log('PizzTremGlissUI.registerBundle:', bundle.id, 'curve:', curveId, 'svg:', svgId, 'midi:', midiSnippetId);
+                console.log('PizzTremGlissUI.registerBundle:', bundle.id, 'curve:', curveId, 'svg:', svgId, 'midi:', midiSnippetId, 'ly:', bundle.lyFilename);
                 return bundle;
             },
             
@@ -19639,6 +19804,21 @@
                     });
                 }
                 
+                // Replace SVG button
+                const replaceSvgBtn = document.getElementById('ptgReplaceSvgBtn');
+                if (replaceSvgBtn) {
+                    replaceSvgBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle && bundle.svgId) SVGElementManager.replaceSvgFromFile(bundle.svgId);
+                    });
+                }
+                
                 // Regen MIDI button
                 const regenBtn = document.getElementById('ptgRegenMidiBtn');
                 if (regenBtn) {
@@ -19747,13 +19927,13 @@
                 console.log('VibratoUI initialized (two-phase workflow)');
             },
             
-            // Generate vibrato filename
-            // Format: Vib-{dir}-{clef}-{pitch}-{startDyn}-{endDyn}.ly
+            // Generate vibrato filename (see docs/LY_NAMING_CONVENTION.md)
+            // Format: Vib-{WN|NW}-{clef}-{pitch}-{dyn1}-{dyn2}.ly
             generateFilename(direction, clef, pitch, startDyn, endDyn) {
                 const dirCode = direction === 'wide-narrow' ? 'WN' : 'NW';
-                const clefName = clef === 'cClef' ? 'alto' : clef;
-                const safePitch = pitch.replace('#', 's').replace('+', 'q').replace('d', 'qf');
-                return `Vib-${dirCode}-${clefName}-${safePitch}-${startDyn}-${endDyn}.ly`;
+                const clefName = LongToneUI.canonicalClef(clef);
+                const cp = LongToneUI.canonicalPitch(pitch);
+                return `Vib-${dirCode}-${clefName}-${cp}-${startDyn}-${endDyn}.ly`;
             },
             
             // Create a curve from vibrato UI inputs or programmatic params
@@ -19935,7 +20115,8 @@
                                     model: curve.model,
                                     slope: curve.slope,
                                     y1: curve.y1,
-                                    y2: curve.y2
+                                    y2: curve.y2,
+                                    lyFilename: filename
                                 });
                         }
                         
@@ -20424,10 +20605,11 @@
                     slope: params.slope ?? 0,
                     y1: params.y1 ?? 10,
                     y2: params.y2 ?? 0,
+                    lyFilename: params.lyFilename || null,
                     needsRegeneration: false
                 };
                 this.bundles.push(bundle);
-                console.log('VibratoUI.registerBundle:', bundle.id, 'curve:', curveId, 'svg:', svgId, 'midi:', midiSnippetId);
+                console.log('VibratoUI.registerBundle:', bundle.id, 'curve:', curveId, 'svg:', svgId, 'midi:', midiSnippetId, 'ly:', bundle.lyFilename);
                 return bundle;
             },
             
@@ -20737,6 +20919,21 @@
                     });
                 }
                 
+                // Replace SVG button
+                const replaceSvgBtn = document.getElementById('vibReplaceSvgBtn');
+                if (replaceSvgBtn) {
+                    replaceSvgBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle && bundle.svgId) SVGElementManager.replaceSvgFromFile(bundle.svgId);
+                    });
+                }
+                
                 // Delete key handler
                 document.addEventListener('keydown', (e) => {
                     if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -20851,22 +21048,120 @@
                     });
                 }
                 
+                // Curve Adjust section: mirror inputs that push changes to CurveMaker
+                const cdAdjSection = document.getElementById('cdCurveAdjustSection');
+                const cdAdjStart = document.getElementById('cdAdjStart');
+                const cdAdjEnd = document.getElementById('cdAdjEnd');
+                const cdAdjY1 = document.getElementById('cdAdjY1');
+                const cdAdjY2 = document.getElementById('cdAdjY2');
+                const cdAdjModel = document.getElementById('cdAdjModel');
+                const cdAdjSlope = document.getElementById('cdAdjSlope');
+                
+                const pushAdjustToCurveMaker = () => {
+                    if (!window.CurveMaker || !CurveMaker.selectedCurve) return;
+                    // Write values into CurveMaker's inputs, then trigger its update
+                    if (CurveMaker.startInput) CurveMaker.startInput.value = cdAdjStart.value;
+                    if (CurveMaker.endInput) CurveMaker.endInput.value = cdAdjEnd.value;
+                    if (CurveMaker.y1Input) CurveMaker.y1Input.value = cdAdjY1.value;
+                    if (CurveMaker.y2Input) CurveMaker.y2Input.value = cdAdjY2.value;
+                    CurveMaker.updateSelectedFromInputs();
+                };
+                
+                const pushAdjustModelToCurveMaker = () => {
+                    if (!window.CurveMaker || !CurveMaker.selectedCurve) return;
+                    CurveMaker.selectedCurve.model = cdAdjModel.value;
+                    CurveMaker.setCurveModel(cdAdjModel.value);
+                    CurveMaker.updateCurveRendering(CurveMaker.selectedCurve);
+                    CurveMaker.syncCurveToDatabase(CurveMaker.selectedCurve);
+                    CurveMaker.updateVisibility();
+                };
+                
+                const pushAdjustSlopeToCurveMaker = () => {
+                    if (!window.CurveMaker || !CurveMaker.selectedCurve) return;
+                    CurveMaker.selectedCurve.slope = parseFloat(cdAdjSlope.value) || 0;
+                    if (CurveMaker.slopeInput) CurveMaker.slopeInput.value = cdAdjSlope.value;
+                    CurveMaker.updateCurveRendering(CurveMaker.selectedCurve);
+                    CurveMaker.syncCurveToDatabase(CurveMaker.selectedCurve);
+                    CurveMaker.updateVisibility();
+                };
+                
+                if (cdAdjStart) cdAdjStart.addEventListener('change', pushAdjustToCurveMaker);
+                if (cdAdjEnd) cdAdjEnd.addEventListener('change', pushAdjustToCurveMaker);
+                if (cdAdjY1) cdAdjY1.addEventListener('change', pushAdjustToCurveMaker);
+                if (cdAdjY2) cdAdjY2.addEventListener('change', pushAdjustToCurveMaker);
+                if (cdAdjModel) cdAdjModel.addEventListener('change', pushAdjustModelToCurveMaker);
+                if (cdAdjSlope) cdAdjSlope.addEventListener('change', pushAdjustSlopeToCurveMaker);
+                
                 console.log('CrescendoUI initialized (two-phase workflow)');
             },
             
-            // Generate crescendo filename
-            // Format: Cres-{pitchModel}-{clef}-{pitch(es)}-{dyn1}-{dyn2}.ly
-            generateFilename(pitchModel, clef, pitchInfo, dyn1, dyn2) {
-                const clefName = clef === 'cClef' ? 'alto' : clef;
-                const safePitch = (str) => str.replace('#', 's').replace('+', 'q').replace('d', 'qf');
+            // Populate and show the Curve Adjust section from a curve
+            showCurveAdjust(curve) {
+                const section = document.getElementById('cdCurveAdjustSection');
+                if (!section || !curve) return;
+                
+                const adjStart = document.getElementById('cdAdjStart');
+                const adjEnd = document.getElementById('cdAdjEnd');
+                const adjY1 = document.getElementById('cdAdjY1');
+                const adjY2 = document.getElementById('cdAdjY2');
+                const adjModel = document.getElementById('cdAdjModel');
+                const adjSlope = document.getElementById('cdAdjSlope');
+                
+                if (adjStart) adjStart.value = (curve.startSeconds ?? 0).toFixed(3);
+                if (adjEnd) adjEnd.value = (curve.endSeconds ?? 1).toFixed(3);
+                if (adjY1) adjY1.value = (curve.y1 ?? 0).toFixed(1);
+                if (adjY2) adjY2.value = (curve.y2 ?? 10).toFixed(1);
+                if (adjModel) adjModel.value = curve.model || 'logarithmic';
+                if (adjSlope) adjSlope.value = curve.slope || 0;
+                
+                section.style.display = '';
+                // Expand parent collapsible section
+                requestAnimationFrame(() => {
+                    const sc = section.closest('.section-content');
+                    if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                });
+            },
+            
+            // Hide the Curve Adjust section
+            hideCurveAdjust() {
+                const section = document.getElementById('cdCurveAdjustSection');
+                if (section) section.style.display = 'none';
+            },
+            
+            // Sync Curve Adjust fields from a curve (called by CurveMaker on drag/input update)
+            syncCurveAdjustFromCurve(curve) {
+                const section = document.getElementById('cdCurveAdjustSection');
+                if (!section || section.style.display === 'none') return;
+                
+                const adjStart = document.getElementById('cdAdjStart');
+                const adjEnd = document.getElementById('cdAdjEnd');
+                const adjY1 = document.getElementById('cdAdjY1');
+                const adjY2 = document.getElementById('cdAdjY2');
+                const adjSlope = document.getElementById('cdAdjSlope');
+                const adjModel = document.getElementById('cdAdjModel');
+                
+                if (adjStart) adjStart.value = (curve.startSeconds ?? 0).toFixed(3);
+                if (adjEnd) adjEnd.value = (curve.endSeconds ?? 1).toFixed(3);
+                if (adjY1) adjY1.value = (curve.y1 ?? 0).toFixed(1);
+                if (adjY2) adjY2.value = (curve.y2 ?? 10).toFixed(1);
+                if (adjSlope) adjSlope.value = curve.slope || 0;
+                if (adjModel) adjModel.value = curve.model || 'logarithmic';
+            },
+            
+            // Generate crescendo filename (see docs/LY_NAMING_CONVENTION.md)
+            // Format: ST-{Gliss|Single}-{clef}-{pitch(es)}-{dyn1}-{dyn2}[-secco].ly
+            generateFilename(pitchModel, clef, pitchInfo, dyn1, dyn2, secco) {
+                const clefName = LongToneUI.canonicalClef(clef);
+                const cp = (str) => LongToneUI.canonicalPitch(str);
                 let pitchPart;
                 if (pitchModel === 'glissando') {
-                    pitchPart = `${safePitch(pitchInfo.startPitch)}-${safePitch(pitchInfo.endPitch)}`;
+                    pitchPart = `${cp(pitchInfo.startPitch)}-${cp(pitchInfo.endPitch)}`;
                 } else {
-                    pitchPart = safePitch(pitchInfo.pitch);
+                    pitchPart = cp(pitchInfo.pitch);
                 }
                 const modelCode = pitchModel === 'glissando' ? 'Gliss' : 'Single';
-                return `Cres-${modelCode}-${clefName}-${pitchPart}-${dyn1}-${dyn2}.ly`;
+                const seccoSuffix = secco ? '-secco' : '';
+                return `ST-${modelCode}-${clefName}-${pitchPart}-${dyn1}-${dyn2}${seccoSuffix}.ly`;
             },
             
             // Compute end seconds from UI (handles End vs Duration mode)
@@ -20931,6 +21226,9 @@
                 
                 this.pendingCurve = curve;
                 
+                // Show Curve Adjust section so user can tweak without switching panels
+                this.showCurveAdjust(curve);
+                
                 console.log('CrescendoUI.step1: Curve created. Adjust shape as needed, then click "2: Generate"');
                 console.log('CrescendoUI.step1: Curve ID:', curve.id, 'Name:', curve.name);
                 
@@ -20987,8 +21285,11 @@
                     const d1Idx = dynOrder.indexOf(dyn1);
                     const d2Idx = dynOrder.indexOf(dyn2);
                     hairpin = (d1Idx === d2Idx) ? 'none' : (d2Idx > d1Idx ? '\\<' : '\\>');
+                } else if (volumeMode === 'inverseCurve') {
+                    // inverseCurve: dynamics go opposite to curve Y direction
+                    hairpin = y2 > y1 ? '\\>' : '\\<';
                 } else {
-                    // curve mode (default): Y goes up = crescendo, Y goes down = decrescendo
+                    // curve mode (default): dynamics follow curve Y direction
                     hairpin = y2 > y1 ? '\\<' : '\\>';
                 }
                 
@@ -21012,6 +21313,7 @@
                 
                 // Build LilyPond parameters
                 const lpClef = LongToneUI.clefToLilyPond(clef);
+                const secco = params?.secco ?? (document.getElementById('cdSeccoCheckbox')?.checked !== false);
                 let pitchInfo, filename;
                 
                 if (pitchModel === 'glissando') {
@@ -21019,11 +21321,11 @@
                     const lpEndPitch = LongToneUI.pitchToLilyPond(endPitch);
                     const glissOffset = LongToneUI.sameStaffLine(startPitch, endPitch) ? '0.3' : '0';
                     pitchInfo = { startPitch, endPitch, lpStartPitch, lpEndPitch, glissOffset };
-                    filename = this.generateFilename('glissando', clef, { startPitch, endPitch }, dyn1, dyn2);
+                    filename = this.generateFilename('glissando', clef, { startPitch, endPitch }, dyn1, dyn2, secco);
                 } else {
                     const lpPitch = LongToneUI.pitchToLilyPond(singlePitch);
                     pitchInfo = { pitch: singlePitch, lpPitch };
-                    filename = this.generateFilename('single', clef, { pitch: singlePitch }, dyn1, dyn2);
+                    filename = this.generateFilename('single', clef, { pitch: singlePitch }, dyn1, dyn2, secco);
                 }
                 
                 console.log('CrescendoUI.step2:', JSON.stringify({
@@ -21044,7 +21346,7 @@
                             dynamic1: dyn1,
                             dynamic2: dyn2,
                             hairpin: hairpin === 'none' ? 'none' : (hairpin === '\\<' ? '<' : '>'),
-                            secco: params?.secco ?? (document.getElementById('cdSeccoCheckbox')?.checked !== false)
+                            secco
                         })
                     });
                     const createResult = await createResp.json();
@@ -21100,7 +21402,8 @@
                                     pitchModel, pitchInfo, dynamic1: dyn1, dynamic2: dyn2,
                                     clef: lpClef, velocity: params?.velocity ?? (parseInt(document.getElementById('cdVelocityInput').value) || 115),
                                     volumeMode: params?.volumeMode ?? document.getElementById('cdVolumeMode').value,
-                                    secco: params?.secco ?? (document.getElementById('cdSeccoCheckbox')?.checked !== false)
+                                    secco: params?.secco ?? (document.getElementById('cdSeccoCheckbox')?.checked !== false),
+                                    lyFilename: filename
                                 });
                         }
                         
@@ -21198,43 +21501,64 @@
                 const startTime = curveData.startTime;
                 const duration = curve.endSeconds - curve.startSeconds;
                 
-                // Dynamic name to CC7 value mapping
-                const dynamicToCC7 = (dyn) => {
-                    const map = { pppp: 10, ppp: 20, pp: 35, p: 50, mp: 65, mf: 80, f: 95, ff: 110, fff: 120, ffff: 127 };
-                    return map[dyn] ?? 80;
-                };
+                // Dynamic marking to CC7 value mapping
+                const DYNAMICS_CC7_MAP = { pppp: 40, ppp: 47, pp: 55, p: 64, mp: 70, mf: 80, f: 89, ff: 100, fff: 113, ffff: 127 };
+                const dynamicToCC7 = (dyn) => DYNAMICS_CC7_MAP[dyn] ?? 80;
+                const dynOrder = ['pppp','ppp','pp','p','mp','mf','f','ff','fff','ffff'];
                 
                 // Build CC7 volume samples based on volume mode
                 const volumeMode = params?.volumeMode ?? 'curve';
+                const dyn1CC7 = dynamicToCC7(params?.dynamic1 ?? 'p');
+                const dyn2CC7 = dynamicToCC7(params?.dynamic2 ?? 'f');
                 const cc7Samples = [];
                 const numCC7Samples = Math.max(2, Math.ceil(duration * 1000 / CC_SAMPLE_INTERVAL));
                 
                 if (volumeMode === 'steady') {
                     // Steady: flat CC7 at Dyn1 level throughout
-                    const steadyValue = dynamicToCC7(params?.dynamic1 ?? 'mf');
                     for (let i = 0; i < numCC7Samples; i++) {
                         const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
-                        cc7Samples.push({ time: t, value: steadyValue });
+                        cc7Samples.push({ time: t, value: dyn1CC7 });
                     }
                 } else if (volumeMode === 'linear') {
                     // Linear: ramp from Dyn1 CC7 to Dyn2 CC7, independent of curve shape
-                    const startCC7 = dynamicToCC7(params?.dynamic1 ?? 'p');
-                    const endCC7 = dynamicToCC7(params?.dynamic2 ?? 'f');
                     for (let i = 0; i < numCC7Samples; i++) {
                         const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
                         const progress = i / (numCC7Samples - 1);
-                        const ccValue = Math.round(startCC7 + progress * (endCC7 - startCC7));
+                        const ccValue = Math.round(dyn1CC7 + progress * (dyn2CC7 - dyn1CC7));
                         cc7Samples.push({ time: t, value: Math.max(0, Math.min(127, ccValue)) });
                     }
-                } else {
-                    // Curve (default): CC7 follows curve Y shape (normalizedY 0-1 → CC7 0-127)
+                } else if (volumeMode === 'inverseCurve') {
+                    // Inverse Curve: CC7 follows INVERTED curve Y, interpolated between Dyn1 and Dyn2
+                    // Dyn1 = start dynamic, Dyn2 = end dynamic
+                    // Curve Y is inverted: high Y → Dyn1, low Y → Dyn2 (opposite of curve mode)
                     for (let i = 0; i < numCC7Samples; i++) {
                         const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
                         const curveIdx = Math.round((t - startTime) / sampleInterval);
                         const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
-                        const normalizedY = samples[clampedIdx];
-                        const ccValue = Math.round(Math.max(0, Math.min(127, normalizedY * 127)));
-                        cc7Samples.push({ time: t, value: ccValue });
+                        const normalizedY = samples[clampedIdx]; // 0-1
+                        const invertedY = 1.0 - normalizedY;
+                        const ccValue = Math.round(dyn1CC7 + invertedY * (dyn2CC7 - dyn1CC7));
+                        cc7Samples.push({ time: t, value: Math.max(0, Math.min(127, ccValue)) });
+                    }
+                } else {
+                    // Curve (default): CC7 follows curve Y, interpolated between Dyn1 and Dyn2
+                    // Dyn1 = start dynamic, Dyn2 = end dynamic
+                    // Validate: curve direction must match dynamic direction
+                    const curveGoesUp = samples[samples.length - 1] > samples[0];
+                    const dynGoesUp = dyn2CC7 > dyn1CC7;
+                    if (dyn1CC7 !== dyn2CC7 && curveGoesUp !== dynGoesUp) {
+                        const curveDir = curveGoesUp ? 'ascending (low Y → high Y)' : 'descending (high Y → low Y)';
+                        const dynDir = dynGoesUp ? `getting louder (${params?.dynamic1 ?? 'p'} → ${params?.dynamic2 ?? 'f'})` : `getting softer (${params?.dynamic1 ?? 'p'} → ${params?.dynamic2 ?? 'f'})`;
+                        alert(`⚠️ Curve mode: dynamics direction doesn't match curve direction.\n\nCurve is ${curveDir}, but dynamics are ${dynDir}.\n\nEither swap Dyn1/Dyn2 to match the curve, or use "Linear" mode (direction-independent) or "Inv. Curve" mode (opposite direction).`);
+                        return null;
+                    }
+                    for (let i = 0; i < numCC7Samples; i++) {
+                        const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
+                        const curveIdx = Math.round((t - startTime) / sampleInterval);
+                        const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
+                        const normalizedY = samples[clampedIdx]; // 0-1
+                        const ccValue = Math.round(dyn1CC7 + normalizedY * (dyn2CC7 - dyn1CC7));
+                        cc7Samples.push({ time: t, value: Math.max(0, Math.min(127, ccValue)) });
                     }
                 }
                 
@@ -21826,10 +22150,11 @@
                     velocity: params.velocity || 115,
                     volumeMode: params.volumeMode || 'curve',
                     secco: params.secco !== undefined ? params.secco : true,
+                    lyFilename: params.lyFilename || null,
                     needsRegeneration: false
                 };
                 this.bundles.push(bundle);
-                console.log('CrescendoUI.registerBundle:', bundle.id, 'curve:', curveId, 'pitchModel:', bundle.pitchModel, 'volumeMode:', bundle.volumeMode);
+                console.log('CrescendoUI.registerBundle:', bundle.id, 'curve:', curveId, 'pitchModel:', bundle.pitchModel, 'volumeMode:', bundle.volumeMode, 'ly:', bundle.lyFilename);
                 return bundle;
             },
             
@@ -22243,6 +22568,21 @@
                     });
                 }
                 
+                // Replace SVG button
+                const replaceSvgBtn = document.getElementById('cdReplaceSvgBtn');
+                if (replaceSvgBtn) {
+                    replaceSvgBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (window.CurveMaker && CurveMaker.selectedCurve) {
+                            bundle = this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle && bundle.svgId) SVGElementManager.replaceSvgFromFile(bundle.svgId);
+                    });
+                }
+                
                 // Patch SVGElementManager.selectElement to show/hide bundle row + regen button
                 if (window.SVGElementManager) {
                     const origSelect = SVGElementManager.selectElement.bind(SVGElementManager);
@@ -22466,12 +22806,14 @@
                     
                     // Step 5: Register bundle (links GC + SVG + MIDI as a unit)
                     if (gc || svgElement || midiSnippet) {
+                        const lyFn = this.canonicalLyFilename(clef, pitchEnglish, dynamic);
                         this.registerBundle(
                             gc ? gc.id : null,
                             svgElement ? svgElement.id : null,
                             midiSnippet,
                             impactTime,
-                            track
+                            track,
+                            lyFn
                         );
                     }
                     
@@ -22663,8 +23005,16 @@
                 return snippet.id;
             },
             
+            // Generate canonical .ly filename from params (see docs/LY_NAMING_CONVENTION.md)
+            // Format: BP-{clef}-{pitch}-{dyn}.ly
+            canonicalLyFilename(clef, pitchEnglish, dynamic) {
+                const cc = LongToneUI.canonicalClef(clef);
+                const cp = LongToneUI.canonicalPitch(pitchEnglish);
+                return `BP-${cc}-${cp}-${dynamic}.ly`;
+            },
+            
             // ── Bundle registry: unified drag/delete for BP components ──
-            registerBundle(gcId, svgId, midiSnippetId, impactTime, track) {
+            registerBundle(gcId, svgId, midiSnippetId, impactTime, track, lyFilename) {
                 // Remove any existing bundles for same gcId (prevents duplicates)
                 const old = this.bundles.filter(b => b.gcId === gcId);
                 if (old.length > 0) {
@@ -22676,11 +23026,12 @@
                     svgId,
                     midiSnippetId,
                     impactTime,
-                    track
+                    track,
+                    lyFilename: lyFilename || null
                 };
                 this.bundles.push(bundle);
                 console.log('BartokPizzUI: bundle registered', bundle.id,
-                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId);
+                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId, 'ly:', bundle.lyFilename);
                 return bundle;
             },
             
@@ -22902,6 +23253,24 @@
                             const row = document.getElementById('bpBundleRow');
                             if (row) row.style.display = 'none';
                         }
+                    });
+                }
+                
+                // Replace SVG button
+                const replaceSvgBtn = document.getElementById('bpReplaceSvgBtn');
+                if (replaceSvgBtn) {
+                    replaceSvgBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (this.selectedBundleId != null) {
+                            bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                        }
+                        if (!bundle && window.GCMaker && GCMaker.selectedGC) {
+                            bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle && bundle.svgId) SVGElementManager.replaceSvgFromFile(bundle.svgId);
                     });
                 }
                 
@@ -23440,12 +23809,14 @@
                     
                     // Step 5: Register bundle (links GC + SVG + MIDI as a unit)
                     if (gc || svgElement || midiSnippet) {
+                        const lyFn = this.canonicalLyFilename(inputs.clef, pitchEnglish, inputs.dynamic);
                         this.registerBundle(
                             gc ? gc.id : null,
                             svgElement ? svgElement.id : null,
                             midiSnippet,
                             inputs.start,
-                            inputs.track
+                            inputs.track,
+                            lyFn
                         );
                     }
                     
@@ -23469,8 +23840,16 @@
                 }
                 return result;
             },
+            // Generate canonical .ly filename from params (see docs/LY_NAMING_CONVENTION.md)
+            // Format: PT-{clef}-{pitch}-{dyn}.ly
+            canonicalLyFilename(clef, pitchEnglish, dynamic) {
+                const cc = LongToneUI.canonicalClef(clef);
+                const cp = LongToneUI.canonicalPitch(pitchEnglish);
+                return `PT-${cc}-${cp}-${dynamic}.ly`;
+            },
+            
             // ── Bundle registry: unified drag/delete for PT components ──
-            registerBundle(gcId, svgId, midiSnippetId, startTime, track) {
+            registerBundle(gcId, svgId, midiSnippetId, startTime, track, lyFilename) {
                 const old = this.bundles.filter(b => b.gcId === gcId);
                 if (old.length > 0) {
                     for (const ob of old) this.bundles = this.bundles.filter(b => b.id !== ob.id);
@@ -23481,11 +23860,12 @@
                     svgId,
                     midiSnippetId,
                     startTime,
-                    track
+                    track,
+                    lyFilename: lyFilename || null
                 };
                 this.bundles.push(bundle);
                 console.log('PizzTremUI: bundle registered', bundle.id,
-                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId);
+                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId, 'ly:', bundle.lyFilename);
                 return bundle;
             },
             
@@ -23692,6 +24072,24 @@
                             const row = document.getElementById('ptBundleRow');
                             if (row) row.style.display = 'none';
                         }
+                    });
+                }
+                
+                // Replace SVG button
+                const replaceSvgBtn = document.getElementById('ptReplaceSvgBtn');
+                if (replaceSvgBtn) {
+                    replaceSvgBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (this.selectedBundleId != null) {
+                            bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                        }
+                        if (!bundle && window.GCMaker && GCMaker.selectedGC) {
+                            bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle && bundle.svgId) SVGElementManager.replaceSvgFromFile(bundle.svgId);
                     });
                 }
                 
@@ -24033,7 +24431,7 @@
             },
             
             // ── Bundle registry: unified drag/delete for NF components ──
-            registerBundle(gcId, svgId, midiSnippetId, arrowEl, impactTime, track) {
+            registerBundle(gcId, svgId, midiSnippetId, arrowEl, impactTime, track, lyFilename) {
                 // Remove any existing bundles for same gcId (prevents duplicates)
                 const old = this.bundles.filter(b => b.gcId === gcId);
                 if (old.length > 0) {
@@ -24047,11 +24445,12 @@
                     arrowEl,
                     hasArrow: !!arrowEl,
                     impactTime,
-                    track
+                    track,
+                    lyFilename: lyFilename || null
                 };
                 this.bundles.push(bundle);
                 console.log('NotationFragmentSystem: bundle registered', bundle.id,
-                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId);
+                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId, 'ly:', bundle.lyFilename);
                 return bundle;
             },
             
@@ -24586,6 +24985,24 @@
                     this.deleteSelectedBundle();
                 });
                 
+                // Replace SVG button
+                const replaceSvgBtn = document.getElementById('nfReplaceSvgBtn');
+                if (replaceSvgBtn) {
+                    replaceSvgBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (this.selectedBundleId != null) {
+                            bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                        }
+                        if (!bundle && window.GCMaker && GCMaker.selectedGC) {
+                            bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                        }
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) {
+                            bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        }
+                        if (bundle && bundle.svgId) SVGElementManager.replaceSvgFromFile(bundle.svgId);
+                    });
+                }
+                
                 // Listen for SVG selection changes to show/hide bundle row
                 const origSelect = SVGElementManager.selectElement.bind(SVGElementManager);
                 const origDeselect = SVGElementManager.deselectAll.bind(SVGElementManager);
@@ -24780,13 +25197,15 @@
                     const midiSnippetId = await nfs.insertFragmentMidi(placement, track);
                     
                     // Register bundle for unified drag/delete
+                    const lyFn = `${this.currentFragment.id}-${this.currentFragment.instrument}.ly`;
                     const bundle = nfs.registerBundle(
                         gc ? gc.id : null,
                         svg ? svg.id : null,
                         midiSnippetId,
                         arrowEl,
                         impactTime,
-                        track
+                        track,
+                        lyFn
                     );
                     
                     result = { gc, svg, midiSnippetId, placement, track, bundleId: bundle.id };
@@ -31354,12 +31773,16 @@
                     <label style="color:#888;font-size:11px;">Δt:</label>
                     <input id="msDeltaInput" type="number" step="0.1" value="0" style="background:#222;color:#ccc;border:1px solid #555;border-radius:3px;padding:1px 4px;font-size:11px;width:50px;">
                     <button id="msMoveBtn" title="Apply time shift" style="background:#2a4a2a;color:#8f8;border:1px solid #4a4;border-radius:3px;padding:2px 6px;cursor:pointer;font-size:11px;">Move</button>
+                    <button id="msCaptureMMBtn" title="Capture as Musical Material" style="background:#5a3a8a;color:#c8f;border:1px solid #8a5cf5;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:11px;">MM</button>
                 `;
                 document.body.appendChild(this.toolbarEl);
                 
                 // Toolbar button handlers
                 document.getElementById('msDupBtn').addEventListener('click', () => this.duplicateAll());
                 document.getElementById('msDelBtn').addEventListener('click', () => this.deleteAll());
+                document.getElementById('msCaptureMMBtn').addEventListener('click', () => {
+                    if (window.MusicalMaterialSystem) MusicalMaterialSystem.captureFromMultiSelect();
+                });
                 document.getElementById('msTkSelect').addEventListener('change', (e) => {
                     if (e.target.value) this.changeTrackAll(e.target.value);
                     e.target.value = '';
@@ -31693,6 +32116,505 @@
         MultiSelect.init();
         window.MultiSelect = MultiSelect;
         
+        
+        // ============================================
+        // MUSICAL MATERIAL SYSTEM
+        // Catalogs compositional units (bundles, curves, GCs, SVGs, MIDI)
+        // with versioned snapshots for revision tracking
+        // ============================================
+        const MusicalMaterialSystem = {
+            materials: [],
+            nextId: 1,
+            selectedId: null,
+            
+            init() {
+                this.captureBtn = document.getElementById('mmCaptureBtn');
+                this.updateBtn = document.getElementById('mmUpdateBtn');
+                this.deleteBtn = document.getElementById('mmDeleteBtn');
+                this.nameInput = document.getElementById('mmNameInput');
+                this.descInput = document.getElementById('mmDescInput');
+                this.listSelect = document.getElementById('mmListSelect');
+                this.detailPanel = document.getElementById('mmDetailPanel');
+                this.detailContent = document.getElementById('mmDetailContent');
+                this.versionRow = document.getElementById('mmVersionRow');
+                this.versionSelect = document.getElementById('mmVersionSelect');
+                this.statusLabel = document.getElementById('mmStatusLabel');
+                
+                if (this.captureBtn) this.captureBtn.addEventListener('click', () => this.captureFromSelection());
+                if (this.updateBtn) this.updateBtn.addEventListener('click', () => this.updateSelected());
+                if (this.deleteBtn) this.deleteBtn.addEventListener('click', () => this.deleteSelected());
+                if (this.listSelect) this.listSelect.addEventListener('change', () => this.onListChange());
+                if (this.versionSelect) this.versionSelect.addEventListener('change', () => this.onVersionChange());
+                
+                console.log('MusicalMaterialSystem initialized');
+            },
+            
+            // ── Phase 1: Data Model & Capture ──
+            
+            captureFromSelection() {
+                const bundleRefs = this._collectBundleRefs();
+                if (bundleRefs.length === 0) {
+                    this._setStatus('No bundles selected. Select bundles via MultiSelect first.');
+                    return;
+                }
+                
+                const name = this.nameInput?.value?.trim() || `MM${String(this.nextId).padStart(3, '0')}`;
+                const description = this.descInput?.value?.trim() || '';
+                
+                const snapshot = this._createSnapshot(bundleRefs);
+                const track = this._inferTrack(bundleRefs);
+                const timeRange = this._inferTimeRange(bundleRefs);
+                
+                const mm = {
+                    id: this.nextId++,
+                    name,
+                    description,
+                    track,
+                    timeRange,
+                    bundleRefs,
+                    versions: [{
+                        date: new Date().toISOString(),
+                        label: 'original',
+                        snapshot
+                    }],
+                    currentVersionIndex: 0
+                };
+                
+                this.materials.push(mm);
+                this.selectedId = mm.id;
+                this._refreshList();
+                this._showDetail(mm);
+                this._setStatus(`Captured "${name}" (${bundleRefs.length} bundle${bundleRefs.length > 1 ? 's' : ''})`);
+                
+                if (this.nameInput) this.nameInput.value = '';
+                if (this.descInput) this.descInput.value = '';
+                
+                console.log('MusicalMaterialSystem: captured', mm.id, name, bundleRefs);
+            },
+            
+            _collectBundleRefs() {
+                const refs = [];
+                
+                // If MultiSelect has selected items, use those to find matching bundles
+                if (window.MultiSelect && MultiSelect.selected && MultiSelect.selected.length > 0) {
+                    for (const item of MultiSelect.selected) {
+                        const found = this._findBundleForObject(item.system, item.obj);
+                        if (found && !refs.some(r => r.type === found.type && r.bundleId === found.bundleId)) {
+                            refs.push(found);
+                        }
+                    }
+                }
+                
+                // Fallback: detect bundles from currently selected objects in each maker system
+                if (refs.length === 0) {
+                    const addUnique = (found) => {
+                        if (found && !refs.some(r => r.type === found.type && r.bundleId === found.bundleId)) {
+                            refs.push(found);
+                        }
+                    };
+                    if (window.CurveMaker && CurveMaker.selectedCurve) {
+                        addUnique(this._findBundleForObject('curve', CurveMaker.selectedCurve));
+                    }
+                    if (window.GCMaker && GCMaker.selectedGC) {
+                        addUnique(this._findBundleForObject('gc', GCMaker.selectedGC));
+                    }
+                    if (window.SVGElementManager && SVGElementManager.selectedElement) {
+                        addUnique(this._findBundleForObject('svg', SVGElementManager.selectedElement));
+                    }
+                }
+                
+                return refs;
+            },
+            
+            _findBundleForObject(system, obj) {
+                // Map selected objects back to their bundle
+                // Normalize system name to lowercase (MultiSelect uses PascalCase: 'Curve', 'GC', 'SVG')
+                const sys = system.toLowerCase();
+                if (sys === 'curve') {
+                    const curveId = obj.id || obj;
+                    // Check curve-based bundle systems
+                    if (window.CrescendoUI) {
+                        const b = CrescendoUI.bundles?.find(b => b.curveId === curveId);
+                        if (b) return { type: 'cd', bundleId: b.id };
+                    }
+                    if (window.PizzTremGlissUI) {
+                        const b = PizzTremGlissUI.bundles?.find(b => b.curveId === curveId);
+                        if (b) return { type: 'ptg', bundleId: b.id };
+                    }
+                    if (window.VibratoUI) {
+                        const b = VibratoUI.bundles?.find(b => b.curveId === curveId);
+                        if (b) return { type: 'vib', bundleId: b.id };
+                    }
+                }
+                if (sys === 'gc') {
+                    const gcId = obj.id || obj;
+                    if (window.NotationFragmentSystem) {
+                        const b = NotationFragmentSystem.bundles?.find(b => b.gcId === gcId);
+                        if (b) return { type: 'nf', bundleId: b.id };
+                    }
+                    if (window.BartokPizzUI) {
+                        const b = BartokPizzUI.bundles?.find(b => b.gcId === gcId);
+                        if (b) return { type: 'bp', bundleId: b.id };
+                    }
+                    if (window.PizzTremUI) {
+                        const b = PizzTremUI.bundles?.find(b => b.gcId === gcId);
+                        if (b) return { type: 'pt', bundleId: b.id };
+                    }
+                }
+                if (sys === 'svg') {
+                    const svgId = obj.id || obj;
+                    // Check all bundle systems for matching svgId
+                    const systems = [
+                        { ui: window.CrescendoUI, type: 'cd', key: 'svgId' },
+                        { ui: window.NotationFragmentSystem, type: 'nf', key: 'svgId' },
+                        { ui: window.BartokPizzUI, type: 'bp', key: 'svgId' },
+                        { ui: window.PizzTremUI, type: 'pt', key: 'svgId' },
+                        { ui: window.PizzTremGlissUI, type: 'ptg', key: 'svgId' },
+                        { ui: window.VibratoUI, type: 'vib', key: 'svgId' },
+                    ];
+                    for (const s of systems) {
+                        if (s.ui) {
+                            const b = s.ui.bundles?.find(b => b[s.key] === svgId);
+                            if (b) return { type: s.type, bundleId: b.id };
+                        }
+                    }
+                }
+                return null;
+            },
+            
+            _getBundleSystem(type) {
+                const map = {
+                    cd: window.CrescendoUI,
+                    nf: window.NotationFragmentSystem,
+                    bp: window.BartokPizzUI,
+                    pt: window.PizzTremUI,
+                    ptg: window.PizzTremGlissUI,
+                    vib: window.VibratoUI
+                };
+                return map[type] || null;
+            },
+            
+            _getBundle(ref) {
+                const sys = this._getBundleSystem(ref.type);
+                if (!sys || !sys.bundles) return null;
+                return sys.bundles.find(b => b.id === ref.bundleId) || null;
+            },
+            
+            _createSnapshot(bundleRefs) {
+                const snapshot = {};
+                for (const ref of bundleRefs) {
+                    const bundle = this._getBundle(ref);
+                    if (!bundle) continue;
+                    const key = `${ref.type}_${ref.bundleId}`;
+                    // Deep copy the bundle data (excluding huge fields like curveData samples)
+                    const data = JSON.parse(JSON.stringify(bundle));
+                    
+                    // Enrich with component details
+                    if (bundle.curveId && window.CurveMaker) {
+                        const curve = CurveMaker.curves?.find(c => c.id === bundle.curveId);
+                        if (curve) {
+                            data._curveInfo = {
+                                name: curve.name,
+                                startSeconds: curve.startSeconds,
+                                endSeconds: curve.endSeconds,
+                                slope: curve.slope,
+                                tension: curve.tension,
+                                gTrack: curve.gTrack,
+                                color: curve.color,
+                                page: curve.page
+                            };
+                        }
+                    }
+                    if (bundle.gcId && window.GCMaker) {
+                        const gcs = GCMaker.gcs || GCMaker.conductors || [];
+                        const gc = gcs.find(g => g.id === bundle.gcId);
+                        if (gc) {
+                            data._gcInfo = {
+                                name: gc.name,
+                                impactSeconds: gc.impactSeconds,
+                                gTrack: gc.gTrack,
+                                stiffness: gc.stiffness,
+                                damping: gc.damping,
+                                ictus: gc.ictus,
+                                duration: gc.duration
+                            };
+                        }
+                    }
+                    if (bundle.svgId && window.SVGElementManager) {
+                        const svg = SVGElementManager.elements?.find(s => s.id === bundle.svgId);
+                        if (svg) {
+                            data._svgInfo = {
+                                name: svg.name || `SVG-${svg.id}`,
+                                referenceSeconds: svg.referenceSeconds,
+                                offsetSeconds: svg.offsetSeconds,
+                                offsetYFraction: svg.offsetYFraction,
+                                scale: svg.scale,
+                                track: svg.track
+                            };
+                        }
+                    }
+                    
+                    snapshot[key] = data;
+                }
+                return snapshot;
+            },
+            
+            _inferTrack(bundleRefs) {
+                for (const ref of bundleRefs) {
+                    const b = this._getBundle(ref);
+                    if (b && b.track) return b.track;
+                }
+                return null;
+            },
+            
+            _inferTimeRange(bundleRefs) {
+                let start = Infinity, end = -Infinity;
+                for (const ref of bundleRefs) {
+                    const b = this._getBundle(ref);
+                    if (!b) continue;
+                    if (b.startTime !== undefined && b.startTime < start) start = b.startTime;
+                    if (b.endTime !== undefined && b.endTime > end) end = b.endTime;
+                    if (b.impactTime !== undefined) {
+                        if (b.impactTime < start) start = b.impactTime;
+                        if (b.impactTime > end) end = b.impactTime;
+                    }
+                }
+                if (start === Infinity) start = null;
+                if (end === -Infinity) end = null;
+                return { start, end };
+            },
+            
+            // ── Phase 2: UI Panel ──
+            
+            _refreshList() {
+                if (!this.listSelect) return;
+                this.listSelect.innerHTML = '';
+                if (this.materials.length === 0) {
+                    this.listSelect.innerHTML = '<option value="">-- No Materials --</option>';
+                    return;
+                }
+                for (const mm of this.materials) {
+                    const opt = document.createElement('option');
+                    opt.value = mm.id;
+                    const verCount = mm.versions.length;
+                    opt.textContent = `${mm.name} [T${mm.track || '?'}] (${mm.bundleRefs.length}b, ${verCount}v)`;
+                    this.listSelect.appendChild(opt);
+                }
+                if (this.selectedId) {
+                    this.listSelect.value = this.selectedId;
+                }
+            },
+            
+            onListChange() {
+                const id = parseInt(this.listSelect?.value);
+                if (!id) {
+                    this.selectedId = null;
+                    this._hideDetail();
+                    return;
+                }
+                this.selectedId = id;
+                const mm = this.materials.find(m => m.id === id);
+                if (mm) this._showDetail(mm);
+            },
+            
+            _showDetail(mm) {
+                if (!this.detailPanel || !this.detailContent) return;
+                
+                const ver = mm.versions[mm.currentVersionIndex] || mm.versions[mm.versions.length - 1];
+                
+                let html = `<div style="margin-bottom: 4px;"><strong style="color: #8a5cf5;">${mm.name}</strong>`;
+                if (mm.description) html += ` <span style="color: #888;">— ${mm.description}</span>`;
+                html += `</div>`;
+                html += `<div style="margin-bottom: 4px;">Track: <strong>${mm.track || '?'}</strong> | Time: <strong>${mm.timeRange?.start?.toFixed(1) ?? '?'}s – ${mm.timeRange?.end?.toFixed(1) ?? '?'}s</strong></div>`;
+                html += `<div style="margin-bottom: 6px; color: #aaa;">Bundles (${mm.bundleRefs.length}):</div>`;
+                
+                for (const ref of mm.bundleRefs) {
+                    const key = `${ref.type}_${ref.bundleId}`;
+                    const snap = ver?.snapshot?.[key];
+                    html += `<div style="margin-left: 8px; margin-bottom: 4px; padding: 3px; background: rgba(50,50,60,0.5); border-radius: 2px;">`;
+                    html += `<span style="color: #8a5cf5; font-weight: bold;">${ref.type.toUpperCase()}</span> #${ref.bundleId}`;
+                    
+                    if (snap) {
+                        // Show key params per bundle type
+                        if (ref.type === 'cd') {
+                            html += ` — ${snap.pitchInfo?.pitch || '?'} ${snap.dynamic1 || '?'}→${snap.dynamic2 || '?'} ${snap.volumeMode || ''}`;
+                            if (snap.secco) html += ' secco';
+                        } else if (ref.type === 'nf') {
+                            html += ` — impact: ${snap.impactTime?.toFixed(1) || '?'}s`;
+                            if (snap.hasArrow) html += ' +arrow';
+                        } else if (ref.type === 'bp') {
+                            html += ` — impact: ${snap.impactTime?.toFixed(1) || '?'}s`;
+                        } else if (ref.type === 'pt') {
+                            html += ` — start: ${snap.startTime?.toFixed(1) || '?'}s`;
+                        } else if (ref.type === 'ptg') {
+                            html += ` — ${snap.startTime?.toFixed(1) || '?'}s–${snap.endTime?.toFixed(1) || '?'}s`;
+                        } else if (ref.type === 'vib') {
+                            html += ` — ${snap.startTime?.toFixed(1) || '?'}s–${snap.endTime?.toFixed(1) || '?'}s`;
+                        }
+                        
+                        if (snap._curveInfo) {
+                            html += `<div style="margin-left: 8px; color: #7a7;">curve: ${snap._curveInfo.name || '?'}, slope: ${snap._curveInfo.slope ?? '?'}</div>`;
+                        }
+                        if (snap._gcInfo) {
+                            html += `<div style="margin-left: 8px; color: #a7a;">gc: ${snap._gcInfo.name || '?'}, impact: ${snap._gcInfo.impactSeconds?.toFixed(1) || '?'}s</div>`;
+                        }
+                        if (snap._svgInfo) {
+                            html += `<div style="margin-left: 8px; color: #77a;">svg: ${snap._svgInfo.name || '?'}, scale: ${snap._svgInfo.scale?.toFixed(2) ?? '?'}</div>`;
+                        }
+                    }
+                    
+                    html += `</div>`;
+                }
+                
+                html += `<div style="margin-top: 6px; color: #666; font-size: 8px;">Version ${mm.currentVersionIndex + 1}/${mm.versions.length} — ${ver?.label || ''} — ${new Date(ver?.date).toLocaleString()}</div>`;
+                
+                this.detailContent.innerHTML = html;
+                this.detailPanel.style.display = 'block';
+                
+                // Version selector
+                if (mm.versions.length > 1) {
+                    this.versionRow.style.display = 'flex';
+                    this.versionSelect.innerHTML = '';
+                    mm.versions.forEach((v, i) => {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = `v${i + 1}: ${v.label || 'update'} (${new Date(v.date).toLocaleDateString()})`;
+                        this.versionSelect.appendChild(opt);
+                    });
+                    this.versionSelect.value = mm.currentVersionIndex;
+                } else {
+                    this.versionRow.style.display = 'none';
+                }
+            },
+            
+            _hideDetail() {
+                if (this.detailPanel) this.detailPanel.style.display = 'none';
+                if (this.versionRow) this.versionRow.style.display = 'none';
+            },
+            
+            onVersionChange() {
+                const mm = this.materials.find(m => m.id === this.selectedId);
+                if (!mm) return;
+                const idx = parseInt(this.versionSelect?.value);
+                if (isNaN(idx)) return;
+                mm.currentVersionIndex = idx;
+                this._showDetail(mm);
+            },
+            
+            // ── Phase 3: Update & Revision ──
+            
+            updateSelected() {
+                const mm = this.materials.find(m => m.id === this.selectedId);
+                if (!mm) {
+                    this._setStatus('No material selected to update.');
+                    return;
+                }
+                
+                // Re-snapshot current bundle state
+                const snapshot = this._createSnapshot(mm.bundleRefs);
+                const label = this.descInput?.value?.trim() || 'update';
+                
+                // Update description if provided
+                if (this.descInput?.value?.trim()) {
+                    mm.description = this.descInput.value.trim();
+                }
+                
+                // Recalculate time range and track
+                mm.track = this._inferTrack(mm.bundleRefs);
+                mm.timeRange = this._inferTimeRange(mm.bundleRefs);
+                
+                mm.versions.push({
+                    date: new Date().toISOString(),
+                    label,
+                    snapshot
+                });
+                mm.currentVersionIndex = mm.versions.length - 1;
+                
+                this._refreshList();
+                this._showDetail(mm);
+                this._setStatus(`Updated "${mm.name}" → v${mm.versions.length}`);
+                
+                if (this.descInput) this.descInput.value = '';
+                
+                console.log('MusicalMaterialSystem: updated', mm.id, mm.name, 'v' + mm.versions.length);
+            },
+            
+            deleteSelected() {
+                const mm = this.materials.find(m => m.id === this.selectedId);
+                if (!mm) {
+                    this._setStatus('No material selected to delete.');
+                    return;
+                }
+                
+                this.materials = this.materials.filter(m => m.id !== mm.id);
+                this.selectedId = null;
+                this._refreshList();
+                this._hideDetail();
+                this._setStatus(`Deleted "${mm.name}"`);
+                
+                console.log('MusicalMaterialSystem: deleted', mm.id, mm.name);
+            },
+            
+            // ── Phase 4: MultiSelect Integration ──
+            
+            captureFromMultiSelect() {
+                // Called from MultiSelect toolbar button
+                this.captureFromSelection();
+            },
+            
+            // ── Save/Load ──
+            
+            exportData() {
+                return {
+                    materials: JSON.parse(JSON.stringify(this.materials)),
+                    nextId: this.nextId
+                };
+            },
+            
+            importData(data) {
+                if (!data) return;
+                this.materials = data.materials || [];
+                this.nextId = data.nextId || 1;
+                this.selectedId = null;
+                this._refreshList();
+                this._hideDetail();
+                console.log('MusicalMaterialSystem: imported', this.materials.length, 'materials');
+            },
+            
+            // ── Utilities ──
+            
+            _setStatus(msg) {
+                if (this.statusLabel) {
+                    this.statusLabel.textContent = msg;
+                    setTimeout(() => {
+                        if (this.statusLabel.textContent === msg) this.statusLabel.textContent = '';
+                    }, 5000);
+                }
+            },
+            
+            getMaterialById(id) {
+                return this.materials.find(m => m.id === id) || null;
+            },
+            
+            getMaterialByName(name) {
+                return this.materials.find(m => m.name === name) || null;
+            },
+            
+            listMaterials() {
+                return this.materials.map(m => ({
+                    id: m.id,
+                    name: m.name,
+                    description: m.description,
+                    track: m.track,
+                    timeRange: m.timeRange,
+                    bundleCount: m.bundleRefs.length,
+                    versionCount: m.versions.length
+                }));
+            }
+        };
+        
+        MusicalMaterialSystem.init();
+        window.MusicalMaterialSystem = MusicalMaterialSystem;
         
         // Initialize Score Manager (after all other systems)
         ScoreManager.init();

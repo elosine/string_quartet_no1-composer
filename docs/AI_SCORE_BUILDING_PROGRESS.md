@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 5, 2026  
-**Current ASB Number:** ASB-129
+**Current ASB Number:** ASB-131
 
 ---
 
@@ -135,17 +135,17 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-128–129 + v1.0-composition milestone.** Bow Overpressure MIDI model (CC0=53, random pitch, quarter-tone pitch bend). Sustained Tone quarter-tone pitch bend fix (single pitch mode was ignoring quarterTone offset). Composition phase milestone tagged `v1.0-composition` — 129 ASB increments, 434 score versions.
+> **ASB-130: Musical Material System.** First revision-phase feature. New `MusicalMaterialSystem` — data catalog grouping bundles into named Musical Materials with versioned snapshots. 4 phases: data model + capture, UI panel (sidebar), update/revision tracking, MultiSelect integration (purple MM button). Registered with ScoreManager for persistence. Supports all 6 bundle types (CD, NF, BP, PT, PTG, VIB).
 
 ---
 
 ## Current Session
 
-**Date:** Mar 4, 2026  
-**Focus:** Bow Overpressure MIDI model + Sustained Tone quarter-tone fix  
-**ASB:** ASB-129  
-**Tier 1 Count This Session:** 2 (ASB-128, ASB-129)  
-**Tier 2 Threshold:** 2 of 3-4
+**Date:** Mar 5, 2026  
+**Focus:** SVG Workflow Improvements — lyFilename storage, Replace SVG buttons  
+**ASB:** ASB-131  
+**Tier 1 Count This Session:** 0 (reset after Tier 2 commit)  
+**Tier 2 Threshold:** 0 of 3-4
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -483,6 +483,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-127 | GC support in Transient Grouping System — hit test data fix (x1/x2/trackDims in renderGC), typeMap entries, ObjectRegistry adapter (setTime/setTrack/delete/clone/getBounds) | Complete |
 | ASB-128 | Bow Overpressure MIDI Model — MidiModelSystem model def (CC0=53, randomPitch, pitchRanges), dropdown option, generateRandomPitch + pitchToNoteNameWithQuarter helpers, attachToSelectedGC (random pitch + quarter-tone pitch bend), previewPlay (random pitch + bend), onModelSelect/updatePitchModeUI/updateInfo (hide pitch input, show random info) | Complete (intermediary) |
 | ASB-129 | Sustained Tone quarter-tone pitch bend fix — single pitch mode in CrescendoUI.generateCrescendoMidi() was ignoring quarterTone offset (hardcoded startBend=8192). Fixed: calculate bend from quarterToneOffset * 8192 (±1 semitone range). Added pitch bend reset to center after note off. Key insight: PITCH_BEND_RANGE=2 is segment threshold, not synth range. | Complete |
+| ASB-131 | Phase 1 SVG Workflow Improvements — lyFilename storage on all 6 bundle types (content-addressable naming convention), Replace SVG from File buttons wired for all 6 systems, _svgInfo bug already fixed, LY_NAMING_CONVENTION.md documentation | Complete |
 
 ---
 
