@@ -1050,6 +1050,68 @@ app.post('/api/lilypond/create-vibrato', (req, res) => {
     }
 });
 
+// ============================================
+// SVG ASSEMBLY ENGINE — Direct SVG generation (no LilyPond)
+// ============================================
+
+const svgAssembly = require(path.join(LILYPOND_DIR, 'svg_assembly', 'assemble_svg.js'));
+
+app.post('/api/svg-assembly/sustained-tone', (req, res) => {
+    const { pitch, clef, dynamic1, dynamic2, hairpin, secco, nonVib, noteheadType, filename } = req.body;
+    
+    if (!pitch || !clef || !dynamic1) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters: pitch, clef, dynamic1' });
+    }
+    if (hairpin && hairpin !== 'none' && !dynamic2) {
+        return res.status(400).json({ success: false, error: 'dynamic2 required when hairpin is not none' });
+    }
+    
+    try {
+        const staffPosition = svgAssembly.pitchToStaffPosition(pitch, clef === 'cClef' ? 'alto' : clef);
+        const accidental = svgAssembly.pitchToAccidental(pitch);
+        
+        const params = {
+            staffPosition,
+            accidental,
+            noteheadType: noteheadType || 'longTone',
+            dynamic1,
+            dynamic2: dynamic2 || null,
+            hairpin: hairpin || 'none',
+            secco: secco !== false,
+            nonVib: nonVib !== false,
+            debug: false
+        };
+        
+        const result = svgAssembly.assembleSustainedTone(params);
+        const { svg, metadata } = result;
+        
+        // Write to disk for replaceSvgFromFile compatibility
+        let svgPath = null;
+        if (filename) {
+            const svgOutputDir = path.join(__dirname, 'public', 'SVG_graphics');
+            const baseName = path.basename(filename, '.ly');
+            const svgFile = path.join(svgOutputDir, `${baseName}.svg`);
+            fs.writeFileSync(svgFile, svg);
+            svgPath = `/SVG_graphics/${encodeURIComponent(baseName + '.svg')}`;
+            console.log(`SVG Assembly: wrote ${baseName}.svg (${metadata.width_mm.toFixed(1)}×${metadata.height_mm.toFixed(1)}mm, staffPos=${staffPosition}, acc=${accidental}, nhCenterX=${metadata.noteheadCenterX_mm.toFixed(2)}mm)`);
+        }
+        
+        res.json({
+            success: true,
+            svg,
+            svgPath,
+            width: metadata.width_mm,
+            height: metadata.height_mm,
+            staffPosition,
+            accidental,
+            metadata
+        });
+    } catch (err) {
+        console.error('SVG Assembly error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // Create crescendo LilyPond file from template
 app.post('/api/lilypond/create-crescendo', (req, res) => {
     const { filename, pitchModel, clef, pitchInfo, dynamic1, dynamic2, hairpin, secco } = req.body;

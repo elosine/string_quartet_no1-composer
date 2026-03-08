@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 7, 2026  
-**Current ASB Number:** ASB-137
+**Last Updated:** Mar 8, 2026  
+**Current ASB Number:** ASB-139
 
 ---
 
@@ -54,6 +54,7 @@ That's it. Everything else below is for Cascade.
 | Crescendo/Decrescendo Bundle | **Complete** | All 3 phases working. Phase 3 MIDI regeneration fully operational (9 bugs fixed across ASB-106/107). Bundle dedup, dual-lookup delete. See ASB-107 |
 | LilyPond Settings Registry | Active | Update when settings change |
 | Musical Material Workflow | Active | Expand as new material types are built |
+| Animated Badge System | **Complete (v1)** | BadgeDatabase + BadgeMaker (murmuration Boids/SMIL) + UI panel + integration hooks + ObjectRegistry/ObjectSelector/MultiSelect. See ASB-138 |
 
 ### 4. Reusable Tools (remember these exist)
 
@@ -105,7 +106,7 @@ That's it. Everything else below is for Cascade.
 | **TODO: Sustained Tone Template Modernization (ASB-132)** | Current `CrescendoSinglePitchTemplate.ly` and `CrescendoGlissandoTemplate.ly` use outdated LilyPond settings (NoteHead #-2 vs registry #-3.3, Accidental -5 vs #-7, proportional 1/28 vs 1/13, staff line width 2mm vs 2.4mm, inline lambda vs `#custom-staff-lines`). Only 2 templates cover all sustained tone scenarios — generates visual inconsistencies across different pitch registers and clefs. **Multi-template model planned:** specialized templates per register/clef scenario with correct registry defaults. SVG reuse lookup (from LY_NAMING_CONVENTION.md) not yet implemented in pipeline. See ASB-132 Tier 1 memory for full analysis. | When fixing sustained tone SVGs, when modernizing any LilyPond template |
 | **SVG Assembly Engine — Phase 3: Server Pipeline Integration** | Assembly engine (`assemble_svg.js`) produces correct SVGs for sustained tones. Phase 3: new endpoint `POST /api/svg-assembly/sustained-tone` that calls `assembleSustainedTone()` directly (skipping LilyPond compile). Needs: export function from module, pitch-to-staffPosition mapping, accidental name mapping, update `CrescendoUI.step2()` to call new endpoint. Keep LilyPond path as fallback for glissando model. See ASB-137 memory for rules+profile architecture. | When wiring assembly engine into the app |
 | **SVG Positioning & Sizing in Score** | After pipeline integration: refine how assembled SVGs are sized and positioned in the score and within bundles. Currently hardcoded: 67% track height, 0.05 offsetYFraction, 8px overlap. Develop positioning rules as part of the profile system. | After Phase 3 pipeline integration is complete |
-| **Transient Grouping System (v1)** | ObjectRegistry + MultiSelect implemented (ASB-123). Shift+Click multi-select, Shift+Ctrl+Win+Click for overlapping objects, per-object cyan highlights + dashed bounding box, floating mini-toolbar (Dup/Del/Track/Time), keyboard shortcuts (Ctrl+Alt+D/Delete/Escape). Adapters: Curve, LineWedge, SVG, Motive. **Future:** Rubber-band selection (Option 1), Temporal Range Grouping (Option 4), persistent groups. | When extending grouping features or adding new object types |
+| **Transient Grouping System (v1)** | ObjectRegistry + MultiSelect implemented (ASB-123). Shift+Click multi-select, Shift+Ctrl+Win+Click for overlapping objects, per-object cyan highlights + dashed bounding box, floating mini-toolbar (Dup/Del/Track/Time — now **draggable** via grip handle, ASB-139), keyboard shortcuts (Ctrl+Alt+D/Delete/Escape). Adapters: Curve, LineWedge, SVG, Motive, GC, **Badge**. **Future:** Rubber-band selection (Option 1), Temporal Range Grouping (Option 4), persistent groups. | When extending grouping features or adding new object types |
 
 ---
 
@@ -142,17 +143,21 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-131: Phase 1 SVG Workflow Improvements.** Three-phase improvement to SVG notation workflow: Phase 1a: Store `lyFilename` on bundles at generation time (content-addressable naming convention). Phase 1b: Fix `_svgInfo` bug in MMS `_createSnapshot`. Phase 1c: Implement `SVGElementManager.replaceSvgFromFile()` and wire "Replace SVG" buttons for all 6 systems. Also completed ASB-130 (Musical Material System) and ASB-133 (MMS Bugfix). Tier 2 commit: 0a121cf.
+> **ASB-132–137: SVG Component Assembly Engine.** Bbox calculator, layout engine, text measurement tool, rules+profile architecture for assembling notation SVGs from component library. 6 Tier 1 increments. Tier 2 commit pending.
 
 ---
 
 ## Current Session
 
-**Date:** Mar 7, 2026  
-**Focus:** SVG Component Assembly Engine — bbox system, layout engine, text measurement, rules+profile architecture  
-**ASB:** ASB-132 through ASB-137  
-**Tier 1 Count This Session:** 6 (ASB-132, ASB-134, ASB-135, ASB-136, ASB-137 + layout tuning)  
-**Tier 2 Commit:** Pending
+**Date:** Mar 8, 2026  
+**Focus:** Animated Badge System + MultiSelect toolbar draggable  
+**ASB:** ASB-138 through ASB-139  
+**Tier 1 Count This Session:** 2 (ASB-138, ASB-139)  
+**Tier 2 Commit:** f9a45495
+
+### Session Log — Animated Badge System
+- ASB-138: Full animated badge system — BadgeDatabase (CRUD + ScoreManager), Badge UI panel (type/time/track/alignment), BadgeMaker JS (murmuration Boids/SMIL animation, create/render/select/delete/visibility/reload), integration hooks (GraphicTimeline visibility, z-order, resize), ObjectSelector hit-testing, ObjectRegistry adapter (getAll/setTime/setTrack/delete/clone/select/deselect/getElement/getBounds), MultiSelect typeMap for shift-click support
+- ASB-139: MultiSelect toolbar draggable — grip handle (⠿), mousedown/mousemove/mouseup drag logic, viewport clamping, cursor feedback (grab↔grabbing)
 
 ### Session Log — SVG Component Assembly Engine
 - ASB-132: Sustained Tone pipeline analysis — traced full client→server→LilyPond→SVG flow, identified template settings discrepancies vs registry, proposed multi-template model and SVG assembly engine approach

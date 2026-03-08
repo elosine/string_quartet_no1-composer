@@ -1550,6 +1550,11 @@
                     <label for="curveFillTop">Fill ↑</label>
                 </div>
                 
+                <div class="curve-input-row" style="margin-top: 3px; margin-bottom: 3px;">
+                    <label style="font-size: 9px; min-width: 28px;">Opacity</label>
+                    <input type="number" id="curveOpacityInput" class="curve-input" value="0.30" min="0" max="1" step="0.05" style="width: 55px; font-size: 9px; padding: 2px 3px;">
+                </div>
+                
                 <div class="control-row" style="margin-top: 4px;">
                     <button id="curveDrawBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px;">Draw</button>
                     <button id="curveDeleteBtn" class="control-btn" style="font-size: 8px; padding: 4px 8px; background: var(--clr-darkRed); margin-left: 6px;">Delete</button>
@@ -1769,6 +1774,10 @@
                     <label style="font-size: 10px;">Node Time</label>
                     <span id="lwNodeTimeDisplay" style="font-size: 10px; color: #ccc; flex: 1; text-align: right;">—</span>
                 </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 10px;">Opacity</label>
+                    <input type="number" id="lwOpacityInput" class="curve-input" value="0.30" min="0" max="1" step="0.05" style="width: 55px; font-size: 10px;">
+                </div>
                 
                 <div class="color-swatches" id="lwColorSwatches" style="margin-top: 6px;">
                     <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
@@ -1788,6 +1797,40 @@
                 <button id="lwDrawBtn" class="curve-draw-btn" style="margin-top: 6px; background: #1a3a5c; border-color: #2a5a8c;">Draw</button>
                 <button id="lwDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: #1a3a5c; border-color: #2a5a8c;">Delete</button>
                 <button id="lwDeleteNodeBtn" class="curve-draw-btn" style="margin-top: 5px; background: #1a3a5c; border-color: #2a5a8c; display: none;">Delete Node</button>
+                
+                <div class="section-divider"></div>
+                <div class="section-label" style="background: #2D3748; color: #5B9BF5; padding: 3px 6px; border-radius: 2px; font-weight: bold;">Badge Maker</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 10px;">Type</label>
+                    <select id="badgeTypeSelect" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                        <option value="murmuration">Murmuration</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 10px;">Time</label>
+                    <input type="text" id="badgeTimeInput" class="curve-input" value="0.000">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 10px;">Track</label>
+                    <select id="badgeTrackSelect" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 10px;">Align</label>
+                    <select id="badgeAlignSelect" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                        <option value="left">Left edge at time</option>
+                        <option value="center">Center at time</option>
+                        <option value="right">Right edge at time</option>
+                    </select>
+                </div>
+                
+                <button id="badgeDrawBtn" class="curve-draw-btn" style="margin-top: 6px; background: #2D3748; border-color: #5B9BF5; color: #5B9BF5;">Draw Badge</button>
+                <button id="badgeDeleteBtn" class="curve-draw-btn" style="margin-top: 5px; background: #2D3748; border-color: #5B9BF5; color: #5B9BF5;">Delete Badge</button>
                 
                 <div class="section-divider"></div>
                 <div class="section-label" style="background: #8a5cf5; color: #fff; padding: 3px 6px; border-radius: 2px; font-weight: bold;">Musical Materials</div>
@@ -5377,6 +5420,7 @@
                 const secondsPerPage = (60 / beatsPerMinute) * beatsPerPage;
                 const leadInFraction = leadInSeconds / secondsPerPage;
                 const leadInPixels = leadInFraction * scoreWidth;
+                const pixelsPerSecond = scoreWidth / secondsPerPage;
                 
                 // SVG header dimensions (1/3 of staff height)
                 const headerHeight = staffHeight / 3;
@@ -5388,8 +5432,8 @@
                 const headerWidth = headerHeight * svgAspectRatio;
                 const staffLineStartFraction = 0.775 / 5.8450; // ~0.1326
                 
-                // Right edge of SVGs should be 3px before timeline 0
-                const svgRightEdge = leadInPixels - 3;
+                // Right edge of SVGs at second -1
+                const svgRightEdge = leadInPixels - pixelsPerSecond;
                 const svgLeftEdge = svgRightEdge - headerWidth;
                 
                 // Connector line X: at the staff line start X coordinate
@@ -5473,6 +5517,7 @@
                 const secondsPerPage = (60 / beatsPerMinute) * beatsPerPage;
                 const leadInFraction = leadInSeconds / secondsPerPage;
                 const leadInPixels = leadInFraction * scoreWidth;
+                const pixelsPerSecond = scoreWidth / secondsPerPage;
                 
                 // SVG header dimensions (1/3 of staff height)
                 const headerHeight = staffHeight / 3;
@@ -5480,8 +5525,8 @@
                 const headerWidth = headerHeight * svgAspectRatio;
                 const staffLineStartFraction = 0.775 / 5.8450;
                 
-                // Right edge of SVGs should be 3px before timeline 0
-                const svgRightEdge = leadInPixels - 3;
+                // Right edge of SVGs at second -1
+                const svgRightEdge = leadInPixels - pixelsPerSecond;
                 const svgLeftEdge = svgRightEdge - headerWidth;
                 
                 // Connector line X: at the staff line start X coordinate
@@ -6988,6 +7033,7 @@
                 if (window.CurveMaker) CurveMaker.updateVisibility();
                 if (window.MotiveMaker) MotiveMaker.updateVisibility();
                 if (window.LineWedgeMaker) LineWedgeMaker.updateVisibility();
+                if (window.BadgeMaker) BadgeMaker.updateVisibility();
                 if (window.FlowchartConnector) FlowchartConnector.updateVisibility();
                 if (window.GCMaker) GCMaker.updateVisibility();
                 if (window.MidiController) MidiController.updateMidiDisplayVisibility();
@@ -8192,6 +8238,14 @@
                         if (cursor.lwMeterBottom && cursor.lwMeterBottom.group) {
                             this.scoreBottomEl.appendChild(cursor.lwMeterBottom.group);
                         }
+                    }
+                }
+                if (window.BadgeMaker) {
+                    if (BadgeMaker.topBadgeGroup && this.scoreTopEl) {
+                        this.scoreTopEl.appendChild(BadgeMaker.topBadgeGroup);
+                    }
+                    if (BadgeMaker.bottomBadgeGroup && this.scoreBottomEl) {
+                        this.scoreBottomEl.appendChild(BadgeMaker.bottomBadgeGroup);
                     }
                 }
                 if (window.GCMaker) {
@@ -10026,6 +10080,52 @@
             }
         };
         window.LineWedgeDatabase = LineWedgeDatabase;
+        
+        // Badge Database - stores animated badges (flocking/murmuration)
+        const BadgeDatabase = {
+            badges: [],
+            nextId: 1,
+            
+            add(data) {
+                const badge = {
+                    id: this.nextId++,
+                    ...data,
+                    createdAt: Date.now()
+                };
+                this.badges.push(badge);
+                return badge;
+            },
+            
+            get(id) {
+                return this.badges.find(b => b.id === id);
+            },
+            
+            update(id, updates) {
+                const b = this.get(id);
+                if (b) Object.assign(b, updates);
+                return b;
+            },
+            
+            remove(id) {
+                const index = this.badges.findIndex(b => b.id === id);
+                if (index !== -1) { this.badges.splice(index, 1); return true; }
+                return false;
+            },
+            
+            getAll() { return this.badges; },
+            
+            exportData() {
+                return { badges: this.badges, nextId: this.nextId };
+            },
+            
+            importData(data) {
+                if (data && data.badges) {
+                    this.badges = data.badges;
+                    this.nextId = data.nextId || (this.badges.length > 0 ? Math.max(...this.badges.map(b => b.id)) + 1 : 1);
+                }
+            }
+        };
+        window.BadgeDatabase = BadgeDatabase;
         
         // Group Database - groups of objects (curves, GCs, motives, SVGs, MIDI snippets, audio clips)
         const GroupDatabase = {
@@ -13183,6 +13283,17 @@
                     }
                 );
                 
+                // BadgeDatabase
+                this.registerSource('databases.badges',
+                    () => BadgeDatabase.exportData(),
+                    (data) => {
+                        BadgeDatabase.importData(data);
+                        if (window.BadgeMaker) {
+                            BadgeMaker.reloadFromDatabase();
+                        }
+                    }
+                );
+                
                 // GCMaker - gravitational conductor objects
                 this.registerSource('databases.gcs',
                     () => window.GCMaker ? GCMaker.exportData() : { gcs: [], nextId: 1 },
@@ -14189,6 +14300,7 @@
                 this.recallSelected = document.getElementById('curveRecallSelected');
                 this.recallOptions = document.getElementById('curveRecallOptions');
                 this.insertBtn = document.getElementById('curveInsertBtn');
+                this.opacityInput = document.getElementById('curveOpacityInput');
                 
                 // Custom dropdown toggle handler
                 if (this.recallSelected) {
@@ -14328,6 +14440,12 @@
                             this.updateVisibility();
                         }
                     });
+                }
+                
+                // Opacity input handler - dynamic for selected curve
+                if (this.opacityInput) {
+                    this.opacityInput.addEventListener('change', () => this.updateSelectedOpacity());
+                    this.opacityInput.addEventListener('input', () => this.updateSelectedOpacity());
                 }
                 
                 // Input field handlers - dynamic for selected curve
@@ -14662,6 +14780,9 @@
                 const name = this.generateCurveName();
                 
                 // Create curve data
+                // Get opacity from params or UI (default 0.3)
+                const opacity = params?.opacity ?? (this.opacityInput ? parseFloat(this.opacityInput.value) : 0.3);
+                
                 const curveDataObj = {
                     name,
                     startSeconds,
@@ -14671,6 +14792,7 @@
                     gTrack,
                     color,
                     fillMode,
+                    opacity,
                     section,
                     page: startPage,
                     x1: x1Pixel,
@@ -14760,19 +14882,20 @@
                 const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 const { lineD, filledD } = this.generatePathFromModel(curve);
                 
+                const renderOpacity = String(curve.opacity ?? 0.3);
                 if (curve.fillMode === 'line' || !curve.trackDims || !filledD) {
                     path.setAttribute('d', lineD);
                     path.setAttribute('fill', 'none');
                     path.setAttribute('stroke', color);
                     path.setAttribute('stroke-width', '2');
-                    path.setAttribute('opacity', '0.3');
+                    path.setAttribute('opacity', renderOpacity);
                 } else {
                     path.setAttribute('d', filledD);
                     path.setAttribute('fill', color);
-                    path.setAttribute('fill-opacity', '0.3');
+                    path.setAttribute('fill-opacity', renderOpacity);
                     path.setAttribute('stroke', color);
                     path.setAttribute('stroke-width', '2');
-                    path.setAttribute('opacity', '0.3');
+                    path.setAttribute('opacity', renderOpacity);
                 }
                 
                 path.style.cursor = 'pointer';
@@ -15175,6 +15298,9 @@
                 
                 // Update slope input
                 if (this.slopeInput) this.slopeInput.value = curve.slope || 0;
+                
+                // Update opacity input
+                if (this.opacityInput) this.opacityInput.value = curve.opacity ?? 0.3;
                 
                 // Notify MidiModelSystem of curve selection (for Long Tone)
                 if (window.MidiModelSystem && MidiModelSystem.selectedModelKey === 'longTone') {
@@ -15670,13 +15796,14 @@
                 curve.elements[pathKey].setAttribute('stroke', color);
                 
                 // Apply fill mode to continuation segment
+                const contOpacity = String(curve.opacity ?? 0.3);
                 if (curve.fillMode && curve.fillMode !== 'line') {
                     curve.elements[pathKey].setAttribute('fill', color);
-                    curve.elements[pathKey].setAttribute('fill-opacity', '0.3');
+                    curve.elements[pathKey].setAttribute('fill-opacity', contOpacity);
                 } else {
                     curve.elements[pathKey].setAttribute('fill', 'none');
                 }
-                curve.elements[pathKey].setAttribute('opacity', '0.3');
+                curve.elements[pathKey].setAttribute('opacity', contOpacity);
                 
                 curve.elements[groupKey].style.display = '';
                 
@@ -16146,6 +16273,16 @@
                 this.updateVisibility();
             },
             
+            updateSelectedOpacity() {
+                if (!this.selectedCurve) return;
+                const val = parseFloat(this.opacityInput.value);
+                if (isNaN(val)) return;
+                this.selectedCurve.opacity = Math.max(0, Math.min(1, val));
+                this.updateCurveRendering(this.selectedCurve);
+                this.syncCurveToDatabase(this.selectedCurve);
+                this.updateVisibility();
+            },
+            
             syncCurveToDatabase(curve) {
                 // Regenerate curveData array when curve is modified
                 const curveDataArray = this.generateCurveDataArray(curve);
@@ -16203,6 +16340,7 @@
                     tension: curve.tension,
                     slope: curve.slope,
                     model: curve.model || 'bezier',
+                    opacity: curve.opacity,
                     x1: curve.x1,
                     y1Pixel: curve.y1Pixel,
                     x2: curve.x2,
@@ -16238,17 +16376,18 @@
                 // Generate path using the unified model system
                 const { lineD, filledD } = this.generatePathFromModel(curve);
                 
+                const opacityStr = String(curve.opacity ?? 0.3);
                 if (curve.fillMode === 'line' || !curve.trackDims || !filledD) {
                     path.setAttribute('d', lineD);
                     path.setAttribute('fill', 'none');
                     path.setAttribute('stroke', color);
-                    path.setAttribute('opacity', '0.3');
+                    path.setAttribute('opacity', opacityStr);
                 } else {
                     path.setAttribute('d', filledD);
                     path.setAttribute('fill', color);
-                    path.setAttribute('fill-opacity', '0.3');
+                    path.setAttribute('fill-opacity', opacityStr);
                     path.setAttribute('stroke', color);
-                    path.setAttribute('opacity', '0.3');
+                    path.setAttribute('opacity', opacityStr);
                 }
                 
                 // Update hit path for easier clicking
@@ -16698,6 +16837,7 @@
                         tension: savedCurve.tension || 0,
                         slope: savedCurve.slope || 0,
                         model: savedCurve.model || 'bezier',
+                        opacity: savedCurve.opacity ?? 0.3,
                         trackDims
                     };
                     
@@ -21333,44 +21473,86 @@
                 }, null, 2));
                 
                 let result = null;
+                const hairpinDir = hairpin === 'none' ? 'none' : (hairpin === '\\<' ? '<' : '>');
                 try {
-                    // Create LilyPond file from template
-                    const createResp = await fetch('/api/lilypond/create-crescendo', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            filename,
-                            pitchModel,
-                            clef: lpClef,
-                            pitchInfo,
-                            dynamic1: dyn1,
-                            dynamic2: dyn2,
-                            hairpin: hairpin === 'none' ? 'none' : (hairpin === '\\<' ? '<' : '>'),
-                            secco
-                        })
-                    });
-                    const createResult = await createResp.json();
+                    let svgPath;
                     
-                    if (!createResult.success) {
-                        console.error('CrescendoUI.step2: Failed to create file:', createResult.error);
-                        throw new Error(createResult.error);
-                    }
-                    console.log('CrescendoUI.step2: LilyPond file created:', filename);
+                    let assemblyMetadata = null;
                     
-                    // Render LilyPond to SVG (reuse existing render endpoint)
-                    const renderResp = await fetch('/api/lilypond/render-glissando', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ filename })
-                    });
-                    const renderResult = await renderResp.json();
-                    
-                    if (renderResult.success) {
-                        console.log('CrescendoUI.step2: SVG rendered:', renderResult.svgPath);
+                    if (pitchModel !== 'glissando') {
+                        // Single-pitch: use SVG Assembly Engine (instant, no LilyPond)
+                        // Steady mode: no hairpin, no dynamic2, no secco (matches old LilyPond behavior)
+                        const isSteady = hairpinDir === 'none';
+                        const assembleResp = await fetch('/api/svg-assembly/sustained-tone', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                pitch: singlePitch,
+                                clef,
+                                dynamic1: dyn1,
+                                dynamic2: isSteady ? null : dyn2,
+                                hairpin: hairpinDir,
+                                secco: isSteady ? false : secco,
+                                nonVib: true,
+                                noteheadType: 'longTone',
+                                filename
+                            })
+                        });
+                        const assembleResult = await assembleResp.json();
                         
-                        // Insert SVG into score
-                        const svgPath = renderResult.svgPath;
-                        const insertResult = await this.insertCrescendoSvg(svgPath, startSeconds, track);
+                        if (!assembleResult.success) {
+                            console.error('CrescendoUI.step2: SVG assembly failed:', assembleResult.error);
+                            throw new Error(assembleResult.error);
+                        }
+                        svgPath = assembleResult.svgPath;
+                        assemblyMetadata = assembleResult.metadata;
+                        console.log('CrescendoUI.step2: SVG assembled (no LilyPond):', svgPath,
+                            `staffPos=${assembleResult.staffPosition}, acc=${assembleResult.accidental}`,
+                            `nhCenterX=${assemblyMetadata.noteheadCenterX_mm.toFixed(2)}mm`);
+                    } else {
+                        // Glissando: use LilyPond pipeline (fallback)
+                        const createResp = await fetch('/api/lilypond/create-crescendo', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                filename,
+                                pitchModel,
+                                clef: lpClef,
+                                pitchInfo,
+                                dynamic1: dyn1,
+                                dynamic2: dyn2,
+                                hairpin: hairpinDir,
+                                secco
+                            })
+                        });
+                        const createResult = await createResp.json();
+                        
+                        if (!createResult.success) {
+                            console.error('CrescendoUI.step2: Failed to create file:', createResult.error);
+                            throw new Error(createResult.error);
+                        }
+                        console.log('CrescendoUI.step2: LilyPond file created:', filename);
+                        
+                        const renderResp = await fetch('/api/lilypond/render-glissando', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ filename })
+                        });
+                        const renderResult = await renderResp.json();
+                        
+                        if (!renderResult.success) {
+                            console.error('CrescendoUI.step2: Render failed:', renderResult.error);
+                            throw new Error(renderResult.error || 'Render failed');
+                        }
+                        svgPath = renderResult.svgPath;
+                        console.log('CrescendoUI.step2: SVG rendered (LilyPond):', svgPath);
+                    }
+                    
+                    if (svgPath) {
+                        console.log('CrescendoUI.step2: SVG ready:', svgPath);
+                        
+                        // Insert SVG into score (pass metadata for profile-based positioning)
+                        const insertResult = await this.insertCrescendoSvg(svgPath, startSeconds, track, assemblyMetadata);
                         if (insertResult) {
                             console.log('CrescendoUI.step2: SVG inserted into score');
                         }
@@ -21419,9 +21601,6 @@
                             midi: midiResult,
                             midiInsert: midiInsert
                         };
-                    } else {
-                        console.error('CrescendoUI.step2: Render failed:', renderResult.error);
-                        throw new Error(renderResult.error || 'Render failed');
                     }
                 } catch (err) {
                     console.error('CrescendoUI.step2 error:', err);
@@ -22013,7 +22192,14 @@
             },
             
             // Insert crescendo SVG into score (matches LongToneUI.insertGlissandoSvg pattern)
-            async insertCrescendoSvg(svgPath, startSeconds, track) {
+            // metadata: optional object from SVG assembly engine with positioning info.
+            //   When provided (assembly path), uses profile-based positioning:
+            //     metadata.positioning.heightFraction — SVG height as fraction of track height
+            //     metadata.positioning.offsetYFraction — vertical offset from track top
+            //     metadata.positioning.anchorElement — which element to align with curve start
+            //     metadata.noteheadCenterX_mm — notehead center X in mm from SVG left edge
+            //   When null (glissando/LilyPond path), falls back to legacy hardcoded values.
+            async insertCrescendoSvg(svgPath, startSeconds, track, metadata = null) {
                 if (!svgPath) {
                     console.error('CrescendoUI.insertCrescendoSvg: Missing svgPath');
                     return null;
@@ -22049,18 +22235,31 @@
                     const trackDims = CompositionPanel.getTrackDimensions(String(trackNum), scoreEl);
                     const trackHeight = trackDims.height;
                     
-                    // Scale cropped content to fit ~67% of track height
-                    const targetHeight = trackHeight * 0.67;
-                    const scale = targetHeight / svgHeight;
-                    const scaledContentWidth = svgWidth * scale;
+                    // Positioning: use profile values from metadata, or legacy hardcoded fallback
+                    const positioning = metadata?.positioning || null;
+                    const heightFraction = positioning ? positioning.heightFraction : 0.67;
+                    const offsetYFraction = positioning ? positioning.offsetYFraction : 0.05;
                     
-                    // Calculate offsetSeconds: position SVG near curve start with slight overlap
+                    const targetHeight = trackHeight * heightFraction;
+                    const scale = targetHeight / svgHeight;
+                    
+                    // Calculate offsetSeconds: X positioning relative to curve start time
                     const secondsPerPage = window.GraphicTimeline 
                         ? GraphicTimeline.getSecondsPerPage() 
                         : (beatsPerPage / beatsPerMinute) * 60;
                     const secondsPerPixel = secondsPerPage / scoreWidth;
-                    const overlap = 8;
-                    const offsetSeconds = -(scaledContentWidth - overlap) * secondsPerPixel;
+                    
+                    let offsetSeconds;
+                    if (positioning && positioning.anchorElement === 'noteheadCenter' && metadata.noteheadCenterX_mm) {
+                        // Profile-based: center notehead over curve start time
+                        const noteheadCenterPx = metadata.noteheadCenterX_mm * 3.78 * scale;
+                        offsetSeconds = -noteheadCenterPx * secondsPerPixel;
+                    } else {
+                        // Legacy fallback: position SVG left of curve start with 8px overlap
+                        const scaledContentWidth = svgWidth * scale;
+                        const overlap = 8;
+                        offsetSeconds = -(scaledContentWidth - overlap) * secondsPerPixel;
+                    }
                     
                     // Create wrapper and image
                     const id = SVGElementManager.nextId++;
@@ -22085,11 +22284,11 @@
                         image: image,
                         referenceSeconds: startSeconds,
                         offsetSeconds: offsetSeconds,
-                        offsetYFraction: 0.05,
+                        offsetYFraction: offsetYFraction,
                         width: svgWidth,
                         height: svgHeight,
                         scale: scale,
-                        heightFraction: 0.67,
+                        heightFraction: heightFraction,
                         track: trackNum
                     };
                     
@@ -22119,7 +22318,8 @@
                     console.log('CrescendoUI.insertCrescendoSvg: Inserted', elementData.name, 
                         'refSec:', startSeconds, 'offsetSec:', offsetSeconds.toFixed(3),
                         'scale:', scale.toFixed(3), 'track:', trackNum,
-                        'page:', pos.page, 'section:', pos.section);
+                        'page:', pos.page, 'section:', pos.section,
+                        positioning ? `(profile: hFrac=${heightFraction}, yFrac=${offsetYFraction}, anchor=${positioning.anchorElement})` : '(legacy)');
                     
                     return elementData;
                 } catch (err) {
@@ -26174,6 +26374,8 @@
             nodeThicknessInput: null,
             nodeTimeRow: null,
             nodeTimeDisplay: null,
+            opacityInput: null,
+            defaultOpacity: 0.3,
             colorSwatches: null,
             
             init() {
@@ -26190,6 +26392,7 @@
                 this.nodeThicknessInput = document.getElementById('lwNodeThicknessInput');
                 this.nodeTimeRow = document.getElementById('lwNodeTimeRow');
                 this.nodeTimeDisplay = document.getElementById('lwNodeTimeDisplay');
+                this.opacityInput = document.getElementById('lwOpacityInput');
                 this.colorSwatches = document.getElementById('lwColorSwatches');
                 
                 this.topLWGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -26210,6 +26413,11 @@
                 if (this.nodeThicknessInput) {
                     this.nodeThicknessInput.addEventListener('change', () => this.updateSelectedNodeThickness());
                     this.nodeThicknessInput.addEventListener('input', () => this.updateSelectedNodeThickness());
+                }
+                
+                if (this.opacityInput) {
+                    this.opacityInput.addEventListener('change', () => this.updateSelectedOpacity());
+                    this.opacityInput.addEventListener('input', () => this.updateSelectedOpacity());
                 }
                 
                 if (this.colorSwatches) {
@@ -26308,12 +26516,15 @@
                     ? params.nodes.map(n => ({ pos: n.pos, thickness: n.thickness }))
                     : [{ pos: 0, thickness: defaultThickness }, { pos: 1, thickness: defaultThickness }];
                 
+                const opacity = params?.opacity ?? (this.opacityInput ? parseFloat(this.opacityInput.value) : this.defaultOpacity);
+                
                 const lwData = {
                     name,
                     startSeconds,
                     endSeconds,
                     gTrack: actualGTrack,
                     color,
+                    opacity,
                     section: pos.section,
                     page: pos.page,
                     x1: pos.x,
@@ -26392,6 +26603,7 @@
                 path.setAttribute('stroke', color);
                 path.setAttribute('stroke-width', '0.5');
                 path.setAttribute('stroke-linejoin', 'round');
+                path.setAttribute('opacity', String(lw.opacity ?? this.defaultOpacity));
                 group.appendChild(path);
                 
                 const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -26473,6 +26685,7 @@
                 lw.elements.path.setAttribute('d', pathD);
                 lw.elements.path.setAttribute('fill', color);
                 lw.elements.path.setAttribute('stroke', color);
+                lw.elements.path.setAttribute('opacity', String(lw.opacity ?? this.defaultOpacity));
                 lw.elements.hitPath.setAttribute('d', pathD);
                 lw.elements.highlight.setAttribute('d', pathD);
                 
@@ -26508,6 +26721,7 @@
                 if (this.startInput) this.startInput.value = lw.startSeconds.toFixed(3);
                 if (this.endInput) this.endInput.value = lw.endSeconds.toFixed(3);
                 if (this.trackSelect) this.trackSelect.value = lw.gTrack;
+                if (this.opacityInput) this.opacityInput.value = (lw.opacity ?? this.defaultOpacity).toFixed(2);
                 
                 if (this.colorSwatches) {
                     this.colorSwatches.querySelectorAll('.color-swatch').forEach(s => {
@@ -26867,6 +27081,17 @@
                 this.syncToDatabase(lw);
             },
             
+            updateSelectedOpacity() {
+                const lw = this.selectedLineWedge;
+                if (!lw) return;
+                
+                const val = parseFloat(this.opacityInput.value);
+                lw.opacity = Math.max(0, Math.min(1, isNaN(val) ? this.defaultOpacity : val));
+                
+                this.updateLineWedgeRendering(lw);
+                this.syncToDatabase(lw);
+            },
+            
             syncToDatabase(lw) {
                 if (window.ScoreManager) ScoreManager.markDirty();
                 LineWedgeDatabase.update(lw.id, {
@@ -26874,6 +27099,7 @@
                     endSeconds: lw.endSeconds,
                     gTrack: lw.gTrack,
                     color: lw.color,
+                    opacity: lw.opacity,
                     nodes: lw.nodes.map(n => ({ pos: n.pos, thickness: n.thickness }))
                 });
             },
@@ -27165,6 +27391,7 @@
                 lw.elements[pathKey].setAttribute('d', d);
                 lw.elements[pathKey].setAttribute('fill', color);
                 lw.elements[pathKey].setAttribute('stroke', color);
+                lw.elements[pathKey].setAttribute('opacity', String(lw.opacity ?? this.defaultOpacity));
                 if (lw.elements[hitPathKey]) {
                     lw.elements[hitPathKey].setAttribute('d', d);
                 }
@@ -27286,6 +27513,429 @@
         
         LineWedgeMaker.init();
         window.LineWedgeMaker = LineWedgeMaker;
+        
+        // ============================================
+        // BADGE MAKER — animated badges (murmuration, etc.)
+        // ============================================
+        const BadgeMaker = {
+            scoreTopEl: null,
+            scoreBottomEl: null,
+            topBadgeGroup: null,
+            bottomBadgeGroup: null,
+            badges: [],
+            selectedBadge: null,
+            
+            // UI refs
+            typeSelect: null,
+            timeInput: null,
+            trackSelect: null,
+            alignSelect: null,
+            drawBtn: null,
+            deleteBtn: null,
+            
+            // Murmuration defaults (user-tuned values)
+            MURM: {
+                BOID_COUNT: 9, FRAMES: 120, DUR: 4, TRI_SIZE: 2,
+                BORDER_R: 4, BG: '#2D3748', BOID_CLR: '#5B9BF5',
+                NEIGHBOR_COUNT: 7, SEPARATION_DIST_FRAC: 0.08,
+                ALIGNMENT_WEIGHT: 0.12, COHESION_WEIGHT: 0.008,
+                SEPARATION_WEIGHT: 0.4, LEADER_WEIGHT: 0.003,
+                MAX_SPEED: 1, MIN_SPEED: 0.35, TURN_FACTOR: 0.3
+            },
+            
+            init() {
+                this.scoreTopEl = document.getElementById('ScoreTop');
+                this.scoreBottomEl = document.getElementById('ScoreBottom');
+                
+                // Create SVG container groups
+                const ns = 'http://www.w3.org/2000/svg';
+                this.topBadgeGroup = document.createElementNS(ns, 'g');
+                this.bottomBadgeGroup = document.createElementNS(ns, 'g');
+                this.topBadgeGroup.setAttribute('class', 'badge-container');
+                this.bottomBadgeGroup.setAttribute('class', 'badge-container');
+                this.scoreTopEl.appendChild(this.topBadgeGroup);
+                this.scoreBottomEl.appendChild(this.bottomBadgeGroup);
+                
+                // UI refs
+                this.typeSelect = document.getElementById('badgeTypeSelect');
+                this.timeInput = document.getElementById('badgeTimeInput');
+                this.trackSelect = document.getElementById('badgeTrackSelect');
+                this.alignSelect = document.getElementById('badgeAlignSelect');
+                this.drawBtn = document.getElementById('badgeDrawBtn');
+                this.deleteBtn = document.getElementById('badgeDeleteBtn');
+                
+                // Event listeners
+                if (this.drawBtn) this.drawBtn.addEventListener('click', () => this.createBadge());
+                if (this.deleteBtn) this.deleteBtn.addEventListener('click', () => this.deleteSelectedBadge());
+                
+                // Debounced resize
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => this.reloadFromDatabase(), 100);
+                });
+                
+                console.debug('BadgeMaker initialized');
+            },
+            
+            calcPositionFromTime(seconds) {
+                const spp = GraphicTimeline.getSecondsPerPage();
+                const dispTime = seconds + leadInSeconds;
+                const page = Math.floor(Math.max(0, dispTime) / spp);
+                const section = page % 2 === 0 ? 'top' : 'bottom';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const xPct = (dispTime / spp) - page;
+                const x = xPct * scoreWidth;
+                return { x, page, section, scoreEl, scoreWidth, secondsPerPage: spp };
+            },
+            
+            getBadgeSize(gTrack) {
+                const td = CompositionPanel.getTrackDimensions(gTrack, this.scoreTopEl);
+                return { sz: Math.round(td.height / 4), trackDims: td };
+            },
+            
+            createBadge(params) {
+                const type = params?.type || (this.typeSelect ? this.typeSelect.value : 'murmuration');
+                const startSeconds = params?.startSeconds ?? (this.timeInput ? parseFloat(this.timeInput.value) : 0);
+                const gTrack = params?.gTrack || (this.trackSelect ? this.trackSelect.value : '1');
+                const alignment = params?.alignment || (this.alignSelect ? this.alignSelect.value : 'left');
+                
+                const now = new Date();
+                const name = `BDG_${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+                
+                const pos = this.calcPositionFromTime(startSeconds);
+                const { sz, trackDims } = this.getBadgeSize(gTrack);
+                
+                // Alignment offset: px is where the anchor point meets startSeconds
+                let xPos;
+                if (alignment === 'right') xPos = pos.x - sz;
+                else if (alignment === 'center') xPos = pos.x - sz / 2;
+                else xPos = pos.x; // left
+                
+                const yPos = trackDims.y + trackDims.height / 6 - sz / 2;
+                
+                const badge = {
+                    name, type, startSeconds, gTrack, alignment,
+                    section: pos.section, page: pos.page,
+                    x: xPos, y: yPos, sz, trackDims,
+                    elements: {}
+                };
+                
+                // Save to database
+                const dbBadge = BadgeDatabase.add({
+                    name, type, startSeconds, gTrack, alignment
+                });
+                badge.id = dbBadge.id;
+                
+                // Generate and render
+                this.renderBadge(badge);
+                this.badges.push(badge);
+                this.selectBadge(badge);
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                console.debug(`Badge created: ${name} at ${startSeconds}s, track ${gTrack}`);
+                return badge;
+            },
+            
+            generateMurmurationSVG(sz) {
+                const M = this.MURM;
+                const ns = 'http://www.w3.org/2000/svg';
+                const margin = 4;
+                const sDist = sz * M.SEPARATION_DIST_FRAC;
+                const edge = margin + 2;
+                
+                // Initialize boids
+                const boids = Array.from({length: M.BOID_COUNT}, () => ({
+                    x: margin + Math.random() * (sz - 2 * margin),
+                    y: margin + Math.random() * (sz - 2 * margin),
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2
+                }));
+                
+                // Leader path (figure-8 lemniscate)
+                const cx = sz / 2, cy = sz / 2;
+                const rx = sz * 0.3, ry = sz * 0.25;
+                let leaderT = 0;
+                const leaderSpeed = (2 * Math.PI) / M.FRAMES;
+                
+                function leaderPos(t) {
+                    const sint = Math.sin(t), cost = Math.cos(t);
+                    const denom = 1 + sint * sint;
+                    return { x: cx + rx * cost / denom, y: cy + ry * sint * cost / denom };
+                }
+                
+                function getNearest(boid, count) {
+                    return boids
+                        .filter(o => o !== boid)
+                        .map(o => ({ o, d: Math.hypot(boid.x - o.x, boid.y - o.y) }))
+                        .sort((a, b) => a.d - b.d)
+                        .slice(0, count);
+                }
+                
+                function tick() {
+                    leaderT += leaderSpeed;
+                    const leader = leaderPos(leaderT);
+                    for (const b of boids) {
+                        const neighbors = getNearest(b, M.NEIGHBOR_COUNT);
+                        let sx = 0, sy = 0, ax = 0, ay = 0, cohX = 0, cohY = 0;
+                        for (const { o, d } of neighbors) {
+                            cohX += o.x; cohY += o.y;
+                            ax += o.vx; ay += o.vy;
+                            if (d < sDist && d > 0) { sx += (b.x - o.x) / d; sy += (b.y - o.y) / d; }
+                        }
+                        const n = neighbors.length;
+                        if (n > 0) {
+                            b.vx += (cohX / n - b.x) * M.COHESION_WEIGHT;
+                            b.vy += (cohY / n - b.y) * M.COHESION_WEIGHT;
+                            b.vx += (ax / n - b.vx) * M.ALIGNMENT_WEIGHT;
+                            b.vy += (ay / n - b.vy) * M.ALIGNMENT_WEIGHT;
+                            b.vx += sx * M.SEPARATION_WEIGHT;
+                            b.vy += sy * M.SEPARATION_WEIGHT;
+                        }
+                        b.vx += (leader.x - b.x) * M.LEADER_WEIGHT;
+                        b.vy += (leader.y - b.y) * M.LEADER_WEIGHT;
+                        if (b.x < edge) b.vx += M.TURN_FACTOR;
+                        if (b.x > sz - edge) b.vx -= M.TURN_FACTOR;
+                        if (b.y < edge) b.vy += M.TURN_FACTOR;
+                        if (b.y > sz - edge) b.vy -= M.TURN_FACTOR;
+                        const spd = Math.hypot(b.vx, b.vy);
+                        if (spd > M.MAX_SPEED) { b.vx *= M.MAX_SPEED / spd; b.vy *= M.MAX_SPEED / spd; }
+                        if (spd < M.MIN_SPEED && spd > 0) { b.vx *= M.MIN_SPEED / spd; b.vy *= M.MIN_SPEED / spd; }
+                    }
+                    for (const b of boids) {
+                        b.x = Math.max(margin, Math.min(sz - margin, b.x + b.vx));
+                        b.y = Math.max(margin, Math.min(sz - margin, b.y + b.vy));
+                    }
+                }
+                
+                // Warm up then record keyframes
+                for (let i = 0; i < 200; i++) tick();
+                const data = Array.from({length: M.BOID_COUNT}, () => []);
+                for (let f = 0; f < M.FRAMES; f++) {
+                    tick();
+                    for (let i = 0; i < M.BOID_COUNT; i++) {
+                        data[i].push({ x: boids[i].x, y: boids[i].y, a: Math.atan2(boids[i].vy, boids[i].vx) * 180 / Math.PI });
+                    }
+                }
+                // Unwrap angles
+                for (let i = 0; i < M.BOID_COUNT; i++) {
+                    for (let f = 1; f < M.FRAMES; f++) {
+                        while (data[i][f].a - data[i][f-1].a > 180) data[i][f].a -= 360;
+                        while (data[i][f].a - data[i][f-1].a < -180) data[i][f].a += 360;
+                    }
+                }
+                
+                // Build SVG group (no translate — caller sets position)
+                const g = document.createElementNS(ns, 'g');
+                
+                // Background rounded rect
+                const bg = document.createElementNS(ns, 'rect');
+                bg.setAttribute('width', sz); bg.setAttribute('height', sz);
+                bg.setAttribute('rx', M.BORDER_R); bg.setAttribute('ry', M.BORDER_R);
+                bg.setAttribute('fill', M.BG);
+                g.appendChild(bg);
+                
+                // Clip path
+                const clipId = 'badge-clip-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+                const defs = document.createElementNS(ns, 'defs');
+                const cp = document.createElementNS(ns, 'clipPath');
+                cp.setAttribute('id', clipId);
+                cp.appendChild(bg.cloneNode());
+                defs.appendChild(cp);
+                g.appendChild(defs);
+                
+                // Flock container
+                const flock = document.createElementNS(ns, 'g');
+                flock.setAttribute('clip-path', `url(#${clipId})`);
+                
+                const s = M.TRI_SIZE;
+                const triD = `M ${s} 0 L ${-s*0.6} ${s*0.6} L ${-s*0.6} ${-s*0.6} Z`;
+                
+                for (let i = 0; i < M.BOID_COUNT; i++) {
+                    const outer = document.createElementNS(ns, 'g');
+                    const at = document.createElementNS(ns, 'animateTransform');
+                    at.setAttribute('attributeName', 'transform');
+                    at.setAttribute('type', 'translate');
+                    at.setAttribute('values', data[i].map(d => `${d.x.toFixed(1)} ${d.y.toFixed(1)}`).join(';'));
+                    at.setAttribute('dur', `${M.DUR}s`);
+                    at.setAttribute('repeatCount', 'indefinite');
+                    outer.appendChild(at);
+                    
+                    const inner = document.createElementNS(ns, 'g');
+                    const ar = document.createElementNS(ns, 'animateTransform');
+                    ar.setAttribute('attributeName', 'transform');
+                    ar.setAttribute('type', 'rotate');
+                    ar.setAttribute('values', data[i].map(d => `${d.a.toFixed(0)}`).join(';'));
+                    ar.setAttribute('dur', `${M.DUR}s`);
+                    ar.setAttribute('repeatCount', 'indefinite');
+                    inner.appendChild(ar);
+                    
+                    const tri = document.createElementNS(ns, 'path');
+                    tri.setAttribute('d', triD);
+                    tri.setAttribute('fill', M.BOID_CLR);
+                    inner.appendChild(tri);
+                    outer.appendChild(inner);
+                    flock.appendChild(outer);
+                }
+                g.appendChild(flock);
+                
+                // Invisible hit area for click selection
+                const hit = document.createElementNS(ns, 'rect');
+                hit.setAttribute('width', sz); hit.setAttribute('height', sz);
+                hit.setAttribute('fill', 'transparent');
+                hit.style.cursor = 'pointer';
+                g.appendChild(hit);
+                
+                return g;
+            },
+            
+            renderBadge(badge) {
+                const ns = 'http://www.w3.org/2000/svg';
+                
+                // Generate the animated SVG content
+                let svgContent;
+                if (badge.type === 'murmuration') {
+                    svgContent = this.generateMurmurationSVG(badge.sz);
+                } else {
+                    svgContent = this.generateMurmurationSVG(badge.sz); // fallback
+                }
+                
+                // Wrapper group with position
+                const wrapper = document.createElementNS(ns, 'g');
+                wrapper.setAttribute('transform', `translate(${badge.x.toFixed(1)}, ${badge.y.toFixed(1)})`);
+                wrapper.setAttribute('class', 'badge-element');
+                wrapper.appendChild(svgContent);
+                
+                // Selection highlight (yellow border, hidden by default)
+                const highlight = document.createElementNS(ns, 'rect');
+                highlight.setAttribute('width', badge.sz); highlight.setAttribute('height', badge.sz);
+                highlight.setAttribute('rx', this.MURM.BORDER_R); highlight.setAttribute('ry', this.MURM.BORDER_R);
+                highlight.setAttribute('fill', 'none');
+                highlight.setAttribute('stroke', 'yellow');
+                highlight.setAttribute('stroke-width', '2');
+                highlight.setAttribute('stroke-opacity', '0.7');
+                highlight.style.display = 'none';
+                wrapper.appendChild(highlight);
+                
+                // Click handler
+                const hitRect = svgContent.querySelector('rect[fill="transparent"]');
+                if (hitRect) {
+                    hitRect.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.selectBadge(badge);
+                    });
+                }
+                
+                badge.elements = { wrapper, highlight, svgContent };
+                
+                // Append to correct container
+                const container = badge.section === 'top' ? this.topBadgeGroup : this.bottomBadgeGroup;
+                container.appendChild(wrapper);
+                
+                // Store hit-test bounds
+                badge.x1 = badge.x;
+                badge.x2 = badge.x + badge.sz;
+            },
+            
+            selectBadge(badge) {
+                if (this.selectedBadge && this.selectedBadge.elements) {
+                    this.selectedBadge.elements.highlight.style.display = 'none';
+                }
+                this.selectedBadge = badge;
+                if (badge.elements) badge.elements.highlight.style.display = '';
+                
+                // Update UI
+                if (this.timeInput) this.timeInput.value = badge.startSeconds.toFixed(3);
+                if (this.trackSelect) this.trackSelect.value = badge.gTrack;
+                if (this.alignSelect) this.alignSelect.value = badge.alignment;
+                if (this.typeSelect) this.typeSelect.value = badge.type;
+            },
+            
+            deselectBadge() {
+                if (this.selectedBadge && this.selectedBadge.elements) {
+                    this.selectedBadge.elements.highlight.style.display = 'none';
+                }
+                this.selectedBadge = null;
+            },
+            
+            deleteSelectedBadge() {
+                if (!this.selectedBadge) return;
+                const badge = this.selectedBadge;
+                
+                if (badge.elements && badge.elements.wrapper) badge.elements.wrapper.remove();
+                
+                BadgeDatabase.remove(badge.id);
+                const idx = this.badges.indexOf(badge);
+                if (idx > -1) this.badges.splice(idx, 1);
+                
+                this.selectedBadge = null;
+                if (window.ScoreManager) ScoreManager.markDirty();
+                console.debug(`Badge deleted: ${badge.name}`);
+            },
+            
+            updateVisibility() {
+                if (!window.GraphicTimeline) return;
+                const topPage = GraphicTimeline.currentTopPage;
+                const bottomPage = GraphicTimeline.currentBottomPage;
+                
+                for (const badge of this.badges) {
+                    if (!badge.elements || !badge.elements.wrapper) continue;
+                    const visible = (badge.section === 'top' && badge.page === topPage)
+                                 || (badge.section === 'bottom' && badge.page === bottomPage);
+                    badge.elements.wrapper.style.display = visible ? '' : 'none';
+                }
+            },
+            
+            reloadFromDatabase() {
+                // Clear existing
+                if (this.topBadgeGroup) this.topBadgeGroup.innerHTML = '';
+                if (this.bottomBadgeGroup) this.bottomBadgeGroup.innerHTML = '';
+                this.badges = [];
+                this.selectedBadge = null;
+                
+                const dbBadges = BadgeDatabase.getAll();
+                for (const dbB of dbBadges) {
+                    const pos = this.calcPositionFromTime(dbB.startSeconds);
+                    const { sz, trackDims } = this.getBadgeSize(dbB.gTrack);
+                    
+                    let xPos;
+                    if (dbB.alignment === 'right') xPos = pos.x - sz;
+                    else if (dbB.alignment === 'center') xPos = pos.x - sz / 2;
+                    else xPos = pos.x;
+                    
+                    const yPos = trackDims.y + trackDims.height / 6 - sz / 2;
+                    
+                    const badge = {
+                        id: dbB.id, name: dbB.name, type: dbB.type,
+                        startSeconds: dbB.startSeconds, gTrack: dbB.gTrack,
+                        alignment: dbB.alignment,
+                        section: pos.section, page: pos.page,
+                        x: xPos, y: yPos, sz, trackDims,
+                        elements: {}
+                    };
+                    
+                    this.renderBadge(badge);
+                    this.badges.push(badge);
+                }
+                
+                this.updateVisibility();
+                console.debug(`BadgeMaker: Reloaded ${this.badges.length} badges`);
+            },
+            
+            syncToDatabase(badge) {
+                if (window.ScoreManager) ScoreManager.markDirty();
+                BadgeDatabase.update(badge.id, {
+                    startSeconds: badge.startSeconds,
+                    gTrack: badge.gTrack,
+                    alignment: badge.alignment,
+                    type: badge.type
+                });
+            }
+        };
+        
+        BadgeMaker.init();
+        window.BadgeMaker = BadgeMaker;
         
         // Bring SVG elements containers to front (after motives and line-wedges are initialized)
         if (window.SVGElementManager) {
@@ -31295,6 +31945,29 @@
                     }
                 }
                 
+                // Check Badges
+                if (window.BadgeMaker && BadgeMaker.badges) {
+                    for (const badge of BadgeMaker.badges) {
+                        if (badge.section !== section) continue;
+                        if (badge.page !== currentPage) continue;
+                        if (clickedTrack && String(badge.gTrack) !== clickedTrack) continue;
+                        // Simple bounding-box hit test
+                        const bx1 = badge.x;
+                        const by1 = badge.y;
+                        const bx2 = badge.x + badge.sz;
+                        const by2 = badge.y + badge.sz;
+                        if (svgX >= bx1 && svgX <= bx2 && svgY >= by1 && svgY <= by2) {
+                            objects.push({
+                                type: 'Badge',
+                                name: badge.name || `Badge ${badge.id}`,
+                                color: '#5B9BF5',
+                                obj: badge,
+                                select: () => BadgeMaker.selectBadge(badge)
+                            });
+                        }
+                    }
+                }
+                
                 return objects;
             },
             
@@ -31401,7 +32074,7 @@
                 this.menuEl.innerHTML = html;
                 
                 // Add click handlers
-                const typeMap = { 'Curve': 'Curve', 'LineWedge': 'LineWedge', 'SVG': 'SVG', 'Motive': 'Motive', 'GC': 'GC' };
+                const typeMap = { 'Curve': 'Curve', 'LineWedge': 'LineWedge', 'SVG': 'SVG', 'Motive': 'Motive', 'GC': 'GC', 'Badge': 'Badge' };
                 this.menuEl.querySelectorAll('.obj-selector-item').forEach((item, idx) => {
                     item.addEventListener('click', () => {
                         if (msMode && typeMap[objects[idx].type]) {
@@ -31733,6 +32406,66 @@
             }
         });
         
+        ObjectRegistry.register('Badge', {
+            getAll: () => BadgeMaker.badges,
+            getPosition: (b) => ({ startSeconds: b.startSeconds, endSeconds: b.startSeconds, track: b.gTrack }),
+            setTime: (b, start) => {
+                b.startSeconds = start;
+                const pos = BadgeMaker.calcPositionFromTime(start);
+                const { sz, trackDims } = BadgeMaker.getBadgeSize(b.gTrack);
+                let xPos;
+                if (b.alignment === 'right') xPos = pos.x - sz;
+                else if (b.alignment === 'center') xPos = pos.x - sz / 2;
+                else xPos = pos.x;
+                b.x = xPos;
+                b.y = trackDims.y + trackDims.height / 6 - sz / 2;
+                b.sz = sz;
+                b.page = pos.page;
+                b.section = pos.section;
+                b.trackDims = trackDims;
+                // Re-render
+                if (b.elements && b.elements.wrapper) b.elements.wrapper.remove();
+                BadgeMaker.renderBadge(b);
+                BadgeMaker.syncToDatabase(b);
+                BadgeMaker.updateVisibility();
+            },
+            setTrack: (b, track) => {
+                b.gTrack = track;
+                const pos = BadgeMaker.calcPositionFromTime(b.startSeconds);
+                const { sz, trackDims } = BadgeMaker.getBadgeSize(track);
+                let xPos;
+                if (b.alignment === 'right') xPos = pos.x - sz;
+                else if (b.alignment === 'center') xPos = pos.x - sz / 2;
+                else xPos = pos.x;
+                b.x = xPos;
+                b.y = trackDims.y + trackDims.height / 6 - sz / 2;
+                b.sz = sz;
+                b.page = pos.page;
+                b.section = pos.section;
+                b.trackDims = trackDims;
+                if (b.elements && b.elements.wrapper) b.elements.wrapper.remove();
+                BadgeMaker.renderBadge(b);
+                BadgeMaker.syncToDatabase(b);
+                BadgeMaker.updateVisibility();
+            },
+            delete: (b) => {
+                BadgeMaker.selectedBadge = b;
+                BadgeMaker.deleteSelectedBadge();
+            },
+            clone: (b) => {
+                return BadgeMaker.createBadge({
+                    type: b.type, startSeconds: b.startSeconds,
+                    gTrack: b.gTrack, alignment: b.alignment
+                });
+            },
+            select: (b) => BadgeMaker.selectBadge(b),
+            deselect: () => BadgeMaker.deselectBadge(),
+            getElement: (b) => b.elements ? b.elements.wrapper : null,
+            getBounds: (b) => {
+                return { x1: b.x, x2: b.x + b.sz, y: b.y, height: b.sz, section: b.section, page: b.page };
+            }
+        });
+        
         
         // ========================================
         // MultiSelect - Transient group selection with actions
@@ -31744,6 +32477,9 @@
             toolbarEl: null,    // Floating toolbar DOM element
             scoreTopEl: null,
             scoreBottomEl: null,
+            _dragging: false,
+            _dragOffX: 0,
+            _dragOffY: 0,
             
             init() {
                 this.scoreTopEl = document.getElementById('ScoreTop');
@@ -31761,6 +32497,7 @@
                     font-family: 'Inter', sans-serif;
                 `;
                 this.toolbarEl.innerHTML = `
+                    <span id="msDragHandle" title="Drag to move" style="cursor:grab;color:#667;font-size:14px;user-select:none;padding:0 2px;">⠿</span>
                     <span id="msCount" style="color: #4af; font-weight: bold;">0 selected</span>
                     <button id="msDupBtn" title="Duplicate All (Ctrl+Alt+D)" style="background:#2a4a6a;color:#8cf;border:1px solid #4af;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:11px;">Dup</button>
                     <button id="msDelBtn" title="Delete All (Delete)" style="background:#4a2a2a;color:#f88;border:1px solid #f44;border-radius:3px;padding:2px 8px;cursor:pointer;font-size:11px;">Del</button>
@@ -31793,6 +32530,29 @@
                     document.getElementById('msDeltaInput').value = '0';
                 });
                 
+                // Drag handle
+                const dragHandle = document.getElementById('msDragHandle');
+                dragHandle.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    this._dragging = true;
+                    const rect = this.toolbarEl.getBoundingClientRect();
+                    this._dragOffX = e.clientX - rect.left;
+                    this._dragOffY = e.clientY - rect.top;
+                    dragHandle.style.cursor = 'grabbing';
+                });
+                document.addEventListener('mousemove', (e) => {
+                    if (!this._dragging) return;
+                    this.toolbarEl.style.left = Math.max(0, e.clientX - this._dragOffX) + 'px';
+                    this.toolbarEl.style.top = Math.max(0, e.clientY - this._dragOffY) + 'px';
+                });
+                document.addEventListener('mouseup', () => {
+                    if (this._dragging) {
+                        this._dragging = false;
+                        const dh = document.getElementById('msDragHandle');
+                        if (dh) dh.style.cursor = 'grab';
+                    }
+                });
+                
                 // Shift+Click handler on score elements (capture phase)
                 const shiftClickHandler = (e, section) => {
                     if (!e.shiftKey) return;
@@ -31815,7 +32575,7 @@
                     const topObj = objects[0];
                     
                     // Map ObjectSelector type names to registry system names
-                    const typeMap = { 'Curve': 'Curve', 'LineWedge': 'LineWedge', 'SVG': 'SVG', 'Motive': 'Motive', 'GC': 'GC' };
+                    const typeMap = { 'Curve': 'Curve', 'LineWedge': 'LineWedge', 'SVG': 'SVG', 'Motive': 'Motive', 'GC': 'GC', 'Badge': 'Badge' };
                     const systemName = typeMap[topObj.type];
                     if (!systemName) return;
                     

@@ -236,7 +236,7 @@ function createProfile(config = {}) {
 }
 
 const PROFILES = {
-    sustainedTone: createProfile({
+    sustainedToneSinglePitch: createProfile({
         // Notation-specific element positions and sizes
         noteX: 1.1,
         staffWidth: 5.76,
@@ -244,13 +244,25 @@ const PROFILES = {
         ledgerLineWidth: 1.2,
         hairpinLength: 2.66,
         hairpinHeight: 0.55,
-        dyn1LeftEdge: 0.48
+        dyn1LeftEdge: 0.48,
         // No rule overrides — uses all defaults from LAYOUT_RULES
+
+        // Positioning: how this SVG is placed in the score (consumed client-side).
+        // anchorElement: which metadata field to align with the curve start time.
+        //   Assembly function computes anchor positions and returns them in metadata.
+        //   Client reads positioning.anchorElement to pick the right metadata value.
+        // heightFraction: SVG height as fraction of track height.
+        // offsetYFraction: vertical offset as fraction of track height from top.
+        positioning: {
+            anchorElement: 'noteheadCenter',
+            heightFraction: 0.95,
+            offsetYFraction: 0.05
+        }
     })
 };
 
 // Active profile (selected per assembly function)
-const LAYOUT = PROFILES.sustainedTone;
+const LAYOUT = PROFILES.sustainedToneSinglePitch;
 
 // ============================================
 // MAIN ASSEMBLY (bbox-aware layout)
@@ -286,7 +298,7 @@ const LAYOUT = PROFILES.sustainedTone;
  * @param {object} [params.gaps] - Override edge-to-edge gaps
  * @param {number} [params.noteToRowGap] - Override note-to-dynamics gap
  * @param {boolean} [params.debug] - Render debug bounding box overlays
- * @returns {string} Complete SVG document
+ * @returns {{ svg: string, metadata: object }} SVG document + positioning metadata
  */
 function assembleSustainedTone(params) {
     const {
@@ -489,7 +501,20 @@ function assembleSustainedTone(params) {
         height: viewBox.height * mmPerStaffSpace
     };
 
-    return wrapSvg(parts.filter(Boolean).join('\n'), viewBox, dimensions);
+    const svg = wrapSvg(parts.filter(Boolean).join('\n'), viewBox, dimensions);
+
+    // Compute positioning metadata: element positions relative to SVG left edge (in mm)
+    const noteheadCenterX_mm = (LAYOUT.noteX + nhBbox.midX - viewBox.x) * mmPerStaffSpace;
+
+    return {
+        svg,
+        metadata: {
+            noteheadCenterX_mm,
+            width_mm: dimensions.width,
+            height_mm: dimensions.height,
+            positioning: LAYOUT.positioning
+        }
+    };
 }
 
 /**
@@ -645,10 +670,10 @@ if (require.main === module) {
                   file: 'test-assembled-4ledger-down.svg' }
             ];
             for (const t of tests) {
-                const s = assembleSustainedTone(t.params);
+                const result = assembleSustainedTone(t.params);
                 const p = path.join(outputDir, t.file);
-                fs.writeFileSync(p, s);
-                console.log(`Written: ${p}`);
+                fs.writeFileSync(p, result.svg);
+                console.log(`Written: ${p} (noteheadCenterX: ${result.metadata.noteheadCenterX_mm.toFixed(2)}mm)`);
             }
             return;
         }
@@ -661,6 +686,84 @@ if (require.main === module) {
     fs.writeFileSync(outputPath, svg);
     console.log(`Written: ${outputPath}`);
     console.log(`Open in browser to compare with LilyPond output.`);
+}
+
+// ============================================
+// PITCH MAPPING UTILITIES (for server pipeline)
+// ============================================
+//
+// Convert user-format pitch strings (e.g., "C#4", "Bb3", "C+4") to assembly
+// engine parameters (staffPosition, accidental).
+//
+// User pitch format: NoteAccidentalOctave
+//   Note: A-G (case insensitive)
+//   Accidental: # (sharp), b (flat), + (quarter sharp), d (quarter flat),
+//               #+ (three-quarter sharp), bd (three-quarter flat), or empty (natural)
+//   Octave: integer (e.g., 3, 4, 5)
+//
+// Clef: "treble", "alto", "bass"
+
+const CLEF_MIDDLE_LINE = {
+    // Diatonic position (octave * 7 + noteIndex) of the note on the middle staff line
+    treble: 4 * 7 + 6,  // B4 = 34
+    alto:   4 * 7 + 0,  // C4 = 28
+    bass:   3 * 7 + 1   // D3 = 22
+};
+
+const NOTE_INDEX = { c: 0, d: 1, e: 2, f: 3, g: 4, a: 5, b: 6 };
+
+const ACCIDENTAL_MAP = {
+    '#':  'sharp',
+    'b':  'flat',
+    '+':  'quarterSharp',
+    'd':  'quarterFlat',
+    '#+': 'threeQuarterSharp',
+    'bd': 'threeQuarterFlat',
+    '':   null
+};
+
+/**
+ * Parse a user-format pitch string into its components.
+ * @param {string} pitch - e.g., "C#4", "Bb3", "C+4", "Cbd4", "C#+5"
+ * @returns {{ note: string, accidental: string, octave: number } | null}
+ */
+function parsePitch(pitch) {
+    if (!pitch) return null;
+    const match = pitch.match(/^([A-Ga-g])([#b+d]*)?(\d)$/);
+    if (!match) return null;
+    return {
+        note: match[1].toLowerCase(),
+        accidental: match[2] || '',
+        octave: parseInt(match[3])
+    };
+}
+
+/**
+ * Convert a user-format pitch + clef to a staff position for the assembly engine.
+ * Staff position 0 = middle line, negative = above, positive = below.
+ * Each diatonic step = 0.5 staff-spaces.
+ * 
+ * @param {string} pitch - e.g., "C#4", "Bb3"
+ * @param {string} clef - "treble", "alto", or "bass"
+ * @returns {number} Staff position in staff-spaces
+ */
+function pitchToStaffPosition(pitch, clef) {
+    const parsed = parsePitch(pitch);
+    if (!parsed) return 0;
+    const diatonicPos = parsed.octave * 7 + NOTE_INDEX[parsed.note];
+    const middleLine = CLEF_MIDDLE_LINE[clef] || CLEF_MIDDLE_LINE.treble;
+    return (middleLine - diatonicPos) * 0.5;
+}
+
+/**
+ * Extract the accidental library name from a user-format pitch string.
+ * @param {string} pitch - e.g., "C#4", "Bb3", "C+4"
+ * @returns {string|null} Library accidental name, or null for natural
+ */
+function pitchToAccidental(pitch) {
+    const parsed = parsePitch(pitch);
+    if (!parsed) return null;
+    return ACCIDENTAL_MAP[parsed.accidental] ?? null;
 }
 
 // ============================================
@@ -679,6 +782,12 @@ module.exports = {
     assembleSustainedTone,
     wrapSvg,
     LAYOUT,
+    LAYOUT_RULES,
+    PROFILES,
+    createProfile,
+    pitchToStaffPosition,
+    pitchToAccidental,
+    parsePitch,
     generateStaffLineTest,
     generateLedgerLineTest
 };
