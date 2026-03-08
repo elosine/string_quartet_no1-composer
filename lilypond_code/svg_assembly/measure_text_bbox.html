@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Text BBox Measurement Tool</title>
+<!-- Load Crimson Pro from Google Fonts as fallback if not installed locally -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  body { font-family: sans-serif; margin: 20px; background: #f5f5f5; }
+  h1 { font-size: 18px; }
+  .instructions { background: #e8f4fd; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 13px; }
+  .measurement { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 16px; margin-bottom: 12px; }
+  .measurement h3 { margin: 0 0 8px 0; font-size: 14px; }
+  .result { font-family: 'Courier New', monospace; font-size: 12px; background: #f0f0f0; padding: 8px; border-radius: 4px; white-space: pre; margin-top: 8px; }
+  svg { border: 1px solid #ddd; background: white; display: block; margin: 8px 0; }
+  .json-output { background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; white-space: pre; margin-top: 16px; }
+  button { background: #0078FF; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 12px; }
+  button:hover { background: #005cc5; }
+  .add-form { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+  .add-form input, .add-form select { margin: 4px 8px 4px 0; padding: 4px 8px; }
+  .add-form label { font-size: 13px; font-weight: bold; display: inline-block; width: 100px; }
+</style>
+</head>
+<body>
+<h1>SVG Text BBox Measurement Tool</h1>
+
+<div class="instructions">
+  <strong>How this works:</strong> This tool renders text in an SVG element using the exact font settings
+  from the component library, then uses <code>SVGElement.getBBox()</code> to measure the precise bounding box.
+  Results are in <strong>staff-spaces</strong> (matching the assembly engine coordinate system).
+  <br><br>
+  <strong>To add new text elements:</strong> Use the form below. The measurement is automatic.
+  Copy the JSON output into <code>svg_component_library.json</code> under the text entry.
+  <br><br>
+  <strong>Prerequisite:</strong> The <em>Crimson Pro</em> font must be installed on this system.
+  If the text looks wrong (wrong font), install the font from
+  <a href="https://fonts.google.com/specimen/Crimson+Pro">Google Fonts</a>.
+</div>
+
+<div class="add-form">
+  <h3>Add Custom Text Measurement</h3>
+  <div>
+    <label>Content:</label>
+    <input type="text" id="customContent" value="sul pont." size="20">
+  </div>
+  <div>
+    <label>Font Size (ss):</label>
+    <input type="number" id="customFontSize" value="1.0" step="0.01" size="6">
+  </div>
+  <div>
+    <label>Font Weight:</label>
+    <select id="customWeight">
+      <option value="300" selected>Light (300)</option>
+      <option value="400">Regular (400)</option>
+      <option value="600">SemiBold (600)</option>
+      <option value="700">Bold (700)</option>
+    </select>
+  </div>
+  <div>
+    <label>Font Style:</label>
+    <select id="customStyle">
+      <option value="italic" selected>Italic</option>
+      <option value="normal">Normal</option>
+    </select>
+  </div>
+  <button onclick="addCustom()">Measure</button>
+</div>
+
+<div id="measurements"></div>
+
+<h3>Combined JSON for svg_component_library.json <button onclick="copyJson()" style="font-size:12px; margin-left:8px;">📋 Copy JSON</button></h3>
+<div class="json-output" id="jsonOutput">Measuring...</div>
+
+<script>
+// Text elements to measure — matches svg_component_library.json
+// ADD NEW TEXT ELEMENTS HERE when expanding the library
+const TEXT_ELEMENTS = [
+  { key: 'secco', content: 'secco', fontSize: 1.0998, fontWeight: '300', fontStyle: 'italic' },
+  { key: 'nonVib', content: 'Non-Vib', fontSize: 0.9797, fontWeight: '300', fontStyle: 'italic' }
+];
+
+const allResults = {};
+const svgNS = 'http://www.w3.org/2000/svg';
+
+function round4(n) {
+  return Math.round(n * 10000) / 10000;
+}
+
+// Wait for one animation frame (ensures browser has rendered)
+function nextFrame() {
+  return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+}
+
+// Phase 1: create SVG with text element and add to DOM (no measurement yet)
+function createTextSvg(element, container) {
+  const div = document.createElement('div');
+  div.className = 'measurement';
+  div.dataset.key = element.key;
+
+  const h3 = document.createElement('h3');
+  h3.textContent = `"${element.content}" (key: ${element.key}) — fontSize: ${element.fontSize}, weight: ${element.fontWeight}, style: ${element.fontStyle}`;
+  div.appendChild(h3);
+
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width', '500');
+  svg.setAttribute('height', '120');
+  svg.setAttribute('viewBox', '-1 -2 16 4');
+  svg.style.display = 'block';
+
+  // Baseline marker
+  const baseline = document.createElementNS(svgNS, 'line');
+  baseline.setAttribute('x1', '-1');
+  baseline.setAttribute('y1', '0');
+  baseline.setAttribute('x2', '15');
+  baseline.setAttribute('y2', '0');
+  baseline.setAttribute('stroke', '#ccc');
+  baseline.setAttribute('stroke-width', '0.02');
+  baseline.setAttribute('stroke-dasharray', '0.1,0.1');
+  svg.appendChild(baseline);
+
+  // The text element to measure
+  const text = document.createElementNS(svgNS, 'text');
+  text.setAttribute('id', 'txt-' + element.key);
+  text.setAttribute('x', '0');
+  text.setAttribute('y', '0');
+  text.setAttribute('font-family', 'Crimson Pro');
+  text.setAttribute('font-weight', element.fontWeight);
+  text.setAttribute('font-style', element.fontStyle);
+  text.setAttribute('font-size', element.fontSize.toString());
+  text.setAttribute('text-anchor', 'start');
+  text.setAttribute('fill', 'black');
+  text.textContent = element.content;
+  svg.appendChild(text);
+
+  div.appendChild(svg);
+  container.appendChild(div);
+
+  return { div, svg, text, element };
+}
+
+// Measure using Canvas actualBoundingBox* for true ink bounds
+// (SVG getBBox uses font-level ascent/descent, which is inaccurate per-string)
+function canvasMeasure(element) {
+  const referencePx = 200;
+  const canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 400;
+  const ctx = canvas.getContext('2d');
+  const styleStr = `${element.fontStyle} ${element.fontWeight} ${referencePx}px 'Crimson Pro'`;
+  ctx.font = styleStr;
+
+  const m = ctx.measureText(element.content);
+  // actualBoundingBox* gives true ink bounds relative to the baseline/alignment point
+  // Ascent is above baseline (positive = up), Descent is below baseline (positive = down)
+  // Left is to the left of alignment (positive = left), Right is to the right (positive = right)
+  const scale = element.fontSize / referencePx;
+  return {
+    left:   round4(-m.actualBoundingBoxLeft * scale),
+    top:    round4(-m.actualBoundingBoxAscent * scale),
+    right:  round4(m.actualBoundingBoxRight * scale),
+    bottom: round4(m.actualBoundingBoxDescent * scale),
+    width:  round4((m.actualBoundingBoxLeft + m.actualBoundingBoxRight) * scale),
+    height: round4((m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) * scale),
+    midX:   round4((-m.actualBoundingBoxLeft + m.actualBoundingBoxRight) / 2 * scale),
+    midY:   round4((-m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) / 2 * scale)
+  };
+}
+
+// Phase 2: measure a text element that's already in the DOM and rendered
+function measureAndAnnotate(entry) {
+  const { svg, text, element } = entry;
+
+  // Use Canvas for true ink bounds
+  const result = canvasMeasure(element);
+
+  // Draw measured bbox outline
+  const rect = document.createElementNS(svgNS, 'rect');
+  rect.setAttribute('x', result.left.toString());
+  rect.setAttribute('y', result.top.toString());
+  rect.setAttribute('width', result.width.toString());
+  rect.setAttribute('height', result.height.toString());
+  rect.setAttribute('fill', 'none');
+  rect.setAttribute('stroke', '#8000FF');
+  rect.setAttribute('stroke-width', '0.03');
+  rect.setAttribute('stroke-opacity', '0.7');
+  svg.appendChild(rect);
+
+  // Midline
+  const midline = document.createElementNS(svgNS, 'line');
+  midline.setAttribute('x1', result.left.toString());
+  midline.setAttribute('y1', result.midY.toString());
+  midline.setAttribute('x2', result.right.toString());
+  midline.setAttribute('y2', result.midY.toString());
+  midline.setAttribute('stroke', 'red');
+  midline.setAttribute('stroke-width', '0.02');
+  midline.setAttribute('stroke-dasharray', '0.08,0.08');
+  svg.appendChild(midline);
+
+  // Show numeric results
+  const pre = document.createElement('div');
+  pre.className = 'result';
+  pre.textContent =
+    `left: ${result.left}  top: ${result.top}  right: ${result.right}  bottom: ${result.bottom}\n` +
+    `width: ${result.width}  height: ${result.height}  midX: ${result.midX}  midY: ${result.midY}`;
+  entry.div.appendChild(pre);
+
+  // Check for zero values (font not loaded)
+  if (result.width === 0) {
+    const warn = document.createElement('div');
+    warn.style.color = 'red';
+    warn.style.fontWeight = 'bold';
+    warn.textContent = '⚠ Zero width detected — font may not be loaded. Click "Re-measure All" below.';
+    entry.div.appendChild(warn);
+  }
+
+  allResults[element.key] = { element, bbox: result };
+  return result;
+}
+
+async function measureAll() {
+  const container = document.getElementById('measurements');
+  container.innerHTML = '';
+  document.getElementById('jsonOutput').textContent = 'Waiting for fonts...';
+
+  // Phase 1: Create all SVGs and add to DOM
+  const entries = [];
+  for (const el of TEXT_ELEMENTS) {
+    entries.push(createTextSvg(el, container));
+  }
+
+  // Wait for fonts to load
+  try {
+    await document.fonts.ready;
+    document.getElementById('jsonOutput').textContent = 'Fonts loaded. Waiting for render...';
+  } catch(e) {
+    document.getElementById('jsonOutput').textContent = 'Font loading error: ' + e;
+  }
+
+  // Wait for browser to render the text with the loaded font
+  await nextFrame();
+  await nextFrame(); // double frame for safety
+
+  // Phase 2: Now measure everything
+  for (const entry of entries) {
+    measureAndAnnotate(entry);
+  }
+
+  updateJsonOutput();
+}
+
+async function addCustom() {
+  const content = document.getElementById('customContent').value;
+  const fontSize = parseFloat(document.getElementById('customFontSize').value);
+  const fontWeight = document.getElementById('customWeight').value;
+  const fontStyle = document.getElementById('customStyle').value;
+  const key = content.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+
+  // Check if already exists, remove it
+  const idx = TEXT_ELEMENTS.findIndex(e => e.key === key);
+  if (idx >= 0) TEXT_ELEMENTS.splice(idx, 1);
+
+  TEXT_ELEMENTS.push({ key, content, fontSize, fontWeight, fontStyle });
+  await measureAll();
+}
+
+function updateJsonOutput() {
+  const json = {};
+  for (const [key, data] of Object.entries(allResults)) {
+    json[key] = {
+      fontFamily: 'Crimson Pro',
+      fontWeight: data.element.fontWeight,
+      fontStyle: data.element.fontStyle,
+      fontSize: data.element.fontSize,
+      content: data.element.content,
+      bbox: {
+        _note: 'Measured via measure_text_bbox.html using SVG getBBox()',
+        ...data.bbox
+      }
+    };
+  }
+  document.getElementById('jsonOutput').textContent = JSON.stringify(json, null, 2);
+}
+
+function copyJson() {
+  const text = document.getElementById('jsonOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('button[onclick="copyJson()"]');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = '📋 Copy JSON'; }, 2000);
+  });
+}
+
+// Auto-run on page load
+window.addEventListener('load', () => setTimeout(measureAll, 500));
+</script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 5, 2026  
-**Current ASB Number:** ASB-131
+**Last Updated:** Mar 7, 2026  
+**Current ASB Number:** ASB-137
 
 ---
 
@@ -69,6 +69,10 @@ That's it. Everything else below is for Cascade.
 | `render_pizz_tremolo.js` | `lilypond_code/` | Full pizz tremolo pipeline (single + batch: .ly → SVG → MIDI) |
 | `generate_pizz_tremolo_midi.js` | `lilypond_code/` | Standalone tremolo MIDI generator (timing DB sampling + CC7 ramp) |
 | `generate_pizz_trem_gliss_midi.js` | `lilypond_code/` | Pizz tremolo glissando MIDI generator (timing DB + pitch bend segmentation + per-note velocity) |
+| `assemble_svg.js` | `lilypond_code/svg_assembly/` | SVG Component Assembly Engine — assembles notation SVGs from component library (noteheads, accidentals, dynamics, hairpins, text). `assembleSustainedTone()` with bbox-aware layout. CLI: `node assemble_svg.js assemble` |
+| `svg_bbox.js` | `lilypond_code/svg_assembly/` | SVG path bounding box calculator (Bézier extrema). CLI: `node svg_bbox.js populate` (write bboxes to library), `node svg_bbox.js verify` (print to console) |
+| `measure_text_bbox.html` | `lilypond_code/svg_assembly/` | Browser-based text bbox measurement tool (Canvas actualBoundingBox). Open in browser, use form to measure any text, copy JSON output. Required for adding new text elements to the component library. |
+| `svg_component_library.json` | `lilypond_code/svg_assembly/` | JSON library of all SVG glyph paths, scales, offsets, and bounding boxes. Source of truth for the assembly engine. |
 
 ### 5. Available Slash Commands
 
@@ -98,6 +102,9 @@ That's it. Everything else below is for Cascade.
 | **TODO: MIDI State Reset Problem** | CC state (CC7 volume, CC4/channel pressure) persists after snippet ends — next snippet on same channel inherits final value. CC120/CC123 don't work with synth. Current workaround: dedicated channel banks per modification type. Need to investigate: micro-fade, inter-snippet gaps, channel rotation, or multi-port expansion (16 ch per port limit). See `MIDI_MUSIC_GENERATION.md` §13 "MIDI State Reset Problem." | When adding volume/vibrato to notation fragments or when channel count becomes limiting |
 | **TODO: Long Tone Glissando System + Bundle** | The Long Tone Glissando system (UI section at line ~823) and the GlissandoSystem object (line ~16387, attaches pitch tracking to curves) exist separately. Need to: (1) combine into a unified pipeline with proper SVG + MIDI generation, (2) implement bundle system (curve-based, like CD/Vibrato). Pipeline may need significant work — GlissandoSystem currently only attaches pitch metadata to curves, no standalone MIDI/SVG generation. | When user wants to compose with long tone glissandi as bundled units |
 | **TODO: XLD Cell System + Bundle** | XLD Cell exists only in pieces — no unified system or pipeline yet. Need to: (1) inventory existing XLD Cell components, (2) create a proper system with UI/pipeline, (3) implement bundle system. Scope TBD — may be GC-based or curve-based depending on XLD Cell semantics. | When user wants to compose with XLD Cells as bundled units |
+| **TODO: Sustained Tone Template Modernization (ASB-132)** | Current `CrescendoSinglePitchTemplate.ly` and `CrescendoGlissandoTemplate.ly` use outdated LilyPond settings (NoteHead #-2 vs registry #-3.3, Accidental -5 vs #-7, proportional 1/28 vs 1/13, staff line width 2mm vs 2.4mm, inline lambda vs `#custom-staff-lines`). Only 2 templates cover all sustained tone scenarios — generates visual inconsistencies across different pitch registers and clefs. **Multi-template model planned:** specialized templates per register/clef scenario with correct registry defaults. SVG reuse lookup (from LY_NAMING_CONVENTION.md) not yet implemented in pipeline. See ASB-132 Tier 1 memory for full analysis. | When fixing sustained tone SVGs, when modernizing any LilyPond template |
+| **SVG Assembly Engine — Phase 3: Server Pipeline Integration** | Assembly engine (`assemble_svg.js`) produces correct SVGs for sustained tones. Phase 3: new endpoint `POST /api/svg-assembly/sustained-tone` that calls `assembleSustainedTone()` directly (skipping LilyPond compile). Needs: export function from module, pitch-to-staffPosition mapping, accidental name mapping, update `CrescendoUI.step2()` to call new endpoint. Keep LilyPond path as fallback for glissando model. See ASB-137 memory for rules+profile architecture. | When wiring assembly engine into the app |
+| **SVG Positioning & Sizing in Score** | After pipeline integration: refine how assembled SVGs are sized and positioned in the score and within bundles. Currently hardcoded: 67% track height, 0.05 offsetYFraction, 8px overlap. Develop positioning rules as part of the profile system. | After Phase 3 pipeline integration is complete |
 | **Transient Grouping System (v1)** | ObjectRegistry + MultiSelect implemented (ASB-123). Shift+Click multi-select, Shift+Ctrl+Win+Click for overlapping objects, per-object cyan highlights + dashed bounding box, floating mini-toolbar (Dup/Del/Track/Time), keyboard shortcuts (Ctrl+Alt+D/Delete/Escape). Adapters: Curve, LineWedge, SVG, Motive. **Future:** Rubber-band selection (Option 1), Temporal Range Grouping (Option 4), persistent groups. | When extending grouping features or adding new object types |
 
 ---
@@ -135,17 +142,25 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-130: Musical Material System.** First revision-phase feature. New `MusicalMaterialSystem` — data catalog grouping bundles into named Musical Materials with versioned snapshots. 4 phases: data model + capture, UI panel (sidebar), update/revision tracking, MultiSelect integration (purple MM button). Registered with ScoreManager for persistence. Supports all 6 bundle types (CD, NF, BP, PT, PTG, VIB).
+> **ASB-131: Phase 1 SVG Workflow Improvements.** Three-phase improvement to SVG notation workflow: Phase 1a: Store `lyFilename` on bundles at generation time (content-addressable naming convention). Phase 1b: Fix `_svgInfo` bug in MMS `_createSnapshot`. Phase 1c: Implement `SVGElementManager.replaceSvgFromFile()` and wire "Replace SVG" buttons for all 6 systems. Also completed ASB-130 (Musical Material System) and ASB-133 (MMS Bugfix). Tier 2 commit: 0a121cf.
 
 ---
 
 ## Current Session
 
-**Date:** Mar 5, 2026  
-**Focus:** SVG Workflow Improvements — lyFilename storage, Replace SVG buttons  
-**ASB:** ASB-131  
-**Tier 1 Count This Session:** 0 (reset after Tier 2 commit)  
-**Tier 2 Threshold:** 0 of 3-4
+**Date:** Mar 7, 2026  
+**Focus:** SVG Component Assembly Engine — bbox system, layout engine, text measurement, rules+profile architecture  
+**ASB:** ASB-132 through ASB-137  
+**Tier 1 Count This Session:** 6 (ASB-132, ASB-134, ASB-135, ASB-136, ASB-137 + layout tuning)  
+**Tier 2 Commit:** Pending
+
+### Session Log — SVG Component Assembly Engine
+- ASB-132: Sustained Tone pipeline analysis — traced full client→server→LilyPond→SVG flow, identified template settings discrepancies vs registry, proposed multi-template model and SVG assembly engine approach
+- ASB-134: SVG bounding box calculator (`svg_bbox.js`) — parses SVG path commands including Bézier extrema, `populate` and `verify` CLI commands. Populated bbox data for all noteheads, accidentals (7 × 2 sizes), and 10 dynamic composites in `svg_component_library.json`
+- ASB-135: Bbox-aware layout engine — refactored `assembleSustainedTone()` for midline alignment, edge-to-edge spacing, consistent note-to-dynamics gap. Debug overlay mode with colored bbox outlines and alignment guides (Inkscape-compatible). Font-family fix for Inkscape (`'Crimson Pro'` + `font-weight="300"`). 5 test SVG variants generated
+- ASB-136: Text bbox measurement tool (`measure_text_bbox.html`) — browser-based Canvas `actualBoundingBox*` for true ink bounds (SVG `getBBox()` was inaccurate — used font-level ascent/descent). Accurate bboxes measured for "secco" and "Non-Vib" and updated in library. Reusable for any future text elements
+- Layout tuning: Reduced note-to-dynamics gap (0.45→0.28 ss, ~0.5mm), reduced Non-Vib padding (0.55→0.275 ss), matched hairpin-to-dyn2 gap to dyn1-to-hairpin (0.12 ss). Non-Vib positioning now references highest visual element (accidental > notehead > staff). ViewBox calculation rewritten for tight content bounds + uniform padding.
+- ASB-137: Layout Rules + Profile system — extracted 5 general LAYOUT_RULES (textAboveStaff, glyphRowGap, glyphToTextGap, contentToRowGap, viewBoxPadding). `createProfile()` merges rules with notation-specific values. `PROFILES.sustainedTone` is first profile. Assembly function derives all gaps from rules. Architecture designed so new notation types inherit all spacing automatically.
 
 ### Session Log (prior sessions)
 - ASB-001 through ASB-013: Long Tone Glissando workflow (see Tier 3 milestone below)
@@ -484,6 +499,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-128 | Bow Overpressure MIDI Model — MidiModelSystem model def (CC0=53, randomPitch, pitchRanges), dropdown option, generateRandomPitch + pitchToNoteNameWithQuarter helpers, attachToSelectedGC (random pitch + quarter-tone pitch bend), previewPlay (random pitch + bend), onModelSelect/updatePitchModeUI/updateInfo (hide pitch input, show random info) | Complete (intermediary) |
 | ASB-129 | Sustained Tone quarter-tone pitch bend fix — single pitch mode in CrescendoUI.generateCrescendoMidi() was ignoring quarterTone offset (hardcoded startBend=8192). Fixed: calculate bend from quarterToneOffset * 8192 (±1 semitone range). Added pitch bend reset to center after note off. Key insight: PITCH_BEND_RANGE=2 is segment threshold, not synth range. | Complete |
 | ASB-131 | Phase 1 SVG Workflow Improvements — lyFilename storage on all 6 bundle types (content-addressable naming convention), Replace SVG from File buttons wired for all 6 systems, _svgInfo bug already fixed, LY_NAMING_CONVENTION.md documentation | Complete |
+| ASB-132 | Sustained Tone Pipeline Analysis — full pipeline trace (template → server substitution → render → crop → insert), identified 6 registry setting discrepancies in templates, documented directory structure (lilypond_code/ for .ly, public/SVG_graphics/ for .svg), confirmed SVG reuse lookup not yet implemented, proposed multi-template model | Analysis Complete |
 
 ---
 
@@ -519,6 +535,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Mar 2, 2026 | d6c84c9 | LilyPond notation controls + MultiSelect bug fixes (ASB-124/125/126) |
 | Mar 2, 2026 | 555a212 | GC grouping support + LilyPond notation controls + MultiSelect fixes (ASB-124-127) |
 | Mar 5, 2026 | 2b68ff4 | Bow Overpressure MIDI model + Sustained Tone quarter-tone pitch bend fix (ASB-128-129) |
+| Mar 5, 2026 | 0a121cf | Phase 1 SVG workflow improvements — lyFilename storage, Replace SVG buttons, MMS, LY naming convention (ASB-130/131/133) |
 
 ---
 
