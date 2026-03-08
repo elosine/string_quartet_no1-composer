@@ -100,7 +100,9 @@ CC0 (Bank Select / Articulation ID) is used as a **technique identifier** so the
 
 | CC0 Value | Technique | System |
 |-----------|-----------|--------|
+| 69 | Regular pizzicato (quarter-tone enabled) | Two-Hand Pizz Grace Note Clusters |
 | 71 | Pizzicato open string (one-shot) | Notation Fragments |
+| 80 | Behind the bridge pizzicato (open strings) | Two-Hand Pizz Grace Note Clusters |
 | 89 | Senza vibrato / arco (default sustained) | Vibrato, Glissando, Crescendo, Notation Fragments |
 | 95 | Pizzicato | Z-Stem Pizz Trem, Notation Fragments |
 | 97 | Bartók pizzicato (snap pizz, one-shot) | Bartók Pizzicato, Notation Fragments |

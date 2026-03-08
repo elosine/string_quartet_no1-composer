@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 8, 2026  
-**Current ASB Number:** ASB-139
+**Current ASB Number:** ASB-141
 
 ---
 
@@ -55,6 +55,7 @@ That's it. Everything else below is for Cascade.
 | LilyPond Settings Registry | Active | Update when settings change |
 | Musical Material Workflow | Active | Expand as new material types are built |
 | Animated Badge System | **Complete (v1)** | BadgeDatabase + BadgeMaker (murmuration Boids/SMIL) + UI panel + integration hooks + ObjectRegistry/ObjectSelector/MultiSelect. See ASB-138 |
+| Two-Hand Pizz Grace Note Clusters | **Complete (pre-test)** | Full MIDI model: cluster DB (35 clusters), dual CC0 (80 behind bridge / 69 regular pizz), generation logic, UI panel, Pattern 3 insertion. See ASB-140 |
 
 ### 4. Reusable Tools (remember these exist)
 
@@ -67,6 +68,7 @@ That's it. Everything else below is for Cascade.
 | `crop_svg.js` | `lilypond_code/` | Standalone SVG cropping (same logic as server.js) |
 | `render_bartok_pizz.js` | `lilypond_code/` | Full Bartók pizz pipeline (single or batch) |
 | `ingest_pizz_tremolo.js` | `lilypond_code/` | Parse recorded MIDI → JSON timing database (new/append modes) |
+| `ingest_grace_note_clusters.js` | `lilypond_code/` | Parse recorded MIDI → grace note cluster JSON database (500ms gap threshold, pitch-agnostic) |
 | `render_pizz_tremolo.js` | `lilypond_code/` | Full pizz tremolo pipeline (single + batch: .ly → SVG → MIDI) |
 | `generate_pizz_tremolo_midi.js` | `lilypond_code/` | Standalone tremolo MIDI generator (timing DB sampling + CC7 ramp) |
 | `generate_pizz_trem_gliss_midi.js` | `lilypond_code/` | Pizz tremolo glissando MIDI generator (timing DB + pitch bend segmentation + per-note velocity) |
@@ -150,10 +152,14 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 ## Current Session
 
 **Date:** Mar 8, 2026  
-**Focus:** Animated Badge System + MultiSelect toolbar draggable  
-**ASB:** ASB-138 through ASB-139  
-**Tier 1 Count This Session:** 2 (ASB-138, ASB-139)  
+**Focus:** Two-Hand Pizz Grace Notes + SVG Height % scaling  
+**ASB:** ASB-138 through ASB-141  
+**Tier 1 Count This Session:** 4 (ASB-138, ASB-139, ASB-140, ASB-141)  
 **Tier 2 Commit:** f9a45495
+
+### Session Log — Two-Hand Pizz Grace Note Clusters + SVG Scaling
+- ASB-140: THPGNC full system — ingestion script (`ingest_grace_note_clusters.js`, 500ms gap threshold → 35 clusters), cluster DB (`grace_note_cluster_db.json`), model definition (cc0Behind=80, cc0Pizz=69, instrumentRanges, openStrings, durationMsRange 30-60ms), HTML UI panel (#twoHandPizzGraceParams: time/instrument/track/align), init() wiring, onModelSelect() early return, generation methods (loadThpgClusterDb, generateTwoHandPizzGraceMidi — random cluster sampling, Fisher-Yates CC0 shuffle, open string pitch for behind-bridge, random range pitch with quarter-tone for regular pizz, pre/post alignment, Pattern 3 insertion), CC registry updated (CC0=69, CC0=80)
+- ASB-141: SVG scaling UI — changed "Scale" (pixel multiplier, changes on resize) to "Height %" (heightFraction × 100, stable across window sizes). HTML slider/input (5–200%), updateUIFromSelected shows heightFraction %, updateSelectedScaleFromSlider/Input set heightFraction then derive scale via new _scaleFromHeightFraction() helper. No breakage: resize handle drag, window resize, save/load, programmatic insertions all unaffected
 
 ### Session Log — Animated Badge System
 - ASB-138: Full animated badge system — BadgeDatabase (CRUD + ScoreManager), Badge UI panel (type/time/track/alignment), BadgeMaker JS (murmuration Boids/SMIL animation, create/render/select/delete/visibility/reload), integration hooks (GraphicTimeline visibility, z-order, resize), ObjectSelector hit-testing, ObjectRegistry adapter (getAll/setTime/setTrack/delete/clone/select/deselect/getElement/getBounds), MultiSelect typeMap for shift-click support

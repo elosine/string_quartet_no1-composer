@@ -1,0 +1,1374 @@
+{
+  "type": "grace_note_cluster_db",
+  "version": 1,
+  "created": "2026-03-08T22:52:10.530Z",
+  "updated": "2026-03-08T22:52:10.531Z",
+  "description": "Grace note cluster timing and velocity database. Pitch-agnostic — only relative onset times and velocities are stored. Durations are assigned at generation time.",
+  "gapThresholdMs": 500,
+  "ingestions": [
+    {
+      "timestamp": "2026-03-08T22:52:10.531Z",
+      "source": "grace note figure for sample database",
+      "inputFile": "grace note figure for sample database.mid",
+      "gapThresholdMs": 500,
+      "rawNoteEvents": 402,
+      "noteOnEvents": 201,
+      "clustersDetected": 35,
+      "clustersAdded": 35,
+      "clusterIndexRange": [
+        0,
+        34
+      ]
+    }
+  ],
+  "clusters": [
+    {
+      "clusterIndex": 0,
+      "source": "grace note figure for sample database",
+      "noteCount": 11,
+      "totalDurationMs": 177.08,
+      "stats": {
+        "velocity": {
+          "avg": 91,
+          "min": 54,
+          "max": 127
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 4.17,
+          "velocity": 60
+        },
+        {
+          "relativeOnsetMs": 19.79,
+          "velocity": 54
+        },
+        {
+          "relativeOnsetMs": 57.29,
+          "velocity": 68
+        },
+        {
+          "relativeOnsetMs": 72.92,
+          "velocity": 70
+        },
+        {
+          "relativeOnsetMs": 81.25,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 81.25,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 82.29,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 128.12,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 151.04,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 177.08,
+          "velocity": 83
+        }
+      ]
+    },
+    {
+      "clusterIndex": 1,
+      "source": "grace note figure for sample database",
+      "noteCount": 5,
+      "totalDurationMs": 309.38,
+      "stats": {
+        "velocity": {
+          "avg": 80,
+          "min": 48,
+          "max": 98
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 65.63,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 129.17,
+          "velocity": 76
+        },
+        {
+          "relativeOnsetMs": 237.5,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 309.38,
+          "velocity": 48
+        }
+      ]
+    },
+    {
+      "clusterIndex": 2,
+      "source": "grace note figure for sample database",
+      "noteCount": 4,
+      "totalDurationMs": 180.21,
+      "stats": {
+        "velocity": {
+          "avg": 76,
+          "min": 62,
+          "max": 86
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 68.75,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 148.96,
+          "velocity": 80
+        },
+        {
+          "relativeOnsetMs": 180.21,
+          "velocity": 62
+        }
+      ]
+    },
+    {
+      "clusterIndex": 3,
+      "source": "grace note figure for sample database",
+      "noteCount": 6,
+      "totalDurationMs": 427.08,
+      "stats": {
+        "velocity": {
+          "avg": 87,
+          "min": 59,
+          "max": 110
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 68
+        },
+        {
+          "relativeOnsetMs": 97.92,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 145.83,
+          "velocity": 59
+        },
+        {
+          "relativeOnsetMs": 188.54,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 297.92,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 427.08,
+          "velocity": 110
+        }
+      ]
+    },
+    {
+      "clusterIndex": 4,
+      "source": "grace note figure for sample database",
+      "noteCount": 6,
+      "totalDurationMs": 235.42,
+      "stats": {
+        "velocity": {
+          "avg": 101,
+          "min": 54,
+          "max": 127
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 1.04,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 1.04,
+          "velocity": 127
+        },
+        {
+          "relativeOnsetMs": 79.17,
+          "velocity": 73
+        },
+        {
+          "relativeOnsetMs": 118.75,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 235.42,
+          "velocity": 54
+        }
+      ]
+    },
+    {
+      "clusterIndex": 5,
+      "source": "grace note figure for sample database",
+      "noteCount": 5,
+      "totalDurationMs": 318.75,
+      "stats": {
+        "velocity": {
+          "avg": 71,
+          "min": 32,
+          "max": 90
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 54.17,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 83.33,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 157.29,
+          "velocity": 32
+        },
+        {
+          "relativeOnsetMs": 318.75,
+          "velocity": 75
+        }
+      ]
+    },
+    {
+      "clusterIndex": 6,
+      "source": "grace note figure for sample database",
+      "noteCount": 7,
+      "totalDurationMs": 322.92,
+      "stats": {
+        "velocity": {
+          "avg": 78,
+          "min": 73,
+          "max": 86
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 98.96,
+          "velocity": 76
+        },
+        {
+          "relativeOnsetMs": 110.42,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 111.46,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 173.96,
+          "velocity": 73
+        },
+        {
+          "relativeOnsetMs": 263.54,
+          "velocity": 73
+        },
+        {
+          "relativeOnsetMs": 322.92,
+          "velocity": 83
+        }
+      ]
+    },
+    {
+      "clusterIndex": 7,
+      "source": "grace note figure for sample database",
+      "noteCount": 3,
+      "totalDurationMs": 53.13,
+      "stats": {
+        "velocity": {
+          "avg": 82,
+          "min": 75,
+          "max": 94
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 31.25,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 53.13,
+          "velocity": 78
+        }
+      ]
+    },
+    {
+      "clusterIndex": 8,
+      "source": "grace note figure for sample database",
+      "noteCount": 6,
+      "totalDurationMs": 518.75,
+      "stats": {
+        "velocity": {
+          "avg": 83,
+          "min": 47,
+          "max": 106
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 62.5,
+          "velocity": 47
+        },
+        {
+          "relativeOnsetMs": 81.25,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 144.79,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 328.13,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 518.75,
+          "velocity": 106
+        }
+      ]
+    },
+    {
+      "clusterIndex": 9,
+      "source": "grace note figure for sample database",
+      "noteCount": 7,
+      "totalDurationMs": 909.38,
+      "stats": {
+        "velocity": {
+          "avg": 94,
+          "min": 67,
+          "max": 110
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 400,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 502.08,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 628.13,
+          "velocity": 67
+        },
+        {
+          "relativeOnsetMs": 670.83,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 821.88,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 909.38,
+          "velocity": 103
+        }
+      ]
+    },
+    {
+      "clusterIndex": 10,
+      "source": "grace note figure for sample database",
+      "noteCount": 13,
+      "totalDurationMs": 747.92,
+      "stats": {
+        "velocity": {
+          "avg": 77,
+          "min": 46,
+          "max": 100
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 41.67,
+          "velocity": 46
+        },
+        {
+          "relativeOnsetMs": 114.58,
+          "velocity": 73
+        },
+        {
+          "relativeOnsetMs": 129.17,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 269.79,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 273.96,
+          "velocity": 57
+        },
+        {
+          "relativeOnsetMs": 463.54,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 482.29,
+          "velocity": 55
+        },
+        {
+          "relativeOnsetMs": 488.54,
+          "velocity": 80
+        },
+        {
+          "relativeOnsetMs": 541.67,
+          "velocity": 96
+        },
+        {
+          "relativeOnsetMs": 626.04,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 721.88,
+          "velocity": 80
+        },
+        {
+          "relativeOnsetMs": 747.92,
+          "velocity": 84
+        }
+      ]
+    },
+    {
+      "clusterIndex": 11,
+      "source": "grace note figure for sample database",
+      "noteCount": 3,
+      "totalDurationMs": 123.96,
+      "stats": {
+        "velocity": {
+          "avg": 100,
+          "min": 82,
+          "max": 123
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 8.33,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 123.96,
+          "velocity": 123
+        }
+      ]
+    },
+    {
+      "clusterIndex": 12,
+      "source": "grace note figure for sample database",
+      "noteCount": 6,
+      "totalDurationMs": 177.08,
+      "stats": {
+        "velocity": {
+          "avg": 73,
+          "min": 58,
+          "max": 99
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 36.46,
+          "velocity": 68
+        },
+        {
+          "relativeOnsetMs": 154.17,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 158.33,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 168.75,
+          "velocity": 58
+        },
+        {
+          "relativeOnsetMs": 177.08,
+          "velocity": 58
+        }
+      ]
+    },
+    {
+      "clusterIndex": 13,
+      "source": "grace note figure for sample database",
+      "noteCount": 6,
+      "totalDurationMs": 489.58,
+      "stats": {
+        "velocity": {
+          "avg": 81,
+          "min": 59,
+          "max": 98
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 59
+        },
+        {
+          "relativeOnsetMs": 92.71,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 120.83,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 252.08,
+          "velocity": 74
+        },
+        {
+          "relativeOnsetMs": 326.04,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 489.58,
+          "velocity": 86
+        }
+      ]
+    },
+    {
+      "clusterIndex": 14,
+      "source": "grace note figure for sample database",
+      "noteCount": 3,
+      "totalDurationMs": 108.33,
+      "stats": {
+        "velocity": {
+          "avg": 93,
+          "min": 80,
+          "max": 105
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 80
+        },
+        {
+          "relativeOnsetMs": 75,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 108.33,
+          "velocity": 95
+        }
+      ]
+    },
+    {
+      "clusterIndex": 15,
+      "source": "grace note figure for sample database",
+      "noteCount": 4,
+      "totalDurationMs": 325,
+      "stats": {
+        "velocity": {
+          "avg": 92,
+          "min": 84,
+          "max": 101
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 44.79,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 143.75,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 325,
+          "velocity": 95
+        }
+      ]
+    },
+    {
+      "clusterIndex": 16,
+      "source": "grace note figure for sample database",
+      "noteCount": 3,
+      "totalDurationMs": 146.87,
+      "stats": {
+        "velocity": {
+          "avg": 95,
+          "min": 90,
+          "max": 106
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 21.87,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 146.87,
+          "velocity": 90
+        }
+      ]
+    },
+    {
+      "clusterIndex": 17,
+      "source": "grace note figure for sample database",
+      "noteCount": 4,
+      "totalDurationMs": 97.92,
+      "stats": {
+        "velocity": {
+          "avg": 91,
+          "min": 84,
+          "max": 95
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 91
+        },
+        {
+          "relativeOnsetMs": 30.21,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 93.75,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 97.92,
+          "velocity": 95
+        }
+      ]
+    },
+    {
+      "clusterIndex": 18,
+      "source": "grace note figure for sample database",
+      "noteCount": 5,
+      "totalDurationMs": 475,
+      "stats": {
+        "velocity": {
+          "avg": 103,
+          "min": 72,
+          "max": 127
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 7.29,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 155.21,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 279.17,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 475,
+          "velocity": 127
+        }
+      ]
+    },
+    {
+      "clusterIndex": 19,
+      "source": "grace note figure for sample database",
+      "noteCount": 3,
+      "totalDurationMs": 83.33,
+      "stats": {
+        "velocity": {
+          "avg": 85,
+          "min": 79,
+          "max": 90
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 31.25,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 83.33,
+          "velocity": 90
+        }
+      ]
+    },
+    {
+      "clusterIndex": 20,
+      "source": "grace note figure for sample database",
+      "noteCount": 8,
+      "totalDurationMs": 347.92,
+      "stats": {
+        "velocity": {
+          "avg": 74,
+          "min": 57,
+          "max": 105
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 71
+        },
+        {
+          "relativeOnsetMs": 92.71,
+          "velocity": 58
+        },
+        {
+          "relativeOnsetMs": 142.71,
+          "velocity": 58
+        },
+        {
+          "relativeOnsetMs": 155.21,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 197.92,
+          "velocity": 105
+        },
+        {
+          "relativeOnsetMs": 298.96,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 310.42,
+          "velocity": 57
+        },
+        {
+          "relativeOnsetMs": 347.92,
+          "velocity": 84
+        }
+      ]
+    },
+    {
+      "clusterIndex": 21,
+      "source": "grace note figure for sample database",
+      "noteCount": 5,
+      "totalDurationMs": 326.04,
+      "stats": {
+        "velocity": {
+          "avg": 75,
+          "min": 51,
+          "max": 103
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 71.88,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 167.71,
+          "velocity": 51
+        },
+        {
+          "relativeOnsetMs": 183.33,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 326.04,
+          "velocity": 62
+        }
+      ]
+    },
+    {
+      "clusterIndex": 22,
+      "source": "grace note figure for sample database",
+      "noteCount": 5,
+      "totalDurationMs": 123.96,
+      "stats": {
+        "velocity": {
+          "avg": 81,
+          "min": 48,
+          "max": 123
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 48
+        },
+        {
+          "relativeOnsetMs": 20.83,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 38.54,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 48.96,
+          "velocity": 123
+        },
+        {
+          "relativeOnsetMs": 123.96,
+          "velocity": 81
+        }
+      ]
+    },
+    {
+      "clusterIndex": 23,
+      "source": "grace note figure for sample database",
+      "noteCount": 8,
+      "totalDurationMs": 173.96,
+      "stats": {
+        "velocity": {
+          "avg": 72,
+          "min": 55,
+          "max": 82
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 76
+        },
+        {
+          "relativeOnsetMs": 48.96,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 55.21,
+          "velocity": 55
+        },
+        {
+          "relativeOnsetMs": 66.67,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 87.5,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 118.75,
+          "velocity": 80
+        },
+        {
+          "relativeOnsetMs": 119.79,
+          "velocity": 58
+        },
+        {
+          "relativeOnsetMs": 173.96,
+          "velocity": 78
+        }
+      ]
+    },
+    {
+      "clusterIndex": 24,
+      "source": "grace note figure for sample database",
+      "noteCount": 5,
+      "totalDurationMs": 130.21,
+      "stats": {
+        "velocity": {
+          "avg": 81,
+          "min": 61,
+          "max": 98
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 40.63,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 62.5,
+          "velocity": 61
+        },
+        {
+          "relativeOnsetMs": 86.46,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 130.21,
+          "velocity": 98
+        }
+      ]
+    },
+    {
+      "clusterIndex": 25,
+      "source": "grace note figure for sample database",
+      "noteCount": 2,
+      "totalDurationMs": 33.33,
+      "stats": {
+        "velocity": {
+          "avg": 105,
+          "min": 86,
+          "max": 123
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 33.33,
+          "velocity": 123
+        }
+      ]
+    },
+    {
+      "clusterIndex": 26,
+      "source": "grace note figure for sample database",
+      "noteCount": 4,
+      "totalDurationMs": 251.04,
+      "stats": {
+        "velocity": {
+          "avg": 81,
+          "min": 63,
+          "max": 104
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 63
+        },
+        {
+          "relativeOnsetMs": 113.54,
+          "velocity": 104
+        },
+        {
+          "relativeOnsetMs": 175,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 251.04,
+          "velocity": 86
+        }
+      ]
+    },
+    {
+      "clusterIndex": 27,
+      "source": "grace note figure for sample database",
+      "noteCount": 5,
+      "totalDurationMs": 240.63,
+      "stats": {
+        "velocity": {
+          "avg": 72,
+          "min": 61,
+          "max": 81
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 81.25,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 114.58,
+          "velocity": 69
+        },
+        {
+          "relativeOnsetMs": 138.54,
+          "velocity": 61
+        },
+        {
+          "relativeOnsetMs": 240.63,
+          "velocity": 81
+        }
+      ]
+    },
+    {
+      "clusterIndex": 28,
+      "source": "grace note figure for sample database",
+      "noteCount": 4,
+      "totalDurationMs": 119.79,
+      "stats": {
+        "velocity": {
+          "avg": 80,
+          "min": 55,
+          "max": 98
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 68.75,
+          "velocity": 55
+        },
+        {
+          "relativeOnsetMs": 97.92,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 119.79,
+          "velocity": 83
+        }
+      ]
+    },
+    {
+      "clusterIndex": 29,
+      "source": "grace note figure for sample database",
+      "noteCount": 4,
+      "totalDurationMs": 339.58,
+      "stats": {
+        "velocity": {
+          "avg": 87,
+          "min": 73,
+          "max": 98
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 104.17,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 233.33,
+          "velocity": 73
+        },
+        {
+          "relativeOnsetMs": 339.58,
+          "velocity": 98
+        }
+      ]
+    },
+    {
+      "clusterIndex": 30,
+      "source": "grace note figure for sample database",
+      "noteCount": 4,
+      "totalDurationMs": 647.92,
+      "stats": {
+        "velocity": {
+          "avg": 85,
+          "min": 56,
+          "max": 110
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 76.04,
+          "velocity": 110
+        },
+        {
+          "relativeOnsetMs": 550,
+          "velocity": 56
+        },
+        {
+          "relativeOnsetMs": 647.92,
+          "velocity": 90
+        }
+      ]
+    },
+    {
+      "clusterIndex": 31,
+      "source": "grace note figure for sample database",
+      "noteCount": 5,
+      "totalDurationMs": 269.79,
+      "stats": {
+        "velocity": {
+          "avg": 87,
+          "min": 71,
+          "max": 103
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 94.79,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 115.62,
+          "velocity": 71
+        },
+        {
+          "relativeOnsetMs": 170.83,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 269.79,
+          "velocity": 103
+        }
+      ]
+    },
+    {
+      "clusterIndex": 32,
+      "source": "grace note figure for sample database",
+      "noteCount": 4,
+      "totalDurationMs": 188.54,
+      "stats": {
+        "velocity": {
+          "avg": 78,
+          "min": 70,
+          "max": 86
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 131.25,
+          "velocity": 77
+        },
+        {
+          "relativeOnsetMs": 134.38,
+          "velocity": 70
+        },
+        {
+          "relativeOnsetMs": 188.54,
+          "velocity": 86
+        }
+      ]
+    },
+    {
+      "clusterIndex": 33,
+      "source": "grace note figure for sample database",
+      "noteCount": 15,
+      "totalDurationMs": 716.67,
+      "stats": {
+        "velocity": {
+          "avg": 80,
+          "min": 26,
+          "max": 106
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 99
+        },
+        {
+          "relativeOnsetMs": 4.17,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 126.04,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 134.38,
+          "velocity": 94
+        },
+        {
+          "relativeOnsetMs": 175,
+          "velocity": 32
+        },
+        {
+          "relativeOnsetMs": 183.33,
+          "velocity": 26
+        },
+        {
+          "relativeOnsetMs": 213.54,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 314.58,
+          "velocity": 70
+        },
+        {
+          "relativeOnsetMs": 473.96,
+          "velocity": 103
+        },
+        {
+          "relativeOnsetMs": 594.79,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 614.58,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 622.92,
+          "velocity": 100
+        },
+        {
+          "relativeOnsetMs": 626.04,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 698.96,
+          "velocity": 101
+        },
+        {
+          "relativeOnsetMs": 716.67,
+          "velocity": 73
+        }
+      ]
+    },
+    {
+      "clusterIndex": 34,
+      "source": "grace note figure for sample database",
+      "noteCount": 13,
+      "totalDurationMs": 796.88,
+      "stats": {
+        "velocity": {
+          "avg": 82,
+          "min": 59,
+          "max": 106
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 37.5,
+          "velocity": 74
+        },
+        {
+          "relativeOnsetMs": 129.17,
+          "velocity": 59
+        },
+        {
+          "relativeOnsetMs": 147.92,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 169.79,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 180.21,
+          "velocity": 106
+        },
+        {
+          "relativeOnsetMs": 232.29,
+          "velocity": 86
+        },
+        {
+          "relativeOnsetMs": 252.08,
+          "velocity": 98
+        },
+        {
+          "relativeOnsetMs": 541.67,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 616.67,
+          "velocity": 83
+        },
+        {
+          "relativeOnsetMs": 744.79,
+          "velocity": 69
+        },
+        {
+          "relativeOnsetMs": 751.04,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 796.88,
+          "velocity": 90
+        }
+      ]
+    }
+  ],
+  "globalStats": {
+    "totalClusters": 35,
+    "totalNotes": 201,
+    "clusterSize": {
+      "avg": 5.74,
+      "min": 2,
+      "max": 15
+    },
+    "clusterDuration": {
+      "avgMs": 312.38,
+      "minMs": 33.33,
+      "maxMs": 909.38
+    },
+    "velocity": {
+      "avg": 83,
+      "min": 26,
+      "max": 127
+    }
+  }
+}

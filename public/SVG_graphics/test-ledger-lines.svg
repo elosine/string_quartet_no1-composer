@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="11.72mm" height="15.82mm" viewBox="-0.5000 -3.5000 6.6692 9.0000">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g id="staff-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="5.6692" y2="-2.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="5.6692" y2="-1.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="0.0000" x2="5.6692" y2="0.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="5.6692" y2="1.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="5.6692" y2="2.0000"/>
+</g>
+<g id="ledger-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.4000" y1="3.0000" x2="1.6000" y2="3.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.4000" y1="4.0000" x2="1.6000" y2="4.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.4000" y1="5.0000" x2="1.6000" y2="5.0000"/>
+</g>
+<g id="ledger-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="3.4000" y1="-3.0000" x2="4.6000" y2="-3.0000"/>
+</g>
+</svg>

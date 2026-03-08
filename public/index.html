@@ -1873,6 +1873,9 @@
                         <option value="">-- Select Model --</option>
                         <option value="bartokPizz">Bartok Pizzicato</option>
                         <option value="bowOverpressure">Bow Overpressure</option>
+                        <option value="colLegnoGettato">Col Legno Gettato</option>
+                        <option value="gettato">Gettato</option>
+                        <option value="twoHandPizzGrace">Two-Hand Pizz Grace Note Clusters</option>
                         <option value="accelDecel">Accel/Decel (Curve)</option>
                         <option value="crescDecresc">Crescendo/Decrescendo</option>
                         <option value="longTone">Long Tone</option>
@@ -1939,6 +1942,157 @@
                     <div id="longToneSegmentInfo" style="width: 100%; padding: 6px; background: rgba(30,40,50,0.5); border: 1px solid #456; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #8af; max-height: 150px; overflow-y: auto;">
                         Click "Generate Segments" to calculate pitch segments
                     </div>
+                </div>
+                
+                <!-- Col Legno Gettato controls (outside midiModelParams) -->
+                <div id="colLegnoGettatoParams" style="display: none;">
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Time</label>
+                        <input type="number" id="clgTime" class="curve-input" value="0" min="0" step="0.001" style="width: 70px; font-size: 10px;" placeholder="0.000">
+                        <span style="font-size: 9px; color: #888; margin-left: 4px;">sec</span>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Instrument</label>
+                        <select id="clgInstrument" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="violin">Violin</option>
+                            <option value="viola">Viola</option>
+                            <option value="cello">Cello</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Track</label>
+                        <select id="clgTrack" style="width: 45px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Pitch</label>
+                        <input type="text" id="clgPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                        <span id="clgPitchRange" style="font-size: 8px; color: #888; margin-left: 4px;">G3–A6</span>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Velocity</label>
+                        <input type="number" id="clgVelocity" class="curve-input" value="127" min="1" max="127" step="1" style="width: 50px; font-size: 10px;">
+                    </div>
+                    <div id="clgInfo" style="width: 100%; padding: 4px; background: rgba(30,30,40,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #888;">
+                    </div>
+                    <button id="clgGenerateBtn" class="curve-draw-btn" style="margin-top: 6px; background: #5a4a3a; border-color: #6a5a4a;">Generate MIDI Snippet</button>
+                </div>
+                
+                <!-- Gettato controls (outside midiModelParams) -->
+                <div id="gettatoParams" style="display: none;">
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Time</label>
+                        <input type="number" id="getTime" class="curve-input" value="0" min="0" step="0.001" style="width: 70px; font-size: 10px;" placeholder="0.000">
+                        <span style="font-size: 9px; color: #888; margin-left: 4px;">sec</span>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Instrument</label>
+                        <select id="getInstrument" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="violin">Violin</option>
+                            <option value="viola">Viola</option>
+                            <option value="cello">Cello</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Track</label>
+                        <select id="getTrack" style="width: 45px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Pitch</label>
+                        <input type="text" id="getPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                        <span id="getPitchRange" style="font-size: 8px; color: #888; margin-left: 4px;">G3–A6</span>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Velocity</label>
+                        <input type="number" id="getVelocity" class="curve-input" value="127" min="1" max="127" step="1" style="width: 50px; font-size: 10px;">
+                    </div>
+                    <div id="getInfo" style="width: 100%; padding: 4px; background: rgba(30,30,40,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #888;">
+                    </div>
+                    <button id="getGenerateBtn" class="curve-draw-btn" style="margin-top: 6px; background: #3a4a5a; border-color: #4a5a6a;">Generate MIDI Snippet</button>
+                </div>
+                
+                <!-- Two-Hand Pizz Grace Note Clusters controls (outside midiModelParams) -->
+                <div id="twoHandPizzGraceParams" style="display: none;">
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Time</label>
+                        <input type="number" id="thpgTime" class="curve-input" value="0" min="0" step="0.001" style="width: 70px; font-size: 10px;" placeholder="0.000">
+                        <span style="font-size: 9px; color: #888; margin-left: 4px;">sec</span>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Instrument</label>
+                        <select id="thpgInstrument" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="violin">Violin</option>
+                            <option value="viola">Viola</option>
+                            <option value="cello">Cello</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Track</label>
+                        <select id="thpgTrack" style="width: 45px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="gap: 3px; align-items: center; margin-top: 6px;">
+                        <label style="font-size: 10px; min-width: 32px;">Align:</label>
+                        <input type="radio" id="thpgAlignPre" name="thpgAlign" value="pre" checked style="margin: 0;">
+                        <label for="thpgAlignPre" style="font-size: 9px; cursor: pointer;">Pre</label>
+                        <input type="radio" id="thpgAlignPost" name="thpgAlign" value="post" style="margin: 0 0 0 8px;">
+                        <label for="thpgAlignPost" style="font-size: 9px; cursor: pointer;">Post</label>
+                    </div>
+                    <div id="thpgInfo" style="width: 100%; padding: 4px; background: rgba(30,30,40,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #888;">
+                    </div>
+                    <button id="thpgGenerateBtn" class="curve-draw-btn" style="margin-top: 6px; background: #6B3FA0; border-color: #7B4FB0;">Generate MIDI Snippet</button>
+                </div>
+                
+                <!-- Bartók Pizzicato controls (outside midiModelParams) -->
+                <div id="bartokPizzParams" style="display: none;">
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Time</label>
+                        <input type="number" id="bpMidiTime" class="curve-input" value="0" min="0" step="0.001" style="width: 70px; font-size: 10px;" placeholder="0.000">
+                        <span style="font-size: 9px; color: #888; margin-left: 4px;">sec</span>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Instrument</label>
+                        <select id="bpMidiInstrument" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="violin">Violin</option>
+                            <option value="viola">Viola</option>
+                            <option value="cello">Cello</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Track</label>
+                        <select id="bpMidiTrack" style="width: 45px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Pitch</label>
+                        <input type="text" id="bpMidiPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                        <span id="bpMidiPitchRange" style="font-size: 8px; color: #888; margin-left: 4px;">G3–E6</span>
+                    </div>
+                    <div class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;">Velocity</label>
+                        <input type="number" id="bpMidiVelocity" class="curve-input" value="127" min="1" max="127" step="1" style="width: 50px; font-size: 10px;">
+                    </div>
+                    <div id="bpMidiInfo" style="width: 100%; padding: 4px; background: rgba(30,30,40,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #888;">
+                    </div>
+                    <button id="bpMidiGenerateBtn" class="curve-draw-btn" style="margin-top: 6px; background: #5a2a4a; border-color: #6a3a5a;">Generate MIDI Snippet</button>
+                    <button id="bpMidiAttachGCBtn" class="curve-draw-btn" style="margin-top: 6px; background: #6a4a3a; border-color: #7a5a4a;">Attach to Selected GC</button>
                 </div>
                 
                 <div id="midiModelParams" style="display: none;">
@@ -2159,9 +2313,9 @@
                         <input type="number" id="svgPosY" class="curve-input" value="0" step="0.001" style="width: 52px; font-size: 9px; padding: 2px 3px;">
                     </div>
                     <div class="curve-input-row" style="margin-bottom: 2px;">
-                        <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 28px;">Scale</label>
-                        <input type="range" id="svgScaleSlider" min="0.1" max="5" step="0.01" value="1" style="width: 80px;">
-                        <input type="number" id="svgScaleInput" class="curve-input" value="1" step="0.01" min="0.1" max="5" style="width: 52px; font-size: 9px; padding: 2px 3px; margin-left: 4px;">
+                        <label style="font-size: 9px; color: rgba(255,255,255,0.5); min-width: 28px;">Ht%</label>
+                        <input type="range" id="svgScaleSlider" min="5" max="200" step="1" value="100" style="width: 80px;">
+                        <input type="number" id="svgScaleInput" class="curve-input" value="100" step="1" min="5" max="200" style="width: 52px; font-size: 9px; padding: 2px 3px; margin-left: 4px;">
                     </div>
                 </div>
                 
@@ -3545,8 +3699,9 @@
                 // X shows offsetSeconds (relative to anchor/dotted line)
                 this.posXInput.value = el.offsetSeconds.toFixed(3);
                 this.posYInput.value = el.offsetYFraction.toFixed(3);
-                this.scaleSlider.value = el.scale;
-                this.scaleInput.value = el.scale.toFixed(2);
+                const htPct = Math.round((el.heightFraction || 1) * 100);
+                this.scaleSlider.value = htPct;
+                this.scaleInput.value = htPct;
                 this.trackSelect.value = el.track;
                 // Standard object info
                 this.objNameInput.value = el.name || '';
@@ -3597,20 +3752,21 @@
             
             updateSelectedScaleFromSlider() {
                 if (!this.selectedElement) return;
-                this.selectedElement.scale = parseFloat(this.scaleSlider.value) || 1;
-                this.scaleInput.value = this.selectedElement.scale.toFixed(2);
-                this._syncHeightFraction(this.selectedElement);
+                const htPct = parseFloat(this.scaleSlider.value) || 100;
+                this.scaleInput.value = Math.round(htPct);
+                this.selectedElement.heightFraction = htPct / 100;
+                this._scaleFromHeightFraction(this.selectedElement);
                 this.updateElementTransform(this.selectedElement);
             },
             
             updateSelectedScaleFromInput() {
                 if (!this.selectedElement) return;
-                let scale = parseFloat(this.scaleInput.value) || 1;
-                scale = Math.max(0.1, Math.min(5, scale)); // Clamp to valid range
-                this.selectedElement.scale = scale;
-                this.scaleSlider.value = scale;
-                this.scaleInput.value = scale.toFixed(2);
-                this._syncHeightFraction(this.selectedElement);
+                let htPct = parseFloat(this.scaleInput.value) || 100;
+                htPct = Math.max(5, Math.min(200, htPct)); // Clamp to valid range
+                this.scaleSlider.value = htPct;
+                this.scaleInput.value = Math.round(htPct);
+                this.selectedElement.heightFraction = htPct / 100;
+                this._scaleFromHeightFraction(this.selectedElement);
                 this.updateElementTransform(this.selectedElement);
             },
             
@@ -3621,6 +3777,17 @@
                     ? CompositionPanel.getTrackDimensions(String(el.track || 1), scoreEl)
                     : { height: 200 };
                 el.heightFraction = (el.scale * el.height) / trackDims.height;
+            },
+            
+            // Compute scale from heightFraction and current track height
+            _scaleFromHeightFraction(el) {
+                const scoreEl = el._section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const trackDims = window.CompositionPanel 
+                    ? CompositionPanel.getTrackDimensions(String(el.track || 1), scoreEl)
+                    : { height: 200 };
+                if (el.heightFraction && el.height && trackDims.height > 0) {
+                    el.scale = (el.heightFraction * trackDims.height) / el.height;
+                }
             },
             
             updateSelectedTrack() {
@@ -10754,6 +10921,11 @@
                     durationTicks: 240,         // Note duration in ticks (clipped)
                     ticksPerQuarter: 1920,      // From original file
                     tempo: 763307,              // Microseconds per quarter note (~78.6 BPM)
+                    instrumentRanges: {         // Pitch ranges per instrument
+                        violin: { low: 55, high: 88 },  // G3–E6
+                        viola:  { low: 48, high: 76 },   // C3–E5
+                        cello:  { low: 36, high: 71 }    // C2–B4
+                    },
                     description: 'Bartok pizzicato snap articulation'
                 },
                 bowOverpressure: {
@@ -10772,6 +10944,57 @@
                         4: { low: 36, high: 71 }   // C2–B4
                     },
                     description: 'Bow overpressure articulation (random pitch per track range)'
+                },
+                colLegnoGettato: {
+                    name: 'Col Legno Gettato',
+                    type: 'single',             // Single note articulation (user pitch)
+                    cc0: 83,                    // Bank select value for col legno gettato
+                    defaultVelocity: 127,       // Default velocity
+                    durationMsRange: [250, 390],// Random duration between 250–390ms
+                    ticksPerQuarter: 1920,      // From original file
+                    tempo: 763307,              // Microseconds per quarter note (~78.6 BPM)
+                    standalone: true,           // Not attached to GC — creates MIDI snippet directly
+                    instrumentRanges: {         // Pitch ranges per instrument
+                        violin: { low: 55, high: 93 },  // G3–A6
+                        viola:  { low: 48, high: 88 },   // C3–E6
+                        cello:  { low: 36, high: 76 }    // C2–E5
+                    },
+                    description: 'Col legno gettato — thrown wood stroke (random duration 250–390ms)'
+                },
+                gettato: {
+                    name: 'Gettato',
+                    type: 'single',             // Single note articulation (user pitch)
+                    cc0: 20,                    // Bank select value for gettato
+                    defaultVelocity: 127,       // Default velocity
+                    durationMsRange: [250, 390],// Random duration between 250–390ms
+                    ticksPerQuarter: 1920,      // From original file
+                    tempo: 763307,              // Microseconds per quarter note (~78.6 BPM)
+                    standalone: true,           // Not attached to GC — creates MIDI snippet directly
+                    instrumentRanges: {         // Pitch ranges per instrument
+                        violin: { low: 55, high: 93 },  // G3–A6
+                        viola:  { low: 48, high: 88 },   // C3–E6
+                        cello:  { low: 36, high: 76 }    // C2–E5
+                    },
+                    description: 'Gettato — thrown bow stroke (random duration 250–390ms)'
+                },
+                twoHandPizzGrace: {
+                    name: 'Two-Hand Pizz Grace Note Clusters',
+                    type: 'cluster',            // Cluster-based — samples whole cluster from DB
+                    cc0Behind: 80,              // Behind the bridge pizzicato
+                    cc0Pizz: 69,                // Regular pizzicato
+                    standalone: true,           // Not attached to GC
+                    durationMsRange: [30, 60],  // Random note duration per note (ms)
+                    instrumentRanges: {         // Pitch ranges per instrument (CC0=69 regular pizz)
+                        violin: { low: 55, high: 96 },  // G3–C7
+                        viola:  { low: 48, high: 88 },   // C3–E6
+                        cello:  { low: 36, high: 83 }    // C2–B5
+                    },
+                    openStrings: {              // Open strings per instrument (CC0=80 behind bridge)
+                        violin: [55, 62, 69, 76],  // G3, D4, A4, E5
+                        viola:  [48, 55, 62, 69],  // C3, G3, D4, A4
+                        cello:  [36, 43, 50, 57]   // C2, G2, D3, A3
+                    },
+                    description: 'Two-hand pizzicato grace note clusters — behind bridge (CC0=80) + regular pizz (CC0=69)'
                 },
                 accelDecel: {
                     name: 'Accel/Decel (Curve)',
@@ -11020,6 +11243,87 @@
                     });
                 }
                 
+                // Col Legno Gettato UI elements
+                this.colLegnoGettatoParamsDiv = document.getElementById('colLegnoGettatoParams');
+                this.clgTimeInput = document.getElementById('clgTime');
+                this.clgInstrumentSelect = document.getElementById('clgInstrument');
+                this.clgTrackSelect = document.getElementById('clgTrack');
+                this.clgPitchInput = document.getElementById('clgPitch');
+                this.clgPitchRangeLabel = document.getElementById('clgPitchRange');
+                this.clgVelocityInput = document.getElementById('clgVelocity');
+                this.clgInfoDisplay = document.getElementById('clgInfo');
+                this.clgGenerateBtn = document.getElementById('clgGenerateBtn');
+                
+                // Col Legno Gettato event listeners
+                if (this.clgInstrumentSelect) {
+                    this.clgInstrumentSelect.addEventListener('change', () => this.updateClgPitchRange());
+                }
+                if (this.clgGenerateBtn) {
+                    this.clgGenerateBtn.addEventListener('click', () => this.generateColLegnoGettatoMidi());
+                }
+                
+                // Gettato UI elements
+                this.gettatoParamsDiv = document.getElementById('gettatoParams');
+                this.getTimeInput = document.getElementById('getTime');
+                this.getInstrumentSelect = document.getElementById('getInstrument');
+                this.getTrackSelect = document.getElementById('getTrack');
+                this.getPitchInput = document.getElementById('getPitch');
+                this.getPitchRangeLabel = document.getElementById('getPitchRange');
+                this.getVelocityInput = document.getElementById('getVelocity');
+                this.getInfoDisplay = document.getElementById('getInfo');
+                this.getGenerateBtn = document.getElementById('getGenerateBtn');
+                
+                // Gettato event listeners
+                if (this.getInstrumentSelect) {
+                    this.getInstrumentSelect.addEventListener('change', () => this.updateGetPitchRange());
+                }
+                if (this.getGenerateBtn) {
+                    this.getGenerateBtn.addEventListener('click', () => this.generateGettatoMidi());
+                }
+                
+                // Two-Hand Pizz Grace Note Clusters UI elements
+                this.twoHandPizzGraceParamsDiv = document.getElementById('twoHandPizzGraceParams');
+                this.thpgTimeInput = document.getElementById('thpgTime');
+                this.thpgInstrumentSelect = document.getElementById('thpgInstrument');
+                this.thpgTrackSelect = document.getElementById('thpgTrack');
+                this.thpgInfoDisplay = document.getElementById('thpgInfo');
+                this.thpgGenerateBtn = document.getElementById('thpgGenerateBtn');
+                this.thpgClusterDb = null; // cached cluster database
+                
+                // THPGNC event listeners
+                if (this.thpgGenerateBtn) {
+                    this.thpgGenerateBtn.addEventListener('click', () => this.generateTwoHandPizzGraceMidi());
+                }
+                if (this.thpgInstrumentSelect) {
+                    this.thpgInstrumentSelect.addEventListener('change', () => this.updateThpgInfo());
+                }
+                if (this.thpgTrackSelect) {
+                    this.thpgTrackSelect.addEventListener('change', () => this.updateThpgInfo());
+                }
+                
+                // Bartók Pizzicato UI elements
+                this.bartokPizzParamsDiv = document.getElementById('bartokPizzParams');
+                this.bpMidiTimeInput = document.getElementById('bpMidiTime');
+                this.bpMidiInstrumentSelect = document.getElementById('bpMidiInstrument');
+                this.bpMidiTrackSelect = document.getElementById('bpMidiTrack');
+                this.bpMidiPitchInput = document.getElementById('bpMidiPitch');
+                this.bpMidiPitchRangeLabel = document.getElementById('bpMidiPitchRange');
+                this.bpMidiVelocityInput = document.getElementById('bpMidiVelocity');
+                this.bpMidiInfoDisplay = document.getElementById('bpMidiInfo');
+                this.bpMidiGenerateBtn = document.getElementById('bpMidiGenerateBtn');
+                this.bpMidiAttachGCBtn = document.getElementById('bpMidiAttachGCBtn');
+                
+                // Bartók Pizzicato event listeners
+                if (this.bpMidiInstrumentSelect) {
+                    this.bpMidiInstrumentSelect.addEventListener('change', () => this.updateBpMidiPitchRange());
+                }
+                if (this.bpMidiGenerateBtn) {
+                    this.bpMidiGenerateBtn.addEventListener('click', () => this.generateBartokPizzMidi());
+                }
+                if (this.bpMidiAttachGCBtn) {
+                    this.bpMidiAttachGCBtn.addEventListener('click', () => this.attachBartokPizzToGC());
+                }
+                
                 // Long Tone event listeners
                 if (this.longTonePitchModeSelect) {
                     this.longTonePitchModeSelect.addEventListener('change', () => {
@@ -11251,8 +11555,81 @@
                 const isBartokPizz = modelKey === 'bartokPizz';
                 const isBowOverpressure = modelKey === 'bowOverpressure';
                 const isLongTone = modelKey === 'longTone';
+                const isColLegnoGettato = modelKey === 'colLegnoGettato';
+                const isGettato = modelKey === 'gettato';
+                const isTwoHandPizzGrace = modelKey === 'twoHandPizzGrace';
                 const isSingleNote = isBartokPizz || isBowOverpressure;
                 const isCurveBased = isAccelDecel || isCrescDecresc;
+                
+                // Bartók Pizzicato: hide shared params, show BP specific UI
+                if (isBartokPizz) {
+                    this.paramsDiv.style.display = 'none';
+                    if (this.bartokPizzParamsDiv) this.bartokPizzParamsDiv.style.display = 'block';
+                    if (this.colLegnoGettatoParamsDiv) this.colLegnoGettatoParamsDiv.style.display = 'none';
+                    if (this.gettatoParamsDiv) this.gettatoParamsDiv.style.display = 'none';
+                    if (this.twoHandPizzGraceParamsDiv) this.twoHandPizzGraceParamsDiv.style.display = 'none';
+                    if (this.longToneCurveIndicator) this.longToneCurveIndicator.style.display = 'none';
+                    if (this.longToneParamsDiv) this.longToneParamsDiv.style.display = 'none';
+                    this.updateBpMidiInfo();
+                    requestAnimationFrame(() => {
+                        const sc = this.modelSelect.closest('.section-content');
+                        if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                    });
+                    return;
+                } else {
+                    if (this.bartokPizzParamsDiv) this.bartokPizzParamsDiv.style.display = 'none';
+                }
+                
+                // Col Legno Gettato: hide shared params, show CLG specific UI
+                if (isColLegnoGettato) {
+                    this.paramsDiv.style.display = 'none';
+                    if (this.colLegnoGettatoParamsDiv) this.colLegnoGettatoParamsDiv.style.display = 'block';
+                    if (this.gettatoParamsDiv) this.gettatoParamsDiv.style.display = 'none';
+                    if (this.twoHandPizzGraceParamsDiv) this.twoHandPizzGraceParamsDiv.style.display = 'none';
+                    if (this.longToneCurveIndicator) this.longToneCurveIndicator.style.display = 'none';
+                    if (this.longToneParamsDiv) this.longToneParamsDiv.style.display = 'none';
+                    this.updateClgInfo();
+                    requestAnimationFrame(() => {
+                        const sc = this.modelSelect.closest('.section-content');
+                        if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                    });
+                    return;
+                } else {
+                    if (this.colLegnoGettatoParamsDiv) this.colLegnoGettatoParamsDiv.style.display = 'none';
+                }
+                
+                // Gettato: hide shared params, show Gettato specific UI
+                if (isGettato) {
+                    this.paramsDiv.style.display = 'none';
+                    if (this.gettatoParamsDiv) this.gettatoParamsDiv.style.display = 'block';
+                    if (this.twoHandPizzGraceParamsDiv) this.twoHandPizzGraceParamsDiv.style.display = 'none';
+                    if (this.longToneCurveIndicator) this.longToneCurveIndicator.style.display = 'none';
+                    if (this.longToneParamsDiv) this.longToneParamsDiv.style.display = 'none';
+                    this.updateGetInfo();
+                    requestAnimationFrame(() => {
+                        const sc = this.modelSelect.closest('.section-content');
+                        if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                    });
+                    return;
+                } else {
+                    if (this.gettatoParamsDiv) this.gettatoParamsDiv.style.display = 'none';
+                }
+                
+                // Two-Hand Pizz Grace Note Clusters: hide shared params, show THPGNC specific UI
+                if (isTwoHandPizzGrace) {
+                    this.paramsDiv.style.display = 'none';
+                    if (this.twoHandPizzGraceParamsDiv) this.twoHandPizzGraceParamsDiv.style.display = 'block';
+                    if (this.longToneCurveIndicator) this.longToneCurveIndicator.style.display = 'none';
+                    if (this.longToneParamsDiv) this.longToneParamsDiv.style.display = 'none';
+                    this.updateThpgInfo();
+                    requestAnimationFrame(() => {
+                        const sc = this.modelSelect.closest('.section-content');
+                        if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                    });
+                    return;
+                } else {
+                    if (this.twoHandPizzGraceParamsDiv) this.twoHandPizzGraceParamsDiv.style.display = 'none';
+                }
                 
                 // Long Tone: hide shared params, show Long Tone specific UI
                 if (isLongTone) {
@@ -11265,6 +11642,10 @@
                         this.longToneParamsDiv.style.display = 'block';
                         this.updateLongTonePitchModeUI();
                     }
+                    requestAnimationFrame(() => {
+                        const sc = this.modelSelect.closest('.section-content');
+                        if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                    });
                     return;
                 } else {
                     if (this.longToneCurveIndicator) {
@@ -11306,6 +11687,12 @@
                 }
                 
                 this.updateInfo();
+                
+                // Recalculate parent section maxHeight so panel expands to fit new controls
+                requestAnimationFrame(() => {
+                    const sc = this.modelSelect.closest('.section-content');
+                    if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                });
             },
             
             // Update Long Tone curve indicator based on curve selection
@@ -12544,6 +12931,835 @@
                     <div>CC0: ${model.cc0} | Pitch: ${pitchDisplay} | Vel: ${velocity}</div>
                     <div>Duration: ${durationMs.toFixed(0)}ms</div>
                 `;
+            },
+            
+            // Update CLG pitch range label when instrument changes
+            updateClgPitchRange() {
+                if (!this.clgInstrumentSelect || !this.clgPitchRangeLabel) return;
+                const instrument = this.clgInstrumentSelect.value;
+                const model = this.models.colLegnoGettato;
+                const range = model.instrumentRanges[instrument];
+                if (range) {
+                    const lowName = this.pitchToNoteName(range.low);
+                    const highName = this.pitchToNoteName(range.high);
+                    this.clgPitchRangeLabel.textContent = `${lowName}–${highName}`;
+                }
+                this.updateClgInfo();
+            },
+            
+            // Update CLG info display
+            updateClgInfo() {
+                if (!this.clgInfoDisplay) return;
+                const model = this.models.colLegnoGettato;
+                const instrument = this.clgInstrumentSelect?.value || 'violin';
+                const track = this.clgTrackSelect?.value || '1';
+                const pitchStr = this.clgPitchInput?.value || 'C4';
+                const velocity = parseInt(this.clgVelocityInput?.value) || 127;
+                const time = parseFloat(this.clgTimeInput?.value) || 0;
+                
+                const pitchObj = this.noteNameToPitch(pitchStr, true);
+                let pitchDisplay = '(invalid)';
+                let rangeWarning = '';
+                if (pitchObj) {
+                    pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
+                    const range = model.instrumentRanges[instrument];
+                    if (range && (pitchObj.pitch < range.low || pitchObj.pitch > range.high)) {
+                        rangeWarning = `<div style="color: #f88;">⚠ Out of range for ${instrument}</div>`;
+                    }
+                }
+                
+                this.clgInfoDisplay.innerHTML = `
+                    <div style="color: #dca;"><strong>Col Legno Gettato</strong></div>
+                    <div>CC0: ${model.cc0} | Pitch: ${pitchDisplay} | Vel: ${velocity}</div>
+                    <div>Track: ${track} | Instrument: ${instrument} | Time: ${time.toFixed(3)}s</div>
+                    <div>Duration: random 250–390ms</div>
+                    ${rangeWarning}
+                `;
+            },
+            
+            // Generate standalone Col Legno Gettato MIDI snippet
+            generateColLegnoGettatoMidi() {
+                const model = this.models.colLegnoGettato;
+                const instrument = this.clgInstrumentSelect?.value || 'violin';
+                const track = parseInt(this.clgTrackSelect?.value) || 1;
+                const pitchStr = this.clgPitchInput?.value || 'C4';
+                const velocity = Math.max(1, Math.min(127, parseInt(this.clgVelocityInput?.value) || 127));
+                const timeSec = parseFloat(this.clgTimeInput?.value) || 0;
+                
+                // Parse pitch (with quarter-tone support)
+                const pitchObj = this.noteNameToPitch(pitchStr, true);
+                if (!pitchObj) {
+                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                    return;
+                }
+                
+                const pitch = pitchObj.pitch;
+                const quarterToneOffset = pitchObj.quarterTone || 0;
+                
+                // Validate pitch against instrument range
+                const range = model.instrumentRanges[instrument];
+                if (range && (pitch < range.low || pitch > range.high)) {
+                    const lowName = this.pitchToNoteName(range.low);
+                    const highName = this.pitchToNoteName(range.high);
+                    alert(`Pitch out of range for ${instrument}. Range: ${lowName}–${highName}`);
+                    return;
+                }
+                
+                // Random duration between 250–390ms
+                const [minMs, maxMs] = model.durationMsRange;
+                const durationMs = minMs + Math.random() * (maxMs - minMs);
+                const durationSec = durationMs / 1000;
+                
+                const trackIndex = track - 1;
+                const channel = trackIndex; // MIDI channel 0-3 for tracks 1-4
+                const timeMs = timeSec * 1000;
+                
+                // Quarter-tone pitch bend (±1 semitone range, 8192 per semitone)
+                const needsBend = quarterToneOffset !== 0;
+                const bendValue = quarterToneOffset > 0 ? 12288 : quarterToneOffset < 0 ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
+                
+                // Create MIDI events
+                const snippetEvents = [];
+                
+                // Pitch bend before note (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: timeMs,
+                        relativeTimeMs: 0,
+                        type: 0xE0,
+                        data: [0xE0 | channel, bendLSB, bendMSB]
+                    });
+                }
+                
+                snippetEvents.push(
+                    {
+                        timeMs: timeMs,
+                        relativeTimeMs: 0,
+                        type: 'cc',
+                        data: [0xB0 | channel, 0x00, model.cc0]
+                    },
+                    {
+                        timeMs: timeMs,
+                        relativeTimeMs: 0,
+                        type: 'noteOn',
+                        data: [0x90 | channel, pitch, velocity]
+                    },
+                    {
+                        timeMs: timeMs + durationMs,
+                        relativeTimeMs: durationMs,
+                        type: 'noteOff',
+                        data: [0x80 | channel, pitch, 0]
+                    }
+                );
+                
+                // Reset pitch bend after note off (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: timeMs + durationMs,
+                        relativeTimeMs: durationMs,
+                        type: 0xE0,
+                        data: [0xE0 | channel, 0x00, 0x40] // bend = 8192 (center)
+                    });
+                }
+                
+                const pitchDisplayName = this.pitchToNoteNameWithQuarter(pitch, quarterToneOffset);
+                
+                // Create snippet data for MidiSnippetDatabase
+                const snippetData = {
+                    name: `CLG ${pitchDisplayName} T${track} @${timeSec.toFixed(3)}s`,
+                    trackIndex: trackIndex,
+                    startSeconds: timeSec,
+                    endSeconds: timeSec + durationSec,
+                    events: snippetEvents,
+                    color: '#8B6914' // dark goldenrod for col legno gettato
+                };
+                
+                // Add to MidiSnippetDatabase
+                if (window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.add(snippetData);
+                }
+                
+                // Reload MidiController from database (Pattern 3 insertion)
+                if (window.MidiController && MidiController.reloadFromDatabase) {
+                    MidiController.reloadFromDatabase();
+                }
+                
+                // Mark score as dirty
+                if (window.ScoreManager) {
+                    ScoreManager.markDirty();
+                }
+                
+                // Update info display
+                if (this.clgInfoDisplay) {
+                    this.clgInfoDisplay.innerHTML = `
+                        <div style="color: #dca;"><strong>Col Legno Gettato</strong></div>
+                        <div style="color: #8f8;">✓ Generated: ${pitchDisplayName} vel=${velocity} T${track}</div>
+                        <div>Time: ${timeSec.toFixed(3)}s | Duration: ${durationMs.toFixed(0)}ms</div>
+                        ${needsBend ? '<div style="color: #fd8;">Quarter-tone pitch bend applied</div>' : ''}
+                    `;
+                }
+                
+                console.debug(`Col Legno Gettato generated: ${pitchDisplayName} vel=${velocity} T${track} @${timeSec.toFixed(3)}s dur=${durationMs.toFixed(0)}ms${needsBend ? ' (quarter-tone)' : ''}`);
+            },
+            
+            // Update Gettato pitch range label when instrument changes
+            updateGetPitchRange() {
+                if (!this.getInstrumentSelect || !this.getPitchRangeLabel) return;
+                const instrument = this.getInstrumentSelect.value;
+                const model = this.models.gettato;
+                const range = model.instrumentRanges[instrument];
+                if (range) {
+                    const lowName = this.pitchToNoteName(range.low);
+                    const highName = this.pitchToNoteName(range.high);
+                    this.getPitchRangeLabel.textContent = `${lowName}–${highName}`;
+                }
+                this.updateGetInfo();
+            },
+            
+            // Update Gettato info display
+            updateGetInfo() {
+                if (!this.getInfoDisplay) return;
+                const model = this.models.gettato;
+                const instrument = this.getInstrumentSelect?.value || 'violin';
+                const track = this.getTrackSelect?.value || '1';
+                const pitchStr = this.getPitchInput?.value || 'C4';
+                const velocity = parseInt(this.getVelocityInput?.value) || 127;
+                const time = parseFloat(this.getTimeInput?.value) || 0;
+                
+                const pitchObj = this.noteNameToPitch(pitchStr, true);
+                let pitchDisplay = '(invalid)';
+                let rangeWarning = '';
+                if (pitchObj) {
+                    pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
+                    const range = model.instrumentRanges[instrument];
+                    if (range && (pitchObj.pitch < range.low || pitchObj.pitch > range.high)) {
+                        rangeWarning = `<div style="color: #f88;">⚠ Out of range for ${instrument}</div>`;
+                    }
+                }
+                
+                this.getInfoDisplay.innerHTML = `
+                    <div style="color: #acd;"><strong>Gettato</strong></div>
+                    <div>CC0: ${model.cc0} | Pitch: ${pitchDisplay} | Vel: ${velocity}</div>
+                    <div>Track: ${track} | Instrument: ${instrument} | Time: ${time.toFixed(3)}s</div>
+                    <div>Duration: random 250–390ms</div>
+                    ${rangeWarning}
+                `;
+            },
+            
+            // Generate standalone Gettato MIDI snippet
+            generateGettatoMidi() {
+                const model = this.models.gettato;
+                const instrument = this.getInstrumentSelect?.value || 'violin';
+                const track = parseInt(this.getTrackSelect?.value) || 1;
+                const pitchStr = this.getPitchInput?.value || 'C4';
+                const velocity = Math.max(1, Math.min(127, parseInt(this.getVelocityInput?.value) || 127));
+                const timeSec = parseFloat(this.getTimeInput?.value) || 0;
+                
+                // Parse pitch (with quarter-tone support)
+                const pitchObj = this.noteNameToPitch(pitchStr, true);
+                if (!pitchObj) {
+                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                    return;
+                }
+                
+                const pitch = pitchObj.pitch;
+                const quarterToneOffset = pitchObj.quarterTone || 0;
+                
+                // Validate pitch against instrument range
+                const range = model.instrumentRanges[instrument];
+                if (range && (pitch < range.low || pitch > range.high)) {
+                    const lowName = this.pitchToNoteName(range.low);
+                    const highName = this.pitchToNoteName(range.high);
+                    alert(`Pitch out of range for ${instrument}. Range: ${lowName}–${highName}`);
+                    return;
+                }
+                
+                // Random duration between 250–390ms
+                const [minMs, maxMs] = model.durationMsRange;
+                const durationMs = minMs + Math.random() * (maxMs - minMs);
+                const durationSec = durationMs / 1000;
+                
+                const trackIndex = track - 1;
+                const channel = trackIndex; // MIDI channel 0-3 for tracks 1-4
+                const timeMs = timeSec * 1000;
+                
+                // Quarter-tone pitch bend (±1 semitone range, 8192 per semitone)
+                const needsBend = quarterToneOffset !== 0;
+                const bendValue = quarterToneOffset > 0 ? 12288 : quarterToneOffset < 0 ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
+                
+                // Create MIDI events
+                const snippetEvents = [];
+                
+                // Pitch bend before note (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: timeMs,
+                        relativeTimeMs: 0,
+                        type: 0xE0,
+                        data: [0xE0 | channel, bendLSB, bendMSB]
+                    });
+                }
+                
+                snippetEvents.push(
+                    {
+                        timeMs: timeMs,
+                        relativeTimeMs: 0,
+                        type: 'cc',
+                        data: [0xB0 | channel, 0x00, model.cc0]
+                    },
+                    {
+                        timeMs: timeMs,
+                        relativeTimeMs: 0,
+                        type: 'noteOn',
+                        data: [0x90 | channel, pitch, velocity]
+                    },
+                    {
+                        timeMs: timeMs + durationMs,
+                        relativeTimeMs: durationMs,
+                        type: 'noteOff',
+                        data: [0x80 | channel, pitch, 0]
+                    }
+                );
+                
+                // Reset pitch bend after note off (if quarter-tone)
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: timeMs + durationMs,
+                        relativeTimeMs: durationMs,
+                        type: 0xE0,
+                        data: [0xE0 | channel, 0x00, 0x40] // bend = 8192 (center)
+                    });
+                }
+                
+                const pitchDisplayName = this.pitchToNoteNameWithQuarter(pitch, quarterToneOffset);
+                
+                // Create snippet data for MidiSnippetDatabase
+                const snippetData = {
+                    name: `GET ${pitchDisplayName} T${track} @${timeSec.toFixed(3)}s`,
+                    trackIndex: trackIndex,
+                    startSeconds: timeSec,
+                    endSeconds: timeSec + durationSec,
+                    events: snippetEvents,
+                    color: '#4682B4' // steel blue for gettato
+                };
+                
+                // Add to MidiSnippetDatabase
+                if (window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.add(snippetData);
+                }
+                
+                // Reload MidiController from database (Pattern 3 insertion)
+                if (window.MidiController && MidiController.reloadFromDatabase) {
+                    MidiController.reloadFromDatabase();
+                }
+                
+                // Mark score as dirty
+                if (window.ScoreManager) {
+                    ScoreManager.markDirty();
+                }
+                
+                // Update info display
+                if (this.getInfoDisplay) {
+                    this.getInfoDisplay.innerHTML = `
+                        <div style="color: #acd;"><strong>Gettato</strong></div>
+                        <div style="color: #8f8;">✓ Generated: ${pitchDisplayName} vel=${velocity} T${track}</div>
+                        <div>Time: ${timeSec.toFixed(3)}s | Duration: ${durationMs.toFixed(0)}ms</div>
+                        ${needsBend ? '<div style="color: #fd8;">Quarter-tone pitch bend applied</div>' : ''}
+                    `;
+                }
+                
+                console.debug(`Gettato generated: ${pitchDisplayName} vel=${velocity} T${track} @${timeSec.toFixed(3)}s dur=${durationMs.toFixed(0)}ms${needsBend ? ' (quarter-tone)' : ''}`);
+            },
+            
+            // Update THPGNC info display
+            updateThpgInfo() {
+                if (!this.thpgInfoDisplay) return;
+                const model = this.models.twoHandPizzGrace;
+                if (!model) return;
+                
+                const instrument = this.thpgInstrumentSelect?.value || 'violin';
+                const track = parseInt(this.thpgTrackSelect?.value) || 1;
+                const timeSec = parseFloat(this.thpgTimeInput?.value) || 0;
+                const alignment = document.querySelector('input[name="thpgAlign"]:checked')?.value || 'pre';
+                const range = model.instrumentRanges[instrument];
+                const openStrs = model.openStrings[instrument];
+                
+                this.thpgInfoDisplay.innerHTML = `
+                    <div style="color: #c8a0e8;"><strong>Two-Hand Pizz Grace Notes</strong></div>
+                    <div>CC0: ${model.cc0Behind} (behind bridge) / ${model.cc0Pizz} (regular pizz)</div>
+                    <div>${instrument} | T${track} | ${timeSec.toFixed(3)}s | ${alignment}</div>
+                    <div>Pizz range: ${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)}</div>
+                    <div>Open strings: ${openStrs.map(p => this.pitchToNoteName(p)).join(', ')}</div>
+                    <div>Duration/note: ${model.durationMsRange[0]}–${model.durationMsRange[1]}ms</div>
+                `;
+            },
+            
+            // Load and cache the grace note cluster database
+            async loadThpgClusterDb() {
+                if (this.thpgClusterDb) return this.thpgClusterDb;
+                try {
+                    const resp = await fetch('/midi_files/grace_note_cluster_db.json');
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    this.thpgClusterDb = await resp.json();
+                    console.debug(`THPGNC: loaded cluster DB with ${this.thpgClusterDb.clusters.length} clusters`);
+                    return this.thpgClusterDb;
+                } catch (e) {
+                    console.error('THPGNC: failed to load cluster DB', e);
+                    return null;
+                }
+            },
+            
+            // Generate standalone Two-Hand Pizz Grace Note Clusters MIDI snippet
+            async generateTwoHandPizzGraceMidi() {
+                const model = this.models.twoHandPizzGrace;
+                if (!model) return;
+                
+                const instrument = this.thpgInstrumentSelect?.value || 'violin';
+                const track = parseInt(this.thpgTrackSelect?.value) || 1;
+                const timeSec = parseFloat(this.thpgTimeInput?.value) || 0;
+                const alignment = document.querySelector('input[name="thpgAlign"]:checked')?.value || 'pre';
+                
+                // Load cluster database
+                const db = await this.loadThpgClusterDb();
+                if (!db || !db.clusters || db.clusters.length === 0) {
+                    alert('Failed to load grace note cluster database.');
+                    return;
+                }
+                
+                // Sample a random cluster
+                const clusterIdx = Math.floor(Math.random() * db.clusters.length);
+                const cluster = db.clusters[clusterIdx];
+                const notes = cluster.notes;
+                const noteCount = notes.length;
+                
+                // Assign CC0 per note: 50/50 shuffled distribution
+                const cc0Assignments = [];
+                const halfBehind = Math.ceil(noteCount / 2);
+                for (let i = 0; i < noteCount; i++) {
+                    cc0Assignments.push(i < halfBehind ? model.cc0Behind : model.cc0Pizz);
+                }
+                // Fisher-Yates shuffle
+                for (let i = cc0Assignments.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [cc0Assignments[i], cc0Assignments[j]] = [cc0Assignments[j], cc0Assignments[i]];
+                }
+                
+                const range = model.instrumentRanges[instrument];
+                const openStrs = model.openStrings[instrument];
+                const [minDurMs, maxDurMs] = model.durationMsRange;
+                const trackIndex = track - 1;
+                const channel = trackIndex; // MIDI channels 0-3 for tracks 1-4
+                
+                // Compute cluster total duration from last note onset + its duration
+                // (we'll compute actual end after assigning durations)
+                const clusterTotalMs = cluster.totalDurationMs;
+                
+                // Determine snippet start time based on alignment
+                let snippetStartSec;
+                if (alignment === 'pre') {
+                    snippetStartSec = timeSec - (clusterTotalMs / 1000);
+                } else {
+                    snippetStartSec = timeSec;
+                }
+                if (snippetStartSec < 0) snippetStartSec = 0;
+                const snippetStartMs = snippetStartSec * 1000;
+                
+                // Build MIDI events
+                const snippetEvents = [];
+                let maxEndMs = 0;
+                
+                for (let i = 0; i < noteCount; i++) {
+                    const note = notes[i];
+                    const cc0 = cc0Assignments[i];
+                    const noteOnsetMs = note.relativeOnsetMs;
+                    const velocity = note.velocity;
+                    const durationMs = minDurMs + Math.random() * (maxDurMs - minDurMs);
+                    const noteEndMs = noteOnsetMs + durationMs;
+                    if (noteEndMs > maxEndMs) maxEndMs = noteEndMs;
+                    
+                    let pitch, quarterToneOffset = 0, needsBend = false;
+                    
+                    if (cc0 === model.cc0Behind) {
+                        // Behind bridge: pick random open string, no pitch bend
+                        pitch = openStrs[Math.floor(Math.random() * openStrs.length)];
+                    } else {
+                        // Regular pizz: random pitch in instrument range, quarter-tone enabled
+                        // Pick random MIDI note in range
+                        pitch = range.low + Math.floor(Math.random() * (range.high - range.low + 1));
+                        // 50% chance of quarter-tone offset
+                        const qRoll = Math.random();
+                        if (qRoll < 0.25) {
+                            quarterToneOffset = 0.5;  // quarter sharp
+                            needsBend = true;
+                        } else if (qRoll < 0.5) {
+                            quarterToneOffset = -0.5; // quarter flat
+                            needsBend = true;
+                        }
+                        // else: no quarter tone
+                    }
+                    
+                    // CC0 message
+                    snippetEvents.push({
+                        timeMs: snippetStartMs + noteOnsetMs,
+                        relativeTimeMs: noteOnsetMs,
+                        type: 'cc',
+                        data: [0xB0 | channel, 0x00, cc0]
+                    });
+                    
+                    // Pitch bend before note (if quarter-tone)
+                    if (needsBend) {
+                        const bendValue = quarterToneOffset > 0 ? 12288 : 4096;
+                        const bendMSB = bendValue >> 7;
+                        const bendLSB = bendValue & 0x7F;
+                        snippetEvents.push({
+                            timeMs: snippetStartMs + noteOnsetMs,
+                            relativeTimeMs: noteOnsetMs,
+                            type: 0xE0,
+                            data: [0xE0 | channel, bendLSB, bendMSB]
+                        });
+                    }
+                    
+                    // Note on
+                    snippetEvents.push({
+                        timeMs: snippetStartMs + noteOnsetMs,
+                        relativeTimeMs: noteOnsetMs,
+                        type: 'noteOn',
+                        data: [0x90 | channel, pitch, velocity]
+                    });
+                    
+                    // Note off
+                    snippetEvents.push({
+                        timeMs: snippetStartMs + noteEndMs,
+                        relativeTimeMs: noteEndMs,
+                        type: 'noteOff',
+                        data: [0x80 | channel, pitch, 0]
+                    });
+                    
+                    // Reset pitch bend after note off (if quarter-tone)
+                    if (needsBend) {
+                        snippetEvents.push({
+                            timeMs: snippetStartMs + noteEndMs,
+                            relativeTimeMs: noteEndMs,
+                            type: 0xE0,
+                            data: [0xE0 | channel, 0x00, 0x40] // bend = 8192 (center)
+                        });
+                    }
+                }
+                
+                // Sort events by time, then by type priority (cc before pitch bend before noteOn before noteOff)
+                const typePriority = { 'cc': 0, [0xE0]: 1, 'noteOn': 2, 'noteOff': 3 };
+                snippetEvents.sort((a, b) => {
+                    if (a.timeMs !== b.timeMs) return a.timeMs - b.timeMs;
+                    const pa = typePriority[a.type] ?? 2;
+                    const pb = typePriority[b.type] ?? 2;
+                    return pa - pb;
+                });
+                
+                const snippetEndSec = snippetStartSec + (maxEndMs / 1000);
+                
+                // Create snippet data for MidiSnippetDatabase
+                const snippetData = {
+                    name: `THPGNC T${track} @${timeSec.toFixed(3)}s`,
+                    trackIndex: trackIndex,
+                    startSeconds: snippetStartSec,
+                    endSeconds: snippetEndSec,
+                    events: snippetEvents,
+                    color: '#9B59B6' // amethyst purple for THPGNC
+                };
+                
+                // Add to MidiSnippetDatabase (Pattern 3 insertion)
+                if (window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.add(snippetData);
+                }
+                
+                // Reload MidiController from database
+                if (window.MidiController && MidiController.reloadFromDatabase) {
+                    MidiController.reloadFromDatabase();
+                }
+                
+                // Mark score as dirty
+                if (window.ScoreManager) {
+                    ScoreManager.markDirty();
+                }
+                
+                // Count CC0 types for info
+                const behindCount = cc0Assignments.filter(c => c === model.cc0Behind).length;
+                const pizzCount = cc0Assignments.filter(c => c === model.cc0Pizz).length;
+                
+                // Update info display
+                if (this.thpgInfoDisplay) {
+                    this.thpgInfoDisplay.innerHTML = `
+                        <div style="color: #c8a0e8;"><strong>Two-Hand Pizz Grace Notes</strong></div>
+                        <div style="color: #8f8;">✓ Generated: cluster #${clusterIdx} (${noteCount} notes)</div>
+                        <div>Behind bridge: ${behindCount} | Regular pizz: ${pizzCount}</div>
+                        <div>T${track} | ${timeSec.toFixed(3)}s | ${alignment} | ${instrument}</div>
+                        <div>Span: ${snippetStartSec.toFixed(3)}s – ${snippetEndSec.toFixed(3)}s</div>
+                    `;
+                }
+                
+                console.debug(`THPGNC generated: cluster #${clusterIdx} (${noteCount} notes) T${track} @${timeSec.toFixed(3)}s ${alignment} behind=${behindCount} pizz=${pizzCount}`);
+            },
+            
+            // Update Bartók Pizz pitch range label when instrument changes
+            updateBpMidiPitchRange() {
+                const model = this.models.bartokPizz;
+                if (!model || !model.instrumentRanges) return;
+                const instrument = this.bpMidiInstrumentSelect?.value || 'violin';
+                const range = model.instrumentRanges[instrument];
+                if (range && this.bpMidiPitchRangeLabel) {
+                    this.bpMidiPitchRangeLabel.textContent = `${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)}`;
+                }
+                this.updateBpMidiInfo();
+            },
+            
+            // Update Bartók Pizz info display
+            updateBpMidiInfo() {
+                if (!this.bpMidiInfoDisplay) return;
+                const model = this.models.bartokPizz;
+                if (!model) return;
+                
+                const pitchStr = this.bpMidiPitchInput?.value || 'C4';
+                const pitchObj = this.noteNameToPitch(pitchStr, true);
+                const velocity = Math.max(1, Math.min(127, parseInt(this.bpMidiVelocityInput?.value) || 127));
+                const track = parseInt(this.bpMidiTrackSelect?.value) || 1;
+                const instrument = this.bpMidiInstrumentSelect?.value || 'violin';
+                const timeSec = parseFloat(this.bpMidiTimeInput?.value) || 0;
+                
+                let rangeWarning = '';
+                let pitchDisplay = '<span style="color:#f88;">invalid</span>';
+                if (pitchObj) {
+                    pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
+                    if (model.instrumentRanges && model.instrumentRanges[instrument]) {
+                        const range = model.instrumentRanges[instrument];
+                        if (pitchObj.pitch < range.low || pitchObj.pitch > range.high) {
+                            rangeWarning = `<div style="color: #f88;">⚠ Pitch out of ${instrument} range (${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)})</div>`;
+                        }
+                    }
+                }
+                
+                this.bpMidiInfoDisplay.innerHTML = `
+                    <div style="color: #f8a;"><strong>Bartók Pizzicato</strong> CC0: ${model.cc0}</div>
+                    <div>Pitch: ${pitchDisplay} | Vel: ${velocity} | T${track}</div>
+                    <div>${instrument} | ${timeSec.toFixed(3)}s</div>
+                    ${rangeWarning}
+                `;
+            },
+            
+            // Generate standalone Bartók Pizz MIDI snippet (not attached to GC)
+            generateBartokPizzMidi() {
+                const model = this.models.bartokPizz;
+                if (!model) return;
+                
+                const pitchStr = this.bpMidiPitchInput?.value || 'C4';
+                const pitchObj = this.noteNameToPitch(pitchStr, true);
+                if (!pitchObj) {
+                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                    return;
+                }
+                
+                const pitch = pitchObj.pitch;
+                const quarterToneOffset = pitchObj.quarterTone;
+                const pitchDisplayName = this.pitchToNoteNameWithQuarter(pitch, quarterToneOffset);
+                
+                const velocity = Math.max(1, Math.min(127, parseInt(this.bpMidiVelocityInput?.value) || 127));
+                const track = parseInt(this.bpMidiTrackSelect?.value) || 1;
+                const instrument = this.bpMidiInstrumentSelect?.value || 'violin';
+                const timeSec = parseFloat(this.bpMidiTimeInput?.value) || 0;
+                const channel = track - 1;
+                
+                // Validate pitch against instrument range
+                if (model.instrumentRanges && model.instrumentRanges[instrument]) {
+                    const range = model.instrumentRanges[instrument];
+                    if (pitch < range.low || pitch > range.high) {
+                        alert(`Pitch ${pitchDisplayName} is out of ${instrument} range (${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)})`);
+                        return;
+                    }
+                }
+                
+                // Calculate duration from ticks
+                const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
+                const durationMs = model.durationTicks * msPerTick;
+                const impactMs = timeSec * 1000;
+                
+                // Quarter-tone pitch bend
+                const needsBend = quarterToneOffset !== 0;
+                const bendValue = quarterToneOffset > 0 ? 12288 : quarterToneOffset < 0 ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
+                
+                // Build MIDI events
+                const snippetEvents = [];
+                
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: impactMs, relativeTimeMs: 0,
+                        type: 0xE0, data: [0xE0 | channel, bendLSB, bendMSB]
+                    });
+                }
+                
+                snippetEvents.push(
+                    { timeMs: impactMs, relativeTimeMs: 0, type: 0xB0, data: [0xB0 | channel, 0x00, model.cc0] },
+                    { timeMs: impactMs, relativeTimeMs: 0, type: 0x90, data: [0x90 | channel, pitch, velocity] },
+                    { timeMs: impactMs + durationMs, relativeTimeMs: durationMs, type: 0x80, data: [0x80 | channel, pitch, 0] }
+                );
+                
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: impactMs + durationMs, relativeTimeMs: durationMs,
+                        type: 0xE0, data: [0xE0 | channel, 0x00, 0x40]
+                    });
+                }
+                
+                // Create snippet data
+                const snippetData = {
+                    name: `BP ${pitchDisplayName} T${track} @${timeSec.toFixed(1)}s`,
+                    trackIndex: channel,
+                    startSeconds: timeSec,
+                    endSeconds: timeSec + (durationMs / 1000),
+                    events: snippetEvents,
+                    color: '#FF00FF'
+                };
+                
+                // Add to MidiSnippetDatabase
+                if (window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.add(snippetData);
+                }
+                
+                // Reload MidiController from database (Pattern 3 insertion)
+                if (window.MidiController && MidiController.reloadFromDatabase) {
+                    MidiController.reloadFromDatabase();
+                }
+                
+                // Mark score as dirty
+                if (window.ScoreManager) {
+                    ScoreManager.markDirty();
+                }
+                
+                // Update info display
+                if (this.bpMidiInfoDisplay) {
+                    this.bpMidiInfoDisplay.innerHTML = `
+                        <div style="color: #f8a;"><strong>Bartók Pizzicato</strong></div>
+                        <div style="color: #8f8;">✓ Generated: ${pitchDisplayName} vel=${velocity} T${track}</div>
+                        <div>Time: ${timeSec.toFixed(3)}s | Duration: ${durationMs.toFixed(0)}ms</div>
+                        ${needsBend ? '<div style="color: #fd8;">Quarter-tone pitch bend applied</div>' : ''}
+                    `;
+                }
+                
+                console.debug(`Bartók Pizz generated: ${pitchDisplayName} vel=${velocity} T${track} @${timeSec.toFixed(3)}s dur=${durationMs.toFixed(0)}ms${needsBend ? ' (quarter-tone)' : ''}`);
+            },
+            
+            // Attach Bartók Pizz MIDI snippet to the currently selected GC
+            attachBartokPizzToGC() {
+                const model = this.models.bartokPizz;
+                if (!model) return;
+                
+                // Check if GCMaker has a selected GC
+                if (!window.GCMaker || !GCMaker.selectedGC) {
+                    alert('Please select a GC first (click on a GC in the score).');
+                    return;
+                }
+                
+                const gc = GCMaker.selectedGC;
+                const trackIndex = parseInt(gc.gTrack) - 1;
+                const trackNum = trackIndex + 1;
+                const channel = trackIndex;
+                
+                const pitchStr = this.bpMidiPitchInput?.value || 'C4';
+                const pitchObj = this.noteNameToPitch(pitchStr, true);
+                if (!pitchObj) {
+                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                    return;
+                }
+                
+                const pitch = pitchObj.pitch;
+                const quarterToneOffset = pitchObj.quarterTone;
+                const pitchDisplayName = this.pitchToNoteNameWithQuarter(pitch, quarterToneOffset);
+                const velocity = Math.max(1, Math.min(127, parseInt(this.bpMidiVelocityInput?.value) || 127));
+                
+                // Calculate duration
+                const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
+                const durationMs = model.durationTicks * msPerTick;
+                const durationSec = durationMs / 1000;
+                
+                const impactSeconds = gc.impactSeconds;
+                const impactMs = impactSeconds * 1000;
+                
+                // Quarter-tone pitch bend
+                const needsBend = quarterToneOffset !== 0;
+                const bendValue = quarterToneOffset > 0 ? 12288 : quarterToneOffset < 0 ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
+                
+                const snippetEvents = [];
+                
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: impactMs, relativeTimeMs: 0,
+                        type: 0xE0, data: [0xE0 | channel, bendLSB, bendMSB]
+                    });
+                }
+                
+                snippetEvents.push(
+                    { timeMs: impactMs, relativeTimeMs: 0, type: 'cc', data: [0xB0 | channel, 0x00, model.cc0] },
+                    { timeMs: impactMs, relativeTimeMs: 0, type: 'noteOn', data: [0x90 | channel, pitch, velocity] },
+                    { timeMs: impactMs + durationMs, relativeTimeMs: durationMs, type: 'noteOff', data: [0x80 | channel, pitch, 0] }
+                );
+                
+                if (needsBend) {
+                    snippetEvents.push({
+                        timeMs: impactMs + durationMs, relativeTimeMs: durationMs,
+                        type: 0xE0, data: [0xE0 | channel, 0x00, 0x40]
+                    });
+                }
+                
+                // Store snippet reference on the GC
+                gc.midiSnippet = {
+                    modelName: model.name,
+                    modelKey: 'bartokPizz',
+                    pitch: pitch,
+                    quarterTone: quarterToneOffset,
+                    pitchName: pitchDisplayName,
+                    velocity: velocity,
+                    cc0: model.cc0,
+                    durationMs: durationMs
+                };
+                
+                // Create snippet in database
+                const snippetData = {
+                    name: `BP ${pitchDisplayName} T${trackNum} @${impactSeconds.toFixed(1)}s`,
+                    trackIndex: trackIndex,
+                    startSeconds: impactSeconds,
+                    endSeconds: impactSeconds + durationSec,
+                    events: snippetEvents,
+                    color: '#FF00FF',
+                    sourceGC: gc.id
+                };
+                
+                if (window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.add(snippetData);
+                }
+                if (window.MidiController && MidiController.reloadFromDatabase) {
+                    MidiController.reloadFromDatabase();
+                }
+                if (window.ScoreManager) {
+                    ScoreManager.markDirty();
+                }
+                
+                // Update info display
+                if (this.bpMidiInfoDisplay) {
+                    this.bpMidiInfoDisplay.innerHTML = `
+                        <div style="color: #f8a;"><strong>Bartók Pizzicato</strong></div>
+                        <div style="color: #8f8;">✓ Attached to GC: ${gc.name || gc.id}</div>
+                        <div>${pitchDisplayName} vel=${velocity} T${trackNum} @${impactSeconds.toFixed(3)}s</div>
+                        ${needsBend ? '<div style="color: #fd8;">Quarter-tone pitch bend applied</div>' : ''}
+                    `;
+                }
+                
+                console.debug(`Bartók Pizz attached to GC ${gc.id}: ${pitchDisplayName} vel=${velocity} T${trackNum} @${impactSeconds.toFixed(3)}s${needsBend ? ' (quarter-tone)' : ''}`);
             },
             
             // Generate MIDI events from model + user parameters
@@ -28043,16 +29259,38 @@
                 
                 // Recall dropdown toggle
                 if (this.recallSelected) {
-                    this.recallSelected.addEventListener('click', () => {
+                    this.recallSelected.addEventListener('click', (e) => {
+                        e.stopPropagation();
                         const isOpen = this.recallOptions.style.display !== 'none';
                         this.recallOptions.style.display = isOpen ? 'none' : 'block';
+                        // Expand parent section-content to accommodate dropdown
+                        requestAnimationFrame(() => {
+                            const sc = this.recallDropdown.closest('.section-content');
+                            if (sc) {
+                                if (!isOpen) {
+                                    // Opening: add dropdown height to maxHeight
+                                    const dropdownHeight = this.recallOptions.scrollHeight || 200;
+                                    sc.style.maxHeight = (sc.scrollHeight + dropdownHeight) + 'px';
+                                } else {
+                                    // Closing: restore to content height
+                                    sc.style.maxHeight = sc.scrollHeight + 'px';
+                                }
+                            }
+                        });
                     });
                 }
                 
                 // Close dropdown when clicking outside
                 document.addEventListener('click', (e) => {
                     if (this.recallDropdown && !this.recallDropdown.contains(e.target)) {
-                        if (this.recallOptions) this.recallOptions.style.display = 'none';
+                        if (this.recallOptions && this.recallOptions.style.display !== 'none') {
+                            this.recallOptions.style.display = 'none';
+                            // Restore parent section-content maxHeight
+                            requestAnimationFrame(() => {
+                                const sc = this.recallDropdown.closest('.section-content');
+                                if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                            });
+                        }
                     }
                 });
                 

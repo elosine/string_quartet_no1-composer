@@ -1,7 +1,7 @@
 {
   "name": "GC_20260116_151414",
-  "description": "nice sharp ictus",
-  "gTrack": "1",
+  "description": "medium",
+  "gTrack": "2",
   "impactSeconds": 9.2,
   "stiffness": 50,
   "damping": 80,
@@ -9,5 +9,5 @@
   "descentRatio": 55,
   "duration": 1.1,
   "color": "neonMagenta",
-  "savedAt": "2026-01-16T20:15:32.063Z"
+  "savedAt": "2026-03-08T21:31:00.171Z"
 }

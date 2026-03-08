@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="22.00mm" height="25.00mm" viewBox="0.0000 -0.0000 12.5192 14.2264">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0569, 4.2129)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="5.7600" y2="2.0000"/>
+</g>
+<g transform="translate(0.0569, 4.2129)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="5.7600" y2="1.0000"/>
+</g>
+<g transform="translate(0.0569, 4.2129)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="5.7600" y2="-0.0000"/>
+</g>
+<g transform="translate(0.0569, 4.2129)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="5.7600" y2="-1.0000"/>
+</g>
+<g transform="translate(0.0569, 4.2129)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="5.7600" y2="-2.0000"/>
+</g>
+<g transform="translate(0.5691, 7.2129)">
+<rect x="0.4129" y="-0.1000" width="1.3591" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/CrescendoSinglePitchTemplate_new_pp-ff.ly:100:4:5">
+<g transform="translate(8.0394, 9.0310)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="1.0998" text-anchor="start" fill="currentColor">
+<tspan>secco</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/CrescendoSinglePitchTemplate_new_pp-ff.ly:96:4:5">
+<g transform="translate(6.2955, 8.8309)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.4097, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/CrescendoSinglePitchTemplate_new_pp-ff.ly:80:4:5">
+<g transform="translate(2.3768, 8.7062)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="0.0000" x2="3.6187" y2="0.5500"/>
+</g>
+<g transform="translate(2.3768, 8.7062)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.0000" y1="-0.0000" x2="3.6187" y2="-0.5500"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/CrescendoSinglePitchTemplate_new_pp-ff.ly:73:4:5">
+<g transform="translate(1.1569, 7.2129)">
+<path transform="scale(0.0027, -0.0027)" d="M308 62c0 23 -20 39 -40 39c-4 0 -7 0 -11 -1c-29 -8 -74 -38 -109 -61s-79 -52 -99 -75c-6 -8 -10 -16 -10 -26c0 -23 20 -39 40 -39c4 0 7 0 11 1c29 8 74 38 109 61s79 52 99 75c6 8 10 16 10 26zM0 -59c0 142 114 198 251 198c53 0 96 -22 96 -80
+c0 -142 -115 -198 -252 -198c-53 0 -95 22 -95 80z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/CrescendoSinglePitchTemplate_new_pp-ff.ly:85:4:5">
+<g transform="translate(1.0569, 1.6629)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="0.9797" text-anchor="start" fill="currentColor">
+<tspan>Non-Vib</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/CrescendoSinglePitchTemplate_new_pp-ff.ly:76:4:5">
+<g transform="translate(1.0842, 8.8309)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M233 243c-57 0 -104 -112 -104 -178c0 -22 9 -38 31 -38c17 0 35 12 47 28c24 33 51 118 51 155c0 18 -7 33 -25 33zM70 243c-52 0 -44 -123 -101 -123c-12 0 -21 6 -21 18c0 4 1 8 3 13c30 68 75 141 136 141c33 0 53 -23 60 -52c29 31 67 52 103 52
+c69 0 107 -49 107 -114c0 -94 -82 -190 -160 -190c-27 0 -52 5 -73 17c-10 6 -24 5 -27 -4l-17 -51c-3 -8 -4 -16 -4 -23c0 -24 10 -29 32 -31c13 -1 19 -11 19 -21s-7 -21 -20 -21c-35 0 -72 5 -108 5c-37 0 -74 -5 -109 -5c-13 0 -20 11 -20 21c0 23 29 22 52 23
+c25 2 49 15 57 39l92 272c3 9 7 18 7 25c0 5 -2 9 -8 9z" fill="currentColor"/>
+
+<path transform="translate(0.5463, 0.0000) scale(0.0015, -0.0015)" d="M233 243c-57 0 -104 -112 -104 -178c0 -22 9 -38 31 -38c17 0 35 12 47 28c24 33 51 118 51 155c0 18 -7 33 -25 33zM70 243c-52 0 -44 -123 -101 -123c-12 0 -21 6 -21 18c0 4 1 8 3 13c30 68 75 141 136 141c33 0 53 -23 60 -52c29 31 67 52 103 52
+c69 0 107 -49 107 -114c0 -94 -82 -190 -160 -190c-27 0 -52 5 -73 17c-10 6 -24 5 -27 -4l-17 -51c-3 -8 -4 -16 -4 -23c0 -24 10 -29 32 -31c13 -1 19 -11 19 -21s-7 -21 -20 -21c-35 0 -72 5 -108 5c-37 0 -74 -5 -109 -5c-13 0 -20 11 -20 21c0 23 29 22 52 23
+c25 2 49 15 57 39l92 272c3 9 7 18 7 25c0 5 -2 9 -8 9z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<g transform="translate(0.3169, 7.2129)">
+<path transform="scale(0.0018, -0.0018)" d="M52 37c-5 -2 -10 -4 -16 -4c-19 0 -36 16 -36 36v41c0 14 9 28 22 33l30 13v144c0 14 11 26 25 26s26 -12 26 -26v-124l69 29v145c0 14 12 25 26 25s25 -11 25 -25v-124c5 2 10 4 16 4c19 0 36 -16 36 -36v-42c0 -14 -9 -28 -22 -33l-30 -12v-144c5 2 10 4 16 4
+c19 0 36 -16 36 -36v-41c0 -14 -9 -28 -22 -33l-30 -13v-144c0 -14 -11 -26 -25 -26s-26 12 -26 26v124l-69 -29v-145c0 -14 -12 -25 -26 -25s-25 11 -25 25v124c-5 -2 -10 -4 -16 -4c-19 0 -36 16 -36 36v42c0 14 9 28 22 33l30 12v144zM172 86l-69 -28v-144l69 28v144z
+" fill="currentColor"/>
+</g>
+</svg>
