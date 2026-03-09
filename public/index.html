@@ -3591,6 +3591,7 @@
                     const newScale = Math.max(0.1, Math.min(5, this.elementStartScale * scaleFactor));
                     this.selectedElement.scale = newScale;
                     this._syncHeightFraction(this.selectedElement);
+                    this._recalcOffsetSeconds(this.selectedElement);
                     
                     this.updateElementTransform(this.selectedElement);
                     this.updateUIFromSelected();
@@ -3756,6 +3757,7 @@
                 this.scaleInput.value = Math.round(htPct);
                 this.selectedElement.heightFraction = htPct / 100;
                 this._scaleFromHeightFraction(this.selectedElement);
+                this._recalcOffsetSeconds(this.selectedElement);
                 this.updateElementTransform(this.selectedElement);
             },
             
@@ -3767,6 +3769,7 @@
                 this.scaleInput.value = Math.round(htPct);
                 this.selectedElement.heightFraction = htPct / 100;
                 this._scaleFromHeightFraction(this.selectedElement);
+                this._recalcOffsetSeconds(this.selectedElement);
                 this.updateElementTransform(this.selectedElement);
             },
             
@@ -3788,6 +3791,25 @@
                 if (el.heightFraction && el.height && trackDims.height > 0) {
                     el.scale = (el.heightFraction * trackDims.height) / el.height;
                 }
+            },
+            
+            // Recompute offsetSeconds when scale changes, keeping anchor point fixed.
+            // Only applies to assembly-generated SVGs that have anchorOffsetX_mm.
+            _recalcOffsetSeconds(el) {
+                if (!el.anchorOffsetX_mm) return;  // skip legacy SVGs
+                const scoreEl = el._section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = window.GraphicTimeline 
+                    ? GraphicTimeline.getSecondsPerPage() 
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                const anchorPx = el.anchorOffsetX_mm * 3.78 * el.scale;
+                el.offsetSeconds = -anchorPx * secondsPerPixel;
+                const pos = this.calcPixelPosition(el);
+                el._x = pos.x;
+                el._y = pos.y;
+                el._page = pos.page;
+                el._section = pos.section;
             },
             
             updateSelectedTrack() {
@@ -3937,6 +3959,7 @@
                     name: el.name,
                     referenceSeconds: el.referenceSeconds,
                     offsetSeconds: el.offsetSeconds,
+                    anchorOffsetX_mm: el.anchorOffsetX_mm || null,
                     offsetYFraction: el.offsetYFraction,
                     width: el.width,
                     height: el.height,
@@ -4030,6 +4053,7 @@
                         image: image,
                         referenceSeconds: referenceSeconds,
                         offsetSeconds: offsetSeconds,
+                        anchorOffsetX_mm: elData.anchorOffsetX_mm || null,
                         offsetYFraction: offsetYFraction,
                         width: elData.width,
                         height: elData.height,
@@ -4093,6 +4117,9 @@
                         el.scale = (el.heightFraction * th) / el.height;
                     }
                     // If th <= 0 (degenerate window size), keep last good scale
+                    
+                    // Recompute offsetSeconds for anchored elements after scale change
+                    this._recalcOffsetSeconds(el);
                     
                     // Move to correct container if section changed
                     const targetContainer = pos.section === 'top' ? this.containerTop : this.containerBottom;
@@ -22726,42 +22753,35 @@
                             `staffPos=${assembleResult.staffPosition}, acc=${assembleResult.accidental}`,
                             `nhCenterX=${assemblyMetadata.noteheadCenterX_mm.toFixed(2)}mm`);
                     } else {
-                        // Glissando: use LilyPond pipeline (fallback)
-                        const createResp = await fetch('/api/lilypond/create-crescendo', {
+                        // Glissando: use SVG Assembly Engine (instant, no LilyPond)
+                        const isSteady = hairpinDir === 'none';
+                        const assembleResp = await fetch('/api/svg-assembly/sustained-tone-glissando', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                filename,
-                                pitchModel,
-                                clef: lpClef,
-                                pitchInfo,
+                                startPitch,
+                                endPitch,
+                                clef,
                                 dynamic1: dyn1,
-                                dynamic2: dyn2,
+                                dynamic2: isSteady ? null : dyn2,
                                 hairpin: hairpinDir,
-                                secco
+                                secco: isSteady ? false : secco,
+                                nonVib: true,
+                                filename
                             })
                         });
-                        const createResult = await createResp.json();
+                        const assembleResult = await assembleResp.json();
                         
-                        if (!createResult.success) {
-                            console.error('CrescendoUI.step2: Failed to create file:', createResult.error);
-                            throw new Error(createResult.error);
+                        if (!assembleResult.success) {
+                            console.error('CrescendoUI.step2: SVG assembly (gliss) failed:', assembleResult.error);
+                            throw new Error(assembleResult.error);
                         }
-                        console.log('CrescendoUI.step2: LilyPond file created:', filename);
-                        
-                        const renderResp = await fetch('/api/lilypond/render-glissando', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ filename })
-                        });
-                        const renderResult = await renderResp.json();
-                        
-                        if (!renderResult.success) {
-                            console.error('CrescendoUI.step2: Render failed:', renderResult.error);
-                            throw new Error(renderResult.error || 'Render failed');
-                        }
-                        svgPath = renderResult.svgPath;
-                        console.log('CrescendoUI.step2: SVG rendered (LilyPond):', svgPath);
+                        svgPath = assembleResult.svgPath;
+                        assemblyMetadata = assembleResult.metadata;
+                        console.log('CrescendoUI.step2: SVG assembled (gliss, no LilyPond):', svgPath,
+                            `sp1=${assembleResult.staffPosition1}, sp2=${assembleResult.staffPosition2}`,
+                            `sameLine=${assemblyMetadata.sameStaffLine}`,
+                            `startNhCenterX=${assemblyMetadata.startNoteheadCenterX_mm.toFixed(2)}mm`);
                     }
                     
                     if (svgPath) {
@@ -23453,11 +23473,24 @@
                     
                     // Positioning: use profile values from metadata, or legacy hardcoded fallback
                     const positioning = metadata?.positioning || null;
-                    const heightFraction = positioning ? positioning.heightFraction : 0.67;
                     const offsetYFraction = positioning ? positioning.offsetYFraction : 0.05;
                     
-                    const targetHeight = trackHeight * heightFraction;
-                    const scale = targetHeight / svgHeight;
+                    // Scale computation: staffHeight mode (preferred) or legacy heightFraction
+                    let scale, heightFraction;
+                    if (positioning?.scaleMode === 'staffHeight' && metadata?.staffHeight_mm) {
+                        // Staff-height mode: scale so staff lines match staffHeightFraction
+                        // of track height. Guarantees identical staff-line spacing across
+                        // all pitches and all profiles with the same staffHeightFraction.
+                        const staffHeightPx = metadata.staffHeight_mm * 3.78;
+                        const targetStaffHeight = trackHeight * positioning.staffHeightFraction;
+                        scale = targetStaffHeight / staffHeightPx;
+                        heightFraction = (svgHeight * scale) / trackHeight;
+                    } else {
+                        // Legacy heightFraction mode: scale total SVG height to fraction of track
+                        heightFraction = positioning ? positioning.heightFraction : 0.67;
+                        const targetHeight = trackHeight * heightFraction;
+                        scale = targetHeight / svgHeight;
+                    }
                     
                     // Calculate offsetSeconds: X positioning relative to curve start time
                     const secondsPerPage = window.GraphicTimeline 
@@ -23466,10 +23499,17 @@
                     const secondsPerPixel = secondsPerPage / scoreWidth;
                     
                     let offsetSeconds;
+                    let anchorOffsetX_mm = null;  // scale-independent anchor (mm from SVG left edge)
                     if (positioning && positioning.anchorElement === 'noteheadCenter' && metadata.noteheadCenterX_mm) {
                         // Profile-based: center notehead over curve start time
-                        const noteheadCenterPx = metadata.noteheadCenterX_mm * 3.78 * scale;
+                        anchorOffsetX_mm = metadata.noteheadCenterX_mm;
+                        const noteheadCenterPx = anchorOffsetX_mm * 3.78 * scale;
                         offsetSeconds = -noteheadCenterPx * secondsPerPixel;
+                    } else if (positioning && positioning.anchorElement === 'startNoteheadCenter' && metadata.startNoteheadCenterX_mm) {
+                        // Glissando: align start notehead center with curve start time
+                        anchorOffsetX_mm = metadata.startNoteheadCenterX_mm;
+                        const startNhCenterPx = anchorOffsetX_mm * 3.78 * scale;
+                        offsetSeconds = -startNhCenterPx * secondsPerPixel;
                     } else {
                         // Legacy fallback: position SVG left of curve start with 8px overlap
                         const scaledContentWidth = svgWidth * scale;
@@ -23500,6 +23540,7 @@
                         image: image,
                         referenceSeconds: startSeconds,
                         offsetSeconds: offsetSeconds,
+                        anchorOffsetX_mm: anchorOffsetX_mm,  // null for legacy SVGs
                         offsetYFraction: offsetYFraction,
                         width: svgWidth,
                         height: svgHeight,
@@ -23535,7 +23576,7 @@
                         'refSec:', startSeconds, 'offsetSec:', offsetSeconds.toFixed(3),
                         'scale:', scale.toFixed(3), 'track:', trackNum,
                         'page:', pos.page, 'section:', pos.section,
-                        positioning ? `(profile: hFrac=${heightFraction}, yFrac=${offsetYFraction}, anchor=${positioning.anchorElement})` : '(legacy)');
+                        positioning ? `(profile: mode=${positioning.scaleMode || 'heightFraction'}, hFrac=${heightFraction.toFixed(4)}, yFrac=${offsetYFraction}, anchor=${positioning.anchorElement})` : '(legacy)');
                     
                     return elementData;
                 } catch (err) {

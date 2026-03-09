@@ -168,6 +168,45 @@ function generateText(type, x, y) {
 </g>`;
 }
 
+/**
+ * Generate a glissando line between two points.
+ * Parametric (like hairpin) — not a library glyph.
+ * @param {number} x1 - Start X in staff-spaces
+ * @param {number} y1 - Start Y in staff-spaces
+ * @param {number} x2 - End X in staff-spaces
+ * @param {number} y2 - End Y in staff-spaces
+ * @param {number} [lineThickness=0.1] - Stroke width
+ * @returns {string} SVG line element
+ */
+function generateGlissandoLine(x1, y1, x2, y2, lineThickness = 0.1) {
+    return `<line stroke-linejoin="round" stroke-linecap="round" ` +
+        `stroke-width="${lineThickness.toFixed(4)}" stroke="currentColor" ` +
+        `x1="${x1.toFixed(4)}" y1="${y1.toFixed(4)}" ` +
+        `x2="${x2.toFixed(4)}" y2="${y2.toFixed(4)}"/>`;
+}
+
+/**
+ * Check if a staff position sits on an actual staff line (not a space or ledger line).
+ * Staff lines are at integer positions in [-2, -1, 0, 1, 2].
+ * @param {number} staffPosition
+ * @returns {boolean}
+ */
+function isOnStaffLine(staffPosition) {
+    return Number.isInteger(staffPosition) && staffPosition >= -2 && staffPosition <= 2;
+}
+
+/**
+ * Check if two staff positions are on the same staff line.
+ * Both must be on actual staff lines (not spaces or ledger lines) AND equal.
+ * Used to determine if glissando line needs vertical offset (Registry §9).
+ * @param {number} sp1 - First note staff position
+ * @param {number} sp2 - Second note staff position
+ * @returns {boolean}
+ */
+function sameStaffLineCheck(sp1, sp2) {
+    return isOnStaffLine(sp1) && isOnStaffLine(sp2) && sp1 === sp2;
+}
+
 // ============================================
 // LAYOUT RULES (general, shared across all notation types)
 // ============================================
@@ -251,11 +290,41 @@ const PROFILES = {
         // anchorElement: which metadata field to align with the curve start time.
         //   Assembly function computes anchor positions and returns them in metadata.
         //   Client reads positioning.anchorElement to pick the right metadata value.
-        // heightFraction: SVG height as fraction of track height.
+        // scaleMode: 'staffHeight' = scale so staff height matches staffHeightFraction
+        //            of track height. Guarantees identical staff-line spacing across all
+        //            pitches and all profiles that share the same staffHeightFraction.
+        //            Future profiles can use a different staffHeightFraction if needed.
+        // staffHeightFraction: staff height (top-to-bottom staff line) as fraction of
+        //   track height. 0.35 shared across all sustained-tone profiles for matching
+        //   staff-line sizes. Typical on-staff notes land at ~71% Ht%.
         // offsetYFraction: vertical offset as fraction of track height from top.
         positioning: {
             anchorElement: 'noteheadCenter',
-            heightFraction: 0.95,
+            scaleMode: 'staffHeight',
+            staffHeightFraction: 0.35,
+            offsetYFraction: 0.05
+        }
+    }),
+
+    sustainedToneGlissando: createProfile({
+        // Two-note layout: note1 (left) and note2 (right) with glissando line between
+        note1X: 1.1,            // First notehead anchor X (same as single-pitch noteX)
+        note2X: 4.5,            // Second notehead anchor X
+        staffWidth: 6.5,        // Wider than single-pitch (5.76) to frame both notes
+        nonVibX: 1.0,
+        ledgerLineWidth: 1.2,
+        hairpinLength: 2.66,
+        hairpinHeight: 0.55,
+        dyn1LeftEdge: 0.48,
+        // Glissando line settings
+        glissPaddingLeft: 0.3,  // Gap from note1 right edge to gliss line start
+        glissPaddingRight: 0.15, // Gap from gliss line end to note2 left edge
+        sameLineYOffset: -0.3,  // Upward Y shift when both notes on same staff line (Registry §9)
+        // Positioning: startNoteheadCenter aligns note1 center with curve start time
+        positioning: {
+            anchorElement: 'startNoteheadCenter',
+            scaleMode: 'staffHeight',
+            staffHeightFraction: 0.35,    // Smaller than single-pitch (0.5654) — gliss SVG has more content
             offsetYFraction: 0.05
         }
     })
@@ -360,13 +429,14 @@ function assembleSustainedTone(params) {
     const dyn2Bbox = dynamic2 ? LIBRARY.components.dynamics.composites[dynamic2].bbox : null;
     // Round line caps extend by strokeWidth/2 = 0.05 beyond geometric endpoints
     const capR = 0.05;
-    const hairpinBbox = (hairpin && hairpin !== 'none')
-        ? { left: -capR, top: -(LAYOUT.hairpinHeight + capR), right: LAYOUT.hairpinLength + capR, bottom: LAYOUT.hairpinHeight + capR, midY: 0 }
-        : null;
+    // Reference hairpin bbox is ALWAYS included in midline calculation so that
+    // the dynamics row Y stays consistent regardless of volume mode (steady vs others).
+    const refHairpinBbox = { left: -capR, top: -(LAYOUT.hairpinHeight + capR), right: LAYOUT.hairpinLength + capR, bottom: LAYOUT.hairpinHeight + capR, midY: 0 };
+    const renderHairpin = hairpin && hairpin !== 'none';
     const seccoBbox = secco ? LIBRARY.components.text.secco.bbox : null;
 
-    // Gather all row element bboxes for computing max upward/downward extent from midline
-    const rowBboxes = [dyn1Bbox, dyn2Bbox, hairpinBbox, seccoBbox].filter(Boolean);
+    // Always include refHairpinBbox so midline position is stable across volume modes
+    const rowBboxes = [dyn1Bbox, dyn2Bbox, refHairpinBbox, seccoBbox].filter(Boolean);
     const maxAboveMidline = Math.max(...rowBboxes.map(b => b.midY - b.top));
     const maxBelowMidline = Math.max(...rowBboxes.map(b => b.bottom - b.midY));
 
@@ -386,15 +456,13 @@ function assembleSustainedTone(params) {
         curX = dyn1AnchorX + dyn1Bbox.right + g.dyn1ToHairpin;
     }
 
-    // Hairpin
+    // Hairpin (only rendered for non-steady volume modes)
     let hairpinEndX = curX;
-    if (hairpinBbox) {
+    if (renderHairpin) {
         const hairpinStartX = curX;
-        const hairpinAnchorY = dynRowMidline - hairpinBbox.midY;
+        const hairpinAnchorY = dynRowMidline - refHairpinBbox.midY;
         parts.push(generateHairpin(hairpin, hairpinStartX, hairpinAnchorY, LAYOUT.hairpinLength, LAYOUT.hairpinHeight));
-        if (debug) debugRects.push(debugBbox(hairpinStartX, hairpinAnchorY,
-            { left: -capR, top: -(LAYOUT.hairpinHeight + capR), right: LAYOUT.hairpinLength + capR, bottom: LAYOUT.hairpinHeight + capR, midY: 0 },
-            '#00C800', 'hairpin'));
+        if (debug) debugRects.push(debugBbox(hairpinStartX, hairpinAnchorY, refHairpinBbox, '#00C800', 'hairpin'));
         hairpinEndX = hairpinStartX + LAYOUT.hairpinLength;
         curX = hairpinEndX + g.hairpinToDyn2;
     }
@@ -505,14 +573,315 @@ function assembleSustainedTone(params) {
 
     // Compute positioning metadata: element positions relative to SVG left edge (in mm)
     const noteheadCenterX_mm = (LAYOUT.noteX + nhBbox.midX - viewBox.x) * mmPerStaffSpace;
+    // Staff height: distance from top staff line (-2) to bottom staff line (2) = 4 ss
+    const staffHeight_mm = 4 * mmPerStaffSpace;  // 7.0292mm for standard 5-line staff
 
     return {
         svg,
         metadata: {
             noteheadCenterX_mm,
+            staffHeight_mm,
             width_mm: dimensions.width,
             height_mm: dimensions.height,
             positioning: LAYOUT.positioning
+        }
+    };
+}
+
+// ============================================
+// GLISSANDO ASSEMBLY (two-note with gliss line)
+// ============================================
+
+/**
+ * Assemble a sustained tone glissando SVG (two shortTone noteheads + glissando line).
+ *
+ * LAYOUT:
+ *   1. Note 1 (shortTone) at staffPosition1 with optional accidental1.
+ *   2. Note 2 (shortTone) at staffPosition2 with optional accidental2.
+ *   3. Glissando line between noteheads (with padding and same-staff-line offset).
+ *   4. Dynamics row below (same midline alignment pattern as single-pitch).
+ *   5. Non-Vib text above (references highest element across both notes).
+ *   6. ViewBox: computed from actual element positions + bboxes.
+ *
+ * @param {object} params
+ * @param {number} params.staffPosition1 - First note Y in staff-spaces
+ * @param {number} params.staffPosition2 - Second note Y in staff-spaces
+ * @param {string|null} params.accidental1 - First note accidental or null
+ * @param {string|null} params.accidental2 - Second note accidental or null
+ * @param {string} params.dynamic1 - First dynamic marking
+ * @param {string} params.dynamic2 - Second dynamic marking
+ * @param {string} params.hairpin - '<', '>', or 'none'
+ * @param {boolean} params.secco - Include secco text
+ * @param {boolean} params.nonVib - Include Non-Vib text
+ * @param {boolean} [params.debug] - Render debug bounding box overlays
+ * @returns {{ svg: string, metadata: object }} SVG document + positioning metadata
+ */
+function assembleSustainedToneGlissando(params) {
+    const {
+        staffPosition1,
+        staffPosition2,
+        accidental1 = null,
+        accidental2 = null,
+        dynamic1,
+        dynamic2,
+        hairpin = '<',
+        secco = true,
+        nonVib = true,
+        debug = false
+    } = params;
+
+    const P = PROFILES.sustainedToneGlissando;
+    const noteheadType = 'shortTone';
+    const nhBbox = LIBRARY.components.noteheads[noteheadType].bbox;
+    const parts = [];
+    const debugRects = [];
+
+    // Derive row gaps from rules (same as single-pitch)
+    const g = {
+        dyn1ToHairpin: P.rules.glyphRowGap,
+        hairpinToDyn2: P.rules.glyphRowGap,
+        dyn2ToSecco: P.rules.glyphToTextGap
+    };
+
+    // --- STAFF ---
+    parts.push(generateStaffLines(P.staffWidth));
+
+    // --- NOTE 1: notehead + ledger lines + accidental ---
+    const note1Center = P.note1X + nhBbox.midX;
+    parts.push(generateNotehead(noteheadType, P.note1X, staffPosition1));
+    if (debug) debugRects.push(debugBbox(P.note1X, staffPosition1, nhBbox, '#0078FF', 'note1'));
+
+    const ledgers1 = generateLedgerLines(staffPosition1, note1Center, P.ledgerLineWidth);
+    if (ledgers1) parts.push(ledgers1);
+
+    const acc1Gen = generateAccidental(accidental1, noteheadType, P.note1X, staffPosition1);
+    if (acc1Gen) parts.push(acc1Gen);
+
+    // --- NOTE 2: notehead + ledger lines + accidental ---
+    const note2Center = P.note2X + nhBbox.midX;
+    parts.push(generateNotehead(noteheadType, P.note2X, staffPosition2));
+    if (debug) debugRects.push(debugBbox(P.note2X, staffPosition2, nhBbox, '#0078FF', 'note2'));
+
+    const ledgers2 = generateLedgerLines(staffPosition2, note2Center, P.ledgerLineWidth);
+    if (ledgers2) parts.push(ledgers2);
+
+    const acc2Gen = generateAccidental(accidental2, noteheadType, P.note2X, staffPosition2);
+    if (acc2Gen) parts.push(acc2Gen);
+
+    // --- GLISSANDO LINE ---
+    const glissX1 = P.note1X + nhBbox.right + P.glissPaddingLeft;
+    // If note 2 has an accidental, stop at its left edge (not the notehead's)
+    let note2LeftBound = P.note2X + nhBbox.left;
+    if (accidental2) {
+        const accV2 = LIBRARY.components.accidentals.variants[accidental2];
+        note2LeftBound = P.note2X + accV2.xOffsetShortTone + accV2.bboxShortTone.left;
+    }
+    const glissX2 = note2LeftBound - P.glissPaddingRight;
+    let glissY1 = staffPosition1;
+    let glissY2 = staffPosition2;
+
+    // Same-staff-line offset: shift gliss line upward by 0.3 ss (Registry §9)
+    const isSameLine = sameStaffLineCheck(staffPosition1, staffPosition2);
+    if (isSameLine) {
+        glissY1 += P.sameLineYOffset;
+        glissY2 += P.sameLineYOffset;
+    }
+
+    parts.push(generateGlissandoLine(glissX1, glissY1, glissX2, glissY2));
+    if (debug) {
+        // Cyan for gliss line endpoints
+        debugRects.push(
+            `<circle cx="${glissX1.toFixed(4)}" cy="${glissY1.toFixed(4)}" r="0.06" fill="#00CED1" fill-opacity="0.8"/>` +
+            `<circle cx="${glissX2.toFixed(4)}" cy="${glissY2.toFixed(4)}" r="0.06" fill="#00CED1" fill-opacity="0.8"/>`
+        );
+    }
+
+    // --- CONTENT AREA BOTTOM (for dynamics row placement) ---
+    // Consider both notes' bottom edges and the bottom staff line
+    let note1Bottom = staffPosition1 + nhBbox.bottom;
+    let note2Bottom = staffPosition2 + nhBbox.bottom;
+    if (accidental1) {
+        const accV = LIBRARY.components.accidentals.variants[accidental1];
+        const accB = accV.bboxShortTone;
+        note1Bottom = Math.max(note1Bottom, staffPosition1 + accB.bottom);
+        if (debug) {
+            const xOff = accV.xOffsetShortTone;
+            debugRects.push(debugBbox(P.note1X + xOff, staffPosition1, accB, '#FFA500', 'acc1'));
+        }
+    }
+    if (accidental2) {
+        const accV = LIBRARY.components.accidentals.variants[accidental2];
+        const accB = accV.bboxShortTone;
+        note2Bottom = Math.max(note2Bottom, staffPosition2 + accB.bottom);
+        if (debug) {
+            const xOff = accV.xOffsetShortTone;
+            debugRects.push(debugBbox(P.note2X + xOff, staffPosition2, accB, '#FFA500', 'acc2'));
+        }
+    }
+    const lineHalf = 0.05;
+    const lowestRef = Math.max(note1Bottom, note2Bottom, 2.0 + lineHalf);
+
+    // --- DYNAMICS ROW: collect element bboxes for midline alignment ---
+    const dyn1Bbox = dynamic1 ? LIBRARY.components.dynamics.composites[dynamic1].bbox : null;
+    const dyn2Bbox = dynamic2 ? LIBRARY.components.dynamics.composites[dynamic2].bbox : null;
+    const capR = 0.05;
+    // Reference hairpin bbox is ALWAYS included in midline calculation so that
+    // the dynamics row Y stays consistent regardless of volume mode (steady vs others).
+    const refHairpinBbox = { left: -capR, top: -(P.hairpinHeight + capR), right: P.hairpinLength + capR, bottom: P.hairpinHeight + capR, midY: 0 };
+    const renderHairpin = hairpin && hairpin !== 'none';
+    const seccoBbox = secco ? LIBRARY.components.text.secco.bbox : null;
+
+    // Always include refHairpinBbox so midline position is stable across volume modes
+    const rowBboxes = [dyn1Bbox, dyn2Bbox, refHairpinBbox, seccoBbox].filter(Boolean);
+    const maxAboveMidline = Math.max(...rowBboxes.map(b => b.midY - b.top));
+    const maxBelowMidline = Math.max(...rowBboxes.map(b => b.bottom - b.midY));
+
+    const dynRowMidline = lowestRef + P.rules.contentToRowGap + maxAboveMidline;
+
+    // --- DYNAMICS ROW: compute X positions left-to-right ---
+    let curX = P.dyn1LeftEdge;
+
+    let dyn1AnchorX = 0;
+    if (dyn1Bbox) {
+        dyn1AnchorX = curX - dyn1Bbox.left;
+        const dyn1AnchorY = dynRowMidline - dyn1Bbox.midY;
+        parts.push(generateDynamic(dynamic1, dyn1AnchorX, dyn1AnchorY));
+        if (debug) debugRects.push(debugBbox(dyn1AnchorX, dyn1AnchorY, dyn1Bbox, '#FF0000', 'dyn1'));
+        curX = dyn1AnchorX + dyn1Bbox.right + g.dyn1ToHairpin;
+    }
+
+    let hairpinEndX = curX;
+    if (renderHairpin) {
+        const hairpinStartX = curX;
+        const hairpinAnchorY = dynRowMidline - refHairpinBbox.midY;
+        parts.push(generateHairpin(hairpin, hairpinStartX, hairpinAnchorY, P.hairpinLength, P.hairpinHeight));
+        if (debug) debugRects.push(debugBbox(hairpinStartX, hairpinAnchorY, refHairpinBbox, '#00C800', 'hairpin'));
+        hairpinEndX = hairpinStartX + P.hairpinLength;
+        curX = hairpinEndX + g.hairpinToDyn2;
+    }
+
+    let dyn2RightEdge = curX;
+    if (dyn2Bbox) {
+        const dyn2AnchorX = curX - dyn2Bbox.left;
+        const dyn2AnchorY = dynRowMidline - dyn2Bbox.midY;
+        parts.push(generateDynamic(dynamic2, dyn2AnchorX, dyn2AnchorY));
+        if (debug) debugRects.push(debugBbox(dyn2AnchorX, dyn2AnchorY, dyn2Bbox, '#FF0000', 'dyn2'));
+        dyn2RightEdge = dyn2AnchorX + dyn2Bbox.right;
+        curX = dyn2RightEdge + g.dyn2ToSecco;
+    }
+
+    let seccoRightEdge = curX;
+    if (seccoBbox) {
+        const seccoAnchorX = curX - seccoBbox.left;
+        const seccoAnchorY = dynRowMidline - seccoBbox.midY;
+        parts.push(generateText('secco', seccoAnchorX, seccoAnchorY));
+        if (debug) debugRects.push(debugBbox(seccoAnchorX, seccoAnchorY, seccoBbox, '#8000FF', 'secco'));
+        seccoRightEdge = seccoAnchorX + seccoBbox.right;
+    }
+
+    // --- NON-VIB TEXT ---
+    if (nonVib) {
+        const nonVibBbox = LIBRARY.components.text.nonVib.bbox;
+        // Reference the highest visual element across BOTH notes
+        let highestPoint = -2; // top staff line
+        // Check note 1
+        if (staffPosition1 < -2) {
+            highestPoint = staffPosition1 + nhBbox.top;
+            if (accidental1) {
+                const accV = LIBRARY.components.accidentals.variants[accidental1];
+                highestPoint = Math.min(highestPoint, staffPosition1 + accV.bboxShortTone.top);
+            }
+        }
+        // Check note 2 (use the higher of the two)
+        if (staffPosition2 < -2) {
+            highestPoint = Math.min(highestPoint, staffPosition2 + nhBbox.top);
+            if (accidental2) {
+                const accV = LIBRARY.components.accidentals.variants[accidental2];
+                highestPoint = Math.min(highestPoint, staffPosition2 + accV.bboxShortTone.top);
+            }
+        }
+        const nonVibY = highestPoint - P.rules.textAboveStaff;
+        parts.push(generateText('nonVib', P.nonVibX, nonVibY));
+        if (debug) debugRects.push(debugBbox(P.nonVibX, nonVibY, nonVibBbox, '#8000FF', 'nonVib'));
+    }
+
+    // --- DEBUG OVERLAYS ---
+    if (debug) {
+        debugRects.push(
+            `<line x1="-0.5" y1="${dynRowMidline.toFixed(4)}" x2="${(seccoRightEdge + 0.5).toFixed(4)}" ` +
+            `y2="${dynRowMidline.toFixed(4)}" stroke="red" stroke-width="0.02" stroke-dasharray="0.1,0.1" opacity="0.6"/>`
+        );
+        debugRects.push(
+            `<line x1="0" y1="${lowestRef.toFixed(4)}" x2="${P.staffWidth.toFixed(4)}" ` +
+            `y2="${lowestRef.toFixed(4)}" stroke="blue" stroke-width="0.02" stroke-dasharray="0.1,0.1" opacity="0.6"/>`
+        );
+        parts.push(`<g id="debug-overlay">\n${debugRects.join('\n')}\n</g>`);
+    }
+
+    // --- VIEWBOX ---
+    let contentTop = -2 - lineHalf;
+    // Check both notes for ledger lines above
+    if (staffPosition1 < -2) contentTop = Math.min(contentTop, staffPosition1 - 1 - lineHalf);
+    if (staffPosition2 < -2) contentTop = Math.min(contentTop, staffPosition2 - 1 - lineHalf);
+    if (nonVib) {
+        const nvBbox = LIBRARY.components.text.nonVib.bbox;
+        let nvRef = -2;
+        if (staffPosition1 < -2) {
+            nvRef = staffPosition1 + nhBbox.top;
+            if (accidental1) {
+                nvRef = Math.min(nvRef, staffPosition1 + LIBRARY.components.accidentals.variants[accidental1].bboxShortTone.top);
+            }
+        }
+        if (staffPosition2 < -2) {
+            nvRef = Math.min(nvRef, staffPosition2 + nhBbox.top);
+            if (accidental2) {
+                nvRef = Math.min(nvRef, staffPosition2 + LIBRARY.components.accidentals.variants[accidental2].bboxShortTone.top);
+            }
+        }
+        const nvY = nvRef - P.rules.textAboveStaff;
+        contentTop = Math.min(contentTop, nvY + nvBbox.top);
+    }
+
+    const contentBottom = dynRowMidline + maxBelowMidline;
+    const contentLeft = 0;
+    const contentRight = Math.max(P.staffWidth, seccoRightEdge, dyn2RightEdge, hairpinEndX);
+
+    // Check ledger lines below for both notes
+    if (staffPosition1 > 2) contentTop = contentTop; // already handled above
+    // Expand bottom for ledger lines
+    let contentBottomExpanded = contentBottom;
+    if (staffPosition1 >= 3) contentBottomExpanded = Math.max(contentBottomExpanded, staffPosition1 + 1 + lineHalf);
+    if (staffPosition2 >= 3) contentBottomExpanded = Math.max(contentBottomExpanded, staffPosition2 + 1 + lineHalf);
+
+    const padding = P.rules.viewBoxPadding;
+    const viewBox = {
+        x: contentLeft - padding,
+        y: contentTop - padding,
+        width: (contentRight - contentLeft) + padding * 2,
+        height: (Math.max(contentBottom, contentBottomExpanded) - contentTop) + padding * 2
+    };
+
+    const mmPerStaffSpace = 1.7573;
+    const dimensions = {
+        width: viewBox.width * mmPerStaffSpace,
+        height: viewBox.height * mmPerStaffSpace
+    };
+
+    const svg = wrapSvg(parts.filter(Boolean).join('\n'), viewBox, dimensions);
+
+    // Compute positioning metadata
+    const startNoteheadCenterX_mm = (P.note1X + nhBbox.midX - viewBox.x) * mmPerStaffSpace;
+    const staffHeight_mm = 4 * mmPerStaffSpace;
+
+    return {
+        svg,
+        metadata: {
+            startNoteheadCenterX_mm,
+            staffHeight_mm,
+            width_mm: dimensions.width,
+            height_mm: dimensions.height,
+            sameStaffLine: isSameLine,
+            positioning: P.positioning
         }
     };
 }
@@ -667,7 +1036,15 @@ if (require.main === module) {
                 // 4 ledger lines down, three-quarter flat
                 { params: { staffPosition: 6.5, accidental: 'threeQuarterFlat', noteheadType: 'longTone',
                     dynamic1: 'ppp', dynamic2: 'fff', hairpin: '<', secco: true, nonVib: true, debug: dbg },
-                  file: 'test-assembled-4ledger-down.svg' }
+                  file: 'test-assembled-4ledger-down.svg' },
+                // Steady mode: only dyn1, no hairpin, no dyn2 (compare dyn1 Y with p-f test)
+                { params: { staffPosition: 3, accidental: 'sharp', noteheadType: 'longTone',
+                    dynamic1: 'p', dynamic2: null, hairpin: 'none', secco: true, nonVib: true, debug: dbg },
+                  file: 'test-assembled-steady.svg' },
+                // No secco (compare layout with p-f test)
+                { params: { staffPosition: 3, accidental: 'sharp', noteheadType: 'longTone',
+                    dynamic1: 'p', dynamic2: 'f', hairpin: '<', secco: false, nonVib: true, debug: dbg },
+                  file: 'test-assembled-no-secco.svg' }
             ];
             for (const t of tests) {
                 const result = assembleSustainedTone(t.params);
@@ -677,8 +1054,52 @@ if (require.main === module) {
             }
             return;
         }
+        case 'glissando': {
+            const dbg = true;
+            const glissTests = [
+                // 1. Normal gliss up: E4→G4 (treble), one staff line apart
+                { params: { staffPosition1: 2, staffPosition2: 1, accidental1: null, accidental2: null,
+                    dynamic1: 'p', dynamic2: 'f', hairpin: '<', secco: true, nonVib: true, debug: dbg },
+                  file: 'test-gliss-up.svg' },
+                // 2. Wide gliss down: D5→G4 (treble), two staff lines apart
+                { params: { staffPosition1: -1, staffPosition2: 1, accidental1: 'sharp', accidental2: 'flat',
+                    dynamic1: 'pp', dynamic2: 'ff', hairpin: '<', secco: true, nonVib: true, debug: dbg },
+                  file: 'test-gliss-down.svg' },
+                // 3. Same staff line: G4→G#4 (treble, both on G4 line = position 1)
+                { params: { staffPosition1: 1, staffPosition2: 1, accidental1: null, accidental2: 'sharp',
+                    dynamic1: 'ppp', dynamic2: 'fff', hairpin: '<', secco: true, nonVib: true, debug: dbg },
+                  file: 'test-gliss-same-line.svg' },
+                // 4. Same staff line middle: B4→Bb4 (treble, both on middle line = position 0)
+                { params: { staffPosition1: 0, staffPosition2: 0, accidental1: null, accidental2: 'flat',
+                    dynamic1: 'mp', dynamic2: 'mf', hairpin: '<', secco: true, nonVib: true, debug: dbg },
+                  file: 'test-gliss-same-mid.svg' },
+                // 5. Low with ledger lines: C4→E4 (treble), note1 on 1 ledger below, note2 on staff
+                { params: { staffPosition1: 3, staffPosition2: 2, accidental1: 'sharp', accidental2: null,
+                    dynamic1: 'p', dynamic2: 'f', hairpin: '<', secco: true, nonVib: true, debug: dbg },
+                  file: 'test-gliss-low-ledger.svg' },
+                // 6. High with ledger lines: A5→C6 (treble), both above staff
+                { params: { staffPosition1: -3, staffPosition2: -4, accidental1: null, accidental2: 'sharp',
+                    dynamic1: 'pp', dynamic2: 'ff', hairpin: '<', secco: true, nonVib: true, debug: dbg },
+                  file: 'test-gliss-high-ledger.svg' },
+                // 7. Steady mode: only dyn1, no hairpin, no dyn2 (compare dyn1 Y with test 1)
+                { params: { staffPosition1: 2, staffPosition2: 1, accidental1: null, accidental2: null,
+                    dynamic1: 'p', dynamic2: null, hairpin: 'none', secco: true, nonVib: true, debug: dbg },
+                  file: 'test-gliss-steady.svg' },
+                // 8. No secco (compare layout with test 1)
+                { params: { staffPosition1: 2, staffPosition2: 1, accidental1: null, accidental2: null,
+                    dynamic1: 'p', dynamic2: 'f', hairpin: '<', secco: false, nonVib: true, debug: dbg },
+                  file: 'test-gliss-no-secco.svg' }
+            ];
+            for (const t of glissTests) {
+                const result = assembleSustainedToneGlissando(t.params);
+                const p = path.join(outputDir, t.file);
+                fs.writeFileSync(p, result.svg);
+                console.log(`Written: ${p} (startNoteheadCenterX: ${result.metadata.startNoteheadCenterX_mm.toFixed(2)}mm, sameLine: ${result.metadata.sameStaffLine})`);
+            }
+            return;
+        }
         default:
-            console.log('Usage: node assemble_svg.js [staff|ledger|assemble]');
+            console.log('Usage: node assemble_svg.js [staff|ledger|assemble|glissando]');
             process.exit(1);
     }
     
@@ -779,7 +1200,11 @@ module.exports = {
     generateDynamic,
     generateHairpin,
     generateText,
+    generateGlissandoLine,
+    isOnStaffLine,
+    sameStaffLineCheck,
     assembleSustainedTone,
+    assembleSustainedToneGlissando,
     wrapSvg,
     LAYOUT,
     LAYOUT_RULES,

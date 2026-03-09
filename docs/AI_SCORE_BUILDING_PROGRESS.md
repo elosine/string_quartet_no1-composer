@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 8, 2026  
-**Current ASB Number:** ASB-141
+**Current ASB Number:** ASB-144
 
 ---
 
@@ -152,10 +152,15 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 ## Current Session
 
 **Date:** Mar 8, 2026  
-**Focus:** Two-Hand Pizz Grace Notes + SVG Height % scaling  
-**ASB:** ASB-138 through ASB-141  
-**Tier 1 Count This Session:** 4 (ASB-138, ASB-139, ASB-140, ASB-141)  
-**Tier 2 Commit:** f9a45495
+**Focus:** Two-Hand Pizz Grace Notes + SVG Height % scaling + Glissando Assembly Engine  
+**ASB:** ASB-138 through ASB-144  
+**Tier 1 Count This Session:** 7 (ASB-138–141, ASB-142–144)  
+**Tier 2 Commits:** ac769fb4, d14d7396
+
+### Session Log — Glissando Assembly Engine + SVG Scaling Fixes
+- ASB-142: Glissando SVG Assembly Engine — `assembleSustainedToneGlissando()` in assemble_svg.js (dual noteheads, dual accidentals, parametric Bézier glissando line with same-line collision avoidance, ledger lines for both notes, dynamics/hairpin/secco/Non-Vib). New helpers: `generateGlissandoLine()`, `isOnStaffLine()`, `sameStaffLineCheck()`. Server endpoint `POST /api/svg-assembly/sustained-tone-glissando`. Client CrescendoUI.step2 replaced LilyPond pipeline with assembly endpoint for glissando. CLI `glissando` command with 8 test cases.
+- ASB-143: staffHeightFraction sync — both `sustainedToneSinglePitch` and `sustainedToneGlissando` profiles set to `staffHeightFraction: 0.35` for identical staff-line sizes. New `scaleMode: 'staffHeight'` in client insertCrescendoSvg — scales staff height (not total SVG) to fraction of track. `startNoteheadCenter` anchor support for glissando X-positioning.
+- ASB-144: offsetSeconds recalculation on resize — new `_recalcOffsetSeconds(el)` method stores anchor offset in mm (`anchorOffsetX_mm`), recomputes `offsetSeconds` whenever scale changes. Called from 4 code paths: resize drag, slider, input, window resize. Persisted in export/import. Legacy SVGs (null anchorOffsetX_mm) skipped.
 
 ### Session Log — Two-Hand Pizz Grace Note Clusters + SVG Scaling
 - ASB-140: THPGNC full system — ingestion script (`ingest_grace_note_clusters.js`, 500ms gap threshold → 35 clusters), cluster DB (`grace_note_cluster_db.json`), model definition (cc0Behind=80, cc0Pizz=69, instrumentRanges, openStrings, durationMsRange 30-60ms), HTML UI panel (#twoHandPizzGraceParams: time/instrument/track/align), init() wiring, onModelSelect() early return, generation methods (loadThpgClusterDb, generateTwoHandPizzGraceMidi — random cluster sampling, Fisher-Yates CC0 shuffle, open string pitch for behind-bridge, random range pitch with quarter-tone for regular pizz, pre/post alignment, Pattern 3 insertion), CC registry updated (CC0=69, CC0=80)

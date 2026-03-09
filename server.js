@@ -1112,6 +1112,68 @@ app.post('/api/svg-assembly/sustained-tone', (req, res) => {
     }
 });
 
+app.post('/api/svg-assembly/sustained-tone-glissando', (req, res) => {
+    const { startPitch, endPitch, clef, dynamic1, dynamic2, hairpin, secco, nonVib, filename } = req.body;
+    
+    if (!startPitch || !endPitch || !clef || !dynamic1) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters: startPitch, endPitch, clef, dynamic1' });
+    }
+    if (hairpin && hairpin !== 'none' && !dynamic2) {
+        return res.status(400).json({ success: false, error: 'dynamic2 required when hairpin is not none' });
+    }
+    
+    try {
+        const clefName = clef === 'cClef' ? 'alto' : clef;
+        const staffPosition1 = svgAssembly.pitchToStaffPosition(startPitch, clefName);
+        const staffPosition2 = svgAssembly.pitchToStaffPosition(endPitch, clefName);
+        const accidental1 = svgAssembly.pitchToAccidental(startPitch);
+        const accidental2 = svgAssembly.pitchToAccidental(endPitch);
+        
+        const params = {
+            staffPosition1,
+            staffPosition2,
+            accidental1,
+            accidental2,
+            dynamic1,
+            dynamic2: dynamic2 || null,
+            hairpin: hairpin || 'none',
+            secco: secco !== false,
+            nonVib: nonVib !== false,
+            debug: false
+        };
+        
+        const result = svgAssembly.assembleSustainedToneGlissando(params);
+        const { svg, metadata } = result;
+        
+        // Write to disk for replaceSvgFromFile compatibility
+        let svgPath = null;
+        if (filename) {
+            const svgOutputDir = path.join(__dirname, 'public', 'SVG_graphics');
+            const baseName = path.basename(filename, '.ly');
+            const svgFile = path.join(svgOutputDir, `${baseName}.svg`);
+            fs.writeFileSync(svgFile, svg);
+            svgPath = `/SVG_graphics/${encodeURIComponent(baseName + '.svg')}`;
+            console.log(`SVG Assembly (gliss): wrote ${baseName}.svg (${metadata.width_mm.toFixed(1)}×${metadata.height_mm.toFixed(1)}mm, sp1=${staffPosition1}, sp2=${staffPosition2}, sameLine=${metadata.sameStaffLine}, startNhCenterX=${metadata.startNoteheadCenterX_mm.toFixed(2)}mm)`);
+        }
+        
+        res.json({
+            success: true,
+            svg,
+            svgPath,
+            width: metadata.width_mm,
+            height: metadata.height_mm,
+            staffPosition1,
+            staffPosition2,
+            accidental1,
+            accidental2,
+            metadata
+        });
+    } catch (err) {
+        console.error('SVG Assembly (gliss) error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // Create crescendo LilyPond file from template
 app.post('/api/lilypond/create-crescendo', (req, res) => {
     const { filename, pitchModel, clef, pitchInfo, dynamic1, dynamic2, hairpin, secco } = req.body;
