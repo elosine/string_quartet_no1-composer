@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 8, 2026  
-**Current ASB Number:** ASB-144
+**Current ASB Number:** ASB-146
 
 ---
 
@@ -95,6 +95,7 @@ That's it. Everything else below is for Cascade.
 | `modify_midi.js` enhanced with `--map` | Now supports per-note CC injection via JSON map file. Note groups (chords = one group) get CC just before first Note On. Expandable: any CC 0–127 per note (CC0 for articulation, CC7 for volume, etc.). `--cc` still works for tick-0 insertion. | Any notation fragment MIDI post-processing, future articulation systems |
 | MIDI channel bank architecture | Three banks: Base (0–3), Vibrato (4–7), Volume (8–11). Each bank isolates a category of persistent MIDI control state. See **🎹 MIDI Channel Designation** section below. | When building any new musical material system — must choose correct bank |
 | Synth pitch bend range is ±1 semitone | All quarter-tone pitch bends use 8192 per semitone. Quarter sharp = 12288, quarter flat = 4096, center = 8192. Applied in Bartók pizz, Crescendo single-pitch, Vibrato. Glissando systems use their own segment-based approach (untouched). | If pitch bend sounds wrong or if synth config changes |
+| **Curve Y vs Pitch vs Volume — design intent** | **Long Tone & Pizz Trem Glissando:** Curve Y drives *pitch trajectory* — pitch follows the curve shape. **Crescendo/Decrescendo:** Curve Y drives *CC7 volume* — pitch is time-linear from start pitch to end pitch, independent of curve shape. In other words: CD glissando pitch always goes straight from start→end over time; only volume follows the curve's rise/fall. This distinction was confirmed and documented in ASB-145 after a bug where CD pitch was incorrectly following curve Y. | Any MIDI generation work involving curves + pitch bends, any new curve-based system |
 | Registry §28 microtonal pitch syntax | Full suffix reference for quarter/three-quarter tones. Used by `render_bartok_pizz.js` pitch parser. | Any new pitch-input automation |
 | `crop_svg.js` Pass 3 fix | Handles nested `<g>`/`<a>` groups with scale transforms. Fix ported to both standalone and server.js. | If SVG cropping bugs reappear — check Pass 3 first |
 | AI Command Bridge (Pattern 4) is the ideal pattern | `POST /api/ai/command` → Socket.IO `aiCommand` → browser `eval()`. Cascade sends commands directly to browser — no paste, no save, no reload. First used in Bartók Pizzicato. Pattern 3 (Direct Live Insertion) is the fallback. See `docs/MUSICAL_MATERIAL_WORKFLOW.md` "Insertion Patterns". | When building any new musical material system |
@@ -552,6 +553,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | Mar 2, 2026 | 555a212 | GC grouping support + LilyPond notation controls + MultiSelect fixes (ASB-124-127) |
 | Mar 5, 2026 | 2b68ff4 | Bow Overpressure MIDI model + Sustained Tone quarter-tone pitch bend fix (ASB-128-129) |
 | Mar 5, 2026 | 0a121cf | Phase 1 SVG workflow improvements — lyFilename storage, Replace SVG buttons, MMS, LY naming convention (ASB-130/131/133) |
+| Mar 9, 2026 | 04aa346 | Pitch bend fixes: CD glissando direction (curve-Y→time-linear), pizz trem pitchBendRange 2→1, clarified PITCH_BEND_RANGE comments, design intent doc (ASB-145/146) |
 
 ---
 

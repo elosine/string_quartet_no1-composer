@@ -2665,7 +2665,7 @@ function buildGlissandoSegmentMidi(segment, bpm) {
 // Helper: generate glissando segments from curve data and pitch range
 // Replicates client-side LongToneUI.generateGlissandoMidi segment logic
 function generateGlissandoSegments(curveData, startPitchMidi, endPitchMidi, velocity, articulationValue) {
-    const PITCH_BEND_RANGE = 2;
+    const PITCH_BEND_RANGE = 2; // max one-dir deviation: 1st MIDI note offset + 1st ±1 synth bend
     const PITCH_BEND_SAMPLE_INTERVAL = 50; // ms
     const PITCH_BEND_MAX = 16383;
     const PITCH_BEND_MIN = 0;

@@ -11753,7 +11753,7 @@
             
             // Generate Long Tone segments based on curve and pitch parameters
             generateLongToneSegments() {
-                const PITCH_BEND_RANGE = 2; // semitones - max deviation before new segment (configurable)
+                const PITCH_BEND_RANGE = 2; // max one-dir deviation: 1st MIDI note offset + 1st ±1 synth bend
                 const PITCH_BEND_SAMPLE_INTERVAL = 50; // ms between pitch bend messages (50ms = 20/sec)
                 const PITCH_BEND_CENTER = 8192;
                 const PITCH_BEND_MAX = 16383;
@@ -12397,8 +12397,8 @@
                 
                 // Calculate pitch for each note
                 // Hybrid glissando strategy:
-                // - ≤2 semitones: Pure pitch bend (single note with bend)
-                // - >2 semitones: Chromatic steps with pitch bend slides between
+                // - ≤1 semitone: Pure pitch bend (single note with bend)
+                // - >1 semitone: Chromatic steps with pitch bend slides between
                 // Quarter tones are handled via pitch bend offset
                 const totalNotes = humanizedTimes.length;
                 const pitchRange = endPitch - startPitch;
@@ -12406,13 +12406,13 @@
                 // Total range in semitones including quarter tones
                 const totalPitchRange = pitchRange + quarterToneRange;
                 const absPitchRange = Math.abs(totalPitchRange);
-                const pitchBendRange = 2; // Standard ±2 semitones pitch bend range
+                const pitchBendRange = 1; // Synth pitch bend range: ±1 semitone
                 const useHybridGliss = this.pitchMode === 'glissando' && absPitchRange > 0;
                 const usePurePitchBend = useHybridGliss && absPitchRange <= pitchBendRange;
                 // Check if we need quarter tone pitch bend (for single note mode or any quarter tone usage)
                 const hasQuarterTones = startQuarterTone !== 0 || endQuarterTone !== 0;
                 
-                // For hybrid glissando with >2 semitones, calculate chromatic steps
+                // For hybrid glissando with >1 semitone, calculate chromatic steps
                 // Each note will bend toward the next note's pitch
                 // notePitchData stores { pitch, quarterToneOffset } for each note
                 let notePitchData = [];
@@ -19580,7 +19580,7 @@
             // Follows the same algorithm as MidiModelSystem.generateLongToneSegments()
             // but uses provided curve and pitch parameters instead of UI selections
             async generateGlissandoMidi(curve, startPitchStr, endPitchStr, params = {}) {
-                const PITCH_BEND_RANGE = 2; // semitones - max deviation before new segment
+                const PITCH_BEND_RANGE = 2; // max one-dir deviation: 1st MIDI note offset + 1st ±1 synth bend
                 const PITCH_BEND_SAMPLE_INTERVAL = 50; // ms between pitch bend messages
                 const PITCH_BEND_MAX = 16383;
                 const PITCH_BEND_MIN = 0;
@@ -22872,7 +22872,7 @@
             // Generate crescendo MIDI: pitch bend segments (like glissando) + CC7 volume ramp following curve Y
             async generateCrescendoMidi(curve, pitchModel, pitchInfo, params = {}) {
                 const CC_SAMPLE_INTERVAL = 50; // ms between CC7 messages (20/sec)
-                const PITCH_BEND_RANGE = 2;
+                const PITCH_BEND_RANGE = 2; // max one-dir deviation: 1st MIDI note offset + 1st ±1 synth bend
                 const PITCH_BEND_SAMPLE_INTERVAL = 50;
                 const PITCH_BEND_MAX = 16383;
                 const PITCH_BEND_MIN = 0;
@@ -23003,17 +23003,18 @@
                     const startPitchMidi = startPitchObj.pitch + startPitchObj.quarterTone;
                     const endPitchMidi = endPitchObj.pitch + endPitchObj.quarterTone;
                     
-                    const highPitch = Math.max(startPitchMidi, endPitchMidi);
-                    const lowPitch = Math.min(startPitchMidi, endPitchMidi);
-                    const pitchRange = highPitch - lowPitch;
+                    const pitchRange = endPitchMidi - startPitchMidi;
                     
                     console.log('  pitchCalc: startMidi=', startPitchMidi, 'endMidi=', endPitchMidi,
-                        'low=', lowPitch, 'high=', highPitch, 'range=', pitchRange);
+                        'range=', pitchRange, '(negative = gliss down)');
                     
-                    // Map curve Y to pitch
-                    const pitchAtSample = samples.map(normalizedY => 
-                        lowPitch + normalizedY * pitchRange
-                    );
+                    // Map time progress to pitch (linear from startPitch to endPitch)
+                    // Pitch direction follows user's start→end order, NOT curve Y
+                    // (curve Y drives volume via CC7, not pitch)
+                    const pitchAtSample = samples.map((normalizedY, idx) => {
+                        const t = samples.length > 1 ? idx / (samples.length - 1) : 0;
+                        return startPitchMidi + t * pitchRange;
+                    });
                     
                     console.log('  pitchAtSample: first=', pitchAtSample[0].toFixed(2),
                         'last=', pitchAtSample[pitchAtSample.length-1].toFixed(2),
