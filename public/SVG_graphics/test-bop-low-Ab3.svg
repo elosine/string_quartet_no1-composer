@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="5.51mm" height="21.63mm" viewBox="-0.1500 -3.3825 3.1346 12.3065">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g id="staff-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="2.8346" y2="-2.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="2.8346" y2="-1.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="0.0000" x2="2.8346" y2="0.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="2.8346" y2="1.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="2.8346" y2="2.0000"/>
+</g>
+<g id="ledger-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.9000" y1="3.0000" x2="2.1000" y2="3.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.9000" y1="4.0000" x2="2.1000" y2="4.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.9000" y1="5.0000" x2="2.1000" y2="5.0000"/>
+</g>
+<rect x="1.1000" y="5.1000" width="0.8000" height="0.8000" ry="0.0000" fill="currentColor"/>
+<g transform="translate(0.4234, 5.5000)">
+<path transform="scale(0.0022, -0.0022)" d="M37 30l-2 -55v-10c0 -21 2 -42 5 -62c40 38 83 79 83 134c0 30 -13 61 -39 61c-31 0 -46 -34 -47 -68zM-19 -144l-16 580c11 6 23 9 35 9s24 -3 35 -9l-9 -330c25 29 61 46 99 46c49 0 75 -54 75 -108c0 -75 -75 -117 -129 -169c-20 -20 -28 -57 -58 -57c-19 0 -32 18 -32 38z" fill="currentColor"/>
+</g>
+<rect x="1.7700" y="0.0000" width="0.1300" height="5.3760" ry="0.0400" fill="currentColor"/>
+<g transform="translate(1.9000, 0.0400)">
+<path transform="scale(0.004, -0.004)" d="M0 0c0 -177 201 -293 201 -470c0 -33 -9 -65 -23 -95c18 -37 29 -75 29 -117c0 -63 -15 -125 -41 -183c-5 -8 -13 -12 -20 -12c-13 0 -26 11 -23 27c26 52 42 110 42 168c0 97 -94 190 -165 257v-75h-16v500h16zM151 -517c5 15 8 31 8 47c0 96 -91 190 -159 257c0 -118 90 -206 151 -304z" fill="currentColor"/>
+</g>
+<g transform="translate(1.5000, -0.4000)">
+<path transform="scale(0.0025, -0.0025)" d="M-172 333h344c9 0 16 -7 16 -16v-296c0 -11 -10 -21 -21 -21s-21 10 -21 21v179h-292v-179c0 -11 -10 -21 -21 -21s-21 10 -21 21v296c0 9 7 16 16 16z" fill="currentColor"/>
+</g>
+<g transform="translate(1.5000, -1.4000)">
+<path transform="scale(0.0025, -0.0025)" d="M-172 333h344c9 0 16 -7 16 -16v-296c0 -11 -10 -21 -21 -21s-21 10 -21 21v179h-292v-179c0 -11 -10 -21 -21 -21s-21 10 -21 21v296c0 9 7 16 16 16z" fill="currentColor"/>
+</g>
+<g transform="translate(1.5000, -2.4000)">
+<path transform="scale(0.0025, -0.0025)" d="M-172 333h344c9 0 16 -7 16 -16v-296c0 -11 -10 -21 -21 -21s-21 10 -21 21v179h-292v-179c0 -11 -10 -21 -21 -21s-21 10 -21 21v296c0 9 7 16 16 16z" fill="currentColor"/>
+</g>
+<g transform="translate(1.5000, 6.1000)">
+<path transform="scale(0.004, -0.004)" d="M112 0c9 0 16 -10 12 -18l-113 -250c-2 -4 -6 -7 -11 -7s-9 3 -11 7l-113 250c-4 8 3 18 12 18h66c5 0 10 -3 12 -7l68 -150l67 150c2 4 6 7 11 7z" fill="currentColor"/>
+</g>
+<g transform="translate(0.6588, 8.4000)">
+<g>
+<path transform="scale(0.002, -0.002)" d="M180 219c0 6 6 12 6 18c0 10 -8 19 -19 19c-21 0 -42 -11 -42 -30c0 -16 16 -26 31 -33c34 -17 69 -39 69 -76c0 -66 -55 -117 -122 -117c-43 0 -77 36 -77 80c0 21 12 42 31 42c18 0 32 -15 32 -33c0 -13 -22 -16 -22 -29s15 -19 29 -19c35 0 69 17 69 48c0 55 -101 54 -101 109c0 51 40 94 90 94c60 0 85 -36 85 -64c0 -17 -10 -31 -27 -31c-18 0 -32 11 -32 22z" fill="currentColor"/>
+<path transform="translate(0.4097, 0.0000) scale(0.002, -0.002)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+<path transform="translate(1.0584, 0.0000) scale(0.002, -0.002)" d="M128 192c-24 0 -50 -7 -71 -7c-9 0 -15 3 -15 12c0 30 28 70 57 70c34 0 60 -34 94 -34c13 0 24 6 33 15c5 4 9 7 14 7c11 0 21 -11 21 -22c0 -5 -2 -10 -7 -15l-152 -147c26 -5 47 -30 74 -30c33 0 59 23 59 49c0 7 -4 15 -4 22c0 12 10 20 21 20c25 0 34 -55 34 -77c0 -63 -70 -97 -140 -97c-35 0 -38 59 -73 59c-14 0 -28 -2 -38 -11c-5 -4 -9 -6 -14 -6c-11 0 -21 10 -21 21c0 5 1 10 6 15l161 156h-3h-36z" fill="currentColor"/>
+</g>
+</g>
+<!-- DEBUG OVERLAYS -->
+<rect x="1.1000" y="5.1000" width="0.8000" height="0.8000" fill="none" stroke="#0078FF" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.1000" y="5.0500" font-size="0.18" fill="#0078FF" fill-opacity="0.8">notehead</text>
+<rect x="0.3464" y="4.5210" width="0.5170" height="1.3794" fill="none" stroke="#FFA500" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="0.3464" y="4.4710" font-size="0.18" fill="#FFA500" fill-opacity="0.8">accidental</text>
+<rect x="1.7700" y="0.0000" width="0.1300" height="5.3760" fill="none" stroke="#888888" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.7700" y="-0.0500" font-size="0.18" fill="#888888" fill-opacity="0.8">stem</text>
+<rect x="1.8360" y="0.0400" width="0.8920" height="3.5080" fill="none" stroke="#CC6600" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.8360" y="-0.0100" font-size="0.18" fill="#CC6600" fill-opacity="0.8">flag</text>
+<rect x="1.0300" y="-1.2325" width="0.9400" height="0.8325" fill="none" stroke="#00AA00" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.0300" y="-1.2825" font-size="0.18" fill="#00AA00" fill-opacity="0.8">downbow1</text>
+<rect x="1.0300" y="-2.2325" width="0.9400" height="0.8325" fill="none" stroke="#00AA00" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.0300" y="-2.2825" font-size="0.18" fill="#00AA00" fill-opacity="0.8">downbow2</text>
+<rect x="1.0300" y="-3.2325" width="0.9400" height="0.8325" fill="none" stroke="#00AA00" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.0300" y="-3.2825" font-size="0.18" fill="#00AA00" fill-opacity="0.8">downbow3</text>
+<rect x="0.9994" y="6.1000" width="1.0012" height="1.1000" fill="none" stroke="#FF0000" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="0.9994" y="6.0500" font-size="0.18" fill="#FF0000" fill-opacity="0.8">marcato</text>
+<rect x="0.7108" y="7.4800" width="1.5784" height="1.2940" fill="none" stroke="#8000FF" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="0.7108" y="7.4300" font-size="0.18" fill="#8000FF" fill-opacity="0.8">sfz</text>
+</svg>

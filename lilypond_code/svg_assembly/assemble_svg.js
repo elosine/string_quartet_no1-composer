@@ -306,6 +306,30 @@ const PROFILES = {
         }
     }),
 
+    bowOverpressureAccent: createProfile({
+        // One-shot articulation: square notehead + stem + flag + 3× downbow + marcato + sfz
+        noteX: 1.5,              // Notehead center X (shifted right for accidental room)
+        staffWidth: 2.8346,       // Staff line width (1mm in ss, matching .ly template)
+        noteSize: 0.8,            // Square notehead side length
+        stemWidth: 0.13,          // Stem thickness
+        stemLength: 5.376,        // Stem length (from .ly Stem.details.lengths = 5.5 adjusted)
+        stemNoteOffset: 0.124,    // Stem start offset from note center toward note edge
+        flagOffset: 0.04,         // Flag Y offset from stem end (toward note)
+        downbowCount: 3,          // Number of downbow marks
+        downbowSpacing: 1.0,      // Center-to-center spacing of stacked downbow marks
+        downbowGapFromNote: 0.4,  // Gap from notehead/stem top edge to lowest downbow bottom
+        marcatoGap: 0.2,          // Gap from stem end/note bottom to marcato top
+        sfzGap: 0.28,             // Gap from marcato bottom to sfz top (≈ contentToRowGap)
+        ledgerLineWidth: 1.2,     // Ledger line width
+        // Positioning: how this SVG is placed in the score (consumed client-side)
+        positioning: {
+            anchorElement: 'noteheadCenter',
+            scaleMode: 'staffHeight',
+            staffHeightFraction: 0.60,
+            offsetYFraction: 0.05
+        }
+    }),
+
     sustainedToneGlissando: createProfile({
         // Two-note layout: note1 (left) and note2 (right) with glissando line between
         note1X: 1.1,            // First notehead anchor X (same as single-pitch noteX)
@@ -886,6 +910,368 @@ function assembleSustainedToneGlissando(params) {
     };
 }
 
+// ============================================
+// BOW OVERPRESSURE ACCENT GENERATORS
+// ============================================
+
+/**
+ * Generate a square notehead (filled rect)
+ * @param {number} x - Center X in staff-spaces
+ * @param {number} y - Center Y in staff-spaces (staffPosition)
+ * @param {number} size - Side length in staff-spaces (default 0.8)
+ * @returns {string} SVG rect element
+ */
+function generateSquareNotehead(x, y, size = 0.8) {
+    const half = size / 2;
+    return `<rect x="${(x - half).toFixed(4)}" y="${(y - half).toFixed(4)}" ` +
+        `width="${size.toFixed(4)}" height="${size.toFixed(4)}" ry="0.0000" fill="currentColor"/>`;
+}
+
+/**
+ * Generate a stem rect
+ * @param {number} x - Stem center X
+ * @param {number} yTop - Top edge Y (smaller value = higher on page)
+ * @param {number} height - Stem height (positive)
+ * @param {number} width - Stem width (default 0.13)
+ * @returns {string} SVG rect element
+ */
+function generateStem(x, yTop, height, width = 0.13) {
+    return `<rect x="${(x - width / 2).toFixed(4)}" y="${yTop.toFixed(4)}" ` +
+        `width="${width.toFixed(4)}" height="${height.toFixed(4)}" ry="0.0400" fill="currentColor"/>`;
+}
+
+/**
+ * Generate a single downbow mark from the library
+ * @param {number} x - Anchor X
+ * @param {number} y - Anchor Y
+ * @returns {string} SVG path element
+ */
+function generateDownbow(x, y) {
+    const db = LIBRARY.components.scripts.downbow;
+    return `<g transform="translate(${x.toFixed(4)}, ${y.toFixed(4)})">
+<path transform="scale(${db.scale[0]}, ${db.scale[1]})" d="${db.path}" fill="currentColor"/>
+</g>`;
+}
+
+/**
+ * Generate marcato accent mark from the library
+ * @param {number} x - Anchor X
+ * @param {number} y - Anchor Y
+ * @returns {string} SVG path element
+ */
+function generateMarcato(x, y) {
+    const m = LIBRARY.components.scripts.marcato;
+    return `<g transform="translate(${x.toFixed(4)}, ${y.toFixed(4)})">
+<path transform="scale(${m.scale[0]}, ${m.scale[1]})" d="${m.path}" fill="currentColor"/>
+</g>`;
+}
+
+/**
+ * Generate sfz dynamic composite from the sfzDynamic library section
+ * @param {number} x - Anchor X (left edge of composite)
+ * @param {number} y - Anchor Y (baseline)
+ * @returns {string} SVG group element
+ */
+function generateSfz(x, y) {
+    const sfzLib = LIBRARY.components.sfzDynamic;
+    const comp = sfzLib.composite.sfz;
+    const paths = [];
+    for (let i = 0; i < comp.glyphs.length; i++) {
+        const glyphName = comp.glyphs[i];
+        const glyph = sfzLib.glyphs[glyphName];
+        const offsetX = comp.spacing[i];
+        const transform = offsetX > 0
+            ? `translate(${offsetX.toFixed(4)}, 0.0000) scale(${sfzLib.scale[0]}, ${sfzLib.scale[1]})`
+            : `scale(${sfzLib.scale[0]}, ${sfzLib.scale[1]})`;
+        paths.push(`<path transform="${transform}" d="${glyph.path}" fill="currentColor"/>`);
+    }
+    return `<g transform="translate(${x.toFixed(4)}, ${y.toFixed(4)})">
+<g>
+${paths.join('\n')}
+</g>
+</g>`;
+}
+
+/**
+ * Generate a 16th note stem flag from the library
+ * @param {number} x - Anchor X (stem right edge)
+ * @param {number} y - Anchor Y (near stem endpoint)
+ * @param {boolean} stemDown - true = down flag, false = up flag
+ * @returns {string} SVG path element
+ */
+function generateFlag(x, y, stemDown) {
+    const flagKey = stemDown ? 'flag16down' : 'flag16up';
+    const flag = LIBRARY.components.scripts[flagKey];
+    return `<g transform="translate(${x.toFixed(4)}, ${y.toFixed(4)})">
+<path transform="scale(${flag.scale[0]}, ${flag.scale[1]})" d="${flag.path}" fill="currentColor"/>
+</g>`;
+}
+
+// ============================================
+// BOW OVERPRESSURE ACCENT ASSEMBLY
+// ============================================
+
+/**
+ * Assemble a complete bow overpressure accent SVG.
+ *
+ * LAYOUT (stem down — note above staff or on upper half):
+ *   3× downbow marks (above, stacked upward from note)
+ *   notehead (square) + accidental + ledger lines
+ *   stem (from note edge downward)
+ *   marcato (below stem end)
+ *   sfz (below marcato)
+ *
+ * LAYOUT (stem up — note below staff or on lower half):
+ *   3× downbow marks (above, stacked upward from stem top)
+ *   stem (from note edge upward)
+ *   notehead (square) + accidental + ledger lines
+ *   marcato (below note)
+ *   sfz (below marcato)
+ *
+ * Stem direction: staffPosition <= 0 → stem down, > 0 → stem up
+ * (B4 in treble = position 0 → stem down; C4 in treble = position 3 → stem up)
+ *
+ * @param {object} params
+ * @param {number} params.staffPosition - Note Y in staff-spaces
+ * @param {string|null} params.accidental - Accidental type or null
+ * @param {boolean} [params.debug] - Render debug bounding box overlays
+ * @returns {{ svg: string, metadata: object }} SVG document + positioning metadata
+ */
+function assembleBowOverpressureAccent(params) {
+    const {
+        staffPosition,
+        accidental = null,
+        debug = false
+    } = params;
+
+    const P = PROFILES.bowOverpressureAccent;
+    const parts = [];
+    const debugRects = [];
+
+    // --- Stem direction ---
+    const stemDown = staffPosition <= 0;
+
+    // --- Staff lines ---
+    parts.push(generateStaffLines(P.staffWidth));
+
+    // --- Ledger lines (same thickness as staff lines = 0.1) ---
+    const ledgerSvg = generateLedgerLines(staffPosition, P.noteX, P.ledgerLineWidth, 0.1);
+    if (ledgerSvg) parts.push(ledgerSvg);
+
+    // --- Square notehead ---
+    const noteY = staffPosition;
+    parts.push(generateSquareNotehead(P.noteX, noteY, P.noteSize));
+    const noteHalf = P.noteSize / 2;
+    const noteTop = noteY - noteHalf;
+    const noteBottom = noteY + noteHalf;
+    const noteLeft = P.noteX - noteHalf;
+    const noteRight = P.noteX + noteHalf;
+
+    if (debug) {
+        debugRects.push(debugBbox(P.noteX, noteY, {
+            left: -noteHalf, top: -noteHalf, right: noteHalf, bottom: noteHalf
+        }, '#0078FF', 'notehead'));
+    }
+
+    // --- Accidental ---
+    // Use shortTone scale. xOffsetShortTone assumes anchor at notehead LEFT edge,
+    // but square notehead anchor is at CENTER, so subtract noteHalf to compensate.
+    let accBbox = null;
+    let accAnchorX = null;
+    if (accidental) {
+        const variant = LIBRARY.components.accidentals.variants[accidental];
+        if (variant) {
+            const scaleData = LIBRARY.components.accidentals.shortTone;
+            const xOffset = variant.xOffsetShortTone;
+            accAnchorX = P.noteX - noteHalf + xOffset - 0.2276; // extra 0.4mm left shift
+            parts.push(`<g transform="translate(${accAnchorX.toFixed(4)}, ${noteY.toFixed(4)})">
+<path transform="scale(${scaleData.scale[0]}, ${scaleData.scale[1]})" d="${variant.path}" fill="currentColor"/>
+</g>`);
+            accBbox = variant.bboxShortTone;
+            if (debug) {
+                debugRects.push(debugBbox(accAnchorX, noteY, accBbox, '#FFA500', 'accidental'));
+            }
+        }
+    }
+
+    // --- Stem ---
+    let stemX, stemTop, stemBottom;
+    if (stemDown) {
+        // Stem on LEFT side of notehead, extends downward
+        stemX = noteLeft + P.stemWidth / 2;
+        stemTop = noteY + P.stemNoteOffset;
+        stemBottom = stemTop + P.stemLength;
+    } else {
+        // Stem on RIGHT side of notehead, extends upward
+        stemX = noteRight - P.stemWidth / 2;
+        stemBottom = noteY - P.stemNoteOffset;
+        stemTop = stemBottom - P.stemLength;
+    }
+    parts.push(generateStem(stemX, stemTop, P.stemLength, P.stemWidth));
+
+    // --- 16th note flag (at stem endpoint) ---
+    const stemRightEdge = stemX + P.stemWidth / 2;
+    let flagX, flagY, flagBbox;
+    if (stemDown) {
+        flagX = stemRightEdge;
+        flagY = stemBottom - P.flagOffset;
+        flagBbox = LIBRARY.components.scripts.flag16down.bbox;
+    } else {
+        flagX = stemRightEdge;
+        flagY = stemTop + P.flagOffset;
+        flagBbox = LIBRARY.components.scripts.flag16up.bbox;
+    }
+    parts.push(generateFlag(flagX, flagY, stemDown));
+
+    if (debug) {
+        debugRects.push(debugBbox(stemX, stemTop, {
+            left: -P.stemWidth / 2, top: 0, right: P.stemWidth / 2, bottom: P.stemLength
+        }, '#888888', 'stem'));
+        debugRects.push(debugBbox(flagX, flagY, flagBbox, '#CC6600', 'flag'));
+    }
+
+    // --- 3× Downbow marks (always above) ---
+    const dbBbox = LIBRARY.components.scripts.downbow.bbox;
+    // Determine the highest point of note area or stem top
+    let highestPoint;
+    if (stemDown) {
+        // Note is above stem — use notehead top (or accidental top if higher)
+        highestPoint = noteTop;
+        if (accBbox && (noteY + accBbox.top) < highestPoint) {
+            highestPoint = noteY + accBbox.top;
+        }
+    } else {
+        // Stem goes up — use stem top
+        highestPoint = stemTop;
+    }
+    // Lowest downbow anchor: bottom edge of downbow (dbBbox.bottom=0) sits at
+    // highestPoint - gap.  Anchor Y = highestPoint - gap - dbBbox.bottom
+    const lowestDbY = highestPoint - P.downbowGapFromNote;
+    for (let i = 0; i < P.downbowCount; i++) {
+        const dbY = lowestDbY - i * P.downbowSpacing;
+        parts.push(generateDownbow(P.noteX, dbY));
+        if (debug) {
+            debugRects.push(debugBbox(P.noteX, dbY, dbBbox, '#00AA00', `downbow${i + 1}`));
+        }
+    }
+    const topDownbowY = lowestDbY - (P.downbowCount - 1) * P.downbowSpacing;
+    const topDownbowTop = topDownbowY + dbBbox.top;
+
+    // --- Marcato (always below) ---
+    const mBbox = LIBRARY.components.scripts.marcato.bbox;
+    let marcatoRef;
+    if (stemDown) {
+        // Below stem end
+        marcatoRef = stemBottom;
+    } else {
+        // Below note bottom
+        marcatoRef = noteBottom;
+    }
+    // Marcato anchor: mBbox.top = 0, so anchor at marcatoRef + gap
+    const marcatoY = marcatoRef + P.marcatoGap;
+    parts.push(generateMarcato(P.noteX, marcatoY));
+    const marcatoBottom = marcatoY + mBbox.bottom;
+
+    if (debug) {
+        debugRects.push(debugBbox(P.noteX, marcatoY, mBbox, '#FF0000', 'marcato'));
+    }
+
+    // --- sfz (below marcato) ---
+    const sfzBbox = LIBRARY.components.sfzDynamic.composite.sfz.bbox;
+    // sfz anchor: center it horizontally under the note
+    const sfzAnchorY = marcatoBottom + P.sfzGap - sfzBbox.top;
+    // X: center the sfz composite under the notehead
+    const sfzCenterX = P.noteX - sfzBbox.midX;
+    parts.push(generateSfz(sfzCenterX, sfzAnchorY));
+    const sfzBottom = sfzAnchorY + sfzBbox.bottom;
+
+    if (debug) {
+        debugRects.push(debugBbox(sfzCenterX, sfzAnchorY, sfzBbox, '#8000FF', 'sfz'));
+    }
+
+    // ============================
+    // VIEWBOX COMPUTATION
+    // ============================
+    const mmPerStaffSpace = 1.7573;
+    const padding = P.rules.viewBoxPadding;
+
+    // Find content extents
+    let contentLeft = 0;  // Staff lines start at 0
+    let contentRight = P.staffWidth;
+    let contentTop = Math.min(-2, topDownbowTop);  // Top staff line or downbow top
+    let contentBottom = Math.max(2, sfzBottom);  // Bottom staff line or sfz bottom
+
+    // Expand for accidental
+    if (accBbox && accAnchorX !== null) {
+        contentLeft = Math.min(contentLeft, accAnchorX + accBbox.left);
+        contentRight = Math.max(contentRight, accAnchorX + accBbox.right);
+    }
+
+    // Expand for note
+    contentLeft = Math.min(contentLeft, noteLeft);
+    contentRight = Math.max(contentRight, noteRight);
+
+    // Expand for sfz
+    contentLeft = Math.min(contentLeft, sfzCenterX + sfzBbox.left);
+    contentRight = Math.max(contentRight, sfzCenterX + sfzBbox.right);
+
+    // Expand for downbow marks
+    contentLeft = Math.min(contentLeft, P.noteX + dbBbox.left);
+    contentRight = Math.max(contentRight, P.noteX + dbBbox.right);
+
+    // Expand for marcato
+    contentLeft = Math.min(contentLeft, P.noteX + mBbox.left);
+    contentRight = Math.max(contentRight, P.noteX + mBbox.right);
+
+    // Expand for flag
+    contentLeft = Math.min(contentLeft, flagX + flagBbox.left);
+    contentRight = Math.max(contentRight, flagX + flagBbox.right);
+    contentTop = Math.min(contentTop, flagY + flagBbox.top);
+    contentBottom = Math.max(contentBottom, flagY + flagBbox.bottom);
+
+    // Expand for ledger lines
+    if (staffPosition >= 3 || staffPosition <= -3) {
+        const ledgerHalf = P.ledgerLineWidth / 2;
+        contentLeft = Math.min(contentLeft, P.noteX - ledgerHalf);
+        contentRight = Math.max(contentRight, P.noteX + ledgerHalf);
+    }
+
+    const viewBox = {
+        x: contentLeft - padding,
+        y: contentTop - padding,
+        width: (contentRight - contentLeft) + padding * 2,
+        height: (contentBottom - contentTop) + padding * 2
+    };
+
+    const dimensions = {
+        width: viewBox.width * mmPerStaffSpace,
+        height: viewBox.height * mmPerStaffSpace
+    };
+
+    // Assemble final SVG
+    let content = parts.join('\n');
+    if (debug && debugRects.length > 0) {
+        content += '\n<!-- DEBUG OVERLAYS -->\n' + debugRects.join('\n');
+    }
+    const svg = wrapSvg(content, viewBox, dimensions);
+
+    // Compute positioning metadata
+    const noteheadCenterX_mm = (P.noteX - viewBox.x) * mmPerStaffSpace;
+    const staffHeight_mm = 4 * mmPerStaffSpace;
+
+    return {
+        svg,
+        metadata: {
+            noteheadCenterX_mm,
+            staffHeight_mm,
+            width_mm: dimensions.width,
+            height_mm: dimensions.height,
+            stemDirection: stemDown ? 'down' : 'up',
+            positioning: P.positioning
+        }
+    };
+}
+
 /**
  * Generate a debug bounding box rectangle overlay
  * Uses fill-opacity/stroke-opacity for Inkscape compatibility (no rgba).
@@ -1098,8 +1484,44 @@ if (require.main === module) {
             }
             return;
         }
+        case 'bow-overpressure': {
+            const dbg = true;
+            const bopTests = [
+                // 1. On staff, stem down (B4 = position 0, treble middle line)
+                { params: { staffPosition: 0, accidental: null, debug: dbg },
+                  file: 'test-bop-on-staff-B4.svg' },
+                // 2. On staff, stem down with sharp (F#5 = position -1.5)
+                { params: { staffPosition: -1.5, accidental: 'sharp', debug: dbg },
+                  file: 'test-bop-above-Fs5.svg' },
+                // 3. On staff, stem up (C4 = position 3 in treble, 1 ledger below)
+                { params: { staffPosition: 3, accidental: null, debug: dbg },
+                  file: 'test-bop-ledger-below-C4.svg' },
+                // 4. High above staff, stem down (G5 = position -2.5, above top line)
+                { params: { staffPosition: -2.5, accidental: null, debug: dbg },
+                  file: 'test-bop-high-G5.svg' },
+                // 5. Low below staff, stem up (A3 = position 5.5 in treble, 3 ledger lines below)
+                { params: { staffPosition: 5.5, accidental: 'flat', debug: dbg },
+                  file: 'test-bop-low-Ab3.svg' },
+                // 6. Quarter sharp accidental, stem down
+                { params: { staffPosition: 1, accidental: 'quarterSharp', debug: dbg },
+                  file: 'test-bop-quarter-sharp.svg' },
+                // 7. Three quarter flat, stem up (below staff)
+                { params: { staffPosition: 4, accidental: 'threeQuarterFlat', debug: dbg },
+                  file: 'test-bop-3qtr-flat.svg' },
+                // 8. Extreme ledger lines above (4 ledger lines)
+                { params: { staffPosition: -6, accidental: 'sharp', debug: dbg },
+                  file: 'test-bop-4ledger-up.svg' }
+            ];
+            for (const t of bopTests) {
+                const result = assembleBowOverpressureAccent(t.params);
+                const p = path.join(outputDir, t.file);
+                fs.writeFileSync(p, result.svg);
+                console.log(`Written: ${p} (stem: ${result.metadata.stemDirection}, noteheadCenterX: ${result.metadata.noteheadCenterX_mm.toFixed(2)}mm)`);
+            }
+            return;
+        }
         default:
-            console.log('Usage: node assemble_svg.js [staff|ledger|assemble|glissando]');
+            console.log('Usage: node assemble_svg.js [staff|ledger|assemble|glissando|bow-overpressure]');
             process.exit(1);
     }
     
@@ -1203,8 +1625,15 @@ module.exports = {
     generateGlissandoLine,
     isOnStaffLine,
     sameStaffLineCheck,
+    generateSquareNotehead,
+    generateStem,
+    generateDownbow,
+    generateMarcato,
+    generateSfz,
+    generateFlag,
     assembleSustainedTone,
     assembleSustainedToneGlissando,
+    assembleBowOverpressureAccent,
     wrapSvg,
     LAYOUT,
     LAYOUT_RULES,

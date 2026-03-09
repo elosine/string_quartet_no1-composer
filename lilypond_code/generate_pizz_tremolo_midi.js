@@ -49,8 +49,8 @@ const CHANNEL_OFFSET = 7; // channel = track + 7 (track is 1-based)
 
 // Dynamic → MIDI velocity (standard mapping, same as Bartók Pizzicato)
 const DYNAMIC_VELOCITY = {
-    ppp: 30, pp: 45, p: 60, mp: 70,
-    mf: 85, f: 95, ff: 107, fff: 120
+    pppp: 15, ppp: 30, pp: 45, p: 60, mp: 70,
+    mf: 85, f: 95, ff: 107, fff: 120, ffff: 127
 };
 
 // Default timing database path (relative to project root)

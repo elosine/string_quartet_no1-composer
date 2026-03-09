@@ -40,8 +40,8 @@ const BEND_MAX = 16383;
 
 // Dynamic → MIDI velocity
 const DYNAMIC_VELOCITY = {
-    ppp: 30, pp: 45, p: 60, mp: 70,
-    mf: 85, f: 95, ff: 107, fff: 120
+    pppp: 15, ppp: 30, pp: 45, p: 60, mp: 70,
+    mf: 85, f: 95, ff: 107, fff: 120, ffff: 127
 };
 
 // Timing database path

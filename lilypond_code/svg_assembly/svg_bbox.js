@@ -457,6 +457,52 @@ function populateLibraryBboxes(library) {
         composite.bbox = computeCompositeBbox(name, library);
     }
 
+    // Scripts (articulation marks)
+    if (c.scripts) {
+        for (const [name, script] of Object.entries(c.scripts)) {
+            if (script.path && script.scale) {
+                script.bbox = scaledBbox(script.path, script.scale);
+            }
+        }
+    }
+
+    // sfzDynamic (larger-scale dynamic glyphs)
+    if (c.sfzDynamic) {
+        const sfzScale = c.sfzDynamic.scale;
+        for (const [name, glyph] of Object.entries(c.sfzDynamic.glyphs)) {
+            glyph.bbox = scaledBbox(glyph.path, sfzScale);
+        }
+        // sfz composite bbox
+        if (c.sfzDynamic.composite) {
+            for (const [name, comp] of Object.entries(c.sfzDynamic.composite)) {
+                let compLeft = Infinity, compTop = Infinity;
+                let compRight = -Infinity, compBottom = -Infinity;
+                let offsetX = 0;
+                for (let i = 0; i < comp.glyphs.length; i++) {
+                    const glyphName = comp.glyphs[i];
+                    const glyph = c.sfzDynamic.glyphs[glyphName];
+                    if (comp.spacing) {
+                        offsetX = comp.spacing[i];
+                    } else if (i > 0) {
+                        offsetX += glyph.glyphSpacing;
+                    }
+                    const gb = scaledBbox(glyph.path, sfzScale);
+                    compLeft = Math.min(compLeft, gb.left + offsetX);
+                    compTop = Math.min(compTop, gb.top);
+                    compRight = Math.max(compRight, gb.right + offsetX);
+                    compBottom = Math.max(compBottom, gb.bottom);
+                }
+                comp.bbox = {
+                    left: compLeft, top: compTop, right: compRight, bottom: compBottom,
+                    width: compRight - compLeft,
+                    height: compBottom - compTop,
+                    midX: (compLeft + compRight) / 2,
+                    midY: (compTop + compBottom) / 2
+                };
+            }
+        }
+    }
+
     return library;
 }
 
@@ -507,6 +553,31 @@ if (require.main === module) {
             for (const [name, comp] of Object.entries(c.dynamics.composites)) {
                 const b = comp.bbox;
                 console.log(`  ${name}: L=${b.left.toFixed(4)} T=${b.top.toFixed(4)} R=${b.right.toFixed(4)} B=${b.bottom.toFixed(4)}  W=${b.width.toFixed(4)} H=${b.height.toFixed(4)} midY=${b.midY.toFixed(4)}`);
+            }
+
+            if (c.scripts) {
+                console.log('\n=== SCRIPTS (articulation marks) ===');
+                for (const [name, script] of Object.entries(c.scripts)) {
+                    if (script.bbox && script.bbox.width !== undefined) {
+                        const b = script.bbox;
+                        console.log(`  ${name}: L=${b.left.toFixed(4)} T=${b.top.toFixed(4)} R=${b.right.toFixed(4)} B=${b.bottom.toFixed(4)}  W=${b.width.toFixed(4)} H=${b.height.toFixed(4)} midY=${b.midY.toFixed(4)}`);
+                    }
+                }
+            }
+
+            if (c.sfzDynamic) {
+                console.log('\n=== SFZ DYNAMIC (scale 0.0020) ===');
+                for (const [name, glyph] of Object.entries(c.sfzDynamic.glyphs)) {
+                    const b = glyph.bbox;
+                    console.log(`  ${name}: L=${b.left.toFixed(4)} T=${b.top.toFixed(4)} R=${b.right.toFixed(4)} B=${b.bottom.toFixed(4)}  W=${b.width.toFixed(4)} H=${b.height.toFixed(4)}`);
+                }
+                if (c.sfzDynamic.composite) {
+                    console.log('  --- composite ---');
+                    for (const [name, comp] of Object.entries(c.sfzDynamic.composite)) {
+                        const b = comp.bbox;
+                        console.log(`  ${name}: L=${b.left.toFixed(4)} T=${b.top.toFixed(4)} R=${b.right.toFixed(4)} B=${b.bottom.toFixed(4)}  W=${b.width.toFixed(4)} H=${b.height.toFixed(4)} midY=${b.midY.toFixed(4)}`);
+                    }
+                }
             }
             break;
         }

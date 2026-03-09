@@ -1174,6 +1174,55 @@ app.post('/api/svg-assembly/sustained-tone-glissando', (req, res) => {
     }
 });
 
+app.post('/api/svg-assembly/bow-overpressure-accent', (req, res) => {
+    const { pitch, clef, filename } = req.body;
+    
+    if (!pitch || !clef) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters: pitch, clef' });
+    }
+    
+    try {
+        const clefName = clef === 'cClef' ? 'alto' : clef;
+        const staffPosition = svgAssembly.pitchToStaffPosition(pitch, clefName);
+        const accidental = svgAssembly.pitchToAccidental(pitch);
+        
+        const params = {
+            staffPosition,
+            accidental,
+            debug: false
+        };
+        
+        const result = svgAssembly.assembleBowOverpressureAccent(params);
+        const { svg, metadata } = result;
+        
+        // Write to disk
+        let svgPath = null;
+        if (filename) {
+            const svgOutputDir = path.join(__dirname, 'public', 'SVG_graphics', 'notation_fragments');
+            if (!fs.existsSync(svgOutputDir)) fs.mkdirSync(svgOutputDir, { recursive: true });
+            const baseName = path.basename(filename, path.extname(filename));
+            const svgFile = path.join(svgOutputDir, `${baseName}.svg`);
+            fs.writeFileSync(svgFile, svg);
+            svgPath = `/SVG_graphics/notation_fragments/${encodeURIComponent(baseName + '.svg')}`;
+            console.log(`SVG Assembly (bop): wrote ${baseName}.svg (${metadata.width_mm.toFixed(1)}×${metadata.height_mm.toFixed(1)}mm, staffPos=${staffPosition}, acc=${accidental}, stem=${metadata.stemDirection})`);
+        }
+        
+        res.json({
+            success: true,
+            svg,
+            svgPath,
+            width: metadata.width_mm,
+            height: metadata.height_mm,
+            staffPosition,
+            accidental,
+            metadata
+        });
+    } catch (err) {
+        console.error('SVG Assembly (bop) error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // Create crescendo LilyPond file from template
 app.post('/api/lilypond/create-crescendo', (req, res) => {
     const { filename, pitchModel, clef, pitchInfo, dynamic1, dynamic2, hairpin, secco } = req.body;

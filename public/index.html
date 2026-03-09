@@ -1085,6 +1085,14 @@
                     <label style="font-size: 9px; min-width: 24px; margin-left: 3px;">End</label>
                     <input type="text" id="cdEndPitch" class="curve-input" value="Ab3" style="width: 45px; font-size: 10px;" placeholder="Ab3">
                 </div>
+                <div id="cdGlissPitchModeRow" class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Gliss</label>
+                    <select id="cdGlissPitchMode" style="width: 100px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;" title="Pitch trajectory mode: how pitch traverses from start to end">
+                        <option value="curve">Curve</option>
+                        <option value="inverseCurve">Inv. Curve</option>
+                        <option value="linear" selected>Linear</option>
+                    </select>
+                </div>
                 <div id="cdSinglePitchRow" class="curve-input-row" style="display: none;">
                     <label style="font-size: 9px; min-width: 28px;">Pitch</label>
                     <input type="text" id="cdSinglePitchInput" class="curve-input" value="A3" style="width: 55px; font-size: 10px;" placeholder="A3">
@@ -1209,10 +1217,31 @@
                     </select>
                 </div>
                 <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Instr</label>
+                    <select id="bpInstrumentSelect" style="width: 65px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="violin" selected>Violin</option>
+                        <option value="viola">Viola</option>
+                        <option value="cello">Cello</option>
+                    </select>
+                    <label style="font-size: 9px; min-width: 28px; margin-left: 5px;">Pitch</label>
+                    <select id="bpPitchModeSelect" style="width: 60px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="manual" selected>Manual</option>
+                        <option value="random">Random</option>
+                    </select>
+                </div>
+                <div id="bpManualPitchRow" class="curve-input-row">
                     <label style="font-size: 9px; min-width: 28px;">Pitch</label>
                     <input type="text" id="bpPitchInput" class="curve-input" value="B4" style="width: 55px; font-size: 10px;" placeholder="B4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
-                    <label style="font-size: 9px; min-width: 24px; margin-left: 3px;">Dyn</label>
+                    <span id="bpPitchRangeHint" style="font-size: 8px; color: #888; margin-left: 4px;">G3–E6</span>
+                </div>
+                <div id="bpRandomPitchRow" class="curve-input-row" style="display: none;">
+                    <span style="font-size: 9px; color: #c8a0e8;">Random pitch within <span id="bpRandomRangeLabel">Violin</span> range</span>
+                    <span id="bpRandomRangeHint" style="font-size: 8px; color: #888; margin-left: 4px;">G3–E6</span>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Dyn</label>
                     <select id="bpDynamicSelect" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="pppp">pppp</option>
                         <option value="ppp">ppp</option>
                         <option value="pp">pp</option>
                         <option value="p">p</option>
@@ -1221,7 +1250,9 @@
                         <option value="f">f</option>
                         <option value="ff">ff</option>
                         <option value="fff" selected>fff</option>
+                        <option value="ffff">ffff</option>
                     </select>
+                    <span id="bpPitchWarning" style="font-size: 8px; color: #f88; margin-left: 4px; display: none;"></span>
                 </div>
                 <div class="curve-input-row">
                     <label style="font-size: 9px; min-width: 28px;">Time</label>
@@ -1236,6 +1267,56 @@
                     <span id="bpBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
                     <button id="bpReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
                     <button id="bpDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
+                </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label" style="background: #C0392B; color: #fff; padding: 3px 6px; border-radius: 2px; font-weight: bold;">Bow Overpressure</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Track</label>
+                    <input type="number" id="bopTrackInput" class="curve-input" value="1" min="1" max="4" step="1" style="width: 35px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">Clef</label>
+                    <select id="bopClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="treble" selected>Treble</option>
+                        <option value="alto">Alto</option>
+                        <option value="bass">Bass</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Instr</label>
+                    <select id="bopInstrumentSelect" style="width: 65px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="violin" selected>Violin</option>
+                        <option value="viola">Viola</option>
+                        <option value="cello">Cello</option>
+                    </select>
+                    <label style="font-size: 9px; min-width: 28px; margin-left: 5px;">Pitch</label>
+                    <select id="bopPitchModeSelect" style="width: 60px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="random" selected>Random</option>
+                        <option value="manual">Manual</option>
+                    </select>
+                </div>
+                <div id="bopManualPitchRow" class="curve-input-row" style="display: none;">
+                    <label style="font-size: 9px; min-width: 28px;">Pitch</label>
+                    <input type="text" id="bopPitchInput" class="curve-input" value="B4" style="width: 55px; font-size: 10px;" placeholder="B4" title="Pitch format: C4, C#4, Bb3, C+4, Cd4, C#+4, Cbd4">
+                    <span id="bopPitchRangeHint" style="font-size: 8px; color: #888; margin-left: 4px;">G3–F6</span>
+                </div>
+                <div id="bopRandomPitchRow" class="curve-input-row">
+                    <span style="font-size: 9px; color: #e8a0a0;">Random pitch within <span id="bopRandomRangeLabel">Violin</span> range</span>
+                    <span id="bopRandomRangeHint" style="font-size: 8px; color: #888; margin-left: 4px;">G3–F6</span>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Time</label>
+                    <input type="number" id="bopTimeInput" class="curve-input" value="0" step="0.1" style="width: 65px; font-size: 10px;" title="Impact time in seconds">
+                    <span style="font-size: 8px; color: #888; margin-left: 3px;">s</span>
+                    <span style="font-size: 8px; color: #999; margin-left: 8px;">sfz · vel 127</span>
+                </div>
+                <div class="control-row" style="margin-top: 5px;">
+                    <button id="bopGoBtn" class="control-btn" style="font-size: 11px; background: #C0392B; color: #fff; font-weight: bold; padding: 4px 12px;">Go</button>
+                </div>
+                <div id="bopBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px; color: #C0392B;">Impact</label>
+                    <span id="bopBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
+                    <button id="bopDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px; margin-left: auto;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -14588,6 +14669,16 @@
                     }
                 );
                 
+                // BowOverpressureUI bundles - unified bow overpressure component groups (GC + SVG + MIDI)
+                this.registerSource('bopBundles',
+                    () => window.BowOverpressureUI ? BowOverpressureUI.exportBundles() : { bundles: [], nextBundleId: 1 },
+                    (data) => {
+                        if (window.BowOverpressureUI) {
+                            BowOverpressureUI.importBundles(data);
+                        }
+                    }
+                );
+                
                 // PizzTremUI bundles - unified pizz tremolo component groups (GC + SVG + MIDI)
                 this.registerSource('ptBundles',
                     () => window.PizzTremUI ? PizzTremUI.exportBundles() : { bundles: [], nextBundleId: 1 },
@@ -22418,6 +22509,7 @@
                     pitchModelSelect.addEventListener('change', () => {
                         const isGliss = pitchModelSelect.value === 'glissando';
                         document.getElementById('cdGlissPitchRow').style.display = isGliss ? '' : 'none';
+                        document.getElementById('cdGlissPitchModeRow').style.display = isGliss ? '' : 'none';
                         document.getElementById('cdSinglePitchRow').style.display = isGliss ? 'none' : '';
                     });
                 }
@@ -22657,6 +22749,9 @@
                 // Read volumeMode early (needed for hairpin determination)
                 const volumeMode = params?.volumeMode ?? document.getElementById('cdVolumeMode').value;
                 
+                // Read glissando pitch mode (curve/inverseCurve/linear)
+                const pitchMode = params?.pitchMode ?? document.getElementById('cdGlissPitchMode').value;
+                
                 // Determine hairpin direction based on volumeMode
                 const y1 = params?.y1 ?? (parseFloat(document.getElementById('cdY1Input').value) || 0);
                 const y2 = params?.y2 ?? (parseFloat(document.getElementById('cdY2Input').value) || 0);
@@ -22794,7 +22889,7 @@
                         }
                         
                         // Generate and insert MIDI (pitch bend segments + CC7 volume)
-                        const midiParams = { ...params, volumeMode, dynamic1: dyn1, dynamic2: dyn2 };
+                        const midiParams = { ...params, volumeMode, pitchMode, dynamic1: dyn1, dynamic2: dyn2 };
                         const midiResult = await this.generateCrescendoMidi(curve, pitchModel, pitchInfo, midiParams);
                         let midiInsert = null;
                         if (midiResult) {
@@ -22820,6 +22915,7 @@
                                     pitchModel, pitchInfo, dynamic1: dyn1, dynamic2: dyn2,
                                     clef: lpClef, velocity: params?.velocity ?? (parseInt(document.getElementById('cdVelocityInput').value) || 115),
                                     volumeMode: params?.volumeMode ?? document.getElementById('cdVolumeMode').value,
+                                    pitchMode: pitchMode,
                                     secco: params?.secco ?? (document.getElementById('cdSeccoCheckbox')?.checked !== false),
                                     lyFilename: filename
                                 });
@@ -23005,20 +23101,67 @@
                     
                     const pitchRange = endPitchMidi - startPitchMidi;
                     
-                    console.log('  pitchCalc: startMidi=', startPitchMidi, 'endMidi=', endPitchMidi,
-                        'range=', pitchRange, '(negative = gliss down)');
+                    // Glissando pitch mode: curve, inverseCurve, or linear
+                    const pitchMode = params?.pitchMode ?? 'linear';
                     
-                    // Map time progress to pitch (linear from startPitch to endPitch)
-                    // Pitch direction follows user's start→end order, NOT curve Y
-                    // (curve Y drives volume via CC7, not pitch)
-                    const pitchAtSample = samples.map((normalizedY, idx) => {
-                        const t = samples.length > 1 ? idx / (samples.length - 1) : 0;
-                        return startPitchMidi + t * pitchRange;
-                    });
+                    console.log('  pitchCalc: startMidi=', startPitchMidi, 'endMidi=', endPitchMidi,
+                        'range=', pitchRange, '(negative = gliss down)', 'pitchMode=', pitchMode);
+                    
+                    // Direction validation for curve and inverseCurve pitch modes
+                    const curveGoesUp = samples[samples.length - 1] > samples[0];
+                    const pitchGoesUp = endPitchMidi > startPitchMidi;
+                    
+                    if (pitchMode === 'curve' && pitchRange !== 0) {
+                        // Curve mode: pitch follows curve Y — high Y = high pitch, low Y = low pitch
+                        // If curve goes up (low Y → high Y), pitch must go up (start < end)
+                        // If curve goes down (high Y → low Y), pitch must go down (start > end)
+                        if (curveGoesUp !== pitchGoesUp) {
+                            const curveDir = curveGoesUp ? 'ascending (low Y → high Y)' : 'descending (high Y → low Y)';
+                            const pitchDir = pitchGoesUp ? `ascending (${pitchInfo.startPitch} → ${pitchInfo.endPitch})` : `descending (${pitchInfo.startPitch} → ${pitchInfo.endPitch})`;
+                            alert(`⚠️ Pitch mode "Curve": pitch direction doesn't match curve direction.\n\nCurve is ${curveDir}, but pitch is ${pitchDir}.\n\nEither swap Start/End pitches to match the curve direction, or use "Linear" mode (direction-independent) or "Inv. Curve" mode (opposite direction).`);
+                            return null;
+                        }
+                    } else if (pitchMode === 'inverseCurve' && pitchRange !== 0) {
+                        // Inverse Curve mode: pitch follows INVERTED curve Y
+                        // If curve goes up, inverted goes down → pitch must go down (start > end)
+                        // If curve goes down, inverted goes up → pitch must go up (start < end)
+                        if (curveGoesUp === pitchGoesUp) {
+                            const curveDir = curveGoesUp ? 'ascending (low Y → high Y)' : 'descending (high Y → low Y)';
+                            const invDir = curveGoesUp ? 'descending' : 'ascending';
+                            const pitchDir = pitchGoesUp ? `ascending (${pitchInfo.startPitch} → ${pitchInfo.endPitch})` : `descending (${pitchInfo.startPitch} → ${pitchInfo.endPitch})`;
+                            alert(`⚠️ Pitch mode "Inv. Curve": pitch direction doesn't match inverted curve direction.\n\nCurve is ${curveDir} (inverted = ${invDir}), but pitch is ${pitchDir}.\n\nEither swap Start/End pitches to match the inverted curve direction, or use "Linear" mode (direction-independent) or "Curve" mode (same direction as curve).`);
+                            return null;
+                        }
+                    }
+                    
+                    // Build pitchAtSample based on pitch mode
+                    let pitchAtSample;
+                    if (pitchMode === 'curve') {
+                        // Curve: pitch follows curve Y shape
+                        // normalizedY (0-1) maps: 0 = low pitch, 1 = high pitch
+                        const lowPitch = Math.min(startPitchMidi, endPitchMidi);
+                        const highPitch = Math.max(startPitchMidi, endPitchMidi);
+                        const absPitchRange = highPitch - lowPitch;
+                        pitchAtSample = samples.map(normalizedY => lowPitch + normalizedY * absPitchRange);
+                    } else if (pitchMode === 'inverseCurve') {
+                        // Inverse Curve: pitch follows INVERTED curve Y shape
+                        // invertedY = 1.0 - normalizedY
+                        const lowPitch = Math.min(startPitchMidi, endPitchMidi);
+                        const highPitch = Math.max(startPitchMidi, endPitchMidi);
+                        const absPitchRange = highPitch - lowPitch;
+                        pitchAtSample = samples.map(normalizedY => lowPitch + (1.0 - normalizedY) * absPitchRange);
+                    } else {
+                        // Linear (default): straight line from startPitch to endPitch
+                        pitchAtSample = samples.map((normalizedY, idx) => {
+                            const t = samples.length > 1 ? idx / (samples.length - 1) : 0;
+                            return startPitchMidi + t * pitchRange;
+                        });
+                    }
                     
                     console.log('  pitchAtSample: first=', pitchAtSample[0].toFixed(2),
                         'last=', pitchAtSample[pitchAtSample.length-1].toFixed(2),
-                        'totalPitchSpan=', (Math.max(...pitchAtSample) - Math.min(...pitchAtSample)).toFixed(2));
+                        'totalPitchSpan=', (Math.max(...pitchAtSample) - Math.min(...pitchAtSample)).toFixed(2),
+                        'pitchMode=', pitchMode);
                     
                     // Create segments when pitch deviates > PITCH_BEND_RANGE
                     let segmentStartIndex = 0;
@@ -23607,6 +23750,7 @@
                     clef: params.clef || 'treble',
                     velocity: params.velocity || 115,
                     volumeMode: params.volumeMode || 'curve',
+                    pitchMode: params.pitchMode || 'linear',
                     secco: params.secco !== undefined ? params.secco : true,
                     lyFilename: params.lyFilename || null,
                     needsRegeneration: false
@@ -23724,6 +23868,7 @@
                         clef: b.clef,
                         velocity: b.velocity,
                         volumeMode: b.volumeMode || 'curve',
+                        pitchMode: b.pitchMode || 'linear',
                         secco: b.secco !== undefined ? b.secco : true,
                         needsRegeneration: b.needsRegeneration
                     })),
@@ -23930,6 +24075,7 @@
                     velocity: bundle.velocity || 115,
                     articulation: 89, // senza vibrato
                     volumeMode: bundle.volumeMode || 'curve',
+                    pitchMode: bundle.pitchMode || 'linear',
                     dynamic1: bundle.dynamic1 || 'pp',
                     dynamic2: bundle.dynamic2 || 'ff'
                 };
@@ -24106,6 +24252,13 @@
                 color: 'neonMagenta'
             },
             
+            // Instrument pitch ranges (same as MidiModelSystem.models.bartokPizz.instrumentRanges)
+            instrumentRanges: {
+                violin: { low: 55, high: 88 },  // G3–E6
+                viola:  { low: 48, high: 76 },   // C3–E5
+                cello:  { low: 36, high: 71 }    // C2–B4
+            },
+            
             // ============ BARTÓK PIZZ BUNDLE SYSTEM ============
             bundles: [],
             nextBundleId: 1,
@@ -24116,13 +24269,170 @@
                 if (goBtn) {
                     goBtn.addEventListener('click', () => this.go());
                 }
+                
+                // Instrument dropdown → update pitch range hints + validation
+                const instrSel = document.getElementById('bpInstrumentSelect');
+                if (instrSel) {
+                    instrSel.addEventListener('change', () => this.updatePitchRangeUI());
+                }
+                
+                // Pitch mode selector → toggle manual/random rows
+                const pitchModeSel = document.getElementById('bpPitchModeSelect');
+                if (pitchModeSel) {
+                    pitchModeSel.addEventListener('change', () => this.updatePitchModeUI());
+                }
+                
+                // Pitch input → validate on change
+                const pitchInput = document.getElementById('bpPitchInput');
+                if (pitchInput) {
+                    pitchInput.addEventListener('input', () => this.validatePitch());
+                }
+                
+                this.updatePitchRangeUI();
                 this.initBundleUI();
                 console.log('BartokPizzUI initialized');
             },
             
+            // Convert MIDI pitch number to display name (e.g. 55 → "G3")
+            pitchToNoteName(pitch) {
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(pitch / 12) - 1;
+                return noteNames[pitch % 12] + octave;
+            },
+            
+            // Convert MIDI pitch + quarter tone offset to display name
+            pitchToNoteNameWithQuarter(pitch, quarterTone = 0) {
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(pitch / 12) - 1;
+                const noteName = noteNames[pitch % 12];
+                let suffix = '';
+                if (quarterTone > 0.25) suffix = '+';
+                else if (quarterTone < -0.25) suffix = 'd';
+                return noteName + suffix + octave;
+            },
+            
+            // Generate random pitch within instrument range (with quarter tones)
+            // Returns { pitch, quarterTone, displayName, englishPitch } or null
+            generateRandomPitch(instrument) {
+                const range = this.instrumentRanges[instrument];
+                if (!range) return null;
+                
+                const quarterToneSteps = (range.high - range.low) * 2;
+                const randomStep = Math.floor(Math.random() * (quarterToneSteps + 1));
+                
+                const midiNote = range.low + Math.floor(randomStep / 2);
+                const quarterTone = (randomStep % 2 === 1) ? 0.5 : 0;
+                
+                const displayName = this.pitchToNoteNameWithQuarter(midiNote, quarterTone);
+                
+                // Convert to English pitch string for pipeline (e.g. "C#4", "C+4", "Cd4")
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(midiNote / 12) - 1;
+                let baseName = noteNames[midiNote % 12];
+                // Convert '#' to '#' (already correct) and add quarter tone suffix
+                let englishPitch = baseName + octave;
+                if (quarterTone > 0.25) {
+                    // Quarter sharp: insert '+' before octave
+                    // If base has '#', result is e.g. "C#+4"; otherwise "C+4"
+                    englishPitch = baseName + '+' + octave;
+                }
+                
+                return { pitch: midiNote, quarterTone, displayName, englishPitch };
+            },
+            
+            // Update pitch range hints when instrument changes
+            updatePitchRangeUI() {
+                const instrument = document.getElementById('bpInstrumentSelect')?.value || 'violin';
+                const range = this.instrumentRanges[instrument];
+                if (!range) return;
+                
+                const lowName = this.pitchToNoteName(range.low);
+                const highName = this.pitchToNoteName(range.high);
+                const rangeStr = `${lowName}–${highName}`;
+                
+                const hint = document.getElementById('bpPitchRangeHint');
+                if (hint) hint.textContent = rangeStr;
+                
+                const randomHint = document.getElementById('bpRandomRangeHint');
+                if (randomHint) randomHint.textContent = rangeStr;
+                
+                const randomLabel = document.getElementById('bpRandomRangeLabel');
+                if (randomLabel) randomLabel.textContent = instrument.charAt(0).toUpperCase() + instrument.slice(1);
+                
+                this.validatePitch();
+            },
+            
+            // Toggle manual/random pitch rows
+            updatePitchModeUI() {
+                const mode = document.getElementById('bpPitchModeSelect')?.value || 'manual';
+                const manualRow = document.getElementById('bpManualPitchRow');
+                const randomRow = document.getElementById('bpRandomPitchRow');
+                if (manualRow) manualRow.style.display = mode === 'manual' ? 'flex' : 'none';
+                if (randomRow) randomRow.style.display = mode === 'random' ? 'flex' : 'none';
+                
+                // Clear warning when switching to random
+                if (mode === 'random') {
+                    const warn = document.getElementById('bpPitchWarning');
+                    if (warn) { warn.style.display = 'none'; warn.textContent = ''; }
+                }
+            },
+            
+            // Validate manual pitch against instrument range
+            validatePitch() {
+                const instrument = document.getElementById('bpInstrumentSelect')?.value || 'violin';
+                const pitchStr = document.getElementById('bpPitchInput')?.value?.trim();
+                const warn = document.getElementById('bpPitchWarning');
+                if (!warn) return;
+                
+                if (!pitchStr) { warn.style.display = 'none'; return; }
+                
+                const midiNote = this.englishToMidi(pitchStr);
+                if (midiNote === null) { warn.style.display = 'none'; return; }
+                
+                const range = this.instrumentRanges[instrument];
+                if (range && (midiNote < range.low || midiNote > range.high)) {
+                    const lowName = this.pitchToNoteName(range.low);
+                    const highName = this.pitchToNoteName(range.high);
+                    warn.textContent = `⚠ Out of ${instrument} range (${lowName}–${highName})`;
+                    warn.style.display = 'inline';
+                } else {
+                    warn.style.display = 'none';
+                    warn.textContent = '';
+                }
+            },
+            
+            // Generate random pitch (with quarter tones) within instrument range
+            // Returns { pitch: MIDI note, quarterTone: -0.5|0|+0.5, displayName: string, englishPitch: string }
+            generateRandomPitch(instrument) {
+                const range = this.instrumentRanges[instrument];
+                if (!range) return null;
+                
+                // Total quarter-tone steps in range: (high - low) * 2 + 1
+                const quarterToneSteps = (range.high - range.low) * 2;
+                const randomStep = Math.floor(Math.random() * (quarterToneSteps + 1));
+                
+                // Convert quarter-tone step to MIDI note + quarter-tone offset
+                const midiNote = range.low + Math.floor(randomStep / 2);
+                const quarterTone = (randomStep % 2 === 1) ? 0.5 : 0;
+                
+                const displayName = this.pitchToNoteName(midiNote);
+                
+                // Build English pitch string (e.g. "C#4", "C+4" for quarter sharp)
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(midiNote / 12) - 1;
+                const noteName = noteNames[midiNote % 12];
+                let englishPitch = noteName + octave;
+                if (quarterTone > 0.25) {
+                    // Quarter sharp: insert '+' before octave digit
+                    englishPitch = noteName + '+' + octave;
+                }
+                
+                return { pitch: midiNote, quarterTone, displayName: displayName + (quarterTone > 0.25 ? '+' : ''), englishPitch };
+            },
+            
             // Dynamic → MIDI velocity mapping
             dynamicToVelocity(dynamic) {
-                const map = { ppp: 30, pp: 45, p: 60, mp: 70, mf: 85, f: 95, ff: 107, fff: 120 };
+                const map = { pppp: 15, ppp: 30, pp: 45, p: 60, mp: 70, mf: 85, f: 95, ff: 107, fff: 120, ffff: 127 };
                 return map[dynamic] || 100;
             },
             
@@ -24171,13 +24481,40 @@
             
             // Full workflow (UI or programmatic)
             async go(params = null) {
-                const pitchEnglish = params?.pitch ?? document.getElementById('bpPitchInput').value.trim();
                 const dynamic = params?.dynamic ?? document.getElementById('bpDynamicSelect').value;
                 const clef = params?.clef ?? document.getElementById('bpClefSelect').value;
                 const track = params?.track ?? parseInt(document.getElementById('bpTrackInput').value);
                 const impactTime = params?.time ?? parseFloat(document.getElementById('bpTimeInput').value);
+                const instrument = params?.instrument ?? document.getElementById('bpInstrumentSelect')?.value ?? 'violin';
+                const pitchMode = params?.pitchMode ?? document.getElementById('bpPitchModeSelect')?.value ?? 'manual';
+                
+                // Determine pitch based on pitch mode
+                let pitchEnglish;
+                if (pitchMode === 'random') {
+                    const randomResult = this.generateRandomPitch(instrument);
+                    if (!randomResult) {
+                        alert('Could not generate random pitch for ' + instrument);
+                        return null;
+                    }
+                    pitchEnglish = randomResult.englishPitch;
+                    console.log('BartokPizzUI: Random pitch:', randomResult.displayName, '→', pitchEnglish);
+                } else {
+                    pitchEnglish = params?.pitch ?? document.getElementById('bpPitchInput').value.trim();
+                }
                 
                 if (!pitchEnglish) { console.error('BartokPizzUI: pitch required'); return null; }
+                
+                // Validate pitch against instrument range (manual mode only — random is always in range)
+                if (pitchMode === 'manual') {
+                    const midiNote = this.englishToMidi(pitchEnglish);
+                    const range = this.instrumentRanges[instrument];
+                    if (midiNote !== null && range && (midiNote < range.low || midiNote > range.high)) {
+                        const lowName = this.pitchToNoteName(range.low);
+                        const highName = this.pitchToNoteName(range.high);
+                        alert(`⚠️ Pitch ${pitchEnglish} is out of ${instrument} range (${lowName}–${highName}).\n\nChange the pitch or select a different instrument.`);
+                        return null;
+                    }
+                }
                 
                 // Convert plain English to LilyPond notation for pipeline
                 const pitch = this.englishToLilypond(pitchEnglish);
@@ -24271,7 +24608,9 @@
                             midiSnippet,
                             impactTime,
                             track,
-                            lyFn
+                            lyFn,
+                            instrument,
+                            pitchEnglish
                         );
                     }
                     
@@ -24472,7 +24811,7 @@
             },
             
             // ── Bundle registry: unified drag/delete for BP components ──
-            registerBundle(gcId, svgId, midiSnippetId, impactTime, track, lyFilename) {
+            registerBundle(gcId, svgId, midiSnippetId, impactTime, track, lyFilename, instrument, pitch) {
                 // Remove any existing bundles for same gcId (prevents duplicates)
                 const old = this.bundles.filter(b => b.gcId === gcId);
                 if (old.length > 0) {
@@ -24485,11 +24824,13 @@
                     midiSnippetId,
                     impactTime,
                     track,
-                    lyFilename: lyFilename || null
+                    lyFilename: lyFilename || null,
+                    instrument: instrument || null,
+                    pitch: pitch || null
                 };
                 this.bundles.push(bundle);
                 console.log('BartokPizzUI: bundle registered', bundle.id,
-                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId, 'ly:', bundle.lyFilename);
+                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId, 'ly:', bundle.lyFilename, 'inst:', bundle.instrument, 'pitch:', bundle.pitch);
                 return bundle;
             },
             
@@ -24567,7 +24908,9 @@
                         svgId: b.svgId,
                         midiSnippetId: b.midiSnippetId,
                         impactTime: b.impactTime,
-                        track: b.track
+                        track: b.track,
+                        instrument: b.instrument || null,
+                        pitch: b.pitch || null
                     })),
                     nextBundleId: this.nextBundleId
                 };
@@ -24793,6 +25136,661 @@
         window.BartokPizzUI = BartokPizzUI;
         
         // ============================================
+        // BOW OVERPRESSURE UI
+        // Single-click workflow: assembly SVG → GC → insert SVG → MIDI → bundle
+        // ============================================
+        const BowOverpressureUI = {
+            // Fixed GC parameters
+            GC_PARAMS: {
+                stiffness: 62,
+                damping: 100,
+                ictus: 90,
+                descentRatio: 60,
+                duration: 0.6,
+                color: 'neonMagenta'
+            },
+            
+            // Instrument pitch ranges (MIDI note numbers)
+            instrumentRanges: {
+                violin: { low: 55, high: 89 },  // G3–F6
+                viola:  { low: 48, high: 83 },   // C3–B5
+                cello:  { low: 36, high: 71 }    // C2–B4
+            },
+            
+            // ============ BUNDLE SYSTEM ============
+            bundles: [],
+            nextBundleId: 1,
+            selectedBundleId: null,
+            
+            init() {
+                const goBtn = document.getElementById('bopGoBtn');
+                if (goBtn) goBtn.addEventListener('click', () => this.go());
+                
+                const instrSel = document.getElementById('bopInstrumentSelect');
+                if (instrSel) instrSel.addEventListener('change', () => this.updatePitchRangeUI());
+                
+                const pitchModeSel = document.getElementById('bopPitchModeSelect');
+                if (pitchModeSel) pitchModeSel.addEventListener('change', () => this.updatePitchModeUI());
+                
+                const pitchInput = document.getElementById('bopPitchInput');
+                if (pitchInput) pitchInput.addEventListener('input', () => this.validatePitch());
+                
+                this.updatePitchRangeUI();
+                this.initBundleUI();
+                console.log('BowOverpressureUI initialized');
+            },
+            
+            pitchToNoteName(pitch) {
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(pitch / 12) - 1;
+                return noteNames[pitch % 12] + octave;
+            },
+            
+            generateRandomPitch(instrument) {
+                const range = this.instrumentRanges[instrument];
+                if (!range) return null;
+                
+                const quarterToneSteps = (range.high - range.low) * 2;
+                const randomStep = Math.floor(Math.random() * (quarterToneSteps + 1));
+                const midiNote = range.low + Math.floor(randomStep / 2);
+                const quarterTone = (randomStep % 2 === 1) ? 0.5 : 0;
+                
+                const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+                const octave = Math.floor(midiNote / 12) - 1;
+                const noteName = noteNames[midiNote % 12];
+                let englishPitch = noteName + octave;
+                if (quarterTone > 0.25) englishPitch = noteName + '+' + octave;
+                
+                const displayName = this.pitchToNoteName(midiNote) + (quarterTone > 0.25 ? '+' : '');
+                return { pitch: midiNote, quarterTone, displayName, englishPitch };
+            },
+            
+            updatePitchRangeUI() {
+                const instrument = document.getElementById('bopInstrumentSelect')?.value || 'violin';
+                const range = this.instrumentRanges[instrument];
+                if (!range) return;
+                
+                const rangeStr = `${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)}`;
+                const hint = document.getElementById('bopPitchRangeHint');
+                if (hint) hint.textContent = rangeStr;
+                const randomHint = document.getElementById('bopRandomRangeHint');
+                if (randomHint) randomHint.textContent = rangeStr;
+                const randomLabel = document.getElementById('bopRandomRangeLabel');
+                if (randomLabel) randomLabel.textContent = instrument.charAt(0).toUpperCase() + instrument.slice(1);
+                this.validatePitch();
+            },
+            
+            updatePitchModeUI() {
+                const mode = document.getElementById('bopPitchModeSelect')?.value || 'random';
+                const manualRow = document.getElementById('bopManualPitchRow');
+                const randomRow = document.getElementById('bopRandomPitchRow');
+                if (manualRow) manualRow.style.display = mode === 'manual' ? 'flex' : 'none';
+                if (randomRow) randomRow.style.display = mode === 'random' ? 'flex' : 'none';
+            },
+            
+            validatePitch() {
+                const instrument = document.getElementById('bopInstrumentSelect')?.value || 'violin';
+                const pitchStr = document.getElementById('bopPitchInput')?.value?.trim();
+                if (!pitchStr) return;
+                const midiNote = BartokPizzUI.englishToMidi(pitchStr);
+                if (midiNote === null) return;
+                const range = this.instrumentRanges[instrument];
+                // No warning UI for BOP — keep simple
+            },
+            
+            // Reuse BartokPizzUI helpers for pitch conversion
+            englishToLilypond(pitchStr) { return BartokPizzUI.englishToLilypond(pitchStr); },
+            englishToMidi(pitchStr) { return BartokPizzUI.englishToMidi(pitchStr); },
+            dynamicToVelocity(dynamic) { return BartokPizzUI.dynamicToVelocity(dynamic); },
+            
+            // ── Main pipeline ──
+            async go(params = null) {
+                const clef = params?.clef ?? document.getElementById('bopClefSelect').value;
+                const track = params?.track ?? parseInt(document.getElementById('bopTrackInput').value);
+                const impactTime = params?.time ?? parseFloat(document.getElementById('bopTimeInput').value);
+                const instrument = params?.instrument ?? document.getElementById('bopInstrumentSelect')?.value ?? 'violin';
+                const pitchMode = params?.pitchMode ?? document.getElementById('bopPitchModeSelect')?.value ?? 'random';
+                
+                // Determine pitch
+                let pitchEnglish;
+                if (pitchMode === 'random') {
+                    const randomResult = this.generateRandomPitch(instrument);
+                    if (!randomResult) { alert('Could not generate random pitch for ' + instrument); return null; }
+                    pitchEnglish = randomResult.englishPitch;
+                    console.log('BowOverpressureUI: Random pitch:', randomResult.displayName, '→', pitchEnglish);
+                } else {
+                    pitchEnglish = params?.pitch ?? document.getElementById('bopPitchInput').value.trim();
+                }
+                
+                if (!pitchEnglish) { console.error('BowOverpressureUI: pitch required'); return null; }
+                
+                // Validate pitch format (English: C4, C#4, Bb3, C+4, Cd4)
+                if (!/^[A-Ga-g][#b+d]*\d$/i.test(pitchEnglish.trim())) {
+                    console.error('BowOverpressureUI: Invalid pitch format:', pitchEnglish);
+                    alert('Invalid pitch. Format: C4, C#4, Bb3, C+4, Cd4');
+                    return null;
+                }
+                
+                const btn = document.getElementById('bopGoBtn');
+                const originalText = btn?.textContent;
+                if (btn) { btn.textContent = '...'; btn.disabled = true; }
+                
+                let result = null;
+                try {
+                    const filename = `BOP-${clef}-${LongToneUI.canonicalPitch(pitchEnglish)}`;
+                    console.log('BowOverpressureUI.go:', { pitch: pitchEnglish, clef, track, impactTime, filename });
+                    
+                    // Step 1: Generate SVG via assembly engine
+                    const svgResp = await fetch('/api/svg-assembly/bow-overpressure-accent', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pitch: pitchEnglish, clef, filename })
+                    });
+                    const svgResult = await svgResp.json();
+                    
+                    if (!svgResult.success) {
+                        console.error('BowOverpressureUI: SVG assembly failed:', svgResult.error);
+                        throw new Error(svgResult.error);
+                    }
+                    console.log('BowOverpressureUI: SVG assembled:', svgResult.svgPath);
+                    
+                    // Step 2: Create GC at impact time
+                    let gc = null;
+                    if (window.GCMaker) {
+                        const saved = {
+                            stiffness: GCMaker.stiffness, damping: GCMaker.damping,
+                            ictus: GCMaker.ictus, descentRatio: GCMaker.descentRatio,
+                            duration: GCMaker.duration
+                        };
+                        
+                        GCMaker.stiffness = this.GC_PARAMS.stiffness;
+                        GCMaker.damping = this.GC_PARAMS.damping;
+                        GCMaker.ictus = this.GC_PARAMS.ictus;
+                        GCMaker.descentRatio = this.GC_PARAMS.descentRatio;
+                        GCMaker.duration = this.GC_PARAMS.duration;
+                        
+                        if (GCMaker.impactInput) GCMaker.impactInput.value = impactTime;
+                        if (GCMaker.trackSelect) GCMaker.trackSelect.value = String(track);
+                        
+                        GCMaker.createGC();
+                        gc = GCMaker.gcs[GCMaker.gcs.length - 1];
+                        
+                        if (gc) {
+                            gc.color = this.GC_PARAMS.color;
+                            gc.name = `BowOverpressure_${gc.name}`;
+                            GCMaker.rerenderAllGCs();
+                            console.log('BowOverpressureUI: GC created:', gc.name);
+                        }
+                        
+                        Object.assign(GCMaker, saved);
+                    }
+                    
+                    // Step 3: Insert SVG notation
+                    let svgElement = null;
+                    if (svgResult.svgPath) {
+                        svgElement = await this.insertSvg(svgResult, impactTime, track);
+                        if (svgElement) console.log('BowOverpressureUI: SVG inserted:', svgElement.name);
+                    }
+                    
+                    // Step 4: Insert MIDI (CC0=53, velocity 127)
+                    let midiSnippet = null;
+                    if (window.MidiController) {
+                        midiSnippet = this.insertMidi(pitchEnglish, track, impactTime);
+                        if (midiSnippet) console.log('BowOverpressureUI: MIDI inserted');
+                    }
+                    
+                    // Step 5: Register bundle
+                    if (gc || svgElement || midiSnippet) {
+                        this.registerBundle(
+                            gc ? gc.id : null,
+                            svgElement ? svgElement.id : null,
+                            midiSnippet,
+                            impactTime, track, instrument, pitchEnglish
+                        );
+                    }
+                    
+                    result = { gc, svgElement, midiSnippet, svgResult };
+                    console.log('BowOverpressureUI: Complete');
+                    
+                } catch (err) {
+                    console.error('BowOverpressureUI error:', err);
+                } finally {
+                    if (btn) {
+                        if (result) {
+                            btn.textContent = '✓';
+                            btn.style.background = 'var(--clr-green)';
+                            setTimeout(() => { btn.textContent = originalText; btn.style.background = '#C0392B'; btn.disabled = false; }, 1500);
+                        } else {
+                            btn.textContent = '✗';
+                            btn.style.background = 'var(--clr-brightRed)';
+                            setTimeout(() => { btn.textContent = originalText; btn.style.background = '#C0392B'; btn.disabled = false; }, 2000);
+                        }
+                    }
+                }
+                return result;
+            },
+            
+            // Insert SVG into score using assembly metadata for positioning
+            async insertSvg(svgResult, startSeconds, track) {
+                if (!svgResult.svgPath) return null;
+                
+                try {
+                    const response = await fetch(svgResult.svgPath);
+                    const svgContent = await response.text();
+                    
+                    const parser = new DOMParser();
+                    const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                    const svgEl = svgDoc.documentElement;
+                    
+                    let svgWidth = parseFloat(svgEl.getAttribute('width')) || 100;
+                    let svgHeight = parseFloat(svgEl.getAttribute('height')) || 100;
+                    const widthStr = svgEl.getAttribute('width') || '';
+                    const heightStr = svgEl.getAttribute('height') || '';
+                    if (widthStr.includes('mm')) svgWidth = parseFloat(widthStr) * 3.78;
+                    if (heightStr.includes('mm')) svgHeight = parseFloat(heightStr) * 3.78;
+                    
+                    svgEl.setAttribute('width', String(svgWidth));
+                    svgEl.setAttribute('height', String(svgHeight));
+                    
+                    const trackNum = parseInt(track) || 1;
+                    const scoreEl = document.getElementById('ScoreTop');
+                    const scoreWidth = scoreEl.clientWidth;
+                    const trackDims = CompositionPanel.getTrackDimensions(String(trackNum), scoreEl);
+                    const trackHeight = trackDims.height;
+                    
+                    // Use metadata positioning if available
+                    const meta = svgResult.metadata;
+                    const positioning = meta?.positioning || {};
+                    const offsetYFraction = positioning.offsetYFraction || 0.05;
+                    
+                    // Scale SVG to percentage of track height (same approach as BartokPizzUI)
+                    const heightFraction = 0.60;
+                    const targetHeight = trackHeight * heightFraction;
+                    const scale = targetHeight / svgHeight;
+                    const scaledContentWidth = svgWidth * scale;
+                    
+                    // Position: align notehead center with impact time
+                    const secondsPerPage = window.GraphicTimeline 
+                        ? GraphicTimeline.getSecondsPerPage() 
+                        : (beatsPerPage / beatsPerMinute) * 60;
+                    const secondsPerPixel = secondsPerPage / scoreWidth;
+                    
+                    // Compute offset so notehead center aligns with impact time
+                    const noteheadCenterX_mm = meta?.noteheadCenterX_mm || (svgWidth / (2 * 3.78));
+                    const noteheadCenterX_px = noteheadCenterX_mm * 3.78 * scale;
+                    const offsetSeconds = -noteheadCenterX_px * secondsPerPixel;
+                    
+                    const id = SVGElementManager.nextId++;
+                    const wrapper = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    wrapper.setAttribute('id', `svg-element-${id}`);
+                    wrapper.setAttribute('class', 'svg-element-wrapper');
+                    
+                    const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    let svgString = new XMLSerializer().serializeToString(svgEl);
+                    svgString = svgString.replace(/currentColor/g, '#000000');
+                    const dataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                    image.setAttribute('href', dataUrl);
+                    image.setAttribute('width', svgWidth);
+                    image.setAttribute('height', svgHeight);
+                    wrapper.appendChild(image);
+                    
+                    const elementData = {
+                        id: id,
+                        name: SVGElementManager.generateSvgName(svgResult.svgPath.split('/').pop()),
+                        wrapper: wrapper,
+                        image: image,
+                        referenceSeconds: startSeconds,
+                        offsetSeconds: offsetSeconds,
+                        offsetYFraction: offsetYFraction,
+                        width: svgWidth,
+                        height: svgHeight,
+                        scale: scale,
+                        heightFraction: heightFraction,
+                        track: trackNum
+                    };
+                    
+                    const pos = SVGElementManager.calcPixelPosition(elementData);
+                    elementData._x = pos.x;
+                    elementData._y = pos.y;
+                    elementData._page = pos.page;
+                    elementData._section = pos.section;
+                    
+                    SVGElementManager.elements.push(elementData);
+                    SVGElementManager.updateElementTransform(elementData);
+                    
+                    const targetContainer = pos.section === 'top' 
+                        ? SVGElementManager.containerTop 
+                        : SVGElementManager.containerBottom;
+                    targetContainer.appendChild(wrapper);
+                    
+                    wrapper.addEventListener('mousedown', (e) => 
+                        SVGElementManager.handleElementMouseDown(e, elementData));
+                    
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                    
+                    return elementData;
+                } catch (err) {
+                    console.error('BowOverpressureUI.insertSvg error:', err);
+                    return null;
+                }
+            },
+            
+            // Insert MIDI: CC0=53, velocity 127, short duration
+            insertMidi(pitchEnglish, track, impactTime) {
+                if (!window.MidiController || !window.MidiSnippetDatabase) return null;
+                
+                const trackIndex = parseInt(track) - 1;
+                const midiChannel = trackIndex;
+                const velocity = 127;
+                const cc0Value = 53;
+                
+                const midiNote = this.englishToMidi(pitchEnglish);
+                if (midiNote === null) {
+                    console.error('BowOverpressureUI: Could not convert pitch to MIDI:', pitchEnglish);
+                    return null;
+                }
+                
+                const impactMs = impactTime * 1000;
+                const noteDurationMs = 95.4;
+                const durationSec = noteDurationMs / 1000;
+                
+                // Quarter-tone pitch bend
+                const qtMatch = pitchEnglish.trim().toUpperCase().match(/^[A-G][#B]?([+D]?)-?\d$/);
+                const quarterTone = qtMatch ? qtMatch[1] : '';
+                const needsBend = quarterTone === '+' || quarterTone === 'D';
+                const bendValue = quarterTone === '+' ? 12288 : quarterTone === 'D' ? 4096 : 8192;
+                const bendMSB = bendValue >> 7;
+                const bendLSB = bendValue & 0x7F;
+                
+                const snippetEvents = [];
+                
+                if (needsBend) {
+                    snippetEvents.push({ timeMs: impactMs, relativeTimeMs: 0, type: 0xE0, data: [0xE0 | midiChannel, bendLSB, bendMSB] });
+                }
+                
+                snippetEvents.push(
+                    { timeMs: impactMs, relativeTimeMs: 0, type: 0xB0, data: [0xB0 | midiChannel, 0x00, cc0Value] },
+                    { timeMs: impactMs, relativeTimeMs: 0, type: 0x90, data: [0x90 | midiChannel, midiNote, velocity] },
+                    { timeMs: impactMs + noteDurationMs, relativeTimeMs: noteDurationMs, type: 0x80, data: [0x80 | midiChannel, midiNote, 0] }
+                );
+                
+                if (needsBend) {
+                    snippetEvents.push({ timeMs: impactMs + noteDurationMs, relativeTimeMs: noteDurationMs, type: 0xE0, data: [0xE0 | midiChannel, 0x00, 0x40] });
+                }
+                
+                const color = MidiController.snippetColors[MidiController.nextColorIndex % MidiController.snippetColors.length];
+                MidiController.nextColorIndex++;
+                
+                const snippet = MidiSnippetDatabase.add({
+                    name: `BowOverpressure_t${track}_${impactTime.toFixed(1)}s`,
+                    trackIndex: trackIndex,
+                    startSeconds: impactTime,
+                    endSeconds: impactTime + durationSec,
+                    events: snippetEvents,
+                    color: color
+                });
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                MidiController.reloadFromDatabase();
+                
+                return snippet.id;
+            },
+            
+            // ── Bundle registry ──
+            registerBundle(gcId, svgId, midiSnippetId, impactTime, track, instrument, pitch) {
+                const old = this.bundles.filter(b => b.gcId === gcId);
+                if (old.length > 0) {
+                    for (const ob of old) this.bundles = this.bundles.filter(b => b.id !== ob.id);
+                }
+                const bundle = {
+                    id: this.nextBundleId++,
+                    gcId, svgId, midiSnippetId, impactTime, track,
+                    instrument: instrument || null,
+                    pitch: pitch || null
+                };
+                this.bundles.push(bundle);
+                console.log('BowOverpressureUI: bundle registered', bundle.id,
+                    'gc:', gcId, 'svg:', svgId, 'midi:', midiSnippetId, 'inst:', instrument, 'pitch:', pitch);
+                return bundle;
+            },
+            
+            lookupBundleBySvgId(svgId) {
+                const matches = this.bundles.filter(b => b.svgId === svgId);
+                return matches.length > 0 ? matches[matches.length - 1] : null;
+            },
+            
+            lookupBundleByGcId(gcId) {
+                const matches = this.bundles.filter(b => b.gcId === gcId);
+                return matches.length > 0 ? matches[matches.length - 1] : null;
+            },
+            
+            deleteBundle(bundleId) {
+                const idx = this.bundles.findIndex(b => b.id === bundleId);
+                if (idx === -1) return false;
+                const bundle = this.bundles[idx];
+                const systemsToReload = new Set();
+                
+                if (window.GCMaker && bundle.gcId != null) {
+                    const gi = GCMaker.gcs.findIndex(gc => gc.id === bundle.gcId);
+                    if (gi !== -1) {
+                        const gc = GCMaker.gcs[gi];
+                        if (gc.elements && gc.elements.group) gc.elements.group.remove();
+                        GCMaker.gcs.splice(gi, 1);
+                        if (GCMaker.selectedGC && GCMaker.selectedGC.id === bundle.gcId) GCMaker.deselectGC();
+                        systemsToReload.add('gcs');
+                    }
+                }
+                
+                if (window.SVGElementManager && bundle.svgId != null) {
+                    const si = SVGElementManager.elements.findIndex(el => el.id === bundle.svgId);
+                    if (si !== -1) {
+                        const el = SVGElementManager.elements[si];
+                        if (el.wrapper) el.wrapper.remove();
+                        if (SVGElementManager.selectedElement && SVGElementManager.selectedElement.id === bundle.svgId) SVGElementManager.deselectAll();
+                        SVGElementManager.elements.splice(si, 1);
+                        systemsToReload.add('svgs');
+                    }
+                }
+                
+                if (bundle.midiSnippetId != null && window.MidiSnippetDatabase) {
+                    MidiSnippetDatabase.remove(bundle.midiSnippetId);
+                    systemsToReload.add('midi');
+                }
+                
+                this.bundles.splice(idx, 1);
+                
+                if (systemsToReload.has('gcs') && window.GCMaker) GCMaker.rerenderAllGCs();
+                if (systemsToReload.has('svgs') && window.SVGElementManager) {
+                    SVGElementManager.updateElementList();
+                    SVGElementManager.updateVisibility();
+                }
+                if (systemsToReload.has('midi') && window.MidiController) MidiController.reloadFromDatabase();
+                
+                if (window.ScoreManager) ScoreManager.markDirty();
+                console.log('BowOverpressureUI: bundle deleted', bundleId);
+                return true;
+            },
+            
+            exportBundles() {
+                return {
+                    bundles: this.bundles.map(b => ({
+                        id: b.id, gcId: b.gcId, svgId: b.svgId, midiSnippetId: b.midiSnippetId,
+                        impactTime: b.impactTime, track: b.track,
+                        instrument: b.instrument || null, pitch: b.pitch || null
+                    })),
+                    nextBundleId: this.nextBundleId
+                };
+            },
+            
+            importBundles(data) {
+                if (!data || !data.bundles) return;
+                const raw = data.bundles.map(b => ({ ...b }));
+                const byGc = new Map();
+                for (const b of raw) {
+                    const existing = byGc.get(b.gcId);
+                    if (!existing || b.id > existing.id) byGc.set(b.gcId, b);
+                }
+                this.bundles = [...byGc.values()];
+                if (raw.length !== this.bundles.length) {
+                    console.warn('BowOverpressureUI.importBundles: Deduped', raw.length, '\u2192', this.bundles.length, 'bundles');
+                }
+                this.nextBundleId = data.nextBundleId || (this.bundles.length > 0
+                    ? Math.max(...this.bundles.map(b => b.id)) + 1 : 1);
+                console.log('BowOverpressureUI: imported', this.bundles.length, 'bundles');
+            },
+            
+            // ── Bundle drag ──
+            startBundleDrag(bundle, e) {
+                const zoomScale = window.ScoreZoom ? ScoreZoom.getZoom() : 1;
+                const startClientX = e.clientX;
+                
+                const gc = window.GCMaker ? GCMaker.gcs.find(g => g.id === bundle.gcId) : null;
+                if (!gc) return;
+                const scoreEl = gc.section === 'top' ? GCMaker.scoreTopEl : GCMaker.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                const secondsPerPage = window.GraphicTimeline
+                    ? GraphicTimeline.getSecondsPerPage()
+                    : (beatsPerPage / beatsPerMinute) * 60;
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                
+                const origGc = { startSeconds: gc.startSeconds, endSeconds: gc.endSeconds, impactSeconds: gc.impactSeconds };
+                const origImpactTime = bundle.impactTime;
+                
+                const svgEl = window.SVGElementManager ? SVGElementManager.elements.find(el => el.id === bundle.svgId) : null;
+                const origSvgRef = svgEl ? svgEl.referenceSeconds : null;
+                
+                const sn = window.MidiSnippetDatabase ? MidiSnippetDatabase.get(bundle.midiSnippetId) : null;
+                const origMidi = sn ? {
+                    startSeconds: sn.startSeconds, endSeconds: sn.endSeconds,
+                    eventTimes: sn.events ? sn.events.map(ev => ev.timeMs) : []
+                } : null;
+                
+                const row = document.getElementById('bopBundleRow');
+                const readout = document.getElementById('bopBundleTime');
+                if (row) {
+                    row.style.display = 'flex';
+                    const sc = row.closest('.section-content');
+                    if (sc) requestAnimationFrame(() => { sc.style.maxHeight = sc.scrollHeight + 'px'; });
+                }
+                if (readout) readout.textContent = origImpactTime.toFixed(3) + 's';
+                
+                const onMouseMove = (moveE) => {
+                    const dx = (moveE.clientX - startClientX) / zoomScale;
+                    const timeDelta = dx * secondsPerPixel;
+                    
+                    gc.startSeconds = origGc.startSeconds + timeDelta;
+                    gc.endSeconds = origGc.endSeconds + timeDelta;
+                    gc.impactSeconds = origGc.impactSeconds + timeDelta;
+                    GCMaker.rerenderAllGCs();
+                    
+                    if (svgEl && origSvgRef != null) {
+                        svgEl.referenceSeconds = origSvgRef + timeDelta;
+                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                        svgEl._x = pos.x; svgEl._y = pos.y; svgEl._page = pos.page; svgEl._section = pos.section;
+                        SVGElementManager.updateElementTransform(svgEl);
+                    }
+                    
+                    if (sn && origMidi) {
+                        const deltaMs = timeDelta * 1000;
+                        sn.startSeconds = origMidi.startSeconds + timeDelta;
+                        sn.endSeconds = origMidi.endSeconds + timeDelta;
+                        if (sn.events && origMidi.eventTimes.length === sn.events.length) {
+                            for (let i = 0; i < sn.events.length; i++) sn.events[i].timeMs = origMidi.eventTimes[i] + deltaMs;
+                        }
+                    }
+                    
+                    bundle.impactTime = origImpactTime + timeDelta;
+                    if (readout) readout.textContent = bundle.impactTime.toFixed(3) + 's';
+                };
+                
+                const onMouseUp = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    if (window.MidiController) MidiController.reloadFromDatabase();
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    if (window.FlowchartConnector) FlowchartConnector.updateAllConnectors();
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
+            // ── Bundle UI ──
+            initBundleUI() {
+                const self = this;
+                
+                const delBtn = document.getElementById('bopDeleteBundleBtn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', () => {
+                        let bundle = null;
+                        if (this.selectedBundleId != null) bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                        if (!bundle && window.GCMaker && GCMaker.selectedGC) bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                        if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                        if (bundle) {
+                            this.deleteBundle(bundle.id);
+                            this.selectedBundleId = null;
+                            const row = document.getElementById('bopBundleRow');
+                            if (row) row.style.display = 'none';
+                        }
+                    });
+                }
+                
+                // Delete key handler
+                document.addEventListener('keydown', (e) => {
+                    if (e.key !== 'Delete') return;
+                    const tag = document.activeElement?.tagName;
+                    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+                    
+                    let bundle = null;
+                    if (this.selectedBundleId != null) bundle = this.bundles.find(b => b.id === this.selectedBundleId);
+                    if (!bundle && window.GCMaker && GCMaker.selectedGC) bundle = this.lookupBundleByGcId(GCMaker.selectedGC.id);
+                    if (!bundle && window.SVGElementManager && SVGElementManager.selectedElement) bundle = this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                    if (bundle) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.deleteBundle(bundle.id);
+                        this.selectedBundleId = null;
+                        const row = document.getElementById('bopBundleRow');
+                        if (row) row.style.display = 'none';
+                    }
+                });
+                
+                // Patch SVGElementManager to show/hide BOP bundle row
+                if (window.SVGElementManager) {
+                    const origSelect = SVGElementManager.selectElement;
+                    const origDeselect = SVGElementManager.deselectAll;
+                    
+                    SVGElementManager.selectElement = function(elementData) {
+                        origSelect.call(SVGElementManager, elementData);
+                        const bopBundle = self.lookupBundleBySvgId(elementData.id);
+                        const row = document.getElementById('bopBundleRow');
+                        const readout = document.getElementById('bopBundleTime');
+                        if (bopBundle) {
+                            self.selectedBundleId = bopBundle.id;
+                            if (row) {
+                                row.style.display = 'flex';
+                                const sc = row.closest('.section-content');
+                                if (sc) requestAnimationFrame(() => { sc.style.maxHeight = sc.scrollHeight + 'px'; });
+                            }
+                            if (readout) readout.textContent = bopBundle.impactTime.toFixed(3) + 's';
+                        }
+                    };
+                    
+                    const prevDeselect = SVGElementManager.deselectAll;
+                    SVGElementManager.deselectAll = function() {
+                        prevDeselect.call(SVGElementManager);
+                        self.selectedBundleId = null;
+                        const row = document.getElementById('bopBundleRow');
+                        if (row) row.style.display = 'none';
+                    };
+                }
+            }
+        };
+        BowOverpressureUI.init();
+        window.BowOverpressureUI = BowOverpressureUI;
+        
+        // ============================================
         // PIZZICATO TREMOLO UI
         // Single-click workflow: pipeline → GC → SVG + arrow → MIDI
         // ============================================
@@ -24843,7 +25841,7 @@
             
             // Dynamic → MIDI velocity mapping (same as Bartók/generate_pizz_tremolo_midi.js)
             dynamicToVelocity(dynamic) {
-                const map = { ppp: 30, pp: 45, p: 60, mp: 70, mf: 85, f: 95, ff: 107, fff: 120 };
+                const map = { pppp: 15, ppp: 30, pp: 45, p: 60, mp: 70, mf: 85, f: 95, ff: 107, fff: 120, ffff: 127 };
                 return map[dynamic] || 100;
             },
             
@@ -29953,6 +30951,17 @@
                             e.stopPropagation();
                             this.selectGC(gc);
                             BartokPizzUI.startBundleDrag(bpBundle, e);
+                            return;
+                        }
+                    }
+                    // Check BOP bundles
+                    if (window.BowOverpressureUI) {
+                        const bopBundle = BowOverpressureUI.lookupBundleByGcId(gc.id);
+                        if (bopBundle) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            this.selectGC(gc);
+                            BowOverpressureUI.startBundleDrag(bopBundle, e);
                             return;
                         }
                     }
