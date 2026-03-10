@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 8, 2026  
-**Current ASB Number:** ASB-150
+**Last Updated:** Mar 9, 2026  
+**Current ASB Number:** ASB-152
 
 ---
 
@@ -43,7 +43,7 @@ That's it. Everything else below is for Cascade.
 | Workflow | Status | Next Step |
 |----------|--------|-----------|
 | Bartók Pizzicato | Complete (Pattern 4 — AI Direct) | Maintenance only |
-| Bow Overpressure | **Intermediary** | MIDI model complete (CC0=53, random pitch, quarter-tone bend). No SVG, no bundle, no server pipeline yet. Pitch model TBD. See ASB-128 |
+| Bow Overpressure | **Complete (Pipeline + Bundle)** | Full pipeline: SVG assembly engine (square notehead, stem, flag, 3× downbow, marcato, sfz), server endpoint, UI panel, GC + SVG + MIDI bundle system. See ASB-150–152 |
 | Glissando System | Complete | Maintenance only |
 | Vibrato System | **Bundle Complete** | Bundle system (curve-based, like CD/PTG). MIDI ch fix, params regen, CurveMaker hooks, ScoreManager persistence. See ASB-112 |
 | Crescendo-Decrescendo | **Volume Mode added** | ASB-112: Curve/Steady/Linear CC7 modes. Maintenance otherwise |
@@ -153,11 +153,16 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Current Session
 
-**Date:** Mar 8, 2026  
-**Focus:** Two-Hand Pizz Grace Notes + SVG Height % scaling + Glissando Assembly Engine  
-**ASB:** ASB-138 through ASB-144  
-**Tier 1 Count This Session:** 7 (ASB-138–141, ASB-142–144)  
-**Tier 2 Commits:** ac769fb4, d14d7396
+**Date:** Mar 9, 2026  
+**Focus:** Bow Overpressure Accent full pipeline  
+**ASB:** ASB-150 through ASB-152  
+**Tier 1 Count This Session:** 3 (ASB-150–152)  
+**Tier 2 Commits:** b9110cb0
+
+### Session Log — Bow Overpressure Accent Pipeline
+- ASB-150: SVG Assembly Engine — assembleBowOverpressureAccent() with square notehead, stem, 16th flag, 3× downbow, marcato, sfz. Component library extended (scripts + sfzDynamic). Bbox calculator extended. PROFILES.bowOverpressureAccent. CLI test command.
+- ASB-151: Server endpoint POST /api/svg-assembly/bow-overpressure-accent (English pitch). HTML UI section (track, clef, instrument, pitch mode, time). BowOverpressureUI JS object: go() 5-step pipeline, insertSvg, insertMidi (CC0=53, vel 127, quarter-tone bend). Full bundle system (register/delete/export/import/drag/UI). ScoreManager bopBundles persistence. GCMaker drag hook.
+- ASB-152: Bug fixes — pitch format (English not LilyPond to server), SVG sizing (direct heightFraction 0.60 matching _scaleFromHeightFraction formula), GC color brightRed→neonMagenta.
 
 ### Session Log — Glissando Assembly Engine + SVG Scaling Fixes
 - ASB-142: Glissando SVG Assembly Engine — `assembleSustainedToneGlissando()` in assemble_svg.js (dual noteheads, dual accidentals, parametric Bézier glissando line with same-line collision avoidance, ledger lines for both notes, dynamics/hairpin/secco/Non-Vib). New helpers: `generateGlissandoLine()`, `isOnStaffLine()`, `sameStaffLineCheck()`. Server endpoint `POST /api/svg-assembly/sustained-tone-glissando`. Client CrescendoUI.step2 replaced LilyPond pipeline with assembly endpoint for glissando. CLI `glissando` command with 8 test cases.
