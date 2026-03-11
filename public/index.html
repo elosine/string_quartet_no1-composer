@@ -718,10 +718,12 @@
         /* SVG Element Manager Styles */
         .svg-element-wrapper {
             cursor: move;
+            pointer-events: none;
         }
         .svg-element-wrapper.selected {
             outline: 2px dashed var(--clr-brightBlue);
             outline-offset: 2px;
+            pointer-events: all;
         }
         .svg-resize-handle {
             fill: var(--clr-brightBlue);
@@ -1274,6 +1276,11 @@
                     <input type="number" id="bpTimeInput" class="curve-input" value="0" step="0.1" style="width: 65px; font-size: 10px;" title="Impact time in seconds">
                     <span style="font-size: 8px; color: #888; margin-left: 3px;">s</span>
                 </div>
+                <div class="curve-input-row" style="margin-top: 4px;">
+                    <label style="font-size: 9px; min-width: 28px;">GC</label>
+                    <select id="bpGCPreset" style="flex: 1; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;"></select>
+                </div>
+                <canvas id="bpGCPreview" style="width: 100%; background: rgba(20,20,30,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 2px;"></canvas>
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="bpGoBtn" class="control-btn" style="font-size: 11px; background: var(--clr-neonMagenta); color: #fff; font-weight: bold; padding: 4px 12px;">Go</button>
                 </div>
@@ -1333,6 +1340,11 @@
                 <div class="curve-input-row">
                     <span style="font-size: 8px; color: #999;">sfz · vel 127</span>
                 </div>
+                <div class="curve-input-row" style="margin-top: 4px;">
+                    <label style="font-size: 9px; min-width: 28px;">GC</label>
+                    <select id="bopGCPreset" style="flex: 1; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;"></select>
+                </div>
+                <canvas id="bopGCPreview" style="width: 100%; background: rgba(20,20,30,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 2px;"></canvas>
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="bopGoBtn" class="control-btn" style="font-size: 11px; background: #C0392B; color: #fff; font-weight: bold; padding: 4px 12px;">Go</button>
                 </div>
@@ -1402,6 +1414,11 @@
                     <span style="font-size: 8px; color: #888; margin-left: 3px;">s</span>
                     <span style="font-size: 8px; color: #999; margin-left: 8px;">CC0=83</span>
                 </div>
+                <div class="curve-input-row" style="margin-top: 4px;">
+                    <label style="font-size: 9px; min-width: 28px;">GC</label>
+                    <select id="clbGCPreset" style="flex: 1; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;"></select>
+                </div>
+                <canvas id="clbGCPreview" style="width: 100%; background: rgba(20,20,30,0.5); border: 1px solid #444; border-radius: 3px; margin-top: 2px;"></canvas>
                 <div class="control-row" style="margin-top: 5px;">
                     <button id="clbGoBtn" class="control-btn" style="font-size: 11px; background: #1ABC9C; color: #000; font-weight: bold; padding: 4px 12px;">Go</button>
                 </div>
@@ -2144,8 +2161,15 @@
                     </div>
                     <div class="curve-input-row" style="margin-top: 6px;">
                         <label style="font-size: 10px;">Pitch</label>
-                        <input type="text" id="clgPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                        <select id="clgPitchMode" style="width: 60px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="manual" selected>Manual</option>
+                            <option value="random">Random</option>
+                        </select>
                         <span id="clgPitchRange" style="font-size: 8px; color: #888; margin-left: 4px;">G3–A6</span>
+                    </div>
+                    <div id="clgManualPitchRow" class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;"></label>
+                        <input type="text" id="clgPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                     </div>
                     <div class="curve-input-row" style="margin-top: 6px;">
                         <label style="font-size: 10px;">Velocity</label>
@@ -2182,8 +2206,15 @@
                     </div>
                     <div class="curve-input-row" style="margin-top: 6px;">
                         <label style="font-size: 10px;">Pitch</label>
-                        <input type="text" id="getPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                        <select id="getPitchMode" style="width: 60px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="manual" selected>Manual</option>
+                            <option value="random">Random</option>
+                        </select>
                         <span id="getPitchRange" style="font-size: 8px; color: #888; margin-left: 4px;">G3–A6</span>
+                    </div>
+                    <div id="getManualPitchRow" class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;"></label>
+                        <input type="text" id="getPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                     </div>
                     <div class="curve-input-row" style="margin-top: 6px;">
                         <label style="font-size: 10px;">Velocity</label>
@@ -2256,8 +2287,15 @@
                     </div>
                     <div class="curve-input-row" style="margin-top: 6px;">
                         <label style="font-size: 10px;">Pitch</label>
-                        <input type="text" id="bpMidiPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                        <select id="bpMidiPitchMode" style="width: 60px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                            <option value="manual" selected>Manual</option>
+                            <option value="random">Random</option>
+                        </select>
                         <span id="bpMidiPitchRange" style="font-size: 8px; color: #888; margin-left: 4px;">G3–E6</span>
+                    </div>
+                    <div id="bpMidiManualPitchRow" class="curve-input-row" style="margin-top: 6px;">
+                        <label style="font-size: 10px;"></label>
+                        <input type="text" id="bpMidiPitch" class="curve-input" value="C4" style="width: 60px; font-size: 10px;" placeholder="C4" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
                     </div>
                     <div class="curve-input-row" style="margin-top: 6px;">
                         <label style="font-size: 10px;">Velocity</label>
@@ -2422,18 +2460,15 @@
                 </div>
                 <textarea id="gcDescriptionInput" class="curve-input" style="width: 100%; height: 40px; resize: vertical; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px;" placeholder="GC description..."></textarea>
                 
-                <div class="curve-input-row" style="margin-top: 8px;">
-                    <label style="font-size: 10px;">Recall GC</label>
-                </div>
-                <div id="gcRecallDropdown" class="custom-dropdown" style="width: 100%; position: relative;">
-                    <div id="gcRecallSelected" class="custom-dropdown-selected" style="font-size: 10px; padding: 4px 6px; background: rgba(40,40,50,0.9); border: 1px solid #555; border-radius: 3px; cursor: pointer; min-height: 20px;">
-                        -- Select Saved GC --
-                    </div>
-                    <div id="gcRecallOptions" class="custom-dropdown-options" style="display: none; position: absolute; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background: rgba(30,30,40,0.98); border: 1px solid #555; border-top: none; border-radius: 0 0 3px 3px; z-index: 1000;">
+                <!-- Collapsible GC Recall List -->
+                <div style="margin-top: 8px;">
+                    <div id="gcRecallToggle" style="cursor: pointer; font-size: 8px; color: rgba(255,255,255,0.6); user-select: none;">▶ Recall GC</div>
+                    <div id="gcRecallListContainer" style="display: none; margin-top: 2px;">
+                        <select id="gcRecallList" size="6" style="width: 100%; font-size: 8px; background: #1a1a2e; color: #e0e0e0; border: 1px solid rgba(255,255,255,0.2); padding: 1px;"></select>
+                        <button id="gcInsertBtn" class="curve-draw-btn" style="margin-top: 5px; background: rgb(255, 21, 160); border-color: rgb(255, 21, 160); color: #fff; font-size: 9px;">Insert at Edit Line</button>
                     </div>
                 </div>
                 <input type="hidden" id="gcRecallSelect" value="">
-                <button id="gcInsertBtn" class="curve-draw-btn" style="margin-top: 5px; background: rgb(255, 21, 160); border-color: rgb(255, 21, 160); color: #fff;">Insert at Edit Line</button>
                 
                 <div class="section-divider"></div>
                 <div class="section-label" style="background: var(--clr-brightBlue); color: #fff; padding: 3px 6px; border-radius: 2px;">SVG Elements</div>
@@ -3331,15 +3366,35 @@
                 this.trackSelect.addEventListener('change', () => this.updateSelectedTrack());
                 this.objStartInput.addEventListener('change', () => this.updateSelectedStartTime());
                 
-                // Click on score to deselect
+                // Click on score to select SVG element or deselect
+                // Since unselected SVGs have pointer-events:none, clicks pass through
+                // to the score — check if click lands within any SVG bounding box
                 this.scoreTopEl.addEventListener('click', (e) => {
+                    if (e.shiftKey || e.ctrlKey || e.metaKey) return;
                     if (e.target === this.scoreTopEl || e.target.tagName === 'svg') {
-                        this.deselectAll();
+                        const rect = this.scoreTopEl.getBoundingClientRect();
+                        const svgX = e.clientX - rect.left;
+                        const svgY = e.clientY - rect.top;
+                        const hitEl = this._findElementAtPoint(svgX, svgY, 'top');
+                        if (hitEl) {
+                            this.selectElement(hitEl);
+                        } else {
+                            this.deselectAll();
+                        }
                     }
                 });
                 this.scoreBottomEl.addEventListener('click', (e) => {
+                    if (e.shiftKey || e.ctrlKey || e.metaKey) return;
                     if (e.target === this.scoreBottomEl || e.target.tagName === 'svg') {
-                        this.deselectAll();
+                        const rect = this.scoreBottomEl.getBoundingClientRect();
+                        const svgX = e.clientX - rect.left;
+                        const svgY = e.clientY - rect.top;
+                        const hitEl = this._findElementAtPoint(svgX, svgY, 'bottom');
+                        if (hitEl) {
+                            this.selectElement(hitEl);
+                        } else {
+                            this.deselectAll();
+                        }
                     }
                 });
                 
@@ -3737,6 +3792,11 @@
                     return;
                 }
                 
+                // Let ObjectSelector (Ctrl+Win+Click) pass through to handle overlapping objects
+                if (e.ctrlKey && e.metaKey) {
+                    return;
+                }
+                
                 e.stopPropagation();
                 this.selectElement(elementData);
                 
@@ -3815,6 +3875,29 @@
                 this.resizeCorner = null;
             },
             
+            // Find topmost SVG element at a given SVG coordinate in a section
+            // Used by score click handler to select SVGs through pointer-events:none
+            _findElementAtPoint(svgX, svgY, section) {
+                let currentPage = 0;
+                if (window.GraphicTimeline) {
+                    currentPage = section === 'top' ? GraphicTimeline.currentTopPage : GraphicTimeline.currentBottomPage;
+                }
+                const margin = 5;
+                let hitEl = null;
+                for (const el of this.elements) {
+                    if (el._section !== section) continue;
+                    if (el._page !== currentPage) continue;
+                    if (el._x === undefined || el._y === undefined) continue;
+                    const sw = (el.width || 50) * (el.scale || 1);
+                    const sh = (el.height || 50) * (el.scale || 1);
+                    if (svgX >= el._x - margin && svgX <= el._x + sw + margin &&
+                        svgY >= el._y - margin && svgY <= el._y + sh + margin) {
+                        hitEl = el; // last match = topmost (later in DOM order)
+                    }
+                }
+                return hitEl;
+            },
+            
             selectElement(elementData) {
                 this.deselectAll();
                 this.selectedElement = elementData;
@@ -3839,6 +3922,11 @@
                 this.updateUIFromSelected();
                 if (this.svgListOpen && this.svgElementListSelect) {
                     this.svgElementListSelect.value = elementData.id;
+                }
+                
+                // Sync mini toolbar
+                if (window.MultiSelect) {
+                    requestAnimationFrame(() => MultiSelect.syncSingleSelection());
                 }
             },
             
@@ -5682,10 +5770,9 @@
                     ring.setAttribute('opacity', '0.7');
                     group.appendChild(ring);
                     
-                    // Center bar (thickness indicator, grows/shrinks from midline)
-                    const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    bar.setAttribute('opacity', '0.9');
-                    group.appendChild(bar);
+                    // Center bar removed — transparent center lets the line-wedge
+                    // shape show thickness changes underneath the meter ring
+                    const bar = null;
                     
                     // Square border
                     const border = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -6340,17 +6427,7 @@
                     );
                 }
                 
-                // Center bar - grows/shrinks from midline
-                const innerR = outerR - ringWidth - 1;
-                const barWidth = innerR * 1.2;
-                const barMaxHeight = innerR * 1.6;
-                const barHeight = barMaxHeight * thicknessNorm;
-                
-                meter.bar.setAttribute('x', centerX - barWidth / 2);
-                meter.bar.setAttribute('y', centerY - barHeight / 2);
-                meter.bar.setAttribute('width', barWidth);
-                meter.bar.setAttribute('height', Math.max(1, barHeight));
-                meter.bar.setAttribute('fill', color);
+                // Center bar removed — transparent center shows line-wedge shape underneath
                 
                 meter.group.style.display = '';
             },
@@ -11189,7 +11266,7 @@
                     type: 'single',             // Single note articulation (random pitch)
                     cc0: 53,                    // Bank select value for bow overpressure
                     defaultVelocity: 127,       // Default velocity
-                    durationTicks: 240,         // Note duration in ticks (same as bartok pizz)
+                    durationTicks: 629,         // Note duration in ticks (~250ms)
                     ticksPerQuarter: 1920,      // From original file
                     tempo: 763307,              // Microseconds per quarter note (~78.6 BPM)
                     randomPitch: true,          // Pitch is randomly selected per track range
@@ -11504,6 +11581,8 @@
                 this.clgTimeInput = document.getElementById('clgTime');
                 this.clgInstrumentSelect = document.getElementById('clgInstrument');
                 this.clgTrackSelect = document.getElementById('clgTrack');
+                this.clgPitchModeSelect = document.getElementById('clgPitchMode');
+                this.clgManualPitchRow = document.getElementById('clgManualPitchRow');
                 this.clgPitchInput = document.getElementById('clgPitch');
                 this.clgPitchRangeLabel = document.getElementById('clgPitchRange');
                 this.clgVelocityInput = document.getElementById('clgVelocity');
@@ -11514,6 +11593,13 @@
                 if (this.clgInstrumentSelect) {
                     this.clgInstrumentSelect.addEventListener('change', () => this.updateClgPitchRange());
                 }
+                if (this.clgPitchModeSelect) {
+                    this.clgPitchModeSelect.addEventListener('change', () => {
+                        const isRandom = this.clgPitchModeSelect.value === 'random';
+                        if (this.clgManualPitchRow) this.clgManualPitchRow.style.display = isRandom ? 'none' : 'flex';
+                        this.updateClgInfo();
+                    });
+                }
                 if (this.clgGenerateBtn) {
                     this.clgGenerateBtn.addEventListener('click', () => this.generateColLegnoGettatoMidi());
                 }
@@ -11523,6 +11609,8 @@
                 this.getTimeInput = document.getElementById('getTime');
                 this.getInstrumentSelect = document.getElementById('getInstrument');
                 this.getTrackSelect = document.getElementById('getTrack');
+                this.getPitchModeSelect = document.getElementById('getPitchMode');
+                this.getManualPitchRow = document.getElementById('getManualPitchRow');
                 this.getPitchInput = document.getElementById('getPitch');
                 this.getPitchRangeLabel = document.getElementById('getPitchRange');
                 this.getVelocityInput = document.getElementById('getVelocity');
@@ -11532,6 +11620,13 @@
                 // Gettato event listeners
                 if (this.getInstrumentSelect) {
                     this.getInstrumentSelect.addEventListener('change', () => this.updateGetPitchRange());
+                }
+                if (this.getPitchModeSelect) {
+                    this.getPitchModeSelect.addEventListener('change', () => {
+                        const isRandom = this.getPitchModeSelect.value === 'random';
+                        if (this.getManualPitchRow) this.getManualPitchRow.style.display = isRandom ? 'none' : 'flex';
+                        this.updateGetInfo();
+                    });
                 }
                 if (this.getGenerateBtn) {
                     this.getGenerateBtn.addEventListener('click', () => this.generateGettatoMidi());
@@ -11562,6 +11657,8 @@
                 this.bpMidiTimeInput = document.getElementById('bpMidiTime');
                 this.bpMidiInstrumentSelect = document.getElementById('bpMidiInstrument');
                 this.bpMidiTrackSelect = document.getElementById('bpMidiTrack');
+                this.bpMidiPitchModeSelect = document.getElementById('bpMidiPitchMode');
+                this.bpMidiManualPitchRow = document.getElementById('bpMidiManualPitchRow');
                 this.bpMidiPitchInput = document.getElementById('bpMidiPitch');
                 this.bpMidiPitchRangeLabel = document.getElementById('bpMidiPitchRange');
                 this.bpMidiVelocityInput = document.getElementById('bpMidiVelocity');
@@ -11572,6 +11669,13 @@
                 // Bartók Pizzicato event listeners
                 if (this.bpMidiInstrumentSelect) {
                     this.bpMidiInstrumentSelect.addEventListener('change', () => this.updateBpMidiPitchRange());
+                }
+                if (this.bpMidiPitchModeSelect) {
+                    this.bpMidiPitchModeSelect.addEventListener('change', () => {
+                        const isRandom = this.bpMidiPitchModeSelect.value === 'random';
+                        if (this.bpMidiManualPitchRow) this.bpMidiManualPitchRow.style.display = isRandom ? 'none' : 'flex';
+                        this.updateBpMidiInfo();
+                    });
                 }
                 if (this.bpMidiGenerateBtn) {
                     this.bpMidiGenerateBtn.addEventListener('click', () => this.generateBartokPizzMidi());
@@ -13164,6 +13268,22 @@
                 return { pitch: midiNote, quarterTone, displayName };
             },
             
+            // Generate random pitch from instrumentRanges (for BP, CLG, Gettato)
+            // Returns { pitch: MIDI note, quarterTone: 0 | 0.5, displayName: string }
+            generateRandomPitchFromInstrument(instrument, instrumentRanges) {
+                const range = instrumentRanges?.[instrument];
+                if (!range) return null;
+                
+                const quarterToneSteps = (range.high - range.low) * 2;
+                const randomStep = Math.floor(Math.random() * (quarterToneSteps + 1));
+                
+                const midiNote = range.low + Math.floor(randomStep / 2);
+                const quarterTone = (randomStep % 2 === 1) ? 0.5 : 0;
+                
+                const displayName = this.pitchToNoteNameWithQuarter(midiNote, quarterTone);
+                return { pitch: midiNote, quarterTone, displayName };
+            },
+            
             updateInfo() {
                 if (!this.selectedModel || !this.infoDisplay) return;
                 
@@ -13209,18 +13329,22 @@
                 const model = this.models.colLegnoGettato;
                 const instrument = this.clgInstrumentSelect?.value || 'violin';
                 const track = this.clgTrackSelect?.value || '1';
-                const pitchStr = this.clgPitchInput?.value || 'C4';
                 const velocity = parseInt(this.clgVelocityInput?.value) || 127;
                 const time = parseFloat(this.clgTimeInput?.value) || 0;
+                const pitchMode = this.clgPitchModeSelect?.value || 'manual';
                 
-                const pitchObj = this.noteNameToPitch(pitchStr, true);
-                let pitchDisplay = '(invalid)';
+                let pitchDisplay = 'Random';
                 let rangeWarning = '';
-                if (pitchObj) {
-                    pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
-                    const range = model.instrumentRanges[instrument];
-                    if (range && (pitchObj.pitch < range.low || pitchObj.pitch > range.high)) {
-                        rangeWarning = `<div style="color: #f88;">⚠ Out of range for ${instrument}</div>`;
+                if (pitchMode === 'manual') {
+                    const pitchStr = this.clgPitchInput?.value || 'C4';
+                    const pitchObj = this.noteNameToPitch(pitchStr, true);
+                    pitchDisplay = '(invalid)';
+                    if (pitchObj) {
+                        pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
+                        const range = model.instrumentRanges[instrument];
+                        if (range && (pitchObj.pitch < range.low || pitchObj.pitch > range.high)) {
+                            rangeWarning = `<div style="color: #f88;">⚠ Out of range for ${instrument}</div>`;
+                        }
                     }
                 }
                 
@@ -13238,27 +13362,38 @@
                 const model = this.models.colLegnoGettato;
                 const instrument = this.clgInstrumentSelect?.value || 'violin';
                 const track = parseInt(this.clgTrackSelect?.value) || 1;
-                const pitchStr = this.clgPitchInput?.value || 'C4';
                 const velocity = Math.max(1, Math.min(127, parseInt(this.clgVelocityInput?.value) || 127));
                 const timeSec = parseFloat(this.clgTimeInput?.value) || 0;
+                const pitchMode = this.clgPitchModeSelect?.value || 'manual';
                 
-                // Parse pitch (with quarter-tone support)
-                const pitchObj = this.noteNameToPitch(pitchStr, true);
-                if (!pitchObj) {
-                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
-                    return;
-                }
-                
-                const pitch = pitchObj.pitch;
-                const quarterToneOffset = pitchObj.quarterTone || 0;
-                
-                // Validate pitch against instrument range
-                const range = model.instrumentRanges[instrument];
-                if (range && (pitch < range.low || pitch > range.high)) {
-                    const lowName = this.pitchToNoteName(range.low);
-                    const highName = this.pitchToNoteName(range.high);
-                    alert(`Pitch out of range for ${instrument}. Range: ${lowName}–${highName}`);
-                    return;
+                // Determine pitch — random or manual
+                let pitch, quarterToneOffset = 0;
+                if (pitchMode === 'random') {
+                    const randomResult = this.generateRandomPitchFromInstrument(instrument, model.instrumentRanges);
+                    if (!randomResult) {
+                        alert(`No pitch range defined for ${instrument}.`);
+                        return;
+                    }
+                    pitch = randomResult.pitch;
+                    quarterToneOffset = randomResult.quarterTone;
+                } else {
+                    const pitchStr = this.clgPitchInput?.value || 'C4';
+                    const pitchObj = this.noteNameToPitch(pitchStr, true);
+                    if (!pitchObj) {
+                        alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                        return;
+                    }
+                    pitch = pitchObj.pitch;
+                    quarterToneOffset = pitchObj.quarterTone || 0;
+                    
+                    // Validate pitch against instrument range
+                    const range = model.instrumentRanges[instrument];
+                    if (range && (pitch < range.low || pitch > range.high)) {
+                        const lowName = this.pitchToNoteName(range.low);
+                        const highName = this.pitchToNoteName(range.high);
+                        alert(`Pitch out of range for ${instrument}. Range: ${lowName}–${highName}`);
+                        return;
+                    }
                 }
                 
                 // Random duration between 250–390ms
@@ -13380,18 +13515,22 @@
                 const model = this.models.gettato;
                 const instrument = this.getInstrumentSelect?.value || 'violin';
                 const track = this.getTrackSelect?.value || '1';
-                const pitchStr = this.getPitchInput?.value || 'C4';
                 const velocity = parseInt(this.getVelocityInput?.value) || 127;
                 const time = parseFloat(this.getTimeInput?.value) || 0;
+                const pitchMode = this.getPitchModeSelect?.value || 'manual';
                 
-                const pitchObj = this.noteNameToPitch(pitchStr, true);
-                let pitchDisplay = '(invalid)';
+                let pitchDisplay = 'Random';
                 let rangeWarning = '';
-                if (pitchObj) {
-                    pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
-                    const range = model.instrumentRanges[instrument];
-                    if (range && (pitchObj.pitch < range.low || pitchObj.pitch > range.high)) {
-                        rangeWarning = `<div style="color: #f88;">⚠ Out of range for ${instrument}</div>`;
+                if (pitchMode === 'manual') {
+                    const pitchStr = this.getPitchInput?.value || 'C4';
+                    const pitchObj = this.noteNameToPitch(pitchStr, true);
+                    pitchDisplay = '(invalid)';
+                    if (pitchObj) {
+                        pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
+                        const range = model.instrumentRanges[instrument];
+                        if (range && (pitchObj.pitch < range.low || pitchObj.pitch > range.high)) {
+                            rangeWarning = `<div style="color: #f88;">⚠ Out of range for ${instrument}</div>`;
+                        }
                     }
                 }
                 
@@ -13409,27 +13548,38 @@
                 const model = this.models.gettato;
                 const instrument = this.getInstrumentSelect?.value || 'violin';
                 const track = parseInt(this.getTrackSelect?.value) || 1;
-                const pitchStr = this.getPitchInput?.value || 'C4';
                 const velocity = Math.max(1, Math.min(127, parseInt(this.getVelocityInput?.value) || 127));
                 const timeSec = parseFloat(this.getTimeInput?.value) || 0;
+                const pitchMode = this.getPitchModeSelect?.value || 'manual';
                 
-                // Parse pitch (with quarter-tone support)
-                const pitchObj = this.noteNameToPitch(pitchStr, true);
-                if (!pitchObj) {
-                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
-                    return;
-                }
-                
-                const pitch = pitchObj.pitch;
-                const quarterToneOffset = pitchObj.quarterTone || 0;
-                
-                // Validate pitch against instrument range
-                const range = model.instrumentRanges[instrument];
-                if (range && (pitch < range.low || pitch > range.high)) {
-                    const lowName = this.pitchToNoteName(range.low);
-                    const highName = this.pitchToNoteName(range.high);
-                    alert(`Pitch out of range for ${instrument}. Range: ${lowName}–${highName}`);
-                    return;
+                // Determine pitch — random or manual
+                let pitch, quarterToneOffset = 0;
+                if (pitchMode === 'random') {
+                    const randomResult = this.generateRandomPitchFromInstrument(instrument, model.instrumentRanges);
+                    if (!randomResult) {
+                        alert(`No pitch range defined for ${instrument}.`);
+                        return;
+                    }
+                    pitch = randomResult.pitch;
+                    quarterToneOffset = randomResult.quarterTone;
+                } else {
+                    const pitchStr = this.getPitchInput?.value || 'C4';
+                    const pitchObj = this.noteNameToPitch(pitchStr, true);
+                    if (!pitchObj) {
+                        alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                        return;
+                    }
+                    pitch = pitchObj.pitch;
+                    quarterToneOffset = pitchObj.quarterTone || 0;
+                    
+                    // Validate pitch against instrument range
+                    const range = model.instrumentRanges[instrument];
+                    if (range && (pitch < range.low || pitch > range.high)) {
+                        const lowName = this.pitchToNoteName(range.low);
+                        const highName = this.pitchToNoteName(range.high);
+                        alert(`Pitch out of range for ${instrument}. Range: ${lowName}–${highName}`);
+                        return;
+                    }
                 }
                 
                 // Random duration between 250–390ms
@@ -13778,21 +13928,25 @@
                 const model = this.models.bartokPizz;
                 if (!model) return;
                 
-                const pitchStr = this.bpMidiPitchInput?.value || 'C4';
-                const pitchObj = this.noteNameToPitch(pitchStr, true);
                 const velocity = Math.max(1, Math.min(127, parseInt(this.bpMidiVelocityInput?.value) || 127));
                 const track = parseInt(this.bpMidiTrackSelect?.value) || 1;
                 const instrument = this.bpMidiInstrumentSelect?.value || 'violin';
                 const timeSec = parseFloat(this.bpMidiTimeInput?.value) || 0;
+                const pitchMode = this.bpMidiPitchModeSelect?.value || 'manual';
                 
                 let rangeWarning = '';
-                let pitchDisplay = '<span style="color:#f88;">invalid</span>';
-                if (pitchObj) {
-                    pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
-                    if (model.instrumentRanges && model.instrumentRanges[instrument]) {
-                        const range = model.instrumentRanges[instrument];
-                        if (pitchObj.pitch < range.low || pitchObj.pitch > range.high) {
-                            rangeWarning = `<div style="color: #f88;">⚠ Pitch out of ${instrument} range (${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)})</div>`;
+                let pitchDisplay = 'Random';
+                if (pitchMode === 'manual') {
+                    const pitchStr = this.bpMidiPitchInput?.value || 'C4';
+                    const pitchObj = this.noteNameToPitch(pitchStr, true);
+                    pitchDisplay = '<span style="color:#f88;">invalid</span>';
+                    if (pitchObj) {
+                        pitchDisplay = this.pitchToNoteNameWithQuarter(pitchObj.pitch, pitchObj.quarterTone);
+                        if (model.instrumentRanges && model.instrumentRanges[instrument]) {
+                            const range = model.instrumentRanges[instrument];
+                            if (pitchObj.pitch < range.low || pitchObj.pitch > range.high) {
+                                rangeWarning = `<div style="color: #f88;">⚠ Pitch out of ${instrument} range (${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)})</div>`;
+                            }
                         }
                     }
                 }
@@ -13810,29 +13964,42 @@
                 const model = this.models.bartokPizz;
                 if (!model) return;
                 
-                const pitchStr = this.bpMidiPitchInput?.value || 'C4';
-                const pitchObj = this.noteNameToPitch(pitchStr, true);
-                if (!pitchObj) {
-                    alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
-                    return;
-                }
-                
-                const pitch = pitchObj.pitch;
-                const quarterToneOffset = pitchObj.quarterTone;
-                const pitchDisplayName = this.pitchToNoteNameWithQuarter(pitch, quarterToneOffset);
-                
                 const velocity = Math.max(1, Math.min(127, parseInt(this.bpMidiVelocityInput?.value) || 127));
                 const track = parseInt(this.bpMidiTrackSelect?.value) || 1;
                 const instrument = this.bpMidiInstrumentSelect?.value || 'violin';
                 const timeSec = parseFloat(this.bpMidiTimeInput?.value) || 0;
                 const channel = track - 1;
+                const pitchMode = this.bpMidiPitchModeSelect?.value || 'manual';
                 
-                // Validate pitch against instrument range
-                if (model.instrumentRanges && model.instrumentRanges[instrument]) {
-                    const range = model.instrumentRanges[instrument];
-                    if (pitch < range.low || pitch > range.high) {
-                        alert(`Pitch ${pitchDisplayName} is out of ${instrument} range (${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)})`);
+                // Determine pitch — random or manual
+                let pitch, quarterToneOffset = 0, pitchDisplayName;
+                if (pitchMode === 'random') {
+                    const randomResult = this.generateRandomPitchFromInstrument(instrument, model.instrumentRanges);
+                    if (!randomResult) {
+                        alert(`No pitch range defined for ${instrument}.`);
                         return;
+                    }
+                    pitch = randomResult.pitch;
+                    quarterToneOffset = randomResult.quarterTone;
+                    pitchDisplayName = randomResult.displayName;
+                } else {
+                    const pitchStr = this.bpMidiPitchInput?.value || 'C4';
+                    const pitchObj = this.noteNameToPitch(pitchStr, true);
+                    if (!pitchObj) {
+                        alert('Invalid pitch. Format: C4, C#4, Bb3. Quarter tones: C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)');
+                        return;
+                    }
+                    pitch = pitchObj.pitch;
+                    quarterToneOffset = pitchObj.quarterTone;
+                    pitchDisplayName = this.pitchToNoteNameWithQuarter(pitch, quarterToneOffset);
+                    
+                    // Validate pitch against instrument range
+                    if (model.instrumentRanges && model.instrumentRanges[instrument]) {
+                        const range = model.instrumentRanges[instrument];
+                        if (pitch < range.low || pitch > range.high) {
+                            alert(`Pitch ${pitchDisplayName} is out of ${instrument} range (${this.pitchToNoteName(range.low)}–${this.pitchToNoteName(range.high)})`);
+                            return;
+                        }
                     }
                 }
                 
@@ -24714,11 +24881,12 @@
                         const savedDescentRatio = GCMaker.descentRatio;
                         const savedDuration = GCMaker.duration;
                         
-                        GCMaker.stiffness = this.GC_PARAMS.stiffness;
-                        GCMaker.damping = this.GC_PARAMS.damping;
-                        GCMaker.ictus = this.GC_PARAMS.ictus;
-                        GCMaker.descentRatio = this.GC_PARAMS.descentRatio;
-                        GCMaker.duration = this.GC_PARAMS.duration;
+                        const gcPreset = (window.OneShotGCPresets && OneShotGCPresets.getPresetForPanel('bp')) || this.GC_PARAMS;
+                        GCMaker.stiffness = gcPreset.stiffness;
+                        GCMaker.damping = gcPreset.damping;
+                        GCMaker.ictus = gcPreset.ictus;
+                        GCMaker.descentRatio = gcPreset.descentRatio;
+                        GCMaker.duration = gcPreset.duration;
                         
                         if (GCMaker.impactInput) GCMaker.impactInput.value = impactTime;
                         if (GCMaker.trackSelect) GCMaker.trackSelect.value = String(track);
@@ -25463,11 +25631,12 @@
                             duration: GCMaker.duration
                         };
                         
-                        GCMaker.stiffness = this.GC_PARAMS.stiffness;
-                        GCMaker.damping = this.GC_PARAMS.damping;
-                        GCMaker.ictus = this.GC_PARAMS.ictus;
-                        GCMaker.descentRatio = this.GC_PARAMS.descentRatio;
-                        GCMaker.duration = this.GC_PARAMS.duration;
+                        const gcPreset = (window.OneShotGCPresets && OneShotGCPresets.getPresetForPanel('bop')) || this.GC_PARAMS;
+                        GCMaker.stiffness = gcPreset.stiffness;
+                        GCMaker.damping = gcPreset.damping;
+                        GCMaker.ictus = gcPreset.ictus;
+                        GCMaker.descentRatio = gcPreset.descentRatio;
+                        GCMaker.duration = gcPreset.duration;
                         
                         if (GCMaker.impactInput) GCMaker.impactInput.value = impactTime;
                         if (GCMaker.trackSelect) GCMaker.trackSelect.value = String(track);
@@ -25652,7 +25821,7 @@
                 }
                 
                 const impactMs = impactTime * 1000;
-                const noteDurationMs = 95.4;
+                const noteDurationMs = 250;
                 const durationSec = noteDurationMs / 1000;
                 
                 // Quarter-tone pitch bend
@@ -26122,11 +26291,12 @@
                             duration: GCMaker.duration
                         };
                         
-                        GCMaker.stiffness = this.GC_PARAMS.stiffness;
-                        GCMaker.damping = this.GC_PARAMS.damping;
-                        GCMaker.ictus = this.GC_PARAMS.ictus;
-                        GCMaker.descentRatio = this.GC_PARAMS.descentRatio;
-                        GCMaker.duration = this.GC_PARAMS.duration;
+                        const gcPreset = (window.OneShotGCPresets && OneShotGCPresets.getPresetForPanel('clb')) || this.GC_PARAMS;
+                        GCMaker.stiffness = gcPreset.stiffness;
+                        GCMaker.damping = gcPreset.damping;
+                        GCMaker.ictus = gcPreset.ictus;
+                        GCMaker.descentRatio = gcPreset.descentRatio;
+                        GCMaker.duration = gcPreset.duration;
                         
                         if (GCMaker.impactInput) GCMaker.impactInput.value = impactTime;
                         if (GCMaker.trackSelect) GCMaker.trackSelect.value = String(track);
@@ -26629,8 +26799,270 @@
                 Object.keys(panels).forEach(k => {
                     if (panels[k]) panels[k].style.display = (k === val) ? '' : 'none';
                 });
+                if (window.OneShotGCPresets) OneShotGCPresets.setActivePanel(val);
             });
         })();
+        
+        // ============================================
+        // ONE SHOT GC CURVE PRESETS + ANIMATED PREVIEW
+        // Expandable preset array — add new entries to presets[] as needed
+        // ============================================
+        const OneShotGCPresets = {
+            presets: [
+                { label: 'Short', name: 'BartokPizz_GC_20260309_112021', stiffness: 62, damping: 100, ictus: 90, descentRatio: 60, duration: 0.6 },
+                { label: 'Medium', name: 'GC_20260116_151414', stiffness: 50, damping: 80, ictus: 120, descentRatio: 55, duration: 1.1 },
+                { label: 'Medium, Sharp', name: 'GC_20260116_010358', stiffness: 61, damping: 95, ictus: 242, descentRatio: 52, duration: 1.1 },
+                { label: 'Long, Even Curve', name: 'GC_20260119_120846', stiffness: 76, damping: 87, ictus: 133, descentRatio: 50, duration: 1.4 },
+                { label: 'Long, Slow', name: 'GC_20260302_192629', stiffness: 20, damping: 85, ictus: 20, descentRatio: 63, duration: 2 }
+            ],
+            
+            panelKeys: ['bp', 'bop', 'clb'],
+            canvases: {},
+            selects: {},
+            activePanel: 'bp',
+            _animId: null,
+            
+            init() {
+                // Calculate track height from ScoreTop (scoreHeight - timeline) / 4
+                const scoreTopEl = document.getElementById('ScoreTop');
+                let trackHeight = 98; // fallback
+                if (scoreTopEl && scoreTopEl.clientHeight > 0) {
+                    const timelineHeight = 8;
+                    trackHeight = (scoreTopEl.clientHeight - timelineHeight) / 4;
+                }
+                
+                this.panelKeys.forEach(p => {
+                    this.canvases[p] = document.getElementById(`${p}GCPreview`);
+                    this.selects[p] = document.getElementById(`${p}GCPreset`);
+                    
+                    // Set canvas height to match track height
+                    if (this.canvases[p]) {
+                        this.canvases[p].style.height = trackHeight + 'px';
+                    }
+                    
+                    if (this.selects[p]) {
+                        // Placeholder option (no curve selected by default)
+                        const placeholder = document.createElement('option');
+                        placeholder.value = '';
+                        placeholder.textContent = '— Select a curve —';
+                        placeholder.selected = true;
+                        this.selects[p].appendChild(placeholder);
+                        
+                        this.presets.forEach((pr, i) => {
+                            const opt = document.createElement('option');
+                            opt.value = i;
+                            opt.textContent = pr.label;
+                            this.selects[p].appendChild(opt);
+                        });
+                        this.selects[p].addEventListener('change', () => {
+                            if (p === this.activePanel) this.startPreview();
+                        });
+                    }
+                });
+                
+                // Show placeholder on default (no animation until user picks a curve)
+                this.drawPlaceholder();
+                
+                // Watch for parent section expand to restart preview (handles collapsed-on-load)
+                const firstCanvas = this.canvases[this.panelKeys[0]];
+                if (firstCanvas) {
+                    const section = firstCanvas.closest('.panel-section');
+                    if (section) {
+                        new MutationObserver(() => {
+                            if (!section.classList.contains('collapsed')) {
+                                requestAnimationFrame(() => this.startPreview());
+                            }
+                        }).observe(section, { attributes: true, attributeFilter: ['class'] });
+                    }
+                }
+                
+                console.debug('OneShotGCPresets initialized with', this.presets.length, 'curve presets');
+            },
+            
+            setActivePanel(panelKey) {
+                this.activePanel = panelKey;
+                this.startPreview();
+            },
+            
+            getActivePreset() {
+                const select = this.selects[this.activePanel];
+                if (!select || select.value === '') return null;
+                const idx = parseInt(select.value);
+                return this.presets[idx] || null;
+            },
+            
+            getPresetForPanel(panelKey) {
+                const select = this.selects[panelKey];
+                if (!select || select.value === '') return null;
+                const idx = parseInt(select.value);
+                return this.presets[idx] || null;
+            },
+            
+            drawPlaceholder() {
+                const canvas = this.canvases[this.activePanel];
+                if (!canvas) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                if (rect.width === 0 || rect.height === 0) return;
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+                
+                ctx.clearRect(0, 0, rect.width, rect.height);
+                ctx.fillStyle = '#555';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Select a curve', rect.width / 2, rect.height / 2);
+            },
+            
+            generateTrajectory(preset, drawHeight) {
+                const h = drawHeight;
+                const descentPower = 1 + (preset.ictus / 1000) * 20;
+                const ascentPower = 1 + (preset.stiffness / 50);
+                const reboundFraction = preset.damping / 100;
+                const reboundHeight = h * reboundFraction;
+                const descentFraction = preset.descentRatio / 100;
+                
+                const numSamples = 100;
+                const points = [];
+                
+                for (let i = 0; i <= numSamples; i++) {
+                    const tNorm = i / numSamples;
+                    const t = tNorm * descentFraction;
+                    const eased = Math.pow(tNorm, descentPower);
+                    const y = h * (1 - eased);
+                    points.push({ t, y });
+                }
+                
+                for (let i = 1; i <= numSamples; i++) {
+                    const tNorm = i / numSamples;
+                    const t = descentFraction + tNorm * (1 - descentFraction);
+                    const eased = 1 - Math.pow(1 - tNorm, ascentPower);
+                    const y = reboundHeight * eased;
+                    points.push({ t, y });
+                }
+                
+                return { points, descentFraction };
+            },
+            
+            getPointAtProgress(points, progress) {
+                for (let i = 1; i < points.length; i++) {
+                    if (points[i].t >= progress) {
+                        const prev = points[i - 1];
+                        const curr = points[i];
+                        const frac = (progress - prev.t) / (curr.t - prev.t || 1);
+                        return { t: progress, y: prev.y + frac * (curr.y - prev.y) };
+                    }
+                }
+                return points[points.length - 1];
+            },
+            
+            startPreview() {
+                if (this._animId) {
+                    cancelAnimationFrame(this._animId);
+                    this._animId = null;
+                }
+                
+                const canvas = this.canvases[this.activePanel];
+                if (!canvas) return;
+                
+                const preset = this.getActivePreset();
+                if (!preset) { this.drawPlaceholder(); return; }
+                
+                const rect = canvas.getBoundingClientRect();
+                if (rect.width === 0 || rect.height === 0) return;
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+                
+                const w = rect.width;
+                const h = rect.height;
+                const padX = 10;
+                const padY = 8;
+                const drawW = w - padX * 2;
+                const drawH = h - padY * 2;
+                
+                const traj = this.generateTrajectory(preset, drawH);
+                
+                const duration = preset.duration;
+                const pauseDuration = 3;
+                const totalCycle = duration + pauseDuration;
+                const startTime = performance.now();
+                
+                const frame = () => {
+                    const elapsed = (performance.now() - startTime) / 1000;
+                    const cycleTime = elapsed % totalCycle;
+                    
+                    ctx.clearRect(0, 0, w, h);
+                    
+                    ctx.strokeStyle = 'rgba(255, 21, 160, 0.5)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    for (let i = 0; i < traj.points.length; i++) {
+                        const pt = traj.points[i];
+                        const x = padX + pt.t * drawW;
+                        const y = (h - padY) - pt.y;
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    
+                    const impactX = padX + traj.descentFraction * drawW;
+                    const impactY = h - padY;
+                    ctx.fillStyle = 'rgba(255, 21, 160, 0.6)';
+                    ctx.beginPath();
+                    ctx.arc(impactX, impactY, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#666';
+                    ctx.font = '8px Arial';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`${preset.duration.toFixed(1)}s`, w - 4, 10);
+                    ctx.textAlign = 'left';
+                    
+                    if (cycleTime < duration) {
+                        const progress = cycleTime / duration;
+                        const pt = this.getPointAtProgress(traj.points, progress);
+                        const bx = padX + pt.t * drawW;
+                        const by = (h - padY) - pt.y;
+                        
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+                        ctx.beginPath();
+                        ctx.arc(bx, by, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.fillStyle = '#ffffff';
+                        ctx.beginPath();
+                        ctx.arc(bx, by, 3.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#ff15a0';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.arc(bx, by, 3.5, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    
+                    this._animId = requestAnimationFrame(frame);
+                };
+                
+                frame();
+            },
+            
+            stopPreview() {
+                if (this._animId) {
+                    cancelAnimationFrame(this._animId);
+                    this._animId = null;
+                }
+            }
+        };
+        
+        OneShotGCPresets.init();
+        window.OneShotGCPresets = OneShotGCPresets;
         
         // ============================================
         // PIZZICATO TREMOLO UI
@@ -29080,6 +29512,11 @@
                         }
                     });
                 }
+                
+                // Sync mini toolbar (selectMotive fires from click, after mousedown RAF)
+                if (window.MultiSelect) {
+                    requestAnimationFrame(() => MultiSelect.syncSingleSelection());
+                }
             },
             
             deselectMotive() {
@@ -31110,10 +31547,11 @@
                 this.saveBtn = document.getElementById('gcSaveBtn');
                 this.nameInput = document.getElementById('gcNameInput');
                 this.descriptionInput = document.getElementById('gcDescriptionInput');
-                this.recallDropdown = document.getElementById('gcRecallDropdown');
-                this.recallSelected = document.getElementById('gcRecallSelected');
-                this.recallOptions = document.getElementById('gcRecallOptions');
+                this.recallToggle = document.getElementById('gcRecallToggle');
+                this.recallListContainer = document.getElementById('gcRecallListContainer');
+                this.recallList = document.getElementById('gcRecallList');
                 this.recallSelect = document.getElementById('gcRecallSelect');
+                this.recallListOpen = false;
                 this.insertBtn = document.getElementById('gcInsertBtn');
                 
                 // Setup slider value displays and real-time updates
@@ -31139,42 +31577,29 @@
                     this.insertBtn.addEventListener('click', () => this.insertRecalledGC());
                 }
                 
-                // Recall dropdown toggle
-                if (this.recallSelected) {
-                    this.recallSelected.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const isOpen = this.recallOptions.style.display !== 'none';
-                        this.recallOptions.style.display = isOpen ? 'none' : 'block';
-                        // Expand parent section-content to accommodate dropdown
+                // Recall list toggle (matches SVG Elements expand/collapse pattern)
+                if (this.recallToggle) {
+                    this.recallToggle.addEventListener('click', () => {
+                        this.recallListOpen = !this.recallListOpen;
+                        this.recallListContainer.style.display = this.recallListOpen ? 'block' : 'none';
+                        this.recallToggle.textContent = (this.recallListOpen ? '▼' : '▶') + ' Recall GC';
+                        if (this.recallListOpen) this.loadGCLibrary();
+                        // Double RAF ensures browser has completed layout before reading scrollHeight
                         requestAnimationFrame(() => {
-                            const sc = this.recallDropdown.closest('.section-content');
-                            if (sc) {
-                                if (!isOpen) {
-                                    // Opening: add dropdown height to maxHeight
-                                    const dropdownHeight = this.recallOptions.scrollHeight || 200;
-                                    sc.style.maxHeight = (sc.scrollHeight + dropdownHeight) + 'px';
-                                } else {
-                                    // Closing: restore to content height
-                                    sc.style.maxHeight = sc.scrollHeight + 'px';
-                                }
-                            }
+                            requestAnimationFrame(() => {
+                                const sc = this.recallToggle.closest('.section-content');
+                                if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                            });
                         });
                     });
                 }
                 
-                // Close dropdown when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (this.recallDropdown && !this.recallDropdown.contains(e.target)) {
-                        if (this.recallOptions && this.recallOptions.style.display !== 'none') {
-                            this.recallOptions.style.display = 'none';
-                            // Restore parent section-content maxHeight
-                            requestAnimationFrame(() => {
-                                const sc = this.recallDropdown.closest('.section-content');
-                                if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
-                            });
-                        }
-                    }
-                });
+                // When user selects from the list, update the hidden input
+                if (this.recallList) {
+                    this.recallList.addEventListener('change', () => {
+                        if (this.recallSelect) this.recallSelect.value = this.recallList.value;
+                    });
+                }
                 
                 // Load GC library on init
                 this.loadGCLibrary();
@@ -31460,6 +31885,11 @@
                 
                 // Update UI to reflect selected GC
                 this.updateInputsFromGC(gc);
+                
+                // Sync mini toolbar (GC selection may fire from click handler)
+                if (window.MultiSelect) {
+                    requestAnimationFrame(() => MultiSelect.syncSingleSelection());
+                }
             },
             
             // Deselect the current GC
@@ -32296,9 +32726,9 @@
                 }
             },
             
-            // Load GC library and populate dropdown
+            // Load GC library and populate recall list
             async loadGCLibrary() {
-                if (!this.recallOptions) return;
+                if (!this.recallList) return;
                 
                 try {
                     const response = await fetch('/api/gc-library/list');
@@ -32306,63 +32736,31 @@
                     
                     if (result.success) {
                         // Clear existing options
-                        this.recallOptions.innerHTML = '';
+                        this.recallList.innerHTML = '';
                         
-                        // Reset hidden input and selected display
+                        // Reset hidden input
                         if (this.recallSelect) this.recallSelect.value = '';
-                        if (this.recallSelected) this.recallSelected.textContent = '-- Select Saved GC --';
                         
-                        // Add placeholder option
-                        const placeholder = document.createElement('div');
-                        placeholder.className = 'custom-dropdown-option';
-                        placeholder.style.cssText = 'padding: 6px 8px; cursor: pointer; font-size: 10px; color: #888; border-bottom: 1px solid #444;';
-                        placeholder.textContent = '-- Select Saved GC --';
-                        placeholder.dataset.value = '';
-                        placeholder.addEventListener('click', () => this.selectRecallOption('', '-- Select Saved GC --'));
-                        placeholder.addEventListener('mouseenter', () => placeholder.style.background = 'rgba(60,60,80,0.8)');
-                        placeholder.addEventListener('mouseleave', () => placeholder.style.background = '');
-                        this.recallOptions.appendChild(placeholder);
-                        
-                        // Add GCs to dropdown with full descriptions
+                        // Add GCs to select list
                         for (const gc of result.gcs) {
-                            const option = document.createElement('div');
-                            option.className = 'custom-dropdown-option';
-                            option.style.cssText = 'padding: 6px 8px; cursor: pointer; border-bottom: 1px solid #333;';
-                            option.dataset.value = gc.name;
-                            
-                            // Name line
-                            const nameLine = document.createElement('div');
-                            nameLine.style.cssText = 'font-size: 10px; font-weight: bold; color: #ddd;';
+                            const option = document.createElement('option');
+                            option.value = gc.name;
                             const dur = gc.duration ? ` (${gc.duration.toFixed(1)}s)` : '';
-                            nameLine.textContent = `${gc.name}${dur}`;
-                            option.appendChild(nameLine);
-                            
-                            // Description line (full text, wrapped)
-                            if (gc.description) {
-                                const descLine = document.createElement('div');
-                                descLine.style.cssText = 'font-size: 9px; color: #999; margin-top: 2px; white-space: normal; word-wrap: break-word;';
-                                descLine.textContent = gc.description;
-                                option.appendChild(descLine);
-                            }
-                            
-                            option.addEventListener('click', () => this.selectRecallOption(gc.name, `${gc.name}${dur}`));
-                            option.addEventListener('mouseenter', () => option.style.background = 'rgba(60,60,80,0.8)');
-                            option.addEventListener('mouseleave', () => option.style.background = '');
-                            this.recallOptions.appendChild(option);
+                            const desc = gc.description ? ` — ${gc.description}` : '';
+                            option.textContent = `${gc.name}${dur}${desc}`;
+                            this.recallList.appendChild(option);
                         }
                         
                         console.debug(`Loaded ${result.gcs.length} GCs from library`);
+                        // Update section-content maxHeight after async population
+                        requestAnimationFrame(() => {
+                            const sc = this.recallList.closest('.section-content');
+                            if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                        });
                     }
                 } catch (err) {
                     console.error('Error loading GC library:', err);
                 }
-            },
-            
-            // Select a recall option
-            selectRecallOption(value, displayText) {
-                if (this.recallSelect) this.recallSelect.value = value;
-                if (this.recallSelected) this.recallSelected.textContent = displayText;
-                if (this.recallOptions) this.recallOptions.style.display = 'none';
             },
             
             // Insert recalled GC at edit line
@@ -34864,7 +35262,7 @@
                     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
                     z-index: 10000;
                     min-width: 180px;
-                    max-width: 280px;
+                    max-width: 380px;
                     font-family: Arial, sans-serif;
                     font-size: 12px;
                 `;
@@ -34956,6 +35354,8 @@
                                 name: curve.name || `Curve ${curve.id}`,
                                 color: curve.color,
                                 obj: curve,
+                                track: curve.gTrack,
+                                time: curve.startSeconds,
                                 select: () => CurveMaker.selectCurve(curve)
                             });
                         }
@@ -34978,6 +35378,8 @@
                                 name: gc.name || `GC ${gc.id}`,
                                 color: gc.color,
                                 obj: gc,
+                                track: gc.gTrack,
+                                time: gc.startSeconds,
                                 select: () => GCMaker.selectGC(gc)
                             });
                         }
@@ -35000,6 +35402,8 @@
                                 name: motive.name || `Motive ${motive.id}`,
                                 color: motive.color,
                                 obj: motive,
+                                track: motive.gTrack,
+                                time: motive.startSeconds,
                                 select: () => MotiveMaker.selectMotive(motive)
                             });
                         }
@@ -35021,6 +35425,8 @@
                                 name: snippet.name || `MIDI ${snippet.id}`,
                                 color: snippet.color,
                                 obj: snippet,
+                                track: snippet.trackIndex !== undefined ? String(snippet.trackIndex + 1) : null,
+                                time: snippet.startSeconds,
                                 select: () => MidiController.selectSnippet(snippet)
                             });
                         }
@@ -35042,6 +35448,8 @@
                                 name: clip.name || `Audio ${clip.id}`,
                                 color: clip.color || 'cyan',
                                 obj: clip,
+                                track: clip.trackIndex !== undefined ? String(clip.trackIndex + 1) : null,
+                                time: clip.startSeconds,
                                 select: () => AudioController.selectClip(clip)
                             });
                         }
@@ -35061,6 +35469,8 @@
                                 name: el.name || `SVG ${el.id}`,
                                 color: '#888888',
                                 obj: el,
+                                track: el.track ? String(el.track) : null,
+                                time: el.referenceSeconds,
                                 select: () => SVGElementManager.selectElement(el)
                             });
                         }
@@ -35081,6 +35491,8 @@
                                 name: lw.name || `LW ${lw.id}`,
                                 color: lw.color,
                                 obj: lw,
+                                track: lw.gTrack,
+                                time: lw.startSeconds,
                                 select: () => LineWedgeMaker.selectLineWedge(lw)
                             });
                         }
@@ -35104,13 +35516,31 @@
                                 name: badge.name || `Badge ${badge.id}`,
                                 color: '#5B9BF5',
                                 obj: badge,
+                                track: badge.gTrack ? String(badge.gTrack) : null,
+                                time: badge.startSeconds,
                                 select: () => BadgeMaker.selectBadge(badge)
                             });
                         }
                     }
                 }
                 
-                return objects;
+                // Time-proximity filter: convert click X to seconds, exclude far-away objects
+                const scoreWidth = scoreEl.clientWidth;
+                const clickXPercent = (svgX / scoreWidth) * 100;
+                const secondsPerPage = window.GraphicTimeline ? GraphicTimeline.getSecondsPerPage() : 10;
+                const leadIn = typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0;
+                const clickedTimeSec = (currentPage + clickXPercent / 100) * secondsPerPage - leadIn;
+                const TIME_PROXIMITY = 10; // seconds
+                
+                const filtered = objects.filter(o => {
+                    const objStart = o.time != null ? o.time : null;
+                    if (objStart == null) return true; // keep objects with no time info
+                    const objEnd = o.obj && o.obj.endSeconds != null ? o.obj.endSeconds : objStart;
+                    return objStart <= clickedTimeSec + TIME_PROXIMITY &&
+                           objEnd >= clickedTimeSec - TIME_PROXIMITY;
+                });
+                
+                return filtered;
             },
             
             // Hit test helpers - check if point is within object bounds
@@ -35190,6 +35620,9 @@
                 for (let i = 0; i < objects.length; i++) {
                     const obj = objects[i];
                     const colorHex = colorMap[obj.color] || obj.color || '#888';
+                    const trackLabel = obj.track ? `T${obj.track}` : '';
+                    const timeLabel = obj.time != null ? `@${obj.time.toFixed(1)}s` : '';
+                    const infoLabel = [trackLabel, timeLabel].filter(Boolean).join(' ');
                     html += `
                         <div class="obj-selector-item" data-index="${i}" style="
                             padding: 8px 12px;
@@ -35208,6 +35641,7 @@
                                 flex-shrink: 0;
                             "></span>
                             <span style="color: #aaa; min-width: 45px;">${obj.type}</span>
+                            <span style="color: #6cf; min-width: 70px; flex-shrink: 0; font-size: 11px;">${infoLabel}</span>
                             <span style="color: #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${obj.name}</span>
                         </div>
                     `;
@@ -35826,6 +36260,8 @@
                     found = { system: 'LineWedge', obj: LineWedgeMaker.selectedLineWedge };
                 } else if (window.SVGElementManager && SVGElementManager.selectedElement) {
                     found = { system: 'SVG', obj: SVGElementManager.selectedElement };
+                } else if (window.GCMaker && GCMaker.selectedGC) {
+                    found = { system: 'GC', obj: GCMaker.selectedGC };
                 } else if (window.MotiveMaker && MotiveMaker.selectedMotive) {
                     found = { system: 'Motive', obj: MotiveMaker.selectedMotive };
                 }

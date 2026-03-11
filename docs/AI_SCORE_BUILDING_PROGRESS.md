@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 9, 2026  
-**Current ASB Number:** ASB-152
+**Last Updated:** Mar 11, 2026  
+**Current ASB Number:** ASB-162
 
 ---
 
@@ -56,6 +56,7 @@ That's it. Everything else below is for Cascade.
 | Musical Material Workflow | Active | Expand as new material types are built |
 | Animated Badge System | **Complete (v1)** | BadgeDatabase + BadgeMaker (murmuration Boids/SMIL) + UI panel + integration hooks + ObjectRegistry/ObjectSelector/MultiSelect. See ASB-138 |
 | Two-Hand Pizz Grace Note Clusters | **Complete (pre-test)** | Full MIDI model: cluster DB (35 clusters), dual CC0 (80 behind bridge / 69 regular pizz), generation logic, UI panel, Pattern 3 insertion. See ASB-140 |
+| Col Legno Battuto, Jeté | **Complete (Pipeline + Bundle + Batch)** | Full pipeline: SVG assembly engine (cross notehead, stem, marcato, c.l.b. jeté text, dynamic), server endpoint, UI panel (random pitch, GC preset selector w/ animated preview), GC + SVG + MIDI bundle system, batch console scripts for vertical assemblages. See ASB-156–162 |
 
 ### 4. Reusable Tools (remember these exist)
 
@@ -76,6 +77,8 @@ That's it. Everything else below is for Cascade.
 | `svg_bbox.js` | `lilypond_code/svg_assembly/` | SVG path bounding box calculator (Bézier extrema). CLI: `node svg_bbox.js populate` (write bboxes to library), `node svg_bbox.js verify` (print to console) |
 | `measure_text_bbox.html` | `lilypond_code/svg_assembly/` | Browser-based text bbox measurement tool (Canvas actualBoundingBox). Open in browser, use form to measure any text, copy JSON output. Required for adding new text elements to the component library. |
 | `svg_component_library.json` | `lilypond_code/svg_assembly/` | JSON library of all SVG glyph paths, scales, offsets, and bounding boxes. Source of truth for the assembly engine. |
+| `generate_clb_svgs.js` | `scripts/` | Batch CLB no-staff SVG generation for all 10 dynamics (clean + bbox variants). Reusable pattern for other glyph types. Output: `public/SVG_graphics/CLB_SVGs/` |
+| `generate_clb_nodynamic.js` | `scripts/` | CLB no-staff SVG without dynamic marking (clean + bbox). |
 
 ### 5. Available Slash Commands
 
@@ -110,6 +113,7 @@ That's it. Everything else below is for Cascade.
 | **SVG Assembly Engine — Phase 3: Server Pipeline Integration** | Assembly engine (`assemble_svg.js`) produces correct SVGs for sustained tones. Phase 3: new endpoint `POST /api/svg-assembly/sustained-tone` that calls `assembleSustainedTone()` directly (skipping LilyPond compile). Needs: export function from module, pitch-to-staffPosition mapping, accidental name mapping, update `CrescendoUI.step2()` to call new endpoint. Keep LilyPond path as fallback for glissando model. See ASB-137 memory for rules+profile architecture. | When wiring assembly engine into the app |
 | **SVG Positioning & Sizing in Score** | After pipeline integration: refine how assembled SVGs are sized and positioned in the score and within bundles. Currently hardcoded: 67% track height, 0.05 offsetYFraction, 8px overlap. Develop positioning rules as part of the profile system. | After Phase 3 pipeline integration is complete |
 | **Bartók Pizz SVG Scaling & Centering (deferred)** | Current: `heightFraction=0.50` (total SVG → 50% track height), X-centered on impact time, `offsetYFraction=0.05`. Analysis (Mar 9 2026): CrescendoUI uses `staffHeight` mode (scales staff-line height to fraction of track, not total SVG) + notehead-center anchoring (X-aligns notehead, not SVG center, to reference time) + `_recalcOffsetSeconds` (stable anchor on resize) + Height % slider. For Bartók pizz, staff height is identical across all SVGs (same LilyPond settings), so a hardcoded `staffHeight_mm` constant could enable `staffHeight` scaling. Notehead-center X offset could also be hardcoded. **Decision: defer — current 50% height works.** Revisit if SVGs need frequent manual resizing or if centering looks wrong on specific pitches. ~100+ pre-generated SVGs in `public/SVG_graphics/bartok_pizzicato/` (treble/alto/bass clefs). | If Bartók pizz SVGs need frequent resizing or look misaligned |
+| **DEFERRED: Externalize SVG Data (Optimization #5)** | 525 SVG elements (~4.1 MB) stored as base64 data URLs inline in score JSON. Proposed: extract to separate files on disk, reference by path. Saves ~4.1 MB per save file. **Deferred** due to high complexity: migration of 516+ scores, new server endpoints, async load changes, breaks self-contained JSON portability and `bundle_manager.html`. **Revisit when creating final static score version.** Natural fit with printable score generation project (both need separate SVG files). See also: Cascade memory `Optimization #5: Externalize SVG Data`. | When creating final static score version, when starting printable score project |
 | **Transient Grouping System (v1)** | ObjectRegistry + MultiSelect implemented (ASB-123). Shift+Click multi-select, Shift+Ctrl+Win+Click for overlapping objects, per-object cyan highlights + dashed bounding box, floating mini-toolbar (Dup/Del/Track/Time — now **draggable** via grip handle, ASB-139), keyboard shortcuts (Ctrl+Alt+D/Delete/Escape). Adapters: Curve, LineWedge, SVG, Motive, GC, **Badge**. **Future:** Rubber-band selection (Option 1), Temporal Range Grouping (Option 4), persistent groups. | When extending grouping features or adding new object types |
 
 ---
@@ -147,19 +151,33 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-132–137: SVG Component Assembly Engine.** Bbox calculator, layout engine, text measurement tool, rules+profile architecture for assembling notation SVGs from component library. 6 Tier 1 increments. Tier 2 commit pending.
+> **ASB-132–137: SVG Component Assembly Engine.** Bbox calculator, layout engine, text measurement tool, rules+profile architecture for assembling notation SVGs from component library. 6 Tier 1 increments.
 
 ---
 
 ## Current Session
 
-**Date:** Mar 9, 2026  
-**Focus:** Bow Overpressure Accent full pipeline  
-**ASB:** ASB-150 through ASB-152  
-**Tier 1 Count This Session:** 3 (ASB-150–152)  
-**Tier 2 Commits:** b9110cb0
+**Date:** Mar 11, 2026  
+**Focus:** One-Shot Enhancements, GC Presets, CLB Batch Generation, Object Selection Fixes  
+**ASB:** ASB-153 through ASB-162  
+**Tier 1 Count This Session:** 10 (ASB-153–162)  
+**Tier 2 Commits:** ASB-153–162
 
-### Session Log — Bow Overpressure Accent Pipeline
+### Session Log — Object Selection & Mini Toolbar Fixes
+- ASB-153: GC mini toolbar fix — added `requestAnimationFrame(() => MultiSelect.syncSingleSelection())` in `selectGC()` (~line 31461). GC was already in `syncSingleSelection()` (ASB-127) but the method was never triggered on GC select.
+- ASB-154: SVG blocking fix — CSS `pointer-events: none` on `.svg-element-wrapper` / `pointer-events: all` on `.selected` (lines 719–727). Ctrl+Win passthrough in `handleElementMouseDown` (~line 3738). Toolbar sync in `selectElement()` (~line 3849). Unselected SVGs now pass clicks to objects underneath (line wedge nodes, etc.).
+- ASB-155: Motive mini toolbar fix — added `requestAnimationFrame(() => MultiSelect.syncSingleSelection())` in `selectMotive()` (~line 29093). Same pattern as GC fix — toolbar now syncs on first click.
+
+### Session Log — One-Shot Enhancements + CLB Batch Generation
+- ASB-156: Random pitch mode for one-shot panels (BP, BOP, CLB) — added `generateRandomPitch(instrument)` to MidiModelSystem, pitch mode select (Manual/Random) to each panel HTML, show/hide wiring for manual/random pitch rows, go() functions use random pitch when selected, info displays updated.
+- ASB-157: SVG element click-to-select fix — SVG Elements UI panel click handler now correctly selects elements in the score by matching `data-element-id`.
+- ASB-158: One-Shot GC Curve Presets + Animated Preview — `OneShotGCPresets` object with 5 expandable presets (Short/Medium/Medium Sharp/Long Even Curve/Long Slow), dropdown + animated canvas preview for all 3 one-shot panels (BP, BOP, CLB). Physics-based trajectory, real-time ball animation, 3s loop pause. Go buttons use selected preset (fall back to `GC_PARAMS` if none selected). Panel switcher + MutationObserver hooks.
+- ASB-159: GC Presets refinement — canvas height matches track height (dynamic calc from ScoreTop), default empty state with "Select a curve" placeholder (no animation until user picks), loop gap increased to 3s.
+- ASB-160: CLB SVG Batch Generation — `scripts/generate_clb_svgs.js` generates 22 CLB no-staff SVGs (10 dynamics × clean+bbox, plus no-dynamic clean+bbox) via `assembleColLegnoBattutoJete()`. Reusable pattern for other glyph types. Output: `public/SVG_graphics/CLB_SVGs/`.
+- ASB-161: CLB Vertical Unison Console Script Template — reusable browser console script for batch Col Legno Battuto score insertion. Supports partial or full 4-track vertical assemblages via `ColLegnoBattutoUI.go()` with params object.
+- ASB-162: Batch score inserts (1984-clbAutoInsert) — 4 batches: cello track 4 (30.7/31.6/32.3s), viola track 3 (30.7/31.3/32.3s) + violin2 track 2 (32.3s), vertical unison all 4 tracks (33.9s), vertical unison all 4 tracks (36.8/38.3/41.4/42.7s). ~31 total CLB inserts.
+
+### Session Log — Bow Overpressure Accent Pipeline (Mar 9)
 - ASB-150: SVG Assembly Engine — assembleBowOverpressureAccent() with square notehead, stem, 16th flag, 3× downbow, marcato, sfz. Component library extended (scripts + sfzDynamic). Bbox calculator extended. PROFILES.bowOverpressureAccent. CLI test command.
 - ASB-151: Server endpoint POST /api/svg-assembly/bow-overpressure-accent (English pitch). HTML UI section (track, clef, instrument, pitch mode, time). BowOverpressureUI JS object: go() 5-step pipeline, insertSvg, insertMidi (CC0=53, vel 127, quarter-tone bend). Full bundle system (register/delete/export/import/drag/UI). ScoreManager bopBundles persistence. GCMaker drag hook.
 - ASB-152: Bug fixes — pitch format (English not LilyPond to server), SVG sizing (direct heightFraction 0.60 matching _scaleFromHeightFraction formula), GC color brightRed→neonMagenta.
@@ -526,6 +544,12 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-148 | Dynamic→velocity map: added pppp=15 and ffff=127 to BartokPizzUI, PizzTremUI (index.html), generate_pizz_tremolo_midi.js, generate_pizz_trem_gliss_midi.js | Complete |
 | ASB-149 | BartokPizzUI instrument dropdown + random pitch mode — instrument select (violin/viola/cello) with pitch range hints/warnings, pitch mode toggle (manual/random), generateRandomPitch (quarter-tone aware), go() instrument+pitchMode integration, bundle persistence (instrument+pitch in registerBundle/exportBundles) | Complete |
 | ASB-150 | MIDI Snippet Export Applet — `scripts/export_snippet_32.js`: extracts a single MIDI snippet from a saved score JSON by snippetId, writes standard .mid file. No external deps. Demonstrates pattern: parse save → filter by snippetId → normalize times → build MThd+MTrk → write .mid. First use: snippetId 32, track 3, 9.2s from `1025-ReplacePressMidi.json` → `public/midi_exports/snippet32_track3_9200ms.mid`. Reusable as template for future snippet exports. | Complete |
+| ASB-153 | GC mini toolbar fix — requestAnimationFrame sync in selectGC() | Complete |
+| ASB-154 | SVG blocking fix — CSS pointer-events none/all, Ctrl+Win passthrough, toolbar sync in selectElement | Complete |
+| ASB-155 | Motive mini toolbar fix — requestAnimationFrame sync in selectMotive() | Complete |
+| ASB-156 | ObjectSelector menu track+time labels — T1/T2 + @123.4s before name, all 8 object types, menu widened to 380px | Complete |
+| ASB-157 | LW meter center bar removed — transparent center lets line-wedge shape show thickness changes underneath donut ring | Complete |
+| ASB-158 | ObjectSelector time-proximity filter — converts click X to seconds, excludes objects >±10s from click time, fixes page-wide hit results | Complete |
 
 ---
 
