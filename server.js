@@ -142,8 +142,8 @@ function saveScore(scoreName, data, createVersion = true) {
         console.log(`Version backup created: ${versionFilename}`);
     }
     
-    // Save current score
-    fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
+    // Save current score (compact JSON for performance — saves ~45% file size)
+    fs.writeFileSync(filepath, JSON.stringify(data));
     console.log(`Score saved: ${filename}`);
     
     return { success: true, filename, modified: data.metadata.modified };
@@ -173,24 +173,14 @@ function listScores() {
         .map(f => {
             const filepath = path.join(SCORES_DIR, f);
             const stats = fs.statSync(filepath);
-            try {
-                const data = JSON.parse(fs.readFileSync(filepath, 'utf8'));
-                return {
-                    name: f.replace('.json', ''),
-                    filename: f,
-                    title: data.metadata?.title || f.replace('.json', ''),
-                    modified: data.metadata?.modified || stats.mtime.toISOString(),
-                    size: stats.size
-                };
-            } catch {
-                return {
-                    name: f.replace('.json', ''),
-                    filename: f,
-                    title: f.replace('.json', ''),
-                    modified: stats.mtime.toISOString(),
-                    size: stats.size
-                };
-            }
+            const name = f.replace('.json', '');
+            return {
+                name,
+                filename: f,
+                title: name,
+                modified: stats.mtime.toISOString(),
+                size: stats.size
+            };
         });
     // Sort descending by modified date (most recent first)
     files.sort((a, b) => new Date(b.modified) - new Date(a.modified));
@@ -237,12 +227,12 @@ function loadVersion(versionFilename) {
 
 // Save score
 app.post('/api/score/save', (req, res) => {
-    const { name, data } = req.body;
+    const { name, data, skipVersion } = req.body;
     if (!name || !data) {
         return res.status(400).json({ success: false, error: 'Name and data required' });
     }
     
-    const result = saveScore(name, data);
+    const result = saveScore(name, data, !skipVersion);
     if (result.success) {
         scoreData = data;
         currentScoreName = name;

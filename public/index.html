@@ -7523,6 +7523,13 @@
             scoreBottomEl: null,
             timelineHeight: 8, // Match StaffCursors.timelineHeight
             
+            // Debounce timer for reloadFromDatabase
+            _reloadDebounceId: null,
+            
+            // Lazy snippet rendering — track which pages are currently rendered
+            _lastRenderedTopPage: -1,
+            _lastRenderedBottomPage: -1,
+            
             // Snippet selection state
             selectedSnippet: null,
             snippets: [], // Rendered snippets with DOM elements
@@ -7742,16 +7749,27 @@
             
             // Reset playback to a specific time (used when jumping to a position)
             resetPlaybackToTime(targetTimeMs) {
+                // Send All Notes Off + pitch bend center on all channels to clear stuck notes
+                if (this.selectedOutput) {
+                    for (let ch = 0; ch < 16; ch++) {
+                        this.selectedOutput.send([0xB0 | ch, 123, 0]); // CC123 All Notes Off
+                        this.selectedOutput.send([0xB0 | ch, 120, 0]); // CC120 All Sound Off
+                        this.selectedOutput.send([0xE0 | ch, 0x00, 0x40]); // Pitch bend center
+                    }
+                }
+                
                 for (let trackIndex = 0; trackIndex < 4; trackIndex++) {
                     const trackEvents = this.tracks[trackIndex].midiEvents;
                     
-                    // Find the first event at or after the target time
-                    let eventIndex = 0;
-                    while (eventIndex < trackEvents.length && trackEvents[eventIndex].timeMs < targetTimeMs) {
-                        eventIndex++;
+                    // Binary search for the first event at or after the target time
+                    let lo = 0, hi = trackEvents.length;
+                    while (lo < hi) {
+                        const mid = (lo + hi) >>> 1;
+                        if (trackEvents[mid].timeMs < targetTimeMs) lo = mid + 1;
+                        else hi = mid;
                     }
                     
-                    this.currentEventIndices[trackIndex] = eventIndex;
+                    this.currentEventIndices[trackIndex] = lo;
                     this.lastPlaybackTimeMs[trackIndex] = targetTimeMs;
                 }
             },
@@ -8004,8 +8022,19 @@
                 console.debug(`Deleted MIDI snippet: ${snippet.name} (ID: ${snippet.id})`);
             },
             
-            // Reload snippets from database (called after score load)
+            // Reload snippets from database (debounced — multiple rapid calls collapse into one)
             reloadFromDatabase() {
+                if (this._reloadDebounceId) {
+                    cancelAnimationFrame(this._reloadDebounceId);
+                }
+                this._reloadDebounceId = requestAnimationFrame(() => {
+                    this._reloadDebounceId = null;
+                    this._doReloadFromDatabase();
+                });
+            },
+            
+            // Actual reload implementation (called by debounced reloadFromDatabase)
+            _doReloadFromDatabase() {
                 // Clear existing snippet elements
                 for (const snippet of this.snippets) {
                     if (snippet.elements?.group) snippet.elements.group.remove();
@@ -8032,9 +8061,11 @@
                             sourceCurve: snippetData.sourceCurve || event.sourceCurve
                         });
                     }
-                    
-                    // Sort events by time, preserving insertion order for same timestamps
-                    this.tracks[trackIndex].midiEvents.sort((a, b) => {
+                }
+                
+                // Sort all tracks once after all snippets are added (not per-snippet)
+                for (let i = 0; i < 4; i++) {
+                    this.tracks[i].midiEvents.sort((a, b) => {
                         if (a.timeMs !== b.timeMs) return a.timeMs - b.timeMs;
                         return (a.snippetId || 0) - (b.snippetId || 0);
                     });
@@ -8630,6 +8661,7 @@
             },
             
             // Render snippet overlays with colored boundaries and selection highlights
+            // Only renders snippets on currently visible pages (lazy rendering)
             renderSnippetOverlays() {
                 // Clear existing snippet elements
                 for (const snippet of this.snippets) {
@@ -8638,6 +8670,7 @@
                     if (snippet.elements?.continuationGroupBottom) snippet.elements.continuationGroupBottom.remove();
                 }
                 this.snippets = [];
+                this.selectedSnippet = null;
                 
                 const allSnippets = MidiSnippetDatabase.getAll();
                 if (allSnippets.length === 0) return;
@@ -8654,6 +8687,15 @@
                     secondsPerPage = GraphicTimeline.getSecondsPerPage();
                 }
                 
+                // Determine visible pages for lazy rendering
+                let visibleTopPage = 0, visibleBottomPage = 1;
+                if (window.GraphicTimeline) {
+                    visibleTopPage = GraphicTimeline.currentTopPage;
+                    visibleBottomPage = GraphicTimeline.currentBottomPage;
+                }
+                this._lastRenderedTopPage = visibleTopPage;
+                this._lastRenderedBottomPage = visibleBottomPage;
+                
                 for (const snippetData of allSnippets) {
                     const trackIndex = snippetData.trackIndex;
                     const trackY = this.timelineHeight + (trackIndex * trackHeight);
@@ -8667,6 +8709,12 @@
                     const endActualSec = endSec + leadInSeconds;
                     const startPage = Math.floor(startActualSec / secondsPerPage);
                     const endPage = Math.floor(endActualSec / secondsPerPage);
+                    
+                    // Lazy rendering: skip snippets not on any visible page
+                    if (startPage > Math.max(visibleTopPage, visibleBottomPage) ||
+                        endPage < Math.min(visibleTopPage, visibleBottomPage)) {
+                        continue;
+                    }
                     
                     // Render on start page
                     const isTopPage = startPage % 2 === 0;
@@ -8766,10 +8814,12 @@
                     snippet.elements.highlight = highlight;
                     snippet.elements.bgRect = bgRect;
                     
-                    // Handle multi-page snippets - render continuation segments
+                    // Handle multi-page snippets - render continuation segments (only visible pages)
                     if (endPage > startPage) {
                         for (let page = startPage + 1; page <= endPage; page++) {
-                            this.renderSnippetContinuation(snippet, page, trackIndex, trackY, trackHeight, scoreWidth, secondsPerPage, endActualSec);
+                            if (page === visibleTopPage || page === visibleBottomPage) {
+                                this.renderSnippetContinuation(snippet, page, trackIndex, trackY, trackHeight, scoreWidth, secondsPerPage, endActualSec);
+                            }
                         }
                     }
                     
@@ -8869,6 +8919,11 @@
                 
                 const currentTopPage = GraphicTimeline.currentTopPage;
                 const currentBottomPage = GraphicTimeline.currentBottomPage;
+                
+                // Re-render snippet overlays if visible pages changed (lazy rendering)
+                if (currentTopPage !== this._lastRenderedTopPage || currentBottomPage !== this._lastRenderedBottomPage) {
+                    this.renderSnippetOverlays();
+                }
                 
                 // Update top layers - show only elements matching currentTopPage
                 for (const topGroup of this.midiDisplayLayers.top) {
@@ -14585,15 +14640,14 @@
                 );
                 
                 // MIDI tracks from MidiController
+                // Note: tracks are rebuilt from MidiSnippetDatabase on load via reloadFromDatabase(),
+                // so we save only channel info (not events) to avoid ~3.7 MB of redundant data.
                 this.registerSource('midiTracks',
                     () => {
                         if (!window.MidiController) return [];
                         return MidiController.tracks.map(t => ({
                             channel: t.channel,
-                            midiEvents: t.midiEvents.map(e => ({
-                                ...e,
-                                timestamp: e.timeMs // Ensure timestamp is saved
-                            }))
+                            midiEvents: []
                         }));
                     },
                     (data) => {
@@ -14991,8 +15045,8 @@
                 }
             },
             
-            // Save score to server
-            async saveScore() {
+            // Save score to server (skipVersion=true skips version backup for faster auto-saves)
+            async saveScore(skipVersion = false) {
                 const name = this.nameInput?.value?.trim() || 'untitled';
                 const data = this.collectAllData();
                 
@@ -15002,7 +15056,7 @@
                     const response = await fetch('/api/score/save', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, data })
+                        body: JSON.stringify({ name, data, skipVersion })
                     });
                     
                     const result = await response.json();
@@ -15188,8 +15242,8 @@
                 
                 this.autoSaveInterval = setInterval(() => {
                     if (this.isDirty && this.currentScoreName !== 'untitled') {
-                        console.log('Auto-saving...');
-                        this.saveScore();
+                        console.log('Auto-saving (quick, no version backup)...');
+                        this.saveScore(true);
                     }
                 }, this.autoSaveIntervalMs);
             },
