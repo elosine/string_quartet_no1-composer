@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="6.45mm" height="17.92mm" viewBox="-0.1500 -3.6600 3.6680 10.1981">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g id="staff-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="2.8346" y2="-2.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="2.8346" y2="-1.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="0.0000" x2="2.8346" y2="0.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="2.8346" y2="1.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="2.8346" y2="2.0000"/>
+</g>
+<g id="ledger-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="1.4200" y1="3.0000" x2="2.6200" y2="3.0000"/>
+</g>
+<g transform="translate(1.5000, 3.0000)">
+<path transform="scale(0.0032, -0.0032)" d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z" fill="currentColor"/>
+</g>
+<rect x="2.4100" y="-3.5500" width="0.1300" height="6.5000" ry="0.0400" fill="currentColor"/>
+<g transform="translate(2.5400, -3.5100)">
+<path transform="scale(0.004, -0.004)" d="M0 0c0 -177 201 -293 201 -470c0 -33 -9 -65 -23 -95c18 -37 29 -75 29 -117c0 -63 -15 -125 -41 -183c-5 -8 -13 -12 -20 -12c-13 0 -26 11 -23 27c26 52 42 110 42 168c0 97 -94 190 -165 257v-75h-16v500h16zM151 -517c5 15 8 31 8 47c0 96 -91 190 -159 257c0 -118 90 -206 151 -304z" fill="currentColor"/>
+</g>
+<g transform="translate(2.0200, 4.6056)">
+<path transform="scale(0.004, -0.004)" d="M16 0c0 -9 -7 -16 -16 -16s-16 7 -16 16v100c-48 -8 -85 -50 -85 -100c0 -56 45 -101 101 -101s101 45 101 101c0 50 -37 92 -85 100v-100zM-16 132v68c0 9 7 16 16 16s16 -7 16 -16v-68c66 -8 117 -64 117 -132c0 -74 -59 -133 -133 -133s-133 59 -133 133c0 68 51 124 117 132z" fill="currentColor"/>
+</g>
+<g transform="translate(1.5639, 6.1076)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+<path transform="translate(0.4097, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+<!-- DEBUG OVERLAYS -->
+<rect x="1.5000" y="2.5584" width="1.0400" height="0.8832" fill="none" stroke="#0078FF" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.5000" y="2.5084" font-size="0.18" fill="#0078FF" fill-opacity="0.8">notehead</text>
+<rect x="2.4100" y="-3.5500" width="0.1300" height="6.5000" fill="none" stroke="#888888" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="2.4100" y="-3.6000" font-size="0.18" fill="#888888" fill-opacity="0.8">stem</text>
+<rect x="2.4760" y="-3.5100" width="0.8920" height="3.5080" fill="none" stroke="#CC6600" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="2.4760" y="-3.5600" font-size="0.18" fill="#CC6600" fill-opacity="0.8">flag</text>
+<rect x="1.4880" y="3.7416" width="1.0640" height="1.3960" fill="none" stroke="#00CC88" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.4880" y="3.6916" font-size="0.18" fill="#00CC88" fill-opacity="0.8">snapPizz</text>
+<rect x="1.4109" y="5.4176" width="1.2182" height="0.9705" fill="none" stroke="#FF0000" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.4109" y="5.3676" font-size="0.18" fill="#FF0000" fill-opacity="0.8">dynamic</text>
+</svg>

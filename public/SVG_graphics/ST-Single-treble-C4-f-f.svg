@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="10.65mm" height="14.23mm" viewBox="-0.1500 -3.0912 6.0600 8.0965">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g id="staff-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="5.7600" y2="-2.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="5.7600" y2="-1.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="0.0000" x2="5.7600" y2="0.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="5.7600" y2="1.0000"/>
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="5.7600" y2="2.0000"/>
+</g>
+<g id="ledger-lines">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0.9685" y1="3.0000" x2="2.1684" y2="3.0000"/>
+</g>
+<g transform="translate(1.1000, 3.0000)">
+<path transform="scale(0.0027, -0.0027)" d="M308 62c0 23 -20 39 -40 39c-4 0 -7 0 -11 -1c-29 -8 -74 -38 -109 -61s-79 -52 -99 -75c-6 -8 -10 -16 -10 -26c0 -23 20 -39 40 -39c4 0 7 0 11 1c29 8 74 38 109 61s79 52 99 75c6 8 10 16 10 26zM0 -59c0 142 114 198 251 198c53 0 96 -22 96 -80c0 -142 -115 -198 -252 -198c-53 0 -95 22 -95 80z" fill="currentColor"/>
+</g>
+<g transform="translate(0.6330, 4.4600)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+<g transform="translate(1.0000, -2.2750)">
+<text font-family="'Crimson Pro'" font-weight="300" font-style="italic" font-size="0.9797" text-anchor="start" fill="currentColor">
+<tspan>Non-Vib</tspan>
+</text>
+</g>
+</svg>

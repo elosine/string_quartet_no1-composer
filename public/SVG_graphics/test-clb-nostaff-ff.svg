@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="5.88mm" height="14.38mm" viewBox="-0.1500 -6.3405 3.3460 8.1826">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.9706, 0.0000)">
+<path transform="scale(0.0032, -0.0032)" d="M163 42l111 92c3 3 7 4 11 4s8 -1 11 -4l23 -19c4 -3 6 -8 6 -13s-2 -11 -6 -14l-106 -88l106 -88c4 -3 6 -9 6 -14s-2 -10 -6 -13l-23 -19c-3 -3 -7 -4 -11 -4s-8 1 -11 4l-111 92l-111 -92c-3 -3 -8 -4 -12 -4s-8 1 -11 4l-23 19c-4 3 -6 8 -6 13s2 11 6 14l106 88l-106 88c-4 3 -6 9 -6 14s2 10 6 13l23 19c3 3 7 4 11 4s9 -1 12 -4z" fill="currentColor"/>
+</g>
+<rect x="1.8806" y="-3.6240" width="0.1300" height="3.5000" ry="0.0400" fill="currentColor"/>
+<g transform="translate(1.4906, -3.9240)">
+<path transform="scale(0.004, 0.004)" d="M112 0c9 0 16 -10 12 -18l-113 -250c-2 -4 -6 -7 -11 -7s-9 3 -11 7l-113 250c-4 8 3 18 12 18h66c5 0 10 -3 12 -7l68 -150l67 150c2 4 6 7 11 7z" fill="currentColor"/>
+</g>
+<g transform="translate(-0.0294, -5.5243)">
+<text font-family="'Crimson Pro'" font-weight="300" font-style="italic" font-size="0.9797" text-anchor="start" fill="currentColor">
+<tspan>c.l.b. jeté</tspan>
+</text>
+</g>
+<g transform="translate(0.9207, 1.4116)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+<path transform="translate(0.4097, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+<!-- DEBUG OVERLAYS -->
+<rect x="0.9706" y="-0.4416" width="1.0400" height="0.8832" fill="none" stroke="#0078FF" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="0.9706" y="-0.4916" font-size="0.18" fill="#0078FF" fill-opacity="0.8">notehead</text>
+<rect x="1.8806" y="-3.6240" width="0.1300" height="3.5000" fill="none" stroke="#888888" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="1.8806" y="-3.6740" font-size="0.18" fill="#888888" fill-opacity="0.8">stem</text>
+<rect x="0.9900" y="-5.0240" width="1.0012" height="1.1000" fill="none" stroke="#FF6600" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="0.9900" y="-5.0740" font-size="0.18" fill="#FF6600" fill-opacity="0.8">marcatoUp</text>
+<rect x="0.0000" y="-6.1905" width="3.0460" height="0.8915" fill="none" stroke="#8000FF" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="0.0000" y="-6.2405" font-size="0.18" fill="#8000FF" fill-opacity="0.8">clbText</text>
+<rect x="0.7677" y="0.7216" width="1.2182" height="0.9705" fill="none" stroke="#FF0000" stroke-opacity="0.6" stroke-width="0.03"/>
+<text x="0.7677" y="0.6716" font-size="0.18" fill="#FF0000" fill-opacity="0.8">dynamic</text>
+</svg>
