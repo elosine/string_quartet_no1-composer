@@ -119,7 +119,8 @@ function generateAccidental(accidentalType, noteheadType, noteX, y) {
     if (!variant) return '';
     const scaleData = LIBRARY.components.accidentals[noteheadType];
     const xOffset = noteheadType === 'longTone' ? variant.xOffsetLongTone : variant.xOffsetShortTone;
-    return `<g transform="translate(${(noteX + xOffset).toFixed(4)}, ${y.toFixed(4)})">
+    const extraShift = LAYOUT_RULES.accidentalExtraShiftX || 0;
+    return `<g transform="translate(${(noteX + xOffset + extraShift).toFixed(4)}, ${y.toFixed(4)})">
 ` +
         `<path transform="scale(${scaleData.scale[0]}, ${scaleData.scale[1]})" d="${variant.path}" fill="currentColor"/>
 </g>`;
@@ -267,7 +268,11 @@ const LAYOUT_RULES = {
 
     // Uniform padding on all four sides of the viewBox, computed from actual
     // content bounding boxes. Ensures consistent breathing room around all SVGs.
-    viewBoxPadding: 0.15
+    viewBoxPadding: 0.15,
+
+    // Additional horizontal shift applied to all accidentals (staff-spaces).
+    // Negative = leftward. Corrects ~0.4mm visual gap between accidental and notehead.
+    accidentalExtraShiftX: -0.2275
 };
 
 // ============================================
@@ -434,6 +439,46 @@ const PROFILES = {
             anchorElement: 'startNoteheadCenter',
             scaleMode: 'staffHeight',
             staffHeightFraction: 0.35,    // Smaller than single-pitch (0.5654) — gliss SVG has more content
+            offsetYFraction: 0.05
+        }
+    }),
+
+    featheredBeamSinglePitch: createProfile({
+        // Sustained tone single pitch + feathered beam block (accel or decel).
+        // No nonVib, no secco. Feathered block above by default, below if ledger lines above.
+        noteX: 1.1,
+        staffWidth: 5.76,
+        ledgerLineWidth: 1.2,
+        hairpinLength: 2.66,
+        hairpinHeight: 0.55,
+        dyn1LeftEdge: 0.48,
+        featheredBlockGap: 0.4,   // vertical gap between pitch block and feathered beam block
+        positioning: {
+            anchorElement: 'noteheadCenter',
+            scaleMode: 'staffHeight',
+            staffHeightFraction: 0.25,
+            offsetYFraction: 0.05
+        }
+    }),
+
+    featheredBeamGlissando: createProfile({
+        // Sustained tone glissando + feathered beam block (accel or decel).
+        // No nonVib, no secco. Feathered block above by default, below if ledger lines above.
+        note1X: 1.1,
+        note2X: 4.5,
+        staffWidth: 6.5,
+        ledgerLineWidth: 1.2,
+        hairpinLength: 2.66,
+        hairpinHeight: 0.55,
+        dyn1LeftEdge: 0.48,
+        glissPaddingLeft: 0.3,
+        glissPaddingRight: 0.15,
+        sameLineYOffset: -0.3,
+        featheredBlockGap: 0.4,
+        positioning: {
+            anchorElement: 'startNoteheadCenter',
+            scaleMode: 'staffHeight',
+            staffHeightFraction: 0.25,
             offsetYFraction: 0.05
         }
     })
@@ -2012,6 +2057,424 @@ function assembleColLegnoBattutoJete(params) {
     }
 }
 
+// ============================================
+// FEATHERED BEAM DATA (native coordinates)
+// ============================================
+//
+// Geometry extracted from FeatheredDecel_assembled.svg and FeatheredAccel_assembled.svg.
+// All X coordinates shifted so beam left edge = 0 (original beam left was at 0.4).
+// Y origin = top of beam block (top-left corner of first beam).
+// Beams stored as arrays of [x, y] point pairs for each polygon vertex.
+
+const FEATHERED_BEAM_DATA = {
+    decel: {
+        nativeWidth: 10.7233,       // beam span (right edge - left edge)
+        nativeHeight: 5.0639,       // beam top to notehead bottom (4.8083 + 0.2556)
+        stems: [0, 0.6268, 1.5133, 2.767, 4.54, 7.0474, 10.5933],
+        stemWidth: 0.13,
+        stemHeight: 4.8083,
+        noteheadXOffset: -0.4496,   // notehead left edge relative to stem left edge
+        noteheadY: 4.8083,          // notehead anchor Y (bottom of stem)
+        beams: [
+            [[0, 0], [10.7233, 0], [10.7233, 0.4], [0, 0.4]],
+            [[0, 1.4791], [10.7233, 0], [10.7233, 0.4], [0, 1.8791]],
+            [[0, 2.9583], [10.7233, 0], [10.7233, 0.4], [0, 3.3583]]
+        ]
+    },
+    accel: {
+        nativeWidth: 9.5291,
+        nativeHeight: 3.7839,       // 3.5283 + 0.2556
+        stems: [0, 3.1462, 5.3709, 6.944, 8.0563, 8.8429, 9.3991],
+        stemWidth: 0.13,
+        stemHeight: 3.5283,
+        noteheadXOffset: -0.4496,
+        noteheadY: 3.5283,
+        beams: [
+            [[0, 0], [9.5291, 0], [9.5291, 0.25], [0, 0.25]],
+            [[0, 0], [9.5291, 0.8533], [9.5291, 1.1033], [0, 0.25]],
+            [[0, 0], [9.5291, 1.7067], [9.5291, 1.9567], [0, 0.25]]
+        ]
+    }
+};
+
+/**
+ * Generate a feathered beam block (accel or decel) scaled to a target width.
+ * Returns SVG elements in the block's local coordinate system.
+ * Origin: top-left corner of beam area. Y-positive = down (SVG convention).
+ * The caller wraps the result in a <g transform="translate(x, y)"> for positioning.
+ *
+ * @param {string} type - 'accel' or 'decel'
+ * @param {number} targetWidth - Desired width in staff-spaces
+ * @returns {{ svg: string, width: number, height: number, noteheadOverhangLeft: number }}
+ */
+function generateFeatheredBeamBlock(type, targetWidth) {
+    const data = FEATHERED_BEAM_DATA[type];
+    const s = targetWidth / data.nativeWidth;
+    const scaledHeight = data.nativeHeight * s;
+
+    const nhPath = LIBRARY.components.noteheads.smallTone.path;
+    const nhScale = LIBRARY.components.noteheads.smallTone.scale;
+
+    const els = [];
+
+    // Stems
+    for (const sx of data.stems) {
+        els.push(
+            `<rect x="${(sx * s).toFixed(4)}" y="0" width="${(data.stemWidth * s).toFixed(4)}" ` +
+            `height="${(data.stemHeight * s).toFixed(4)}" ry="${(0.04 * s).toFixed(4)}" fill="currentColor"/>`
+        );
+    }
+
+    // Noteheads (smallTone glyph, scaled proportionally)
+    const nhScaleX = nhScale[0] * s;
+    const nhScaleY = nhScale[1] * s;
+    for (const sx of data.stems) {
+        const nhX = (sx + data.noteheadXOffset) * s;
+        const nhY = data.noteheadY * s;
+        els.push(
+            `<g transform="translate(${nhX.toFixed(4)}, ${nhY.toFixed(4)})">` +
+            `<path transform="scale(${nhScaleX.toFixed(6)},${nhScaleY.toFixed(6)})" d="${nhPath}" fill="currentColor"/>` +
+            `</g>`
+        );
+    }
+
+    // Beams (filled polygons)
+    for (const beam of data.beams) {
+        const scaledPts = beam.map(([x, y]) =>
+            `${(x * s).toFixed(4)},${(y * s).toFixed(4)}`
+        ).join(' ');
+        els.push(`<polygon points="${scaledPts}" fill="currentColor"/>`);
+    }
+
+    return {
+        svg: els.join('\n'),
+        width: targetWidth,
+        height: scaledHeight,
+        noteheadOverhangLeft: Math.abs(data.noteheadXOffset) * s
+    };
+}
+
+// ============================================
+// FEATHERED BEAM ASSEMBLY
+// ============================================
+
+/**
+ * Assemble a feathered beam SVG: sustained tone notation (single pitch or glissando)
+ * with a feathered beam block (accel or decel) above or below.
+ *
+ * Like sustained tone but: no Non-Vib text, no secco text.
+ * Feathered beam block width matches pitch block width (x=0 to rightmost element).
+ * Placement: above by default; below if 1+ ledger lines above the staff.
+ *
+ * @param {object} params
+ * @param {string} [params.variant='singlePitch'] - 'singlePitch' or 'glissando'
+ * @param {number} [params.staffPosition] - Note Y in staff-spaces (single pitch)
+ * @param {number} [params.staffPosition1] - First note Y (glissando)
+ * @param {number} [params.staffPosition2] - Second note Y (glissando)
+ * @param {string|null} [params.accidental] - Accidental (single pitch)
+ * @param {string|null} [params.accidental1] - First accidental (glissando)
+ * @param {string|null} [params.accidental2] - Second accidental (glissando)
+ * @param {string} [params.noteheadType='longTone'] - Notehead type (single pitch only)
+ * @param {string} params.dynamic1 - First dynamic
+ * @param {string} [params.dynamic2] - Second dynamic
+ * @param {string} [params.hairpin='<'] - '<', '>', or 'none'
+ * @param {string} [params.featheredType='accel'] - 'accel' or 'decel'
+ * @param {boolean} [params.debug=false] - Debug overlays
+ * @returns {{ svg: string, metadata: object }}
+ */
+function assembleFeatheredBeam(params) {
+    const {
+        variant = 'singlePitch',
+        staffPosition,
+        staffPosition1,
+        staffPosition2,
+        accidental = null,
+        accidental1 = null,
+        accidental2 = null,
+        noteheadType = 'longTone',
+        dynamic1,
+        dynamic2,
+        hairpin = '<',
+        featheredType = 'accel',
+        debug = false
+    } = params;
+
+    const isGliss = variant === 'glissando';
+    const P = isGliss ? PROFILES.featheredBeamGlissando : PROFILES.featheredBeamSinglePitch;
+    const parts = [];
+    const debugRects = [];
+    const lineHalf = 0.05;
+
+    const nhType = isGliss ? 'shortTone' : noteheadType;
+    const nhBbox = LIBRARY.components.noteheads[nhType].bbox;
+
+    // --- STAFF ---
+    parts.push(generateStaffLines(P.staffWidth));
+
+    // --- NOTES ---
+    let noteBottom, highestNotePoint;
+
+    if (isGliss) {
+        const sp1 = staffPosition1, sp2 = staffPosition2;
+        const note1Center = P.note1X + nhBbox.midX;
+        const note2Center = P.note2X + nhBbox.midX;
+
+        parts.push(generateNotehead(nhType, P.note1X, sp1));
+        parts.push(generateNotehead(nhType, P.note2X, sp2));
+        if (debug) {
+            debugRects.push(debugBbox(P.note1X, sp1, nhBbox, '#0078FF', 'note1'));
+            debugRects.push(debugBbox(P.note2X, sp2, nhBbox, '#0078FF', 'note2'));
+        }
+
+        const ledgers1 = generateLedgerLines(sp1, note1Center, P.ledgerLineWidth);
+        if (ledgers1) parts.push(ledgers1);
+        const ledgers2 = generateLedgerLines(sp2, note2Center, P.ledgerLineWidth);
+        if (ledgers2) parts.push(ledgers2);
+
+        const acc1Gen = generateAccidental(accidental1, nhType, P.note1X, sp1);
+        if (acc1Gen) parts.push(acc1Gen);
+        const acc2Gen = generateAccidental(accidental2, nhType, P.note2X, sp2);
+        if (acc2Gen) parts.push(acc2Gen);
+
+        // Glissando line
+        const glissX1 = P.note1X + nhBbox.right + P.glissPaddingLeft;
+        let note2LeftBound = P.note2X + nhBbox.left;
+        if (accidental2) {
+            const accV2 = LIBRARY.components.accidentals.variants[accidental2];
+            note2LeftBound = P.note2X + accV2.xOffsetShortTone + accV2.bboxShortTone.left;
+        }
+        const glissX2 = note2LeftBound - P.glissPaddingRight;
+        let glissY1 = sp1, glissY2 = sp2;
+        const isSameLine = sameStaffLineCheck(sp1, sp2);
+        if (isSameLine) {
+            glissY1 += P.sameLineYOffset;
+            glissY2 += P.sameLineYOffset;
+        }
+        parts.push(generateGlissandoLine(glissX1, glissY1, glissX2, glissY2));
+
+        // Note area bounds
+        let note1Bottom = sp1 + nhBbox.bottom;
+        let note2Bottom = sp2 + nhBbox.bottom;
+        if (accidental1) {
+            const accB = LIBRARY.components.accidentals.variants[accidental1].bboxShortTone;
+            note1Bottom = Math.max(note1Bottom, sp1 + accB.bottom);
+        }
+        if (accidental2) {
+            const accB = LIBRARY.components.accidentals.variants[accidental2].bboxShortTone;
+            note2Bottom = Math.max(note2Bottom, sp2 + accB.bottom);
+        }
+        noteBottom = Math.max(note1Bottom, note2Bottom, 2.0 + lineHalf);
+
+        // Highest point (for feathered block placement logic)
+        highestNotePoint = -2;
+        if (sp1 < -2) {
+            highestNotePoint = Math.min(highestNotePoint, sp1 + nhBbox.top);
+            if (accidental1) {
+                const accV = LIBRARY.components.accidentals.variants[accidental1];
+                highestNotePoint = Math.min(highestNotePoint, sp1 + accV.bboxShortTone.top);
+            }
+        }
+        if (sp2 < -2) {
+            highestNotePoint = Math.min(highestNotePoint, sp2 + nhBbox.top);
+            if (accidental2) {
+                const accV = LIBRARY.components.accidentals.variants[accidental2];
+                highestNotePoint = Math.min(highestNotePoint, sp2 + accV.bboxShortTone.top);
+            }
+        }
+    } else {
+        // Single pitch
+        const sp = staffPosition;
+        const noteCenter = P.noteX + nhBbox.midX;
+
+        parts.push(generateNotehead(nhType, P.noteX, sp));
+        if (debug) debugRects.push(debugBbox(P.noteX, sp, nhBbox, '#0078FF', 'notehead'));
+
+        const ledgers = generateLedgerLines(sp, noteCenter, P.ledgerLineWidth);
+        if (ledgers) parts.push(ledgers);
+
+        const accGen = generateAccidental(accidental, nhType, P.noteX, sp);
+        if (accGen) parts.push(accGen);
+
+        noteBottom = sp + nhBbox.bottom;
+        if (accidental) {
+            const accVariant = LIBRARY.components.accidentals.variants[accidental];
+            const accBbox = nhType === 'longTone' ? accVariant.bboxLongTone : accVariant.bboxShortTone;
+            noteBottom = Math.max(noteBottom, sp + accBbox.bottom);
+            if (debug) {
+                const xOff = nhType === 'longTone' ? accVariant.xOffsetLongTone : accVariant.xOffsetShortTone;
+                debugRects.push(debugBbox(P.noteX + xOff, sp, accBbox, '#FFA500', 'accidental'));
+            }
+        }
+        noteBottom = Math.max(noteBottom, 2.0 + lineHalf);
+
+        highestNotePoint = -2;
+        if (sp < -2) {
+            highestNotePoint = sp + nhBbox.top;
+            if (accidental) {
+                const accV = LIBRARY.components.accidentals.variants[accidental];
+                const accB = nhType === 'longTone' ? accV.bboxLongTone : accV.bboxShortTone;
+                highestNotePoint = Math.min(highestNotePoint, sp + accB.top);
+            }
+        }
+    }
+
+    // --- DYNAMICS ROW (no secco, no nonVib) ---
+    const dyn1Bbox = dynamic1 ? LIBRARY.components.dynamics.composites[dynamic1].bbox : null;
+    const dyn2Bbox = dynamic2 ? LIBRARY.components.dynamics.composites[dynamic2].bbox : null;
+    const capR = 0.05;
+    const refHairpinBbox = {
+        left: -capR,
+        top: -(P.hairpinHeight + capR),
+        right: P.hairpinLength + capR,
+        bottom: P.hairpinHeight + capR,
+        midY: 0
+    };
+    const renderHairpin = hairpin && hairpin !== 'none';
+
+    // Always include refHairpinBbox so dynRow Y is stable across volume modes
+    const rowBboxes = [dyn1Bbox, dyn2Bbox, refHairpinBbox].filter(Boolean);
+    const maxAboveMidline = Math.max(...rowBboxes.map(b => b.midY - b.top));
+    const maxBelowMidline = Math.max(...rowBboxes.map(b => b.bottom - b.midY));
+
+    const dynRowMidline = noteBottom + P.rules.contentToRowGap + maxAboveMidline;
+
+    // Dynamics row: compute X positions left-to-right
+    let curX = P.dyn1LeftEdge;
+
+    let dyn1AnchorX = 0;
+    if (dyn1Bbox) {
+        dyn1AnchorX = curX - dyn1Bbox.left;
+        const dyn1AnchorY = dynRowMidline - dyn1Bbox.midY;
+        parts.push(generateDynamic(dynamic1, dyn1AnchorX, dyn1AnchorY));
+        if (debug) debugRects.push(debugBbox(dyn1AnchorX, dyn1AnchorY, dyn1Bbox, '#FF0000', 'dyn1'));
+        curX = dyn1AnchorX + dyn1Bbox.right + P.rules.glyphRowGap;
+    }
+
+    let hairpinEndX = curX;
+    if (renderHairpin) {
+        const hairpinStartX = curX;
+        const hairpinAnchorY = dynRowMidline - refHairpinBbox.midY;
+        parts.push(generateHairpin(hairpin, hairpinStartX, hairpinAnchorY, P.hairpinLength, P.hairpinHeight));
+        if (debug) debugRects.push(debugBbox(hairpinStartX, hairpinAnchorY, refHairpinBbox, '#00C800', 'hairpin'));
+        hairpinEndX = hairpinStartX + P.hairpinLength;
+        curX = hairpinEndX + P.rules.glyphRowGap;
+    }
+
+    let dyn2RightEdge = curX;
+    if (dyn2Bbox) {
+        const dyn2AnchorX = curX - dyn2Bbox.left;
+        const dyn2AnchorY = dynRowMidline - dyn2Bbox.midY;
+        parts.push(generateDynamic(dynamic2, dyn2AnchorX, dyn2AnchorY));
+        if (debug) debugRects.push(debugBbox(dyn2AnchorX, dyn2AnchorY, dyn2Bbox, '#FF0000', 'dyn2'));
+        dyn2RightEdge = dyn2AnchorX + dyn2Bbox.right;
+    }
+
+    // --- PITCH BLOCK BOUNDS ---
+    const pitchBlockTop = Math.min(-2 - lineHalf, highestNotePoint);
+    const pitchBlockBottom = dynRowMidline + maxBelowMidline;
+    const pitchBlockRight = Math.max(P.staffWidth, dyn2RightEdge, hairpinEndX);
+
+    // --- FEATHERED BEAM BLOCK ---
+    // Placement: above by default; below if any note needs 1+ ledger lines above staff.
+    // Ledger lines above appear at integer positions -3, -4, ... when staffPosition <= -3.
+    let hasLedgersAbove;
+    if (isGliss) {
+        hasLedgersAbove = Math.min(staffPosition1, staffPosition2) <= -3;
+    } else {
+        hasLedgersAbove = staffPosition <= -3;
+    }
+
+    const placement = hasLedgersAbove ? 'below' : 'above';
+    const fb = generateFeatheredBeamBlock(featheredType, pitchBlockRight);
+
+    let fbY;
+    if (placement === 'above') {
+        fbY = pitchBlockTop - P.featheredBlockGap - fb.height;
+    } else {
+        fbY = pitchBlockBottom + P.featheredBlockGap;
+    }
+
+    parts.push(`<g transform="translate(0, ${fbY.toFixed(4)})" id="feathered-beam-block">\n${fb.svg}\n</g>`);
+
+    if (debug) {
+        const fbDebugBbox = {
+            left: -fb.noteheadOverhangLeft,
+            top: 0,
+            right: fb.width,
+            bottom: fb.height
+        };
+        debugRects.push(debugBbox(0, fbY, fbDebugBbox, '#FF00FF', 'feathered'));
+    }
+
+    // --- DEBUG OVERLAYS ---
+    if (debug) {
+        debugRects.push(
+            `<line x1="-0.5" y1="${dynRowMidline.toFixed(4)}" x2="${(pitchBlockRight + 0.5).toFixed(4)}" ` +
+            `y2="${dynRowMidline.toFixed(4)}" stroke="red" stroke-width="0.02" stroke-dasharray="0.1,0.1" opacity="0.6"/>`
+        );
+        parts.push(`<g id="debug-overlay">\n${debugRects.join('\n')}\n</g>`);
+    }
+
+    // --- VIEWBOX ---
+    const fbContentTop = fbY;
+    const fbContentBottom = fbY + fb.height;
+
+    let contentTop = Math.min(pitchBlockTop, fbContentTop);
+    let contentBottom = Math.max(pitchBlockBottom, fbContentBottom);
+    const contentLeft = Math.min(0, -fb.noteheadOverhangLeft);
+    const contentRight = pitchBlockRight;
+
+    // Expand for ledger lines that extend beyond note area
+    if (isGliss) {
+        if (staffPosition1 <= -3) contentTop = Math.min(contentTop, staffPosition1 - 1 - lineHalf);
+        if (staffPosition2 <= -3) contentTop = Math.min(contentTop, staffPosition2 - 1 - lineHalf);
+        if (staffPosition1 >= 3) contentBottom = Math.max(contentBottom, staffPosition1 + 1 + lineHalf);
+        if (staffPosition2 >= 3) contentBottom = Math.max(contentBottom, staffPosition2 + 1 + lineHalf);
+    } else {
+        if (staffPosition <= -3) contentTop = Math.min(contentTop, staffPosition - 1 - lineHalf);
+        if (staffPosition >= 3) contentBottom = Math.max(contentBottom, staffPosition + 1 + lineHalf);
+    }
+
+    const padding = P.rules.viewBoxPadding;
+    const viewBox = {
+        x: contentLeft - padding,
+        y: contentTop - padding,
+        width: (contentRight - contentLeft) + padding * 2,
+        height: (contentBottom - contentTop) + padding * 2
+    };
+
+    const mmPerStaffSpace = 1.7573;
+    const dimensions = {
+        width: viewBox.width * mmPerStaffSpace,
+        height: viewBox.height * mmPerStaffSpace
+    };
+
+    const svg = wrapSvg(parts.filter(Boolean).join('\n'), viewBox, dimensions);
+
+    // Metadata
+    let noteheadCenterX_mm;
+    if (isGliss) {
+        noteheadCenterX_mm = (P.note1X + nhBbox.midX - viewBox.x) * mmPerStaffSpace;
+    } else {
+        noteheadCenterX_mm = (P.noteX + nhBbox.midX - viewBox.x) * mmPerStaffSpace;
+    }
+    const staffHeight_mm = 4 * mmPerStaffSpace;
+
+    return {
+        svg,
+        metadata: {
+            noteheadCenterX_mm,
+            staffHeight_mm,
+            width_mm: dimensions.width,
+            height_mm: dimensions.height,
+            featheredType,
+            placement,
+            variant,
+            positioning: P.positioning
+        }
+    };
+}
+
 /**
  * Generate a debug bounding box rectangle overlay
  * Uses fill-opacity/stroke-opacity for Inkscape compatibility (no rgba).
@@ -2326,8 +2789,64 @@ if (require.main === module) {
             }
             return;
         }
+        case 'feathered-beam': {
+            const dbg = true;
+            const fbTests = [
+                // 1. Single pitch, on staff, accel, above, 2 dynamics, cresc
+                { params: { variant: 'singlePitch', staffPosition: 1, accidental: null, noteheadType: 'longTone',
+                    dynamic1: 'p', dynamic2: 'f', hairpin: '<', featheredType: 'accel', debug: dbg },
+                  file: 'test-fb-single-accel-above.svg' },
+                // 2. Single pitch, on staff, decel, above, 2 dynamics, decresc
+                { params: { variant: 'singlePitch', staffPosition: 1, accidental: null, noteheadType: 'longTone',
+                    dynamic1: 'f', dynamic2: 'p', hairpin: '>', featheredType: 'decel', debug: dbg },
+                  file: 'test-fb-single-decel-above.svg' },
+                // 3. Single pitch, ledger above (sp=-3), accel, BELOW, 2 dynamics
+                { params: { variant: 'singlePitch', staffPosition: -3, accidental: 'sharp', noteheadType: 'longTone',
+                    dynamic1: 'pp', dynamic2: 'ff', hairpin: '<', featheredType: 'accel', debug: dbg },
+                  file: 'test-fb-single-accel-below-ledger.svg' },
+                // 4. Single pitch, on staff, accel, above, 1 dynamic (steady)
+                { params: { variant: 'singlePitch', staffPosition: 0, accidental: null, noteheadType: 'longTone',
+                    dynamic1: 'mp', dynamic2: null, hairpin: 'none', featheredType: 'accel', debug: dbg },
+                  file: 'test-fb-single-accel-steady.svg' },
+                // 5. Single pitch, below staff (ledger below), decel, above, 2 dynamics
+                { params: { variant: 'singlePitch', staffPosition: 4, accidental: 'flat', noteheadType: 'longTone',
+                    dynamic1: 'pp', dynamic2: 'mf', hairpin: '<', featheredType: 'decel', debug: dbg },
+                  file: 'test-fb-single-decel-ledger-below.svg' },
+                // 6. Single pitch, high above (2 ledger lines), decel, BELOW, 1 dynamic
+                { params: { variant: 'singlePitch', staffPosition: -4, accidental: null, noteheadType: 'longTone',
+                    dynamic1: 'p', dynamic2: null, hairpin: 'none', featheredType: 'decel', debug: dbg },
+                  file: 'test-fb-single-decel-below-2ledger.svg' },
+                // 7. Glissando, on staff, accel, above, 2 dynamics, cresc
+                { params: { variant: 'glissando', staffPosition1: 2, staffPosition2: 1,
+                    accidental1: null, accidental2: null,
+                    dynamic1: 'p', dynamic2: 'f', hairpin: '<', featheredType: 'accel', debug: dbg },
+                  file: 'test-fb-gliss-accel-above.svg' },
+                // 8. Glissando, on staff, decel, above, 2 dynamics, decresc
+                { params: { variant: 'glissando', staffPosition1: 1, staffPosition2: -1,
+                    accidental1: null, accidental2: 'sharp',
+                    dynamic1: 'mf', dynamic2: 'pp', hairpin: '>', featheredType: 'decel', debug: dbg },
+                  file: 'test-fb-gliss-decel-above.svg' },
+                // 9. Glissando, one note with ledger above, accel, BELOW
+                { params: { variant: 'glissando', staffPosition1: -3, staffPosition2: -1,
+                    accidental1: 'flat', accidental2: null,
+                    dynamic1: 'pp', dynamic2: 'f', hairpin: '<', featheredType: 'accel', debug: dbg },
+                  file: 'test-fb-gliss-accel-below-ledger.svg' },
+                // 10. Glissando, both on staff, decel, above, hairpin decresc
+                { params: { variant: 'glissando', staffPosition1: 0, staffPosition2: 2,
+                    accidental1: null, accidental2: null,
+                    dynamic1: 'ff', dynamic2: 'p', hairpin: '>', featheredType: 'decel', debug: dbg },
+                  file: 'test-fb-gliss-decel-above-decresc.svg' }
+            ];
+            for (const t of fbTests) {
+                const result = assembleFeatheredBeam(t.params);
+                const p = path.join(outputDir, t.file);
+                fs.writeFileSync(p, result.svg);
+                console.log(`Written: ${p} (${result.metadata.variant}, ${result.metadata.featheredType}, ${result.metadata.placement})`);
+            }
+            return;
+        }
         default:
-            console.log('Usage: node assemble_svg.js [staff|ledger|assemble|glissando|bartok-pizz|bow-overpressure|clb]');
+            console.log('Usage: node assemble_svg.js [staff|ledger|assemble|glissando|bartok-pizz|bow-overpressure|clb|feathered-beam]');
             process.exit(1);
     }
     
@@ -2442,6 +2961,8 @@ module.exports = {
     assembleBartokPizzicato,
     assembleBowOverpressureAccent,
     assembleColLegnoBattutoJete,
+    generateFeatheredBeamBlock,
+    assembleFeatheredBeam,
     generateSnapPizzicato,
     generateCrossNotehead,
     generateMarcatoUp,

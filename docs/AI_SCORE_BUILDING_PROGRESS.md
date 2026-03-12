@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 11, 2026  
-**Current ASB Number:** ASB-165
+**Current ASB Number:** ASB-167
 
 ---
 
@@ -59,6 +59,7 @@ That's it. Everything else below is for Cascade.
 | Col Legno Battuto, Jeté | **Complete (Pipeline + Bundle + Batch)** | Full pipeline: SVG assembly engine (cross notehead, stem, marcato, c.l.b. jeté text, dynamic), server endpoint, UI panel (random pitch, GC preset selector w/ animated preview), GC + SVG + MIDI bundle system, batch console scripts for vertical assemblages. See ASB-156–162 |
 | Col Legno Harmonic Flutter | **Notation Complete (pre-test)** | Custom calligraphic diamond enclosure + squiggle stem + "col legno" text. 3 templates: violin (treble, B3→D4), viola (alto, E3→G3), cello (bass, E2→G2). Vertical fine-tuning complete. See ASB-163–164 |
 | Harmonic Tremolo | **Notation Complete (pre-test)** | Diamond enclosure + 3 filled parallelogram tremolo slashes on stem (from SVG polygon data). Scheme variables `tremolo-center`/`tremolo-gap` for positioning. 3 templates: violin, viola, cello. See ASB-165 |
+| Feathered Beam Assembly | **Assembly Complete (pre-pipeline)** | `assembleFeatheredBeam()` — single pitch + glissando variants, accel/decel feathered beam block, above/below placement (ledger line logic), dynamics + hairpin (no secco/nonVib). 10 test SVGs. Global accidental shift fix. See ASB-166–167 |
 
 ### 4. Reusable Tools (remember these exist)
 
@@ -75,7 +76,7 @@ That's it. Everything else below is for Cascade.
 | `render_pizz_tremolo.js` | `lilypond_code/` | Full pizz tremolo pipeline (single + batch: .ly → SVG → MIDI) |
 | `generate_pizz_tremolo_midi.js` | `lilypond_code/` | Standalone tremolo MIDI generator (timing DB sampling + CC7 ramp) |
 | `generate_pizz_trem_gliss_midi.js` | `lilypond_code/` | Pizz tremolo glissando MIDI generator (timing DB + pitch bend segmentation + per-note velocity) |
-| `assemble_svg.js` | `lilypond_code/svg_assembly/` | SVG Component Assembly Engine — assembles notation SVGs from component library (noteheads, accidentals, dynamics, hairpins, text). `assembleSustainedTone()` with bbox-aware layout. CLI: `node assemble_svg.js assemble` |
+| `assemble_svg.js` | `lilypond_code/svg_assembly/` | SVG Component Assembly Engine — assembles notation SVGs from component library (noteheads, accidentals, dynamics, hairpins, text). `assembleSustainedTone()`, `assembleSustainedToneGlissando()`, `assembleFeatheredBeam()` with bbox-aware layout. CLI: `node assemble_svg.js [assemble|glissando|feathered-beam|...]` |
 | `svg_bbox.js` | `lilypond_code/svg_assembly/` | SVG path bounding box calculator (Bézier extrema). CLI: `node svg_bbox.js populate` (write bboxes to library), `node svg_bbox.js verify` (print to console) |
 | `measure_text_bbox.html` | `lilypond_code/svg_assembly/` | Browser-based text bbox measurement tool (Canvas actualBoundingBox). Open in browser, use form to measure any text, copy JSON output. Required for adding new text elements to the component library. |
 | `svg_component_library.json` | `lilypond_code/svg_assembly/` | JSON library of all SVG glyph paths, scales, offsets, and bounding boxes. Source of truth for the assembly engine. |
@@ -153,17 +154,24 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-132–137: SVG Component Assembly Engine.** Bbox calculator, layout engine, text measurement tool, rules+profile architecture for assembling notation SVGs from component library. 6 Tier 1 increments.
+> **ASB-153–167: One-Shot Enhancements, CLB Batch, Object Selection, Custom Notation Templates, Feathered Beam Assembly.** GC presets + animated preview, CLB batch generation, SVG/GC/Motive selection fixes, col legno flutter & harmonic tremolo templates (3 instruments each), glyph library expansion (smallStaff, smallTone, colLegno, customNotation section, feathered beam SVGs), feathered beam assembly engine (single pitch + glissando, accel/decel, above/below placement), global accidental shift correction.
 
 ---
 
 ## Current Session
 
 **Date:** Mar 11, 2026  
-**Focus:** One-Shot Enhancements, GC Presets, CLB Batch Generation, Object Selection Fixes  
-**ASB:** ASB-153 through ASB-162  
-**Tier 1 Count This Session:** 10 (ASB-153–162)  
-**Tier 2 Commits:** ASB-153–162
+**Focus:** Custom Notation Templates, Glyph Library Expansion, Feathered Beam Assembly  
+**ASB:** ASB-163 through ASB-167  
+**Tier 1 Count This Session:** 5 (ASB-163–167)  
+**Tier 2 Commits:** ASB-163–167
+
+### Session Log — Custom Notation Templates + Feathered Beam Assembly
+- ASB-163: Col Legno Harmonic Flutter templates — custom calligraphic diamond enclosure (4-edge variable stroke weight), vertical stem, 5-loop sine wave squiggle, "col legno" text. 3 instrument versions: violin (treble, B3→D4), viola (alto, E3→G3), cello (bass, E2→G2). Scheme variables for all positioning.
+- ASB-164: Viola/Cello vertical position fine-tuning — diamond translate Y and text extra-offset Y adjusted per instrument. Lesson: with reduced staff-space (#0.65), use 0.2–0.4 increments not full integers.
+- ASB-165: Harmonic Tremolo templates — diamond enclosure + 3 filled parallelogram tremolo slashes (from SVG polygon analysis). Scheme variables `tremolo-center`/`tremolo-gap`. 3 instrument versions.
+- ASB-166: Glyph Library Expansion — added `smallStaff`, `noteheads.smallTone`, `text.colLegno` (measured bbox), `customNotation` section (diamondEnclosure, squiggle, diamondStemSquiggle, diamondStemTremoloSlashes, tremoloSlashes) to `svg_component_library.json`. Created `FeatheredAccel_assembled.svg` and `FeatheredDecel_assembled.svg` with exact proportions from reference SVGs.
+- ASB-167: Feathered Beam Assembly Engine — `FEATHERED_BEAM_DATA` constant (native geometry for accel/decel), `generateFeatheredBeamBlock()` helper (uniform scaling to target width), `assembleFeatheredBeam()` function (single pitch + glissando variants, accel/decel, above/below placement based on ledger lines, dynamics + hairpin, no secco/nonVib). Two new PROFILES (`featheredBeamSinglePitch`, `featheredBeamGlissando`). CLI `feathered-beam` command with 10 test SVGs. Global accidental shift fix: `LAYOUT_RULES.accidentalExtraShiftX = -0.2275` (~0.4mm leftward) applied in `generateAccidental()`.
 
 ### Session Log — Object Selection & Mini Toolbar Fixes
 - ASB-153: GC mini toolbar fix — added `requestAnimationFrame(() => MultiSelect.syncSingleSelection())` in `selectGC()` (~line 31461). GC was already in `syncSingleSelection()` (ASB-127) but the method was never triggered on GC select.

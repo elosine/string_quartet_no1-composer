@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2"
+     width="19.91mm" height="9.08mm"
+     viewBox="-0.1 -0.05 11.3233 5.1639">
+  <style type="text/css"><![CDATA[
+    svg { color: black; }
+  ]]></style>
+  <!-- Feathered Deceleration: 7 notes, spacing increases by √2 ratio -->
+  <!-- Noteheads: smallTone glyph (NoteHead.font-size #-7, scale 0.0018) -->
+  <!-- Stem positions match Feathered Decel.svg reference proportions -->
+  <!-- Beams: 3 beams, fan out on left (close notes), converge on right (far notes) -->
+
+  <!-- Stems (width 0.13, height 4.8083) -->
+  <rect x="0.4000" y="0.0000" width="0.13" height="4.8083" ry="0.04" fill="currentColor" id="stem1"/>
+  <rect x="1.0268" y="0.0000" width="0.13" height="4.8083" ry="0.04" fill="currentColor" id="stem2"/>
+  <rect x="1.9133" y="0.0000" width="0.13" height="4.8083" ry="0.04" fill="currentColor" id="stem3"/>
+  <rect x="3.1670" y="0.0000" width="0.13" height="4.8083" ry="0.04" fill="currentColor" id="stem4"/>
+  <rect x="4.9400" y="0.0000" width="0.13" height="4.8083" ry="0.04" fill="currentColor" id="stem5"/>
+  <rect x="7.4474" y="0.0000" width="0.13" height="4.8083" ry="0.04" fill="currentColor" id="stem6"/>
+  <rect x="10.9933" y="0.0000" width="0.13" height="4.8083" ry="0.04" fill="currentColor" id="stem7"/>
+
+  <!-- Noteheads (smallTone, right edge aligned with stem right edge) -->
+  <g transform="translate(-0.0496, 4.8083)" id="notehead1">
+    <path transform="scale(0.0018,-0.0018)" d="M199 142c66 0 123 -38 123 -108c0 -70 -48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108c0 70 48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+  </g>
+  <g transform="translate(0.5772, 4.8083)" id="notehead2">
+    <path transform="scale(0.0018,-0.0018)" d="M199 142c66 0 123 -38 123 -108c0 -70 -48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108c0 70 48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+  </g>
+  <g transform="translate(1.4637, 4.8083)" id="notehead3">
+    <path transform="scale(0.0018,-0.0018)" d="M199 142c66 0 123 -38 123 -108c0 -70 -48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108c0 70 48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+  </g>
+  <g transform="translate(2.7174, 4.8083)" id="notehead4">
+    <path transform="scale(0.0018,-0.0018)" d="M199 142c66 0 123 -38 123 -108c0 -70 -48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108c0 70 48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+  </g>
+  <g transform="translate(4.4904, 4.8083)" id="notehead5">
+    <path transform="scale(0.0018,-0.0018)" d="M199 142c66 0 123 -38 123 -108c0 -70 -48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108c0 70 48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+  </g>
+  <g transform="translate(6.9978, 4.8083)" id="notehead6">
+    <path transform="scale(0.0018,-0.0018)" d="M199 142c66 0 123 -38 123 -108c0 -70 -48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108c0 70 48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+  </g>
+  <g transform="translate(10.5437, 4.8083)" id="notehead7">
+    <path transform="scale(0.0018,-0.0018)" d="M199 142c66 0 123 -38 123 -108c0 -70 -48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108c0 70 48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+  </g>
+
+  <!-- Beams (3, fanning out on left, converging on right) -->
+  <!-- beam1: horizontal at top -->
+  <polygon points="0.4000,0.0000 11.1233,0.0000 11.1233,0.4000 0.4000,0.4000" fill="currentColor" id="beam1"/>
+  <!-- beam2: angled, left at Y=1.4791, right at Y=0 -->
+  <polygon points="0.4000,1.4791 11.1233,0.0000 11.1233,0.4000 0.4000,1.8791" fill="currentColor" id="beam2"/>
+  <!-- beam3: steepest angle, left at Y=2.9583, right at Y=0 -->
+  <polygon points="0.4000,2.9583 11.1233,0.0000 11.1233,0.4000 0.4000,3.3583" fill="currentColor" id="beam3"/>
+</svg>

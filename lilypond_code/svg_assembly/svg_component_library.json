@@ -17,6 +17,25 @@
         "lineThickness": 0.1
       }
     },
+    "smallStaff": {
+      "type": "parametric",
+      "description": "5-line staff at reduced staff-space #0.65 (diamond harmonic templates). Width 4.6154 from LilyPond render.",
+      "linePositions": [
+        -2,
+        -1,
+        0,
+        1,
+        2
+      ],
+      "staffSpaceSize": 0.65,
+      "defaults": {
+        "lineThickness": 0.1,
+        "width": 4.6154
+      },
+      "sourceSettings": {
+        "StaffSymbol.staff-space": 0.65
+      }
+    },
     "ledgerLine": {
       "type": "parametric",
       "description": "Single ledger line",
@@ -87,6 +106,27 @@
           "width": 1.04,
           "height": 0.8832000000000001,
           "midX": 0.52,
+          "midY": 0
+        }
+      },
+      "smallTone": {
+        "description": "Small filled notehead at font-size #-7 (diamond harmonic templates). Emmentaler glyph at reduced scale.",
+        "scale": [
+          0.0018,
+          -0.0018
+        ],
+        "path": "M199 142c66 0 123 -38 123 -108c0 -70 -48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108c0 70 48 117 94 145c32 19 68 31 105 31z",
+        "sourceSettings": {
+          "NoteHead.font-size": -7
+        },
+        "bbox": {
+          "left": 0,
+          "top": -0.2556,
+          "right": 0.5796,
+          "bottom": 0.2556,
+          "width": 0.5796,
+          "height": 0.5112,
+          "midX": 0.2898,
           "midY": 0
         }
       }
@@ -586,6 +626,28 @@
           "midX": 1.5524,
           "midY": -0.2204
         }
+      },
+      "colLegno": {
+        "fontFamily": "Crimson Pro",
+        "fontWeight": "300",
+        "fontStyle": "italic",
+        "fontSize": 0.9247,
+        "content": "col legno",
+        "bbox": {
+          "_note": "Measured via measure_text_bbox.html using Canvas actualBoundingBox",
+          "left": 0.0277,
+          "top": -0.6288,
+          "right": 2.871,
+          "bottom": 0.2081,
+          "width": 2.8433,
+          "height": 0.8369,
+          "midX": 1.4494,
+          "midY": -0.2104
+        },
+        "sourceSettings": {
+          "LilyPond.fontsize": -7.5,
+          "font-name": "Crimson Pro Light Italic"
+        }
       }
     },
     "scripts": {
@@ -755,6 +817,277 @@
           }
         }
       }
+    },
+    "customNotation": {
+      "description": "Compound multi-element glyphs from custom LilyPond notation templates. All coordinates in SVG convention (Y-positive=down). Origin noted per glyph.",
+      "diamondEnclosure": {
+        "description": "Calligraphic diamond enclosure (4 edges with variable stroke weight). Origin = diamond center. Thick edges (0.43) on top-right and bottom-left, thin edges (0.12) on top-left and bottom-right with perpendicular inset.",
+        "sourceFile": "Col_Legno_Harmonic_Flutter_violin_template.svg",
+        "origin": "diamond center",
+        "elements": [
+          {
+            "id": "thinEdge_A_C",
+            "description": "Thin left-to-top edge, inset perpendicular",
+            "translate": [0.06, 0.05],
+            "path": "M -2 0 L 0 -2.2",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thickEdge_C_B",
+            "description": "Thick top-to-right edge (calligraphic downstroke)",
+            "translate": [0, 0],
+            "path": "M 0 -2.2 L 2 0",
+            "strokeWidth": 0.43,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thinEdge_B_D",
+            "description": "Thin right-to-bottom edge, inset perpendicular",
+            "translate": [-0.06, -0.05],
+            "path": "M 2 0 L 0 2.2",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thickEdge_D_A",
+            "description": "Thick bottom-to-left edge (calligraphic downstroke)",
+            "translate": [0, 0],
+            "path": "M 0 2.2 L -2 0",
+            "strokeWidth": 0.43,
+            "fill": false,
+            "lineCap": "butt"
+          }
+        ],
+        "bbox": {
+          "left": -2.215,
+          "top": -2.415,
+          "right": 2.215,
+          "bottom": 2.415,
+          "width": 4.43,
+          "height": 4.83,
+          "midX": 0,
+          "midY": 0
+        }
+      },
+      "squiggle": {
+        "description": "5-loop vertical sine wave squiggle (amplitude pattern 1-2-3-2-1). Origin = squiggle vertical center. Spans Y=-2.0 to Y=+2.0. Amplitudes: ±0.40, ±0.80, ±1.10, ±0.80, ±0.40.",
+        "sourceFile": "Col_Legno_Harmonic_Flutter_violin_template.svg",
+        "origin": "squiggle vertical center",
+        "elements": [
+          {
+            "id": "squiggle",
+            "translate": [0, 0],
+            "path": "M 0 2.0 C 0.4 1.87 0.4 1.73 0 1.6 C -0.4 1.47 -0.4 1.33 0 1.2 C 0.8 1.07 0.8 0.93 0 0.8 C -0.8 0.67 -0.8 0.53 0 0.4 C 1.1 0.27 1.1 0.13 0 0 C -1.1 -0.13 -1.1 -0.27 0 -0.4 C 0.8 -0.53 0.8 -0.67 0 -0.8 C -0.8 -0.93 -0.8 -1.07 0 -1.2 C 0.4 -1.33 0.4 -1.47 0 -1.6 C -0.4 -1.73 -0.4 -1.87 0 -2.0",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "round"
+          }
+        ],
+        "bbox": {
+          "left": -1.16,
+          "top": -2.06,
+          "right": 1.16,
+          "bottom": 2.06,
+          "width": 2.32,
+          "height": 4.12,
+          "midX": 0,
+          "midY": 0
+        }
+      },
+      "diamondStemSquiggle": {
+        "description": "Complete Col Legno Harmonic Flutter glyph: calligraphic diamond + vertical stem + 5-loop squiggle. Origin = diamond center. Stem extends from Y=-2.2 to Y=-7.5 (upward in visual). Squiggle spans Y=-2.8 to Y=-6.8.",
+        "sourceFile": "Col_Legno_Harmonic_Flutter_violin_template.svg",
+        "origin": "diamond center",
+        "elements": [
+          {
+            "id": "thinEdge_A_C",
+            "translate": [0.06, 0.05],
+            "path": "M -2 0 L 0 -2.2",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thickEdge_C_B",
+            "translate": [0, 0],
+            "path": "M 0 -2.2 L 2 0",
+            "strokeWidth": 0.43,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thinEdge_B_D",
+            "translate": [-0.06, -0.05],
+            "path": "M 2 0 L 0 2.2",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thickEdge_D_A",
+            "translate": [0, 0],
+            "path": "M 0 2.2 L -2 0",
+            "strokeWidth": 0.43,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "stem",
+            "translate": [0.12, 0],
+            "path": "M 0 -2.2 V -7.5",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "squiggle",
+            "translate": [0.12, 0],
+            "path": "M 0 -2.8 C 0.4 -2.93 0.4 -3.07 0 -3.2 C -0.4 -3.33 -0.4 -3.47 0 -3.6 C 0.8 -3.73 0.8 -3.87 0 -4.0 C -0.8 -4.13 -0.8 -4.27 0 -4.4 C 1.1 -4.53 1.1 -4.67 0 -4.8 C -1.1 -4.93 -1.1 -5.07 0 -5.2 C 0.8 -5.33 0.8 -5.47 0 -5.6 C -0.8 -5.73 -0.8 -5.87 0 -6.0 C 0.4 -6.13 0.4 -6.27 0 -6.4 C -0.4 -6.53 -0.4 -6.67 0 -6.8",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "round"
+          }
+        ],
+        "bbox": {
+          "left": -2.215,
+          "top": -7.56,
+          "right": 2.215,
+          "bottom": 2.415,
+          "width": 4.43,
+          "height": 9.975,
+          "midX": 0,
+          "midY": -2.5725
+        }
+      },
+      "diamondStemTremoloSlashes": {
+        "description": "Complete Harmonic Tremolo glyph: calligraphic diamond + vertical stem + 3 filled parallelogram tremolo slashes. Origin = diamond center. Stem from Y=-2.2 to Y=-7.5. Slashes at Y=-4.7, -5.6, -6.5 (gap=0.9, center=5.6).",
+        "sourceFile": "Harmonic_Tremolo_violin_template.svg",
+        "origin": "diamond center",
+        "tremoloCenter": 5.6,
+        "tremoloGap": 0.9,
+        "elements": [
+          {
+            "id": "thinEdge_A_C",
+            "translate": [0.06, 0.05],
+            "path": "M -2 0 L 0 -2.2",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thickEdge_C_B",
+            "translate": [0, 0],
+            "path": "M 0 -2.2 L 2 0",
+            "strokeWidth": 0.43,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thinEdge_B_D",
+            "translate": [-0.06, -0.05],
+            "path": "M 2 0 L 0 2.2",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "thickEdge_D_A",
+            "translate": [0, 0],
+            "path": "M 0 2.2 L -2 0",
+            "strokeWidth": 0.43,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "stem",
+            "translate": [0.12, 0],
+            "path": "M 0 -2.2 V -7.5",
+            "strokeWidth": 0.12,
+            "fill": false,
+            "lineCap": "butt"
+          },
+          {
+            "id": "tremoloSlash1",
+            "translate": [0.12, -4.7],
+            "path": "M -0.45 0.24 V 0 L 0.45 -0.24 V 0 Z",
+            "strokeWidth": 0.08,
+            "fill": true,
+            "lineCap": "butt"
+          },
+          {
+            "id": "tremoloSlash2",
+            "translate": [0.12, -5.6],
+            "path": "M -0.45 0.24 V 0 L 0.45 -0.24 V 0 Z",
+            "strokeWidth": 0.08,
+            "fill": true,
+            "lineCap": "butt"
+          },
+          {
+            "id": "tremoloSlash3",
+            "translate": [0.12, -6.5],
+            "path": "M -0.45 0.24 V 0 L 0.45 -0.24 V 0 Z",
+            "strokeWidth": 0.08,
+            "fill": true,
+            "lineCap": "butt"
+          }
+        ],
+        "bbox": {
+          "left": -2.215,
+          "top": -7.56,
+          "right": 2.215,
+          "bottom": 2.415,
+          "width": 4.43,
+          "height": 9.975,
+          "midX": 0,
+          "midY": -2.5725
+        }
+      },
+      "tremoloSlashes": {
+        "description": "3 filled parallelogram tremolo slashes only (no diamond or stem). Origin = center slash midpoint. Slash spacing = 0.9 units. Each slash: width 0.9, tilt height 0.24.",
+        "sourceFile": "Harmonic_Tremolo_violin_template.svg",
+        "origin": "center slash midpoint",
+        "slashGap": 0.9,
+        "elements": [
+          {
+            "id": "tremoloSlash1",
+            "translate": [0, -0.9],
+            "path": "M -0.45 0.24 V 0 L 0.45 -0.24 V 0 Z",
+            "strokeWidth": 0.08,
+            "fill": true,
+            "lineCap": "butt"
+          },
+          {
+            "id": "tremoloSlash2",
+            "translate": [0, 0],
+            "path": "M -0.45 0.24 V 0 L 0.45 -0.24 V 0 Z",
+            "strokeWidth": 0.08,
+            "fill": true,
+            "lineCap": "butt"
+          },
+          {
+            "id": "tremoloSlash3",
+            "translate": [0, 0.9],
+            "path": "M -0.45 0.24 V 0 L 0.45 -0.24 V 0 Z",
+            "strokeWidth": 0.08,
+            "fill": true,
+            "lineCap": "butt"
+          }
+        ],
+        "bbox": {
+          "left": -0.49,
+          "top": -1.18,
+          "right": 0.49,
+          "bottom": 1.18,
+          "width": 0.98,
+          "height": 2.36,
+          "midX": 0,
+          "midY": 0
+        }
+      }
     }
   },
   "sourceFiles": {
@@ -763,6 +1096,8 @@
     "dynamics_ppp_fff": "CrescendoSinglePitchTemplate_new_ppp-fff.svg",
     "dynamics_pp_ff": "CrescendoSinglePitchTemplate_new_pp-ff.svg",
     "dynamics_p_f": "CrescendoSinglePitchTemplate_new_p-f.svg",
-    "dynamics_mp_mf": "CrescendoSinglePitchTemplate_new_mp-mf.svg"
+    "dynamics_mp_mf": "CrescendoSinglePitchTemplate_new_mp-mf.svg",
+    "colLegnoHarmonicFlutter": "Col_Legno_Harmonic_Flutter_violin_template.svg",
+    "harmonicTremolo": "Harmonic_Tremolo_violin_template.svg"
   }
 }
