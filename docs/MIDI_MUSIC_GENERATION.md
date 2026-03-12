@@ -26,6 +26,9 @@ Reference document for MIDI file generation across all musical material systems 
 16. [Notation → MIDI: State Tracker Strategy](#16-notation--midi-state-tracker-strategy)
 17. [MIDI Tagging: Debugging & Testing Protocols](#17-midi-tagging-debugging--testing-protocols)
 18. [Software Synth Settings: X-Sample Contemporary Solo Strings](#18-software-synth-settings-x-sample-contemporary-solo-strings)
+19. [MIDI Architecture Standards](#19-midi-architecture-standards)
+20. [UI Layout Standards](#20-ui-layout-standards)
+21. [System: Accel/Decel (Feathered Beams)](#21-system-acceldecel-feathered-beams)
 
 ---
 
@@ -759,6 +762,423 @@ Research and investigate legato behavior using the following CCs:
 |----|----------|--------|
 | **CC68** | Legato on/off | Needs testing |
 | **CC24** | Legato intensity | Needs testing |
+
+---
+
+## 19. MIDI Architecture Standards
+
+*Consult this section when designing any new MIDI generation system. These are established patterns across all existing systems — follow them unless you have a specific reason to deviate, and document that deviation here.*
+
+### 19.1 Pitch Bend Segmentation (Glissando Systems)
+
+**Standard algorithm** used by Sustained Tone Glissando and Pizz Trem Glissando:
+
+The synth's pitch bend range is **±1 semitone** from the MIDI note. This gives a **2-semitone pitch window** per segment. To traverse a glissando spanning more than 2 semitones, the algorithm chains multiple segments:
+
+1. **MIDI note selection:** Choose a note **offset by 1 semitone** in the direction of travel from the effective starting pitch.
+   - Ascending: `midiNote = round(effectivePitch) + 1`
+   - Descending: `midiNote = round(effectivePitch) - 1`
+
+2. **Initial bend:** Set pitch bend to the opposite extreme so the *sounding* pitch equals the effective pitch.
+   - Ascending: bend = 0 (minimum, −1 semitone from MIDI note)
+   - Descending: bend = 16383 (maximum, +1 semitone from MIDI note)
+
+3. **Sweep:** As the glissando progresses, pitch bend sweeps toward the other extreme, covering 2 semitones of pitch space.
+
+4. **Segment transition:** When effective pitch exceeds the ±1 semitone bend range of the current MIDI note, start a new segment (new MIDI note, bend resets to the starting extreme).
+
+5. **Seamless join:** The last sounding pitch of segment N equals the first sounding pitch of segment N+1 — no audible gap.
+
+**Concrete ascending example (F4 → A4):**
+
+| Phase | MIDI Note | Bend | Sounding Pitch |
+|-------|-----------|------|----------------|
+| Seg 1 start | F#4 (66) | 0 (−1 st) | F4 (65) |
+| Seg 1 mid | F#4 (66) | 8192 (center) | F#4 (66) |
+| Seg 1 end | F#4 (66) | 16383 (+1 st) | G4 (67) |
+| Seg 2 start | G#4 (68) | ≈0 (−1 st) | G4 (67) |
+| Seg 2 mid | G#4 (68) | 8192 (center) | G#4 (68) |
+| Seg 2 end | G#4 (68) | 16383 (+1 st) | A4 (69) |
+
+**Implementation differences between systems:**
+
+| Aspect | Sustained Tone Glissando | Pizz Trem Glissando |
+|--------|-------------------------|---------------------|
+| Threshold expression | `\|pitch − basePitch\| > 2 semitones` | `\|pitch − midiNote\| > 1 semitone` |
+| Effective window | 2 semitones (same) | 2 semitones (same) |
+| Bend updates | Continuous, every 50ms | Per-note (event-driven) |
+| Note pattern | 1 long note per segment | Many rapid notes per segment |
+
+Both expressions measure the same thing from different reference points — they trigger at the same moment.
+
+### 19.2 Pitch vs Volume Coupling
+
+Two design patterns exist. Choose based on the musical intent:
+
+**Pattern A — Decoupled (Sustained Tone / Crescendo-Decrescendo):**
+- **Pitch trajectory** follows `pitchMode` (curve Y, linear, or inverse curve Y)
+- **Volume (CC7)** independently follows `volumeMode` (curve Y, linear, steady, inverse)
+- Composer controls pitch shape and volume shape separately
+- *Use when:* pitch and dynamics should be independently shaped
+
+**Pattern B — Coupled (Pizz Trem Glissando):**
+- **Pitch trajectory** directly follows curve Y (Y=1 → high pitch, Y=0 → low pitch)
+- **Volume** is per-note velocity with linear interpolation (not curve-shaped)
+- The curve IS the pitch shape
+- *Use when:* the curve's visual shape should directly represent the pitch contour
+
+### 19.3 Volume Handling
+
+Two methods for controlling dynamics over time:
+
+| Method | Mechanism | Channel Bank | Used By |
+|--------|-----------|-------------|---------|
+| **CC7 volume** | Continuous CC7 messages | Volume (8–11) | Sustained Tone, Pizz Tremolo, Cresc/Decresc |
+| **Per-note velocity** | Each note gets its own velocity value | Base (0–3) | Pizz Trem Glissando, one-shots |
+
+**Decision rule:** If the system uses CC7, it **must** use the Volume channel bank (8–11) to prevent CC7 state bleed. If the system uses only per-note velocity (no persistent CC state), it can use the Base bank (0–3).
+
+#### 19.3.1 CC7 Volume Standard (reference: `CrescendoUI.generateCrescendoMidi`)
+
+**Dynamics → CC7 map (canonical):**
+
+| Dynamic | CC7 |
+|---------|-----|
+| pppp | 40 |
+| ppp | 47 |
+| pp | 55 |
+| p | 64 |
+| mp | 70 |
+| mf | 80 |
+| f | 89 |
+| ff | 100 |
+| fff | 113 |
+| ffff | 127 |
+
+All new CC7-based systems **must** use this dynamics map for consistency across the score.
+
+**CC7 sample interval:** 50ms (20 messages/sec). This rate provides smooth volume changes without overwhelming the synth.
+
+**Volume modes** — 4 standard modes, all interpolating between Dyn1 CC7 value and Dyn2 CC7 value:
+
+| Mode | Behavior | Direction Validation |
+|------|----------|---------------------|
+| **Curve** | CC7 = normalizedY × (Dyn2 − Dyn1) + Dyn1 | Yes — curve direction must match dynamic direction |
+| **Inverse Curve** | CC7 = (1 − normalizedY) × (Dyn2 − Dyn1) + Dyn1 | Yes — curve direction must be opposite dynamic direction |
+| **Linear** | CC7 = straight ramp Dyn1 → Dyn2 (ignores curve shape) | No |
+| **Steady** | CC7 = flat at Dyn1 throughout | No |
+
+**Initial CC7:** Write the first CC7 sample value at tick 0 of each segment.
+
+**Secco ramp-down (standard pattern):**
+Applied on the **last segment only** when secco is enabled:
+1. Wait 5ms after Note Off
+2. CC7 → `lastCC7 × 0.66`
+3. CC7 → `lastCC7 × 0.33` (after ~3.3ms)
+4. CC7 → `0` (after ~3.3ms)
+
+Total ramp: 3 steps over 10ms. This produces a clean cut without audible clicks.
+
+**Unity reset value:** CC7 = **100** (sent on all 16 channels during preview/panic reset).
+
+#### 19.3.2 Per-Note Velocity Standard (One-Shots)
+
+**Problem:** The X-Sample Contemporary Solo Strings synth maps MIDI velocity to volume with a quiet bias — a nuanced velocity curve (e.g., `f` = 95) produces audibly too-quiet results for short articulations. A finer-grained dynamics→velocity map is wasted because the perceptual differences are negligible at the quiet end of the synth's velocity response.
+
+**Solution:** Use a compressed ("blunt") velocity map that collapses multiple dynamics into fewer tiers, producing approximately correct audible levels:
+
+| Dynamic | Velocity | Tier |
+|---------|----------|------|
+| pppp | 95 | Quiet |
+| ppp | 95 | Quiet |
+| pp | 95 | Quiet |
+| p | 95 | Quiet |
+| mp | 103 | Medium |
+| mf | 103 | Medium |
+| f | 111 | Loud |
+| ff | 119 | Very Loud |
+| fff | 127 | Maximum |
+| ffff | 127 | Maximum |
+
+**Canonical implementation:** `BartokPizzUI.dynamicToVelocity(dynamic)` in `public/index.html`. All other one-shot systems must delegate to this function (not maintain separate copies).
+
+**Applies to one-shot systems:**
+- **Bartók Pizz — One-Shot Pipeline** (`BartokPizzUI.insertBartokMidi`) — canonical definition
+- **Bow Overpressure — One-Shot** (`BowOverpressureUI.insertMidi`) — delegates to `BartokPizzUI.dynamicToVelocity()`
+- **Col Legno Battuto Jeté — One-Shot** (`ColLegnoBattutoUI.insertMidi`) — delegates to `BartokPizzUI.dynamicToVelocity()`
+
+**Other systems with dynamic→velocity conversion (non-one-shot):**
+- **Pizz Tremolo** (`PizzTremUI.dynamicToVelocity`) — own copy of map, single velocity for all notes in tremolo
+- **Pizz Trem Glissando** (`generate_pizz_trem_gliss_midi.js`, `DYNAMIC_VELOCITY`) — server-side, per-note linear interpolation between start/end dynamics
+
+**Note:** "One-shot" refers specifically to the pipeline UI systems (`BartokPizzUI`, `BowOverpressureUI`, `ColLegnoBattutoUI`) that produce single discrete MIDI events with SVG+GC+MIDI bundles. The `MidiModelSystem` standalone generators for the same articulations (e.g., `MidiModelSystem.generateBartokPizzMidi`) use raw velocity input fields and are not governed by this map.
+
+#### 19.3.3 Non-Conforming Systems
+
+| System | Domain | Deviation | TODO |
+|--------|--------|-----------|------|
+| **Pizzicato Tremolo** | CC7 | Uses hardcoded CC7 ranges (50→127, 127→0) with 20ms interval instead of dynamics map + 50ms interval | Update to use §19.3.1 dynamics map and standard interval |
+| **MidiModelSystem Cresc/Decresc** | CC7 | Uses raw 0–127 sliders instead of dynamics map; 20ms interval; instant CC7→0 secco | Evaluate alignment with standard |
+| **Pizz Tremolo** | Velocity | Own copy of velocity map instead of delegating to canonical definition | Update to delegate or match §19.3.2 map |
+| **Pizz Trem Glissando** | Velocity | Server-side `DYNAMIC_VELOCITY` — separate copy | Update to match §19.3.2 map |
+
+### 19.4 Channel Bank Selection
+
+See §3 for the full channel map. When adding a new system:
+
+| If the system uses… | Assign to bank… | Formula |
+|---------------------|-----------------|---------|
+| Only note-on/off, velocity, pitch bend, CC0 | **Base (0–3)** | `track - 1` |
+| CC4 / channel pressure (vibrato) | **Vibrato (4–7)** | `track + 3` |
+| CC7 volume ramp | **Volume (8–11)** | `track + 7` |
+
+**Why:** The synth does not reliably respond to CC120/CC123 for resetting control state. Separate banks prevent one system's persistent CC state from contaminating another.
+
+### 19.5 Timing Database Patterns
+
+For systems with rapid repeated notes (tremolo, flutter, etc.):
+
+- **Source:** Human performance recordings, ingested via scripts like `ingest_pizz_tremolo.js`
+- **Database:** JSON with segments containing per-note onset, duration, and gap timing
+- **Sampling algorithm (`sampleNotes`):** Random start index, sequential walk through DB notes using recorded inter-note gaps, wraps around with average gap at boundaries, clips last note to fit target duration
+- **Result:** Natural, irregular timing (not algorithmic/metronomic)
+- **Reuse:** The same `pizz_tremolo_db.json` is shared by both Pizz Tremolo and Pizz Trem Glissando
+
+*When building a new tremolo-type system, prefer sampling from a timing database over algorithmic note generation.*
+
+### 19.6 MIDI Snippet Insertion (Pattern 3)
+
+All systems should use Pattern 3 (Direct Live Insertion):
+
+```
+MidiSnippetDatabase.add(snippetData)
+→ MidiController.reloadFromDatabase()
+→ ScoreManager.markDirty()
+```
+
+See `docs/MUSICAL_MATERIAL_WORKFLOW.md` for full insertion pattern documentation.
+
+---
+
+## 20. UI Layout Standards
+
+*Established: Mar 12, 2026 — UI audit of all existing systems.*
+*Reference implementation: Sustained Tone System (CrescendoUI).*
+
+### 20.1 Unified Field Order (Standard)
+
+All system UIs should follow this canonical field order. Not every system uses every field — omit fields that don't apply, but preserve the relative order of the fields that are present.
+
+| Position | Field | Type | Notes |
+|----------|-------|------|-------|
+| 1 | **Track** | number (1–4) | Always first |
+| 2 | **Clef** | select (Treble/Alto/Bass) | Paired with Track on same row |
+| 3 | **Instrument** | select (Violin/Viola/Cello) | Only for systems that need it (one-shots) |
+| 4 | **Time / Start–End** | number | Start time or Start+End pair. TimeMode toggle (End vs Duration) if applicable |
+| 5 | **Curve params: Y1, Y2** | number | For curve-based systems |
+| 6 | **Curve params: Model, Slope** | select + number | For curve-based systems |
+| 7 | **Pitch / Pitch Mode** | text or select | Glissando vs Single toggle if applicable; Start/End pitch pair for gliss; Pitch mode row for gliss trajectory (Curve/Inv.Curve/Linear) |
+| 8 | **Dynamic(s)** | select (pppp–ffff) | Single dynamic or Dyn1+Dyn2 pair |
+| 9 | **Volume Mode** | select | For CC7-based systems (Curve/Inv.Curve/Steady/Linear) |
+| 10 | **Velocity** | number (0–127) | For systems with direct velocity input |
+| 11 | **Color Swatches** | swatch palette (13 colors) | For curve-based systems with canvas rendering |
+| 12 | **Fill Toggle** | radio (Line / Fill↓ / Fill↑) | For curve-based systems |
+| 13 | **Shape / Align** | radio | System-specific (e.g., Cres/Decres/Both; Pre/Post) |
+| 14 | **Secco** | checkbox | For CC7-based sustained systems |
+| 15 | **Staff** | select (Yes/No) | For SVG assembly systems |
+| 16 | **GC Preset** | select + canvas preview | For one-shot systems with grace-note clusters |
+| 17 | **Action Buttons** | button(s) | "1: Curve" + "2: Generate", or single "Go" / "Insert" |
+| 18 | **Curve Adjust** | collapsible section | Post-step-1 adjustment (Start/End/Y1/Y2/Model/Slope) |
+| 19 | **Bundle Row** | hidden row | Start time display + Regen MIDI / Replace SVG / Delete Bundle |
+
+### 20.2 UI Audit — Current State (Mar 2026)
+
+#### 20.2.1 Sustained Tone System (CrescendoUI) — REFERENCE
+
+HTML: `public/index.html` lines ~1037–1206
+Section label: "Sustained Tone System" — `var(--clr-darkRed)` bg
+Workflow: 2-step (1: Curve → 2: Generate)
+
+| Row | Elements (L→R) | IDs | Standard Pos |
+|-----|----------------|-----|-------------|
+| 1 | Track [number], Clef [select] | `cdTrackInput`, `cdClefSelect` | 1, 2 |
+| 2 | Start [number], End [number], TimeMode [select: End/Dur] | `cdStartInput`, `cdEndInput`, `cdTimeMode` | 4 |
+| 3 | Y1 [number], Y2 [number] | `cdY1Input`, `cdY2Input` | 5 |
+| 4 | Md [select], Slp [number] | `cdModelSelect`, `cdSlopeInput` | 6 |
+| 5 | Pitch mode [select: Glissando/Single] | `cdPitchModel` | 7 |
+| 5a | *(if Gliss)* Start pitch [text], End pitch [text] | `cdStartPitch`, `cdEndPitch` | 7 |
+| 5b | *(if Gliss)* Gliss pitch trajectory [select] | `cdGlissPitchMode` | 7 |
+| 5c | *(if Single)* Pitch [text] | `cdSinglePitchInput` | 7 |
+| 6 | Dyn1 [select], Dyn2 [select] | `cdDynamic1`, `cdDynamic2` | 8 |
+| 7 | Vol mode [select] | `cdVolumeMode` | 9 |
+| 8 | Vel [number] (default 115) | `cdVelocityInput` | 10 |
+| 9 | Color swatches (12) | `#cdColorSwatches` | 11 |
+| 10 | Fill toggle [radio] | `cdFillLine`, `cdFillBottom`, `cdFillTop` | 12 |
+| 11 | Secco [checkbox] | `cdSeccoCheckbox` | 14 |
+| 12 | [1: Curve] btn, [2: Generate] btn | `cdStep1Btn`, `cdStep2Btn` | 17 |
+| 13 | Curve Adjust section (hidden) | `cdCurveAdjustSection`, `cdAdj*` | 18 |
+| 14 | Bundle row | `cdBundleRow` | 19 |
+
+#### 20.2.2 Vibrato System
+
+HTML: lines ~930–1034
+Section label: "Vibrato System" — `var(--clr-brightRed)` bg
+Workflow: 2-step
+
+| Row | Elements (L→R) | IDs | Standard Pos |
+|-----|----------------|-----|-------------|
+| 1 | Clef [select], Track [number] | `vibClefSelect`, `vibTrackInput` | **2, 1 ⚠** |
+| 2 | Pitch [text] | `vibPitchInput` | 7 |
+| 3 | Start Dyn [select], End Dyn [select] | `vibStartDynamic`, `vibEndDynamic` | 8 |
+| 4 | Start [number], End [number] | `vibStartInput`, `vibEndInput` | 4 |
+| 5 | Y1 [number], Y2 [number] | `vibY1Input`, `vibY2Input` | 5 |
+| 6 | Model [select], Slope [number] | `vibModelSelect`, `vibSlopeInput` | 6 |
+| 7 | Vel [number] (default 115) | `vibVelocityInput` | 10 |
+| 8 | Color swatches (12) | `#vibColorSwatches` | 11 |
+| 9 | Fill toggle [radio] | `vibFillLine`, `vibFillBottom`, `vibFillTop` | 12 |
+| 10 | [1: Curve] btn, [2: Generate] btn | `vibStep1Btn`, `vibStep2Btn` | 17 |
+| 11 | Bundle row | `vibBundleRow` | 19 |
+
+**Deviations from standard:** Clef/Track order reversed (Clef first); Pitch at row 2 instead of after curve params; Dynamics at row 3 instead of after pitch; Time at row 4 instead of row 2.
+
+#### 20.2.3 One-Shots
+
+HTML: lines ~1209–1431
+Section label: "One Shots" — grey `#555` bg
+Type switcher: `oneShotTypeSelect` (BP / BOP / CLB)
+
+**Bartók Pizzicato (BP):**
+
+| Row | Elements (L→R) | IDs | Standard Pos |
+|-----|----------------|-----|-------------|
+| 1 | Track [number], Clef [select] | `bpTrackInput`, `bpClefSelect` | 1, 2 |
+| 2 | Instr [select], Pitch mode [select] | `bpInstrumentSelect`, `bpPitchModeSelect` | 3, 7 |
+| 3 | Pitch [text] or Random label | `bpPitchInput` | 7 |
+| 4 | Dyn [select], Staff [select] | `bpDynamicSelect`, `bpStaffSelect` | 8, 15 |
+| 5 | Time [number] | `bpTimeInput` | 4 |
+| 6 | GC preset [select] | `bpGCPreset` | 16 |
+| 7 | GC preview [canvas] | `bpGCPreview` | 16 |
+| 8 | [Go] btn | `bpGoBtn` | 17 |
+| 9 | Bundle row | `bpBundleRow` | 19 |
+
+**Bow Overpressure (BOP):** Same structure as BP but no Dynamic dropdown (fixed sfz/vel 127), no Replace SVG in bundle.
+
+**Col Legno Battuto (CLB):** Same structure as BP, dynamic range ppp–fff. No Replace SVG in bundle.
+
+**One-shot deviations from standard:** Instrument+PitchMode share a row; Time comes after Dynamic instead of position 4; Staff shares row with Dynamic.
+
+#### 20.2.4 Notation Fragments
+
+HTML: lines ~1433–1498
+Section label: "Notation Fragments" — `var(--clr-brightOrange)` bg
+
+| Row | Elements | IDs | Standard Pos |
+|-----|----------|-----|-------------|
+| 1 | Frag [select: NF001–NF008] | `nfFragmentSelect` | (unique) |
+| 2 | Preview [img container] | `nfPreviewContainer` | (unique) |
+| 3 | Part [select: Violin 1/2] (conditional) | `nfViolinSelect` | 1 variant |
+| 4 | Time [number] | `nfTimeInput` | 4 |
+| 5 | Align [select: 9 modes] | `nfAlignSelect` | 13 |
+| 6 | Tempo [select] (conditional) | `nfTempoSelect` | (unique) |
+| 7 | [Insert] btn, status label | `nfInsertBtn`, `nfStatusLabel` | 17 |
+| 8 | Bundle row | `nfBundleRow` | 19 |
+
+#### 20.2.5 Pizzicato Tremolo
+
+HTML: lines ~1501–1559
+Section label: "Pizzicato Tremolo" — `var(--clr-brightBlue)` bg
+
+| Row | Elements (L→R) | IDs | Standard Pos |
+|-----|----------------|-----|-------------|
+| 1 | Track [number], Clef [select] | `ptTrackInput`, `ptClefSelect` | 1, 2 |
+| 2 | Pitch [text], Dyn [select] | `ptPitchInput`, `ptDynamicSelect` | 7, 8 |
+| 3 | Start [number], Dur [number] | `ptStartInput`, `ptDurationInput` | 4 |
+| 4 | Shape [radio: Cres/Decres/Both] | `ptShape*` | 13 |
+| 5 | Align [radio: Pre/Post] | `ptAlign*` | 13 |
+| 6 | [Go] btn | `ptGoBtn` | 17 |
+| 7 | Bundle row | `ptBundleRow` | 19 |
+
+**Deviations:** Pitch+Dynamic before Time; no curve params (uses shape radio instead).
+
+#### 20.2.6 Pizz Tremolo Glissando
+
+HTML: lines ~1562–1659
+Section label: "Pizz Tremolo Glissando" — `#2a8a8a` bg
+Workflow: 2-step
+
+| Row | Elements (L→R) | IDs | Standard Pos |
+|-----|----------------|-----|-------------|
+| 1 | Track [number], Clef [select] | `ptgTrackInput`, `ptgClefSelect` | 1, 2 |
+| 2 | Start [number], End [number] | `ptgStartInput`, `ptgEndInput` | 4 |
+| 3 | Y1 [number], Y2 [number] | `ptgY1Input`, `ptgY2Input` | 5 |
+| 4 | Model [select], Slope [number] | `ptgModelSelect`, `ptgSlopeInput` | 6 |
+| 5 | Start pitch [text], End pitch [text] | `ptgStartPitch`, `ptgEndPitch` | 7 |
+| 6 | Dyn1 [select], Dyn2 [select] | `ptgStartDynamic`, `ptgEndDynamic` | 8 |
+| 7 | Color swatches (12) | `#ptgColorSwatches` | 11 |
+| 8 | Fill toggle [radio] | `ptgFill*` | 12 |
+| 9 | [1: Curve] btn, [2: Generate] btn | `ptgStep1Btn`, `ptgStep2Btn` | 17 |
+| 10 | Bundle row | `ptgBundleRow` | 19 |
+
+**Follows standard well.** Minor: no Velocity or Volume Mode fields (uses per-note velocity from dynamics map).
+
+#### 20.2.7 Accel/Decel System (AccelDecelUI)
+
+HTML: lines ~1207–1409
+Section label: "Accel / Decel System" — `#8B4513` bg
+Workflow: 2-step (1: Curve → 2: Generate)
+
+| Row | Elements (L→R) | IDs | Standard Pos |
+|-----|----------------|-----|-------------|
+| 1 | Track [number], Clef [select] | `aduTrackInput`, `aduClefSelect` | 1, 2 |
+| 2 | Instrument [select] | `aduInstrumentSelect` | 3 |
+| 3 | Start [number], End [number], TimeMode [select: End/Dur] | `aduStartInput`, `aduEndInput`, `aduTimeMode` | 4 |
+| 4 | Y1 [number], Y2 [number] | `aduY1Input`, `aduY2Input` | 5 |
+| 5 | Model [select], Slope [number] | `aduModelSelect`, `aduSlopeInput` | 6 |
+| 6 | Pitch mode [select: Glissando/Single] | `aduPitchMode` | 7 |
+| 6a | *(if Gliss)* Start pitch [text], End pitch [text] | `aduStartPitch`, `aduEndPitch` | 7 |
+| 6b | *(if Gliss)* Gliss mode [select] | `aduGlissMode` | 7 |
+| 6c | *(if Single)* Pitch [text] | `aduSinglePitchInput` | 7 |
+| 7 | Dyn1 [select], Dyn2 [select] | `aduDynamic1`, `aduDynamic2` | 8 |
+| 8 | Vol mode [select] | `aduVolumeMode` | 9 |
+| 9 | Articulation [select] | `aduArticulationSelect` | (new) |
+| 10 | Density [slider+number], Humanize [slider+number] | `aduDensitySlider/Num`, `aduHumanizeSlider/Num` | (new) |
+| 11 | Color swatches (13, incl. black) | `#aduColorSwatches` | 11 |
+| 12 | Opacity [number], Fill [radio] | `aduOpacityInput`, `aduFill*` | 12 |
+| 13 | [1: Curve] btn, [2: Generate] btn | `aduStep1Btn`, `aduStep2Btn` | 17 |
+| 14 | Direction indicator | `aduDirectionIndicator` | (new) |
+| 15 | Curve Adjust section | `aduCurveAdjustSection`, `aduAdj*` | 18 |
+| 16 | Bundle row | `aduBundleRow` | 19 |
+
+**Follows standard well.** Adds Instrument (pos 3), Articulation, and Density/Humanize fields (not in standard). Direction indicator auto-derived from curve shape.
+
+### 20.3 Cross-Comparison Summary
+
+| Field | Vibrato | Sustained Tone | One-Shots (BP) | Pizz Trem | PTG | Accel/Decel |
+|-------|---------|----------------|----------------|-----------|-----|-------------|
+| Track | row 1 (2nd) ⚠ | row 1 (1st) ✓ | row 1 (1st) ✓ | row 1 (1st) ✓ | row 1 (1st) ✓ | row 1 (1st) ✓ |
+| Clef | row 1 (1st) ⚠ | row 1 (2nd) ✓ | row 1 (2nd) ✓ | row 1 (2nd) ✓ | row 1 (2nd) ✓ | row 1 (2nd) ✓ |
+| Instrument | — | — | row 2 | — | — | row 2 ✓ |
+| Time/Start | row 4 | row 2 ✓ | row 5 ⚠ | row 3 | row 2 ✓ | row 3 ✓ |
+| Curve Y1/Y2 | row 5 | row 3 ✓ | — | — | row 3 ✓ | row 4 ✓ |
+| Curve Model | row 6 | row 4 ✓ | — | — | row 4 ✓ | row 5 ✓ |
+| Pitch | row 2 ⚠ | row 5 ✓ | rows 2–3 ⚠ | row 2 ⚠ | row 5 ✓ | row 6 ✓ |
+| Dynamic | row 3 ⚠ | row 6 ✓ | row 4 | row 2 ⚠ | row 6 ✓ | row 7 ✓ |
+| Volume Mode | — | row 7 ✓ | — | — | — | row 8 ✓ |
+| Velocity | row 7 | row 8 ✓ | — | — | — | — |
+| Color | row 8 | row 9 ✓ | — | — | row 7 ✓ | row 11 ✓ |
+| Fill | row 9 | row 10 ✓ | — | — | row 8 ✓ | row 12 ✓ |
+| Buttons | row 10 | row 12 ✓ | row 8 | row 6 | row 9 ✓ | row 13 ✓ |
+
+✓ = matches standard position, ⚠ = deviates from standard
+
+### 20.4 Extending the Standard
+
+When designing a new system that requires fields not yet in the standard (§20.1), add the new field to the table at the appropriate position relative to existing fields, and document the addition here.
+
+**Extension log:**
+- **Articulation** (pos 9.5, between Volume Mode and Velocity): select field for articulation technique (e.g., spiccato). Added by Accel/Decel system.
+- **Density / Humanize** (pos 10.5, after Velocity): paired slider+number controls for note density and timing humanization. Added by Accel/Decel system.
+- **Direction Indicator** (pos 17.5, after Action Buttons): read-only label showing auto-detected accel/decel direction. Added by Accel/Decel system.
 
 ---
 

@@ -18,7 +18,9 @@ A **Musical Material Assembly** is a complete notation object that flows through
 
 ## Step 1: Define the Notation Type
 
-Gather and organize this information before prompting:
+Gather and organize this information before prompting.
+
+**⚡ Before filling in the MIDI spec below, consult `docs/MIDI_MUSIC_GENERATION.md` §19 (MIDI Architecture Standards) for established patterns on pitch bend segmentation, pitch/volume coupling, volume control method, channel bank selection, and timing database usage.**
 
 ```
 NOTATION TYPE NAME: ___

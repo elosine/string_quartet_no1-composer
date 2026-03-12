@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 11, 2026  
-**Current ASB Number:** ASB-167
+**Last Updated:** Mar 12, 2026  
+**Current ASB Number:** ASB-174
 
 ---
 
@@ -30,6 +30,7 @@ That's it. Everything else below is for Cascade.
 | `docs/AI_BARTOK_PIZZ_PROMPT_GUIDE.md` | AI-prompted Bartók pizz insertion | — |
 | `docs/AI_PIZZ_TREM_GLISS_PROMPT_GUIDE.md` | AI-prompted Pizz Trem Gliss insertion | — |
 | `docs/MUSICAL_MATERIAL_WORKFLOW.md` | Building any new musical material system | — |
+| `docs/MIDI_MUSIC_GENERATION.md` (esp. §19) | Any MIDI generation work | — |
 | `docs/WORKFLOW_METHODOLOGY.md` | Debugging or process questions | — |
 
 ### 2. Active Rules
@@ -59,7 +60,7 @@ That's it. Everything else below is for Cascade.
 | Col Legno Battuto, Jeté | **Complete (Pipeline + Bundle + Batch)** | Full pipeline: SVG assembly engine (cross notehead, stem, marcato, c.l.b. jeté text, dynamic), server endpoint, UI panel (random pitch, GC preset selector w/ animated preview), GC + SVG + MIDI bundle system, batch console scripts for vertical assemblages. See ASB-156–162 |
 | Col Legno Harmonic Flutter | **Notation Complete (pre-test)** | Custom calligraphic diamond enclosure + squiggle stem + "col legno" text. 3 templates: violin (treble, B3→D4), viola (alto, E3→G3), cello (bass, E2→G2). Vertical fine-tuning complete. See ASB-163–164 |
 | Harmonic Tremolo | **Notation Complete (pre-test)** | Diamond enclosure + 3 filled parallelogram tremolo slashes on stem (from SVG polygon data). Scheme variables `tremolo-center`/`tremolo-gap` for positioning. 3 templates: violin, viola, cello. See ASB-165 |
-| Feathered Beam Assembly | **Assembly Complete (pre-pipeline)** | `assembleFeatheredBeam()` — single pitch + glissando variants, accel/decel feathered beam block, above/below placement (ledger line logic), dynamics + hairpin (no secco/nonVib). 10 test SVGs. Global accidental shift fix. See ASB-166–167 |
+| Feathered Beam (Accel/Decel) | **Complete (Pipeline + Bundle + Fixes)** | Full pipeline: `assembleFeatheredBeam()` SVG assembly (single pitch + glissando), server endpoint (`/api/svg-assembly/feathered-beam`), AccelDecelUI panel (§20.1 field order), 2-step workflow (curve → generate), MIDI generation (curve-integrated density, humanized timing, pitch bend gliss, per-note velocity, CC0 articulation), bundle system (curve + SVG + MIDI), CurveMaker hooks (drag/move/select/regen/slope sync), ScoreManager persistence, SVGElementManager patches, Delete key handler. Bug fixes: SVG sizing (heightFraction scaling), Delete Bundle (correct method names), _activeBundleId wiring, pitch range hints. Black color swatch added to all systems. See ASB-166–174 |
 
 ### 4. Reusable Tools (remember these exist)
 
@@ -160,11 +161,259 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Current Session
 
-**Date:** Mar 11, 2026  
-**Focus:** Custom Notation Templates, Glyph Library Expansion, Feathered Beam Assembly  
-**ASB:** ASB-163 through ASB-167  
-**Tier 1 Count This Session:** 5 (ASB-163–167)  
-**Tier 2 Commits:** ASB-163–167
+**Date:** Mar 12, 2026  
+**Focus:** MIDI Snippet Architecture Analysis, MIDI Full System Audit, UI Layout Audit, Feathered Beam Pipeline + Fixes  
+**ASB:** ASB-174  
+**Tier 1 Count This Session:** 7 (ASB-168, ASB-169, ASB-170, ASB-171, ASB-172, ASB-173, ASB-174)  
+**Tier 2 Commits:** 1 (ASB-168–174)
+
+### Session Log — Feathered Beam Pipeline + Fixes
+- ASB-171: AccelDecelUI panel HTML (§20.1 field order, `adu` prefix IDs, goldenrod header) + server endpoint (`POST /api/svg-assembly/feathered-beam`) + JS object init (instrumentRanges, createCurve, step1, updatePitchRangeUI). Files: `public/index.html` (~lines 1253-1310, ~25059), `server.js` (~line 1230).
+- ASB-172: AccelDecelUI step2() + MIDI generation (migrated from MidiModelSystem.generateAccelDecelEvents — curve integral method, density 0-50→2-32 notes, Gaussian humanization, hybrid chromatic gliss, per-note velocity, CC0 articulation) + SVG insertion (heightFraction/staffHeight dual scaling, notehead-center X anchoring) + MIDI insertion (MidiSnippetDatabase + MidiController). File: `public/index.html` (~lines 25210-25368).
+- ASB-173: Bundle system (registerBundle/lookupByCurveId/lookupBySvgId/deleteBundle/export/import) + CurveMaker hooks (move propagation, select/deselect bundle row, shape change → needsRegeneration flag, slope sync, _isBundleDragging guard) + ScoreManager persistence (`adBundles` source) + initBundleUI (SVGElementManager select/deselect patches, Delete key handler, triple-fallback button handlers). File: `public/index.html` (~lines 25370-25442, hooks at ~17387/17430/17470/17528/17586).
+- ASB-174: Bug fixes — (1) SVG sizing 294%→90%: changed feathered beam profiles from `scaleMode:'staffHeight'` to `scaleMode:'heightFraction'` with `heightFraction:0.90` (scales overall SVG, not just staff). (2) Delete Bundle not working: `CurveMaker.deleteCurve()` and `SVGElementManager.deleteElement()` don't exist — changed to `set selection + call deleteSelected()`. (3) `_activeBundleId` wiring: set in CurveMaker selectCurve hook, cleared on delete/deselect. (4) Pitch range hints: `<span>` elements + tooltip upgrades. (5) Black color swatch added to all systems. Files: `index.html`, `assemble_svg.js`.
+
+### Session Log — UI Layout Standards
+- ASB-170: UI Layout Audit & Unified Field Order Standard — comprehensive audit of all 7 system UI panels (Sustained Tone, Vibrato, One-Shots BP/BOP/CLB, Notation Fragments, Pizz Tremolo, Pizz Trem Glissando). Documented every UI element (inputs, selects, radios, checkboxes, buttons, canvases, swatches) with IDs and row order. Cross-comparison table showing field position consistency. Established unified field order standard (§20 in MIDI_MUSIC_GENERATION.md) based on Sustained Tone System (CrescendoUI) as reference implementation: 19 standard positions from Track/Clef (1-2) through Bundle Row (19). Key findings: Vibrato reverses Track/Clef order, One-Shots place Time after Dynamic, Pizz Trem puts Pitch before Time. Existing systems NOT updated — standard applies to new systems going forward. §20.4 extension log for future field additions.
+
+### Session Log — MIDI Snippet Architecture Analysis
+- ASB-168: MIDI Snippet Architecture Analysis — comprehensive cross-system comparison of 4 MIDI generation systems (Sustained Tone single pitch, Sustained Tone glissando, Pizzicato Tremolo, Pizz Trem Glissando) documenting inputs, decisions, and outputs for each. XLD Cell confirmed non-existent (TODO only). Key findings: (1) Sustained Tone uses CC7 for volume (4 modes: curve/steady/linear/inverseCurve) on channels 8–11, pitch and volume are decoupled (pitch follows pitchMode, volume follows volumeMode), glissando segments when pitch drifts >2 semitones, secco CC7 ramp-down; (2) Pizz Tremolo uses human performance timing DB (`pizz_tremolo_db.json`, 378 notes, 9 segments), CC7 ramp (3 shapes: cres/decres/hp), single fixed pitch, channels 8–11, client-side generation; (3) Pizz Trem Glissando uses same timing DB but server-side generation, curve Y directly drives pitch (not decoupled), per-note velocity interpolation (linear, not curve-shaped), segments when pitch drifts >1 semitone, channels 0–3 (no CC7), pitch bend updated per-note not continuously. Analysis performed as pre-work for Feathered Beam MIDI pipeline design.
+
+- ASB-169: Full MIDI Generation Audit — comprehensive audit of ALL 14 MIDI generation systems in the codebase. Organized by category below.
+
+#### Category A: Curve-Based Sustained Systems (generate .mid files, server-save, parse+insert)
+
+**A1. Sustained Tone — Single Pitch** (`CrescendoUI.generateCrescendoMidi`, pitchModel='singlePitch')
+- Location: `public/index.html` ~line 23290
+- Channel: Volume bank (trackIndex + 8 → ch 8–11)
+- CC0: 89 (senza vibrato)
+- Volume: CC7 with 4 modes (curve/steady/linear/inverseCurve), dynamics map {pppp:40…ffff:127}, sampled every 50ms
+- Pitch: Single MIDI note, static quarter-tone pitch bend if needed (±8192/semitone), reset after note-off
+- Secco: 5ms wait + 3-step CC7→0 ramp over 10ms (last segment only)
+- Output: Format 1 .mid per segment → `/api/midi/save` → parse → MidiSnippetDatabase
+
+**A2. Sustained Tone — Glissando** (`CrescendoUI.generateCrescendoMidi`, pitchModel='glissando')
+- Location: `public/index.html` ~line 23290
+- Channel: Volume bank (trackIndex + 8 → ch 8–11)
+- CC0: 89 (senza vibrato)
+- Pitch/Volume: DECOUPLED — pitch follows pitchMode (curve Y / linear / inverseCurve), volume (CC7) independently follows volumeMode
+- Segmentation: New segment when pitch drifts >2 semitones from base MIDI note. Per-segment MIDI note offset ±1 from effective pitch. Pitch bend sampled every 50ms.
+- Output: Multiple .mid files (one per segment), same save+parse+insert pattern
+
+**A3. Vibrato** (`VibratoUI.generateVibratoMidi`)
+- Location: `public/index.html` ~line 21973
+- Channel: Vibrato bank (track + 3 → ch 4–7)
+- CC0: 89 (senza vibrato / vibrato articulation)
+- Volume: None (no CC7)
+- Pitch: Single MIDI note, static quarter-tone pitch bend if needed, reset after note-off
+- Special: CC4 (vibrato intensity 0–127) + Channel Pressure (aftertouch, same value) both follow curve Y, sampled every 50ms
+- Output: Format 1 .mid → `/api/midi/save` → parse via `LongToneUI.parseMidiFileToEvents` → MidiSnippetDatabase
+
+#### Category B: Curve-Based MidiModelSystem Systems (generate event arrays, direct insertion)
+
+**B1. Accel/Decel** (`MidiModelSystem.generateAccelDecelEvents`)
+- Location: `public/index.html` ~line 12589
+- Channel: Inherited from curve's track (uses whatever channel the attachment target uses)
+- CC0: Optional per selected articulation (spiccato=91, senza vibrato=89, or none)
+- Volume: None (no CC7) — all notes same velocity
+- Pitch modes: (a) Single pitch, (b) Pure pitch bend gliss (≤1 semitone range), (c) Hybrid chromatic gliss (>1 semitone: chromatic note steps + inter-note pitch bend slides, 4-step bend toward next note during 60% of note duration)
+- Note placement: Curve integral method — higher Y = shorter interval (faster). Density 0–50 maps to 2–32 notes. Gaussian humanization (±8ms max, reduced in fast sections).
+- Note duration: 50ms base with ±10% Gaussian variation (capped 35–80ms)
+- Quarter-tone: Pitch bend offset per note, reset at end
+- Output: Event array → MidiSnippetDatabase.add() → Pattern 3
+
+**B2. Crescendo/Decrescendo** (`MidiModelSystem.generateCrescDecrescEvents`)
+- Location: `public/index.html` ~line 12955
+- Channel: Inherited from curve's track
+- CC0: 89 (senza vibrato) at tick 0
+- Volume: CC7 follows normalized curve Y, mapped from startVol→endVol, sampled every 20ms
+- Pitch modes: (a) Single pitch, (b) Glissando with pitch bend (uses `targetPitchOffset % 2` for bend within ±2 range)
+- Secco: CC7→0 at +7ms, Note Off at +10ms with velocity 127
+- Non-secco: Tail delay (configurable ms), then Note Off
+- Note: Single sustained note for entire curve duration
+- Quarter-tone: Static pitch bend at start, reset after note-off
+- Output: Event array → MidiSnippetDatabase.add() → Pattern 3
+
+**B3. Long Tone** (`MidiModelSystem.generateLongToneSegments`)
+- Location: `public/index.html` ~line 12088
+- Channel: Inherited from curve's track
+- Same pitch bend segmentation algorithm as Sustained Tone Glissando (PITCH_BEND_RANGE = 2)
+- Supports single pitch and glissando pitch modes
+- Output: Segments with pitch bend data → exportable as .mid files via `exportLongToneMidiFiles()`
+
+#### Category C: One-Shot Articulations (discrete events, Pattern 3 direct insertion)
+
+**C1. Bartók Pizzicato — Full Pipeline** (`BartokPizzUI.insertBartokMidi`)
+- Location: `public/index.html` ~line 25063
+- Channel: Base bank (track - 1 → ch 0–3)
+- CC0: 97
+- Velocity: Dynamic-mapped (ppp:30, pp:45, p:60, mp:70, mf:85, f:95, ff:107, fff:120)
+- Duration: 95.4ms (snap pizz)
+- Pitch: Manual or random per instrument range. Quarter-tone pitch bend (12288/4096), reset after note-off.
+- Part of full pipeline: SVG assembly → GC → SVG insert → MIDI → bundle registration
+- Output: Event array → MidiSnippetDatabase.add() → Pattern 3
+
+**C2. Bartók Pizzicato — Standalone** (`MidiModelSystem.generateBartokPizzMidi`)
+- Location: `public/index.html` ~line 13963
+- Channel: Base bank (track - 1 → ch 0–3)
+- CC0: 97
+- Velocity: User-specified (default 127)
+- Duration: 240 ticks at 1920 TPQ / 763307 µs/beat ≈ 95ms
+- Pitch: Manual or random per instrument range. Quarter-tone pitch bend.
+- Not part of pipeline — standalone MIDI snippet, can be attached to existing GC
+- Output: Event array → MidiSnippetDatabase.add() → Pattern 3
+
+**C3. Bow Overpressure** (`BowOverpressureUI.insertMidi`)
+- Location: `public/index.html` ~line 25809
+- Channel: Base bank (track - 1 → ch 0–3)
+- CC0: 53
+- Velocity: 127 (fixed)
+- Duration: 250ms (fixed)
+- Pitch: Manual or random per instrument range. Quarter-tone pitch bend.
+- Part of full pipeline: SVG assembly → GC → SVG insert → MIDI → bundle registration
+- Output: Event array → MidiSnippetDatabase.add() → Pattern 3
+
+**C4. Col Legno Gettato** (`MidiModelSystem.generateColLegnoGettatoMidi`)
+- Location: `public/index.html` ~line 13361
+- Channel: Base bank (track - 1 → ch 0–3)
+- CC0: 83
+- Velocity: User-specified (default 127)
+- Duration: Random 250–390ms
+- Pitch: Manual or random per instrument range. Quarter-tone pitch bend.
+- Standalone: Not attached to GC
+- Output: Event array → MidiSnippetDatabase.add() → Pattern 3
+
+**C5. Gettato** (`MidiModelSystem.generateGettatoMidi`)
+- Location: `public/index.html` ~line 13547
+- Channel: Base bank (track - 1 → ch 0–3)
+- CC0: 20
+- Velocity: User-specified (default 127)
+- Duration: Random 250–390ms
+- Pitch: Manual or random per instrument range. Quarter-tone pitch bend.
+- Standalone: Not attached to GC
+- Output: Event array → MidiSnippetDatabase.add() → Pattern 3
+
+#### Category D: Cluster / Multi-Note Systems
+
+**D1. Two-Hand Pizz Grace Note Clusters** (`MidiModelSystem.generateTwoHandPizzGraceMidi`)
+- Location: `public/index.html` ~line 13723
+- Channel: Base bank (track - 1 → ch 0–3)
+- CC0: Mixed per note — 50/50 shuffled distribution of CC0=80 (behind bridge) and CC0=69 (regular pizz)
+- Velocity: Per-note from cluster database
+- Duration: Random 30–60ms per note
+- Pitch: Behind bridge → random open string; Regular pizz → random in instrument range with 50% chance of quarter-tone
+- Timing: From `grace_note_cluster_db.json` — samples a random cluster, uses recorded relative onset times
+- Alignment: Pre (snippet ends at time) or Post (snippet starts at time)
+- Standalone: Not attached to GC
+- Output: Event array → MidiSnippetDatabase.add() → Pattern 3
+
+#### Category E: Tremolo Systems (timing DB-driven)
+
+**E1. Pizzicato Tremolo** (`PizzTremUI.insertPizzTremMidi`)
+- Location: `public/index.html` ~line 27345
+- Channel: Volume bank (trackIndex + 8 → ch 8–11)
+- CC0: 95 at snippet start
+- Volume: CC7 ramp every 20ms — 3 shapes: cres (50→127), decres (127→0), hp (50→127→0 symmetric)
+- Pitch: Single fixed pitch, all notes same velocity
+- Timing: From `pizz_tremolo_db.json` (378 notes, 9 segments) via `sampleNotes()` — random start, sequential walk, wraps with avg gap
+- Quarter-tone: Static pitch bend at start, reset at end
+- Alignment: Pre or Post
+- Output: Event array directly into MidiSnippetDatabase (no .mid file)
+
+**E2. Pizz Trem Glissando** (`generate_pizz_trem_gliss_midi.js`)
+- Location: `lilypond_code/generate_pizz_trem_gliss_midi.js` (server-side Node.js)
+- Channel: Base bank (track - 1 → ch 0–3) — NO CC7
+- CC0: 95 at tick 0
+- Volume: Per-note velocity linear interpolation startVel→endVel (NOT curve-shaped)
+- Pitch: Curve Y directly drives pitch (coupled, not decoupled). `generateCurveSamples()` replicates CurveMaker (logarithmic/power/sigmoid/linear).
+- Segmentation: New segment when pitch drifts >1 semitone from current MIDI note. MIDI note offset ±1 in direction of travel. Pitch bend updated per-note (not continuous 50ms sampling). Bend NOT reset between notes within segment.
+- Timing: Same `pizz_tremolo_db.json` + `sampleNotes()` as Pizz Tremolo
+- Output: Format 1 .mid → server disk → fetched + parsed via `MidiController.parseMidiFile()` → inserted
+
+#### Category F: Notation Fragment Pipeline (LilyPond → MIDI post-processing)
+
+**F1. Notation Fragment MIDI** (`state_tracker.js` + `modify_midi.js`)
+- Location: `lilypond_code/state_tracker.js`, `lilypond_code/modify_midi.js`
+- Pipeline: LilyPond renders `.ly` → raw `.mid` + Scheme engraver event log JSON → `state_tracker.js` converts event log to CC map JSON → `modify_midi.js` rewrites channel + injects per-note CC0/velocity/gliss instructions
+- Channel: User-specified (0-indexed), all channel voice events rewritten
+- CC injection: Per-note CC0 from LilyPond `\midiCCZero` tags (e.g. 95=pizz, 97=Bartók pizz, 71=open string pizz, 80=behind bridge, 89=arco)
+- Velocity override: Per-note from `\midiVelocity` tags (e.g. sfz → 127)
+- Glissando: Per-note `\midiGliss` triggers 20-step linear pitch bend ramp across note duration, then reset to center. Fractional semitones supported.
+- Format: Rewrites existing LilyPond MIDI (384 TPQ) — does NOT generate from scratch
+- Output: Modified `.mid` file (`-Mod.mid` suffix) ready for manual insertion
+
+#### Summary Table
+
+| # | System | CC0 | Channel Bank | Volume Method | Pitch Method | Generation | Insertion |
+|---|--------|-----|-------------|---------------|-------------|------------|----------|
+| A1 | Sustained Tone (single) | 89 | Volume (8–11) | CC7 (4 modes) | Static | Client .mid | Parse+DB |
+| A2 | Sustained Tone (gliss) | 89 | Volume (8–11) | CC7 (4 modes) | Bend segments | Client .mid | Parse+DB |
+| A3 | Vibrato | 89 | Vibrato (4–7) | None | Static | Client .mid | Parse+DB |
+| B1 | Accel/Decel | Optional | Inherited | Per-note vel | Hybrid gliss | Client events | Direct DB |
+| B2 | Cresc/Decresc | 89 | Inherited | CC7 (curve) | Bend | Client events | Direct DB |
+| B3 | Long Tone | — | Inherited | — | Bend segments | Client events | Export .mid |
+| C1 | Bartók Pizz (pipeline) | 97 | Base (0–3) | Dynamic→vel | Static | Client events | Direct DB |
+| C2 | Bartók Pizz (standalone) | 97 | Base (0–3) | User vel | Static | Client events | Direct DB |
+| C3 | Bow Overpressure | 53 | Base (0–3) | Fixed 127 | Static | Client events | Direct DB |
+| C4 | Col Legno Gettato | 83 | Base (0–3) | User vel | Static | Client events | Direct DB |
+| C5 | Gettato | 20 | Base (0–3) | User vel | Static | Client events | Direct DB |
+| D1 | THPGNC | 80/69 | Base (0–3) | Per-note (DB) | Random | Client events | Direct DB |
+| E1 | Pizz Tremolo | 95 | Volume (8–11) | CC7 ramp | Static | Client events | Direct DB |
+| E2 | Pizz Trem Gliss | 95 | Base (0–3) | Per-note vel | Bend segments | Server .mid | Parse |
+| F1 | Notation Fragment | Various | User-specified | Per-note vel | Gliss bend | LilyPond+post | Manual |
+
+#### CC7 Volume Handling Analysis
+
+3 systems use CC7 for volume control:
+
+**1. Sustained Tone** (`CrescendoUI.generateCrescendoMidi`) — **REFERENCE STANDARD**
+- Channel bank: Volume (ch 8–11). Sample interval: 50ms.
+- Dynamics→CC7 map: `{pppp:40, ppp:47, pp:55, p:64, mp:70, mf:80, f:89, ff:100, fff:113, ffff:127}`
+- 4 volume modes: Curve (Y→Dyn1↔Dyn2, direction-validated), Inverse Curve (1-Y, direction-validated), Linear (straight ramp Dyn1→Dyn2), Steady (flat at Dyn1)
+- Secco ramp-down (last segment): 5ms wait → 3-step ramp (66%→33%→0%) over 10ms
+- Initial CC7 written at tick 0 of each segment
+
+**2. Pizzicato Tremolo** (`PizzTremUI.generateCC7Ramp`) — **TODO: update to match standard**
+- Channel bank: Volume (ch 8–11). Sample interval: 20ms.
+- 3 fixed shapes: cres (50→127), decres (127→0), hp (50→127→0 symmetric). No dynamics map.
+
+**3. MidiModelSystem Cresc/Decresc** (`generateCrescDecrescEvents`)
+- Channel bank: Inherited. Sample interval: 20ms.
+- Single mode: normalized curve Y interpolated startVol→endVol (raw 0–127 sliders, not dynamics-mapped)
+- Secco: instant CC7→0 at +7ms
+
+**Other:** Preview/Panic reset sends CC7=100 (unity) on all 16 channels.
+
+#### Velocity Handling Analysis
+
+**Dynamic → Velocity map** (identical in 4 locations before standardization):
+`{ pppp:15, ppp:30, pp:45, p:60, mp:70, mf:85, f:95, ff:107, fff:120, ffff:127 }`
+
+**Systems using dynamic→velocity map (one-shots):**
+- **Bartók Pizz — One-Shot Pipeline** (`BartokPizzUI.insertBartokMidi`) — canonical `dynamicToVelocity()` definition
+- **Col Legno Battuto Jeté — One-Shot** (`ColLegnoBattutoUI.insertMidi`) — delegates to `BartokPizzUI.dynamicToVelocity()`
+- **Bow Overpressure — One-Shot** (`BowOverpressureUI.insertMidi`) — has `dynamicToVelocity()` but **ignores it**, hardcodes velocity=127
+
+**Systems using dynamic→velocity map (non-one-shot):**
+- **Pizz Tremolo** (`PizzTremUI`) — own copy of identical map, single velocity for all notes
+- **Pizz Trem Gliss** (`generate_pizz_trem_gliss_midi.js`) — `DYNAMIC_VELOCITY` constant, per-note linear interpolation startDyn→endDyn
+
+**Systems using raw velocity input (no dynamics map):**
+- MidiModelSystem standalone models (Bartók Pizz, CLG, Gettato): raw UI input, default 127
+- MidiModelSystem Accel/Decel: raw UI input, default 100
+- MidiModelSystem Cresc/Decresc: raw UI input, default 100
+- CrescendoUI (Sustained Tone): raw UI input, default 115
+- VibratoUI: raw UI input, default 115
+
+**Fixed/special velocity:**
+- BowOverpressureUI: fixed 127 (non-conforming — should use dynamics map)
+- THPGNC: per-note from `grace_note_cluster_db.json`
+
+**New standard (blunt map):** Velocity-to-volume yields quiet results in the synth, so dynamics are collapsed into fewer velocity tiers for approximately correct audible levels:
+`{ pppp:95, ppp:95, pp:95, p:95, mp:103, mf:103, f:111, ff:119, fff:127, ffff:127 }`
+Applied to all one-shot systems: Bartók Pizz, Bow Overpressure, Col Legno Battuto Jeté.
+
+*Systems not found in codebase: XLD Cell (TODO only), Col Legno Battuto Jeté (no dedicated MIDI — uses CLB batch via one-shot panels), Harmonic Tremolo (no MIDI system yet).*
 
 ### Session Log — Custom Notation Templates + Feathered Beam Assembly
 - ASB-163: Col Legno Harmonic Flutter templates — custom calligraphic diamond enclosure (4-edge variable stroke weight), vertical stem, 5-loop sine wave squiggle, "col legno" text. 3 instrument versions: violin (treble, B3→D4), viola (alto, E3→G3), cello (bass, E2→G2). Scheme variables for all positioning.
@@ -560,6 +809,9 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | ASB-156 | ObjectSelector menu track+time labels — T1/T2 + @123.4s before name, all 8 object types, menu widened to 380px | Complete |
 | ASB-157 | LW meter center bar removed — transparent center lets line-wedge shape show thickness changes underneath donut ring | Complete |
 | ASB-158 | ObjectSelector time-proximity filter — converts click X to seconds, excludes objects >±10s from click time, fixes page-wide hit results | Complete |
+| ASB-168 | MIDI Snippet Architecture Analysis — cross-system comparison of 4 MIDI generation systems (Sustained Tone single/gliss, Pizz Trem, PTG) documenting inputs, decisions, outputs | Complete |
+| ASB-169 | Full MIDI Generation Audit — all 14 MIDI systems categorized (A–F), summary table, CC7 volume analysis, velocity handling analysis, blunt velocity map standard | Complete |
+| ASB-170 | UI Layout Audit & Unified Field Order Standard — audit of all 7 UI panels, §20 in MIDI_MUSIC_GENERATION.md, 19-position standard based on Sustained Tone | Complete |
 
 ---
 

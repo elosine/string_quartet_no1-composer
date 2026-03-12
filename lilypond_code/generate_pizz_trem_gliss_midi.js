@@ -38,10 +38,12 @@ const BEND_PER_SEMITONE = 8192;
 const BEND_MIN = 0;
 const BEND_MAX = 16383;
 
-// Dynamic → MIDI velocity
+// Dynamic → MIDI velocity (blunt map — see §19.3.2 in MIDI_MUSIC_GENERATION.md)
+// Compressed tiers: synth velocity→volume yields quiet results, so dynamics are
+// collapsed into fewer velocity levels for approximately correct audible output.
 const DYNAMIC_VELOCITY = {
-    pppp: 15, ppp: 30, pp: 45, p: 60, mp: 70,
-    mf: 85, f: 95, ff: 107, fff: 120, ffff: 127
+    pppp: 95, ppp: 95, pp: 95, p: 95, mp: 103,
+    mf: 103, f: 111, ff: 119, fff: 127, ffff: 127
 };
 
 // Timing database path

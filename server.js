@@ -1164,6 +1164,77 @@ app.post('/api/svg-assembly/sustained-tone-glissando', (req, res) => {
     }
 });
 
+app.post('/api/svg-assembly/feathered-beam', (req, res) => {
+    const { variant, pitch, startPitch, endPitch, clef, dynamic1, dynamic2, hairpin, featheredType, filename } = req.body;
+    
+    const v = variant || 'singlePitch';
+    if (v === 'singlePitch' && !pitch) {
+        return res.status(400).json({ success: false, error: 'Missing required parameter: pitch (for singlePitch variant)' });
+    }
+    if (v === 'glissando' && (!startPitch || !endPitch)) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters: startPitch, endPitch (for glissando variant)' });
+    }
+    if (!clef || !dynamic1) {
+        return res.status(400).json({ success: false, error: 'Missing required parameters: clef, dynamic1' });
+    }
+    
+    try {
+        const clefName = clef === 'cClef' ? 'alto' : clef;
+        let params;
+        
+        if (v === 'glissando') {
+            params = {
+                variant: 'glissando',
+                staffPosition1: svgAssembly.pitchToStaffPosition(startPitch, clefName),
+                staffPosition2: svgAssembly.pitchToStaffPosition(endPitch, clefName),
+                accidental1: svgAssembly.pitchToAccidental(startPitch),
+                accidental2: svgAssembly.pitchToAccidental(endPitch),
+                dynamic1,
+                dynamic2: dynamic2 || null,
+                hairpin: hairpin || 'none',
+                featheredType: featheredType || 'accel',
+                debug: false
+            };
+        } else {
+            params = {
+                variant: 'singlePitch',
+                staffPosition: svgAssembly.pitchToStaffPosition(pitch, clefName),
+                accidental: svgAssembly.pitchToAccidental(pitch),
+                dynamic1,
+                dynamic2: dynamic2 || null,
+                hairpin: hairpin || 'none',
+                featheredType: featheredType || 'accel',
+                debug: false
+            };
+        }
+        
+        const result = svgAssembly.assembleFeatheredBeam(params);
+        const { svg, metadata } = result;
+        
+        let svgPath = null;
+        if (filename) {
+            const svgOutputDir = path.join(__dirname, 'public', 'SVG_graphics');
+            const baseName = path.basename(filename, '.ly');
+            const svgFile = path.join(svgOutputDir, `${baseName}.svg`);
+            fs.writeFileSync(svgFile, svg);
+            svgPath = `/SVG_graphics/${encodeURIComponent(baseName + '.svg')}`;
+            console.log(`SVG Assembly (feathered-beam): wrote ${baseName}.svg (${metadata.width_mm.toFixed(1)}×${metadata.height_mm.toFixed(1)}mm, variant=${v}, type=${metadata.featheredType}, placement=${metadata.placement})`);
+        }
+        
+        res.json({
+            success: true,
+            svg,
+            svgPath,
+            width: metadata.width_mm,
+            height: metadata.height_mm,
+            metadata
+        });
+    } catch (err) {
+        console.error('SVG Assembly (feathered-beam) error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 app.post('/api/svg-assembly/bow-overpressure-accent', (req, res) => {
     const { pitch, clef, showStaff, filename } = req.body;
     

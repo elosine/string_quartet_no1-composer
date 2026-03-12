@@ -455,9 +455,9 @@ const PROFILES = {
         featheredBlockGap: 0.4,   // vertical gap between pitch block and feathered beam block
         positioning: {
             anchorElement: 'noteheadCenter',
-            scaleMode: 'staffHeight',
-            staffHeightFraction: 0.25,
-            offsetYFraction: 0.05
+            scaleMode: 'heightFraction',
+            heightFraction: 0.90,
+            offsetYFraction: 0.03
         }
     }),
 
@@ -477,9 +477,9 @@ const PROFILES = {
         featheredBlockGap: 0.4,
         positioning: {
             anchorElement: 'startNoteheadCenter',
-            scaleMode: 'staffHeight',
-            staffHeightFraction: 0.25,
-            offsetYFraction: 0.05
+            scaleMode: 'heightFraction',
+            heightFraction: 0.90,
+            offsetYFraction: 0.03
         }
     })
 };

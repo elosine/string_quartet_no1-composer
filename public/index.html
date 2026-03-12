@@ -912,6 +912,7 @@
                     <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
                     <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
                     <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                    <div class="color-swatch" data-color="black" style="background: #000; border: 1px solid #555;"></div>
                 </div>
                 <div class="curve-fill-toggle" style="margin-top: 3px;">
                     <input type="radio" id="ltFillLine" name="ltFill" value="line">
@@ -1012,6 +1013,7 @@
                     <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
                     <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
                     <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                    <div class="color-swatch" data-color="black" style="background: #000; border: 1px solid #555;"></div>
                 </div>
                 <div class="curve-fill-toggle" style="margin-top: 3px;">
                     <input type="radio" id="vibFillLine" name="vibFill" value="line">
@@ -1153,6 +1155,7 @@
                     <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
                     <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
                     <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                    <div class="color-swatch" data-color="black" style="background: #000; border: 1px solid #555;"></div>
                 </div>
                 <div class="curve-fill-toggle" style="margin-top: 3px;">
                     <input type="radio" id="cdFillLine" name="cdFill" value="line">
@@ -1203,6 +1206,208 @@
                     <button id="cdRegenMidiBtn" class="control-btn" style="font-size: 9px; background: var(--clr-limeGreen); color: #000; padding: 2px 8px; display: none;">Regen MIDI</button>
                     <button id="cdReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
                     <button id="cdDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
+                </div>
+                
+                <div class="section-divider"></div>
+                <div class="section-label" style="background: #3a7a6a; color: #fff; padding: 3px 6px; border-radius: 2px;">Accel / Decel System</div>
+                
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Track</label>
+                    <input type="number" id="aduTrackInput" class="curve-input" value="1" min="1" max="4" step="1" style="width: 35px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 5px;">Clef</label>
+                    <select id="aduClefSelect" style="width: 60px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="treble" selected>Treble</option>
+                        <option value="bass">Bass</option>
+                        <option value="cClef">C Clef</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Instr</label>
+                    <select id="aduInstrumentSelect" style="width: 70px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="violin" selected>Violin</option>
+                        <option value="viola">Viola</option>
+                        <option value="cello">Cello</option>
+                    </select>
+                    <span id="aduPitchRangeHint" style="font-size: 8px; color: #888; margin-left: 4px;">G3–F7</span>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Start</label>
+                    <input type="number" id="aduStartInput" class="curve-input" value="0" step="0.1" style="width: 50px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 10px; margin-left: 2px;" id="aduTimeLabel2">End</label>
+                    <input type="number" id="aduEndInput" class="curve-input" value="10" step="0.1" style="width: 50px; font-size: 10px;">
+                    <select id="aduTimeMode" style="width: 38px; background: #333; color: #fff; border: 1px solid #555; font-size: 8px; margin-left: 2px;" title="Switch between End time and Duration">
+                        <option value="end" selected>End</option>
+                        <option value="dur">Dur</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Y1</label>
+                    <input type="number" id="aduY1Input" class="curve-input" value="0" step="0.5" min="0" max="10" style="width: 50px; font-size: 10px;">
+                    <label style="font-size: 9px; min-width: 14px; margin-left: 5px;">Y2</label>
+                    <input type="number" id="aduY2Input" class="curve-input" value="10" step="0.5" min="0" max="10" style="width: 50px; font-size: 10px;">
+                </div>
+                <div class="curve-input-row" style="gap: 2px;">
+                    <label style="font-size: 8px; min-width: 14px;">Md</label>
+                    <select id="aduModelSelect" style="font-size: 8px; padding: 1px 2px; background: #333; color: #fff; border: 1px solid #555; width: 52px;">
+                        <option value="logarithmic" selected>Log</option>
+                        <option value="exponential">Exp</option>
+                        <option value="power">Power</option>
+                        <option value="sigmoid">S-Curve</option>
+                        <option value="bezier">Bezier</option>
+                    </select>
+                    <label style="font-size: 8px; min-width: 14px; margin-left: 2px;">Slp</label>
+                    <input type="number" id="aduSlopeInput" class="curve-input" value="-0.65" step="0.05" min="-3" max="3" style="width: 48px; font-size: 8px; padding: 1px 2px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Pitch</label>
+                    <select id="aduPitchMode" style="width: 80px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="single" selected>Single Pitch</option>
+                        <option value="glissando">Glissando</option>
+                    </select>
+                </div>
+                <div id="aduSinglePitchRow" class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Pitch</label>
+                    <input type="text" id="aduSinglePitchInput" class="curve-input" value="A3" style="width: 55px; font-size: 10px;" placeholder="A3" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                    <span id="aduSinglePitchRangeHint" style="font-size: 8px; color: #888; margin-left: 4px;">G3–F7</span>
+                </div>
+                <div id="aduGlissPitchRow" class="curve-input-row" style="display: none;">
+                    <label style="font-size: 9px; min-width: 28px;">Start</label>
+                    <input type="text" id="aduStartPitch" class="curve-input" value="A3" style="width: 45px; font-size: 10px;" placeholder="A3" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 3px;">End</label>
+                    <input type="text" id="aduEndPitch" class="curve-input" value="Ab3" style="width: 45px; font-size: 10px;" placeholder="Ab3" title="Pitch format: C4, C#4 (sharp), Bb3 (flat), C+4 (quarter sharp), Cd4 (quarter flat), C#+4 (3/4 sharp), Cbd4 (3/4 flat)">
+                    <span id="aduGlissPitchRangeHint" style="font-size: 8px; color: #888; margin-left: 4px;">G3–F7</span>
+                </div>
+                <div id="aduGlissModeRow" class="curve-input-row" style="display: none;">
+                    <label style="font-size: 9px; min-width: 28px;">Gliss</label>
+                    <select id="aduGlissMode" style="width: 100px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;" title="Pitch trajectory mode: how pitch traverses from start to end">
+                        <option value="curve" selected>Curve</option>
+                        <option value="inverseCurve">Inv. Curve</option>
+                        <option value="linear">Linear</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Dyn1</label>
+                    <select id="aduDynamic1" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="pppp">pppp</option>
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p" selected>p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f">f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff">fff</option>
+                        <option value="ffff">ffff</option>
+                    </select>
+                    <label style="font-size: 9px; min-width: 24px; margin-left: 3px;" id="aduDyn2Label">Dyn2</label>
+                    <select id="aduDynamic2" style="width: 50px; font-size: 10px; background: #333; color: #fff; border: 1px solid #555;">
+                        <option value="pppp">pppp</option>
+                        <option value="ppp">ppp</option>
+                        <option value="pp">pp</option>
+                        <option value="p">p</option>
+                        <option value="mp">mp</option>
+                        <option value="mf">mf</option>
+                        <option value="f" selected>f</option>
+                        <option value="ff">ff</option>
+                        <option value="fff">fff</option>
+                        <option value="ffff">ffff</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Vol</label>
+                    <select id="aduVolumeMode" style="width: 100px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;" title="Volume mode: how per-note velocity changes (blunt map §19.3.2)">
+                        <option value="curve" selected>Curve</option>
+                        <option value="inverseCurve">Inv. Curve</option>
+                        <option value="steady">Steady</option>
+                        <option value="linear">Linear</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Art</label>
+                    <select id="aduArticulationSelect" style="width: 120px; background: #333; color: #fff; border: 1px solid #555; font-size: 10px;">
+                        <option value="spiccato" selected>Spiccato (CC0: 15)</option>
+                    </select>
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Dens</label>
+                    <input type="range" id="aduDensitySlider" min="0" max="100" value="45" style="flex: 1; height: 14px;">
+                    <input type="number" id="aduDensityNum" min="0" max="100" value="45" style="width: 36px; font-size: 9px; background: #333; color: #fff; border: 1px solid #555; border-radius: 2px; text-align: center; padding: 1px;">
+                </div>
+                <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Hum</label>
+                    <input type="range" id="aduHumanizeSlider" min="0" max="100" value="20" style="flex: 1; height: 14px;">
+                    <input type="number" id="aduHumanizeNum" min="0" max="100" value="20" style="width: 36px; font-size: 9px; background: #333; color: #fff; border: 1px solid #555; border-radius: 2px; text-align: center; padding: 1px;">
+                </div>
+                <div class="color-swatches" id="aduColorSwatches" style="margin-top: 4px;">
+                    <div class="color-swatch" data-color="brightOrange" style="background: var(--clr-brightOrange);"></div>
+                    <div class="color-swatch" data-color="brightBlue" style="background: var(--clr-brightBlue);"></div>
+                    <div class="color-swatch" data-color="mustard" style="background: var(--clr-mustard);"></div>
+                    <div class="color-swatch" data-color="brightRed" style="background: var(--clr-brightRed);"></div>
+                    <div class="color-swatch" data-color="green" style="background: var(--clr-green);"></div>
+                    <div class="color-swatch selected" data-color="limeGreen" style="background: var(--clr-limeGreen);"></div>
+                    <div class="color-swatch" data-color="brightGreen" style="background: var(--clr-brightGreen);"></div>
+                    <div class="color-swatch" data-color="navyBlue" style="background: var(--clr-navyBlue);"></div>
+                    <div class="color-swatch" data-color="plum" style="background: var(--clr-plum);"></div>
+                    <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
+                    <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
+                    <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                    <div class="color-swatch" data-color="black" style="background: #000; border: 1px solid #555;"></div>
+                </div>
+                <div class="curve-input-row" style="margin-top: 3px;">
+                    <label style="font-size: 9px; min-width: 28px;">Opac</label>
+                    <input type="number" id="aduOpacityInput" class="curve-input" value="0.30" min="0" max="1" step="0.05" style="width: 50px; font-size: 10px;" title="Curve opacity (0–1)">
+                </div>
+                <div class="curve-fill-toggle" style="margin-top: 3px;">
+                    <input type="radio" id="aduFillLine" name="aduFill" value="line">
+                    <label for="aduFillLine">Line</label>
+                    <input type="radio" id="aduFillBottom" name="aduFill" value="bottom" checked>
+                    <label for="aduFillBottom">Fill ↓</label>
+                    <input type="radio" id="aduFillTop" name="aduFill" value="top">
+                    <label for="aduFillTop">Fill ↑</label>
+                </div>
+                <div class="control-row" style="margin-top: 5px; gap: 5px;">
+                    <button id="aduStep1Btn" class="control-btn" style="font-size: 11px; background: var(--clr-brightOrange); color: #000; font-weight: bold; padding: 4px 8px;">1: Curve</button>
+                    <button id="aduStep2Btn" class="control-btn" style="font-size: 11px; background: var(--clr-limeGreen); color: #000; font-weight: bold; padding: 4px 8px;">2: Generate</button>
+                </div>
+                <div id="aduDirectionIndicator" style="font-size: 9px; color: #8af; margin-top: 4px; display: none;"></div>
+                <div id="aduPitchWarning" style="display: none; font-size: 9px; color: #f44; margin-top: 2px;">⚠ Pitch out of instrument range</div>
+                <div id="aduCurveAdjustSection" style="display: none; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 4px;">
+                    <div style="font-size: 9px; color: #3a7a6a; font-weight: bold; margin-bottom: 3px;">Curve Adjust</div>
+                    <div class="curve-input-row" style="margin-bottom: 2px;">
+                        <label style="font-size: 9px; min-width: 28px;">Start</label>
+                        <input type="text" id="aduAdjStart" class="curve-input" value="0.000" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                        <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">End</label>
+                        <input type="text" id="aduAdjEnd" class="curve-input" value="1.000" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    </div>
+                    <div class="curve-input-row" style="margin-bottom: 2px;">
+                        <label style="font-size: 9px; min-width: 28px;">Y1</label>
+                        <input type="text" id="aduAdjY1" class="curve-input" value="0.0" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                        <label style="font-size: 9px; min-width: 22px; margin-left: 6px;">Y2</label>
+                        <input type="text" id="aduAdjY2" class="curve-input" value="10.0" style="width: 60px; font-size: 9px; padding: 2px 3px;">
+                    </div>
+                    <div class="curve-input-row" style="margin-bottom: 2px; gap: 2px;">
+                        <label style="font-size: 8px; min-width: 14px;">Md</label>
+                        <select id="aduAdjModel" style="font-size: 8px; padding: 1px 2px; background: #333; color: #fff; border: 1px solid #555; width: 52px;">
+                            <option value="logarithmic">Log</option>
+                            <option value="exponential">Exp</option>
+                            <option value="power">Power</option>
+                            <option value="sigmoid">S-Curve</option>
+                            <option value="bezier">Bezier</option>
+                        </select>
+                        <label style="font-size: 8px; min-width: 14px; margin-left: 2px;">Slp</label>
+                        <input type="number" id="aduAdjSlope" class="curve-input" value="-0.65" step="0.05" min="-3" max="3" style="width: 48px; font-size: 8px; padding: 1px 2px;">
+                    </div>
+                    <div class="curve-input-row" style="margin-bottom: 2px;">
+                        <label style="font-size: 9px; min-width: 28px;">Opac</label>
+                        <input type="number" id="aduAdjOpacity" class="curve-input" value="0.30" min="0" max="1" step="0.05" style="width: 50px; font-size: 9px; padding: 2px 3px;" title="Curve opacity (0–1)">
+                    </div>
+                </div>
+                <div id="aduBundleRow" class="curve-input-row" style="display: none; margin-top: 4px; align-items: center;">
+                    <label style="font-size: 9px; min-width: 28px; color: #3a7a6a;">Start</label>
+                    <span id="aduBundleTime" style="font-size: 10px; color: #fff; font-family: monospace; min-width: 60px;">—</span>
+                    <button id="aduRegenMidiBtn" class="control-btn" style="font-size: 9px; background: var(--clr-limeGreen); color: #000; padding: 2px 8px; display: none;">Regen MIDI</button>
+                    <button id="aduReplaceSvgBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightOrange); color: #000; padding: 2px 8px; margin-left: auto;">Replace SVG</button>
+                    <button id="aduDeleteBundleBtn" class="control-btn" style="font-size: 9px; background: var(--clr-brightRed); color: #fff; padding: 2px 8px;">Delete Bundle</button>
                 </div>
                 
                 <div class="section-divider"></div>
@@ -1637,6 +1842,7 @@
                     <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
                     <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
                     <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                    <div class="color-swatch" data-color="black" style="background: #000; border: 1px solid #555;"></div>
                 </div>
                 <div class="curve-fill-toggle" style="margin-top: 3px;">
                     <input type="radio" id="ptgFillLine" name="ptgFill" value="line">
@@ -1730,6 +1936,7 @@
                     <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander);"></div>
                     <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow);"></div>
                     <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta);"></div>
+                    <div class="color-swatch" data-color="black" style="background: #000; border: 1px solid #555;"></div>
                 </div>
                 
                 <div class="curve-fill-toggle">
@@ -1983,6 +2190,7 @@
                     <div class="color-swatch" data-color="lavander" style="background: var(--clr-lavander); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
                     <div class="color-swatch" data-color="yellow" style="background: var(--clr-yellow); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
                     <div class="color-swatch" data-color="neonMagenta" style="background: var(--clr-neonMagenta); width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
+                    <div class="color-swatch" data-color="black" style="background: #000; border: 1px solid #555; width: 16px; height: 16px; border-radius: 2px; cursor: pointer; display: inline-block; margin: 2px;"></div>
                 </div>
                 
                 <button id="lwDrawBtn" class="curve-draw-btn" style="margin-top: 6px; background: #1a3a5c; border-color: #2a5a8c;">Draw</button>
@@ -2333,7 +2541,7 @@
                         </div>
                     </div>
                     
-                    <div class="curve-input-row">
+                    <div id="midiModelVelocityRow" class="curve-input-row">
                         <label>Velocity</label>
                         <input type="number" id="midiModelVelocity" class="curve-input" value="127" min="1" max="127" step="1" style="width: 50px;">
                     </div>
@@ -2341,22 +2549,77 @@
                     <!-- Accel/Decel specific controls -->
                     <div id="accelDecelParams" style="display: none;">
                         <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Instrument</label>
+                            <select id="adInstrumentSelect" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                                <option value="violin">Violin</option>
+                                <option value="viola">Viola</option>
+                                <option value="cello">Cello</option>
+                            </select>
+                            <span id="adPitchRangeHint" style="font-size: 8px; color: #888; margin-left: 4px;">G3–F7</span>
+                        </div>
+                        <div id="adGlissModeRow" class="curve-input-row" style="margin-top: 6px; display: none;">
+                            <label style="font-size: 10px;">GlissMode</label>
+                            <select id="adGlissMode" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;" title="How pitch traverses from start to end pitch over the curve duration">
+                                <option value="curve" selected>Curve</option>
+                                <option value="inverseCurve">Inv. Curve</option>
+                                <option value="linear">Linear</option>
+                            </select>
+                        </div>
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Dyn1</label>
+                            <select id="adDynamic1" style="width: 55px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                                <option value="pppp">pppp</option>
+                                <option value="ppp">ppp</option>
+                                <option value="pp">pp</option>
+                                <option value="p" selected>p</option>
+                                <option value="mp">mp</option>
+                                <option value="mf">mf</option>
+                                <option value="f">f</option>
+                                <option value="ff">ff</option>
+                                <option value="fff">fff</option>
+                                <option value="ffff">ffff</option>
+                            </select>
+                            <label style="font-size: 10px; margin-left: 8px;" id="adDyn2Label">Dyn2</label>
+                            <select id="adDynamic2" style="width: 55px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
+                                <option value="pppp">pppp</option>
+                                <option value="ppp">ppp</option>
+                                <option value="pp">pp</option>
+                                <option value="p">p</option>
+                                <option value="mp">mp</option>
+                                <option value="mf">mf</option>
+                                <option value="f" selected>f</option>
+                                <option value="ff">ff</option>
+                                <option value="fff">fff</option>
+                                <option value="ffff">ffff</option>
+                            </select>
+                        </div>
+                        <div class="curve-input-row" style="margin-top: 6px;">
+                            <label style="font-size: 10px;">Volume Mode</label>
+                            <select id="adVolumeMode" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;" title="How velocity changes over time. Uses per-note velocity (blunt map).">
+                                <option value="curve" selected>Curve</option>
+                                <option value="inverseCurve">Inv. Curve</option>
+                                <option value="steady">Steady</option>
+                                <option value="linear">Linear</option>
+                            </select>
+                        </div>
+                        <div class="curve-input-row" style="margin-top: 6px;">
                             <label style="font-size: 10px;">Articulation</label>
                             <select id="accelDecelArticulation" style="flex: 1; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; padding: 3px;">
-                                <option value="">-- None --</option>
-                                <option value="spiccato">Spiccato (CC0: 91)</option>
+                                <option value="spiccato" selected>Spiccato (CC0: 15)</option>
                             </select>
                         </div>
                         <div class="curve-input-row" style="margin-top: 6px;">
                             <label style="font-size: 10px;">Density</label>
-                            <input type="range" id="accelDecelDensity" min="0" max="100" value="50" style="flex: 1;">
-                            <input type="number" id="accelDecelDensityNum" min="0" max="100" value="50" style="width: 40px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; text-align: center;">
+                            <input type="range" id="accelDecelDensity" min="0" max="100" value="45" style="flex: 1;">
+                            <input type="number" id="accelDecelDensityNum" min="0" max="100" value="45" style="width: 40px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; text-align: center;">
                         </div>
                         <div class="curve-input-row" style="margin-top: 6px;">
                             <label style="font-size: 10px;">Humanize</label>
                             <input type="range" id="accelDecelHumanize" min="0" max="100" value="20" style="flex: 1;">
                             <input type="number" id="accelDecelHumanizeNum" min="0" max="100" value="20" style="width: 40px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px; text-align: center;">
                         </div>
+                        <div id="adPitchWarning" style="display: none; font-size: 9px; color: #f44; margin-top: 4px;">⚠ Pitch out of instrument range</div>
+                        <div id="adDirectionIndicator" style="font-size: 9px; color: #8af; margin-top: 4px; display: none;"></div>
                         <div id="accelDecelCurveInfo" style="width: 100%; padding: 4px; background: rgba(30,40,50,0.5); border: 1px solid #456; border-radius: 3px; margin-top: 6px; font-size: 9px; color: #8af;">
                             Select a curve in the score first
                         </div>
@@ -11333,8 +11596,13 @@
                     name: 'Accel/Decel (Curve)',
                     type: 'curve',              // Curve-based articulation pattern
                     defaultVelocity: 100,       // Default velocity
-                    noteDurationMs: 50,         // Duration of each re-articulation note
-                    description: 'Acceleration/deceleration based on curve shape'
+                    noteDurationMs: 100,        // Base duration (adaptive: min(100, nextInterval-5), floor 20ms)
+                    description: 'Acceleration/deceleration based on curve shape',
+                    instrumentRanges: {
+                        violin: { low: 55, high: 101, label: 'G3–F7' },
+                        viola:  { low: 48, high: 93,  label: 'C3–A6' },
+                        cello:  { low: 36, high: 83,  label: 'C2–B5' }
+                    }
                 },
                 crescDecresc: {
                     name: 'Crescendo/Decrescendo',
@@ -11357,8 +11625,13 @@
             // Accel/Decel specific state
             sourceCurve: null,                  // The curve used to generate the pattern
             accelDecelEvents: null,             // Generated events for accel/decel
-            density: 50,                        // 0-100 density value
+            density: 45,                        // 0-100 density value (default 45 → ~28 notes)
             humanize: 20,                       // 0-100 humanization amount
+            adInstrument: 'violin',             // Selected instrument
+            adVolumeMode: 'curve',              // Volume mode: curve/inverseCurve/steady/linear
+            adGlissMode: 'curve',               // Gliss pitch mode: curve/inverseCurve/linear
+            adDynamic1: 'p',                    // Start dynamic
+            adDynamic2: 'f',                    // End dynamic
             
             // UI elements
             modelSelect: null,
@@ -11380,14 +11653,29 @@
             humanizeNum: null,
             curveInfoDisplay: null,
             regenerateBtn: null,
+            adInstrumentSelect: null,
+            adGlissModeRow: null,
+            adGlissModeSelect: null,
+            adDynamic1Select: null,
+            adDynamic2Select: null,
+            adDyn2Label: null,
+            adVolumeModeSelect: null,
+            adPitchRangeHint: null,
+            adPitchWarning: null,
+            adDirectionIndicator: null,
             
             // Articulation definitions (CC0 values)
             articulations: {
-                '': null,                    // None - no CC0 message
-                'spiccato': { cc0: 91, name: 'Spiccato' },
+                'spiccato': { cc0: 15, name: 'Spiccato' },
                 'senzaVibrato': { cc0: 89, name: 'Senza Vibrato' }
             },
-            selectedArticulation: '',
+            selectedArticulation: 'spiccato',
+            
+            // Blunt velocity map (§19.3.2) for per-note velocity
+            dynamicToVelocity: function(dyn) {
+                const map = { pppp: 95, ppp: 95, pp: 95, p: 95, mp: 103, mf: 103, f: 111, ff: 119, fff: 127, ffff: 127 };
+                return map[dyn] || 103;
+            },
             
             // Pitch mode state
             pitchMode: 'single',            // 'single' or 'glissando'
@@ -11428,6 +11716,7 @@
                 this.paramsDiv = document.getElementById('midiModelParams');
                 this.pitchInput = document.getElementById('midiModelPitch');
                 this.velocityInput = document.getElementById('midiModelVelocity');
+                this.velocityRow = document.getElementById('midiModelVelocityRow');
                 this.infoDisplay = document.getElementById('midiModelInfo');
                 this.outputSelect = document.getElementById('midiModelOutputSelect');
                 this.playBtn = document.getElementById('midiModelPlayBtn');
@@ -11443,6 +11732,16 @@
                 this.humanizeNum = document.getElementById('accelDecelHumanizeNum');
                 this.curveInfoDisplay = document.getElementById('accelDecelCurveInfo');
                 this.regenerateBtn = document.getElementById('accelDecelRegenerateBtn');
+                this.adInstrumentSelect = document.getElementById('adInstrumentSelect');
+                this.adGlissModeRow = document.getElementById('adGlissModeRow');
+                this.adGlissModeSelect = document.getElementById('adGlissMode');
+                this.adDynamic1Select = document.getElementById('adDynamic1');
+                this.adDynamic2Select = document.getElementById('adDynamic2');
+                this.adDyn2Label = document.getElementById('adDyn2Label');
+                this.adVolumeModeSelect = document.getElementById('adVolumeMode');
+                this.adPitchRangeHint = document.getElementById('adPitchRangeHint');
+                this.adPitchWarning = document.getElementById('adPitchWarning');
+                this.adDirectionIndicator = document.getElementById('adDirectionIndicator');
                 
                 // Pitch mode UI elements
                 this.pitchModeSelect = document.getElementById('accelDecelPitchMode');
@@ -11503,7 +11802,7 @@
                 // Accel/Decel slider sync
                 if (this.densitySlider && this.densityNum) {
                     const updateDensity = (val) => {
-                        this.density = Math.max(0, Math.min(100, parseInt(val) || 50));
+                        this.density = Math.max(0, Math.min(100, parseInt(val) || 45));
                         this.densitySlider.value = this.density;
                         this.densityNum.value = this.density;
                         this.generateAccelDecelEvents();
@@ -11527,6 +11826,47 @@
                 if (this.articulationSelect) {
                     this.articulationSelect.addEventListener('change', () => {
                         this.selectedArticulation = this.articulationSelect.value;
+                        this.generateAccelDecelEvents();
+                    });
+                }
+                
+                // Instrument select → update range hint + pitch validation
+                if (this.adInstrumentSelect) {
+                    this.adInstrumentSelect.addEventListener('change', () => {
+                        this.adInstrument = this.adInstrumentSelect.value;
+                        const range = this.models.accelDecel.instrumentRanges[this.adInstrument];
+                        if (this.adPitchRangeHint && range) this.adPitchRangeHint.textContent = range.label;
+                        this.validateAdPitchRange();
+                        this.generateAccelDecelEvents();
+                    });
+                }
+                // GlissMode select
+                if (this.adGlissModeSelect) {
+                    this.adGlissModeSelect.addEventListener('change', () => {
+                        this.adGlissMode = this.adGlissModeSelect.value;
+                        this.generateAccelDecelEvents();
+                    });
+                }
+                // Volume Mode select → show/hide Dyn2 for Steady
+                if (this.adVolumeModeSelect) {
+                    this.adVolumeModeSelect.addEventListener('change', () => {
+                        this.adVolumeMode = this.adVolumeModeSelect.value;
+                        const isSteady = this.adVolumeMode === 'steady';
+                        if (this.adDynamic2Select) this.adDynamic2Select.style.display = isSteady ? 'none' : '';
+                        if (this.adDyn2Label) this.adDyn2Label.style.display = isSteady ? 'none' : '';
+                        this.generateAccelDecelEvents();
+                    });
+                }
+                // Dynamic selects
+                if (this.adDynamic1Select) {
+                    this.adDynamic1Select.addEventListener('change', () => {
+                        this.adDynamic1 = this.adDynamic1Select.value;
+                        this.generateAccelDecelEvents();
+                    });
+                }
+                if (this.adDynamic2Select) {
+                    this.adDynamic2Select.addEventListener('change', () => {
+                        this.adDynamic2 = this.adDynamic2Select.value;
                         this.generateAccelDecelEvents();
                     });
                 }
@@ -12026,6 +12366,10 @@
                 
                 if (this.accelDecelParamsDiv) {
                     this.accelDecelParamsDiv.style.display = isAccelDecel ? 'block' : 'none';
+                }
+                // Hide standalone velocity row for Accel/Decel (volume mode handles it via Dyn1/Dyn2)
+                if (this.velocityRow) {
+                    this.velocityRow.style.display = isAccelDecel ? 'none' : 'flex';
                 }
                 if (this.crescDecrescParamsDiv) {
                     this.crescDecrescParamsDiv.style.display = isCrescDecresc ? 'block' : 'none';
@@ -12549,6 +12893,39 @@
                 if (this.glissandoParamsDiv) {
                     this.glissandoParamsDiv.style.display = isGlissando ? 'block' : 'none';
                 }
+                // Show GlissMode row only when pitch mode is glissando (Accel/Decel only)
+                if (this.adGlissModeRow) {
+                    this.adGlissModeRow.style.display = (this.selectedModelKey === 'accelDecel' && isGlissando) ? 'flex' : 'none';
+                }
+                // Re-validate pitch range after mode change
+                this.validateAdPitchRange();
+            },
+            
+            // Validate pitch against selected instrument range, show warning if out of range
+            validateAdPitchRange() {
+                if (!this.adPitchWarning) return;
+                const range = this.models.accelDecel.instrumentRanges[this.adInstrument];
+                if (!range) { this.adPitchWarning.style.display = 'none'; return; }
+                
+                const parsePitch = (str) => {
+                    if (!str || !str.trim()) return null;
+                    return typeof PitchUtils !== 'undefined' ? PitchUtils.parseNote(str.trim()) : null;
+                };
+                
+                let outOfRange = false;
+                if (this.pitchMode === 'single') {
+                    const p = parsePitch(this.pitchInput?.value);
+                    if (p !== null) {
+                        const midi = Math.round(p);
+                        outOfRange = midi < range.low || midi > range.high;
+                    }
+                } else if (this.pitchMode === 'glissando') {
+                    const s = parsePitch(this.glissandoStartInput?.value);
+                    const e = parsePitch(this.glissandoEndInput?.value);
+                    if (s !== null) { const m = Math.round(s); if (m < range.low || m > range.high) outOfRange = true; }
+                    if (e !== null) { const m = Math.round(e); if (m < range.low || m > range.high) outOfRange = true; }
+                }
+                this.adPitchWarning.style.display = outOfRange ? 'block' : 'none';
             },
             
             // Regenerate events for the current model
@@ -12618,9 +12995,11 @@
                 const startQuarterTone = startPitchData.quarterTone;
                 const endQuarterTone = endPitchData.quarterTone;
                 
-                const velocity = Math.max(1, Math.min(127, parseInt(this.velocityInput?.value) || 100));
+                // Per-note velocity from blunt map (§19.3.2) using volume mode
+                const vel1 = this.dynamicToVelocity(this.adDynamic1);
+                const vel2 = this.dynamicToVelocity(this.adDynamic2);
+                const volumeMode = this.adVolumeMode;
                 const model = this.selectedModel;
-                const noteDurationMs = model.noteDurationMs || 50;
                 
                 const startTime = curveData.startTime;
                 const endTime = curveData.endTime;
@@ -12668,7 +13047,7 @@
                 
                 // Ensure we end with a note near the end (if not already there)
                 if (noteTimes.length > 0 && noteTimes[noteTimes.length - 1] < durationMs - 100) {
-                    noteTimes.push(durationMs - noteDurationMs);
+                    noteTimes.push(durationMs - 100);
                 }
                 
                 // Apply humanization (Gaussian jitter)
@@ -12700,7 +13079,7 @@
                     const adjustedJitter = maxJitterMs * speedFactor;
                     
                     const jitter = this.gaussianRandom(0, adjustedJitter / 2);
-                    return Math.max(0, Math.min(durationMs - noteDurationMs, t + jitter));
+                    return Math.max(0, Math.min(durationMs - 100, t + jitter));
                 });
                 
                 // Sort times (jitter might have reordered some)
@@ -12721,12 +13100,8 @@
                 }
                 
                 // Note On/Off pairs for each articulation
-                // Spiccato duration research: 30-80ms for fast passages, up to 100-150ms slower
-                // Add slight duration variation for natural feel (reduced: ±10% of base duration)
-                const baseDurationMs = noteDurationMs; // 50ms default
-                const minDuration = Math.max(35, baseDurationMs * 0.85);  // 42ms min (tighter range)
-                const maxDuration = Math.min(80, baseDurationMs * 1.15);  // 57ms max (tighter range)
-                const durationRange = maxDuration - minDuration;
+                // Adaptive note duration: min(100ms, nextInterval-5ms), floor 20ms
+                // This prevents note overlap while allowing natural spiccato lengths
                 
                 // Calculate pitch for each note
                 // Hybrid glissando strategy:
@@ -12774,18 +13149,27 @@
                 
                 for (let idx = 0; idx < humanizedTimes.length; idx++) {
                     const timeMs = humanizedTimes[idx];
-                    const nextTimeMs = idx < humanizedTimes.length - 1 ? humanizedTimes[idx + 1] : timeMs + baseDurationMs;
+                    const nextTimeMs = idx < humanizedTimes.length - 1 ? humanizedTimes[idx + 1] : timeMs + 100;
                     
-                    // Calculate local speed factor for this note (reduce variation for fast sections)
-                    const prevInterval = idx > 0 ? humanizedTimes[idx] - humanizedTimes[idx - 1] : avgInterval;
-                    const nextInterval = idx < humanizedTimes.length - 1 ? humanizedTimes[idx + 1] - humanizedTimes[idx] : avgInterval;
-                    const localInterval = Math.min(prevInterval, nextInterval);
-                    const speedFactor = Math.min(0.6, localInterval / 150); // Cap at 0.6 for all notes
+                    // Adaptive note duration: min(100ms, nextInterval-5ms), floor 20ms
+                    const intervalToNext = nextTimeMs - timeMs;
+                    const noteDur = Math.max(20, Math.min(100, intervalToNext - 5));
                     
-                    // Vary note duration slightly using Gaussian distribution
-                    const adjustedDurationRange = durationRange * speedFactor;
-                    const durationVariation = this.gaussianRandom(0, adjustedDurationRange * 0.10);
-                    const noteDur = Math.max(minDuration, Math.min(maxDuration, baseDurationMs + durationVariation));
+                    // Per-note velocity from blunt map based on volume mode
+                    const tNorm = totalNotes > 1 ? idx / (totalNotes - 1) : 0;
+                    let noteVelocity;
+                    if (volumeMode === 'steady') {
+                        noteVelocity = vel1;
+                    } else if (volumeMode === 'linear') {
+                        noteVelocity = Math.round(vel1 + tNorm * (vel2 - vel1));
+                    } else {
+                        // Curve or Inverse Curve: sample curve Y at note's time position
+                        const sampleIdx = Math.min(samples.length - 1, Math.round((timeMs / durationMs) * (samples.length - 1)));
+                        const curveY = samples[sampleIdx] || 0;
+                        const t = volumeMode === 'inverseCurve' ? (1 - curveY) : curveY;
+                        noteVelocity = Math.round(vel1 + t * (vel2 - vel1));
+                    }
+                    noteVelocity = Math.max(1, Math.min(127, noteVelocity));
                     
                     const currentPitchData = notePitchData[idx];
                     const nextPitchData = idx < notePitchData.length - 1 ? notePitchData[idx + 1] : currentPitchData;
@@ -12875,7 +13259,7 @@
                         timeMs: timeMs,
                         relativeTimeMs: timeMs,
                         type: 'noteOn',
-                        data: [0x90, notePitch, velocity]
+                        data: [0x90, notePitch, noteVelocity]
                     });
                     events.push({
                         timeMs: timeMs + noteDur,
@@ -12915,10 +13299,16 @@
             updateAccelDecelInfo() {
                 if (!this.infoDisplay || !this.accelDecelEvents) return;
                 
-                const velocity = parseInt(this.velocityInput?.value) || 100;
                 const direction = this.sourceCurve ? this.getCurveDirection(this.sourceCurve) : 'N/A';
                 const articulation = this.articulations[this.selectedArticulation];
                 const articulationDisplay = articulation ? articulation.name : 'None';
+                
+                // Volume mode display
+                const volModeLabels = { curve: 'Curve', inverseCurve: 'Inv.Curve', steady: 'Steady', linear: 'Linear' };
+                const volModeDisplay = volModeLabels[this.adVolumeMode] || this.adVolumeMode;
+                const dynDisplay = this.adVolumeMode === 'steady' 
+                    ? this.adDynamic1 
+                    : `${this.adDynamic1}→${this.adDynamic2}`;
                 
                 // Build pitch display based on mode (with quarter tone support)
                 let pitchDisplay;
@@ -12936,9 +13326,16 @@
                     pitchDisplay = pitchData ? this.pitchToNoteNameWithQuarter(pitchData.pitch, pitchData.quarterTone) : '(invalid)';
                 }
                 
+                // Update direction indicator
+                if (this.adDirectionIndicator) {
+                    this.adDirectionIndicator.style.display = direction !== 'N/A' ? '' : 'none';
+                    this.adDirectionIndicator.textContent = direction === 'ascending' ? '▲ Accelerando' : 
+                        direction === 'descending' ? '▼ Decelerando' : '― Mixed';
+                }
+                
                 this.infoDisplay.innerHTML = `
                     <div style="color: #adf;"><strong>Accel/Decel</strong></div>
-                    <div>${pitchDisplay} | Vel: ${velocity} | Art: ${articulationDisplay}</div>
+                    <div>${pitchDisplay} | ${dynDisplay} (${volModeDisplay}) | Art: ${articulationDisplay}</div>
                     <div>Notes: ${this.accelDecelEvents.noteCount} | Duration: ${this.accelDecelEvents.durationMs.toFixed(0)}ms</div>
                     <div>Density: ${this.density} | Humanize: ${this.humanize} | ${direction}</div>
                 `;
@@ -14973,6 +15370,16 @@
                     }
                 );
                 
+                // AccelDecelUI bundles - feathered beam component groups (curve + SVG + MIDI)
+                this.registerSource('adBundles',
+                    () => window.AccelDecelUI ? AccelDecelUI.exportBundles() : { bundles: [], nextBundleId: 1 },
+                    (data) => {
+                        if (window.AccelDecelUI) {
+                            AccelDecelUI.importBundles(data);
+                        }
+                    }
+                );
+                
                 // BartokPizzUI bundles - unified bartók pizz component groups (GC + SVG + MIDI)
                 this.registerSource('bpBundles',
                     () => window.BartokPizzUI ? BartokPizzUI.exportBundles() : { bundles: [], nextBundleId: 1 },
@@ -15894,7 +16301,8 @@
             plum: 'rgba(82,44,85,255)',
             lavander: 'rgba(162,126,198,255)',
             yellow: 'rgba(254,213,0,255)',
-            neonMagenta: 'rgb(255, 21, 160)'
+            neonMagenta: 'rgb(255, 21, 160)',
+            black: 'rgb(0, 0, 0)'
         };
         
         // Curve Maker - creates and manages curves on the timeline
@@ -16642,6 +17050,14 @@
                             return;
                         }
                     }
+                    // If part of an accel/decel bundle, move the whole bundle
+                    if (window.AccelDecelUI) {
+                        const adBundle = AccelDecelUI.lookupBundleByCurveId(curve.id);
+                        if (adBundle) {
+                            AccelDecelUI.startBundleDrag(adBundle, e);
+                            return;
+                        }
+                    }
                     // If part of a PTG bundle, move the whole bundle
                     if (window.PizzTremGlissUI) {
                         const ptgBundle = PizzTremGlissUI.lookupBundleByCurveId(curve.id);
@@ -16762,6 +17178,22 @@
                                     cdBundle.startTime = curve.startSeconds;
                                 }
                             }
+                            // Propagate to accel/decel bundled SVG anchor
+                            if (window.AccelDecelUI && window.SVGElementManager) {
+                                const adBundle = AccelDecelUI.lookupBundleByCurveId(curve.id);
+                                if (adBundle) {
+                                    const svgEl = SVGElementManager.elements.find(el => el.id === adBundle.svgId);
+                                    if (svgEl) {
+                                        svgEl.referenceSeconds = curve.startSeconds;
+                                        const pos = SVGElementManager.calcPixelPosition(svgEl);
+                                        svgEl._x = pos.x; svgEl._y = pos.y; svgEl._page = pos.page; svgEl._section = pos.section;
+                                        const tgtContainer = pos.section === 'top' ? SVGElementManager.containerTop : SVGElementManager.containerBottom;
+                                        if (svgEl.wrapper.parentNode !== tgtContainer) tgtContainer.appendChild(svgEl.wrapper);
+                                        SVGElementManager.updateElementTransform(svgEl);
+                                    }
+                                    adBundle.startTime = curve.startSeconds;
+                                }
+                            }
                             // Propagate to vibrato bundled SVG anchor
                             if (window.VibratoUI && window.SVGElementManager) {
                                 const vibBundle = VibratoUI.lookupBundleByCurveId(curve.id);
@@ -16802,6 +17234,14 @@
                                 const cdBundle = CrescendoUI.lookupBundleByCurveId(curve.id);
                                 if (cdBundle) {
                                     cdBundle.endTime = curve.endSeconds;
+                                }
+                            }
+                            // Update bundle endTime if this curve belongs to an AD bundle
+                            if (window.AccelDecelUI) {
+                                const adBundle = AccelDecelUI.lookupBundleByCurveId(curve.id);
+                                if (adBundle) {
+                                    adBundle.endTime = curve.endSeconds;
+                                    adBundle.needsRegeneration = true;
                                 }
                             }
                             // Update bundle endTime if this curve belongs to a vibrato bundle
@@ -16980,6 +17420,25 @@
                         if (regenBtn) regenBtn.style.display = cdBundle.needsRegeneration ? '' : 'none';
                         requestAnimationFrame(() => {
                             const sc = row.closest('.section-content');
+                            if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                        });
+                    }
+                }
+                
+                // Show AD bundle row if this curve belongs to an accel/decel bundle
+                if (window.AccelDecelUI) {
+                    AccelDecelUI.showCurveAdjust(curve);
+                    const adBundle = AccelDecelUI.lookupBundleByCurveId(curve.id);
+                    const adRow = document.getElementById('aduBundleRow');
+                    const adTime = document.getElementById('aduBundleTime');
+                    const adRegen = document.getElementById('aduRegenMidiBtn');
+                    if (adBundle && adRow) {
+                        AccelDecelUI._activeBundleId = adBundle.id;
+                        adRow.style.display = '';
+                        if (adTime) adTime.textContent = adBundle.startTime.toFixed(3) + 's';
+                        if (adRegen) adRegen.style.display = adBundle.needsRegeneration ? '' : 'none';
+                        requestAnimationFrame(() => {
+                            const sc = adRow.closest('.section-content');
                             if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
                         });
                     }
@@ -17889,6 +18348,12 @@
                 if (vibSlopeInput) {
                     vibSlopeInput.value = slope.toFixed(2);
                 }
+                
+                // Also update Accel/Decel UI slope display
+                const aduSlopeInput = document.getElementById('aduSlopeInput');
+                if (aduSlopeInput) {
+                    aduSlopeInput.value = slope.toFixed(2);
+                }
             },
             
             updateSelectedFromInputs() {
@@ -17962,6 +18427,25 @@
                             });
                         }
                         if (regenBtn) regenBtn.style.display = '';
+                    }
+                }
+                
+                // Flag associated AD bundle for MIDI regeneration
+                // Skip during bundle drag (MIDI is time-shifted, not shape-changed)
+                if (window.AccelDecelUI && !AccelDecelUI._isBundleDragging) {
+                    const adBundle = AccelDecelUI.lookupBundleByCurveId(curve.id);
+                    if (adBundle) {
+                        adBundle.needsRegeneration = true;
+                        const adRow = document.getElementById('aduBundleRow');
+                        const adRegen = document.getElementById('aduRegenMidiBtn');
+                        if (adRow) {
+                            adRow.style.display = '';
+                            requestAnimationFrame(() => {
+                                const sc = adRow.closest('.section-content');
+                                if (sc) sc.style.maxHeight = sc.scrollHeight + 'px';
+                            });
+                        }
+                        if (adRegen) adRegen.style.display = '';
                     }
                 }
                 
@@ -24562,6 +25046,403 @@
         window.CrescendoUI = CrescendoUI;
         
         // ============================================
+        // ACCEL / DECEL SYSTEM (Feathered Beams)
+        // ============================================
+        const AccelDecelUI = {
+            pendingCurve: null,
+            instrumentRanges: {
+                violin: { low: 55, high: 101, label: 'G3–F7' },
+                viola:  { low: 48, high: 93,  label: 'C3–A6' },
+                cello:  { low: 36, high: 83,  label: 'C2–B5' }
+            },
+            articulations: { 'spiccato': { cc0: 15, name: 'Spiccato' } },
+            dynamicToVelocity(dyn) {
+                const map = { pppp:95, ppp:95, pp:95, p:95, mp:103, mf:103, f:111, ff:119, fff:127, ffff:127 };
+                return map[dyn] || 103;
+            },
+            gaussianRandom(mean=0, stdDev=1) {
+                const u1 = Math.random(), u2 = Math.random();
+                return Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2)*stdDev+mean;
+            },
+            noteNameToPitch(str, wqt=false) {
+                if (!str) return null;
+                const nm = {C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+                const m = str.trim().match(/^([A-Ga-g])([#bB]?)([+dD]?)(-?\d)$/);
+                if (!m) return null;
+                let [,n,a,q,o] = m; n=n.toUpperCase();
+                let p = nm[n]; if(p===undefined) return null;
+                if(a==='#') p+=1; else if(a==='b'||a==='B') p-=1;
+                p += (parseInt(o)+1)*12; p=Math.max(0,Math.min(127,p));
+                let qt=0; if(q==='+') qt=0.5; else if(q==='d'||q==='D') qt=-0.5;
+                return wqt ? {pitch:p,quarterTone:qt} : p;
+            },
+            pitchToNoteNameWithQuarter(mp,qt) {
+                const nn=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+                let s=nn[mp%12]+(qt===0.5?'+':qt===-0.5?'d':'');
+                return s+(Math.floor(mp/12)-1);
+            },
+            getCurveDirection(c) {
+                if(!c||!c.curveData||!c.curveData.samples) return 'N/A';
+                const s=c.curveData.samples, f=s[0], l=s[s.length-1];
+                return l>f+0.1?'ascending':f>l+0.1?'descending':'flat';
+            },
+            getEndSeconds(ss) {
+                const tm=document.getElementById('aduTimeMode').value;
+                const v=parseFloat(document.getElementById('aduEndInput').value)||10;
+                return tm==='dur'?ss+v:v;
+            },
+            generateFilename(pm,clef,pi,d1,d2,ft) {
+                const cp=s=>s.replace(/[^a-zA-Z0-9]/g,'');
+                const pp=pm==='glissando'?`${cp(pi.startPitch)}-${cp(pi.endPitch)}`:cp(pi.pitch);
+                return `FB-${ft==='accel'?'Acc':'Dec'}-${pm==='glissando'?'Gliss':'Single'}-${clef}-${pp}-${d1}-${d2}.ly`;
+            },
+            updatePitchRangeUI() {
+                const i=document.getElementById('aduInstrumentSelect')?.value||'violin';
+                const r=this.instrumentRanges[i];
+                const h=document.getElementById('aduPitchRangeHint');
+                if(h&&r) h.textContent=r.label;
+                const sh=document.getElementById('aduSinglePitchRangeHint');
+                if(sh&&r) sh.textContent=r.label;
+                const gh=document.getElementById('aduGlissPitchRangeHint');
+                if(gh&&r) gh.textContent=r.label;
+            },
+            showCurveAdjust(curve) {
+                const s=document.getElementById('aduCurveAdjustSection'); if(!s||!curve) return;
+                const el=(id)=>document.getElementById(id);
+                if(el('aduAdjStart')) el('aduAdjStart').value=(curve.startSeconds??0).toFixed(3);
+                if(el('aduAdjEnd')) el('aduAdjEnd').value=(curve.endSeconds??1).toFixed(3);
+                if(el('aduAdjY1')) el('aduAdjY1').value=(curve.y1??0).toFixed(1);
+                if(el('aduAdjY2')) el('aduAdjY2').value=(curve.y2??10).toFixed(1);
+                if(el('aduAdjModel')) el('aduAdjModel').value=curve.model||'logarithmic';
+                if(el('aduAdjSlope')) el('aduAdjSlope').value=curve.slope||0;
+                s.style.display='';
+                requestAnimationFrame(()=>{const sc=s.closest('.section-content');if(sc)sc.style.maxHeight=sc.scrollHeight+'px';});
+            },
+            hideCurveAdjust() { const s=document.getElementById('aduCurveAdjustSection'); if(s) s.style.display='none'; },
+            syncCurveAdjustFromCurve(curve) {
+                const s=document.getElementById('aduCurveAdjustSection'); if(!s||s.style.display==='none') return;
+                const el=(id)=>document.getElementById(id);
+                if(el('aduAdjStart')) el('aduAdjStart').value=(curve.startSeconds??0).toFixed(3);
+                if(el('aduAdjEnd')) el('aduAdjEnd').value=(curve.endSeconds??1).toFixed(3);
+                if(el('aduAdjY1')) el('aduAdjY1').value=(curve.y1??0).toFixed(1);
+                if(el('aduAdjY2')) el('aduAdjY2').value=(curve.y2??10).toFixed(1);
+                if(el('aduAdjSlope')) el('aduAdjSlope').value=curve.slope||0;
+                if(el('aduAdjModel')) el('aduAdjModel').value=curve.model||'logarithmic';
+            },
+            init() {
+                const s1=document.getElementById('aduStep1Btn'), s2=document.getElementById('aduStep2Btn');
+                if(s1) s1.addEventListener('click',()=>this.step1());
+                if(s2) s2.addEventListener('click',()=>this.step2());
+                document.querySelectorAll('#aduColorSwatches .color-swatch').forEach(sw=>{
+                    sw.addEventListener('click',e=>{
+                        document.querySelectorAll('#aduColorSwatches .color-swatch').forEach(s=>s.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                    });
+                });
+                const pm=document.getElementById('aduPitchMode');
+                if(pm) pm.addEventListener('change',()=>{
+                    const g=pm.value==='glissando';
+                    document.getElementById('aduGlissPitchRow').style.display=g?'':'none';
+                    document.getElementById('aduGlissModeRow').style.display=g?'':'none';
+                    document.getElementById('aduSinglePitchRow').style.display=g?'none':'';
+                });
+                const tm=document.getElementById('aduTimeMode');
+                if(tm) tm.addEventListener('change',()=>{const l=document.getElementById('aduTimeLabel2');if(l)l.textContent=tm.value==='end'?'End':'Dur';});
+                const is=document.getElementById('aduInstrumentSelect');
+                if(is) is.addEventListener('change',()=>this.updatePitchRangeUI());
+                const ds=document.getElementById('aduDensitySlider'),dn=document.getElementById('aduDensityNum');
+                if(ds&&dn){ds.addEventListener('input',()=>{dn.value=ds.value;});dn.addEventListener('input',()=>{ds.value=dn.value;});}
+                const hs=document.getElementById('aduHumanizeSlider'),hn=document.getElementById('aduHumanizeNum');
+                if(hs&&hn){hs.addEventListener('input',()=>{hn.value=hs.value;});hn.addEventListener('input',()=>{hs.value=hn.value;});}
+                const vm=document.getElementById('aduVolumeMode');
+                if(vm) vm.addEventListener('change',()=>{
+                    const st=vm.value==='steady';
+                    const d2=document.getElementById('aduDynamic2'),d2l=document.getElementById('aduDyn2Label');
+                    if(d2) d2.style.display=st?'none':''; if(d2l) d2l.style.display=st?'none':'';
+                });
+                // Curve Adjust wiring
+                const el=(id)=>document.getElementById(id);
+                const pushAdj=()=>{if(!window.CurveMaker||!CurveMaker.selectedCurve)return;
+                    if(CurveMaker.startInput)CurveMaker.startInput.value=el('aduAdjStart').value;
+                    if(CurveMaker.endInput)CurveMaker.endInput.value=el('aduAdjEnd').value;
+                    if(CurveMaker.y1Input)CurveMaker.y1Input.value=el('aduAdjY1').value;
+                    if(CurveMaker.y2Input)CurveMaker.y2Input.value=el('aduAdjY2').value;
+                    CurveMaker.updateSelectedFromInputs();};
+                const pushMd=()=>{if(!window.CurveMaker||!CurveMaker.selectedCurve)return;
+                    CurveMaker.selectedCurve.model=el('aduAdjModel').value;CurveMaker.setCurveModel(el('aduAdjModel').value);
+                    CurveMaker.updateCurveRendering(CurveMaker.selectedCurve);CurveMaker.syncCurveToDatabase(CurveMaker.selectedCurve);CurveMaker.updateVisibility();};
+                const pushSl=()=>{if(!window.CurveMaker||!CurveMaker.selectedCurve)return;
+                    CurveMaker.selectedCurve.slope=parseFloat(el('aduAdjSlope').value)||0;
+                    if(CurveMaker.slopeInput)CurveMaker.slopeInput.value=el('aduAdjSlope').value;
+                    CurveMaker.updateCurveRendering(CurveMaker.selectedCurve);CurveMaker.syncCurveToDatabase(CurveMaker.selectedCurve);CurveMaker.updateVisibility();};
+                ['aduAdjStart','aduAdjEnd','aduAdjY1','aduAdjY2'].forEach(id=>{if(el(id))el(id).addEventListener('change',pushAdj);});
+                if(el('aduAdjModel')) el('aduAdjModel').addEventListener('change',pushMd);
+                if(el('aduAdjSlope')) el('aduAdjSlope').addEventListener('change',pushSl);
+                console.log('AccelDecelUI initialized');
+            },
+            createCurve(params=null) {
+                const ss=params?.startSeconds??(parseFloat(document.getElementById('aduStartInput').value)||0);
+                const es=params?.endSeconds??this.getEndSeconds(ss);
+                const y1=params?.y1??parseFloat(document.getElementById('aduY1Input').value);
+                const y2=params?.y2??parseFloat(document.getElementById('aduY2Input').value);
+                const gt=params?.gTrack??document.getElementById('aduTrackInput').value;
+                const sl=params?.slope??(parseFloat(document.getElementById('aduSlopeInput').value)||0);
+                const md=params?.model??document.getElementById('aduModelSelect').value;
+                const sw=document.querySelector('#aduColorSwatches .color-swatch.selected');
+                const co=params?.color??(sw?sw.dataset.color:'limeGreen');
+                const fl=document.querySelector('input[name="aduFill"]:checked');
+                const fm=params?.fillMode??(fl?fl.value:'bottom');
+                const op=params?.opacity??parseFloat(document.getElementById('aduOpacityInput').value);
+                const c=CurveMaker.createCurve({startSeconds:ss,endSeconds:es,y1:isNaN(y1)?0:y1,y2:isNaN(y2)?10:y2,gTrack:gt,model:md,slope:sl,color:co,fillMode:fm,opacity:isNaN(op)?0.3:op});
+                if(c) console.log('AccelDecelUI: Curve created',c.name);
+                return c;
+            },
+            step1(params=null) {
+                const c=this.createCurve(params);
+                if(!c){console.error('AccelDecelUI.step1: Failed');return null;}
+                this.pendingCurve=c; this.showCurveAdjust(c);
+                console.log('AccelDecelUI.step1: Curve ID:',c.id);return c;
+            },
+            // step2, generateAccelDecelMidi, insertMidi, insertSvg, bundles defined below via Object.assign
+            bundles: [], nextBundleId: 1, _isBundleDragging: false, _activeBundleId: null
+        };
+        // --- AccelDecelUI part 2: step2 + MIDI gen + SVG insert + bundles ---
+        // (assigned separately to keep code blocks manageable)
+        Object.assign(AccelDecelUI, {
+            async step2(params=null) {
+                const btn=document.getElementById('aduStep2Btn');
+                const oTxt=btn?btn.textContent:'', oBg=btn?btn.style.background:'';
+                let curve=this.pendingCurve;
+                if(!curve&&window.CurveMaker&&CurveMaker.selectedCurve) curve=CurveMaker.selectedCurve;
+                if(!curve){console.error('AccelDecelUI.step2: No curve');return null;}
+                if(btn){btn.textContent='Generating...';btn.style.background='#888';btn.disabled=true;}
+                const pm=params?.pitchModel??document.getElementById('aduPitchMode').value;
+                const clef=params?.clef??document.getElementById('aduClefSelect').value;
+                const d1=params?.dynamic1??document.getElementById('aduDynamic1').value;
+                const d2=params?.dynamic2??document.getElementById('aduDynamic2').value;
+                const trk=params?.track??(parseInt(document.getElementById('aduTrackInput').value)||1);
+                const vm=params?.volumeMode??document.getElementById('aduVolumeMode').value;
+                const gm=params?.glissMode??(document.getElementById('aduGlissMode')?.value||'curve');
+                const inst=params?.instrument??document.getElementById('aduInstrumentSelect').value;
+                const dens=params?.density??(parseInt(document.getElementById('aduDensityNum').value)||45);
+                const hum=params?.humanize??(parseInt(document.getElementById('aduHumanizeNum').value)||20);
+                const artK=params?.articulation??document.getElementById('aduArticulationSelect').value;
+                const dir=this.getCurveDirection(curve);
+                const ft=dir==='descending'?'decel':'accel';
+                const y1=curve.y1??0, y2=curve.y2??10;
+                let hp;
+                if(vm==='steady') hp='none';
+                else if(vm==='linear'){const dO=['pppp','ppp','pp','p','mp','mf','f','ff','fff','ffff'];hp=dO.indexOf(d1)===dO.indexOf(d2)?'none':dO.indexOf(d2)>dO.indexOf(d1)?'<':'>';}
+                else if(vm==='inverseCurve') hp=y2>y1?'>':'<';
+                else hp=y2>y1?'<':'>';
+                let sP,eP,snP;
+                if(pm==='glissando'){sP=(params?.startPitch??document.getElementById('aduStartPitch').value).trim();eP=(params?.endPitch??document.getElementById('aduEndPitch').value).trim();if(!sP||!eP){if(btn){btn.textContent=oTxt;btn.style.background=oBg;btn.disabled=false;}return null;}}
+                else{snP=(params?.pitch??document.getElementById('aduSinglePitchInput').value).trim();if(!snP){if(btn){btn.textContent=oTxt;btn.style.background=oBg;btn.disabled=false;}return null;}}
+                const fn=pm==='glissando'?this.generateFilename('glissando',clef,{startPitch:sP,endPitch:eP},d1,d2,ft):this.generateFilename('single',clef,{pitch:snP},d1,d2,ft);
+                const di=document.getElementById('aduDirectionIndicator');
+                if(di){di.style.display='';di.textContent=ft==='accel'?'▲ Accelerando':'▼ Decelerando';}
+                let result=null;
+                try{
+                    const svgP=pm==='glissando'?{variant:'glissando',startPitch:sP,endPitch:eP,clef,dynamic1:d1,dynamic2:vm==='steady'?null:d2,hairpin:hp,featheredType:ft,filename:fn}:{variant:'singlePitch',pitch:snP,clef,dynamic1:d1,dynamic2:vm==='steady'?null:d2,hairpin:hp,featheredType:ft,filename:fn};
+                    const svgR=await(await fetch('/api/svg-assembly/feathered-beam',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(svgP)})).json();
+                    if(!svgR.success) throw new Error(svgR.error);
+                    console.log('AccelDecelUI.step2: SVG:',svgR.svgPath,'type:',ft);
+                    const insR=await this.insertAccelDecelSvg(svgR.svgPath,curve.startSeconds,trk,svgR.metadata);
+                    const mR=this.generateAccelDecelMidi(curve,{pitchModel:pm,singlePitch:snP,startPitch:sP,endPitch:eP,dyn1:d1,dyn2:d2,volumeMode:vm,glissMode:gm,instrument:inst,density:dens,humanize:hum,artKey:artK,track:trk});
+                    let mI=null; if(mR) mI=this.insertAccelDecelMidi(mR,curve,trk);
+                    this.bundles=this.bundles.filter(b=>b.curveId!==curve.id);
+                    const bSvg=insR?insR.id:null, bMidi=mI?mI.snippetId:null;
+                    if(bSvg) this.registerBundle(curve.id,bSvg,bMidi,curve.startSeconds,curve.endSeconds,trk,{pitchModel:pm,pitchInfo:pm==='glissando'?{startPitch:sP,endPitch:eP}:{pitch:snP},dynamic1:d1,dynamic2:d2,clef,volumeMode:vm,glissMode:gm,instrument:inst,density:dens,humanize:hum,articulation:artK,featheredType:ft,filename:fn});
+                    const regB=this.lookupBundleByCurveId(curve.id);
+                    if(regB){this._activeBundleId=regB.id;const row=document.getElementById('aduBundleRow'),ts=document.getElementById('aduBundleTime');if(row)row.style.display='';if(ts)ts.textContent=curve.startSeconds.toFixed(3)+'s';}
+                    result={curve,svgPath:svgR.svgPath,midiResult:mR,midiInsert:mI,featheredType:ft};
+                }catch(err){console.error('AccelDecelUI.step2 error:',err);}
+                finally{if(btn){btn.textContent=result?'✓ Done':'✗ Error';btn.style.background=result?'#4a4':'#a44';setTimeout(()=>{btn.textContent=oTxt;btn.style.background=oBg;btn.disabled=false;},1500);}}
+                return result;
+            },
+            async go(params=null){const c=this.step1(params);if(!c)return null;return await this.step2(params);},
+            generateAccelDecelMidi(curve, params) {
+                if(!curve||!curve.curveData||!curve.curveData.samples||curve.curveData.samples.length<2) return null;
+                const {pitchModel,singlePitch,startPitch:sPStr,endPitch:ePStr,dyn1,dyn2,volumeMode,density:dV,humanize:hV,artKey}=params;
+                const cd=curve.curveData, samples=cd.samples, si=cd.sampleInterval;
+                const durMs=(cd.endTime-cd.startTime)*1000;
+                let spd,epd;
+                if(pitchModel==='glissando'){spd=this.noteNameToPitch(sPStr,true);epd=this.noteNameToPitch(ePStr,true);if(!spd||!epd)return null;}
+                else{spd=this.noteNameToPitch(singlePitch,true);epd=spd;if(!spd)return null;}
+                const sP=spd.pitch,eP=epd.pitch,sQ=spd.quarterTone,eQ=epd.quarterTone;
+                const v1=this.dynamicToVelocity(dyn1),v2=this.dynamicToVelocity(dyn2);
+                const dens=Math.max(0,Math.min(100,dV||45)),hum=Math.max(0,Math.min(100,hV||20));
+                const tgtN=Math.round(2+(Math.min(dens,50)/50)*30);
+                const nT=[0]; const tI=samples.reduce((s,y)=>s+Math.max(0.1,y),0); const th=tI/tgtN;
+                let acc=0,nc=1;
+                for(let i=0;i<samples.length&&nc<tgtN;i++){acc+=Math.max(0.1,samples[i]);if(acc>=th){nT.push(i*si*1000);acc-=th;nc++;}}
+                if(nT[nT.length-1]<durMs-100) nT.push(durMs-100);
+                const avgI=durMs/Math.max(1,nT.length-1);
+                const mxJ=Math.min(avgI*0.03*(hum/100),8*(hum/100));
+                const hT=nT.map((t,i)=>{if(i===0||i===nT.length-1)return t;const pI=nT[i]-nT[i-1],nI=i<nT.length-1?nT[i+1]-nT[i]:avgI;return Math.max(0,Math.min(durMs-100,t+this.gaussianRandom(0,mxJ*Math.min(0.7,Math.min(pI,nI)/150)/2)));});
+                hT.sort((a,b)=>a-b);
+                const ev=[]; const art=this.articulations[artKey||'spiccato'];
+                if(art) ev.push({timeMs:0,relativeTimeMs:0,type:'cc',data:[0xB0,0x00,art.cc0]});
+                const tN=hT.length, tPR=(eP-sP)+(eQ-sQ), aPR=Math.abs(tPR), pbr=1;
+                const uHG=pitchModel==='glissando'&&aPR>0, uPPB=uHG&&aPR<=pbr, hQT=sQ!==0||eQ!==0;
+                let npd=[];
+                if(uHG&&!uPPB){for(let i=0;i<tN;i++){const t=tN>1?i/(tN-1):0;const ep=sP+sQ+t*tPR;npd.push({pitch:Math.round(ep),quarterToneOffset:ep-Math.round(ep)});}}
+                else{for(let i=0;i<tN;i++)npd.push({pitch:sP,quarterToneOffset:sQ});}
+                for(let idx=0;idx<hT.length;idx++){
+                    const tMs=hT[idx], nxtMs=idx<hT.length-1?hT[idx+1]:tMs+100;
+                    const nDur=Math.max(20,Math.min(100,nxtMs-tMs-5));
+                    const tNm=tN>1?idx/(tN-1):0;
+                    let nV;
+                    if(volumeMode==='steady') nV=v1;
+                    else if(volumeMode==='linear') nV=Math.round(v1+tNm*(v2-v1));
+                    else{const sIdx=Math.min(samples.length-1,Math.round((tMs/durMs)*(samples.length-1)));const cY=samples[sIdx]||0;nV=Math.round(v1+(volumeMode==='inverseCurve'?(1-cY):cY)*(v2-v1));}
+                    nV=Math.max(1,Math.min(127,nV));
+                    const cp=npd[idx],np=idx<npd.length-1?npd[idx+1]:cp;
+                    if(uHG||hQT){
+                        const bbs=cp.quarterToneOffset;
+                        if(uHG&&uPPB){const t=tN>1?idx/(tN-1):0;const tb=t*tPR+sQ;const bv=Math.round(0x2000+(tb/pbr)*0x2000);const cb=Math.max(0,Math.min(0x3FFF,bv));ev.push({timeMs:tMs,relativeTimeMs:tMs,type:'pitchBend',data:[0xE0,cb&0x7F,(cb>>7)&0x7F]});}
+                        else if(uHG){const sbv=Math.round(0x2000+(bbs/pbr)*0x2000);const scb=Math.max(0,Math.min(0x3FFF,sbv));ev.push({timeMs:tMs,relativeTimeMs:tMs,type:'pitchBend',data:[0xE0,scb&0x7F,(scb>>7)&0x7F]});
+                            const nfp=np.pitch+np.quarterToneOffset,cfp=cp.pitch+cp.quarterToneOffset,pd=nfp-cfp;
+                            if(Math.abs(pd)>0.01&&idx<hT.length-1){for(let b=1;b<=4;b++){const bt=b/4,btm=tMs+nDur*0.3+bt*Math.min(nDur*0.6,(nxtMs-tMs)*0.8);const tbs=bbs+Math.max(-pbr,Math.min(pbr,pd*bt));const bv=Math.round(0x2000+(tbs/pbr)*0x2000);const cb=Math.max(0,Math.min(0x3FFF,bv));ev.push({timeMs:btm,relativeTimeMs:btm,type:'pitchBend',data:[0xE0,cb&0x7F,(cb>>7)&0x7F]});}}}
+                        else if(hQT){const bv=Math.round(0x2000+(bbs/pbr)*0x2000);const cb=Math.max(0,Math.min(0x3FFF,bv));ev.push({timeMs:tMs,relativeTimeMs:tMs,type:'pitchBend',data:[0xE0,cb&0x7F,(cb>>7)&0x7F]});}
+                    }
+                    ev.push({timeMs:tMs,relativeTimeMs:tMs,type:'noteOn',data:[0x90,cp.pitch,nV]});
+                    ev.push({timeMs:tMs+nDur,relativeTimeMs:tMs+nDur,type:'noteOff',data:[0x80,cp.pitch,0]});
+                }
+                if(uHG) ev.push({timeMs:durMs+10,relativeTimeMs:durMs+10,type:'pitchBend',data:[0xE0,0x00,0x40]});
+                ev.sort((a,b)=>a.timeMs-b.timeMs);
+                console.log(`AccelDecelUI MIDI: ${hT.length} notes, ${ev.length} events, ${durMs.toFixed(0)}ms`);
+                return {events:ev,noteCount:hT.length,durationMs:durMs,startSeconds:cd.startTime,endSeconds:cd.endTime};
+            },
+            insertAccelDecelMidi(mR, curve, track) {
+                if(!mR||!mR.events||!mR.events.length) return null;
+                const ti=(parseInt(track)||1)-1, ch=ti, csMs=curve.startSeconds*1000, col=curve.color||'limeGreen';
+                const chEv=mR.events.map(e=>{const d=[...e.data];d[0]=(d[0]&0xF0)|ch;return{timeMs:csMs+e.timeMs,type:e.type,data:d};});
+                let sId=null;
+                if(window.MidiSnippetDatabase){const sn=MidiSnippetDatabase.add({name:`AD @ ${curve.name}`,trackIndex:ti,startTimeMs:csMs,durationMs:mR.durationMs,startSeconds:mR.startSeconds,endSeconds:mR.endSeconds,events:chEv,color:col,sourceCurve:curve.id});sId=sn.id;}
+                if(window.MidiController&&MidiController.tracks&&MidiController.tracks[ti]){
+                    for(const e of chEv) MidiController.tracks[ti].midiEvents.push({id:`ad_${curve.id}_${Date.now()}_${Math.random().toString(36).substr(2,9)}`,timeMs:e.timeMs,type:e.type,data:[...e.data],sourceCurve:curve.id,snippetId:sId});
+                    MidiController.tracks[ti].midiEvents.sort((a,b)=>a.timeMs-b.timeMs);
+                    MidiController.renderAllMidiDisplays();MidiController.updateMidiDisplayVisibility();
+                }
+                if(window.MidiController) MidiController.reloadFromDatabase();
+                if(window.ScoreManager) ScoreManager.markDirty();
+                console.log(`AccelDecelUI MIDI inserted: ${chEv.length} events track ${ti+1} ch ${ch}`);
+                return {snippetId:sId,totalEvents:chEv.length,trackIndex:ti};
+            },
+            async insertAccelDecelSvg(svgPath, startSeconds, track, metadata) {
+                if(!svgPath) return null;
+                try{
+                    const resp=await fetch(svgPath); const svgTxt=await resp.text();
+                    const parser=new DOMParser(); const svgDoc=parser.parseFromString(svgTxt,'image/svg+xml'); const svgEl=svgDoc.documentElement;
+                    let sw=parseFloat(svgEl.getAttribute('width'))||100, sh=parseFloat(svgEl.getAttribute('height'))||100;
+                    if((svgEl.getAttribute('width')||'').includes('mm')) sw=parseFloat(svgEl.getAttribute('width'))*3.78;
+                    if((svgEl.getAttribute('height')||'').includes('mm')) sh=parseFloat(svgEl.getAttribute('height'))*3.78;
+                    svgEl.setAttribute('width',String(sw)); svgEl.setAttribute('height',String(sh));
+                    const tn=parseInt(track)||1, scoreEl=document.getElementById('ScoreTop'), scW=scoreEl.clientWidth;
+                    const td=CompositionPanel.getTrackDimensions(String(tn),scoreEl), tH=td.height;
+                    const pos=metadata?.positioning||null, oyf=pos?pos.offsetYFraction:0.03;
+                    let sc,hf;
+                    if(pos?.scaleMode==='staffHeight'&&metadata?.staffHeight_mm){const spx=metadata.staffHeight_mm*3.78;sc=(tH*pos.staffHeightFraction)/spx;hf=(sh*sc)/tH;}
+                    else{hf=pos?(pos.heightFraction||0.90):0.90;sc=(tH*hf)/sh;}
+                    const spp=window.GraphicTimeline?GraphicTimeline.getSecondsPerPage():(beatsPerPage/beatsPerMinute)*60;
+                    const spPx=spp/scW;
+                    let oSec, aoMm=null;
+                    if(pos&&pos.anchorElement==='noteheadCenter'&&metadata.noteheadCenterX_mm){aoMm=metadata.noteheadCenterX_mm;oSec=-(aoMm*3.78*sc)*spPx;}
+                    else if(pos&&pos.anchorElement==='startNoteheadCenter'&&metadata.startNoteheadCenterX_mm){aoMm=metadata.startNoteheadCenterX_mm;oSec=-(aoMm*3.78*sc)*spPx;}
+                    else{oSec=-(sw*sc-8)*spPx;}
+                    const id=SVGElementManager.nextId++; const wr=document.createElementNS('http://www.w3.org/2000/svg','g');
+                    wr.setAttribute('id',`svg-element-${id}`); wr.setAttribute('class','svg-element-wrapper');
+                    const img=document.createElementNS('http://www.w3.org/2000/svg','image');
+                    let ss=new XMLSerializer().serializeToString(svgEl); ss=ss.replace(/currentColor/g,'#000000');
+                    img.setAttribute('href','data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(ss))));
+                    img.setAttribute('width',sw); img.setAttribute('height',sh); wr.appendChild(img);
+                    const ed={id,name:SVGElementManager.generateSvgName(svgPath.split('/').pop()),wrapper:wr,image:img,referenceSeconds:startSeconds,offsetSeconds:oSec,anchorOffsetX_mm:aoMm,offsetYFraction:oyf,width:sw,height:sh,scale:sc,heightFraction:hf,track:tn};
+                    const p=SVGElementManager.calcPixelPosition(ed);ed._x=p.x;ed._y=p.y;ed._page=p.page;ed._section=p.section;
+                    SVGElementManager.elements.push(ed);SVGElementManager.updateElementTransform(ed);
+                    (p.section==='top'?SVGElementManager.containerTop:SVGElementManager.containerBottom).appendChild(wr);
+                    wr.addEventListener('mousedown',e=>SVGElementManager.handleElementMouseDown(e,ed));
+                    SVGElementManager.updateElementList();SVGElementManager.updateVisibility();
+                    console.log('AccelDecelUI SVG inserted:',ed.name,'scale:',sc.toFixed(3),'track:',tn);
+                    return ed;
+                }catch(err){console.error('AccelDecelUI SVG error:',err);return null;}
+            },
+            registerBundle(curveId,svgId,midiSnippetId,startTime,endTime,track,params){
+                const b={id:this.nextBundleId++,curveId,svgId,midiSnippetId,startTime,endTime,track,...params,needsRegeneration:false};
+                this.bundles.push(b);console.log('AccelDecelUI.registerBundle:',b.id,'curve:',curveId,'type:',b.featheredType);return b;
+            },
+            lookupBundleBySvgId(svgId){return this.bundles.find(b=>b.svgId===svgId)||null;},
+            lookupBundleByCurveId(curveId){const m=this.bundles.filter(b=>b.curveId===curveId);return m.length?m[m.length-1]:null;},
+            deleteBundle(bundleId){
+                const b=this.bundles.find(b=>b.id===bundleId);if(!b)return;
+                if(b.curveId&&window.CurveMaker){const c=CurveMaker.curves.find(c=>c.id===b.curveId);if(c){CurveMaker.selectedCurve=c;CurveMaker.deleteSelectedCurve();}}
+                if(b.svgId&&window.SVGElementManager){const e=SVGElementManager.elements.find(e=>e.id===b.svgId);if(e){SVGElementManager.selectedElement=e;SVGElementManager.deleteSelected();}}
+                if(b.midiSnippetId&&window.MidiSnippetDatabase) MidiSnippetDatabase.remove(b.midiSnippetId);
+                if(b.curveId&&window.MidiController&&MidiController.tracks){for(const t of MidiController.tracks){if(t&&t.midiEvents)t.midiEvents=t.midiEvents.filter(ev=>ev.sourceCurve!==b.curveId);}}
+                this.bundles=this.bundles.filter(x=>x.id!==bundleId);
+                if(window.MidiController){MidiController.renderAllMidiDisplays();MidiController.updateMidiDisplayVisibility();MidiController.reloadFromDatabase();}
+                if(window.ScoreManager) ScoreManager.markDirty();
+                this._activeBundleId=null;
+                const row=document.getElementById('aduBundleRow');if(row)row.style.display='none';
+                console.log('AccelDecelUI.deleteBundle:',bundleId);
+            },
+            startBundleDrag(bundle,e){
+                if(!bundle||!window.CurveMaker)return;const curve=CurveMaker.curves.find(c=>c.id===bundle.curveId);if(!curve)return;
+                this._isBundleDragging=true;const sx=e.clientX,sW=document.getElementById('ScoreTop').clientWidth;
+                const spp=window.GraphicTimeline?GraphicTimeline.getSecondsPerPage():(beatsPerPage/beatsPerMinute)*60;
+                const spPx=spp/sW,oS=curve.startSeconds,dur=curve.endSeconds-oS;
+                const onM=me=>{const dx=me.clientX-sx,ns=Math.max(0,oS+dx*spPx);curve.startSeconds=ns;curve.endSeconds=ns+dur;bundle.startTime=ns;bundle.endTime=ns+dur;
+                    CurveMaker.updateCurveRendering(curve);CurveMaker.syncCurveToDatabase(curve);
+                    if(bundle.svgId&&window.SVGElementManager){const sv=SVGElementManager.elements.find(el=>el.id===bundle.svgId);if(sv){sv.referenceSeconds=ns;SVGElementManager.updateElementTransform(sv);}}};
+                const onU=()=>{this._isBundleDragging=false;document.removeEventListener('mousemove',onM);document.removeEventListener('mouseup',onU);if(window.MidiController)MidiController.reloadFromDatabase();if(window.ScoreManager)ScoreManager.markDirty();};
+                document.addEventListener('mousemove',onM);document.addEventListener('mouseup',onU);
+            },
+            async regenerateMidi(bundle){
+                if(!bundle)return;const curve=window.CurveMaker?CurveMaker.curves.find(c=>c.id===bundle.curveId):null;if(!curve)return;
+                if(window.CurveMaker) curve.curveData=CurveMaker.generateCurveDataArray(curve);
+                const mR=this.generateAccelDecelMidi(curve,{pitchModel:bundle.pitchModel,singlePitch:bundle.pitchInfo?.pitch,startPitch:bundle.pitchInfo?.startPitch,endPitch:bundle.pitchInfo?.endPitch,dyn1:bundle.dynamic1,dyn2:bundle.dynamic2,volumeMode:bundle.volumeMode,glissMode:bundle.glissMode,density:bundle.density,humanize:bundle.humanize,artKey:bundle.articulation,track:bundle.track});
+                if(!mR)return;
+                if(window.MidiSnippetDatabase){MidiSnippetDatabase.getAll().filter(s=>s.sourceCurve===bundle.curveId).forEach(s=>MidiSnippetDatabase.remove(s.id));}
+                if(window.MidiController&&MidiController.tracks){for(const t of MidiController.tracks){if(t&&t.midiEvents)t.midiEvents=t.midiEvents.filter(ev=>ev.sourceCurve!==bundle.curveId);}}
+                const mI=this.insertAccelDecelMidi(mR,curve,bundle.track);
+                if(mI){bundle.midiSnippetId=mI.snippetId;bundle.startTime=curve.startSeconds;bundle.endTime=curve.endSeconds;bundle.needsRegeneration=false;}
+                if(window.MidiController){MidiController.renderAllMidiDisplays();MidiController.updateMidiDisplayVisibility();MidiController.reloadFromDatabase();}
+                if(window.ScoreManager)ScoreManager.markDirty();
+                const rb=document.getElementById('aduRegenMidiBtn');if(rb)rb.style.display='none';
+            },
+            exportBundles(){return{bundles:this.bundles.map(b=>({...b})),nextBundleId:this.nextBundleId};},
+            importBundles(data){if(!data)return;this.bundles=(data.bundles||[]).map(b=>({...b}));this.nextBundleId=data.nextBundleId||1;console.log('AccelDecelUI.importBundles:',this.bundles.length);},
+            initBundleUI(){
+                const db=document.getElementById('aduDeleteBundleBtn');
+                if(db) db.addEventListener('click',()=>{let b=null;if(window.CurveMaker&&CurveMaker.selectedCurve)b=this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);if(!b&&window.SVGElementManager&&SVGElementManager.selectedElement)b=this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);if(!b&&this._activeBundleId)b=this.bundles.find(x=>x.id===this._activeBundleId);if(b)this.deleteBundle(b.id);});
+                const rb=document.getElementById('aduRegenMidiBtn');
+                if(rb) rb.addEventListener('click',()=>{let b=null;if(window.CurveMaker&&CurveMaker.selectedCurve)b=this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);if(!b&&this._activeBundleId)b=this.bundles.find(x=>x.id===this._activeBundleId);if(b)this.regenerateMidi(b);});
+                const rs=document.getElementById('aduReplaceSvgBtn');
+                if(rs) rs.addEventListener('click',()=>{let b=null;if(window.CurveMaker&&CurveMaker.selectedCurve)b=this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);if(!b&&window.SVGElementManager&&SVGElementManager.selectedElement)b=this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);if(!b&&this._activeBundleId)b=this.bundles.find(x=>x.id===this._activeBundleId);if(b&&b.svgId)SVGElementManager.replaceSvgFromFile(b.svgId);});
+                // Patch SVGElementManager.selectElement to show/hide AD bundle row
+                if(window.SVGElementManager){
+                    const origSel=SVGElementManager.selectElement.bind(SVGElementManager);
+                    SVGElementManager.selectElement=(elData)=>{origSel(elData);
+                        const b=this.lookupBundleBySvgId(elData.id);
+                        const row=document.getElementById('aduBundleRow'),ts=document.getElementById('aduBundleTime'),rg=document.getElementById('aduRegenMidiBtn');
+                        if(b&&row){this._activeBundleId=b.id;row.style.display='';if(ts)ts.textContent=b.startTime.toFixed(3)+'s';if(rg)rg.style.display=b.needsRegeneration?'':'none';}
+                        else if(row){row.style.display='none';}};
+                    const origDes=SVGElementManager.deselectAll.bind(SVGElementManager);
+                    SVGElementManager.deselectAll=()=>{origDes();this._activeBundleId=null;const row=document.getElementById('aduBundleRow');if(row)row.style.display='none';};
+                }
+                // Delete key handler for AD bundles
+                document.addEventListener('keydown',(e)=>{if(e.key!=='Delete')return;
+                    let b=null;if(window.CurveMaker&&CurveMaker.selectedCurve)b=this.lookupBundleByCurveId(CurveMaker.selectedCurve.id);
+                    if(!b&&window.SVGElementManager&&SVGElementManager.selectedElement)b=this.lookupBundleBySvgId(SVGElementManager.selectedElement.id);
+                    if(b){e.preventDefault();e.stopPropagation();this.deleteBundle(b.id);}});
+                console.log('AccelDecelUI: Bundle UI initialized');
+            }
+        });
+        AccelDecelUI.init();
+        AccelDecelUI.initBundleUI();
+        window.AccelDecelUI = AccelDecelUI;
+        
+        // ============================================
         // BARTÓK PIZZICATO UI
         // Single-click workflow: pipeline → GC → SVG → MIDI
         // ============================================
@@ -24754,10 +25635,12 @@
                 return { pitch: midiNote, quarterTone, displayName: displayName + (quarterTone > 0.25 ? '+' : ''), englishPitch };
             },
             
-            // Dynamic → MIDI velocity mapping
+            // Dynamic → MIDI velocity mapping (blunt map — see §19.3.2 in MIDI_MUSIC_GENERATION.md)
+            // Compressed tiers: synth velocity→volume yields quiet results, so dynamics are
+            // collapsed into fewer velocity levels for approximately correct audible output.
             dynamicToVelocity(dynamic) {
-                const map = { pppp: 15, ppp: 30, pp: 45, p: 60, mp: 70, mf: 85, f: 95, ff: 107, fff: 120, ffff: 127 };
-                return map[dynamic] || 100;
+                const map = { pppp: 95, ppp: 95, pp: 95, p: 95, mp: 103, mf: 103, f: 111, ff: 119, fff: 127, ffff: 127 };
+                return map[dynamic] || 103;
             },
             
             // Convert plain English pitch (C#4, Ab3, C+4, Cd4, C#+4, Cbd4) to LilyPond notation
@@ -25661,10 +26544,10 @@
                         if (svgElement) console.log('BowOverpressureUI: SVG inserted:', svgElement.name);
                     }
                     
-                    // Step 4: Insert MIDI (CC0=53, velocity 127)
+                    // Step 4: Insert MIDI (CC0=53, dynamic-based velocity per §19.3.2)
                     let midiSnippet = null;
                     if (window.MidiController) {
-                        midiSnippet = this.insertMidi(pitchEnglish, track, impactTime);
+                        midiSnippet = this.insertMidi(pitchEnglish, 'fff', track, impactTime);
                         if (midiSnippet) console.log('BowOverpressureUI: MIDI inserted');
                     }
                     
@@ -25805,13 +26688,13 @@
                 }
             },
             
-            // Insert MIDI: CC0=53, velocity 127, short duration
-            insertMidi(pitchEnglish, track, impactTime) {
+            // Insert MIDI: CC0=53, dynamic-based velocity (§19.3.2), short duration
+            insertMidi(pitchEnglish, dynamic, track, impactTime) {
                 if (!window.MidiController || !window.MidiSnippetDatabase) return null;
                 
                 const trackIndex = parseInt(track) - 1;
                 const midiChannel = trackIndex;
-                const velocity = 127;
+                const velocity = this.dynamicToVelocity(dynamic);
                 const cc0Value = 53;
                 
                 const midiNote = this.englishToMidi(pitchEnglish);
@@ -27113,10 +27996,10 @@
                 };
             },
             
-            // Dynamic → MIDI velocity mapping (same as Bartók/generate_pizz_tremolo_midi.js)
+            // Dynamic → MIDI velocity mapping (blunt map — see §19.3.2 in MIDI_MUSIC_GENERATION.md)
             dynamicToVelocity(dynamic) {
-                const map = { pppp: 15, ppp: 30, pp: 45, p: 60, mp: 70, mf: 85, f: 95, ff: 107, fff: 120, ffff: 127 };
-                return map[dynamic] || 100;
+                const map = { pppp: 95, ppp: 95, pp: 95, p: 95, mp: 103, mf: 103, f: 111, ff: 119, fff: 127, ffff: 127 };
+                return map[dynamic] || 103;
             },
             
             // Convert plain English pitch to LilyPond notation (same as BartokPizzUI)
