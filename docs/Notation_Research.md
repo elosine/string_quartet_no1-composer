@@ -428,6 +428,248 @@ The Z shape is drawn as four connected line segments:
 
 ---
 
-## Notes (add as needed)
+## Playing Behind the Bridge (Pizzicato or Bowed)
+
+*(Migrated from NotationResearch.md — Feb 22, 2026)*
+
+### Description
+
+Plucking or bowing the **afterlength** — the short segment of string between the bridge and the tailpiece. Produces very high, squeaky, indeterminate pitches. On cello/bass the pitches are more recognizable due to longer string lengths; on violin/viola they can be extremely high, even above human hearing range.
+
+Also known as: *dietro il ponticello* (Italian), "3rd bridge" (electric guitar term for same concept).
+
+### Notation Approaches
+
+1. **Text instruction** — `"behind the bridge"` or `"dietro il ponticello"` or abbreviated `"d.p."` / `"b.b."` written above the staff
+2. **String clef system (Lachenmann)** — A special **"Behind the Bridge" string clef** replaces the standard clef. Uses a diagram showing the 4 strings (I–IV as Roman numerals) with an **arc below representing the bridge**. Notes are placed on string lines rather than pitched staff lines. The presence of the bridge arc distinguishes "behind the bridge" from "pegbox side."
+   - First used in Lachenmann's *Zwei Gefühle, Musik mit Leonardo* (Breitkopf & Härtel, PB 5419)
+   - Also discussed in Christian Dimpker's *Extended Notation: The Depiction of the Unconventional* (LIT Verlag, 2013)
+   - A [SMuFL glyph proposal (Issue #275)](https://github.com/w3c/smufl/issues/275) exists to standardize these clef symbols — includes images and design proportions
+3. **X-shaped noteheads** — Some composers use `x` noteheads to indicate indeterminate pitch behind the bridge
+4. **Regular noteheads on string lines** — When using string clef, regular noteheads on the 4 string lines indicate which string to play
+
+### Key Scores
+
+| Composer | Work | Year | Technique | Link |
+|----------|------|------|-----------|------|
+| Krzysztof Penderecki | *Threnody to the Victims of Hiroshima* | 1961 | Bowing behind the bridge extensively; graphic notation with cluster bands | [Analysis + notation examples](https://musichistoryfsu.wordpress.com/2015/04/06/the-graphic-notation-of-krzysztof-pendereckis-threnody-for-the-victims-of-hiroshima/), [Wikipedia](https://en.wikipedia.org/wiki/Threnody_to_the_Victims_of_Hiroshima), [UNT Dissertation (PDF)](https://digital.library.unt.edu/ark:/67531/metadc500894/m2/1/high_res_d/1002775409-Daley.pdf) |
+| Helmut Lachenmann | *Gran Torso* — String Quartet No. 1 | 1971/76/88 | Full string clef system, behind-bridge + pegbox playing, detailed technique catalog | [Score preview (Issuu)](https://issuu.com/breitkopf/docs/km_2233_issuu), [Purchase (Sheet Music Plus)](https://www.sheetmusicplus.com/en/product/gran-torso-2728737.html) |
+| Helmut Lachenmann | *Grido* — String Quartet No. 3 | 2001 | Extended string clef notation, behind-bridge techniques | [Score preview (Issuu)](https://issuu.com/breitkopf/docs/km_2493_issuu) |
+| Helmut Lachenmann | *Zwei Gefühle, Musik mit Leonardo* | 1992 | First systematic use of string clef + behind-bridge string clef | Breitkopf & Härtel, PB 5419 |
+| Helmut Lachenmann | *Toccatina* (solo violin) | 1986 | Bowing on body, scroll, pegs, many extended techniques | Breitkopf & Härtel |
+| George Crumb | *Black Angels* (electric string quartet) | 1970 | Bowing on "wrong" side of strings, thimble trilling, behind-bridge effects, glass harmonica | [Boosey & Hawkes](https://www.boosey.com/shop/prod/Crumb-George-Black-Angels/632749), [Wikipedia](https://en.wikipedia.org/wiki/Black_Angels_(Crumb)), [MTO Analysis](https://mtosmt.org/issues/mto.12.18.2/mto.12.18.2.johnston.html) |
+| Ferde Grofé | *Grand Canyon Suite* | 1931 | Bowing behind bridge for donkey bray effect in violin cadenza | — |
+
+---
+
+## Pegbox Pizzicato (Playing In/On the Pegbox)
+
+*(Migrated from NotationResearch.md — Feb 22, 2026)*
+
+### Description
+
+Plucking the strings **between the nut and the tuning pegs** (in the pegbox area). Produces extremely high, metallic, indeterminate pitches — even shorter string length than behind the bridge. Very quiet, delicate timbre.
+
+Also referred to as: *sul pegbox*, "in the pegbox", "between the pegs", "behind the nut."
+
+### Notation Approaches
+
+1. **Text instruction** — `"sul pegbox"`, `"in the pegbox"`, `"between the pegs"`, or `"behind the nut"` written above the staff (italic)
+2. **Lachenmann's string clef** — The **string clef without the bridge arc** represents the pegbox side of the instrument. Notes on the string lines indicate which string to pluck in the pegbox
+3. **X noteheads + text** — Indeterminate pitch noteheads combined with text instruction
+4. **No standardized symbol exists** — typically communicated through performance notes and text instructions
+
+### Key Scores
+
+| Composer | Work | Year | Notes |
+|----------|------|------|-------|
+| Helmut Lachenmann | *Gran Torso*, *Grido*, *Pression* | 1971–2001 | Systematically uses pegbox playing with string clef notation |
+| Helmut Lachenmann | *Toccatina* (solo violin) | 1986 | Uses bowing on body of instrument, scroll, pegs, etc. |
+
+---
+
+## Related Extended Plucking Techniques
+
+*(Migrated from NotationResearch.md — Feb 22, 2026)*
+
+From [Wikipedia: Bowed string instrument extended technique](https://en.wikipedia.org/wiki/Bowed_string_instrument_extended_technique):
+
+| Technique | Description | Notable Example |
+|-----------|-------------|-----------------|
+| **Buzz pizzicato** | Left hand finger placed parallel to string; pluck forcefully so string buzzes against fingerboard | Zhou Long, *Song of the Ch'in* (1982) |
+| **Snap pizzicato (Bartók pizz)** | Pluck string away from fingerboard with enough force to snap back against it | Béla Bartók (extensive use); first directed by Gustav Mahler (Symphony No. 7) |
+| **Nail pizzicato** | Pluck with fingernail only (not pad of finger); more harsh and metallic | Béla Bartók |
+
+---
+
+## Extended Technique Reference Links
+
+*(Migrated from NotationResearch.md — Feb 22, 2026)*
+
+### General Extended Technique References
+- [Wikipedia: Bowed string instrument extended technique](https://en.wikipedia.org/wiki/Bowed_string_instrument_extended_technique) — comprehensive catalog of bowing, plucking, tapping, and miscellaneous effects
+- [Wikipedia: Pizzicato](https://en.wikipedia.org/wiki/Pizzicato) — history, techniques, and notable repertoire
+- [Noteflight: Playing Techniques and How to Write Them, Part 1: Strings](https://notes.noteflight.com/nfbehindthenotation-playing-techniques/) — practical notation guide
+
+### Notation Standardization
+- [SMuFL Issue #275: String Clef and Behind Bridge String Clef](https://github.com/w3c/smufl/issues/275) — proposed glyph designs for string clef and behind-bridge string clef, with images from Lachenmann scores and design proportions
+- Christian Dimpker, *Extended Notation: The Depiction of the Unconventional* (LIT Verlag, 2013) — comprehensive book on extended notation systems
+
+### Score Previews & Analysis
+- [Lachenmann, *Gran Torso* — score preview (Issuu)](https://issuu.com/breitkopf/docs/km_2233_issuu)
+- [Lachenmann, *Grido* — score preview (Issuu)](https://issuu.com/breitkopf/docs/km_2493_issuu)
+- [Penderecki, *Threnody* — graphic notation analysis (FSU)](https://musichistoryfsu.wordpress.com/2015/04/06/the-graphic-notation-of-krzysztof-pendereckis-threnody-for-the-victims-of-hiroshima/)
+- [Penderecki, *Threnody* — analysis (LSU)](https://music7703lsu.wordpress.com/2017/05/02/threnody-for-the-victims-of-hiroshima-for-52-strings-by-krzysztof-penderecki/)
+- [Penderecki, *Threnody* — UNT Dissertation (PDF)](https://digital.library.unt.edu/ark:/67531/metadc500894/m2/1/high_res_d/1002775409-Daley.pdf)
+- [Crumb, *Black Angels* — MTO analysis](https://mtosmt.org/issues/mto.12.18.2/mto.12.18.2.johnston.html)
+- [Crumb, *Black Angels* — program notes (Newburyport Chamber Music)](https://www.newburyportchambermusic.org/program-notes/black-angels-thirteen-images-from-the-dark-land-for-electric-string-quartet-in-tempore-belli-1970)
+- [Lachenmann, *temA* — Structure of Physicalities analysis](https://www.chrisswithinbank.net/2011/03/a-structure-of-physicalities-helmut-lachenmann-tema/)
+
+### Recordings
+- [Lachenmann: Complete String Quartets — Stadler Quartet (NEOS)](https://en.neos-music.com/product/helmut-lachenmann-string-quartets/)
+- [Lachenmann: Complete String Quartets — Mode Records](https://moderecords.bandcamp.com/album/complete-string-quartets-mode267)
+
+---
+
+## Practical Decisions for String Quartet No. 1
+
+*(Migrated from NotationResearch.md — Feb 22, 2026)*
+
+**No universal standard symbol exists** for either pegbox or behind-the-bridge playing. Options:
+
+1. **Text instruction approach** (simplest) — italic text like `"b.b."` (behind bridge) or `"sul pegbox"` above the staff, with `x` noteheads for indeterminate pitch
+2. **String clef approach** (Lachenmann-style) — replace treble/bass clef with string diagram showing I–IV strings, with/without bridge arc to distinguish pegbox vs behind-bridge
+3. **Performance notes** — define custom symbols in a legend at the top of the score
+
+*Decision pending — to be determined during fragment composition.*
+
+---
+
+## Articulated Col Legno Flutter — Notation Research
+
+*(Research date: Mar 11, 2026)*
+
+### The Technique
+
+An articulated **col legno** bowing where enough bow **pressure and speed** produce a **fluttering/chattering texture**. Distinct from:
+- **Col legno battuto (c.l.b.)** — single percussive strike with wood
+- **Col legno tratto (c.l.t.)** — drawing the wood smoothly across the string (quiet, airy)
+- **Col legno gettato (c.l.g.)** — thrown/bounced wood, controlled ricochet
+- **Jeté / ricochet** — bouncing bow (hair), not wood
+
+The target sound is a sustained, pressured col legno draw that creates an articulated flutter — the wood chatters against the string rather than sliding cleanly. Analogous to **flutter tongue** on wind instruments.
+
+### Existing Col Legno Vocabulary
+
+| Technique | Abbreviation | Sound | Standard Notation |
+|---|---|---|---|
+| Col legno battuto | c.l.b. | Percussive tap | `x` notehead or text |
+| Col legno tratto | c.l.t. | Quiet, airy, pitched with white noise | Text over normal noteheads |
+| Col legno gettato | c.l.g. | Bouncing ricochet on wood | Text + staccato dots or z-stroke |
+| Half wood/half hair | c.l.t. (variant) | Less airy, slightly more tone | Text "c.l.t. (half hair)" |
+
+**Gap identified:** No established symbol for a sustained pressured col legno tratto producing a flutter/chatter texture.
+
+### Composer Research
+
+#### Salvatore Sciarrino — Sei Capricci (1976)
+
+**Most relevant precedent.** Sciarrino's approach is **prescriptive** (notates what the player *does*, not what it *sounds like*).
+
+**Key techniques:**
+- **Spazzolare ("brushing")** — Caprice No. 3. A diagonal windshield-wiper bow motion across strings. Introduces a strong aleatoric element where harmonic pitches pop out unpredictably. Closest Sciarrino technique to the flutter concept — rapid pressured contact creating textural noise.
+- **Jeté harmonics** — Caprices 1, 4, 6. Bouncing bow on harmonics. Caprice 6 has longer, more "indeterminate and gestural" jeté passages.
+- **Oscillating harmonics** — Two pitches notated; player oscillates as fast as possible with light finger, combined with ponticello bow stroke.
+
+**Notation system:** Asterisk footnotes in the score — symbols reference detailed text explanations at bottom of page, "written like footnotes, asterisks indicating descriptions as detailed as stage directions for the sought harmonic effect" (West Cork Music Festival notes).
+
+**Viewable sources:**
+- [Miranda Cuckson's talk (with video demos)](https://www.mirandacuckson.com/sciarrino-talk/) — best readable source, includes embedded video clips of each caprice's techniques
+- [Scribd — Full Score](https://www.scribd.com/document/332823549/Sciarrino-6-Capricci-Per-Violino-Solo) — free account lets you preview pages including notation key
+- [Scribd — Alternative Upload](https://www.scribd.com/document/538135955/Sciarrino-6-capricci-per-violino)
+- [Caroline Eva Chin dissertation (CUNY)](https://academicworks.cuny.edu/gc_etds/4490/) — analysis and performance guide for each caprice
+- [Yujin Sung dissertation (FSU, PDF)](https://www.research.fsu.edu/media/1764/sung.pdf) — lists notation symbols explicitly
+- [Lourenço de Nardin Budó paper (Scribd)](https://www.scribd.com/document/479792443/Lourenco-de-Nardin-Budo-The-Marginal-Virtuosity-Salvatore-Sciarrino-and-Sei-Capricci) — reception, influences, and violin technique
+- [West Cork Music Festival program notes](https://www.westcorkmusic.ie/works/sei-capricci-per-violino/) — describes notation system and technique overview
+
+#### Krzysztof Penderecki — String Quartets
+
+**String Quartet No. 1 (1960)** is a "sonic study" using the full range of traditional techniques plus Penderecki's own extensions.
+
+**Notation approach:**
+- **Graphic symbols** rather than traditional noteheads for many extended techniques
+- **Zigzag lines** for tremolo variants
+- **Thick/thin line weight** to indicate bow pressure
+- **Arrow-headed lines** for directional bowing effects
+- **Time-space notation** (proportional) rather than metered rhythms
+- **Penderecki unmeasured tremolo glyph** (SMuFL U+E22B) — a Z-shaped stem decoration distinct from standard tremolo slashes
+
+**Relevance:** Line thickness to encode pressure + zigzag/wavy lines for tremolo-like articulation directly applicable. See also Z-Stem section above.
+
+#### George Crumb — Black Angels (1970)
+
+Written for **electric string quartet** — amplification creates "highly surrealistic effect."
+
+**Extended techniques:** Bowing on fingerboard above fingers, tapping strings with thimbles, pedal tones (heavy bow pressure), bowing on "wrong" side of strings, glass harmonica (bowed crystal goblets).
+
+**Notation approach:** Combines traditional staff notation with **verbal instructions** and **graphic elements**. Detailed text instructions in score plus stage diagram.
+
+**Relevance:** Practical model for combining conventional notation with specific text instructions for novel techniques.
+
+#### Helmut Lachenmann — Pression (1969)
+
+**Prescriptive notation system:** Notation indicates the player's **actions**, not resulting sounds.
+
+**Key features:**
+- **Multi-line staff** where different lines represent different physical parameters: bow position, bow pressure, bow speed, contact point
+- **Bow pressure indicated by line thickness** or specific symbols
+- Col legno passages notated with specific graphic markers showing where and how the wood contacts the string
+
+**Relevance:** Most thorough precedent for encoding complex bowing actions. Pressure-as-line-weight convention directly useful.
+
+**Viewable source:** [Erudit — Notation analysis article (François-Xavier Féron)](https://www.erudit.org/en/journals/circuit/2015-v25-n1-circuit01800/1029476ar/abstract/)
+
+### Flutter Tongue Graphic Symbols (Wind Instrument Precedents)
+
+The flutter tongue on wind instruments is the closest sonic analogy to the col legno flutter on strings. Research into graphic (non-text) notation for flutter tongue:
+
+#### Standard Notation
+- **Three tremolo slashes through the stem** (identical to unmeasured tremolo) + text "flz." / "frull." / "f.t."
+- Per Wikipedia: "simply writing (3-line) tremolo marks on all rhythmic values without other indication is most generally accepted"
+
+#### Graphic Alternatives
+
+| Symbol | Description | Source/Composer |
+|---|---|---|
+| **Z on stem** | Z-shaped mark on note stem. Originally snare drum buzz roll; can represent unmeasured rapid repetition. | Standard percussion; SMuFL U+E22A |
+| **Penderecki unmeasured tremolo** | SMuFL glyph U+E22B — specific stem decoration distinct from standard tremolo slashes. For strings. | Penderecki |
+| **Rebecca Saunders' squiggle** | A **"stylized squiggle on the stem"** specifically for flutter tongue, freeing standard tremolo slashes for other techniques (valve tremolo, rapid repetitions). | Rebecca Saunders, cited in *The Modern Trumpet* by Nathan Plante |
+| **Wavy trill line** | Wavy/zigzag line extending over duration of flutter. | Finale documentation; general practice |
+
+#### The Rebecca Saunders Squiggle
+
+Most relevant graphic precedent. Saunders recognized that standard tremolo slashes are ambiguous (measured tremolo vs. unmeasured vs. flutter tongue) and created a **distinct graphic stem decoration** specifically for flutter tongue.
+
+**Viewable source:** [Rebecca Saunders, *Fury* — score extract (Issuu/Edition Peters)](https://issuu.com/scoresondemand/docs/rebecca_saunders_fury_ep11054_score_issuu_version_)
+
+**Source reference:** Nathan Plante, [*The Modern Trumpet* — Flutter Tongue, Doodle Tongue and Growl](https://themoderntrumpet.com/2020/10/13/flutter-tongue-doodle-tongue-and-growl/): "I personally like Rebecca Saunders' solution of a stylized squiggle on the stem for flutter tongue while reserving the more traditional notation for other techniques."
+
+### Emerging Synthesis Direction
+
+**Design principles (from research):**
+1. **Prescriptive** (à la Sciarrino/Lachenmann) — notate what the player does, not the sound result
+2. **Flutter tongue analogy** — the col legno flutter is sonically analogous to flatterzunge; borrow graphic language
+3. **Compact graphic** — avoid requiring text instruction on every occurrence
+
+**Proposed elements to combine:**
+1. **"c.l." text** — establishes col legno (wood of bow) on first occurrence
+2. **A squiggle/wavy stem decoration** (à la Saunders) — indicates flutter/chattering quality, distinct from standard tremolo
+3. **Prescriptive footnote** (à la Sciarrino) — first occurrence gets detailed performance instruction explaining bow speed/pressure producing flutter texture
+
+*Decision pending — to be finalized after reviewing Sciarrino score pages and Saunders squiggle.*
+
+---
+
+## Notes
 
 <!-- Add new research findings here -->

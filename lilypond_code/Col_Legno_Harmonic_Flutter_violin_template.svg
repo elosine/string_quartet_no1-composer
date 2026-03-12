@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="40.00mm" height="80.00mm" viewBox="0.0000 -0.0000 22.7622 45.5244">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0569, 7.9746)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.3000" x2="4.6154" y2="1.3000"/>
+</g>
+<g transform="translate(0.0569, 7.9746)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="0.6500" x2="4.6154" y2="0.6500"/>
+</g>
+<g transform="translate(0.0569, 7.9746)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="4.6154" y2="-0.0000"/>
+</g>
+<g transform="translate(0.0569, 7.9746)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.6500" x2="4.6154" y2="-0.6500"/>
+</g>
+<g transform="translate(0.0569, 7.9746)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.3000" x2="4.6154" y2="-1.3000"/>
+</g>
+<g transform="translate(0.5691, 9.9246)">
+<rect x="0.5443" y="-0.0500" width="0.8615" height="0.1000" ry="0.0500" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Col_Legno_Harmonic_Flutter_violin_template.ly:79:4:5">
+<g transform="translate(0.5691, 7.9746)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="1.4256" y1="2.1596" x2="2.1008" y2="1.6827"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Col_Legno_Harmonic_Flutter_violin_template.ly:151:4:5">
+<g transform="translate(2.7515, 9.5996)">
+<path transform="scale(0.0018, -0.0018)" d="M199 142c66 0 123 -38 123 -108s-48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108s48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Col_Legno_Harmonic_Flutter_violin_template.ly:75:4:5">
+<g transform="translate(1.2569, 10.2496)">
+<path transform="scale(0.0018, -0.0018)" d="M199 142c66 0 123 -38 123 -108s-48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108s48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Col_Legno_Harmonic_Flutter_violin_template.ly:88:4:5">
+<g transform="translate(0.9319, 1.7909)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="0.9247" text-anchor="start" fill="currentColor">
+<tspan>col legno</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Col_Legno_Harmonic_Flutter_violin_template.ly:98:4:5">
+<g transform="translate(2.3169, 9.9496)">
+<path stroke-width="0.1200" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M-2 0L0 -2.2000"/>
+</g>
+<g transform="translate(2.2569, 9.8996)">
+<path stroke-width="0.4300" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M0 -2.2000L2 0"/>
+</g>
+<g transform="translate(2.1969, 9.8496)">
+<path stroke-width="0.1200" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M2 0L0 2.2000"/>
+</g>
+<g transform="translate(2.2569, 9.8996)">
+<path stroke-width="0.4300" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M0 2.2000L-2 0"/>
+</g>
+<g transform="translate(2.3769, 9.8996)">
+<path stroke-width="0.1200" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M0 -2.2000L0 -7.5000"/>
+</g>
+<g transform="translate(2.3769, 9.8996)">
+<path stroke-width="0.1200" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M0 -2.8000C0.4000 -2.9300 0.4000 -3.0700 0 -3.2000C-0.4000 -3.3300 -0.4000 -3.4700 0 -3.6000C0.8000 -3.7300 0.8000 -3.8700 0 -4.0000C-0.8000 -4.1300 -0.8000 -4.2700 0 -4.4000C1.1000 -4.5300 1.1000 -4.6700 0 -4.8000C-1.1000 -4.9300 -1.1000 -5.0700 0 -5.2000C0.8000 -5.3300 0.8000 -5.4700 0 -5.6000C-0.8000 -5.7300 -0.8000 -5.8700 0 -6.0000C0.4000 -6.1300 0.4000 -6.2700 0 -6.4000C-0.4000 -6.5300 -0.4000 -6.6700 0 -6.8000"/>
+</g>
+</a>
+</svg>

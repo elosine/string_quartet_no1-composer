@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="40.00mm" height="80.00mm" viewBox="0.0000 -0.0000 22.7622 45.5244">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0569, 6.6893)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.3000" x2="4.6154" y2="1.3000"/>
+</g>
+<g transform="translate(0.0569, 6.6893)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="0.6500" x2="4.6154" y2="0.6500"/>
+</g>
+<g transform="translate(0.0569, 6.6893)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="4.6154" y2="-0.0000"/>
+</g>
+<g transform="translate(0.0569, 6.6893)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.6500" x2="4.6154" y2="-0.6500"/>
+</g>
+<g transform="translate(0.0569, 6.6893)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.3000" x2="4.6154" y2="-1.3000"/>
+</g>
+<g transform="translate(0.5691, 8.6393)">
+<rect x="0.5443" y="-0.0500" width="0.8615" height="0.1000" ry="0.0500" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Harmonic_Tremolo_violin_template_render.ly:79:4:5">
+<g transform="translate(0.5691, 6.6893)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="1.4256" y1="2.1596" x2="2.1008" y2="1.6827"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Harmonic_Tremolo_violin_template_render.ly:130:4:5">
+<g transform="translate(2.7515, 8.3143)">
+<path transform="scale(0.0018, -0.0018)" d="M199 142c66 0 123 -38 123 -108s-48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108s48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(3.2609, 6.6893)">
+<rect x="-0.0650" y="-2.2750" width="0.1300" height="3.8391" ry="0.0400" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Harmonic_Tremolo_violin_template_render.ly:130:7:8">
+<g transform="translate(2.7734, 6.1157)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="0.9350 -0.3598 0.9350 -0.1278 0.0400 0.1160 0.0400 -0.1160"/>
+</g>
+<g transform="translate(2.7734, 5.5892)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="0.9350 -0.3598 0.9350 -0.1278 0.0400 0.1160 0.0400 -0.1160"/>
+</g>
+<g transform="translate(2.7734, 5.0627)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="0.9350 -0.3598 0.9350 -0.1278 0.0400 0.1160 0.0400 -0.1160"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Harmonic_Tremolo_violin_template_render.ly:75:4:5">
+<g transform="translate(1.2569, 8.9643)">
+<path transform="scale(0.0018, -0.0018)" d="M199 142c66 0 123 -38 123 -108s-48 -117 -94 -145c-32 -19 -68 -31 -105 -31c-66 0 -123 38 -123 108s48 117 94 145c32 19 68 31 105 31z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Harmonic_Tremolo_violin_template_render.ly:91:4:5">
+<g transform="translate(2.3169, 8.6643)">
+<path stroke-width="0.1200" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M-2 0L0 -2.2000"/>
+</g>
+<g transform="translate(2.2569, 8.6143)">
+<path stroke-width="0.4300" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M0 -2.2000L2 0"/>
+</g>
+<g transform="translate(2.1969, 8.5643)">
+<path stroke-width="0.1200" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M2 0L0 2.2000"/>
+</g>
+<g transform="translate(2.2569, 8.6143)">
+<path stroke-width="0.4300" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M0 2.2000L-2 0"/>
+</g>
+<g transform="translate(2.3769, 8.6143)">
+<path stroke-width="0.1200" stroke-linejoin="round" stroke-linecap="butt" stroke="currentColor" fill="none" d="M0 -2.2000L0 -7.5000"/>
+</g>
+</a>
+<g transform="translate(1.7663, 6.6893)">
+<rect x="-0.0650" y="-1.6250" width="0.1300" height="3.8391" ry="0.0400" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/GitHub/string_quartet_no1-composer/lilypond_code/Harmonic_Tremolo_violin_template_render.ly:75:6:7">
+<g transform="translate(1.2788, 6.7657)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="0.9350 -0.3598 0.9350 -0.1278 0.0400 0.1160 0.0400 -0.1160"/>
+</g>
+<g transform="translate(1.2788, 6.2392)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="0.9350 -0.3598 0.9350 -0.1278 0.0400 0.1160 0.0400 -0.1160"/>
+</g>
+<g transform="translate(1.2788, 5.7127)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="0.9350 -0.3598 0.9350 -0.1278 0.0400 0.1160 0.0400 -0.1160"/>
+</g>
+</a>
+</svg>

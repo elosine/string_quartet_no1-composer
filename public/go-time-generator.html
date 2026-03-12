@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Go-Time Generator</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 20px; }
+    h1 { font-size: 1.4rem; color: #a0c4ff; margin-bottom: 16px; }
+    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
+    
+    /* ── Input Panel ── */
+    .input-panel { background: #16213e; border-radius: 10px; padding: 20px; border: 1px solid #2a3a5c; }
+    .input-panel h2 { font-size: 1rem; color: #7ec8e3; margin-bottom: 14px; border-bottom: 1px solid #2a3a5c; padding-bottom: 8px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 0.8rem; color: #8899aa; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field input, .field select { width: 100%; padding: 8px 10px; background: #0f1a30; border: 1px solid #2a3a5c; border-radius: 6px; color: #e0e0e0; font-size: 0.95rem; font-family: 'Consolas', monospace; }
+    .field input:focus, .field select:focus { outline: none; border-color: #7ec8e3; }
+    .field .hint { font-size: 0.7rem; color: #556677; margin-top: 2px; }
+    .row { display: flex; gap: 10px; }
+    .row .field { flex: 1; }
+    
+    .scale-ref { font-size: 0.75rem; color: #556677; margin: 8px 0 14px; padding: 8px; background: #0f1a30; border-radius: 6px; line-height: 1.6; font-family: 'Consolas', monospace; }
+    
+    .btn-generate { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 6px; transition: background 0.15s; }
+    .btn-generate:hover { background: #1d4ed8; }
+    .btn-generate:active { background: #1e40af; }
+    
+    .btn-copy { padding: 6px 14px; background: #374151; color: #d1d5db; border: 1px solid #4b5563; border-radius: 6px; font-size: 0.8rem; cursor: pointer; transition: background 0.15s; }
+    .btn-copy:hover { background: #4b5563; }
+    .btn-copy.copied { background: #065f46; border-color: #10b981; color: #6ee7b7; }
+    
+    /* ── Output Panel ── */
+    .output-panel { background: #16213e; border-radius: 10px; padding: 20px; border: 1px solid #2a3a5c; overflow: hidden; }
+    .output-panel h2 { font-size: 1rem; color: #7ec8e3; margin-bottom: 10px; }
+    
+    .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .stat { background: #0f1a30; padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; }
+    .stat strong { color: #a0c4ff; }
+    .stat .val { color: #f0f0f0; font-family: 'Consolas', monospace; }
+    
+    .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+    .tab { padding: 6px 14px; background: #0f1a30; border: 1px solid #2a3a5c; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 0.8rem; color: #8899aa; border-bottom: none; }
+    .tab.active { background: #1e293b; color: #a0c4ff; border-color: #3b5998; }
+    
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .event-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; font-family: 'Consolas', monospace; }
+    .event-table th { text-align: left; padding: 6px 8px; background: #0f1a30; color: #7ec8e3; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; }
+    .event-table td { padding: 4px 8px; border-bottom: 1px solid #1a2744; }
+    .event-table tr.l1 { background: #1a2744; }
+    .event-table tr.l2 { background: transparent; color: #99aabb; }
+    .event-table tr.delayed td { color: #fbbf24; }
+    .event-table tr.dropped td { color: #f87171; text-decoration: line-through; }
+    .track-badge { display: inline-block; width: 22px; height: 18px; text-align: center; border-radius: 4px; font-size: 0.75rem; font-weight: 700; line-height: 18px; }
+    .t1 { background: #3b82f6; color: white; }
+    .t2 { background: #8b5cf6; color: white; }
+    .t3 { background: #f59e0b; color: #1a1a2e; }
+    .t4 { background: #10b981; color: white; }
+    
+    .table-scroll { max-height: 600px; overflow-y: auto; border: 1px solid #2a3a5c; border-radius: 6px; }
+    
+    .code-output { background: #0f1a30; padding: 12px; border-radius: 6px; font-family: 'Consolas', monospace; font-size: 0.8rem; white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto; line-height: 1.5; color: #b0c4de; border: 1px solid #2a3a5c; margin-top: 8px; }
+    
+    .copy-row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+    
+    .log-output { background: #0f1a30; padding: 10px; border-radius: 6px; font-family: 'Consolas', monospace; font-size: 0.78rem; max-height: 200px; overflow-y: auto; color: #fbbf24; margin-top: 10px; border: 1px solid #2a3a5c; }
+    .log-output .drop { color: #f87171; }
+    .log-output .delay { color: #fbbf24; }
+    
+    .track-summary { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .track-card { background: #0f1a30; padding: 10px 14px; border-radius: 6px; min-width: 100px; }
+    .track-card .track-label { font-weight: 700; font-size: 0.85rem; }
+    .track-card .count { font-size: 1.2rem; font-family: 'Consolas', monospace; color: #f0f0f0; }
+    
+    #placeholder { color: #556677; padding: 40px; text-align: center; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<h1>⏱ Go-Time Generator</h1>
+
+<div class="container">
+    <!-- ── INPUT PANEL ── -->
+    <div class="input-panel">
+        <h2>Parameters</h2>
+        
+        <div class="field">
+            <label>Duration (seconds)</label>
+            <input type="number" id="duration" value="24.5" step="0.1" min="0.5">
+        </div>
+        
+        <div class="row">
+            <div class="field">
+                <label>Start Scale (1–10)</label>
+                <input type="number" id="startScale" value="4" step="0.5" min="1" max="10">
+            </div>
+            <div class="field">
+                <label>End Scale (1–10)</label>
+                <input type="number" id="endScale" value="10" step="0.5" min="1" max="10">
+            </div>
+        </div>
+        
+        <div class="scale-ref">
+            Scale → Gap: 1=2.00s  2=1.79s  3=1.59s  4=1.38s  5=1.18s<br>
+            6=0.97s  7=0.77s  8=0.56s  9=0.36s  10=0.15s
+        </div>
+        
+        <div class="row">
+            <div class="field">
+                <label>Noise ±%</label>
+                <input type="number" id="noise" value="12" step="1" min="0" max="50">
+            </div>
+            <div class="field">
+                <label>Score Offset (s)</label>
+                <input type="number" id="offset" value="0" step="0.1" min="0">
+            </div>
+        </div>
+        
+        <h2 style="margin-top:16px;">Level 2 Cascade</h2>
+        
+        <div class="row">
+            <div class="field">
+                <label>Cascade Count</label>
+                <input type="number" id="cascadeCount" value="3" step="1" min="0" max="10">
+                <div class="hint">L2 sub-events per L1 (0 = L1 only)</div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="field">
+                <label>Cascade Gap Min (s)</label>
+                <input type="number" id="cascadeGapMin" value="0.12" step="0.01" min="0.01">
+            </div>
+            <div class="field">
+                <label>Cascade Gap Max (s)</label>
+                <input type="number" id="cascadeGapMax" value="0.19" step="0.01" min="0.01">
+            </div>
+        </div>
+        
+        <h2 style="margin-top:16px;">Track Distribution</h2>
+        
+        <div class="field">
+            <label>Track Mode</label>
+            <select id="trackMode">
+                <option value="random">Random</option>
+                <option value="first-go">First-Go (Track 1 starts)</option>
+                <option value="">None (no track assignment)</option>
+            </select>
+        </div>
+        
+        <div class="field">
+            <label>Cooldown (s)</label>
+            <input type="number" id="cooldown" value="0.15" step="0.01" min="0.01">
+            <div class="hint">Hard min gap per track (delay → drop if crosses L1)</div>
+        </div>
+        
+        <button class="btn-generate" onclick="generate()">Generate</button>
+    </div>
+    
+    <!-- ── OUTPUT PANEL ── -->
+    <div class="output-panel">
+        <h2>Output</h2>
+        <div id="placeholder">Set parameters and click Generate</div>
+        <div id="output" style="display:none;">
+            <div class="stats" id="stats"></div>
+            
+            <div class="track-summary" id="trackSummary"></div>
+            
+            <div class="tabs" id="tabs">
+                <div class="tab active" onclick="switchTab('grouped')">Grouped</div>
+                <div class="tab" onclick="switchTab('pertrack')">Per-Track Arrays</div>
+                <div class="tab" onclick="switchTab('allevents')">All Events JSON</div>
+            </div>
+            
+            <div class="tab-content active" id="tab-grouped">
+                <div class="table-scroll">
+                    <table class="event-table">
+                        <thead><tr><th>#</th><th>Time</th><th>Track</th><th>Gap</th><th>Level</th><th>Scale</th></tr></thead>
+                        <tbody id="eventBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-pertrack">
+                <div class="copy-row">
+                    <button class="btn-copy" onclick="copyText('perTrackCode', this)">Copy Per-Track Arrays</button>
+                </div>
+                <div class="code-output" id="perTrackCode"></div>
+            </div>
+            
+            <div class="tab-content" id="tab-allevents">
+                <div class="copy-row">
+                    <button class="btn-copy" onclick="copyText('allEventsCode', this)">Copy All Events</button>
+                </div>
+                <div class="code-output" id="allEventsCode"></div>
+            </div>
+            
+            <div id="logSection" style="display:none;">
+                <h2 style="margin-top:16px;">Delay/Drop Log</h2>
+                <div class="log-output" id="logOutput"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ── ALGORITHM (same as generate_go_times.js) ──
+
+function scaleToGap(scale) {
+    const minScale = 1, maxScale = 10;
+    const gapAtMin = 2.0, gapAtMax = 0.15;
+    return gapAtMin + (scale - minScale) * (gapAtMax - gapAtMin) / (maxScale - minScale);
+}
+
+function generateGoTimes(params) {
+    const { duration, startScale, endScale, noisePercent = 12, offset = 0 } = params;
+    const times = [0];
+    let t = 0;
+    while (true) {
+        const progress = t / duration;
+        const scale = startScale + (endScale - startScale) * progress;
+        let gap = scaleToGap(scale);
+        gap *= 1 + (Math.random() * 2 - 1) * (noisePercent / 100);
+        gap = Math.max(gap, 0.05);
+        const nextT = t + gap;
+        if (nextT > duration) break;
+        times.push(parseFloat(nextT.toFixed(3)));
+        t = nextT;
+    }
+    return offset !== 0 ? times.map(t => parseFloat((t + offset).toFixed(3))) : times;
+}
+
+function generateCascade(l1Times, count, cascadeGapMin, cascadeGapMax, maxTime) {
+    const l2Groups = [], all = [];
+    l1Times.forEach((l1t, i) => {
+        all.push({ time: l1t, level: 1, l1Index: i });
+        const subs = [];
+        let prev = l1t;
+        for (let j = 0; j < count; j++) {
+            const gap = cascadeGapMin + Math.random() * (cascadeGapMax - cascadeGapMin);
+            const subT = parseFloat((prev + gap).toFixed(3));
+            if (subT > maxTime) break;
+            subs.push(subT);
+            all.push({ time: subT, level: 2, l1Index: i });
+            prev = subT;
+        }
+        l2Groups.push(subs);
+    });
+    all.sort((a, b) => a.time - b.time);
+    return { l1: l1Times, l2: l2Groups, all };
+}
+
+const TRACKS = [1, 2, 3, 4];
+
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function assignTracks(cascadeResult, mode, cooldown) {
+    const { l1, l2 } = cascadeResult;
+    const lastUsed = {};
+    TRACKS.forEach(t => lastUsed[t] = -Infinity);
+    const events = [], log = [];
+    let delayed = 0, dropped = 0;
+
+    function findAvailable(candidates, time) {
+        const avail = candidates.filter(t => (time - lastUsed[t]) >= cooldown);
+        return avail.length > 0 ? { track: avail[Math.floor(Math.random() * avail.length)], time } : null;
+    }
+    function findEarliest(candidates) {
+        let earliest = Infinity, best = null;
+        for (const t of candidates) {
+            const at = lastUsed[t] + cooldown;
+            if (at < earliest) { earliest = at; best = t; }
+        }
+        return { track: best, time: parseFloat(earliest.toFixed(3)) };
+    }
+
+    l1.forEach((l1t, i) => {
+        const nextL1 = i < l1.length - 1 ? l1[i + 1] : Infinity;
+        let l1Track;
+
+        if (mode === 'first-go' && i === 0) {
+            l1Track = 1;
+        } else {
+            const result = findAvailable([...TRACKS], l1t);
+            if (result) {
+                l1Track = result.track;
+            } else {
+                const e = findEarliest([...TRACKS]);
+                l1Track = e.track;
+                if (e.time !== l1t) {
+                    log.push({ type: 'delay', msg: `L1 ${i+1} delayed ${(e.time-l1t).toFixed(3)}s → ${e.time.toFixed(3)}s [T${l1Track}]` });
+                    delayed++;
+                }
+                events.push({ time: e.time, level: 1, l1Index: i, track: l1Track, wasDelayed: true });
+                lastUsed[l1Track] = e.time;
+                doL2(i, l1Track, l1t, nextL1);
+                return;
+            }
+        }
+        lastUsed[l1Track] = l1t;
+        events.push({ time: l1t, level: 1, l1Index: i, track: l1Track });
+        doL2(i, l1Track, l1t, nextL1);
+    });
+
+    function doL2(gi, l1Track, l1t, nextL1) {
+        const remaining = TRACKS.filter(t => t !== l1Track);
+        const l2Evts = l2[gi] || [];
+        const shuffled = shuffle([...remaining]);
+        l2Evts.forEach((l2t, j) => {
+            let candidates;
+            if (j < shuffled.length) {
+                const used = events.filter(e => e.l1Index === gi).map(e => e.track);
+                candidates = remaining.filter(t => !used.includes(t));
+                if (!candidates.length) candidates = [...TRACKS];
+            } else {
+                candidates = [...TRACKS];
+            }
+            const onTime = findAvailable(candidates, l2t);
+            if (onTime) {
+                lastUsed[onTime.track] = l2t;
+                events.push({ time: l2t, level: 2, l1Index: gi, track: onTime.track });
+                return;
+            }
+            const e = findEarliest(candidates);
+            if (e.time >= nextL1) {
+                log.push({ type: 'drop', msg: `L2 ${String.fromCharCode(97+j)} group ${gi+1} DROPPED at ${l2t.toFixed(3)}s` });
+                dropped++;
+                return;
+            }
+            log.push({ type: 'delay', msg: `L2 ${String.fromCharCode(97+j)} group ${gi+1} delayed → ${e.time.toFixed(3)}s [T${e.track}]` });
+            delayed++;
+            lastUsed[e.track] = e.time;
+            events.push({ time: e.time, level: 2, l1Index: gi, track: e.track, wasDelayed: true });
+        });
+    }
+
+    events.sort((a, b) => a.time - b.time);
+    return { events, delayed, dropped, log };
+}
+
+// ── UI ──
+
+function generate() {
+    const duration = parseFloat(document.getElementById('duration').value);
+    const startScale = parseFloat(document.getElementById('startScale').value);
+    const endScale = parseFloat(document.getElementById('endScale').value);
+    const noisePercent = parseFloat(document.getElementById('noise').value);
+    const offset = parseFloat(document.getElementById('offset').value);
+    const cascadeCount = parseInt(document.getElementById('cascadeCount').value);
+    const cascadeGapMin = parseFloat(document.getElementById('cascadeGapMin').value);
+    const cascadeGapMax = parseFloat(document.getElementById('cascadeGapMax').value);
+    const trackMode = document.getElementById('trackMode').value;
+    const cooldown = parseFloat(document.getElementById('cooldown').value);
+
+    const l1Times = generateGoTimes({ duration, startScale, endScale, noisePercent, offset });
+
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('output').style.display = 'block';
+
+    if (cascadeCount > 0) {
+        const maxTime = duration + offset;
+        const cascade = generateCascade(l1Times, cascadeCount, cascadeGapMin, cascadeGapMax, maxTime);
+
+        if (trackMode) {
+            const { events, delayed, dropped, log } = assignTracks(cascade, trackMode, cooldown);
+            renderWithTracks(l1Times, events, delayed, dropped, log, duration, startScale, endScale, offset);
+        } else {
+            renderCascadeOnly(l1Times, cascade, duration, startScale, endScale, offset);
+        }
+    } else {
+        renderL1Only(l1Times, duration, startScale, endScale, offset);
+    }
+}
+
+function renderWithTracks(l1Times, events, delayed, dropped, log, duration, startScale, endScale, offset) {
+    // Stats
+    const trackCounts = {};
+    TRACKS.forEach(t => trackCounts[t] = events.filter(e => e.track === t).length);
+    const l1Count = events.filter(e => e.level === 1).length;
+    const l2Count = events.filter(e => e.level === 2).length;
+
+    document.getElementById('stats').innerHTML = `
+        <div class="stat"><strong>Total:</strong> <span class="val">${events.length}</span></div>
+        <div class="stat"><strong>L1:</strong> <span class="val">${l1Count}</span></div>
+        <div class="stat"><strong>L2:</strong> <span class="val">${l2Count}</span></div>
+        <div class="stat"><strong>Delayed:</strong> <span class="val">${delayed}</span></div>
+        <div class="stat"><strong>Dropped:</strong> <span class="val">${dropped}</span></div>
+    `;
+
+    // Track summary
+    document.getElementById('trackSummary').innerHTML = TRACKS.map(t => `
+        <div class="track-card">
+            <div class="track-label"><span class="track-badge t${t}">${t}</span> Track ${t}</div>
+            <div class="count">${trackCounts[t]} events</div>
+        </div>
+    `).join('');
+
+    // Event table
+    let html = '';
+    l1Times.forEach((l1t, i) => {
+        const l1Evt = events.find(e => e.l1Index === i && e.level === 1);
+        if (!l1Evt) return;
+        const localT = l1t - offset;
+        const progress = localT / duration;
+        const scale = startScale + (endScale - startScale) * progress;
+        const gap = i > 0 ? (l1t - l1Times[i - 1]).toFixed(3) + 's' : '—';
+        const cls = l1Evt.wasDelayed ? 'l1 delayed' : 'l1';
+        html += `<tr class="${cls}">
+            <td>L1 ${i+1}</td>
+            <td>${l1Evt.time.toFixed(3)}s</td>
+            <td><span class="track-badge t${l1Evt.track}">${l1Evt.track}</span></td>
+            <td>${gap}</td>
+            <td>L1</td>
+            <td>${scale.toFixed(1)}</td>
+        </tr>`;
+        const l2Evts = events.filter(e => e.l1Index === i && e.level === 2).sort((a, b) => a.time - b.time);
+        l2Evts.forEach((e, j) => {
+            const l2gap = j === 0 ? (e.time - l1Evt.time).toFixed(3) : (e.time - l2Evts[j-1].time).toFixed(3);
+            const cls2 = e.wasDelayed ? 'l2 delayed' : 'l2';
+            html += `<tr class="${cls2}">
+                <td>${String.fromCharCode(97+j)}</td>
+                <td>${e.time.toFixed(3)}s</td>
+                <td><span class="track-badge t${e.track}">${e.track}</span></td>
+                <td>+${l2gap}s</td>
+                <td>L2</td>
+                <td></td>
+            </tr>`;
+        });
+    });
+    document.getElementById('eventBody').innerHTML = html;
+
+    // Per-track code
+    let code = '';
+    TRACKS.forEach(t => {
+        const trEvts = events.filter(e => e.track === t);
+        code += `const track${t}Times = [${trEvts.map(e => e.time.toFixed(3)).join(', ')}];\n`;
+    });
+    document.getElementById('perTrackCode').textContent = code;
+
+    // All events JSON
+    const allJson = JSON.stringify(events.map(e => ({ t: +e.time.toFixed(3), tr: e.track, lv: e.level })), null, 2);
+    document.getElementById('allEventsCode').textContent = `const allEvents = ${allJson};`;
+
+    // Log
+    if (log.length > 0) {
+        document.getElementById('logSection').style.display = 'block';
+        document.getElementById('logOutput').innerHTML = log.map(l =>
+            `<div class="${l.type}">${l.msg}</div>`
+        ).join('');
+    } else {
+        document.getElementById('logSection').style.display = 'none';
+    }
+}
+
+function renderCascadeOnly(l1Times, cascade, duration, startScale, endScale, offset) {
+    const totalL2 = cascade.l2.reduce((s, g) => s + g.length, 0);
+    document.getElementById('stats').innerHTML = `
+        <div class="stat"><strong>L1:</strong> <span class="val">${l1Times.length}</span></div>
+        <div class="stat"><strong>L2:</strong> <span class="val">${totalL2}</span></div>
+        <div class="stat"><strong>Total:</strong> <span class="val">${l1Times.length + totalL2}</span></div>
+    `;
+    document.getElementById('trackSummary').innerHTML = '<div class="stat">No track assignment</div>';
+
+    let html = '';
+    l1Times.forEach((l1t, i) => {
+        const localT = l1t - offset;
+        const progress = localT / duration;
+        const scale = startScale + (endScale - startScale) * progress;
+        const gap = i > 0 ? (l1t - l1Times[i-1]).toFixed(3) + 's' : '—';
+        html += `<tr class="l1"><td>L1 ${i+1}</td><td>${l1t.toFixed(3)}s</td><td>—</td><td>${gap}</td><td>L1</td><td>${scale.toFixed(1)}</td></tr>`;
+        (cascade.l2[i] || []).forEach((l2t, j) => {
+            const l2gap = j === 0 ? (l2t - l1t).toFixed(3) : (l2t - cascade.l2[i][j-1]).toFixed(3);
+            html += `<tr class="l2"><td>${String.fromCharCode(97+j)}</td><td>${l2t.toFixed(3)}s</td><td>—</td><td>+${l2gap}s</td><td>L2</td><td></td></tr>`;
+        });
+    });
+    document.getElementById('eventBody').innerHTML = html;
+
+    let code = `const l1Times = [${l1Times.map(t => t.toFixed(3)).join(', ')}];\n`;
+    code += `const l2Times = [${cascade.l2.flat().map(t => t.toFixed(3)).join(', ')}];\n`;
+    document.getElementById('perTrackCode').textContent = code;
+    document.getElementById('allEventsCode').textContent = JSON.stringify(cascade.all.map(e => ({ t: +e.time.toFixed(3), lv: e.level })), null, 2);
+    document.getElementById('logSection').style.display = 'none';
+}
+
+function renderL1Only(l1Times, duration, startScale, endScale, offset) {
+    document.getElementById('stats').innerHTML = `
+        <div class="stat"><strong>L1 Events:</strong> <span class="val">${l1Times.length}</span></div>
+    `;
+    document.getElementById('trackSummary').innerHTML = '';
+
+    let html = '';
+    l1Times.forEach((t, i) => {
+        const localT = t - offset;
+        const progress = localT / duration;
+        const scale = startScale + (endScale - startScale) * progress;
+        const gap = i > 0 ? (t - l1Times[i-1]).toFixed(3) + 's' : '—';
+        html += `<tr class="l1"><td>${i+1}</td><td>${t.toFixed(3)}s</td><td>—</td><td>${gap}</td><td>L1</td><td>${scale.toFixed(1)}</td></tr>`;
+    });
+    document.getElementById('eventBody').innerHTML = html;
+    document.getElementById('perTrackCode').textContent = `const goTimes = [${l1Times.map(t => t.toFixed(3)).join(', ')}];`;
+    document.getElementById('allEventsCode').textContent = '';
+    document.getElementById('logSection').style.display = 'none';
+}
+
+function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+}
+
+function copyText(elementId, btn) {
+    const text = document.getElementById(elementId).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.classList.remove('copied'); btn.textContent = btn.dataset.label || 'Copy'; }, 1500);
+    });
+    btn.dataset.label = btn.textContent;
+}
+</script>
+</body>
+</html>

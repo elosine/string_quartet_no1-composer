@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 11, 2026  
-**Current ASB Number:** ASB-162
+**Current ASB Number:** ASB-165
 
 ---
 
@@ -57,6 +57,8 @@ That's it. Everything else below is for Cascade.
 | Animated Badge System | **Complete (v1)** | BadgeDatabase + BadgeMaker (murmuration Boids/SMIL) + UI panel + integration hooks + ObjectRegistry/ObjectSelector/MultiSelect. See ASB-138 |
 | Two-Hand Pizz Grace Note Clusters | **Complete (pre-test)** | Full MIDI model: cluster DB (35 clusters), dual CC0 (80 behind bridge / 69 regular pizz), generation logic, UI panel, Pattern 3 insertion. See ASB-140 |
 | Col Legno Battuto, Jeté | **Complete (Pipeline + Bundle + Batch)** | Full pipeline: SVG assembly engine (cross notehead, stem, marcato, c.l.b. jeté text, dynamic), server endpoint, UI panel (random pitch, GC preset selector w/ animated preview), GC + SVG + MIDI bundle system, batch console scripts for vertical assemblages. See ASB-156–162 |
+| Col Legno Harmonic Flutter | **Notation Complete (pre-test)** | Custom calligraphic diamond enclosure + squiggle stem + "col legno" text. 3 templates: violin (treble, B3→D4), viola (alto, E3→G3), cello (bass, E2→G2). Vertical fine-tuning complete. See ASB-163–164 |
+| Harmonic Tremolo | **Notation Complete (pre-test)** | Diamond enclosure + 3 filled parallelogram tremolo slashes on stem (from SVG polygon data). Scheme variables `tremolo-center`/`tremolo-gap` for positioning. 3 templates: violin, viola, cello. See ASB-165 |
 
 ### 4. Reusable Tools (remember these exist)
 
