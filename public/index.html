@@ -1232,9 +1232,9 @@
                 </div>
                 <div class="curve-input-row">
                     <label style="font-size: 9px; min-width: 28px;">Start</label>
-                    <input type="number" id="aduStartInput" class="curve-input" value="0" step="0.1" style="width: 50px; font-size: 10px;">
+                    <input type="number" id="aduStartInput" class="curve-input" value="0" step="0.1" style="width: 50px; font-size: 9px; padding: 2px 3px;">
                     <label style="font-size: 9px; min-width: 10px; margin-left: 2px;" id="aduTimeLabel2">End</label>
-                    <input type="number" id="aduEndInput" class="curve-input" value="10" step="0.1" style="width: 50px; font-size: 10px;">
+                    <input type="number" id="aduEndInput" class="curve-input" value="10" step="0.1" style="width: 50px; font-size: 9px; padding: 2px 3px;">
                     <select id="aduTimeMode" style="width: 38px; background: #333; color: #fff; border: 1px solid #555; font-size: 8px; margin-left: 2px;" title="Switch between End time and Duration">
                         <option value="end" selected>End</option>
                         <option value="dur">Dur</option>
@@ -2675,7 +2675,7 @@
                 
                 <div class="curve-input-row">
                     <label>Impact</label>
-                    <input type="number" id="gcImpactInput" class="curve-input" value="3" step="0.1" style="width: 60px;">
+                    <input type="number" id="gcImpactInput" class="curve-input" value="3" step="0.0001" style="width: 72px; font-size: 9px; padding: 2px 3px;">
                     <label style="margin-left: 8px;">Track</label>
                     <select id="gcTrackSelect" style="width: 40px; font-size: 10px; background: rgba(40,40,50,0.9); color: #ddd; border: 1px solid #555; border-radius: 3px;">
                         <option value="1">1</option>
@@ -23775,7 +23775,7 @@
             
             // Generate crescendo MIDI: pitch bend segments (like glissando) + CC7 volume ramp following curve Y
             async generateCrescendoMidi(curve, pitchModel, pitchInfo, params = {}) {
-                const CC_SAMPLE_INTERVAL = 50; // ms between CC7 messages (20/sec)
+                const CC_SAMPLE_INTERVAL = 5; // ms between CC7 messages (200/sec)
                 const PITCH_BEND_RANGE = 2; // max one-dir deviation: 1st MIDI note offset + 1st ±1 synth bend
                 const PITCH_BEND_SAMPLE_INTERVAL = 50;
                 const PITCH_BEND_MAX = 16383;
@@ -23825,6 +23825,26 @@
                 const dynamicToCC7 = (dyn) => DYNAMICS_CC7_MAP[dyn] ?? 80;
                 const dynOrder = ['pppp','ppp','pp','p','mp','mf','f','ff','fff','ffff'];
                 
+                // Analytical curve Y computation: bypasses pre-computed samples entirely
+                // for perfect resolution at any time point (no staircase artifacts)
+                const curveModel = curve.model || 'bezier';
+                const curveSlope = curve.slope || 0;
+                const y1Norm = curve.y1 / 10;
+                const y2Norm = curve.y2 / 10;
+                const computeY = (t) => {
+                    const timeT = Math.max(0, Math.min(1, (t - curve.startSeconds) / duration));
+                    return CurveMaker.computeYAtT(curveModel, curveSlope, y1Norm, y2Norm, timeT);
+                };
+                
+                // Linear interpolation helper: for pitch bend lookups on pitchAtSample array
+                const interpolateSample = (arr, t) => {
+                    const exactIdx = (t - startTime) / sampleInterval;
+                    const lo = Math.max(0, Math.min(arr.length - 2, Math.floor(exactIdx)));
+                    const hi = lo + 1;
+                    const frac = Math.max(0, Math.min(1, exactIdx - lo));
+                    return arr[lo] + frac * (arr[hi] - arr[lo]);
+                };
+                
                 // Build CC7 volume samples based on volume mode
                 const volumeMode = params?.volumeMode ?? 'curve';
                 const dyn1CC7 = dynamicToCC7(params?.dynamic1 ?? 'p');
@@ -23852,9 +23872,7 @@
                     // Curve Y is inverted: high Y → Dyn1, low Y → Dyn2 (opposite of curve mode)
                     for (let i = 0; i < numCC7Samples; i++) {
                         const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
-                        const curveIdx = Math.round((t - startTime) / sampleInterval);
-                        const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
-                        const normalizedY = samples[clampedIdx]; // 0-1
+                        const normalizedY = computeY(t);
                         const invertedY = 1.0 - normalizedY;
                         const ccValue = Math.round(dyn1CC7 + invertedY * (dyn2CC7 - dyn1CC7));
                         cc7Samples.push({ time: t, value: Math.max(0, Math.min(127, ccValue)) });
@@ -23873,9 +23891,7 @@
                     }
                     for (let i = 0; i < numCC7Samples; i++) {
                         const t = curve.startSeconds + (i / (numCC7Samples - 1)) * duration;
-                        const curveIdx = Math.round((t - startTime) / sampleInterval);
-                        const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
-                        const normalizedY = samples[clampedIdx]; // 0-1
+                        const normalizedY = computeY(t);
                         const ccValue = Math.round(dyn1CC7 + normalizedY * (dyn2CC7 - dyn1CC7));
                         cc7Samples.push({ time: t, value: Math.max(0, Math.min(127, ccValue)) });
                     }
@@ -24002,9 +24018,7 @@
                         
                         for (let pbIdx = 0; pbIdx < numPbSamples; pbIdx++) {
                             const pbTime = segStartTime + (pbIdx / (numPbSamples - 1)) * segDuration;
-                            const curveIdx = Math.round((pbTime - startTime) / sampleInterval);
-                            const clampedIdx = Math.max(0, Math.min(samples.length - 1, curveIdx));
-                            const pitchAtTime = pitchAtSample[clampedIdx];
+                            const pitchAtTime = interpolateSample(pitchAtSample, pbTime);
                             const pitchProgress = (segEndPitch !== segStartPitch) ? 
                                 (pitchAtTime - segStartPitch) / (segEndPitch - segStartPitch) : 0;
                             const clampedProgress = Math.max(0, Math.min(1, pitchProgress));
@@ -32791,7 +32805,7 @@
             
             // Update UI inputs to reflect selected GC
             updateInputsFromGC(gc) {
-                if (this.impactInput) this.impactInput.value = gc.impactSeconds.toFixed(1);
+                if (this.impactInput) this.impactInput.value = gc.impactSeconds.toFixed(4);
                 if (this.trackSelect) this.trackSelect.value = gc.gTrack;
                 
                 // Update slider values

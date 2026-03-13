@@ -60,7 +60,7 @@ function generateStaffLines(width, lineThickness = 0.1) {
  * @param {number} lineThickness - SVG stroke-width (default 0.1)
  * @returns {string} SVG line string
  */
-function generateLedgerLine(y, x, width = 1.2, lineThickness = 0.1) {
+function generateLedgerLine(y, x, width = 1.5, lineThickness = 0.1) {
     const halfWidth = width / 2;
     return `<line stroke-linejoin="round" stroke-linecap="round" ` +
         `stroke-width="${lineThickness.toFixed(4)}" stroke="currentColor" ` +
@@ -76,7 +76,7 @@ function generateLedgerLine(y, x, width = 1.2, lineThickness = 0.1) {
  * @param {number} lineThickness - SVG stroke-width
  * @returns {string} SVG group string with all needed ledger lines
  */
-function generateLedgerLines(staffPosition, noteX, ledgerWidth = 1.2, lineThickness = 0.1) {
+function generateLedgerLines(staffPosition, noteX, ledgerWidth = 1.5, lineThickness = 0.1) {
     const lines = [];
     
     if (staffPosition >= 3) {
@@ -302,7 +302,7 @@ const PROFILES = {
         noteX: 1.1,
         staffWidth: 5.76,
         nonVibX: 1.0,
-        ledgerLineWidth: 1.2,
+        ledgerLineWidth: 1.5,
         hairpinLength: 2.66,
         hairpinHeight: 0.55,
         dyn1LeftEdge: 0.48,
@@ -339,7 +339,7 @@ const PROFILES = {
         flagOffset: 0.04,         // Flag Y offset from stem end (toward note)
         snapPizzGap: 0.3,         // Gap from notehead/stem top to snap pizz circle bottom
         snapPizzGapNoStaff: 0.3,  // Gap from notehead top to snap pizz bottom (noStaff mode)
-        ledgerLineWidth: 1.2,     // Ledger line width
+        ledgerLineWidth: 1.5,     // Ledger line width
         // Positioning: how this SVG is placed in the score (consumed client-side)
         positioning: {
             anchorElement: 'noteheadCenter',
@@ -373,7 +373,7 @@ const PROFILES = {
         marcatoGap: 0.2,          // Gap from stem end/note bottom to marcato top
         marcatoGapNoStaff: 0.3,   // Gap from notehead bottom to marcato top (noStaff mode)
         sfzGap: 0.28,             // Gap from marcato bottom to sfz top (≈ contentToRowGap)
-        ledgerLineWidth: 1.2,     // Ledger line width
+        ledgerLineWidth: 1.5,     // Ledger line width
         // Positioning: how this SVG is placed in the score (consumed client-side)
         positioning: {
             anchorElement: 'noteheadCenter',
@@ -398,7 +398,7 @@ const PROFILES = {
         stemWidth: 0.13,          // Stem thickness
         stemLength: 3.5,          // Stem length (quarter note — shorter than BOP 16th)
         stemNoteOffset: 0.124,    // Stem start offset from note center toward note edge
-        ledgerLineWidth: 1.2,     // Ledger line width
+        ledgerLineWidth: 1.5,     // Ledger line width
         clbTextX: -0.0294,        // "c.l.b. jeté" text X (left ink edge flush with staff line x=0)
         marcatoGapNoStaff: 0.3,   // Gap from notehead top to marcato bottom (noStaff mode)
         accidentalXShift: -0.1138, // Extra 0.2mm left shift for accidentals (beyond noteX shift)
@@ -426,7 +426,7 @@ const PROFILES = {
         note2X: 4.5,            // Second notehead anchor X
         staffWidth: 6.5,        // Wider than single-pitch (5.76) to frame both notes
         nonVibX: 1.0,
-        ledgerLineWidth: 1.2,
+        ledgerLineWidth: 1.5,
         hairpinLength: 2.66,
         hairpinHeight: 0.55,
         dyn1LeftEdge: 0.48,
@@ -448,7 +448,7 @@ const PROFILES = {
         // No nonVib, no secco. Feathered block above by default, below if ledger lines above.
         noteX: 1.1,
         staffWidth: 5.76,
-        ledgerLineWidth: 1.2,
+        ledgerLineWidth: 1.5,
         hairpinLength: 2.66,
         hairpinHeight: 0.55,
         dyn1LeftEdge: 0.48,
@@ -467,7 +467,7 @@ const PROFILES = {
         note1X: 1.1,
         note2X: 4.5,
         staffWidth: 6.5,
-        ledgerLineWidth: 1.2,
+        ledgerLineWidth: 1.5,
         hairpinLength: 2.66,
         hairpinHeight: 0.55,
         dyn1LeftEdge: 0.48,
@@ -2191,7 +2191,7 @@ function assembleFeatheredBeam(params) {
         accidental = null,
         accidental1 = null,
         accidental2 = null,
-        noteheadType = 'longTone',
+        noteheadType = 'shortTone',
         dynamic1,
         dynamic2,
         hairpin = '<',
@@ -2267,14 +2267,14 @@ function assembleFeatheredBeam(params) {
 
         // Highest point (for feathered block placement logic)
         highestNotePoint = -2;
-        if (sp1 < -2) {
+        if (sp1 <= -2) {
             highestNotePoint = Math.min(highestNotePoint, sp1 + nhBbox.top);
             if (accidental1) {
                 const accV = LIBRARY.components.accidentals.variants[accidental1];
                 highestNotePoint = Math.min(highestNotePoint, sp1 + accV.bboxShortTone.top);
             }
         }
-        if (sp2 < -2) {
+        if (sp2 <= -2) {
             highestNotePoint = Math.min(highestNotePoint, sp2 + nhBbox.top);
             if (accidental2) {
                 const accV = LIBRARY.components.accidentals.variants[accidental2];
@@ -2308,7 +2308,7 @@ function assembleFeatheredBeam(params) {
         noteBottom = Math.max(noteBottom, 2.0 + lineHalf);
 
         highestNotePoint = -2;
-        if (sp < -2) {
+        if (sp <= -2) {
             highestNotePoint = sp + nhBbox.top;
             if (accidental) {
                 const accV = LIBRARY.components.accidentals.variants[accidental];
@@ -2460,19 +2460,21 @@ function assembleFeatheredBeam(params) {
     }
     const staffHeight_mm = 4 * mmPerStaffSpace;
 
-    return {
-        svg,
-        metadata: {
-            noteheadCenterX_mm,
-            staffHeight_mm,
-            width_mm: dimensions.width,
-            height_mm: dimensions.height,
-            featheredType,
-            placement,
-            variant,
-            positioning: P.positioning
-        }
+    const metadata = {
+        noteheadCenterX_mm,
+        staffHeight_mm,
+        width_mm: dimensions.width,
+        height_mm: dimensions.height,
+        featheredType,
+        placement,
+        variant,
+        positioning: P.positioning
     };
+    if (isGliss) {
+        metadata.startNoteheadCenterX_mm = noteheadCenterX_mm;
+    }
+
+    return { svg, metadata };
 }
 
 /**

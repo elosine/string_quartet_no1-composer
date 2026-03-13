@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 12, 2026  
-**Current ASB Number:** ASB-174
+**Current ASB Number:** ASB-181
 
 ---
 
@@ -60,7 +60,7 @@ That's it. Everything else below is for Cascade.
 | Col Legno Battuto, Jeté | **Complete (Pipeline + Bundle + Batch)** | Full pipeline: SVG assembly engine (cross notehead, stem, marcato, c.l.b. jeté text, dynamic), server endpoint, UI panel (random pitch, GC preset selector w/ animated preview), GC + SVG + MIDI bundle system, batch console scripts for vertical assemblages. See ASB-156–162 |
 | Col Legno Harmonic Flutter | **Notation Complete (pre-test)** | Custom calligraphic diamond enclosure + squiggle stem + "col legno" text. 3 templates: violin (treble, B3→D4), viola (alto, E3→G3), cello (bass, E2→G2). Vertical fine-tuning complete. See ASB-163–164 |
 | Harmonic Tremolo | **Notation Complete (pre-test)** | Diamond enclosure + 3 filled parallelogram tremolo slashes on stem (from SVG polygon data). Scheme variables `tremolo-center`/`tremolo-gap` for positioning. 3 templates: violin, viola, cello. See ASB-165 |
-| Feathered Beam (Accel/Decel) | **Complete (Pipeline + Bundle + Fixes)** | Full pipeline: `assembleFeatheredBeam()` SVG assembly (single pitch + glissando), server endpoint (`/api/svg-assembly/feathered-beam`), AccelDecelUI panel (§20.1 field order), 2-step workflow (curve → generate), MIDI generation (curve-integrated density, humanized timing, pitch bend gliss, per-note velocity, CC0 articulation), bundle system (curve + SVG + MIDI), CurveMaker hooks (drag/move/select/regen/slope sync), ScoreManager persistence, SVGElementManager patches, Delete key handler. Bug fixes: SVG sizing (heightFraction scaling), Delete Bundle (correct method names), _activeBundleId wiring, pitch range hints. Black color swatch added to all systems. See ASB-166–174 |
+| Feathered Beam (Accel/Decel) | **Complete (Pipeline + Bundle + Fixes)** | Full pipeline: `assembleFeatheredBeam()` SVG assembly (single pitch + glissando), server endpoint (`/api/svg-assembly/feathered-beam`), AccelDecelUI panel (§20.1 field order), 2-step workflow (curve → generate), MIDI generation (curve-integrated density, humanized timing, pitch bend gliss, per-note velocity, CC0 articulation), bundle system (curve + SVG + MIDI), CurveMaker hooks (drag/move/select/regen/slope sync), ScoreManager persistence, SVGElementManager patches, Delete key handler. Bug fixes: SVG sizing (heightFraction scaling), Delete Bundle (correct method names), _activeBundleId wiring, pitch range hints, gliss X anchor alignment, top-staff-line collision. Black color swatch. Notehead changed to filled (shortTone). See ASB-166–181 |
 
 ### 4. Reusable Tools (remember these exist)
 
@@ -163,9 +163,18 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 **Date:** Mar 12, 2026  
 **Focus:** MIDI Snippet Architecture Analysis, MIDI Full System Audit, UI Layout Audit, Feathered Beam Pipeline + Fixes  
-**ASB:** ASB-174  
-**Tier 1 Count This Session:** 7 (ASB-168, ASB-169, ASB-170, ASB-171, ASB-172, ASB-173, ASB-174)  
-**Tier 2 Commits:** 1 (ASB-168–174)
+**ASB:** ASB-181  
+**Tier 1 Count This Session:** 14 (ASB-168–181)  
+**Tier 2 Commits:** 2 (ASB-168–174, ASB-175–181)
+
+### Session Log — Refinements & Fixes (ASB-175–181)
+- ASB-175: Feathered beam single pitch notehead changed from open half note (`longTone`) to filled quarter note (`shortTone`). File: `assemble_svg.js` line 2194.
+- ASB-176: Ledger line width increased from 1.2 → 1.5 ss across all 7 profiles and both function defaults. File: `assemble_svg.js`.
+- ASB-177: Sustained tone CC7 volume — (1) sample rate 50ms → 5ms, (2) analytical curve Y computation via `CurveMaker.computeYAtT()` replacing pre-computed sample interpolation. Eliminates staircase artifacts on short/steep curves. File: `public/index.html`.
+- ASB-178: Feathered beam glissando X anchor fix — added `startNoteheadCenterX_mm` to metadata (was only returning `noteheadCenterX_mm`, causing fallback to legacy right-aligned positioning). File: `assemble_svg.js`.
+- ASB-179: GC Impact input — font size 12px → 9px, step 0.1 → 0.0001, display precision `.toFixed(1)` → `.toFixed(4)`. File: `public/index.html`.
+- ASB-180: Feathered beam collision fix — `highestNotePoint` threshold changed from `sp < -2` to `sp <= -2` so notes on top staff line include notehead bbox in placement calc. File: `assemble_svg.js`.
+- ASB-181: AccelDecel UI start/end time inputs font size 10px → 9px. File: `public/index.html`.
 
 ### Session Log — Feathered Beam Pipeline + Fixes
 - ASB-171: AccelDecelUI panel HTML (§20.1 field order, `adu` prefix IDs, goldenrod header) + server endpoint (`POST /api/svg-assembly/feathered-beam`) + JS object init (instrumentRanges, createCurve, step1, updatePitchRangeUI). Files: `public/index.html` (~lines 1253-1310, ~25059), `server.js` (~line 1230).
