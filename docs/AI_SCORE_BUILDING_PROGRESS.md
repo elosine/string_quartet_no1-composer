@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 12, 2026  
-**Current ASB Number:** ASB-181
+**Current ASB Number:** ASB-182
 
 ---
 
@@ -163,9 +163,9 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 **Date:** Mar 12, 2026  
 **Focus:** MIDI Snippet Architecture Analysis, MIDI Full System Audit, UI Layout Audit, Feathered Beam Pipeline + Fixes  
-**ASB:** ASB-181  
-**Tier 1 Count This Session:** 14 (ASB-168–181)  
-**Tier 2 Commits:** 2 (ASB-168–174, ASB-175–181)
+**ASB:** ASB-182  
+**Tier 1 Count This Session:** 15 (ASB-168–182)  
+**Tier 2 Commits:** 3 (ASB-168–174, ASB-175–181, ASB-182)
 
 ### Session Log — Refinements & Fixes (ASB-175–181)
 - ASB-175: Feathered beam single pitch notehead changed from open half note (`longTone`) to filled quarter note (`shortTone`). File: `assemble_svg.js` line 2194.
@@ -175,6 +175,7 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 - ASB-179: GC Impact input — font size 12px → 9px, step 0.1 → 0.0001, display precision `.toFixed(1)` → `.toFixed(4)`. File: `public/index.html`.
 - ASB-180: Feathered beam collision fix — `highestNotePoint` threshold changed from `sp < -2` to `sp <= -2` so notes on top staff line include notehead bbox in placement calc. File: `assemble_svg.js`.
 - ASB-181: AccelDecel UI start/end time inputs font size 10px → 9px. File: `public/index.html`.
+- ASB-182: Sustained Tone UI start/end time inputs font size 10px → 9px, step 0.1 → 0.0001, width 50px → 60px. File: `public/index.html`.
 
 ### Session Log — Feathered Beam Pipeline + Fixes
 - ASB-171: AccelDecelUI panel HTML (§20.1 field order, `adu` prefix IDs, goldenrod header) + server endpoint (`POST /api/svg-assembly/feathered-beam`) + JS object init (instrumentRanges, createCurve, step1, updatePitchRangeUI). Files: `public/index.html` (~lines 1253-1310, ~25059), `server.js` (~line 1230).
