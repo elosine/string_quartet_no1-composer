@@ -1543,6 +1543,11 @@
                     </select>
                 </div>
                 <div class="curve-input-row">
+                    <label style="font-size: 9px; min-width: 28px;">Dur</label>
+                    <input type="number" id="bopDurationInput" class="curve-input" value="250" step="10" min="10" max="5000" style="width: 55px; font-size: 10px;" title="Note duration in milliseconds">
+                    <span style="font-size: 8px; color: #888; margin-left: 3px;">ms</span>
+                </div>
+                <div class="curve-input-row">
                     <span style="font-size: 8px; color: #999;">sfz · vel 127</span>
                 </div>
                 <div class="curve-input-row" style="margin-top: 4px;">
@@ -2553,6 +2558,13 @@
                     <div id="midiModelVelocityRow" class="curve-input-row">
                         <label>Velocity</label>
                         <input type="number" id="midiModelVelocity" class="curve-input" value="127" min="1" max="127" step="1" style="width: 50px;">
+                    </div>
+                    
+                    <!-- Duration override - shown for Bow Overpressure -->
+                    <div id="midiModelDurationRow" class="curve-input-row" style="margin-top: 6px; display: none;">
+                        <label>Duration</label>
+                        <input type="number" id="midiModelDuration" class="curve-input" value="250" min="10" max="5000" step="10" style="width: 60px;" title="Note duration in milliseconds">
+                        <span style="font-size: 9px; color: #888; margin-left: 4px;">ms</span>
                     </div>
                     
                     <!-- Accel/Decel specific controls -->
@@ -8320,6 +8332,106 @@
                 this.selectedSnippet = null;
             },
             
+            // Drag-to-move a MIDI snippet horizontally (time shift)
+            // Mousedown on hit area → distinguish click (select) vs drag (move) via threshold
+            startSnippetDrag(snippet, e) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                const zoomScale = window.ScoreZoom ? ScoreZoom.getZoom() : 1;
+                const startClientX = e.clientX;
+                const DRAG_THRESHOLD = 4; // pixels before drag starts
+                let isDragging = false;
+                
+                // Get score dimensions and time scale
+                const section = snippet.section || 'top';
+                const scoreEl = section === 'top' ? this.scoreTopEl : this.scoreBottomEl;
+                const scoreWidth = scoreEl.clientWidth;
+                let secondsPerPage = 10;
+                if (window.GraphicTimeline && typeof GraphicTimeline.getSecondsPerPage === 'function') {
+                    secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                }
+                const secondsPerPixel = secondsPerPage / scoreWidth;
+                
+                // Originals for restoring if needed
+                const dbSnippet = MidiSnippetDatabase.get(snippet.id);
+                if (!dbSnippet) return;
+                const origStartSec = dbSnippet.startSeconds;
+                const origEndSec = dbSnippet.endSeconds;
+                const origEventTimes = dbSnippet.events ? dbSnippet.events.map(ev => ev.timeMs) : [];
+                
+                const onMouseMove = (moveE) => {
+                    const dx = (moveE.clientX - startClientX) / zoomScale;
+                    
+                    if (!isDragging && Math.abs(dx) >= DRAG_THRESHOLD) {
+                        isDragging = true;
+                        this.selectSnippet(snippet);
+                        document.body.style.cursor = 'grabbing';
+                    }
+                    
+                    if (!isDragging) return;
+                    
+                    const timeDelta = dx * secondsPerPixel;
+                    const pixelDelta = dx;
+                    
+                    // Visual feedback: translate the snippet SVG group
+                    if (snippet.elements?.group) {
+                        snippet.elements.group.setAttribute('transform', `translate(${pixelDelta}, 0)`);
+                    }
+                    if (snippet.elements?.continuationGroupTop) {
+                        snippet.elements.continuationGroupTop.setAttribute('transform', `translate(${pixelDelta}, 0)`);
+                    }
+                    if (snippet.elements?.continuationGroupBottom) {
+                        snippet.elements.continuationGroupBottom.setAttribute('transform', `translate(${pixelDelta}, 0)`);
+                    }
+                };
+                
+                const onMouseUp = (upE) => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                    document.body.style.cursor = '';
+                    
+                    if (!isDragging) {
+                        // Was a click, not a drag — select the snippet
+                        this.selectSnippet(snippet);
+                        return;
+                    }
+                    
+                    // Calculate final time delta
+                    const dx = (upE.clientX - startClientX) / zoomScale;
+                    const timeDelta = dx * secondsPerPixel;
+                    const timeDeltaMs = timeDelta * 1000;
+                    
+                    if (Math.abs(timeDelta) < 0.001) {
+                        // Negligible move — reset transform and treat as select
+                        if (snippet.elements?.group) snippet.elements.group.removeAttribute('transform');
+                        return;
+                    }
+                    
+                    // Update database snippet
+                    dbSnippet.startSeconds = origStartSec + timeDelta;
+                    dbSnippet.endSeconds = origEndSec + timeDelta;
+                    if (dbSnippet.events && origEventTimes.length === dbSnippet.events.length) {
+                        for (let i = 0; i < dbSnippet.events.length; i++) {
+                            dbSnippet.events[i].timeMs = origEventTimes[i] + timeDeltaMs;
+                            if (dbSnippet.events[i].relativeTimeMs === undefined) continue;
+                            // relativeTimeMs stays the same (it's relative to snippet start)
+                        }
+                    }
+                    
+                    // Reload to rebuild playback tracks and re-render
+                    this.reloadFromDatabase();
+                    
+                    if (window.ScoreManager) ScoreManager.markDirty();
+                    if (window.FlowchartConnector) FlowchartConnector.updateAllConnectors();
+                    
+                    console.debug(`Moved MIDI snippet: ${snippet.name} (ID: ${snippet.id}) by ${timeDelta > 0 ? '+' : ''}${timeDelta.toFixed(3)}s → ${dbSnippet.startSeconds.toFixed(3)}s`);
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            },
+            
             // Delete the selected snippet
             deleteSelectedSnippet() {
                 if (!this.selectedSnippet) {
@@ -9150,11 +9262,10 @@
                     hitArea.setAttribute('fill', 'transparent');
                     hitArea.setAttribute('class', 'midi-snippet-hit');
                     hitArea.setAttribute('data-page', startPage);
-                    hitArea.style.cursor = 'pointer';
+                    hitArea.style.cursor = 'grab';
                     hitArea.style.pointerEvents = 'all';
-                    hitArea.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.selectSnippet(snippet);
+                    hitArea.addEventListener('mousedown', (e) => {
+                        this.startSnippetDrag(snippet, e);
                     });
                     snippetGroup.appendChild(hitArea);
                     
@@ -9226,11 +9337,10 @@
                 hitArea.setAttribute('fill', 'transparent');
                 hitArea.setAttribute('class', 'midi-snippet-hit');
                 hitArea.setAttribute('data-page', page);
-                hitArea.style.cursor = 'pointer';
+                hitArea.style.cursor = 'grab';
                 hitArea.style.pointerEvents = 'all';
-                hitArea.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    this.selectSnippet(snippet);
+                hitArea.addEventListener('mousedown', (e) => {
+                    this.startSnippetDrag(snippet, e);
                 });
                 contGroup.appendChild(hitArea);
                 
@@ -11726,6 +11836,8 @@
                 this.pitchInput = document.getElementById('midiModelPitch');
                 this.velocityInput = document.getElementById('midiModelVelocity');
                 this.velocityRow = document.getElementById('midiModelVelocityRow');
+                this.durationRow = document.getElementById('midiModelDurationRow');
+                this.durationInput = document.getElementById('midiModelDuration');
                 this.infoDisplay = document.getElementById('midiModelInfo');
                 this.outputSelect = document.getElementById('midiModelOutputSelect');
                 this.playBtn = document.getElementById('midiModelPlayBtn');
@@ -12141,9 +12253,12 @@
                 }
                 
                 // Single note models (Bartok Pizz, Bow Overpressure, etc.)
-                // Calculate duration
+                // Calculate duration (use UI override if available for BOP)
                 const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
-                const durationMs = model.durationTicks * msPerTick;
+                const defaultDurationMs = model.durationTicks * msPerTick;
+                const durationMs = (this.durationInput && this.durationRow && this.durationRow.style.display !== 'none')
+                    ? (parseFloat(this.durationInput.value) || defaultDurationMs)
+                    : defaultDurationMs;
                 
                 // Quarter-tone pitch bend
                 const needsBend = quarterToneOffset !== 0;
@@ -12390,6 +12505,10 @@
                 // Hide pitch input for random-pitch models (bow overpressure)
                 if (this.singlePitchRow) {
                     this.singlePitchRow.style.display = isBowOverpressure ? 'none' : (this.pitchMode === 'glissando' && isCurveBased ? 'none' : 'flex');
+                }
+                // Show duration override for Bow Overpressure
+                if (this.durationRow) {
+                    this.durationRow.style.display = isBowOverpressure ? 'flex' : 'none';
                 }
                 if (this.attachGCBtn) {
                     this.attachGCBtn.style.display = isSingleNote ? 'block' : 'none';
@@ -14734,9 +14853,12 @@
                     pitchDisplayName = this.pitchToNoteName(pitch);
                 }
                 
-                // Calculate duration
+                // Calculate duration (use UI override if available for BOP)
                 const msPerTick = (model.tempo / 1000) / model.ticksPerQuarter;
-                const durationMs = model.durationTicks * msPerTick;
+                const defaultDurationMs = model.durationTicks * msPerTick;
+                const durationMs = (this.durationInput && this.durationRow && this.durationRow.style.display !== 'none')
+                    ? (parseFloat(this.durationInput.value) || defaultDurationMs)
+                    : defaultDurationMs;
                 const durationSec = durationMs / 1000;
                 
                 // The impact point time in seconds
@@ -26766,7 +26888,8 @@
                 }
                 
                 const impactMs = impactTime * 1000;
-                const noteDurationMs = 250;
+                const durationEl = document.getElementById('bopDurationInput');
+                const noteDurationMs = durationEl ? (parseFloat(durationEl.value) || 250) : 250;
                 const durationSec = noteDurationMs / 1000;
                 
                 // Quarter-tone pitch bend

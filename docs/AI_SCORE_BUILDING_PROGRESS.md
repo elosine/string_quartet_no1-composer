@@ -162,10 +162,49 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 ## Current Session
 
 **Date:** Mar 15, 2026  
-**Focus:** THPGNC Cluster Database Expansion + Velocity Analysis  
-**ASB:** ASB-183  
-**Tier 1 Count This Session:** 1 (ASB-183)  
-**Tier 2 Commits:** 0
+**Focus:** THPGNC Cluster Database Expansion + BOP Sequence Generator + MIDI Snippet Drag + BOP Duration Input  
+**ASB:** ASB-186  
+**Tier 1 Count This Session:** 3 (ASB-183, ASB-184, ASB-186)  
+**Tier 2 Commits:** 1
+
+### Session Log — BOP Duration Input in MIDI Model Panel (ASB-186)
+- ASB-186: Added user-editable duration input to the MIDI MODEL panel for Bow Overpressure. Duration row (`#midiModelDurationRow`) appears only when BOP is selected, default 250ms, range 10–5000ms. Wired into both `previewPlay()` and `attachToSelectedGC()` with fallback to model default (~250ms from `durationTicks: 629`). Separate from the one-shot panel duration input (`#bopDurationInput`). Tier 1 memory created.
+
+### Session Log — MIDI Snippet Drag-to-Move (ASB-185)
+- ASB-185: Individual MIDI snippets can now be dragged horizontally to reposition in time. Previously, snippets could only be moved as part of a bundle (e.g., sustained tone, BOP bundle). Now any snippet visible on the score can be grabbed and dragged independently.
+
+**What was implemented:**
+
+1. **`MidiController.startSnippetDrag(snippet, e)`** (~line 8325) — New method that handles the full mousedown → mousemove → mouseup drag cycle:
+   - **Click vs drag threshold**: 4px movement before drag activates (below threshold = select only)
+   - **Zoom-aware**: Accounts for `ScoreZoom.getZoom()` when converting pixel delta to time delta
+   - **Visual feedback**: Translates the snippet's SVG group via `transform="translate(dx, 0)"` during drag, cursor changes to `grabbing`
+   - **On release**: Updates `MidiSnippetDatabase` snippet data (`startSeconds`, `endSeconds`, all `event.timeMs` values), calls `reloadFromDatabase()` to rebuild playback tracks, marks score dirty
+
+2. **Hit area events changed** from `click` → `mousedown` (two locations in `renderSnippetOverlays`):
+   - Main snippet hit area (~line 9255)
+   - Continuation hit area for multi-page snippets (~line 9330)
+   - Cursor changed from `pointer` → `grab`
+
+**How to use:**
+- **Click** a MIDI snippet to select it (yellow highlight)
+- **Click and drag** a MIDI snippet left/right to move it in time
+- Works on both single-page and multi-page snippets
+- Works at any zoom level
+- The snippet's playback timing updates immediately on release
+- Score is marked dirty (unsaved changes) after a move
+
+**Technical details:**
+- `relativeTimeMs` values are preserved (they're relative to snippet start, not absolute)
+- `startSeconds` and `endSeconds` shift by the same delta
+- All `event.timeMs` values shift by `timeDelta * 1000`
+- `reloadFromDatabase()` rebuilds `MidiController.tracks[].midiEvents` from the updated DB
+- `FlowchartConnector.updateAllConnectors()` called after move if available
+
+**File:** `public/index.html`
+
+### Session Log — BOP Sequence Generator (ASB-184)
+- ASB-184: Created `tools/bop_sequence_generator.html` — standalone tool for generating timed sequences of Bow Overpressure events. Based on THPGNC Sequence Generator with modifications: auto-fill only (no fixed count), no CC0 ratio (always CC0=53), 100ms note duration, velocity modes without "Original" option, red (#C0392B) theme. Full preset system, TSV/JSON/Console Script output tabs. Tier 1 memory created.
 
 ### Session Log — THPGNC Cluster Database Expansion (ASB-183)
 - ASB-183: Appended 24 new clusters from `grace note figure for sample database 002.mid` to `grace_note_cluster_db.json` using `ingest_grace_note_clusters.js --mode=append --gap=500`. Database now has **59 clusters** with **324 total notes** (was 35 clusters / 201 notes).
@@ -205,6 +244,103 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 | New (file 002) | 24 | 123 | 20–95 | 64.6 |
 
 **Observations:** Bulk of data sits in 70–89 range (47.2%). New recording is softer (mean 64.6 vs 83.1, max 95). Together the two sources provide good dynamic diversity across the full MIDI velocity range. The THPGNC model samples velocities directly from the DB, so this expanded range gives more expressive variety at generation time.
+
+### Bow Overpressure MIDI Model — Comprehensive Analysis
+
+The Bow Overpressure system has **two generation paths** and a **model definition** in MidiModelSystem. Below is a full rundown of how it is currently calculated and generated.
+
+#### Model Definition (`MidiModelSystem.models.bowOverpressure`, ~line 11536)
+
+| Parameter | Value |
+|-----------|-------|
+| type | `single` (single note articulation) |
+| cc0 | **53** (bank select for bow overpressure) |
+| defaultVelocity | 127 |
+| durationTicks | 629 (~250ms at 1920 TPQ / 763307 µs/beat) |
+| ticksPerQuarter | 1920 |
+| tempo | 763307 µs/beat (~78.6 BPM) |
+| randomPitch | `true` (pitch is randomly selected, not user-input) |
+
+**Pitch ranges (per track):**
+
+| Track | Range | Notes |
+|-------|-------|-------|
+| 1 (Violin 1) | 55–89 | G3–F6 |
+| 2 (Violin 2) | 55–89 | G3–F6 |
+| 3 (Viola) | 48–83 | C3–B5 |
+| 4 (Cello) | 36–71 | C2–B4 |
+
+**Quarter-tone pitch generation:** Calculates `(high - low) * 2` quarter-tone steps in range. Random step → MIDI note + quarter-tone offset (odd steps = quarter sharp +0.5). ~50% of generated pitches will be quarter-tones.
+
+#### Path 1: Full Pipeline — `BowOverpressureUI.go()` (~line 26519)
+
+Single-click workflow that creates all three score components + registers a bundle:
+
+1. **SVG Assembly** — `POST /api/svg-assembly/bow-overpressure-accent` with pitch, clef, showStaff, filename. Server calls `svgAssembly.assembleBowOverpressureAccent()`, writes SVG to `public/SVG_graphics/notation_fragments/`.
+2. **GC Creation** — Creates a GestureComponent at impact time using preset GC params (stiffness: 62, damping: 100, ictus: 90, descentRatio: 60, duration: 0.6, color: neonMagenta). Can use `OneShotGCPresets` if configured.
+3. **SVG Insertion** — Inserts the assembled SVG into the score via `SVGElementManager`. Scales to 60% of track height, aligns notehead center X with impact time.
+4. **MIDI Insertion** — Calls `insertMidi(pitchEnglish, 'fff', track, impactTime)`:
+   - Channel: `track - 1` (base bank, ch 0–3)
+   - CC0=53 at impact time
+   - Velocity: 127 (hardcoded 'fff')
+   - Duration: 250ms (fixed)
+   - Quarter-tone pitch bend if pitch contains `+` or `d` modifier (bend=12288 quarter sharp, 4096 quarter flat), reset to center (8192) after note off
+5. **Bundle Registration** — Links GC ID + SVG ID + MIDI snippet ID for unified drag/delete
+
+**UI Panel** (`#oneShotPanel_bop`, ~line 1500):
+- Track (1–4), Clef (treble/alto/bass)
+- Instrument (violin/viola/cello) — determines pitch range
+- Pitch mode: Random (default) or Manual
+- Impact time (seconds)
+- Staff display (yes/no)
+- GC preset selector + preview canvas
+
+**Instrument ranges** (in BowOverpressureUI, ~line 26426):
+
+| Instrument | Range | Notes |
+|------------|-------|-------|
+| Violin | 55–89 | G3–F6 |
+| Viola | 48–83 | C3–B5 |
+| Cello | 36–71 | C2–B4 |
+
+#### Path 2: Standalone — `MidiModelSystem.attachToSelectedGC()` (~line 14710)
+
+Attaches a MIDI snippet to an already-selected GC (no SVG, no bundle):
+
+- Uses the generic single-note path (shared with Bartók Pizz)
+- Reads `model.randomPitch: true` → calls `generateRandomPitch(trackNum)` using track-based `pitchRanges`
+- Pitch input row is hidden in UI (no manual pitch entry)
+- Duration: `durationTicks * (tempo/1000) / ticksPerQuarter` = 629 × (763.307/1920) ≈ **250ms**
+- Same MIDI event structure: optional pitch bend → CC0=53 → note on → note off → optional bend reset
+- Snippet named `"Bow Overpressure @ {gcName}"`, colored from GC color
+
+#### Preview Playback (`MidiModelSystem.previewPlay()`, ~line 12120)
+
+- Uses track 1 range as default for pitch generation
+- Sends all MIDI messages on all 16 channels (omni)
+- Pitch bend → CC0 → CC7 reset to 100 → note on → (duration) → note off → bend reset
+- Duration calculated same as Path 2
+
+#### MIDI Event Structure (both paths)
+
+For a single bow overpressure note at time T on track N (channel = N-1):
+
+| Order | Time | Event | Data |
+|-------|------|-------|------|
+| 1 (optional) | T | Pitch bend | `[0xE0\|ch, LSB, MSB]` (12288 or 4096) |
+| 2 | T | CC0 (Bank Select) | `[0xB0\|ch, 0x00, 53]` |
+| 3 | T | Note On | `[0x90\|ch, pitch, 127]` |
+| 4 | T+250ms | Note Off | `[0x80\|ch, pitch, 0]` |
+| 5 (optional) | T+250ms | Pitch bend reset | `[0xE0\|ch, 0x00, 0x40]` (8192 center) |
+
+#### Key Observations
+
+- **No velocity variation** — Both paths hardcode velocity 127. The model definition has `defaultVelocity: 127` and BowOverpressureUI always passes `'fff'`. There is no UI control for dynamic level.
+- **No duration variation** — Fixed 250ms in both paths (629 ticks in model def, 250ms literal in BowOverpressureUI). No random range like Col Legno Gettato (250–390ms).
+- **Random pitch only** — `randomPitch: true` means the MidiModelSystem path always generates random pitch. BowOverpressureUI supports manual pitch mode but defaults to random.
+- **Track-based vs instrument-based ranges** — MidiModelSystem uses track numbers (1–4) to index pitch ranges. BowOverpressureUI uses instrument names (violin/viola/cello). The actual ranges are identical.
+- **Bundle system** — Only Path 1 (BowOverpressureUI) creates bundles. Includes unified drag (GC + SVG + MIDI move together) and delete (all three removed atomically).
+- **Persistence** — Bundles exported/imported via ScoreManager source `'bopBundles'`.
 
 ### Previous Session Log (Mar 12, 2026)
 
