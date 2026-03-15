@@ -2,7 +2,7 @@
   "type": "grace_note_cluster_db",
   "version": 1,
   "created": "2026-03-08T22:52:10.530Z",
-  "updated": "2026-03-08T22:52:10.531Z",
+  "updated": "2026-03-15T15:41:50.653Z",
   "description": "Grace note cluster timing and velocity database. Pitch-agnostic — only relative onset times and velocities are stored. Durations are assigned at generation time.",
   "gapThresholdMs": 500,
   "ingestions": [
@@ -18,6 +18,20 @@
       "clusterIndexRange": [
         0,
         34
+      ]
+    },
+    {
+      "timestamp": "2026-03-15T15:41:50.652Z",
+      "source": "grace note figure 002",
+      "inputFile": "grace note figure for sample database 002.mid",
+      "gapThresholdMs": 500,
+      "rawNoteEvents": 246,
+      "noteOnEvents": 123,
+      "clustersDetected": 24,
+      "clustersAdded": 24,
+      "clusterIndexRange": [
+        35,
+        58
       ]
     }
   ],
@@ -1350,24 +1364,876 @@
           "velocity": 90
         }
       ]
+    },
+    {
+      "clusterIndex": 35,
+      "source": "grace note figure 002",
+      "noteCount": 5,
+      "totalDurationMs": 461.46,
+      "stats": {
+        "velocity": {
+          "avg": 73,
+          "min": 55,
+          "max": 90
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 153.13,
+          "velocity": 90
+        },
+        {
+          "relativeOnsetMs": 327.08,
+          "velocity": 55
+        },
+        {
+          "relativeOnsetMs": 444.79,
+          "velocity": 61
+        },
+        {
+          "relativeOnsetMs": 461.46,
+          "velocity": 73
+        }
+      ]
+    },
+    {
+      "clusterIndex": 36,
+      "source": "grace note figure 002",
+      "noteCount": 3,
+      "totalDurationMs": 281.25,
+      "stats": {
+        "velocity": {
+          "avg": 75,
+          "min": 58,
+          "max": 84
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 58
+        },
+        {
+          "relativeOnsetMs": 111.46,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 281.25,
+          "velocity": 84
+        }
+      ]
+    },
+    {
+      "clusterIndex": 37,
+      "source": "grace note figure 002",
+      "noteCount": 5,
+      "totalDurationMs": 307.29,
+      "stats": {
+        "velocity": {
+          "avg": 71,
+          "min": 51,
+          "max": 82
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 51
+        },
+        {
+          "relativeOnsetMs": 87.5,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 91.67,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 168.75,
+          "velocity": 82
+        },
+        {
+          "relativeOnsetMs": 307.29,
+          "velocity": 72
+        }
+      ]
+    },
+    {
+      "clusterIndex": 38,
+      "source": "grace note figure 002",
+      "noteCount": 9,
+      "totalDurationMs": 977.08,
+      "stats": {
+        "velocity": {
+          "avg": 70,
+          "min": 46,
+          "max": 80
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 68
+        },
+        {
+          "relativeOnsetMs": 98.96,
+          "velocity": 76
+        },
+        {
+          "relativeOnsetMs": 209.38,
+          "velocity": 69
+        },
+        {
+          "relativeOnsetMs": 356.25,
+          "velocity": 46
+        },
+        {
+          "relativeOnsetMs": 403.13,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 425,
+          "velocity": 59
+        },
+        {
+          "relativeOnsetMs": 662.5,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 675,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 977.08,
+          "velocity": 80
+        }
+      ]
+    },
+    {
+      "clusterIndex": 39,
+      "source": "grace note figure 002",
+      "noteCount": 10,
+      "totalDurationMs": 938.54,
+      "stats": {
+        "velocity": {
+          "avg": 68,
+          "min": 41,
+          "max": 81
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 169.79,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 181.25,
+          "velocity": 59
+        },
+        {
+          "relativeOnsetMs": 207.29,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 376.04,
+          "velocity": 54
+        },
+        {
+          "relativeOnsetMs": 442.71,
+          "velocity": 41
+        },
+        {
+          "relativeOnsetMs": 656.25,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 686.46,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 905.21,
+          "velocity": 50
+        },
+        {
+          "relativeOnsetMs": 938.54,
+          "velocity": 72
+        }
+      ]
+    },
+    {
+      "clusterIndex": 40,
+      "source": "grace note figure 002",
+      "noteCount": 3,
+      "totalDurationMs": 116.67,
+      "stats": {
+        "velocity": {
+          "avg": 47,
+          "min": 26,
+          "max": 74
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 26
+        },
+        {
+          "relativeOnsetMs": 33.33,
+          "velocity": 74
+        },
+        {
+          "relativeOnsetMs": 116.67,
+          "velocity": 42
+        }
+      ]
+    },
+    {
+      "clusterIndex": 41,
+      "source": "grace note figure 002",
+      "noteCount": 2,
+      "totalDurationMs": 86.46,
+      "stats": {
+        "velocity": {
+          "avg": 71,
+          "min": 63,
+          "max": 79
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 63
+        },
+        {
+          "relativeOnsetMs": 86.46,
+          "velocity": 79
+        }
+      ]
+    },
+    {
+      "clusterIndex": 42,
+      "source": "grace note figure 002",
+      "noteCount": 4,
+      "totalDurationMs": 332.29,
+      "stats": {
+        "velocity": {
+          "avg": 55,
+          "min": 46,
+          "max": 76
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 76
+        },
+        {
+          "relativeOnsetMs": 72.92,
+          "velocity": 50
+        },
+        {
+          "relativeOnsetMs": 129.17,
+          "velocity": 49
+        },
+        {
+          "relativeOnsetMs": 332.29,
+          "velocity": 46
+        }
+      ]
+    },
+    {
+      "clusterIndex": 43,
+      "source": "grace note figure 002",
+      "noteCount": 12,
+      "totalDurationMs": 893.75,
+      "stats": {
+        "velocity": {
+          "avg": 65,
+          "min": 37,
+          "max": 83
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 97.92,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 193.75,
+          "velocity": 37
+        },
+        {
+          "relativeOnsetMs": 209.38,
+          "velocity": 61
+        },
+        {
+          "relativeOnsetMs": 260.42,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 426.04,
+          "velocity": 48
+        },
+        {
+          "relativeOnsetMs": 492.71,
+          "velocity": 54
+        },
+        {
+          "relativeOnsetMs": 512.5,
+          "velocity": 41
+        },
+        {
+          "relativeOnsetMs": 673.96,
+          "velocity": 74
+        },
+        {
+          "relativeOnsetMs": 762.5,
+          "velocity": 75
+        },
+        {
+          "relativeOnsetMs": 792.71,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 893.75,
+          "velocity": 83
+        }
+      ]
+    },
+    {
+      "clusterIndex": 44,
+      "source": "grace note figure 002",
+      "noteCount": 5,
+      "totalDurationMs": 170.83,
+      "stats": {
+        "velocity": {
+          "avg": 63,
+          "min": 35,
+          "max": 80
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 35
+        },
+        {
+          "relativeOnsetMs": 66.67,
+          "velocity": 73
+        },
+        {
+          "relativeOnsetMs": 103.12,
+          "velocity": 47
+        },
+        {
+          "relativeOnsetMs": 168.75,
+          "velocity": 80
+        },
+        {
+          "relativeOnsetMs": 170.83,
+          "velocity": 80
+        }
+      ]
+    },
+    {
+      "clusterIndex": 45,
+      "source": "grace note figure 002",
+      "noteCount": 4,
+      "totalDurationMs": 470.83,
+      "stats": {
+        "velocity": {
+          "avg": 64,
+          "min": 48,
+          "max": 83
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 61
+        },
+        {
+          "relativeOnsetMs": 195.83,
+          "velocity": 63
+        },
+        {
+          "relativeOnsetMs": 300,
+          "velocity": 48
+        },
+        {
+          "relativeOnsetMs": 470.83,
+          "velocity": 83
+        }
+      ]
+    },
+    {
+      "clusterIndex": 46,
+      "source": "grace note figure 002",
+      "noteCount": 8,
+      "totalDurationMs": 1051.04,
+      "stats": {
+        "velocity": {
+          "avg": 70,
+          "min": 56,
+          "max": 79
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 232.29,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 475,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 641.67,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 801.04,
+          "velocity": 78
+        },
+        {
+          "relativeOnsetMs": 1002.08,
+          "velocity": 57
+        },
+        {
+          "relativeOnsetMs": 1005.21,
+          "velocity": 56
+        },
+        {
+          "relativeOnsetMs": 1051.04,
+          "velocity": 57
+        }
+      ]
+    },
+    {
+      "clusterIndex": 47,
+      "source": "grace note figure 002",
+      "noteCount": 5,
+      "totalDurationMs": 377.08,
+      "stats": {
+        "velocity": {
+          "avg": 56,
+          "min": 50,
+          "max": 69
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 52
+        },
+        {
+          "relativeOnsetMs": 12.5,
+          "velocity": 58
+        },
+        {
+          "relativeOnsetMs": 198.96,
+          "velocity": 51
+        },
+        {
+          "relativeOnsetMs": 260.42,
+          "velocity": 69
+        },
+        {
+          "relativeOnsetMs": 377.08,
+          "velocity": 50
+        }
+      ]
+    },
+    {
+      "clusterIndex": 48,
+      "source": "grace note figure 002",
+      "noteCount": 6,
+      "totalDurationMs": 1209.38,
+      "stats": {
+        "velocity": {
+          "avg": 60,
+          "min": 37,
+          "max": 74
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 37
+        },
+        {
+          "relativeOnsetMs": 355.21,
+          "velocity": 74
+        },
+        {
+          "relativeOnsetMs": 539.58,
+          "velocity": 68
+        },
+        {
+          "relativeOnsetMs": 744.79,
+          "velocity": 59
+        },
+        {
+          "relativeOnsetMs": 1046.88,
+          "velocity": 63
+        },
+        {
+          "relativeOnsetMs": 1209.38,
+          "velocity": 60
+        }
+      ]
+    },
+    {
+      "clusterIndex": 49,
+      "source": "grace note figure 002",
+      "noteCount": 3,
+      "totalDurationMs": 112.5,
+      "stats": {
+        "velocity": {
+          "avg": 58,
+          "min": 31,
+          "max": 72
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 31
+        },
+        {
+          "relativeOnsetMs": 23.96,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 112.5,
+          "velocity": 70
+        }
+      ]
+    },
+    {
+      "clusterIndex": 50,
+      "source": "grace note figure 002",
+      "noteCount": 5,
+      "totalDurationMs": 168.75,
+      "stats": {
+        "velocity": {
+          "avg": 56,
+          "min": 20,
+          "max": 74
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 74
+        },
+        {
+          "relativeOnsetMs": 81.25,
+          "velocity": 73
+        },
+        {
+          "relativeOnsetMs": 111.46,
+          "velocity": 58
+        },
+        {
+          "relativeOnsetMs": 117.71,
+          "velocity": 20
+        },
+        {
+          "relativeOnsetMs": 168.75,
+          "velocity": 55
+        }
+      ]
+    },
+    {
+      "clusterIndex": 51,
+      "source": "grace note figure 002",
+      "noteCount": 5,
+      "totalDurationMs": 208.33,
+      "stats": {
+        "velocity": {
+          "avg": 72,
+          "min": 37,
+          "max": 91
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 80
+        },
+        {
+          "relativeOnsetMs": 121.88,
+          "velocity": 91
+        },
+        {
+          "relativeOnsetMs": 122.92,
+          "velocity": 37
+        },
+        {
+          "relativeOnsetMs": 180.21,
+          "velocity": 76
+        },
+        {
+          "relativeOnsetMs": 208.33,
+          "velocity": 75
+        }
+      ]
+    },
+    {
+      "clusterIndex": 52,
+      "source": "grace note figure 002",
+      "noteCount": 7,
+      "totalDurationMs": 983.33,
+      "stats": {
+        "velocity": {
+          "avg": 67,
+          "min": 57,
+          "max": 81
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 58
+        },
+        {
+          "relativeOnsetMs": 407.29,
+          "velocity": 81
+        },
+        {
+          "relativeOnsetMs": 554.17,
+          "velocity": 61
+        },
+        {
+          "relativeOnsetMs": 651.04,
+          "velocity": 68
+        },
+        {
+          "relativeOnsetMs": 795.83,
+          "velocity": 57
+        },
+        {
+          "relativeOnsetMs": 951.04,
+          "velocity": 79
+        },
+        {
+          "relativeOnsetMs": 983.33,
+          "velocity": 63
+        }
+      ]
+    },
+    {
+      "clusterIndex": 53,
+      "source": "grace note figure 002",
+      "noteCount": 4,
+      "totalDurationMs": 110.42,
+      "stats": {
+        "velocity": {
+          "avg": 68,
+          "min": 37,
+          "max": 95
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 37
+        },
+        {
+          "relativeOnsetMs": 79.17,
+          "velocity": 95
+        },
+        {
+          "relativeOnsetMs": 100,
+          "velocity": 55
+        },
+        {
+          "relativeOnsetMs": 110.42,
+          "velocity": 84
+        }
+      ]
+    },
+    {
+      "clusterIndex": 54,
+      "source": "grace note figure 002",
+      "noteCount": 4,
+      "totalDurationMs": 140.63,
+      "stats": {
+        "velocity": {
+          "avg": 70,
+          "min": 59,
+          "max": 84
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 59
+        },
+        {
+          "relativeOnsetMs": 9.38,
+          "velocity": 60
+        },
+        {
+          "relativeOnsetMs": 100,
+          "velocity": 84
+        },
+        {
+          "relativeOnsetMs": 140.63,
+          "velocity": 75
+        }
+      ]
+    },
+    {
+      "clusterIndex": 55,
+      "source": "grace note figure 002",
+      "noteCount": 4,
+      "totalDurationMs": 438.54,
+      "stats": {
+        "velocity": {
+          "avg": 69,
+          "min": 62,
+          "max": 74
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 67
+        },
+        {
+          "relativeOnsetMs": 178.12,
+          "velocity": 72
+        },
+        {
+          "relativeOnsetMs": 383.33,
+          "velocity": 62
+        },
+        {
+          "relativeOnsetMs": 438.54,
+          "velocity": 74
+        }
+      ]
+    },
+    {
+      "clusterIndex": 56,
+      "source": "grace note figure 002",
+      "noteCount": 2,
+      "totalDurationMs": 202.08,
+      "stats": {
+        "velocity": {
+          "avg": 59,
+          "min": 43,
+          "max": 75
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 43
+        },
+        {
+          "relativeOnsetMs": 202.08,
+          "velocity": 75
+        }
+      ]
+    },
+    {
+      "clusterIndex": 57,
+      "source": "grace note figure 002",
+      "noteCount": 4,
+      "totalDurationMs": 211.46,
+      "stats": {
+        "velocity": {
+          "avg": 50,
+          "min": 26,
+          "max": 73
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 54
+        },
+        {
+          "relativeOnsetMs": 84.37,
+          "velocity": 73
+        },
+        {
+          "relativeOnsetMs": 153.13,
+          "velocity": 26
+        },
+        {
+          "relativeOnsetMs": 211.46,
+          "velocity": 46
+        }
+      ]
+    },
+    {
+      "clusterIndex": 58,
+      "source": "grace note figure 002",
+      "noteCount": 4,
+      "totalDurationMs": 79.17,
+      "stats": {
+        "velocity": {
+          "avg": 57,
+          "min": 20,
+          "max": 82
+        }
+      },
+      "notes": [
+        {
+          "relativeOnsetMs": 0,
+          "velocity": 47
+        },
+        {
+          "relativeOnsetMs": 56.25,
+          "velocity": 20
+        },
+        {
+          "relativeOnsetMs": 60.42,
+          "velocity": 80
+        },
+        {
+          "relativeOnsetMs": 79.17,
+          "velocity": 82
+        }
+      ]
     }
   ],
   "globalStats": {
-    "totalClusters": 35,
-    "totalNotes": 201,
+    "totalClusters": 59,
+    "totalNotes": 324,
     "clusterSize": {
-      "avg": 5.74,
+      "avg": 5.49,
       "min": 2,
       "max": 15
     },
     "clusterDuration": {
-      "avgMs": 312.38,
+      "avgMs": 360.38,
       "minMs": 33.33,
-      "maxMs": 909.38
+      "maxMs": 1209.38
     },
     "velocity": {
-      "avg": 83,
-      "min": 26,
+      "avg": 76,
+      "min": 20,
       "max": 127
     }
   }

@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 12, 2026  
-**Current ASB Number:** ASB-182
+**Last Updated:** Mar 15, 2026  
+**Current ASB Number:** ASB-183
 
 ---
 
@@ -155,17 +155,58 @@ See also: `docs/MIDI_MUSIC_GENERATION.md` §3 (Channel Mapping), §13 (MIDI Stat
 
 ## Last Session Summary
 
-> **ASB-153–167: One-Shot Enhancements, CLB Batch, Object Selection, Custom Notation Templates, Feathered Beam Assembly.** GC presets + animated preview, CLB batch generation, SVG/GC/Motive selection fixes, col legno flutter & harmonic tremolo templates (3 instruments each), glyph library expansion (smallStaff, smallTone, colLegno, customNotation section, feathered beam SVGs), feathered beam assembly engine (single pitch + glissando, accel/decel, above/below placement), global accidental shift correction.
+> **ASB-168–182: MIDI Architecture Audit, UI Layout Standards, Feathered Beam Pipeline + Fixes.** Full 14-system MIDI audit (categories A–F), §20 unified UI field order standard, AccelDecelUI panel + server endpoint + MIDI generation + bundle system, 8 bug fixes (SVG sizing, delete bundle, anchor alignment, top-staff-line collision), CC7 analytical curve Y, font/precision standardization across all time inputs.
 
 ---
 
 ## Current Session
 
-**Date:** Mar 12, 2026  
-**Focus:** MIDI Snippet Architecture Analysis, MIDI Full System Audit, UI Layout Audit, Feathered Beam Pipeline + Fixes  
-**ASB:** ASB-182  
-**Tier 1 Count This Session:** 15 (ASB-168–182)  
-**Tier 2 Commits:** 3 (ASB-168–174, ASB-175–181, ASB-182)
+**Date:** Mar 15, 2026  
+**Focus:** THPGNC Cluster Database Expansion + Velocity Analysis  
+**ASB:** ASB-183  
+**Tier 1 Count This Session:** 1 (ASB-183)  
+**Tier 2 Commits:** 0
+
+### Session Log — THPGNC Cluster Database Expansion (ASB-183)
+- ASB-183: Appended 24 new clusters from `grace note figure for sample database 002.mid` to `grace_note_cluster_db.json` using `ingest_grace_note_clusters.js --mode=append --gap=500`. Database now has **59 clusters** with **324 total notes** (was 35 clusters / 201 notes).
+
+#### Velocity Analysis — Combined Database (59 clusters, 324 notes)
+
+| Metric | Value |
+|--------|-------|
+| Range | 20 – 127 |
+| Mean | 76.0 |
+| Median | 78 |
+| Q1 / Q3 | 62 / 86 |
+
+**Histogram (10-unit buckets):**
+
+| Bucket | Notes | % |
+|--------|------:|----:|
+| 20–29 | 5 | 1.5% |
+| 30–39 | 8 | 2.5% |
+| 40–49 | 16 | 4.9% |
+| 50–59 | 41 | 12.7% |
+| 60–69 | 29 | 9.0% |
+| 70–79 | 86 | 26.5% |
+| 80–89 | 67 | 20.7% |
+| 90–99 | 37 | 11.4% |
+| 100–109 | 21 | 6.5% |
+| 110–119 | 4 | 1.2% |
+| 120–129 | 10 | 3.1% |
+
+**Dynamic bands:** Soft (<50): 9.0% | Medium (50–89): 68.8% | Loud (90+): 22.2%
+
+**Per-source comparison:**
+
+| Source | Clusters | Notes | Vel Range | Mean |
+|--------|----------|-------|-----------|------|
+| Original (file 001) | 35 | 201 | 26–127 | 83.1 |
+| New (file 002) | 24 | 123 | 20–95 | 64.6 |
+
+**Observations:** Bulk of data sits in 70–89 range (47.2%). New recording is softer (mean 64.6 vs 83.1, max 95). Together the two sources provide good dynamic diversity across the full MIDI velocity range. The THPGNC model samples velocities directly from the DB, so this expanded range gives more expressive variety at generation time.
+
+### Previous Session Log (Mar 12, 2026)
 
 ### Session Log — Refinements & Fixes (ASB-175–181)
 - ASB-175: Feathered beam single pitch notehead changed from open half note (`longTone`) to filled quarter note (`shortTone`). File: `assemble_svg.js` line 2194.
