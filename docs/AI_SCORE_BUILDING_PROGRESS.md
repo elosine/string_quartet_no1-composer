@@ -1,8 +1,8 @@
 # AI Score Building Progress
 
 **Status:** Active  
-**Last Updated:** Mar 15, 2026  
-**Current ASB Number:** ASB-183
+**Last Updated:** Mar 16, 2026  
+**Current ASB Number:** ASB-187
 
 ---
 
@@ -38,6 +38,7 @@ That's it. Everything else below is for Cascade.
 - **LilyPond Registry**: ALWAYS read `docs/LILYPOND_SETTINGS_REGISTRY.md` before creating or modifying any `.ly` file. Use CURRENT DEFAULT values from the registry. Update the registry when settings change.
 - **Tiered Documentation**: Follow the 3-tier system (see `/ai-score-building` workflow). Tier 1 after each code change, suggest Tier 2 at 3–4 increments, Tier 3 at major milestones.
 - **Naming Conventions**: SVG files use `BartokPizz-[clef]-[Pitch]-[dynamic]` pattern. ASB numbers are sequential. Commit messages reference ASB ranges.
+- **Score Backup**: ALL files in `scores/` and `scores/versions/` MUST be git-tracked. At every Tier 2 commit (or session wrap-up), verify no untracked score files exist (`git status scores/`). Stage and commit any new score/version JSON files. These are the primary creative output and must never be left unversioned.
 
 ### 3. Active Workflows & Their State
 
