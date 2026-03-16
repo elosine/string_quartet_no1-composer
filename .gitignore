@@ -12,6 +12,11 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# Reaper cache/backup files
+*.reapeaks
+*.rpp-bak
+StrQtrNo1-AudioRender-*/*/Media/
+
 # Logs
 *.log
 npm-debug.log*
