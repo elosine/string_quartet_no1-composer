@@ -2,7 +2,7 @@
 
 **Status:** Active  
 **Last Updated:** Mar 16, 2026  
-**Current ASB Number:** ASB-187
+**Current ASB Number:** ASB-189
 
 ---
 
@@ -84,6 +84,7 @@ That's it. Everything else below is for Cascade.
 | `svg_component_library.json` | `lilypond_code/svg_assembly/` | JSON library of all SVG glyph paths, scales, offsets, and bounding boxes. Source of truth for the assembly engine. |
 | `generate_clb_svgs.js` | `scripts/` | Batch CLB no-staff SVG generation for all 10 dynamics (clean + bbox variants). Reusable pattern for other glyph types. Output: `public/SVG_graphics/CLB_SVGs/` |
 | `generate_clb_nodynamic.js` | `scripts/` | CLB no-staff SVG without dynamic marking (clean + bbox). |
+| `export_score_midi.js` | `scripts/` | Export score MIDI snippets as SMF Format 1 .mid files. One file per instrument (4 files), sub-tracks per channel bank (Base/Vibrato/Volume). Skips empty banks. Usage: `node scripts/export_score_midi.js <score.json> [output_dir]` |
 
 ### 5. Available Slash Commands
 
