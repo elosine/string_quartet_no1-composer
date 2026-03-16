@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THPGNC Sequence Generator — String Quartet No. 1</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #1a1a2e; color: #e0e0e0;
+            padding: 20px; line-height: 1.5;
+        }
+        h1 { color: #c8a0e8; font-size: 22px; margin-bottom: 4px; }
+        h2 { color: #a070c0; font-size: 16px; margin: 16px 0 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+        .subtitle { color: #888; font-size: 12px; margin-bottom: 16px; }
+
+        .config-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+            max-width: 900px; margin-bottom: 16px;
+        }
+        .config-section {
+            background: #222244; border: 1px solid #444; border-radius: 6px; padding: 12px;
+        }
+        label { font-size: 12px; color: #aaa; display: block; margin-bottom: 2px; }
+        input, select, textarea {
+            background: #2a2a4a; color: #fff; border: 1px solid #555;
+            border-radius: 4px; padding: 4px 8px; font-size: 12px; width: 100%;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #c8a0e8; }
+        textarea { font-family: 'Consolas', 'Courier New', monospace; resize: vertical; }
+        .row { display: flex; gap: 8px; align-items: end; margin-bottom: 6px; }
+        .row > div { flex: 1; }
+        .row-tight { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+
+        /* Velocity weight rows */
+        .vel-row {
+            display: flex; gap: 8px; align-items: center; margin-bottom: 4px;
+            background: #1e1e3a; padding: 4px 8px; border-radius: 4px;
+        }
+        .vel-row label { display: inline; margin: 0; color: #ddd; font-size: 11px; width: 80px; }
+        .vel-row input { width: 60px; text-align: center; }
+        .vel-bar { flex: 1; height: 8px; background: #333; border-radius: 4px; overflow: hidden; }
+        .vel-bar-fill { height: 100%; border-radius: 4px; transition: width 0.2s; }
+
+        /* Slider styling */
+        input[type="range"] {
+            -webkit-appearance: none; width: 100%; height: 6px;
+            background: #333; border-radius: 3px; border: none; padding: 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 16px; height: 16px;
+            background: #c8a0e8; border-radius: 50%; cursor: pointer;
+        }
+
+        button.generate {
+            background: #c8a0e8; color: #000; font-weight: bold; border: none;
+            border-radius: 6px; padding: 10px 28px; font-size: 14px; cursor: pointer;
+            margin: 12px 0;
+        }
+        button.generate:hover { background: #dbb8f8; }
+        button.generate:active { transform: scale(0.96); background: #b090d0; }
+
+        /* Button press feedback */
+        button { transition: transform 0.08s, background 0.08s, box-shadow 0.08s; }
+        button:active { transform: scale(0.95); }
+        .btn-flash { animation: btnFlash 0.35s ease-out; }
+        @keyframes btnFlash {
+            0% { box-shadow: 0 0 0 0 rgba(200, 160, 232, 0.6); }
+            50% { box-shadow: 0 0 8px 3px rgba(200, 160, 232, 0.4); }
+            100% { box-shadow: none; }
+        }
+        .preset-bar button:active { transform: scale(0.93); }
+        .preset-bar button.btn-flash-green { animation: btnFlashGreen 0.5s ease-out; }
+        @keyframes btnFlashGreen {
+            0% { background: #4a8; box-shadow: 0 0 6px 2px rgba(80,200,120,0.5); }
+            100% { box-shadow: none; }
+        }
+        .preset-bar button.btn-flash-blue { animation: btnFlashBlue 0.5s ease-out; }
+        @keyframes btnFlashBlue {
+            0% { background: #48a; box-shadow: 0 0 6px 2px rgba(80,140,220,0.5); }
+            100% { box-shadow: none; }
+        }
+        .output-tab:active { transform: scale(0.96); }
+
+        .output-section { max-width: 900px; margin-top: 12px; }
+        .output-tabs { display: flex; gap: 4px; margin-bottom: 0; }
+        .output-tab {
+            background: #333; color: #aaa; border: 1px solid #555;
+            border-bottom: none; border-radius: 6px 6px 0 0;
+            padding: 6px 16px; font-size: 12px; cursor: pointer;
+        }
+        .output-tab.active { background: #222244; color: #fff; border-color: #c8a0e8; }
+        .output-content {
+            background: #222244; border: 1px solid #555; border-radius: 0 6px 6px 6px;
+            padding: 12px; position: relative;
+        }
+        .output-content pre {
+            font-family: 'Consolas', 'Courier New', monospace; font-size: 12px;
+            white-space: pre; overflow-x: auto; max-height: 500px; overflow-y: auto;
+        }
+        .copy-btn {
+            position: absolute; top: 8px; right: 8px;
+            background: #555; color: #fff; border: none; border-radius: 4px;
+            padding: 4px 10px; font-size: 11px; cursor: pointer;
+        }
+        .copy-btn:hover { background: #777; }
+        .copy-btn.copied { background: #4a8; }
+
+        .info { font-size: 11px; color: #888; margin-top: 4px; }
+        .stat { font-size: 12px; color: #c8b0f0; margin: 4px 0; }
+
+        /* Preset bar */
+        .preset-bar {
+            max-width: 900px; margin-bottom: 12px; padding: 10px 14px;
+            background: #1e1e3a; border: 1px solid #444; border-radius: 6px;
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .preset-bar label { margin: 0; font-size: 11px; color: #aaa; white-space: nowrap; }
+        .preset-bar select, .preset-bar input[type="text"] {
+            font-size: 11px; padding: 3px 6px; background: #2a2a4a; color: #fff;
+            border: 1px solid #555; border-radius: 3px;
+        }
+        .preset-bar select { width: 220px; }
+        .preset-bar input[type="text"] { width: 200px; }
+        .preset-bar button {
+            font-size: 11px; padding: 4px 10px; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600;
+        }
+        .preset-btn-save { background: #2a6040; color: #fff; }
+        .preset-btn-save:hover { background: #3a7050; }
+        .preset-btn-load { background: #2a4060; color: #8cf; }
+        .preset-btn-load:hover { background: #3a5080; }
+        .preset-btn-del { background: #933; color: #fff; }
+        .preset-btn-del:hover { background: #b44; }
+        .preset-btn-file { background: #555; color: #ddd; }
+        .preset-btn-file:hover { background: #777; }
+        .preset-sep { width: 1px; height: 22px; background: #555; }
+
+        .hidden { display: none; }
+        .mode-indicator {
+            display: inline-block; padding: 2px 8px; border-radius: 3px;
+            font-size: 10px; font-weight: bold; margin-left: 8px;
+        }
+        .mode-auto { background: #2a6040; color: #8f8; }
+        .mode-fixed { background: #604020; color: #fc8; }
+    </style>
+</head>
+<body>
+    <h1>THPGNC Sequence Generator</h1>
+    <div class="subtitle">Generates timed Two-Hand Pizzicato Grace Note Cluster sequences — configurable density, velocity, CC0 ratio</div>
+
+    <div class="config-grid">
+        <!-- LEFT COLUMN -->
+        <div>
+            <div class="config-section">
+                <h2>Time Range</h2>
+                <div class="row">
+                    <div>
+                        <label>Start Time (s)</label>
+                        <input type="number" id="startTime" value="300.000" step="0.001">
+                    </div>
+                    <div>
+                        <label>End Time (s)</label>
+                        <input type="number" id="endTime" value="330.000" step="0.001">
+                    </div>
+                </div>
+                <div class="info">Clusters are placed within this time window (alignment: post — cluster starts at timestamp).</div>
+            </div>
+
+            <div class="config-section">
+                <h2>Cluster Count
+                    <span id="modeIndicator" class="mode-indicator mode-auto">AUTO</span>
+                </h2>
+                <div class="row-tight" style="margin-bottom: 8px;">
+                    <input type="radio" name="countMode" id="countModeAuto" value="auto" checked style="width:auto;">
+                    <label for="countModeAuto" style="display:inline; margin-right: 12px;">Auto (fill time range)</label>
+                    <input type="radio" name="countMode" id="countModeFixed" value="fixed" style="width:auto;">
+                    <label for="countModeFixed" style="display:inline;">Fixed count</label>
+                </div>
+                <div id="fixedCountRow" class="row hidden">
+                    <div>
+                        <label>Cluster Count</label>
+                        <input type="number" id="clusterCount" value="15" min="1" max="500">
+                    </div>
+                </div>
+                <div class="info" id="countModeInfo">Auto: fills the time range with clusters spaced by the gap range below.</div>
+            </div>
+
+            <div class="config-section">
+                <h2>Gap Range (between clusters)</h2>
+                <div class="row">
+                    <div>
+                        <label>Min Gap (s)</label>
+                        <input type="number" id="minGap" value="0.800" step="0.01" min="0.01">
+                    </div>
+                    <div>
+                        <label>Max Gap (s)</label>
+                        <input type="number" id="maxGap" value="2.500" step="0.01" min="0.01">
+                    </div>
+                </div>
+                <div class="info">Random gap between each cluster onset. Lower values = denser clusters.</div>
+            </div>
+
+            <div class="config-section">
+                <h2>Start Behavior</h2>
+                <div class="row-tight" style="margin-bottom: 4px;">
+                    <input type="radio" name="startBehavior" id="startEvent" value="event" checked style="width:auto;">
+                    <label for="startEvent" style="display:inline; margin-right: 10px;">Event at start</label>
+                    <input type="radio" name="startBehavior" id="startGap" value="gap" style="width:auto;">
+                    <label for="startGap" style="display:inline; margin-right: 10px;">Gap at start</label>
+                    <input type="radio" name="startBehavior" id="startPct" value="percentage" style="width:auto;">
+                    <label for="startPct" style="display:inline;">Percentage</label>
+                </div>
+                <div id="startPctRow" class="row-tight hidden" style="margin-top: 4px;">
+                    <span style="font-size: 11px; color: #888;">Event chance:</span>
+                    <input type="range" id="startPctSlider" min="0" max="100" value="50" style="flex:1; max-width: 160px;">
+                    <span id="startPctLabel" style="font-size: 12px; font-weight: bold; width: 36px; text-align: right;">50%</span>
+                </div>
+                <div class="info" id="startBehaviorInfo">First cluster placed exactly at Start Time.</div>
+            </div>
+
+            <div class="config-section">
+                <h2>CC0 Behind-Bridge Ratio</h2>
+                <div class="row-tight">
+                    <span style="font-size: 11px; color: #888; width: 60px;">Behind:</span>
+                    <input type="range" id="cc0Ratio" min="0" max="100" value="50" style="flex:1;">
+                    <span id="cc0RatioLabel" style="font-size: 12px; font-weight: bold; width: 40px; text-align: right;">50%</span>
+                </div>
+                <div class="info">Percentage of notes per cluster that use CC0=80 (behind bridge). Remainder uses CC0=69 (regular pizz).</div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+            <div class="config-section">
+                <h2>Instrument & Track</h2>
+                <div class="row">
+                    <div>
+                        <label>Instrument</label>
+                        <select id="instrument">
+                            <option value="violin">Violin</option>
+                            <option value="viola">Viola</option>
+                            <option value="cello">Cello</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Track</label>
+                        <select id="track">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="rangeInfo" class="info">Pizz range: G3–C7 | Open strings: G3, D4, A4, E5</div>
+            </div>
+
+            <div class="config-section">
+                <h2>Velocity</h2>
+                <div class="row-tight" style="margin-bottom: 8px;">
+                    <input type="radio" name="velMode" id="velModeSingle" value="single" checked style="width:auto;">
+                    <label for="velModeSingle" style="display:inline; margin-right: 12px;">Single</label>
+                    <input type="radio" name="velMode" id="velModeWeighted" value="weighted" style="width:auto;">
+                    <label for="velModeWeighted" style="display:inline;">Weighted Mix</label>
+                </div>
+                <div id="velSingleRow">
+                    <select id="velSingle">
+                        <option value="original">Original (recorded)</option>
+                        <option value="low">Low (10–30)</option>
+                        <option value="medium">Medium (50–70)</option>
+                        <option value="high" selected>High (90–127)</option>
+                    </select>
+                </div>
+                <div id="velWeightedRows" class="hidden">
+                    <div class="vel-row">
+                        <label>Original</label>
+                        <input type="number" id="velWtOriginal" value="0" min="0" max="100" step="5">
+                        <div class="vel-bar"><div class="vel-bar-fill" id="velBarOriginal" style="width:0%; background:#888;"></div></div>
+                    </div>
+                    <div class="vel-row">
+                        <label>Low (10–30)</label>
+                        <input type="number" id="velWtLow" value="30" min="0" max="100" step="5">
+                        <div class="vel-bar"><div class="vel-bar-fill" id="velBarLow" style="width:30%; background:#6a6;"></div></div>
+                    </div>
+                    <div class="vel-row">
+                        <label>Med (50–70)</label>
+                        <input type="number" id="velWtMedium" value="40" min="0" max="100" step="5">
+                        <div class="vel-bar"><div class="vel-bar-fill" id="velBarMedium" style="width:40%; background:#cc8;"></div></div>
+                    </div>
+                    <div class="vel-row">
+                        <label>High (90–127)</label>
+                        <input type="number" id="velWtHigh" value="30" min="0" max="100" step="5">
+                        <div class="vel-bar"><div class="vel-bar-fill" id="velBarHigh" style="width:30%; background:#c66;"></div></div>
+                    </div>
+                    <div class="info" id="velWeightInfo">Distribution: Low 30% | Med 40% | High 30%</div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h2>Output Options</h2>
+                <div class="row-tight">
+                    <input type="checkbox" id="showGap" checked style="width: auto;">
+                    <label for="showGap" style="display: inline;">Show GAP column</label>
+                </div>
+                <div class="row-tight">
+                    <input type="checkbox" id="showCC0" checked style="width: auto;">
+                    <label for="showCC0" style="display: inline;">Show CC0 RATIO column</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="preset-bar">
+        <label>Preset:</label>
+        <select id="presetSelect"><option value="">— Select —</option></select>
+        <button class="preset-btn-load" onclick="loadPreset()">Load</button>
+        <button class="preset-btn-save" onclick="updatePreset()" id="updatePresetBtn" title="Overwrite the currently selected preset with current settings">Save</button>
+        <button class="preset-btn-del" onclick="deletePreset()">×</button>
+        <div class="preset-sep"></div>
+        <input type="text" id="presetName" placeholder="Preset name...">
+        <button class="preset-btn-save" onclick="savePreset()">Save As</button>
+        <div class="preset-sep"></div>
+        <button class="preset-btn-file" onclick="exportPresets()">Export All</button>
+        <button class="preset-btn-file" onclick="document.getElementById('presetFileInput').click()">Import</button>
+        <input type="file" id="presetFileInput" accept=".json" style="display:none;" onchange="importPresets(event)">
+        <div class="preset-sep"></div>
+        <button class="preset-btn-file" onclick="resetToDefaults()" style="background:#933;">Reset to Defaults</button>
+    </div>
+
+    <button class="generate" onclick="generate()">⚡ Generate THPGNC Sequence</button>
+
+    <div class="output-section" id="outputSection" style="display: none;">
+        <div id="stats"></div>
+        <div class="output-tabs">
+            <div class="output-tab active" onclick="switchTab('tsv')">TSV (Google Sheets)</div>
+            <div class="output-tab" onclick="switchTab('json')">JSON (Programmatic)</div>
+            <div class="output-tab" onclick="switchTab('console')">Console Script</div>
+        </div>
+        <div class="output-content">
+            <button class="copy-btn" onclick="copyOutput()">Copy</button>
+            <pre id="outputPre"></pre>
+        </div>
+    </div>
+
+    <script>
+    // ============================================
+    // CONSTANTS — THPGNC Model Parameters
+    // ============================================
+    const THPGNC_MODEL = {
+        cc0Behind: 80,
+        cc0Pizz: 69,
+        durationMsRange: [90, 130],
+        instrumentRanges: {
+            violin: { low: 55, high: 96 },
+            viola:  { low: 48, high: 88 },
+            cello:  { low: 36, high: 83 }
+        },
+        openStrings: {
+            violin: [55, 62, 69, 76],
+            viola:  [48, 55, 62, 69],
+            cello:  [36, 43, 50, 57]
+        }
+    };
+
+    const INSTRUMENT_INFO = {
+        violin: { rangeLabel: 'G3–C7', openLabel: 'G3, D4, A4, E5' },
+        viola:  { rangeLabel: 'C3–E6', openLabel: 'C3, G3, D4, A4' },
+        cello:  { rangeLabel: 'C2–B5', openLabel: 'C2, G2, D3, A3' }
+    };
+
+    const VEL_RANGES = {
+        original: null,
+        low: [10, 30],
+        medium: [50, 70],
+        high: [90, 127]
+    };
+
+    const VEL_LABELS = {
+        original: 'Original',
+        low: 'Low (10–30)',
+        medium: 'Med (50–70)',
+        high: 'High (90–127)'
+    };
+
+    // ============================================
+    // STATE
+    // ============================================
+    let generatedData = null;
+    let currentTab = 'tsv';
+
+    // ============================================
+    // RANDOM UTILITIES
+    // ============================================
+    function randRange(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // ============================================
+    // VELOCITY DISTRIBUTION
+    // ============================================
+    function getVelocityAssignments(count) {
+        const mode = document.querySelector('input[name="velMode"]:checked').value;
+
+        if (mode === 'single') {
+            const vel = document.getElementById('velSingle').value;
+            return Array(count).fill(vel);
+        }
+
+        // Weighted mode
+        const weights = {
+            original: parseFloat(document.getElementById('velWtOriginal').value) || 0,
+            low:      parseFloat(document.getElementById('velWtLow').value) || 0,
+            medium:   parseFloat(document.getElementById('velWtMedium').value) || 0,
+            high:     parseFloat(document.getElementById('velWtHigh').value) || 0
+        };
+
+        const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+        if (totalWeight === 0) return Array(count).fill('original');
+
+        // Build pool proportionally
+        const pool = [];
+        for (const [key, w] of Object.entries(weights)) {
+            if (w > 0) {
+                const n = Math.round((w / totalWeight) * count);
+                for (let i = 0; i < n; i++) pool.push(key);
+            }
+        }
+
+        // Adjust pool size to exactly match count
+        while (pool.length < count) {
+            // Add from highest-weight category
+            const sorted = Object.entries(weights).filter(([, w]) => w > 0).sort((a, b) => b[1] - a[1]);
+            pool.push(sorted[0][0]);
+        }
+        while (pool.length > count) pool.pop();
+
+        return shuffle(pool);
+    }
+
+    // ============================================
+    // MAIN GENERATE
+    // ============================================
+    function generate() {
+        const startTime = parseFloat(document.getElementById('startTime').value) || 0;
+        const endTime = parseFloat(document.getElementById('endTime').value) || 0;
+        const minGap = parseFloat(document.getElementById('minGap').value) || 0.5;
+        const maxGap = parseFloat(document.getElementById('maxGap').value) || 2.0;
+        const cc0Ratio = parseInt(document.getElementById('cc0Ratio').value) / 100;
+        const instrument = document.getElementById('instrument').value;
+        const track = parseInt(document.getElementById('track').value);
+        const countMode = document.querySelector('input[name="countMode"]:checked').value;
+
+        if (endTime <= startTime && countMode === 'auto') {
+            alert('End time must be greater than start time in Auto mode.');
+            return;
+        }
+
+        // Start behavior
+        const startBehavior = document.querySelector('input[name="startBehavior"]:checked').value;
+        let startWithEvent;
+        if (startBehavior === 'event') startWithEvent = true;
+        else if (startBehavior === 'gap') startWithEvent = false;
+        else startWithEvent = Math.random() * 100 < (parseInt(document.getElementById('startPctSlider').value) || 50);
+
+        // 1. Schedule cluster onset times
+        const times = [];
+
+        if (countMode === 'auto') {
+            // Fill the time range with clusters
+            let t = startTime;
+            if (startWithEvent) {
+                times.push(t);
+            } else {
+                t += randRange(minGap, maxGap);
+                if (t <= endTime) times.push(parseFloat(t.toFixed(3)));
+            }
+            while (true) {
+                t += randRange(minGap, maxGap);
+                if (t > endTime) break;
+                times.push(parseFloat(t.toFixed(3)));
+            }
+        } else {
+            // Fixed count
+            const count = parseInt(document.getElementById('clusterCount').value) || 10;
+            let t = startTime;
+            if (startWithEvent) {
+                times.push(t);
+            } else {
+                t += randRange(minGap, maxGap);
+                times.push(parseFloat(t.toFixed(3)));
+            }
+            for (let i = 1; i < count; i++) {
+                t += randRange(minGap, maxGap);
+                times.push(parseFloat(t.toFixed(3)));
+            }
+        }
+
+        const clusterCount = times.length;
+        if (clusterCount === 0) {
+            alert('No clusters generated. Check your time range and gap settings.');
+            return;
+        }
+
+        // 2. Assign velocity to each cluster
+        const velocities = getVelocityAssignments(clusterCount);
+
+        // 3. Build output rows
+        const rows = [];
+        for (let i = 0; i < clusterCount; i++) {
+            const gap = i === 0 ? null : parseFloat((times[i] - times[i - 1]).toFixed(3));
+            rows.push({
+                index: i + 1,
+                time: times[i],
+                gap: gap,
+                velocity: velocities[i],
+                instrument: instrument,
+                track: track,
+                cc0BehindRatio: cc0Ratio
+            });
+        }
+
+        generatedData = rows;
+
+        // 4. Stats
+        const endActual = rows[rows.length - 1].time;
+        const span = parseFloat((endActual - startTime).toFixed(3));
+        const velCounts = {};
+        rows.forEach(r => { velCounts[r.velocity] = (velCounts[r.velocity] || 0) + 1; });
+        const gaps = rows.filter(r => r.gap !== null).map(r => r.gap);
+        const avgGap = gaps.length > 0 ? (gaps.reduce((a, b) => a + b, 0) / gaps.length).toFixed(3) : '—';
+
+        const startLabel = startWithEvent ? 'event at start' : 'gap at start';
+        let statsHtml = `<div class="stat"><strong>${clusterCount} clusters</strong> (${startLabel}) | `;
+        statsHtml += `Time span: ${startTime.toFixed(3)}s → ${endActual.toFixed(3)}s (${span}s)</div>`;
+        statsHtml += `<div class="stat">Avg gap: ${avgGap}s | ${instrument} | Track ${track} | CC0 behind: ${Math.round(cc0Ratio * 100)}%</div>`;
+        statsHtml += `<div class="stat">Velocity: ${Object.entries(velCounts).map(([k, v]) => `${VEL_LABELS[k]}: ${v}`).join(' | ')}</div>`;
+        document.getElementById('stats').innerHTML = statsHtml;
+
+        // 5. Render
+        renderOutput();
+        document.getElementById('outputSection').style.display = 'block';
+        autoSave();
+    }
+
+    // ============================================
+    // OUTPUT RENDERING
+    // ============================================
+    function renderOutput() {
+        if (!generatedData) return;
+        const pre = document.getElementById('outputPre');
+        if (currentTab === 'tsv') pre.textContent = renderTSV();
+        else if (currentTab === 'json') pre.textContent = renderJSON();
+        else if (currentTab === 'console') pre.textContent = renderConsoleScript();
+    }
+
+    function renderTSV() {
+        const showGap = document.getElementById('showGap').checked;
+        const showCC0 = document.getElementById('showCC0').checked;
+
+        let headers = ['#', 'TIME', 'VELOCITY', 'INSTRUMENT', 'TRACK'];
+        if (showGap) headers.splice(2, 0, 'GAP');
+        if (showCC0) headers.push('CC0_BEHIND%');
+
+        const lines = [headers.join('\t')];
+        for (const r of generatedData) {
+            let cols = [r.index, r.time.toFixed(3), VEL_LABELS[r.velocity], r.instrument, r.track];
+            if (showGap) cols.splice(2, 0, r.gap !== null ? `+${r.gap.toFixed(3)}` : '—');
+            if (showCC0) cols.push(Math.round(r.cc0BehindRatio * 100) + '%');
+            lines.push(cols.join('\t'));
+        }
+        return lines.join('\n');
+    }
+
+    function renderJSON() {
+        const output = {
+            _meta: {
+                generator: 'THPGNC Sequence Generator v1.0',
+                generatedAt: new Date().toISOString(),
+                clusterCount: generatedData.length,
+                timeSpan: {
+                    start: generatedData[0].time,
+                    end: generatedData[generatedData.length - 1].time
+                }
+            },
+            targetSystem: 'THPGNC',
+            alignment: 'post',
+            clusters: generatedData.map(r => ({
+                time: r.time,
+                velocity: r.velocity,
+                instrument: r.instrument,
+                track: r.track,
+                cc0BehindRatio: r.cc0BehindRatio
+            }))
+        };
+        return JSON.stringify(output, null, 2);
+    }
+
+    function renderConsoleScript() {
+        // Self-contained console script that generates MIDI snippets directly
+        const rows = generatedData;
+        const instrument = rows[0].instrument;
+        const track = rows[0].track;
+
+        let script = '// THPGNC Sequence — Paste into browser console of your score app\n';
+        script += '// Generates ' + rows.length + ' Two-Hand Pizz Grace Note Clusters\n';
+        script += '(async function() {\n';
+        script += '    const clusters = ' + JSON.stringify(rows.map(r => ({
+            time: r.time, velocity: r.velocity, cc0BehindRatio: r.cc0BehindRatio
+        })), null, 4).split('\n').map((line, i) => i === 0 ? '    ' + line.trim() : '    ' + line).join('\n') + ';\n\n';
+
+        script += '    const instrument = ' + JSON.stringify(instrument) + ';\n';
+        script += '    const track = ' + track + ';\n';
+        script += '    const trackIndex = track - 1;\n';
+        script += '    const channel = trackIndex;\n\n';
+
+        script += '    // THPGNC Model constants\n';
+        script += '    const model = {\n';
+        script += '        cc0Behind: 80, cc0Pizz: 69,\n';
+        script += '        durationMsRange: [90, 130],\n';
+        script += '        instrumentRanges: { violin: {low:55,high:96}, viola: {low:48,high:88}, cello: {low:36,high:83} },\n';
+        script += '        openStrings: { violin: [55,62,69,76], viola: [48,55,62,69], cello: [36,43,50,57] }\n';
+        script += '    };\n';
+        script += '    const velRanges = { low: [10,30], medium: [50,70], high: [90,127] };\n';
+        script += '    const range = model.instrumentRanges[instrument];\n';
+        script += '    const openStrs = model.openStrings[instrument];\n';
+        script += '    const [minDurMs, maxDurMs] = model.durationMsRange;\n\n';
+
+        script += '    // Load cluster database\n';
+        script += '    const response = await fetch(\'/midi_files/grace_note_cluster_db.json\');\n';
+        script += '    const db = await response.json();\n';
+        script += '    if (!db || !db.clusters || db.clusters.length === 0) {\n';
+        script += '        console.error("Failed to load grace note cluster database."); return;\n';
+        script += '    }\n';
+        script += '    console.log(`Loaded ${db.clusters.length} clusters from database.`);\n\n';
+
+        script += '    console.log(`Generating ${clusters.length} THPGNC clusters...`);\n\n';
+
+        script += '    for (let ci = 0; ci < clusters.length; ci++) {\n';
+        script += '        const c = clusters[ci];\n';
+        script += '        const timeSec = c.time;\n';
+        script += '        const snippetStartMs = timeSec * 1000;\n\n';
+
+        script += '        // Pick random cluster from DB\n';
+        script += '        const clusterIdx = Math.floor(Math.random() * db.clusters.length);\n';
+        script += '        const clusterData = db.clusters[clusterIdx];\n';
+        script += '        const notes = clusterData.notes;\n';
+        script += '        const noteCount = notes.length;\n\n';
+
+        script += '        // CC0 assignments with configurable ratio\n';
+        script += '        const behindCount = Math.round(noteCount * c.cc0BehindRatio);\n';
+        script += '        const cc0Assignments = [];\n';
+        script += '        for (let i = 0; i < noteCount; i++) {\n';
+        script += '            cc0Assignments.push(i < behindCount ? model.cc0Behind : model.cc0Pizz);\n';
+        script += '        }\n';
+        script += '        // Fisher-Yates shuffle\n';
+        script += '        for (let i = cc0Assignments.length - 1; i > 0; i--) {\n';
+        script += '            const j = Math.floor(Math.random() * (i + 1));\n';
+        script += '            [cc0Assignments[i], cc0Assignments[j]] = [cc0Assignments[j], cc0Assignments[i]];\n';
+        script += '        }\n\n';
+
+        script += '        // Velocity compression\n';
+        script += '        let compressVelocity;\n';
+        script += '        if (c.velocity === "original") {\n';
+        script += '            compressVelocity = (v) => v;\n';
+        script += '        } else {\n';
+        script += '            const [tLow, tHigh] = velRanges[c.velocity];\n';
+        script += '            const vels = notes.map(n => n.velocity);\n';
+        script += '            const srcMin = Math.min(...vels), srcMax = Math.max(...vels);\n';
+        script += '            const span = srcMax - srcMin || 1;\n';
+        script += '            compressVelocity = (v) => Math.round(tLow + ((v - srcMin) / span) * (tHigh - tLow));\n';
+        script += '        }\n\n';
+
+        script += '        // Build MIDI events\n';
+        script += '        const snippetEvents = [];\n';
+        script += '        let maxEndMs = 0;\n\n';
+
+        script += '        for (let i = 0; i < noteCount; i++) {\n';
+        script += '            const note = notes[i];\n';
+        script += '            const cc0 = cc0Assignments[i];\n';
+        script += '            const noteOnsetMs = note.relativeOnsetMs;\n';
+        script += '            const velocity = compressVelocity(note.velocity);\n';
+        script += '            let durationMs = minDurMs + Math.random() * (maxDurMs - minDurMs);\n\n';
+
+        script += '            // Collision avoidance\n';
+        script += '            if (i < noteCount - 1) {\n';
+        script += '                const nextOnsetMs = notes[i + 1].relativeOnsetMs;\n';
+        script += '                const gapToNext = nextOnsetMs - noteOnsetMs;\n';
+        script += '                if (durationMs > gapToNext && gapToNext > 0) {\n';
+        script += '                    durationMs = gapToNext - 1;\n';
+        script += '                    if (durationMs < 1) durationMs = 1;\n';
+        script += '                }\n';
+        script += '            }\n\n';
+
+        script += '            const noteEndMs = noteOnsetMs + durationMs;\n';
+        script += '            if (noteEndMs > maxEndMs) maxEndMs = noteEndMs;\n\n';
+
+        script += '            let pitch, quarterToneOffset = 0, needsBend = false;\n';
+        script += '            if (cc0 === model.cc0Behind) {\n';
+        script += '                pitch = openStrs[Math.floor(Math.random() * openStrs.length)];\n';
+        script += '            } else {\n';
+        script += '                pitch = range.low + Math.floor(Math.random() * (range.high - range.low + 1));\n';
+        script += '                const qRoll = Math.random();\n';
+        script += '                if (qRoll < 0.25) { quarterToneOffset = 0.5; needsBend = true; }\n';
+        script += '                else if (qRoll < 0.5) { quarterToneOffset = -0.5; needsBend = true; }\n';
+        script += '            }\n\n';
+
+        script += '            // CC0 message\n';
+        script += '            snippetEvents.push({ timeMs: snippetStartMs + noteOnsetMs, relativeTimeMs: noteOnsetMs,\n';
+        script += '                type: "cc", data: [0xB0 | channel, 0x00, cc0] });\n\n';
+
+        script += '            // Pitch bend (quarter-tone)\n';
+        script += '            if (needsBend) {\n';
+        script += '                const bendValue = quarterToneOffset > 0 ? 12288 : 4096;\n';
+        script += '                snippetEvents.push({ timeMs: snippetStartMs + noteOnsetMs, relativeTimeMs: noteOnsetMs,\n';
+        script += '                    type: 0xE0, data: [0xE0 | channel, bendValue & 0x7F, bendValue >> 7] });\n';
+        script += '            }\n\n';
+
+        script += '            // Note on\n';
+        script += '            snippetEvents.push({ timeMs: snippetStartMs + noteOnsetMs, relativeTimeMs: noteOnsetMs,\n';
+        script += '                type: "noteOn", data: [0x90 | channel, pitch, velocity] });\n\n';
+
+        script += '            // Note off\n';
+        script += '            snippetEvents.push({ timeMs: snippetStartMs + noteEndMs, relativeTimeMs: noteEndMs,\n';
+        script += '                type: "noteOff", data: [0x80 | channel, pitch, 0] });\n\n';
+
+        script += '            // Reset pitch bend\n';
+        script += '            if (needsBend) {\n';
+        script += '                snippetEvents.push({ timeMs: snippetStartMs + noteEndMs, relativeTimeMs: noteEndMs,\n';
+        script += '                    type: 0xE0, data: [0xE0 | channel, 0x00, 0x40] });\n';
+        script += '            }\n';
+        script += '        }\n\n';
+
+        script += '        // Sort events\n';
+        script += '        const typePriority = { "cc": 0, [0xE0]: 1, "noteOn": 2, "noteOff": 3 };\n';
+        script += '        snippetEvents.sort((a, b) => {\n';
+        script += '            if (a.timeMs !== b.timeMs) return a.timeMs - b.timeMs;\n';
+        script += '            return (typePriority[a.type] ?? 2) - (typePriority[b.type] ?? 2);\n';
+        script += '        });\n\n';
+
+        script += '        const snippetEndSec = timeSec + (maxEndMs / 1000);\n\n';
+
+        script += '        // Add snippet\n';
+        script += '        const snippetData = {\n';
+        script += '            name: `THPGNC T${track} @${timeSec.toFixed(3)}s`,\n';
+        script += '            trackIndex: trackIndex, startSeconds: timeSec, endSeconds: snippetEndSec,\n';
+        script += '            events: snippetEvents, color: "#9B59B6"\n';
+        script += '        };\n';
+        script += '        if (window.MidiSnippetDatabase) MidiSnippetDatabase.add(snippetData);\n\n';
+
+        script += '        const behindN = cc0Assignments.filter(c => c === model.cc0Behind).length;\n';
+        script += '        console.log(`[${ci+1}/${clusters.length}] cluster #${clusterIdx} (${noteCount} notes) @${timeSec.toFixed(3)}s vel=${c.velocity} behind=${behindN}/${noteCount}`);\n';
+        script += '        await new Promise(r => setTimeout(r, 50));\n';
+        script += '    }\n\n';
+
+        script += '    // Finalize\n';
+        script += '    if (window.MidiController && MidiController.reloadFromDatabase) MidiController.reloadFromDatabase();\n';
+        script += '    if (window.ScoreManager) ScoreManager.markDirty();\n';
+        script += '    console.log(`Done! ${clusters.length} THPGNC clusters generated.`);\n';
+        script += '})();\n';
+
+        return script;
+    }
+
+    // ============================================
+    // UI: TABS
+    // ============================================
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.output-tab').forEach(t => {
+            if ((tab === 'tsv' && t.textContent.includes('TSV')) ||
+                (tab === 'json' && t.textContent.includes('JSON')) ||
+                (tab === 'console' && t.textContent.includes('Console')))
+                t.classList.add('active');
+        });
+        renderOutput();
+    }
+
+    function copyOutput() {
+        const pre = document.getElementById('outputPre');
+        navigator.clipboard.writeText(pre.textContent).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+        });
+    }
+
+    // ============================================
+    // UI: DYNAMIC UPDATES
+    // ============================================
+    document.getElementById('cc0Ratio').addEventListener('input', function() {
+        document.getElementById('cc0RatioLabel').textContent = this.value + '%';
+    });
+
+    document.getElementById('instrument').addEventListener('change', function() {
+        const info = INSTRUMENT_INFO[this.value];
+        document.getElementById('rangeInfo').textContent =
+            `Pizz range: ${info.rangeLabel} | Open strings: ${info.openLabel}`;
+    });
+
+    // Count mode toggle
+    document.querySelectorAll('input[name="countMode"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const isFixed = this.value === 'fixed';
+            document.getElementById('fixedCountRow').classList.toggle('hidden', !isFixed);
+            const ind = document.getElementById('modeIndicator');
+            ind.textContent = isFixed ? 'FIXED' : 'AUTO';
+            ind.className = 'mode-indicator ' + (isFixed ? 'mode-fixed' : 'mode-auto');
+            document.getElementById('countModeInfo').textContent = isFixed
+                ? 'Fixed: generates exactly the specified number of clusters starting at Start Time.'
+                : 'Auto: fills the time range with clusters spaced by the gap range below.';
+        });
+    });
+
+    // Velocity mode toggle
+    document.querySelectorAll('input[name="velMode"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const isWeighted = this.value === 'weighted';
+            document.getElementById('velSingleRow').classList.toggle('hidden', isWeighted);
+            document.getElementById('velWeightedRows').classList.toggle('hidden', !isWeighted);
+        });
+    });
+
+    // Start behavior toggle
+    document.querySelectorAll('input[name="startBehavior"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('startPctRow').classList.toggle('hidden', this.value !== 'percentage');
+            const labels = { event: 'First cluster placed exactly at Start Time.',
+                gap: 'A random gap is inserted before the first cluster.',
+                percentage: 'Coin flip each generation — configurable event-at-start probability.' };
+            document.getElementById('startBehaviorInfo').textContent = labels[this.value] || '';
+        });
+    });
+
+    document.getElementById('startPctSlider').addEventListener('input', function() {
+        document.getElementById('startPctLabel').textContent = this.value + '%';
+    });
+
+    // Velocity weight bars
+    ['Original', 'Low', 'Medium', 'High'].forEach(name => {
+        const input = document.getElementById('velWt' + name);
+        const bar = document.getElementById('velBar' + name);
+        if (input && bar) {
+            input.addEventListener('input', updateVelBars);
+        }
+    });
+
+    function updateVelBars() {
+        const weights = {
+            Original: parseFloat(document.getElementById('velWtOriginal').value) || 0,
+            Low:      parseFloat(document.getElementById('velWtLow').value) || 0,
+            Medium:   parseFloat(document.getElementById('velWtMedium').value) || 0,
+            High:     parseFloat(document.getElementById('velWtHigh').value) || 0
+        };
+        const total = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
+        const colors = { Original: '#888', Low: '#6a6', Medium: '#cc8', High: '#c66' };
+        const parts = [];
+        for (const [name, w] of Object.entries(weights)) {
+            const pct = Math.round((w / total) * 100);
+            document.getElementById('velBar' + name).style.width = pct + '%';
+            if (w > 0) parts.push(`${name} ${pct}%`);
+        }
+        document.getElementById('velWeightInfo').textContent = 'Distribution: ' + (parts.join(' | ') || 'None');
+    }
+
+    // ============================================
+    // SETTINGS COLLECT / RESTORE
+    // ============================================
+    const STORAGE_KEY = 'thpgnc_seqgen_autosave';
+    const PRESETS_KEY = 'thpgnc_seqgen_presets';
+
+    function collectAllSettings() {
+        return {
+            startTime: parseFloat(document.getElementById('startTime').value) || 0,
+            endTime: parseFloat(document.getElementById('endTime').value) || 0,
+            countMode: document.querySelector('input[name="countMode"]:checked').value,
+            startBehavior: document.querySelector('input[name="startBehavior"]:checked').value,
+            startPct: parseInt(document.getElementById('startPctSlider').value) || 50,
+            clusterCount: parseInt(document.getElementById('clusterCount').value) || 15,
+            minGap: parseFloat(document.getElementById('minGap').value) || 0.8,
+            maxGap: parseFloat(document.getElementById('maxGap').value) || 2.5,
+            cc0Ratio: parseInt(document.getElementById('cc0Ratio').value),
+            instrument: document.getElementById('instrument').value,
+            track: parseInt(document.getElementById('track').value),
+            velMode: document.querySelector('input[name="velMode"]:checked').value,
+            velSingle: document.getElementById('velSingle').value,
+            velWtOriginal: parseFloat(document.getElementById('velWtOriginal').value) || 0,
+            velWtLow: parseFloat(document.getElementById('velWtLow').value) || 0,
+            velWtMedium: parseFloat(document.getElementById('velWtMedium').value) || 0,
+            velWtHigh: parseFloat(document.getElementById('velWtHigh').value) || 0,
+            showGap: document.getElementById('showGap').checked,
+            showCC0: document.getElementById('showCC0').checked
+        };
+    }
+
+    function restoreAllSettings(cfg) {
+        if (!cfg) return;
+        if (cfg.startTime != null) document.getElementById('startTime').value = cfg.startTime;
+        if (cfg.endTime != null) document.getElementById('endTime').value = cfg.endTime;
+        if (cfg.countMode) {
+            document.getElementById(cfg.countMode === 'fixed' ? 'countModeFixed' : 'countModeAuto').checked = true;
+            document.getElementById(cfg.countMode === 'fixed' ? 'countModeFixed' : 'countModeAuto').dispatchEvent(new Event('change'));
+        }
+        if (cfg.startBehavior) {
+            const radioId = cfg.startBehavior === 'gap' ? 'startGap' : cfg.startBehavior === 'percentage' ? 'startPct' : 'startEvent';
+            document.getElementById(radioId).checked = true;
+            document.getElementById(radioId).dispatchEvent(new Event('change'));
+        }
+        if (cfg.startPct != null) {
+            document.getElementById('startPctSlider').value = cfg.startPct;
+            document.getElementById('startPctLabel').textContent = cfg.startPct + '%';
+        }
+        if (cfg.clusterCount != null) document.getElementById('clusterCount').value = cfg.clusterCount;
+        if (cfg.minGap != null) document.getElementById('minGap').value = cfg.minGap;
+        if (cfg.maxGap != null) document.getElementById('maxGap').value = cfg.maxGap;
+        if (cfg.cc0Ratio != null) {
+            document.getElementById('cc0Ratio').value = cfg.cc0Ratio;
+            document.getElementById('cc0RatioLabel').textContent = cfg.cc0Ratio + '%';
+        }
+        if (cfg.instrument) {
+            document.getElementById('instrument').value = cfg.instrument;
+            document.getElementById('instrument').dispatchEvent(new Event('change'));
+        }
+        if (cfg.track != null) document.getElementById('track').value = cfg.track;
+        if (cfg.velMode) {
+            document.getElementById(cfg.velMode === 'weighted' ? 'velModeWeighted' : 'velModeSingle').checked = true;
+            document.getElementById(cfg.velMode === 'weighted' ? 'velModeWeighted' : 'velModeSingle').dispatchEvent(new Event('change'));
+        }
+        if (cfg.velSingle) document.getElementById('velSingle').value = cfg.velSingle;
+        if (cfg.velWtOriginal != null) document.getElementById('velWtOriginal').value = cfg.velWtOriginal;
+        if (cfg.velWtLow != null) document.getElementById('velWtLow').value = cfg.velWtLow;
+        if (cfg.velWtMedium != null) document.getElementById('velWtMedium').value = cfg.velWtMedium;
+        if (cfg.velWtHigh != null) document.getElementById('velWtHigh').value = cfg.velWtHigh;
+        if (cfg.showGap != null) document.getElementById('showGap').checked = cfg.showGap;
+        if (cfg.showCC0 != null) document.getElementById('showCC0').checked = cfg.showCC0;
+        updateVelBars();
+    }
+
+    function autoSave() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(collectAllSettings())); }
+        catch (e) { /* ignore */ }
+    }
+
+    function autoRestore() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) { restoreAllSettings(JSON.parse(saved)); return true; }
+        } catch (e) { /* ignore */ }
+        return false;
+    }
+
+    // ============================================
+    // PRESETS
+    // ============================================
+    const BUILT_IN_PRESETS = {
+        'Dense low-velocity 300-330s violin T1': {
+            startTime: 300, endTime: 330, countMode: 'auto', clusterCount: 15,
+            minGap: 0.5, maxGap: 1.2, cc0Ratio: 50, instrument: 'violin', track: 1,
+            velMode: 'single', velSingle: 'low',
+            velWtOriginal: 0, velWtLow: 30, velWtMedium: 40, velWtHigh: 30,
+            showGap: true, showCC0: true
+        },
+        'Sparse weighted-vel 300-360s cello T4': {
+            startTime: 300, endTime: 360, countMode: 'auto', clusterCount: 15,
+            minGap: 2.0, maxGap: 5.0, cc0Ratio: 60, instrument: 'cello', track: 4,
+            velMode: 'weighted', velSingle: 'high',
+            velWtOriginal: 10, velWtLow: 20, velWtMedium: 40, velWtHigh: 30,
+            showGap: true, showCC0: true
+        }
+    };
+
+    function getAllPresets() {
+        let presets = {};
+        try {
+            const stored = localStorage.getItem(PRESETS_KEY);
+            if (stored) presets = JSON.parse(stored);
+        } catch (e) { /* ignore */ }
+        return { ...BUILT_IN_PRESETS, ...presets };
+    }
+
+    function getUserPresets() {
+        try {
+            const stored = localStorage.getItem(PRESETS_KEY);
+            return stored ? JSON.parse(stored) : {};
+        } catch (e) { return {}; }
+    }
+
+    function saveUserPresets(presets) {
+        try { localStorage.setItem(PRESETS_KEY, JSON.stringify(presets)); }
+        catch (e) { /* ignore */ }
+    }
+
+    function refreshPresetDropdown() {
+        const sel = document.getElementById('presetSelect');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">— Select —</option>';
+        const all = getAllPresets();
+        for (const name of Object.keys(all).sort()) {
+            const isBuiltIn = BUILT_IN_PRESETS[name] && !getUserPresets()[name];
+            sel.innerHTML += `<option value="${name}">${name}${isBuiltIn ? ' (built-in)' : ''}</option>`;
+        }
+        if (current && all[current]) sel.value = current;
+    }
+
+    function savePreset() {
+        const nameInput = document.getElementById('presetName');
+        const name = nameInput.value.trim();
+        if (!name) { alert('Enter a preset name first.'); return; }
+        const presets = getUserPresets();
+        const isOverwrite = !!presets[name];
+        presets[name] = collectAllSettings();
+        saveUserPresets(presets);
+        refreshPresetDropdown();
+        document.getElementById('presetSelect').value = name;
+        nameInput.value = '';
+        flashBtn(event.target, 'btn-flash-green', isOverwrite ? `Updated "${name}"` : `Saved "${name}"`);
+    }
+
+    function updatePreset() {
+        const name = document.getElementById('presetSelect').value;
+        if (!name) { alert('Select a preset to update first.'); return; }
+        if (BUILT_IN_PRESETS[name] && !getUserPresets()[name]) {
+            alert('Cannot overwrite a built-in preset. Use Save As instead.'); return;
+        }
+        const presets = getUserPresets();
+        presets[name] = collectAllSettings();
+        saveUserPresets(presets);
+        flashBtn(document.getElementById('updatePresetBtn'), 'btn-flash-green', `Saved "${name}"`);
+    }
+
+    function flashBtn(btn, cls, msg) {
+        if (!btn) return;
+        const orig = btn.textContent;
+        btn.classList.remove(cls);
+        void btn.offsetWidth; // force reflow
+        btn.classList.add(cls);
+        if (msg) { btn.textContent = msg; }
+        setTimeout(() => { btn.classList.remove(cls); btn.textContent = orig; }, 800);
+    }
+
+    function loadPreset() {
+        const name = document.getElementById('presetSelect').value;
+        if (!name) { alert('Select a preset first.'); return; }
+        const all = getAllPresets();
+        if (!all[name]) { alert('Preset not found.'); return; }
+        restoreAllSettings(all[name]);
+        autoSave();
+        flashBtn(event.target, 'btn-flash-blue', 'Loaded!');
+    }
+
+    function deletePreset() {
+        const name = document.getElementById('presetSelect').value;
+        if (!name) { alert('Select a preset first.'); return; }
+        if (BUILT_IN_PRESETS[name] && !getUserPresets()[name]) {
+            alert('Cannot delete a built-in preset.'); return;
+        }
+        if (!confirm(`Delete preset "${name}"?`)) return;
+        const presets = getUserPresets();
+        delete presets[name];
+        saveUserPresets(presets);
+        refreshPresetDropdown();
+    }
+
+    function exportPresets() {
+        const all = getAllPresets();
+        const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'thpgnc_seqgen_presets.json'; a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importPresets(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const imported = JSON.parse(ev.target.result);
+                const presets = getUserPresets();
+                let count = 0;
+                for (const [name, cfg] of Object.entries(imported)) {
+                    if (cfg && typeof cfg === 'object' && cfg.minGap != null) {
+                        presets[name] = cfg; count++;
+                    }
+                }
+                saveUserPresets(presets);
+                refreshPresetDropdown();
+                alert(`Imported ${count} preset(s).`);
+            } catch (e) { alert('Error reading preset file: ' + e.message); }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    function resetToDefaults() {
+        if (!confirm('Reset all settings to defaults?')) return;
+        localStorage.removeItem(STORAGE_KEY);
+        document.getElementById('startTime').value = '300.000';
+        document.getElementById('endTime').value = '330.000';
+        document.getElementById('countModeAuto').checked = true;
+        document.getElementById('countModeAuto').dispatchEvent(new Event('change'));
+        document.getElementById('startEvent').checked = true;
+        document.getElementById('startEvent').dispatchEvent(new Event('change'));
+        document.getElementById('startPctSlider').value = '50';
+        document.getElementById('startPctLabel').textContent = '50%';
+        document.getElementById('clusterCount').value = '15';
+        document.getElementById('minGap').value = '0.800';
+        document.getElementById('maxGap').value = '2.500';
+        document.getElementById('cc0Ratio').value = '50';
+        document.getElementById('cc0RatioLabel').textContent = '50%';
+        document.getElementById('instrument').value = 'violin';
+        document.getElementById('instrument').dispatchEvent(new Event('change'));
+        document.getElementById('track').value = '1';
+        document.getElementById('velModeSingle').checked = true;
+        document.getElementById('velModeSingle').dispatchEvent(new Event('change'));
+        document.getElementById('velSingle').value = 'high';
+        document.getElementById('velWtOriginal').value = '0';
+        document.getElementById('velWtLow').value = '30';
+        document.getElementById('velWtMedium').value = '40';
+        document.getElementById('velWtHigh').value = '30';
+        document.getElementById('showGap').checked = true;
+        document.getElementById('showCC0').checked = true;
+        updateVelBars();
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    function init() {
+        if (!autoRestore()) {
+            // Defaults are already in the HTML
+        }
+        updateVelBars();
+        refreshPresetDropdown();
+    }
+
+    init();
+    </script>
+</body>
+</html>

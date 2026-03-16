@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bow Overpressure Sequence Generator — String Quartet No. 1</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #1a1a2e; color: #e0e0e0;
+            padding: 20px; line-height: 1.5;
+        }
+        h1 { color: #e86050; font-size: 22px; margin-bottom: 4px; }
+        h2 { color: #c04838; font-size: 16px; margin: 16px 0 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+        .subtitle { color: #888; font-size: 12px; margin-bottom: 16px; }
+
+        .config-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+            max-width: 900px; margin-bottom: 16px;
+        }
+        .config-section {
+            background: #2a2020; border: 1px solid #444; border-radius: 6px; padding: 12px;
+        }
+        label { font-size: 12px; color: #aaa; display: block; margin-bottom: 2px; }
+        input, select, textarea {
+            background: #3a2828; color: #fff; border: 1px solid #555;
+            border-radius: 4px; padding: 4px 8px; font-size: 12px; width: 100%;
+            font-family: inherit;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #e86050; }
+        textarea { font-family: 'Consolas', 'Courier New', monospace; resize: vertical; }
+        .row { display: flex; gap: 8px; align-items: end; margin-bottom: 6px; }
+        .row > div { flex: 1; }
+        .row-tight { display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+
+        /* Velocity weight rows */
+        .vel-row {
+            display: flex; gap: 8px; align-items: center; margin-bottom: 4px;
+            background: #2a1e1e; padding: 4px 8px; border-radius: 4px;
+        }
+        .vel-row label { display: inline; margin: 0; color: #ddd; font-size: 11px; width: 80px; }
+        .vel-row input { width: 60px; text-align: center; }
+        .vel-bar { flex: 1; height: 8px; background: #333; border-radius: 4px; overflow: hidden; }
+        .vel-bar-fill { height: 100%; border-radius: 4px; transition: width 0.2s; }
+
+        /* Slider styling */
+        input[type="range"] {
+            -webkit-appearance: none; width: 100%; height: 6px;
+            background: #333; border-radius: 3px; border: none; padding: 0;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 16px; height: 16px;
+            background: #C0392B; border-radius: 50%; cursor: pointer;
+        }
+
+        button.generate {
+            background: #C0392B; color: #fff; font-weight: bold; border: none;
+            border-radius: 6px; padding: 10px 28px; font-size: 14px; cursor: pointer;
+            margin: 12px 0;
+        }
+        button.generate:hover { background: #e04838; }
+        button.generate:active { transform: scale(0.96); background: #a02a1e; }
+
+        /* Button press feedback */
+        button { transition: transform 0.08s, background 0.08s, box-shadow 0.08s; }
+        button:active { transform: scale(0.95); }
+        .btn-flash { animation: btnFlash 0.35s ease-out; }
+        @keyframes btnFlash {
+            0% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0.6); }
+            50% { box-shadow: 0 0 8px 3px rgba(192, 57, 43, 0.4); }
+            100% { box-shadow: none; }
+        }
+        .preset-bar button:active { transform: scale(0.93); }
+        .preset-bar button.btn-flash-green { animation: btnFlashGreen 0.5s ease-out; }
+        @keyframes btnFlashGreen {
+            0% { background: #4a8; box-shadow: 0 0 6px 2px rgba(80,200,120,0.5); }
+            100% { box-shadow: none; }
+        }
+        .preset-bar button.btn-flash-blue { animation: btnFlashBlue 0.5s ease-out; }
+        @keyframes btnFlashBlue {
+            0% { background: #48a; box-shadow: 0 0 6px 2px rgba(80,140,220,0.5); }
+            100% { box-shadow: none; }
+        }
+        .output-tab:active { transform: scale(0.96); }
+
+        .output-section { max-width: 900px; margin-top: 12px; }
+        .output-tabs { display: flex; gap: 4px; margin-bottom: 0; }
+        .output-tab {
+            background: #333; color: #aaa; border: 1px solid #555;
+            border-bottom: none; border-radius: 6px 6px 0 0;
+            padding: 6px 16px; font-size: 12px; cursor: pointer;
+        }
+        .output-tab.active { background: #2a2020; color: #fff; border-color: #C0392B; }
+        .output-content {
+            background: #2a2020; border: 1px solid #555; border-radius: 0 6px 6px 6px;
+            padding: 12px; position: relative;
+        }
+        .output-content pre {
+            font-family: 'Consolas', 'Courier New', monospace; font-size: 12px;
+            white-space: pre; overflow-x: auto; max-height: 500px; overflow-y: auto;
+        }
+        .copy-btn {
+            position: absolute; top: 8px; right: 8px;
+            background: #555; color: #fff; border: none; border-radius: 4px;
+            padding: 4px 10px; font-size: 11px; cursor: pointer;
+        }
+        .copy-btn:hover { background: #777; }
+        .copy-btn.copied { background: #4a8; }
+
+        .info { font-size: 11px; color: #888; margin-top: 4px; }
+        .stat { font-size: 12px; color: #e8a090; margin: 4px 0; }
+
+        /* Preset bar */
+        .preset-bar {
+            max-width: 900px; margin-bottom: 12px; padding: 10px 14px;
+            background: #2a1e1e; border: 1px solid #444; border-radius: 6px;
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .preset-bar label { margin: 0; font-size: 11px; color: #aaa; white-space: nowrap; }
+        .preset-bar select, .preset-bar input[type="text"] {
+            font-size: 11px; padding: 3px 6px; background: #3a2828; color: #fff;
+            border: 1px solid #555; border-radius: 3px;
+        }
+        .preset-bar select { width: 220px; }
+        .preset-bar input[type="text"] { width: 200px; }
+        .preset-bar button {
+            font-size: 11px; padding: 4px 10px; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600;
+        }
+        .preset-btn-save { background: #2a6040; color: #fff; }
+        .preset-btn-save:hover { background: #3a7050; }
+        .preset-btn-load { background: #2a4060; color: #8cf; }
+        .preset-btn-load:hover { background: #3a5080; }
+        .preset-btn-del { background: #933; color: #fff; }
+        .preset-btn-del:hover { background: #b44; }
+        .preset-btn-file { background: #555; color: #ddd; }
+        .preset-btn-file:hover { background: #777; }
+        .preset-sep { width: 1px; height: 22px; background: #555; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>🏹 Bow Overpressure Sequence Generator</h1>
+    <div class="subtitle">Generates timed sequences of BOP events for batch insertion — CC0=53</div>
+
+    <div class="config-grid">
+        <div>
+            <div class="config-section">
+                <h2>Time Range</h2>
+                <div class="row">
+                    <div>
+                        <label>Start Time (s)</label>
+                        <input type="number" id="startTime" value="300.000" step="0.001" min="0">
+                    </div>
+                    <div>
+                        <label>End Time (s)</label>
+                        <input type="number" id="endTime" value="330.000" step="0.001" min="0">
+                    </div>
+                </div>
+                <div class="info">Auto-fills the time range with events spaced by the gap range below.</div>
+            </div>
+
+            <div class="config-section">
+                <h2>Gap Range</h2>
+                <div class="row">
+                    <div>
+                        <label>Min Gap (s)</label>
+                        <input type="number" id="minGap" value="0.800" step="0.01" min="0.01">
+                    </div>
+                    <div>
+                        <label>Max Gap (s)</label>
+                        <input type="number" id="maxGap" value="2.500" step="0.01" min="0.01">
+                    </div>
+                </div>
+                <div class="info">Random gap between each event onset. Lower values = denser events.</div>
+            </div>
+
+            <div class="config-section">
+                <h2>Start Behavior</h2>
+                <div class="row-tight" style="margin-bottom: 4px;">
+                    <input type="radio" name="startBehavior" id="startEvent" value="event" checked style="width:auto;">
+                    <label for="startEvent" style="display:inline; margin-right: 10px;">Event at start</label>
+                    <input type="radio" name="startBehavior" id="startGap" value="gap" style="width:auto;">
+                    <label for="startGap" style="display:inline; margin-right: 10px;">Gap at start</label>
+                    <input type="radio" name="startBehavior" id="startPct" value="percentage" style="width:auto;">
+                    <label for="startPct" style="display:inline;">Percentage</label>
+                </div>
+                <div id="startPctRow" class="row-tight hidden" style="margin-top: 4px;">
+                    <span style="font-size: 11px; color: #888;">Event chance:</span>
+                    <input type="range" id="startPctSlider" min="0" max="100" value="50" style="flex:1; max-width: 160px;">
+                    <span id="startPctLabel" style="font-size: 12px; font-weight: bold; width: 36px; text-align: right;">50%</span>
+                </div>
+                <div class="info" id="startBehaviorInfo">First event placed exactly at Start Time.</div>
+            </div>
+
+            <div class="config-section">
+                <h2>Instrument & Track</h2>
+                <div class="row">
+                    <div>
+                        <label>Instrument</label>
+                        <select id="instrument">
+                            <option value="violin" selected>Violin</option>
+                            <option value="viola">Viola</option>
+                            <option value="cello">Cello</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Track</label>
+                        <select id="track">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="info" id="rangeInfo">Pitch range: G3–F6 | Quarter-tones enabled</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="config-section">
+                <h2>Velocity</h2>
+                <div class="row-tight" style="margin-bottom: 6px;">
+                    <input type="radio" name="velMode" id="velModeSingle" value="single" checked style="width: auto;">
+                    <label for="velModeSingle" style="display: inline; margin-right: 8px;">Single</label>
+                    <input type="radio" name="velMode" id="velModeWeighted" value="weighted" style="width: auto;">
+                    <label for="velModeWeighted" style="display: inline;">Weighted Mix</label>
+                </div>
+
+                <div id="velSingleRow">
+                    <label>Velocity Range</label>
+                    <select id="velSingle">
+                        <option value="low">Low (10–30)</option>
+                        <option value="medium">Medium (50–70)</option>
+                        <option value="high" selected>High (90–127)</option>
+                    </select>
+                </div>
+
+                <div id="velWeightedRows" class="hidden">
+                    <div class="vel-row">
+                        <label>Low (10–30)</label>
+                        <input type="number" id="velWtLow" value="30" min="0" max="100" step="5">
+                        <div class="vel-bar"><div class="vel-bar-fill" id="velBarLow" style="width:30%; background:#6a6;"></div></div>
+                    </div>
+                    <div class="vel-row">
+                        <label>Med (50–70)</label>
+                        <input type="number" id="velWtMedium" value="40" min="0" max="100" step="5">
+                        <div class="vel-bar"><div class="vel-bar-fill" id="velBarMedium" style="width:40%; background:#cc8;"></div></div>
+                    </div>
+                    <div class="vel-row">
+                        <label>High (90–127)</label>
+                        <input type="number" id="velWtHigh" value="30" min="0" max="100" step="5">
+                        <div class="vel-bar"><div class="vel-bar-fill" id="velBarHigh" style="width:30%; background:#c66;"></div></div>
+                    </div>
+                    <div class="info" id="velWeightInfo">Distribution: Low 30% | Med 40% | High 30%</div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h2>Output Options</h2>
+                <div class="row-tight">
+                    <input type="checkbox" id="showGap" checked style="width: auto;">
+                    <label for="showGap" style="display: inline;">Show GAP column</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="preset-bar">
+        <label>Preset:</label>
+        <select id="presetSelect"><option value="">— Select —</option></select>
+        <button class="preset-btn-load" onclick="loadPreset()">Load</button>
+        <button class="preset-btn-save" onclick="updatePreset()" id="updatePresetBtn" title="Overwrite the currently selected preset with current settings">Save</button>
+        <button class="preset-btn-del" onclick="deletePreset()">×</button>
+        <div class="preset-sep"></div>
+        <input type="text" id="presetName" placeholder="Preset name...">
+        <button class="preset-btn-save" onclick="savePreset()">Save As</button>
+        <div class="preset-sep"></div>
+        <button class="preset-btn-file" onclick="exportPresets()">Export All</button>
+        <button class="preset-btn-file" onclick="document.getElementById('presetFileInput').click()">Import</button>
+        <input type="file" id="presetFileInput" accept=".json" style="display:none;" onchange="importPresets(event)">
+        <div class="preset-sep"></div>
+        <button class="preset-btn-file" onclick="resetToDefaults()" style="background:#933;">Reset to Defaults</button>
+    </div>
+
+    <button class="generate" onclick="generate()">🏹 Generate BOP Sequence</button>
+
+    <div class="output-section" id="outputSection" style="display: none;">
+        <div id="stats"></div>
+        <div class="output-tabs">
+            <div class="output-tab active" onclick="switchTab('tsv')">TSV (Google Sheets)</div>
+            <div class="output-tab" onclick="switchTab('json')">JSON (Programmatic)</div>
+            <div class="output-tab" onclick="switchTab('console')">Console Script</div>
+        </div>
+        <div class="output-content">
+            <button class="copy-btn" onclick="copyOutput()">Copy</button>
+            <pre id="outputPre"></pre>
+        </div>
+    </div>
+
+    <script>
+    // ============================================
+    // CONSTANTS — BOP Model Parameters
+    // ============================================
+    const BOP_MODEL = {
+        cc0: 53,
+        noteDurationMs: 100,
+        instrumentRanges: {
+            violin: { low: 55, high: 89 },
+            viola:  { low: 48, high: 83 },
+            cello:  { low: 36, high: 71 }
+        }
+    };
+
+    const INSTRUMENT_INFO = {
+        violin: { rangeLabel: 'G3–F6' },
+        viola:  { rangeLabel: 'C3–B5' },
+        cello:  { rangeLabel: 'C2–B4' }
+    };
+
+    const VEL_RANGES = {
+        low: [10, 30],
+        medium: [50, 70],
+        high: [90, 127]
+    };
+
+    const VEL_LABELS = {
+        low: 'Low (10–30)',
+        medium: 'Med (50–70)',
+        high: 'High (90–127)'
+    };
+
+    // ============================================
+    // STATE
+    // ============================================
+    let generatedData = null;
+    let currentTab = 'tsv';
+
+    // ============================================
+    // RANDOM UTILITIES
+    // ============================================
+    function randRange(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // ============================================
+    // VELOCITY DISTRIBUTION
+    // ============================================
+    function getVelocityAssignments(count) {
+        const mode = document.querySelector('input[name="velMode"]:checked').value;
+
+        if (mode === 'single') {
+            const vel = document.getElementById('velSingle').value;
+            return Array(count).fill(vel);
+        }
+
+        // Weighted mode
+        const weights = {
+            low:      parseFloat(document.getElementById('velWtLow').value) || 0,
+            medium:   parseFloat(document.getElementById('velWtMedium').value) || 0,
+            high:     parseFloat(document.getElementById('velWtHigh').value) || 0
+        };
+
+        const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0);
+        if (totalWeight === 0) return Array(count).fill('high');
+
+        // Build pool proportionally
+        const pool = [];
+        for (const [key, w] of Object.entries(weights)) {
+            if (w > 0) {
+                const n = Math.round((w / totalWeight) * count);
+                for (let i = 0; i < n; i++) pool.push(key);
+            }
+        }
+
+        // Adjust pool size to exactly match count
+        while (pool.length < count) {
+            const sorted = Object.entries(weights).filter(([, w]) => w > 0).sort((a, b) => b[1] - a[1]);
+            pool.push(sorted[0][0]);
+        }
+        while (pool.length > count) pool.pop();
+
+        return shuffle(pool);
+    }
+
+    // ============================================
+    // MAIN GENERATE
+    // ============================================
+    function generate() {
+        const startTime = parseFloat(document.getElementById('startTime').value) || 0;
+        const endTime = parseFloat(document.getElementById('endTime').value) || 0;
+        const minGap = parseFloat(document.getElementById('minGap').value) || 0.5;
+        const maxGap = parseFloat(document.getElementById('maxGap').value) || 2.0;
+        const instrument = document.getElementById('instrument').value;
+        const track = parseInt(document.getElementById('track').value);
+
+        if (endTime <= startTime) {
+            alert('End time must be greater than start time.');
+            return;
+        }
+
+        // Start behavior
+        const startBehavior = document.querySelector('input[name="startBehavior"]:checked').value;
+        let startWithEvent;
+        if (startBehavior === 'event') startWithEvent = true;
+        else if (startBehavior === 'gap') startWithEvent = false;
+        else startWithEvent = Math.random() * 100 < (parseInt(document.getElementById('startPctSlider').value) || 50);
+
+        // 1. Schedule event onset times
+        const times = [];
+        let t = startTime;
+        if (startWithEvent) {
+            times.push(t);
+        } else {
+            t += randRange(minGap, maxGap);
+            if (t <= endTime) times.push(parseFloat(t.toFixed(3)));
+        }
+        while (true) {
+            t += randRange(minGap, maxGap);
+            if (t > endTime) break;
+            times.push(parseFloat(t.toFixed(3)));
+        }
+
+        const eventCount = times.length;
+        if (eventCount === 0) {
+            alert('No events generated. Check your time range and gap settings.');
+            return;
+        }
+
+        // 2. Assign velocity to each event
+        const velocities = getVelocityAssignments(eventCount);
+
+        // 3. Build output rows
+        const rows = [];
+        for (let i = 0; i < eventCount; i++) {
+            const gap = i === 0 ? null : parseFloat((times[i] - times[i - 1]).toFixed(3));
+            rows.push({
+                index: i + 1,
+                time: times[i],
+                gap: gap,
+                velocity: velocities[i],
+                instrument: instrument,
+                track: track
+            });
+        }
+
+        generatedData = rows;
+
+        // 4. Stats
+        const endActual = rows[rows.length - 1].time;
+        const span = parseFloat((endActual - startTime).toFixed(3));
+        const velCounts = {};
+        rows.forEach(r => { velCounts[r.velocity] = (velCounts[r.velocity] || 0) + 1; });
+        const gaps = rows.filter(r => r.gap !== null).map(r => r.gap);
+        const avgGap = gaps.length > 0 ? (gaps.reduce((a, b) => a + b, 0) / gaps.length).toFixed(3) : '—';
+
+        const startLabel = startWithEvent ? 'event at start' : 'gap at start';
+        let statsHtml = `<div class="stat"><strong>${eventCount} events</strong> (${startLabel}) | `;
+        statsHtml += `Time span: ${startTime.toFixed(3)}s → ${endActual.toFixed(3)}s (${span}s)</div>`;
+        statsHtml += `<div class="stat">Avg gap: ${avgGap}s | ${instrument} | Track ${track} | CC0=53 | Duration: ${BOP_MODEL.noteDurationMs}ms</div>`;
+        statsHtml += `<div class="stat">Velocity: ${Object.entries(velCounts).map(([k, v]) => `${VEL_LABELS[k]}: ${v}`).join(' | ')}</div>`;
+        document.getElementById('stats').innerHTML = statsHtml;
+
+        // 5. Render
+        renderOutput();
+        document.getElementById('outputSection').style.display = 'block';
+        autoSave();
+    }
+
+    // ============================================
+    // OUTPUT RENDERING
+    // ============================================
+    function renderOutput() {
+        if (!generatedData) return;
+        const pre = document.getElementById('outputPre');
+        if (currentTab === 'tsv') pre.textContent = renderTSV();
+        else if (currentTab === 'json') pre.textContent = renderJSON();
+        else if (currentTab === 'console') pre.textContent = renderConsoleScript();
+    }
+
+    function renderTSV() {
+        const showGap = document.getElementById('showGap').checked;
+
+        let headers = ['#', 'TIME', 'VELOCITY', 'INSTRUMENT', 'TRACK'];
+        if (showGap) headers.splice(2, 0, 'GAP');
+
+        const lines = [headers.join('\t')];
+        for (const r of generatedData) {
+            let cols = [r.index, r.time.toFixed(3), VEL_LABELS[r.velocity], r.instrument, r.track];
+            if (showGap) cols.splice(2, 0, r.gap !== null ? `+${r.gap.toFixed(3)}` : '—');
+            lines.push(cols.join('\t'));
+        }
+        return lines.join('\n');
+    }
+
+    function renderJSON() {
+        const output = {
+            _meta: {
+                generator: 'BOP Sequence Generator v1.0',
+                generatedAt: new Date().toISOString(),
+                eventCount: generatedData.length,
+                timeSpan: {
+                    start: generatedData[0].time,
+                    end: generatedData[generatedData.length - 1].time
+                }
+            },
+            targetSystem: 'BowOverpressure',
+            cc0: BOP_MODEL.cc0,
+            noteDurationMs: BOP_MODEL.noteDurationMs,
+            events: generatedData.map(r => ({
+                time: r.time,
+                velocity: r.velocity,
+                instrument: r.instrument,
+                track: r.track
+            }))
+        };
+        return JSON.stringify(output, null, 2);
+    }
+
+    function renderConsoleScript() {
+        const rows = generatedData;
+        const instrument = rows[0].instrument;
+        const track = rows[0].track;
+
+        let script = '// Bow Overpressure Sequence — Paste into browser console of your score app\n';
+        script += '// Generates ' + rows.length + ' Bow Overpressure events (CC0=53)\n';
+        script += '(async function() {\n';
+        script += '    const events = ' + JSON.stringify(rows.map(r => ({
+            time: r.time, velocity: r.velocity
+        })), null, 4).split('\n').map((line, i) => i === 0 ? '    ' + line.trim() : '    ' + line).join('\n') + ';\n\n';
+
+        script += '    const instrument = ' + JSON.stringify(instrument) + ';\n';
+        script += '    const track = ' + track + ';\n';
+        script += '    const trackIndex = track - 1;\n';
+        script += '    const channel = trackIndex;\n\n';
+
+        script += '    // BOP Model constants\n';
+        script += '    const model = {\n';
+        script += '        cc0: 53,\n';
+        script += '        noteDurationMs: ' + BOP_MODEL.noteDurationMs + ',\n';
+        script += '        instrumentRanges: { violin: {low:55,high:89}, viola: {low:48,high:83}, cello: {low:36,high:71} }\n';
+        script += '    };\n';
+        script += '    const velRanges = { low: [10,30], medium: [50,70], high: [90,127] };\n';
+        script += '    const range = model.instrumentRanges[instrument];\n\n';
+
+        script += '    // Random pitch with quarter-tones\n';
+        script += '    function randomPitch() {\n';
+        script += '        const quarterToneSteps = (range.high - range.low) * 2;\n';
+        script += '        const step = Math.floor(Math.random() * (quarterToneSteps + 1));\n';
+        script += '        const midiNote = range.low + Math.floor(step / 2);\n';
+        script += '        const quarterTone = (step % 2 === 1) ? 0.5 : 0;\n';
+        script += '        return { pitch: midiNote, quarterTone };\n';
+        script += '    }\n\n';
+
+        script += '    console.log(`Generating ${events.length} Bow Overpressure events...`);\n\n';
+
+        script += '    for (let ei = 0; ei < events.length; ei++) {\n';
+        script += '        const ev = events[ei];\n';
+        script += '        const timeSec = ev.time;\n';
+        script += '        const snippetStartMs = timeSec * 1000;\n\n';
+
+        script += '        // Random velocity in range\n';
+        script += '        const [vLow, vHigh] = velRanges[ev.velocity];\n';
+        script += '        const velocity = Math.floor(vLow + Math.random() * (vHigh - vLow + 1));\n\n';
+
+        script += '        // Random pitch\n';
+        script += '        const { pitch, quarterTone } = randomPitch();\n';
+        script += '        const needsBend = quarterTone !== 0;\n';
+        script += '        const bendValue = quarterTone > 0 ? 12288 : 8192;\n\n';
+
+        script += '        const snippetEvents = [];\n\n';
+
+        script += '        // Pitch bend (quarter-tone)\n';
+        script += '        if (needsBend) {\n';
+        script += '            snippetEvents.push({ timeMs: snippetStartMs, relativeTimeMs: 0,\n';
+        script += '                type: 0xE0, data: [0xE0 | channel, bendValue & 0x7F, bendValue >> 7] });\n';
+        script += '        }\n\n';
+
+        script += '        // CC0 message\n';
+        script += '        snippetEvents.push({ timeMs: snippetStartMs, relativeTimeMs: 0,\n';
+        script += '            type: "cc", data: [0xB0 | channel, 0x00, model.cc0] });\n\n';
+
+        script += '        // Note on\n';
+        script += '        snippetEvents.push({ timeMs: snippetStartMs, relativeTimeMs: 0,\n';
+        script += '            type: "noteOn", data: [0x90 | channel, pitch, velocity] });\n\n';
+
+        script += '        // Note off\n';
+        script += '        const noteEndMs = model.noteDurationMs;\n';
+        script += '        snippetEvents.push({ timeMs: snippetStartMs + noteEndMs, relativeTimeMs: noteEndMs,\n';
+        script += '            type: "noteOff", data: [0x80 | channel, pitch, 0] });\n\n';
+
+        script += '        // Reset pitch bend\n';
+        script += '        if (needsBend) {\n';
+        script += '            snippetEvents.push({ timeMs: snippetStartMs + noteEndMs, relativeTimeMs: noteEndMs,\n';
+        script += '                type: 0xE0, data: [0xE0 | channel, 0x00, 0x40] });\n';
+        script += '        }\n\n';
+
+        script += '        // Sort events\n';
+        script += '        const typePriority = { "cc": 0, [0xE0]: 1, "noteOn": 2, "noteOff": 3 };\n';
+        script += '        snippetEvents.sort((a, b) => {\n';
+        script += '            if (a.timeMs !== b.timeMs) return a.timeMs - b.timeMs;\n';
+        script += '            return (typePriority[a.type] ?? 2) - (typePriority[b.type] ?? 2);\n';
+        script += '        });\n\n';
+
+        script += '        const snippetEndSec = timeSec + (noteEndMs / 1000);\n\n';
+
+        script += '        // Add snippet\n';
+        script += '        const snippetData = {\n';
+        script += '            name: `BOP T${track} @${timeSec.toFixed(3)}s`,\n';
+        script += '            trackIndex: trackIndex, startSeconds: timeSec, endSeconds: snippetEndSec,\n';
+        script += '            events: snippetEvents, color: "#C0392B"\n';
+        script += '        };\n';
+        script += '        if (window.MidiSnippetDatabase) MidiSnippetDatabase.add(snippetData);\n\n';
+
+        script += '        console.log(`[${ei+1}/${events.length}] BOP @${timeSec.toFixed(3)}s pitch=${pitch}${quarterTone > 0 ? "+qt" : ""} vel=${velocity}`);\n';
+        script += '        await new Promise(r => setTimeout(r, 50));\n';
+        script += '    }\n\n';
+
+        script += '    // Finalize\n';
+        script += '    if (window.MidiController && MidiController.reloadFromDatabase) MidiController.reloadFromDatabase();\n';
+        script += '    if (window.ScoreManager) ScoreManager.markDirty();\n';
+        script += '    console.log(`Done! ${events.length} Bow Overpressure events generated.`);\n';
+        script += '})();\n';
+
+        return script;
+    }
+
+    // ============================================
+    // UI: TABS
+    // ============================================
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.output-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.output-tab').forEach(t => {
+            if ((tab === 'tsv' && t.textContent.includes('TSV')) ||
+                (tab === 'json' && t.textContent.includes('JSON')) ||
+                (tab === 'console' && t.textContent.includes('Console')))
+                t.classList.add('active');
+        });
+        renderOutput();
+    }
+
+    function copyOutput() {
+        const pre = document.getElementById('outputPre');
+        navigator.clipboard.writeText(pre.textContent).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+        });
+    }
+
+    // ============================================
+    // UI: DYNAMIC UPDATES
+    // ============================================
+    document.getElementById('instrument').addEventListener('change', function() {
+        const info = INSTRUMENT_INFO[this.value];
+        document.getElementById('rangeInfo').textContent =
+            `Pitch range: ${info.rangeLabel} | Quarter-tones enabled`;
+    });
+
+    // Velocity mode toggle
+    document.querySelectorAll('input[name="velMode"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const isWeighted = this.value === 'weighted';
+            document.getElementById('velSingleRow').classList.toggle('hidden', isWeighted);
+            document.getElementById('velWeightedRows').classList.toggle('hidden', !isWeighted);
+        });
+    });
+
+    // Start behavior toggle
+    document.querySelectorAll('input[name="startBehavior"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('startPctRow').classList.toggle('hidden', this.value !== 'percentage');
+            const labels = { event: 'First event placed exactly at Start Time.',
+                gap: 'A random gap is inserted before the first event.',
+                percentage: 'Coin flip each generation — configurable event-at-start probability.' };
+            document.getElementById('startBehaviorInfo').textContent = labels[this.value] || '';
+        });
+    });
+
+    document.getElementById('startPctSlider').addEventListener('input', function() {
+        document.getElementById('startPctLabel').textContent = this.value + '%';
+    });
+
+    // Velocity weight bars
+    ['Low', 'Medium', 'High'].forEach(name => {
+        const input = document.getElementById('velWt' + name);
+        const bar = document.getElementById('velBar' + name);
+        if (input && bar) {
+            input.addEventListener('input', updateVelBars);
+        }
+    });
+
+    function updateVelBars() {
+        const weights = {
+            Low:      parseFloat(document.getElementById('velWtLow').value) || 0,
+            Medium:   parseFloat(document.getElementById('velWtMedium').value) || 0,
+            High:     parseFloat(document.getElementById('velWtHigh').value) || 0
+        };
+        const total = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
+        const colors = { Low: '#6a6', Medium: '#cc8', High: '#c66' };
+        const parts = [];
+        for (const [name, w] of Object.entries(weights)) {
+            const pct = Math.round((w / total) * 100);
+            document.getElementById('velBar' + name).style.width = pct + '%';
+            if (w > 0) parts.push(`${name} ${pct}%`);
+        }
+        document.getElementById('velWeightInfo').textContent = 'Distribution: ' + (parts.join(' | ') || 'None');
+    }
+
+    // ============================================
+    // SETTINGS COLLECT / RESTORE
+    // ============================================
+    const STORAGE_KEY = 'bop_seqgen_autosave';
+    const PRESETS_KEY = 'bop_seqgen_presets';
+
+    function collectAllSettings() {
+        return {
+            startTime: parseFloat(document.getElementById('startTime').value) || 0,
+            endTime: parseFloat(document.getElementById('endTime').value) || 0,
+            startBehavior: document.querySelector('input[name="startBehavior"]:checked').value,
+            startPct: parseInt(document.getElementById('startPctSlider').value) || 50,
+            minGap: parseFloat(document.getElementById('minGap').value) || 0.8,
+            maxGap: parseFloat(document.getElementById('maxGap').value) || 2.5,
+            instrument: document.getElementById('instrument').value,
+            track: parseInt(document.getElementById('track').value),
+            velMode: document.querySelector('input[name="velMode"]:checked').value,
+            velSingle: document.getElementById('velSingle').value,
+            velWtLow: parseFloat(document.getElementById('velWtLow').value) || 0,
+            velWtMedium: parseFloat(document.getElementById('velWtMedium').value) || 0,
+            velWtHigh: parseFloat(document.getElementById('velWtHigh').value) || 0,
+            showGap: document.getElementById('showGap').checked
+        };
+    }
+
+    function restoreAllSettings(cfg) {
+        if (!cfg) return;
+        if (cfg.startTime != null) document.getElementById('startTime').value = cfg.startTime;
+        if (cfg.endTime != null) document.getElementById('endTime').value = cfg.endTime;
+        if (cfg.startBehavior) {
+            const radioId = cfg.startBehavior === 'gap' ? 'startGap' : cfg.startBehavior === 'percentage' ? 'startPct' : 'startEvent';
+            document.getElementById(radioId).checked = true;
+            document.getElementById(radioId).dispatchEvent(new Event('change'));
+        }
+        if (cfg.startPct != null) {
+            document.getElementById('startPctSlider').value = cfg.startPct;
+            document.getElementById('startPctLabel').textContent = cfg.startPct + '%';
+        }
+        if (cfg.minGap != null) document.getElementById('minGap').value = cfg.minGap;
+        if (cfg.maxGap != null) document.getElementById('maxGap').value = cfg.maxGap;
+        if (cfg.instrument) {
+            document.getElementById('instrument').value = cfg.instrument;
+            document.getElementById('instrument').dispatchEvent(new Event('change'));
+        }
+        if (cfg.track != null) document.getElementById('track').value = cfg.track;
+        if (cfg.velMode) {
+            document.getElementById(cfg.velMode === 'weighted' ? 'velModeWeighted' : 'velModeSingle').checked = true;
+            document.getElementById(cfg.velMode === 'weighted' ? 'velModeWeighted' : 'velModeSingle').dispatchEvent(new Event('change'));
+        }
+        if (cfg.velSingle) document.getElementById('velSingle').value = cfg.velSingle;
+        if (cfg.velWtLow != null) document.getElementById('velWtLow').value = cfg.velWtLow;
+        if (cfg.velWtMedium != null) document.getElementById('velWtMedium').value = cfg.velWtMedium;
+        if (cfg.velWtHigh != null) document.getElementById('velWtHigh').value = cfg.velWtHigh;
+        if (cfg.showGap != null) document.getElementById('showGap').checked = cfg.showGap;
+        updateVelBars();
+    }
+
+    function autoSave() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(collectAllSettings())); }
+        catch (e) { /* ignore */ }
+    }
+
+    function autoRestore() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) { restoreAllSettings(JSON.parse(saved)); return true; }
+        } catch (e) { /* ignore */ }
+        return false;
+    }
+
+    // ============================================
+    // PRESETS
+    // ============================================
+    const BUILT_IN_PRESETS = {
+        'Dense high-vel 300-330s violin T1': {
+            startTime: 300, endTime: 330, startBehavior: 'event', startPct: 50,
+            minGap: 0.5, maxGap: 1.2, instrument: 'violin', track: 1,
+            velMode: 'single', velSingle: 'high',
+            velWtLow: 30, velWtMedium: 40, velWtHigh: 30,
+            showGap: true
+        },
+        'Sparse weighted-vel 300-360s cello T4': {
+            startTime: 300, endTime: 360, startBehavior: 'gap', startPct: 50,
+            minGap: 2.0, maxGap: 5.0, instrument: 'cello', track: 4,
+            velMode: 'weighted', velSingle: 'high',
+            velWtLow: 20, velWtMedium: 40, velWtHigh: 40,
+            showGap: true
+        }
+    };
+
+    function getAllPresets() {
+        let presets = {};
+        try {
+            const stored = localStorage.getItem(PRESETS_KEY);
+            if (stored) presets = JSON.parse(stored);
+        } catch (e) { /* ignore */ }
+        return { ...BUILT_IN_PRESETS, ...presets };
+    }
+
+    function getUserPresets() {
+        try {
+            const stored = localStorage.getItem(PRESETS_KEY);
+            return stored ? JSON.parse(stored) : {};
+        } catch (e) { return {}; }
+    }
+
+    function saveUserPresets(presets) {
+        try { localStorage.setItem(PRESETS_KEY, JSON.stringify(presets)); }
+        catch (e) { /* ignore */ }
+    }
+
+    function refreshPresetDropdown() {
+        const sel = document.getElementById('presetSelect');
+        const current = sel.value;
+        sel.innerHTML = '<option value="">— Select —</option>';
+        const all = getAllPresets();
+        for (const name of Object.keys(all).sort()) {
+            const isBuiltIn = BUILT_IN_PRESETS[name] && !getUserPresets()[name];
+            sel.innerHTML += `<option value="${name}">${name}${isBuiltIn ? ' (built-in)' : ''}</option>`;
+        }
+        if (current && all[current]) sel.value = current;
+    }
+
+    function savePreset() {
+        const nameInput = document.getElementById('presetName');
+        const name = nameInput.value.trim();
+        if (!name) { alert('Enter a preset name first.'); return; }
+        const presets = getUserPresets();
+        const isOverwrite = !!presets[name];
+        presets[name] = collectAllSettings();
+        saveUserPresets(presets);
+        refreshPresetDropdown();
+        document.getElementById('presetSelect').value = name;
+        nameInput.value = '';
+        flashBtn(event.target, 'btn-flash-green', isOverwrite ? `Updated "${name}"` : `Saved "${name}"`);
+    }
+
+    function updatePreset() {
+        const name = document.getElementById('presetSelect').value;
+        if (!name) { alert('Select a preset to update first.'); return; }
+        if (BUILT_IN_PRESETS[name] && !getUserPresets()[name]) {
+            alert('Cannot overwrite a built-in preset. Use Save As instead.'); return;
+        }
+        const presets = getUserPresets();
+        presets[name] = collectAllSettings();
+        saveUserPresets(presets);
+        flashBtn(document.getElementById('updatePresetBtn'), 'btn-flash-green', `Saved "${name}"`);
+    }
+
+    function flashBtn(btn, cls, msg) {
+        if (!btn) return;
+        const orig = btn.textContent;
+        btn.classList.remove(cls);
+        void btn.offsetWidth; // force reflow
+        btn.classList.add(cls);
+        if (msg) { btn.textContent = msg; }
+        setTimeout(() => { btn.classList.remove(cls); btn.textContent = orig; }, 800);
+    }
+
+    function loadPreset() {
+        const name = document.getElementById('presetSelect').value;
+        if (!name) { alert('Select a preset first.'); return; }
+        const all = getAllPresets();
+        if (!all[name]) { alert('Preset not found.'); return; }
+        restoreAllSettings(all[name]);
+        autoSave();
+        flashBtn(event.target, 'btn-flash-blue', 'Loaded!');
+    }
+
+    function deletePreset() {
+        const name = document.getElementById('presetSelect').value;
+        if (!name) { alert('Select a preset first.'); return; }
+        if (BUILT_IN_PRESETS[name] && !getUserPresets()[name]) {
+            alert('Cannot delete a built-in preset.'); return;
+        }
+        if (!confirm(`Delete preset "${name}"?`)) return;
+        const presets = getUserPresets();
+        delete presets[name];
+        saveUserPresets(presets);
+        refreshPresetDropdown();
+    }
+
+    function exportPresets() {
+        const all = getAllPresets();
+        const blob = new Blob([JSON.stringify(all, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'bop_seqgen_presets.json'; a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function importPresets(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const imported = JSON.parse(ev.target.result);
+                const presets = getUserPresets();
+                let count = 0;
+                for (const [name, cfg] of Object.entries(imported)) {
+                    if (cfg && typeof cfg === 'object' && cfg.minGap != null) {
+                        presets[name] = cfg; count++;
+                    }
+                }
+                saveUserPresets(presets);
+                refreshPresetDropdown();
+                alert(`Imported ${count} preset(s).`);
+            } catch (e) { alert('Error reading preset file: ' + e.message); }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    function resetToDefaults() {
+        if (!confirm('Reset all settings to defaults?')) return;
+        localStorage.removeItem(STORAGE_KEY);
+        document.getElementById('startTime').value = '300.000';
+        document.getElementById('endTime').value = '330.000';
+        document.getElementById('startEvent').checked = true;
+        document.getElementById('startEvent').dispatchEvent(new Event('change'));
+        document.getElementById('startPctSlider').value = '50';
+        document.getElementById('startPctLabel').textContent = '50%';
+        document.getElementById('minGap').value = '0.800';
+        document.getElementById('maxGap').value = '2.500';
+        document.getElementById('instrument').value = 'violin';
+        document.getElementById('instrument').dispatchEvent(new Event('change'));
+        document.getElementById('track').value = '1';
+        document.getElementById('velModeSingle').checked = true;
+        document.getElementById('velModeSingle').dispatchEvent(new Event('change'));
+        document.getElementById('velSingle').value = 'high';
+        document.getElementById('velWtLow').value = '30';
+        document.getElementById('velWtMedium').value = '40';
+        document.getElementById('velWtHigh').value = '30';
+        document.getElementById('showGap').checked = true;
+        updateVelBars();
+    }
+
+    // ============================================
+    // INIT
+    // ============================================
+    function init() {
+        if (!autoRestore()) {
+            // Defaults are already in the HTML
+        }
+        updateVelBars();
+        refreshPresetDropdown();
+    }
+
+    init();
+    </script>
+</body>
+</html>
