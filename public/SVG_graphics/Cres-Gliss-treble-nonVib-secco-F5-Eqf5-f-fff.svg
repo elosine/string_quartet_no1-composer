@@ -1,120 +1,97 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    version="1.2"
-   width="19.15mm"
-   height="20.33mm"
-   viewBox="-0.4431 0.1443 10.8982 11.5715"
+   width="17.909386mm"
+   height="13.056834mm"
+   viewBox="-0.4431 0.1443 10.192171 7.4308693"
    id="svg17"
-   sodipodi:docname="Cres-Gliss-treble-E4-Dq4-f-fff.svg"
-   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs17" />
-  <sodipodi:namedview
-     id="namedview17"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:document-units="mm"
-     inkscape:zoom="14.836449"
-     inkscape:cx="36.160945"
-     inkscape:cy="38.418897"
-     inkscape:window-width="3440"
-     inkscape:window-height="1400"
-     inkscape:window-x="-12"
-     inkscape:window-y="-12"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg17" />
   <style
      type="text/css"
      id="style1"><![CDATA[
 tspan { white-space: pre; }
 ]]></style>
   <g
-     transform="translate(0.0569, 6.2127)"
+     transform="translate(-0.39329737,3.8871902)"
      id="g1">
     <line
        stroke-linejoin="round"
        stroke-linecap="round"
-       stroke-width="0.1000"
+       stroke-width="0.1"
        stroke="currentColor"
        x1="0"
-       y1="2.0000"
-       x2="6.8030"
-       y2="2.0000"
+       y1="2"
+       x2="6.803"
+       y2="2"
        id="line1" />
   </g>
   <g
-     transform="translate(0.0569, 6.2127)"
+     transform="translate(-0.39329737,3.8871902)"
      id="g2">
     <line
        stroke-linejoin="round"
        stroke-linecap="round"
-       stroke-width="0.1000"
+       stroke-width="0.1"
        stroke="currentColor"
        x1="0"
-       y1="1.0000"
-       x2="6.8030"
-       y2="1.0000"
+       y1="1"
+       x2="6.803"
+       y2="1"
        id="line2" />
   </g>
   <g
-     transform="translate(0.0569, 6.2127)"
+     transform="translate(-0.39329737,3.8871902)"
      id="g3">
     <line
        stroke-linejoin="round"
        stroke-linecap="round"
-       stroke-width="0.1000"
+       stroke-width="0.1"
        stroke="currentColor"
        x1="0"
-       y1="-0.0000"
-       x2="6.8030"
-       y2="-0.0000"
+       y1="0"
+       x2="6.803"
+       y2="0"
        id="line3" />
   </g>
   <g
-     transform="translate(0.0569, 6.2127)"
+     transform="translate(-0.39329737,3.8871902)"
      id="g4">
     <line
        stroke-linejoin="round"
        stroke-linecap="round"
-       stroke-width="0.1000"
+       stroke-width="0.1"
        stroke="currentColor"
        x1="0"
-       y1="-1.0000"
-       x2="6.8030"
-       y2="-1.0000"
+       y1="-1"
+       x2="6.803"
+       y2="-1"
        id="line4" />
   </g>
   <g
-     transform="translate(0.0569, 6.2127)"
+     transform="translate(-0.39329737,3.8871902)"
      id="g5">
     <line
        stroke-linejoin="round"
        stroke-linecap="round"
-       stroke-width="0.1000"
+       stroke-width="0.1"
        stroke="currentColor"
        x1="0"
-       y1="-2.0000"
-       x2="6.8030"
-       y2="-2.0000"
+       y1="-2"
+       x2="6.803"
+       y2="-2"
        id="line5" />
   </g>
   <a
      style="color:inherit"
-     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-E4-Dq4-f-fff.ly:112:4:5"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-F5-Eqf5-f-fff.ly:112:4:5"
      id="a6"
-     transform="translate(0,0.07222104)">
+     transform="translate(-0.45019737,-3.4024097)">
     <g
-       transform="translate(7.2056,10.7435)"
+       transform="translate(7.2056,10.5775)"
        id="g6">
       <text
          font-family="'Crimson Pro Light'"
@@ -127,31 +104,32 @@ tspan { white-space: pre; }
     </g>
   </a>
   <a
-     style="color:inherit;"
-     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-E4-Dq4-f-fff.ly:79:4:5"
-     id="a7">
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-F5-Eqf5-f-fff.ly:79:4:5"
+     id="a7"
+     transform="translate(-0.45019737,-0.76420977)">
     <g
-       transform="translate(0.5691, 6.2127)"
+       transform="translate(0.5691,4.6514)"
        id="g7">
       <line
          stroke-linejoin="round"
          stroke-linecap="round"
-         stroke-width="0.1000"
+         stroke-width="0.1"
          stroke="currentColor"
-         x1="1.4148"
-         y1="2.0663"
-         x2="4.0923"
-         y2="2.5166"
+         x1="1.4143"
+         y1="-1.931"
+         x2="3.9733"
+         y2="-1.4827"
          id="line6" />
     </g>
   </a>
   <a
      style="color:inherit"
-     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-E4-Dq4-f-fff.ly:108:4:5"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-F5-Eqf5-f-fff.ly:108:4:5"
      id="a10"
-     transform="translate(-0.30119294,0.07995)">
+     transform="translate(-0.75135523,-3.6946808)">
     <g
-       transform="translate(5.7731,10.6406)"
+       transform="translate(5.7731,10.7746)"
        id="g10">
       <g
          id="g9">
@@ -174,66 +152,68 @@ tspan { white-space: pre; }
     </g>
   </a>
   <g
-     transform="translate(4.8627, 8.7127)"
+     transform="translate(4.3947026,2.3871902)"
      id="g11">
     <path
-       transform="scale(0.0022, -0.0022)"
-       d="M113 -52c7 5 16 11 26 11c19 0 36 -15 36 -36v-42c0 -12 -6 -23 -16 -30l-46 -29v-129c0 -14 -11 -25 -25 -25s-26 11 -26 25v96c-7 -5 -16 -10 -26 -10c-19 0 -36 15 -36 36v41c0 12 6 23 16 30l46 30v136c-7 -5 -16 -11 -26 -11c-19 0 -36 15 -36 36v42 c0 12 6 23 16 30l46 29v129c0 14 12 26 26 26s25 -12 25 -26v-96c7 5 16 10 26 10c19 0 36 -15 36 -36v-41c0 -12 -6 -23 -16 -30l-46 -30v-136z"
+       transform="scale(0.0022,-0.0022)"
+       d="M 118,30 C 117,64 101,98 70,98 44,98 32,67 32,37 c 0,-55 42,-96 82,-134 3,20 5,41 5,62 v 10 z m 55,-174 c 0,-20 -12,-38 -31,-38 -30,0 -39,37 -59,57 -54,52 -128,94 -128,169 0,54 26,108 75,108 38,0 74,-17 99,-46 l -10,330 c 11,6 24,9 36,9 12,0 24,-3 35,-9 z"
        fill="currentColor"
        id="path10" />
   </g>
   <a
-     style="color:inherit;"
-     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-E4-Dq4-f-fff.ly:89:4:5"
-     id="a13">
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-F5-Eqf5-f-fff.ly:89:4:5"
+     id="a13"
+     transform="translate(-0.45019737,-3.4746307)">
     <g
-       transform="translate(1.5121, 10.5158)"
+       transform="translate(1.5121,10.3498)"
        id="g12">
       <line
          stroke-linejoin="round"
          stroke-linecap="round"
-         stroke-width="0.1000"
+         stroke-width="0.1"
          stroke="currentColor"
-         x1="0.0000"
-         y1="0.0000"
-         x2="3.6610"
-         y2="0.6500"
+         x1="0"
+         y1="0"
+         x2="3.661"
+         y2="0.64999998"
          id="line11" />
     </g>
     <g
-       transform="translate(1.5121, 10.5158)"
+       transform="translate(1.5121,10.3498)"
        id="g13">
       <line
          stroke-linejoin="round"
          stroke-linecap="round"
-         stroke-width="0.1000"
+         stroke-width="0.1"
          stroke="currentColor"
-         x1="0.0000"
-         y1="-0.0000"
-         x2="3.6610"
-         y2="-0.6500"
+         x1="0"
+         y1="0"
+         x2="3.661"
+         y2="-0.64999998"
          id="line12" />
     </g>
   </a>
   <a
-     style="color:inherit;"
-     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-E4-Dq4-f-fff.ly:75:4:5"
-     id="a14">
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-F5-Eqf5-f-fff.ly:75:4:5"
+     id="a14"
+     transform="translate(-0.45019737,-0.76420977)">
     <g
-       transform="translate(0.5569, 8.2127)"
+       transform="translate(0.5569,2.6514)"
        id="g14">
       <path
-         transform="scale(0.0032, -0.0032)"
-         d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z"
+         transform="scale(0.0032,-0.0032)"
+         d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
          fill="currentColor"
          id="path13" />
     </g>
   </a>
   <a
      style="color:inherit"
-     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-E4-Dq4-f-fff.ly:94:4:5"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-F5-Eqf5-f-fff.ly:94:4:5"
      id="a15"
-     transform="translate(0,1.8071576)">
+     transform="translate(-0.45019737,-0.76420977)">
     <g
        transform="translate(0.5569,1.7441)"
        id="g15">
@@ -249,11 +229,11 @@ tspan { white-space: pre; }
   </a>
   <a
      style="color:inherit"
-     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-E4-Dq4-f-fff.ly:85:4:5"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-F5-Eqf5-f-fff.ly:85:4:5"
      id="a16"
-     transform="translate(0,0.07995)">
+     transform="translate(-0.45019737,-3.6946808)">
     <g
-       transform="translate(0.8341,10.6406)"
+       transform="translate(0.8341,10.7746)"
        id="g16">
       <path
          transform="scale(0.0015,-0.0015)"
@@ -263,15 +243,16 @@ tspan { white-space: pre; }
     </g>
   </a>
   <a
-     style="color:inherit;"
-     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-E4-Dq4-f-fff.ly:105:4:5"
-     id="a17">
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-treble-F5-Eqf5-f-fff.ly:105:4:5"
+     id="a17"
+     transform="translate(-0.45019737,-0.76420977)">
     <g
-       transform="translate(5.3056, 8.7127)"
+       transform="translate(5.3056,3.1514)"
        id="g17">
       <path
-         transform="scale(0.0032, -0.0032)"
-         d="M212 138c59 0 113 -31 113 -95c0 -71 -52 -120 -99 -148c-34 -21 -73 -33 -113 -33c-59 0 -113 31 -113 95c0 71 53 120 100 148c34 21 72 33 112 33z"
+         transform="scale(0.0032,-0.0032)"
+         d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
          fill="currentColor"
          id="path16" />
     </g>
