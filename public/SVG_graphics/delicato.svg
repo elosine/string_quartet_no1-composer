@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="5.3390098mm"
+   height="1.3229572mm"
+   viewBox="-0.4431 0.1443 3.0384124 0.75268954"
+   id="svg23"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs23" />
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-G5-Fs5-f-fff.ly:112:4:5"
+     id="a12"
+     transform="translate(-7.6819947,-10.840634)">
+    <g
+       transform="translate(7.2056,11.7291)"
+       id="g12">
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.0998px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text11"><tspan
+           id="tspan11"
+           style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-family:'Crimson Pro';-inkscape-font-specification:'Crimson Pro Light Italic'">delicato</tspan></text>
+    </g>
+  </a>
+</svg>
