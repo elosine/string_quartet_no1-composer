@@ -377,6 +377,127 @@ scoreConfig.totalDurationSeconds = maxTime;
 
 console.log(`  Total duration: ${maxTime.toFixed(1)}s`);
 
+// ─── Step 3: Compute Layout & Timeline ──────────────────────────────────────
+
+console.log('\nStep 3: Compute layout & timeline...');
+
+// Layout parameters (from Workshop: GraphicTimeline, StaffPositions, SVGElementManager)
+const tempo = score.tempoHistory?.[0] || { bpm: 60, beatsPerPage: 8 };
+const beatsPerPage = tempo.beatsPerPage || 8;
+const beatsPerMinute = tempo.bpm || 60;
+const leadInSeconds = score.cursorState?.leadInSeconds || 2;
+const secondsPerPage = (beatsPerPage / beatsPerMinute) * 60;
+const timelineHeight = 8;  // px — matches StaffPositions.timelineHeight
+
+const layout = {
+    beatsPerPage,
+    beatsPerMinute,
+    leadInSeconds,
+    secondsPerPage,
+    timelineHeight,
+    trackCount: 4,
+    // Track Y layout: 4 equal tracks below timeline
+    // At render time: staffHeight = (scoreHeight - timelineHeight) / 4
+    // Track N Y position = timelineHeight + (N-1) * staffHeight
+    // These are ratios, not pixels, since score height varies with viewport
+    trackLayout: {
+        description: 'Y positions are computed at render time from scoreHeight',
+        formula: 'staffHeight = (scoreHeight - timelineHeight) / 4; trackY = timelineHeight + (trackIndex) * staffHeight',
+    },
+};
+
+// Pre-compute page/section/xPercent for each element
+// This matches SVGElementManager.calcPixelPosition() from the Workshop
+function calcPageLayout(refSeconds, offSeconds) {
+    let displayTime = (refSeconds || 0) + (offSeconds || 0) + leadInSeconds;
+    
+    // Clamp: if negative offset pulls element onto previous page, clamp to page start
+    if ((offSeconds || 0) < 0) {
+        const refDisplayTime = (refSeconds || 0) + leadInSeconds;
+        const refPage = Math.floor(Math.max(0, refDisplayTime) / secondsPerPage);
+        const pageStartTime = refPage * secondsPerPage;
+        if (displayTime < pageStartTime) {
+            displayTime = pageStartTime;
+        }
+    }
+    
+    const page = Math.floor(Math.max(0, displayTime) / secondsPerPage);
+    const section = page % 2 === 0 ? 'top' : 'bottom';
+    const xPercent = ((displayTime / secondsPerPage) - page) * 100;
+    
+    return { page, section, xPercent: Math.round(xPercent * 1000) / 1000 };
+}
+
+// Add layout data to each element
+for (const el of allElements) {
+    const pos = calcPageLayout(el.referenceSeconds, el.offsetSeconds);
+    el.page = pos.page;
+    el.section = pos.section;
+    el.xPercent = pos.xPercent;
+}
+
+// Add layout data to lineWedges
+for (const lw of lineWedges) {
+    const startPos = calcPageLayout(lw.startSeconds, 0);
+    const endPos = calcPageLayout(lw.endSeconds, 0);
+    lw.startPage = startPos.page;
+    lw.startSection = startPos.section;
+    lw.startXPercent = startPos.xPercent;
+    lw.endPage = endPos.page;
+    lw.endSection = endPos.section;
+    lw.endXPercent = endPos.xPercent;
+}
+
+// Add layout data to standalone curves
+for (const c of standaloneCurves) {
+    const startPos = calcPageLayout(c.startSeconds, 0);
+    const endPos = calcPageLayout(c.endSeconds, 0);
+    c.startPage = startPos.page;
+    c.startSection = startPos.section;
+    c.startXPercent = startPos.xPercent;
+    c.endPage = endPos.page;
+    c.endSection = endPos.section;
+    c.endXPercent = endPos.xPercent;
+}
+
+// Add layout data to standalone GCs
+for (const g of standaloneGCs) {
+    const pos = calcPageLayout(g.impactSeconds, 0);
+    g.page = pos.page;
+    g.section = pos.section;
+    g.xPercent = pos.xPercent;
+}
+
+// Add layout data to badges
+for (const b of badges) {
+    const pos = calcPageLayout(b.startSeconds, 0);
+    b.page = pos.page;
+    b.section = pos.section;
+    b.xPercent = pos.xPercent;
+}
+
+// Compute total page count
+const totalPages = Math.ceil((maxTime + leadInSeconds) / secondsPerPage);
+layout.totalPages = totalPages;
+
+// Build page index: which elements are on each page
+const pageIndex = {};
+for (const el of allElements) {
+    const p = el.page;
+    if (!pageIndex[p]) pageIndex[p] = [];
+    pageIndex[p].push(el.id);
+}
+
+console.log(`  Seconds per page: ${secondsPerPage}s`);
+console.log(`  Lead-in: ${leadInSeconds}s`);
+console.log(`  Total pages: ${totalPages}`);
+console.log(`  Pages with elements: ${Object.keys(pageIndex).length}`);
+
+// Spot-check: element distribution across sections
+const topCount = allElements.filter(e => e.section === 'top').length;
+const bottomCount = allElements.filter(e => e.section === 'bottom').length;
+console.log(`  Elements on top: ${topCount} | bottom: ${bottomCount}`);
+
 // ─── Assemble score_data.json ───────────────────────────────────────────────
 
 const scoreData = {
@@ -384,6 +505,8 @@ const scoreData = {
     generatedFrom: path.basename(scoreFile),
     generatedAt: new Date().toISOString(),
     config: scoreConfig,
+    layout: layout,
+    pageIndex: pageIndex,
     elements: allElements,
     lineWedges: lineWedges,
     badges: badges,
@@ -398,9 +521,9 @@ fs.writeFileSync(scoreDataPath, JSON.stringify(scoreData, null, 2));
 const scoreDataSize = fs.statSync(scoreDataPath).size;
 console.log(`\nStep 2 complete: ${scoreDataPath} (${(scoreDataSize / 1024 / 1024).toFixed(2)} MB)`);
 
-// ─── Step 3: Export SVGs ────────────────────────────────────────────────────
+// ─── Step 4: Export SVGs ────────────────────────────────────────────────────
 
-console.log('\nStep 3: Export SVG files...');
+console.log('\nStep 4: Export SVG files...');
 
 let svgExportCount = 0;
 let svgExportErrors = 0;
@@ -497,8 +620,12 @@ console.log(`  ✓ SVG export check: ${svgCountMatch ? 'PASS' : 'FAIL'} (${summa
 // Write summary
 fs.writeFileSync(path.join(outputDir, 'summary.json'), JSON.stringify(summary, null, 2));
 
+// Check: all elements have page assignments
+const allHavePages = allElements.every(e => e.page !== undefined && e.section !== undefined);
+console.log(`  ✓ Page assignment check: ${allHavePages ? 'PASS' : 'FAIL'}`);
+
 console.log(`\n═══ Pipeline Complete ═══`);
 console.log(`Output: ${outputDir}/`);
-console.log(`  score_data.json  — ${summary.scoreDataSizeMB} MB`);
+console.log(`  score_data.json  — ${summary.scoreDataSizeMB} MB (includes layout + page assignments)`);
 console.log(`  svgs/            — ${summary.counts.svgFilesExported} files`);
 console.log(`  summary.json     — validation data\n`);
