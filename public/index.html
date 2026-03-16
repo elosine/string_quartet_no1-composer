@@ -19747,12 +19747,12 @@
                         img.dataset.staffIndex = i;
                     });
                     
-                    // Append to score container (not SVG, since these are HTML img elements)
-                    const scoreContainer = document.getElementById('ScoreContainer');
-                    if (scoreContainer) {
-                        scoreContainer.appendChild(imgTop);
-                        scoreContainer.appendChild(imgBottom);
-                    }
+                    // Append to document.body (NOT ScoreContainer) so that position:fixed
+                    // works relative to the viewport. ScoreContainer may have a CSS transform
+                    // from ScoreZoom, which would make position:fixed relative to the
+                    // transformed ancestor instead, causing misplacement.
+                    document.body.appendChild(imgTop);
+                    document.body.appendChild(imgBottom);
                     
                     this.pitchDisplays.push({
                         staffIndex: i,
