@@ -1,0 +1,11 @@
+Completed
+§20 UI Layout Standards written to @C:\Users\jwloy\GitHub\string_quartet_no1-composer\docs\MIDI_MUSIC_GENERATION.md:961-1148 — includes:
+§20.1 Unified Field Order (19 standard positions based on Sustained Tone)
+§20.2 Full audit of all 7 system panels with element IDs, row order, and standard-position mapping
+§20.3 Cross-comparison summary table with ✓/⚠ deviation markers
+§20.4 Extension log for future additions
+ASB-170 Tier 1 entry added to @C:\Users\jwloy\GitHub\string_quartet_no1-composer\docs\AI_SCORE_BUILDING_PROGRESS.md:170-171 session log + Tier 1 table (lines 806–808)
+Two memories created:
+Tier 1 memory — full ASB-170 details (standard positions, deviations, decision not to update existing systems)
+Session-continuity memory — current state (ASB-170), next task (Accel/Decel feathered beam pipeline), what exists already (MIDI generation + SVG assembly engine), what's needed (UI panel, server endpoint, bundle system), and instruction to follow §20.1 field order for the new UI
+After restart, just say you want to work on the Accel/Decel pipeline and I'll pick up exactly where we left off.

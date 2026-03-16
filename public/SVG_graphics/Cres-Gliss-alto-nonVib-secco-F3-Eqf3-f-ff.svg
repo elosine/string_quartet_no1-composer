@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="16.851702mm"
+   height="14.695725mm"
+   viewBox="-0.4431 0.1443 9.5902465 8.3629068"
+   id="svg16"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs16" />
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <g
+     transform="translate(-0.3931,3.6413465)"
+     id="g1">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="2"
+       x2="6.803"
+       y2="2"
+       id="line1" />
+  </g>
+  <g
+     transform="translate(-0.3931,3.6413465)"
+     id="g2">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="1"
+       x2="6.803"
+       y2="1"
+       id="line2" />
+  </g>
+  <g
+     transform="translate(-0.3931,3.6413465)"
+     id="g3">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="0"
+       x2="6.803"
+       y2="0"
+       id="line3" />
+  </g>
+  <g
+     transform="translate(-0.3931,3.6413465)"
+     id="g4">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-1"
+       x2="6.803"
+       y2="-1"
+       id="line4" />
+  </g>
+  <g
+     transform="translate(-0.3931,3.6413465)"
+     id="g5">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-2"
+       x2="6.803"
+       y2="-2"
+       id="line5" />
+  </g>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Eqf3-f-ff.ly:112:4:5"
+     id="a6"
+     transform="translate(-1.0522939,-2.5713535)">
+    <g
+       transform="translate(7.2056,10.6786)"
+       id="g6">
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.0998px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text5"><tspan
+           id="tspan5">secco</tspan></text>
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Eqf3-f-ff.ly:79:4:5"
+     id="a7"
+     transform="translate(-0.45,-2.5713535)">
+    <g
+       transform="translate(0.5691,6.2127)"
+       id="g7">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="1.4143"
+         y1="2.069"
+         x2="3.9733"
+         y2="2.5172999"
+         id="line6" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Eqf3-f-ff.ly:108:4:5"
+     id="a9"
+     transform="translate(-1.0522939,-2.8640245)">
+    <g
+       transform="translate(5.978,10.8761)"
+       id="g9">
+      <g
+         id="g8">
+        <path
+           transform="scale(0.0015,-0.0015)"
+           d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+           fill="currentColor"
+           id="path7" />
+        <path
+           transform="matrix(0.0015,0,0,-0.0015,0.4097,0)"
+           d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+           fill="currentColor"
+           id="path8" />
+      </g>
+    </g>
+  </a>
+  <g
+     transform="translate(4.3949,6.1413465)"
+     id="g10">
+    <path
+       transform="scale(0.0022,-0.0022)"
+       d="M 118,30 C 117,64 101,98 70,98 44,98 32,67 32,37 c 0,-55 42,-96 82,-134 3,20 5,41 5,62 v 10 z m 55,-174 c 0,-20 -12,-38 -31,-38 -30,0 -39,37 -59,57 -54,52 -128,94 -128,169 0,54 26,108 75,108 38,0 74,-17 99,-46 l -10,330 c 11,6 24,9 36,9 12,0 24,-3 35,-9 z"
+       fill="currentColor"
+       id="path9" />
+  </g>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Eqf3-f-ff.ly:89:4:5"
+     id="a12"
+     transform="translate(-0.75114695,-2.6440745)">
+    <g
+       transform="translate(1.5121,10.4514)"
+       id="g11">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0"
+         y1="0"
+         x2="3.8657999"
+         y2="0.64999998"
+         id="line10" />
+    </g>
+    <g
+       transform="translate(1.5121,10.4514)"
+       id="g12">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0"
+         y1="0"
+         x2="3.8657999"
+         y2="-0.64999998"
+         id="line11" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Eqf3-f-ff.ly:75:4:5"
+     id="a13"
+     transform="translate(-0.45,-2.5713535)">
+    <g
+       transform="translate(0.5569,8.2127)"
+       id="g13">
+      <path
+         transform="scale(0.0032,-0.0032)"
+         d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
+         fill="currentColor"
+         id="path12" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Eqf3-f-ff.ly:94:4:5"
+     id="a14"
+     transform="translate(-0.75114695,-0.76447168)">
+    <g
+       transform="translate(0.5569,1.7441)"
+       id="g14">
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.0998px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text13"><tspan
+           id="tspan13">Non-Vib</tspan></text>
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Eqf3-f-ff.ly:85:4:5"
+     id="a15"
+     transform="translate(-0.75114695,-2.8640245)">
+    <g
+       transform="translate(0.8341,10.8761)"
+       id="g15">
+      <path
+         transform="scale(0.0015,-0.0015)"
+         d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+         fill="currentColor"
+         id="path14" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Gliss-alto-F3-Eqf3-f-ff.ly:105:4:5"
+     id="a16"
+     transform="translate(-0.45,-2.5713535)">
+    <g
+       transform="translate(5.3056,8.7127)"
+       id="g16">
+      <path
+         transform="scale(0.0032,-0.0032)"
+         d="m 212,138 c 59,0 113,-31 113,-95 0,-71 -52,-120 -99,-148 -34,-21 -73,-33 -113,-33 -59,0 -113,31 -113,95 0,71 53,120 100,148 34,21 72,33 112,33 z"
+         fill="currentColor"
+         id="path15" />
+    </g>
+  </a>
+</svg>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.2"
+   width="20.226654mm"
+   height="13.559969mm"
+   viewBox="-0.9104 -4.6557 11.512288 7.715662"
+   id="svg15"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs15" />
+  <style
+     type="text/css"
+     id="style1"><![CDATA[
+tspan { white-space: pre; }
+]]></style>
+  <g
+     transform="translate(-0.8604,-0.99032619)"
+     id="g1">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="2"
+       x2="5.6691999"
+       y2="2"
+       id="line1" />
+  </g>
+  <g
+     transform="translate(-0.8604,-0.99032619)"
+     id="g2">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="1"
+       x2="5.6691999"
+       y2="1"
+       id="line2" />
+  </g>
+  <g
+     transform="translate(-0.8604,-0.99032619)"
+     id="g3">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="0"
+       x2="5.6691999"
+       y2="0"
+       id="line3" />
+  </g>
+  <g
+     transform="translate(-0.8604,-0.99032619)"
+     id="g4">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-1"
+       x2="5.6691999"
+       y2="-1"
+       id="line4" />
+  </g>
+  <g
+     transform="translate(-0.8604,-0.99032619)"
+     id="g5">
+    <line
+       stroke-linejoin="round"
+       stroke-linecap="round"
+       stroke-width="0.1"
+       stroke="currentColor"
+       x1="0"
+       y1="-2"
+       x2="5.6691999"
+       y2="-2"
+       id="line5" />
+  </g>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Single-bass-Gs3-f-fff.ly:99:4:5"
+     id="a6"
+     transform="translate(-0.01375175,-9.3175052)">
+    <g
+       transform="translate(7.6218,11.9771)"
+       id="g6">
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.0998px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text5"><tspan
+           id="tspan5">secco</tspan></text>
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Single-bass-Gs3-f-fff.ly:95:4:5"
+     id="a9"
+     transform="translate(-0.3149345,-5.5043762)">
+    <g
+       transform="translate(6.2731,8.0688)"
+       id="g9">
+      <g
+         id="g8">
+        <path
+           transform="scale(0.0015,-0.0015)"
+           d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+           fill="currentColor"
+           id="path6" />
+        <path
+           transform="matrix(0.0015,0,0,-0.0015,0.4097,0)"
+           d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+           fill="currentColor"
+           id="path7" />
+        <path
+           transform="matrix(0.0015,0,0,-0.0015,0.8194,0)"
+           d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+           fill="currentColor"
+           id="path8" />
+      </g>
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Single-bass-Gs3-f-fff.ly:79:4:5"
+     id="a11"
+     transform="translate(-0.01375175,-5.2844262)">
+    <g
+       transform="translate(1.5451,7.6441)"
+       id="g10">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0"
+         y1="0"
+         x2="4.2280002"
+         y2="0.64999998"
+         id="line9" />
+    </g>
+    <g
+       transform="translate(1.5451,7.6441)"
+       id="g11">
+      <line
+         stroke-linejoin="round"
+         stroke-linecap="round"
+         stroke-width="0.1"
+         stroke="currentColor"
+         x1="0"
+         y1="0"
+         x2="4.2280002"
+         y2="-0.64999998"
+         id="line10" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Single-bass-Gs3-f-fff.ly:72:4:5"
+     id="a12"
+     transform="translate(-0.01375175,-5.2844262)">
+    <g
+       transform="translate(0.5569,2.7941)"
+       id="g12">
+      <path
+         transform="scale(0.0032,-0.0032)"
+         d="m 310,63 c 0,23 -19,40 -40,40 -4,0 -8,-1 -12,-2 C 228,93 183,63 147,40 111,17 66,-12 46,-36 39,-44 36,-53 36,-63 c 0,-23 19,-40 40,-40 4,0 8,1 12,2 30,8 75,38 111,61 36,23 81,52 101,76 7,8 10,17 10,27 z m -54,75 c 50,0 90,-22 90,-77 0,-18 -5,-37 -10,-55 -11,-38 -30,-74 -63,-96 -53,-35 -111,-48 -183,-48 -50,0 -90,22 -90,77 0,18 5,37 10,55 11,38 30,74 63,96 53,36 111,48 183,48 z"
+         fill="currentColor"
+         id="path11" />
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Single-bass-Gs3-f-fff.ly:84:4:5"
+     id="a13"
+     transform="translate(-0.01375175,-0.76668549)">
+    <g
+       transform="translate(0.5569,-3.0559)"
+       id="g13">
+      <text
+         font-family="'Crimson Pro Light'"
+         font-style="italic"
+         font-size="1.0998px"
+         text-anchor="start"
+         fill="currentColor"
+         id="text12"><tspan
+           id="tspan12">Non-Vib</tspan></text>
+    </g>
+  </a>
+  <a
+     style="color:inherit"
+     xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/Cres-Single-bass-Gs3-f-fff.ly:75:4:5"
+     id="a14"
+     transform="translate(-0.01375175,-5.5043762)">
+    <g
+       transform="translate(0.8671,8.0688)"
+       id="g14">
+      <path
+         transform="scale(0.0015,-0.0015)"
+         d="M 250,221 203,68 C 173,-31 82,-187 -15,-187 c -48,0 -87,39 -87,88 0,39 17,77 52,77 24,0 44,-19 44,-43 0,-30 -38,-25 -38,-55 0,-10 11,-11 23,-11 h 6 c 42,0 62,45 73,89 l 66,263 H 87 c -16,0 -29,13 -29,29 0,16 13,29 29,29 h 53 c 34,92 119,181 210,181 48,0 87,-40 87,-89 0,-39 -17,-77 -52,-77 -24,0 -44,20 -44,44 0,30 38,25 38,55 0,10 -10,10 -22,10 h -7 c -52,0 -68,-67 -83,-124 h 42 c 16,0 29,-13 29,-29 0,-16 -13,-29 -29,-29 z"
+         fill="currentColor"
+         id="path13" />
+    </g>
+  </a>
+  <g
+     transform="translate(-0.42415175,-2.4903262)"
+     id="g15">
+    <path
+       transform="scale(0.0022,-0.0022)"
+       d="M 52,37 C 47,35 42,33 36,33 17,33 0,49 0,69 v 41 c 0,14 9,28 22,33 l 30,13 v 144 c 0,14 11,26 25,26 14,0 26,-12 26,-26 V 176 l 69,29 v 145 c 0,14 12,25 26,25 14,0 25,-11 25,-25 V 226 c 5,2 10,4 16,4 19,0 36,-16 36,-36 v -42 c 0,-14 -9,-28 -22,-33 L 223,107 V -37 c 5,2 10,4 16,4 19,0 36,-16 36,-36 v -41 c 0,-14 -9,-28 -22,-33 l -30,-13 v -144 c 0,-14 -11,-26 -25,-26 -14,0 -26,12 -26,26 v 124 l -69,-29 v -145 c 0,-14 -12,-25 -26,-25 -14,0 -25,11 -25,25 v 124 c -5,-2 -10,-4 -16,-4 -19,0 -36,16 -36,36 v 42 c 0,14 9,28 22,33 l 30,12 z M 172,86 103,58 V -86 l 69,28 z"
+       fill="currentColor"
+       id="path14" />
+  </g>
+</svg>
