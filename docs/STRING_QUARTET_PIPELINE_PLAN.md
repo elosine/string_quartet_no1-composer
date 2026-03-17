@@ -580,3 +580,58 @@ We build the pipeline in 6 discrete steps. Each step has a clear input and outpu
 - Verify that Engraving edits persist through Performance rebuild
 - Test print PDF output quality
 - Test Scenario A (major edit) and Scenario B (minor edit) end-to-end
+
+---
+
+## 11. Engraving App v2 — Subtractive Process Notes
+
+### Key Insight
+
+The correct approach for building the Engraving version of the score is **subtractive** — start with the full Workshop HTML (`public/index.html`) and surgically remove/replace only what's needed. This preserves the exact look and feel of the score (colors, aspect ratios, lineWedge shapes, GC rendering, etc.) without having to rebuild any rendering logic.
+
+v1 (abandoned) tried to generate HTML from scratch with its own renderer — this produced wrong colors, wrong aspect ratios, wrong shapes, and many visual mismatches. v2 copies the Workshop HTML verbatim and applies minimal patches.
+
+### What Was Removed/Replaced (3 Patches in `build_engraving_app.js`)
+
+| Patch | What Was Removed | What Replaced It | Why |
+|-------|-----------------|-------------------|-----|
+| **1. socket.io** | `<script src="/socket.io/socket.io.js"></script>` — the live WebSocket connection to the Workshop server | Inline `io()` stub function that returns a fake socket object | The Engraving app has no server. The stub intercepts `scoreGoto`, `scoreGo`, `scoreStop` events and handles them locally (tracks playback time, fires event handlers). This is what makes Play/Stop/Jump To work without a server. |
+| **2. Score auto-load** | ScoreManager's server-based auto-load block (fetched latest score from Workshop server via HTTP) | `fetch('score.json')` → `distributeData()` → triggers `scoreState` event after 200ms | The Engraving app loads from a static JSON file instead of asking the server. The `scoreState` trigger after 200ms is essential — it initializes AnimationEngine and StaffCursors. |
+| **3. saveScore** | ScoreManager's `saveScore()` method that POSTed JSON to the Workshop server | Blob download — creates a JSON file and triggers browser download | Saves work as a downloaded file instead of sending to server. |
+
+### What Was Copied Alongside
+- Score JSON → `score.json` (the full score data, ~9 MB)
+- `public/midi_files/` → `midi_files/` (MIDI files referenced by the score)
+
+### What Was NOT Removed (Yet)
+The current v2 Engraving app is the **full Workshop HTML minus 3 server dependencies**. This means it still contains:
+- All composition UI panels (Sustained Tone, Vibrato, One-Shots, Crescendo, etc.)
+- All generation pipelines (SVG assembly calls, MIDI generation, LilyPond integration)
+- All bundle systems (create, drag, delete)
+- MidiModelSystem and all MIDI playback infrastructure
+- All editing tools (curve editor, GC maker, etc.)
+- All server API calls that haven't been patched (e.g., SVG assembly endpoints, LilyPond endpoints)
+- The full CSS for the dark Workshop theme
+
+### What Needs to Happen Next (Starting Tomorrow)
+
+**Phase A: Audit the Engraving app — identify what to keep vs. remove**
+1. Open the Engraving app side-by-side with the Workshop
+2. Go through every UI element and feature systematically
+3. For each feature, decide: **Keep** (needed for engraving workflow), **Remove** (composition-only), or **Re-establish** (needs a non-server equivalent)
+4. Document the decisions in a checklist
+
+**Phase B: Identify what needs re-establishing**
+Some features that are currently broken (because they call server endpoints) may need non-server equivalents if they're useful for the engraving workflow. Examples might include:
+- SVG assembly endpoints (if we want to regenerate notation in the Engraving app)
+- Any other server-dependent features that are useful for engraving
+
+**Phase C: Reverse-engineer the pipeline**
+Once we know exactly what to keep and what to remove, update `build_engraving_app.js` with additional patches:
+- Strip out composition UI panels that aren't needed
+- Strip out generation pipelines that aren't needed
+- Add light theme CSS (Patch 4 — already planned)
+- Re-establish any features that need non-server equivalents
+- The pipeline becomes: "these are the things we remove, and these are the things we re-establish"
+
+This is a deliberate, methodical process — not a rush job. Getting the audit right means the pipeline will be clean and maintainable.
