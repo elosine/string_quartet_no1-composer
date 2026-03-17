@@ -34,11 +34,11 @@ const PAGE_HEIGHT = 400;
 const TIMELINE_HEIGHT = 20;      // Top area for second ticks
 const TRACK_AREA_HEIGHT = PAGE_HEIGHT - TIMELINE_HEIGHT;
 const TRACK_HEIGHT = TRACK_AREA_HEIGHT / 4;
-const TRACK_COLORS = ['#444', '#3a3a3a', '#444', '#3a3a3a'];  // Alternating track bg
-const BG_COLOR = '#1a1a1a';
-const GRID_COLOR = '#333';
-const TICK_COLOR = '#666';
-const TICK_LABEL_COLOR = '#888';
+const TRACK_COLORS = ['#f5f5f5', '#ebebf0', '#f5f5f5', '#ebebf0'];  // Alternating track bg
+const BG_COLOR = '#ffffff';
+const GRID_COLOR = '#bbb';
+const TICK_COLOR = '#999';
+const TICK_LABEL_COLOR = '#666';
 
 // ─── Load Data ──────────────────────────────────────────────────────────────
 
@@ -125,9 +125,9 @@ const COLOR_MAP = {
 };
 
 function resolveColor(colorName) {
-    if (!colorName) return '#ffffff';
+    if (!colorName) return '#333333';
     if (colorName.startsWith('#')) return colorName;
-    return COLOR_MAP[colorName] || '#ffffff';
+    return COLOR_MAP[colorName] || '#333333';
 }
 
 // ─── Helper: Compute seconds-to-X mapping for a page ────────────────────────

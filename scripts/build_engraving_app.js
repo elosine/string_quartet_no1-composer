@@ -34,40 +34,40 @@ const html = `<!DOCTYPE html>
 <title>${title} — Engraving</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #111; color: #ccc; font-family: 'Lato', 'Helvetica Neue', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+body { background: #f0f0f0; color: #333; font-family: 'Lato', 'Helvetica Neue', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
 /* Header */
-#header { display: flex; align-items: center; gap: 16px; padding: 6px 16px; background: #1a1a1a; border-bottom: 1px solid #333; flex-shrink: 0; font-size: 13px; }
-#header h1 { font-size: 14px; font-weight: 400; color: #888; }
-#header button { padding: 4px 12px; background: #333; color: #ccc; border: 1px solid #555; border-radius: 3px; cursor: pointer; font-size: 12px; }
-#header button:hover { background: #444; }
+#header { display: flex; align-items: center; gap: 16px; padding: 6px 16px; background: #fff; border-bottom: 1px solid #ccc; flex-shrink: 0; font-size: 13px; }
+#header h1 { font-size: 14px; font-weight: 400; color: #555; }
+#header button { padding: 4px 12px; background: #e8e8e8; color: #444; border: 1px solid #bbb; border-radius: 3px; cursor: pointer; font-size: 12px; }
+#header button:hover { background: #ddd; }
 #header button.active { background: #2a6; color: #fff; border-color: #2a6; }
-#header input[type="number"] { width: 60px; padding: 3px 6px; background: #222; color: #ccc; border: 1px solid #555; border-radius: 3px; font-size: 12px; }
-#header label { color: #666; font-size: 11px; }
-#page-info { color: #666; font-size: 11px; }
+#header input[type="number"] { width: 60px; padding: 3px 6px; background: #fff; color: #333; border: 1px solid #bbb; border-radius: 3px; font-size: 12px; }
+#header label { color: #888; font-size: 11px; }
+#page-info { color: #888; font-size: 11px; }
 
 /* Score area */
 #score-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .score-panel { flex: 1; position: relative; overflow: hidden; }
 .score-panel svg { width: 100%; height: 100%; display: block; }
-#panel-divider { height: 2px; background: #333; flex-shrink: 0; }
+#panel-divider { height: 2px; background: #bbb; flex-shrink: 0; }
 
 /* Inspector */
-#inspector { position: fixed; right: 10px; top: 50px; width: 240px; background: #1e1e1e; border: 1px solid #444; border-radius: 6px; padding: 12px; font-size: 12px; display: none; z-index: 100; }
-#inspector h3 { font-size: 13px; color: #aaa; margin-bottom: 8px; font-weight: 400; }
+#inspector { position: fixed; right: 10px; top: 50px; width: 240px; background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 12px; font-size: 12px; display: none; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+#inspector h3 { font-size: 13px; color: #555; margin-bottom: 8px; font-weight: 400; }
 #inspector .field { display: flex; align-items: center; margin-bottom: 6px; }
-#inspector .field label { width: 80px; color: #666; flex-shrink: 0; }
-#inspector .field input, #inspector .field select { flex: 1; padding: 3px 6px; background: #222; color: #ccc; border: 1px solid #444; border-radius: 3px; font-size: 12px; }
+#inspector .field label { width: 80px; color: #777; flex-shrink: 0; }
+#inspector .field input, #inspector .field select { flex: 1; padding: 3px 6px; background: #fafafa; color: #333; border: 1px solid #ccc; border-radius: 3px; font-size: 12px; }
 #inspector .field input[type="range"] { padding: 0; }
-#inspector .field span { color: #888; margin-left: 6px; font-size: 11px; }
-#inspector .name { color: #999; font-size: 11px; margin-bottom: 6px; word-break: break-all; }
-#inspector .type-badge { display: inline-block; padding: 1px 6px; background: #2a4; color: #fff; border-radius: 3px; font-size: 10px; margin-bottom: 6px; }
+#inspector .field span { color: #666; margin-left: 6px; font-size: 11px; }
+#inspector .name { color: #666; font-size: 11px; margin-bottom: 6px; word-break: break-all; }
+#inspector .type-badge { display: inline-block; padding: 1px 6px; background: #2a6; color: #fff; border-radius: 3px; font-size: 10px; margin-bottom: 6px; }
 
 /* Selection highlight */
-.selected-highlight { stroke: #0af; stroke-width: 2; fill: none; pointer-events: none; }
+.selected-highlight { stroke: #07f; stroke-width: 2; fill: none; pointer-events: none; }
 
 /* Status bar */
-#status { padding: 4px 16px; background: #1a1a1a; border-top: 1px solid #333; font-size: 11px; color: #555; flex-shrink: 0; }
+#status { padding: 4px 16px; background: #fff; border-top: 1px solid #ccc; font-size: 11px; color: #888; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -129,9 +129,9 @@ let dragStartOffsetSeconds = 0;
 let dragStartOffsetYFraction = 0;
 
 const TIMELINE_HEIGHT = 20;
-const TRACK_COLORS = ['rgba(68,68,68,0.3)', 'rgba(58,58,58,0.3)', 'rgba(68,68,68,0.3)', 'rgba(58,58,58,0.3)'];
-const GRID_COLOR = '#333';
-const BG_COLOR = '#1a1a1a';
+const TRACK_COLORS = ['rgba(245,245,245,1)', 'rgba(235,235,240,1)', 'rgba(245,245,245,1)', 'rgba(235,235,240,1)'];
+const GRID_COLOR = '#bbb';
+const BG_COLOR = '#ffffff';
 
 const COLOR_MAP = {
     neonMagenta:'#ff00ff', limeGreen:'#00ff00', brightGreen:'#00ff00',
@@ -141,9 +141,9 @@ const COLOR_MAP = {
 };
 
 function resolveColor(c) {
-    if (!c) return '#ffffff';
+    if (!c) return '#333333';
     if (c.startsWith('#')) return c;
-    return COLOR_MAP[c] || '#ffffff';
+    return COLOR_MAP[c] || '#333333';
 }
 
 // ─── SVG Element Cache ──────────────────────────────────────────────────────
@@ -244,7 +244,7 @@ function renderPage(svgEl, pageNum) {
         const x = (xPct / 100) * W;
         const isFifth = sec % 5 === 0;
         const isLeadIn = sec < 0;
-        const color = isLeadIn ? '#cc3333' : '#666';
+        const color = isLeadIn ? '#cc3333' : '#999';
         
         if (isFifth) {
             const tick = document.createElementNS(ns, 'line');
@@ -257,7 +257,7 @@ function renderPage(svgEl, pageNum) {
             label.setAttribute('x', x); label.setAttribute('y', 14);
             label.setAttribute('font-family', 'Lato, sans-serif');
             label.setAttribute('font-size', '9');
-            label.setAttribute('fill', '#888');
+            label.setAttribute('fill', '#666');
             label.setAttribute('text-anchor', xPct < 3 ? 'start' : (xPct > 97 ? 'end' : 'middle'));
             label.textContent = sec;
             svgEl.appendChild(label);
