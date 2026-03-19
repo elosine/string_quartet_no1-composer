@@ -2795,6 +2795,58 @@ If a bug or issue resists debugging after 30+ minutes of focused effort:
 4. **The plan is a guide, not a prison.** If real-world experience during implementation reveals that the order should change, log the change and adjust. But do it deliberately, not accidentally.
 5. **Prefer minimal fixes over large refactors.** If a 3-line change solves the problem, don't rewrite the module. The codebase is already working — preserve that.
 
+#### 13.2.6 Phase Completion Post-Mortem Protocol
+
+**After every phase passes its completion checkpoint, perform this post-mortem before committing.** This protocol was established during Phase 1 and captures lessons learned about what to review and document at each phase boundary.
+
+**Step A: Human Verbal Audit**
+Walk through every step and bullet point in the phase plan. For each:
+- Did we fully address it? If not, what's missing?
+- Did the human visual test pass? Note any caveats.
+- Record the audit results (pass/fail/partial per step).
+
+**Step B: AI Audit**
+AI independently verifies each step's bullet points:
+- Run automated checks (console errors, element counts, asset presence, fetch calls)
+- Verify stubs cover all unguarded references to stripped systems
+- Verify no unintended code paths can trigger errors
+- Report findings with specifics (counts, line numbers, file names)
+
+**Step C: Post-Mortem Pass 1 — Capture (Tier 1 memories)**
+Create memories documenting:
+- Build script architecture (patches, strips, stubs, assets)
+- Every bug encountered: symptom, root cause, fix, lesson learned
+- Key design decisions and why they were made
+
+**Step D: Post-Mortem Pass 2 — Future Impacts**
+Review all bugs and discoveries for impact on future phases:
+- What did we learn that changes assumptions in later phases?
+- Are there entanglements or dependencies we now understand better?
+- Are there process improvements needed (e.g., automated asset audit)?
+- Flag any findings that contradict or require updates to the plan.
+
+**Step E: Post-Mortem Pass 3 — Repeatability**
+Document what's needed if this phase must be re-run (e.g., score changes requiring reconversion):
+- Step-by-step rebuild instructions
+- Visual audit checklist for human verification
+- Known gotchas and what to watch for
+- Conditions that would require build script updates
+
+**Step F: Troubleshooting Review**
+Compare actual debugging process against §13.2.1–§13.2.4:
+- Did we follow severity assessment correctly?
+- Did we fix at root cause or apply workarounds?
+- Did we create minimal test cases when appropriate?
+- Were diagnostic logs effective?
+- Note any process improvements for future debugging.
+
+**Step G: Documentation & Commit**
+- Update Known Issues table with any open items
+- Remove diagnostic/temporary code (e.g., playback diagnostic intervals)
+- Commit: `[Phase N] Description — stripped, verified`
+- Tag: `git tag phase-N-complete`
+- Update progress file / decision log if maintained
+
 ### 13.3 Testing Strategy
 
 #### 13.3.1 Testing Types
@@ -3568,6 +3620,47 @@ Phase 1: Foundation ────────────────────
 
 ---
 
+#### Phase 15: Composition & Performance Notes
+**Depends on:** Phase 14 (website infrastructure), but content authoring can begin anytime
+**Est. sessions:** 1–2
+**Risk level:** Low — static content generation, no complex interactivity
+
+**Goal:** The composer writes composition and performance notes (program notes, performance instructions, technical explanations, interpretive guidance). These are made available through the website as both an HTML page (viewable inline) and a downloadable/printable PDF.
+
+**Step 15.1: Author notes content**
+- Create a Markdown source file: `docs/PERFORMANCE_NOTES.md`
+- Sections might include: Program Notes, Performance Instructions, Notation Guide (explaining graphic score symbols), Technical Requirements, Synchronization Setup Guide, Performer Tips
+- Content is written/edited by the composer over time — this step is ongoing
+- 🤖 *AI Test:* Markdown file exists, is well-structured, renders correctly
+
+**Step 15.2: Generate HTML page from notes**
+- Create `scripts/generate_notes_html.js` — converts Markdown → styled HTML page
+- Use a Markdown parser (e.g. `marked`) with a clean, printable stylesheet
+- Output: `builds/performance/notes.html` (or served from website route `/notes`)
+- Include navigation back to the score app
+- 🤖→👁️ *AI verifies HTML renders correctly → Human confirms content reads well, styling is professional*
+
+**Step 15.3: Generate downloadable PDF**
+- Option A: Use Puppeteer to capture the HTML page as PDF (reuse from Phase 4 infrastructure)
+- Option B: Use a Markdown-to-PDF library (e.g. `md-to-pdf`)
+- Output: `builds/performance/notes.pdf` (or served from `/notes.pdf`)
+- Ensure print-friendly layout: page breaks, headers/footers, page numbers
+- 🤖→👁️ *AI verifies PDF generates without errors → Human confirms print layout, readability*
+
+**Step 15.4: Integrate with website**
+- Add "Notes" link/button to the Performance Score app UI (accessible from the right panel or a top nav)
+- Add route on server: `/notes` serves HTML, `/notes.pdf` serves PDF download
+- Optional: embed notes as a collapsible panel within the score app itself
+- 🤖→👁️ *AI verifies links work → Human confirms navigation flow is intuitive*
+
+**Phase 15 Completion Checkpoint:**
+- 🤖 Notes HTML and PDF generate from Markdown source without errors
+- 👁️ **Human verification:** Notes content is complete, well-formatted, and accessible from the website. PDF prints correctly.
+- Commit: `[Phase 15] Composition & Performance Notes — HTML + PDF`
+- Tag: `git tag phase-15-complete`
+
+---
+
 ### 13.5 Phase Summary Table
 
 | Phase | Name | Sessions | Depends On | Key Risk | Testing |
@@ -3586,7 +3679,8 @@ Phase 1: Foundation ────────────────────
 | **12** | Part View Enhancements | 1–2 | 3,8 | Layout math at different scales | 🤖→👁️ |
 | **13** | Sync+Animation Tier 3 | 2–3 | 10 | Subtle timing improvements | 🤖→👁️ |
 | **14** | Website & Production | 3–5 | 1-11 | Infrastructure / networking | 🤖→👁️ |
-| | **TOTAL** | **~32–48** | | | |
+| **15** | Composition & Performance Notes | 1–2 | 14 (content anytime) | Minimal — static content | 🤖→👁️ |
+| | **TOTAL** | **~33–50** | | | |
 
 ### 13.6 Milestone Gates
 
