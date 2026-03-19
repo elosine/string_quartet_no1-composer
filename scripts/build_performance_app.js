@@ -526,6 +526,130 @@ replaceOnce(
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// PHASE 2 OPTIMIZATIONS: Canvas overlay + badge freeze + CSS containment
+// ═══════════════════════════════════════════════════════════════════════════════
+
+console.log('\n  --- Phase 2: Animation Optimizations ---');
+
+// ─── O1: CSS containment on score SVGs ──────────────────────────────────────
+replaceOnce(
+    '            position: relative;\n        }\n        #ScoreBottom {',
+    '            position: relative;\n            contain: layout style paint;\n        }\n        #ScoreBottom {',
+    'O1a: CSS containment on ScoreTop'
+);
+replaceOnce(
+    '            position: relative;\n        }\n        h1 {',
+    '            position: relative;\n            contain: layout style paint;\n        }\n        h1 {',
+    'O1b: CSS containment on ScoreBottom'
+);
+
+// ─── O2: Badge freeze — static transforms instead of <animateTransform> ────
+stripBetween(
+    'for (let i = 0; i < M.BOID_COUNT; i++) {\n                    const outer = document.createElementNS(ns, \'g\');\n                    const at = document.createElementNS(ns, \'animateTransform\');',
+    'g.appendChild(flock);',
+    'O2: Badge animateTransform loop'
+);
+const badgeFreeze = [
+    '                // Performance Score: static snapshot at middle frame (no animateTransform)',
+    '                const snapFrame = Math.floor(M.FRAMES / 2);',
+    '                for (let i = 0; i < M.BOID_COUNT; i++) {',
+    '                    const snap = data[i][snapFrame];',
+    '                    const outer = document.createElementNS(ns, \'g\');',
+    '                    outer.setAttribute(\'transform\', `translate(${snap.x.toFixed(1)} ${snap.y.toFixed(1)})`);',
+    '                    const inner = document.createElementNS(ns, \'g\');',
+    '                    inner.setAttribute(\'transform\', `rotate(${snap.a.toFixed(0)})`);',
+    '                    const tri = document.createElementNS(ns, \'path\');',
+    '                    tri.setAttribute(\'d\', triD);',
+    '                    tri.setAttribute(\'fill\', M.BOID_CLR);',
+    '                    inner.appendChild(tri);',
+    '                    outer.appendChild(inner);',
+    '                    flock.appendChild(outer);',
+    '                }',
+    '                '
+].join('\n');
+replaceOnce('g.appendChild(flock);', badgeFreeze + 'g.appendChild(flock);', 'O2: Badge freeze insert');
+
+// ─── O3a: StaffCursors init — add canvas overlay creation ──────────────────
+replaceOnce(
+    'this.createStaffHeaders();\n                \n                // Listen for score state from server',
+    'this.createStaffHeaders();\n                \n                // Create canvas overlays (Phase 2)\n                this._createCanvasOverlays();\n                \n                // Listen for score state from server',
+    'O3a: Canvas overlay init call'
+);
+replaceOnce(
+    'this.updateCursorDimensions();\n                    this.updateStaffHeaders();\n                    // DISABLED: this.updateMotiveContainerWidths();\n                });',
+    'this.updateCursorDimensions();\n                    this.updateStaffHeaders();\n                    this._resizeCanvases();\n                });',
+    'O3a2: Resize handler'
+);
+
+// ─── O5: LW re-append cleanup ──────────────────────────────────────────────
+replaceOnce(
+    '                // Re-append LW meter groups so they render on top of line-wedge elements\n                if (window.StaffCursors && StaffCursors.cursors) {\n                    for (const cursor of StaffCursors.cursors) {\n                        if (cursor.lwMeterTop && cursor.lwMeterTop.group) {\n                            this.scoreTopEl.appendChild(cursor.lwMeterTop.group);\n                        }\n                        if (cursor.lwMeterBottom && cursor.lwMeterBottom.group) {\n                            this.scoreBottomEl.appendChild(cursor.lwMeterBottom.group);\n                        }\n                    }\n                }',
+    '                // LW meters now drawn on canvas overlay — no SVG re-append needed',
+    'O5: LW re-append cleanup'
+);
+
+// ─── AE1: Add subscriber pattern to AnimationEngine (§12.8 item 2c) ────────
+replaceOnce(
+    'onDraw: null,              // Called each frame for rendering',
+    'onDraw: null,              // Called each frame for rendering\n            \n            // Phase 2: Subscriber pattern for animation hooks (§12.8 2c)\n            subscribers: [],\n            subscribe(name, fn, priority = 0) {\n                this.subscribers.push({ name, fn, priority });\n                this.subscribers.sort((a, b) => a.priority - b.priority);\n            },',
+    'AE1: Subscriber pattern on AnimationEngine'
+);
+
+// ─── AE2: Remove frame quantization — continuous time (§12.8 item 1a) ───────
+stripBetween(
+    '// Main animation loop\n            loop(timestamp) {',
+    '            // Get current frame number',
+    'AE2: Strip old frame-quantized loop'
+);
+const newLoop = [
+    '// Main animation loop (Phase 2: continuous time, no frame quantization)',
+    '            loop(timestamp) {',
+    '                if (!this.running) return;',
+    '                const elapsedMs = ClockSync.now() - this.startTime;',
+    '                // Phase 2: Always draw — continuous time, subscriber pattern',
+    '                if (this.onUpdate) this.onUpdate(elapsedMs);',
+    '                if (this.onDraw) this.onDraw(elapsedMs);',
+    '                for (const sub of this.subscribers) sub.fn(elapsedMs);',
+    '                requestAnimationFrame((ts) => this.loop(ts));',
+    '            },',
+    '            ',
+    '            '
+].join('\n');
+replaceOnce(
+    '            // Get current frame number',
+    newLoop + '// Get current frame number',
+    'AE2: Insert continuous-time loop'
+);
+
+// ─── AE3: Convert hook-chain wrappers to subscriber calls (§12.8 item 2c) ──
+replaceOnce(
+    '// Hook into AnimationEngine\n                const originalOnDraw = AnimationEngine.onDraw;\n                AnimationEngine.onDraw = (frameNumber, elapsedMs) => {\n                    if (originalOnDraw) originalOnDraw(frameNumber, elapsedMs);\n                    this.update();\n                };',
+    '// Hook into AnimationEngine (Phase 2: subscriber pattern)\n                AnimationEngine.subscribe(\'StaffCursors\', () => this.update(), 0);',
+    'AE3a: StaffCursors → subscriber'
+);
+replaceOnce(
+    '// Hook into animation for updates\n                const originalOnDraw = AnimationEngine.onDraw;\n                AnimationEngine.onDraw = (frameNumber, elapsedMs) => {\n                    if (originalOnDraw) originalOnDraw(frameNumber, elapsedMs);\n                    this.update();\n                };',
+    '// Hook into animation for updates (Phase 2: subscriber pattern)\n                AnimationEngine.subscribe(\'StaffPositions\', () => this.update(), 5);',
+    'AE3b: StaffPositions → subscriber'
+);
+replaceOnce(
+    '// Hook into animation to check for page changes\n                const originalOnDraw = AnimationEngine.onDraw;\n                AnimationEngine.onDraw = (frameNumber, elapsedMs) => {\n                    if (originalOnDraw) originalOnDraw(frameNumber, elapsedMs);\n                    this.checkPageChange();\n                };',
+    '// Hook into animation to check for page changes (Phase 2: subscriber pattern)\n                AnimationEngine.subscribe(\'GraphicTimeline\', () => this.checkPageChange(), 10);',
+    'AE3c: GraphicTimeline → subscriber'
+);
+
+// ─── O3b, O3c, O4: Large method replacements loaded from patch file ────────
+const patchFile = path.join(__dirname, 'performance_canvas_patches.js');
+if (fs.existsSync(patchFile)) {
+    const applyCanvasPatches = require(patchFile);
+    html = applyCanvasPatches(html);
+    console.log('  ✓ Loaded canvas overlay patches from performance_canvas_patches.js');
+} else {
+    console.log('  ⚠ performance_canvas_patches.js not found — skipping O3b/O3c/O4');
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // WRITE OUTPUT FILES
 // ═══════════════════════════════════════════════════════════════════════════════
 

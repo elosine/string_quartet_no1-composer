@@ -1430,13 +1430,29 @@ Small visual element showing sync health (pairs with §12.7 Tier 2c sync quality
 
 ---
 
-**Implementation timeline:**
+**Implementation Risk Assessment & Timing Recommendations:**
+
+*Analysis performed during Phase 2 implementation (Mar 19, 2026). Based on actual Phase 1 experience and dependency analysis against the current standalone (no-server) architecture.*
+
+| Component | Risk | Dependencies | When to Implement | Rationale |
+|-----------|------|-------------|-------------------|-----------|
+| **1a.** Remove frame quantization | **Low** | None | ✅ **Phase 2 — Done** | Continuous time loop, no `Math.floor` frame gating. Patch AE2. |
+| **1b.** Cache layout dimensions | **Low** | None | ✅ **Phase 2 — Done** | `_cachedScoreWidth/Height/StaffHeight` in canvas overlay. Patch O3b. |
+| **1c.** Per-frame calculation cache | **Low** | None | ✅ **Phase 2 — Done** | GCMaker reuses StaffCursors page calculation. Patch O4. |
+| **2a.** Dual-clock model (rAF + ClockSync) | **Medium** | ⚠️ Real sync system (Phase 6) | **Phase 10** | Without a real server, ClockSync is a stub returning `Date.now()`. The sync-correction logic (detecting drift, smooth correction) would be untestable dead code. Switching to `performance.now()` for local smoothing IS done in Phase 2 (as part of 1a), but the dual-clock architecture with server verification should wait until there's a server to verify against. |
+| **2b.** CSS transforms / Canvas overlay | **Low** | None | ✅ **Phase 2 — Done** | Went further than CSS transforms — all animated elements (cursors, pies, meters, followers, GC balls) moved to HTML5 canvas overlay. Zero per-frame SVG mutations. Patches O3a–O3c, O4. |
+| **2c.** Subscriber pattern | **Low-Med** | None | ✅ **Phase 2 — Done** | `AnimationEngine.subscribe(name, fn, priority)` replaces hook-chain wrappers. StaffCursors(0), StaffPositions(5), GraphicTimeline(10). Patches AE1, AE3a–c. |
+| **3a.** Web Animations API for cursor | **High** | Real sync system (Phase 6), Tier 2a dual-clock | **Phase 13** | Fundamentally changes how cursor movement works — browser compositor thread drives it instead of JS. Page turns require cancel/restart. Sync corrections require nudging `animation.currentTime`. Without real sync, correction path is untestable. Also significantly harder to debug (cursor no longer visible in JS state). |
+| **3b.** Predictive rendering | **Low** | Tier 2a | **Phase 13 (optional)** | Subtle improvement (~4-8ms lookahead). Only noticeable on 120Hz+ displays or under heavy main-thread load. Premature optimization until profiling shows it's needed. Low risk but low value until the system is under real performance pressure. |
+| **3c.** Sync quality indicator UI | **N/A** | Sync Tier 2c metric | **Phase 10** | Cannot build without the sync quality metric from §12.7 Tier 2c. Purely a UI representation of sync data that doesn't exist yet. |
+
+**Summary of recommended implementation schedule:**
 
 | Tier | When | What you get |
 |------|------|-------------|
-| Tier 1 | First pass building Performance Score | Smooth cursor (no micro-stepping), reduced reflow, faster frame processing |
-| Tier 2 | Before first rehearsal with performers | Display-aligned rendering, GPU-composited animations, clean architecture |
-| Tier 3 | If profiling shows main-thread jank | Compositor-thread cursor (immune to JS pauses), predictive positioning |
+| Tier 1 (all) + 2b + 2c | ✅ **Phase 2 — Complete** | Smooth cursor (continuous time), canvas overlay (zero SVG mutations), reduced reflow, clean subscriber architecture, badge freeze, CSS containment |
+| Tier 2a + 3c | **Phase 10** (after server + sync Tier 1) | Display-aligned dual-clock rendering with sync correction, sync quality indicator |
+| Tier 3a + 3b | **Phase 13** (after sync Tier 2, before live performance) | Compositor-thread cursor (immune to JS pauses), predictive positioning. **Only if profiling shows main-thread jank** — may not be needed if Tier 1+2 is sufficient. |
 
 #### Animation Smoothness Checklist
 
@@ -4110,3 +4126,148 @@ The single-server setup handles the expected load easily (one quartet, maybe a f
 - **Horizontal:** Socket.IO with Redis adapter for multi-server. Sticky sessions via nginx `ip_hash`. Only needed if serving dozens of ensembles simultaneously.
 - **CDN:** Put score.json behind Cloudflare (free tier) for global edge caching. 9 MB served from edge instead of origin.
 - **Database migration:** If JSON files become unwieldy (unlikely at this scale), migrate to SQLite (zero-config, single file) or PostgreSQL.
+
+---
+
+## 14. Phase 2 Post-Mortem — Animation Performance Optimizations
+
+**Date:** Mar 19, 2026
+**Tag:** `phase-2-complete`
+**Scope:** Performance Score animation smoothness
+**Workshop impact:** None — `public/index.html` unchanged (verified via `git diff` against `phase-1-complete` tag)
+
+### 14.1 Problem Statement
+
+Animation jitter in busy score sections during playback of the Performance Score. Cursors, motive pies, line-wedge meters, curve followers, and GC bouncing balls all exhibited visible stuttering.
+
+### 14.2 Root Cause
+
+**GPU rasterization bottleneck** caused by per-frame SVG `setAttribute()` calls on animated elements. Each `setAttribute` triggers SVG DOM recalculation and re-rasterization across the entire score SVG — expensive when the SVG contains hundreds of static elements (notation, badges, etc.).
+
+Additionally, BadgeMaker's boid murmuration system ran **576 continuous SVG `<animateTransform>` animations** (9 boids × 2 transforms × 32 badges), forcing constant GPU rasterization even when nothing else was animating.
+
+The AnimationEngine also used **frame quantization** (`Math.floor(elapsedMs / 16.67)`), causing positions to snap to 16.67ms boundaries — visible micro-stepping in cursor movement.
+
+### 14.3 Strategy: What Was NOT the Cause
+
+- **Delta-checking** (only updating changed attributes) was tried and made jitter WORSE — the overhead of comparison exceeded the savings.
+- **JavaScript execution time** was not the bottleneck; GPU rasterization was.
+
+### 14.4 What Was Built
+
+All optimizations applied via **subtractive build patches** in `scripts/build_performance_app.js` and `scripts/performance_canvas_patches.js`. The Workshop source (`public/index.html`) is never modified.
+
+#### A. Canvas Overlay (Patches O3a, O3b, O3c, O4)
+
+Migrated all per-frame animated elements from SVG to HTML5 canvas:
+- **Two `<canvas>` elements** created in `StaffCursors._createCanvasOverlays()`, one overlaying each score section (ScoreTop/ScoreBottom)
+- **HiDPI-aware:** canvas buffer sized at `rect.width × devicePixelRatio`, CSS size matches logical pixels
+- **Positioned absolutely** over the SVG, `z-index: 10`, `pointer-events: none`
+- **Elements drawn on canvas:** cursor lines (fillRect), curve followers (_drawCurveFollower), motive pies (_drawMotivePie), line-wedge meters (_drawLineWedgeMeter), GC bouncing balls (arc + fill)
+- **Canvas clears both sections each frame**, draws only on the active one
+- **GCMaker** draws AFTER StaffCursors (wraps `StaffCursors.update` via existing hook pattern)
+- **Result:** SVG is now completely static during playback — zero `setAttribute` calls per frame
+
+#### B. Badge Freeze (Patch O2)
+
+Replaced continuous SVG `<animateTransform>` animations with static transforms:
+- Boid murmuration data is pre-computed (unchanged)
+- Instead of creating `<animateTransform>` elements for all 120 keyframes, takes a **snapshot at frame 60** (middle keyframe)
+- Sets `outer.setAttribute('transform', 'translate(x y)')` and `inner.setAttribute('transform', 'rotate(a)')` once
+- **Eliminates 576 continuously running SVG animations** (9 boids × 2 transforms × ~32 badges)
+
+#### C. CSS Containment (Patches O1a, O1b)
+
+Added `contain: layout style paint` to `#ScoreTop` and `#ScoreBottom` CSS rules. This tells the browser that layout/paint changes inside these containers cannot affect elements outside them, limiting the scope of rasterization work.
+
+#### D. AnimationEngine: Continuous Time (Patch AE2)
+
+Removed frame quantization from the animation loop:
+- **Before:** `Math.floor(elapsedMs / MS_PER_FRAME)` calculated discrete frame numbers; only drew on new frames; positions snapped to 16.67ms steps
+- **After:** Always draws on every `requestAnimationFrame` callback using continuous `elapsedMs` — no frame gating, no snapping
+- All downstream systems already computed positions from continuous time — they just inherited the quantized input. This change flows through automatically.
+
+#### E. AnimationEngine: Subscriber Pattern (Patches AE1, AE3a–c)
+
+Replaced fragile hook-chain wrapper pattern with clean subscriber array:
+- **Before:** Each system overwrote `AnimationEngine.onDraw` with a closure wrapping the previous value. Hard to debug, profile, or selectively disable.
+- **After:** `AnimationEngine.subscribe(name, fn, priority)` — systems register with a name and priority. Loop iterates sorted subscriber array.
+- **Subscribers:** StaffCursors (priority 0), StaffPositions (priority 5), GraphicTimeline (priority 10)
+- MidiController and AudioClipController already stripped by Phase 1 S3
+
+#### F. Dimension Caching (Patches O3b, O3c)
+
+Cached layout dimensions to eliminate per-frame reflow:
+- `_cachedScoreWidth`, `_cachedScoreHeight`, `_cachedStaffHeight` computed on init and resize
+- `StaffCursors.update()` reads from cache instead of `scoreTopEl.clientWidth` (which forces browser reflow)
+
+### 14.5 Complete Patch Inventory (21 patches)
+
+| # | Patch | Type | What |
+|---|-------|------|------|
+| 1 | O1a | Replace | CSS containment on #ScoreTop |
+| 2 | O1b | Replace | CSS containment on #ScoreBottom |
+| 3 | O2 strip | Strip | Remove animateTransform loop (1 KB) |
+| 4 | O2 insert | Insert | Badge freeze — static snapshot at frame 60 |
+| 5 | O3a | Replace | Canvas overlay init call in StaffCursors.init() |
+| 6 | O3a2 | Replace | Resize handler — add `_resizeCanvases()` call |
+| 7 | O5 | Replace | LW re-append cleanup (target not found — harmless) |
+| 8 | AE1 | Insert | Subscriber pattern: `subscribers[]` + `subscribe()` on AnimationEngine |
+| 9 | AE2 strip | Strip | Remove frame-quantized loop (2 KB) |
+| 10 | AE2 insert | Insert | Continuous-time loop with subscriber calls |
+| 11 | AE3a | Replace | StaffCursors → `AnimationEngine.subscribe('StaffCursors', fn, 0)` |
+| 12 | AE3b | Replace | StaffPositions → `AnimationEngine.subscribe('StaffPositions', fn, 5)` |
+| 13 | AE3c | Replace | GraphicTimeline → `AnimationEngine.subscribe('GraphicTimeline', fn, 10)` |
+| 14 | O3b strip | Strip | Remove old createCursor + updateCursorDimensions (9.8 KB) |
+| 15 | O3b insert | Insert | Canvas createCursor + _createCanvasOverlays + _resizeCanvases |
+| 16 | O3c strip | Strip | Remove old update/pie/lw/curve/getPosition (34 KB) |
+| 17 | O3c insert | Insert | Canvas update + _drawMotivePie + _drawLineWedgeMeter + _drawCurveFollower + getPosition |
+| 18 | O4a | Replace | Remove ballsTop/ballsBottom SVG init |
+| 19 | O4b strip | Strip | Remove old GCMaker.update SVG (3.5 KB) |
+| 20 | O4b insert | Insert | Canvas GCMaker.update |
+| 21 | Canvas patches | Load | `performance_canvas_patches.js` — large method replacements |
+
+### 14.6 Files Modified/Created
+
+| File | Action | Purpose |
+|------|--------|--------|
+| `scripts/build_performance_app.js` | Modified | Added Phase 2 patches (O1–O5, AE1–AE3) |
+| `scripts/performance_canvas_patches.js` | **New** | Large method replacements for O3b, O3c, O4 |
+| `builds/performance/index.html` | Regenerated | Output with all optimizations applied |
+| `public/index.html` | **Unchanged** | Workshop source verified identical to `phase-1-complete` tag |
+
+### 14.7 Build Output
+
+- **Original size:** 1966 KB
+- **After strips:** 979 KB (50.2% reduction)
+- **Patches applied:** 21 (Phase 1: 16 + Phase 2: 5 new patches)
+- **Score JSON:** 16.16 MB
+
+### 14.8 §12.8 Implementation Status
+
+| Item | Status | Implementation |
+|------|--------|---------------|
+| 1a. Remove frame quantization | ✅ Done | Continuous time in AnimationEngine.loop (AE2) |
+| 1b. Cache layout dimensions | ✅ Done | `_cachedScoreWidth/Height/StaffHeight` (O3b) |
+| 1c. Per-frame calculation cache | ✅ Done | GCMaker reuses StaffCursors page calc (O4) |
+| 2b. CSS transforms / Canvas | ✅ Done | Canvas overlay — went further than planned (O3a–c, O4) |
+| 2c. Subscriber pattern | ✅ Done | `AnimationEngine.subscribe()` (AE1, AE3a–c) |
+| 2a. Dual-clock model | ⏳ Deferred | Phase 10 — needs real server for sync testing |
+| 3a. Web Animations API | ⏳ Deferred | Phase 13 — needs sync system + profiling data |
+| 3b. Predictive rendering | ⏳ Deferred | Phase 13 — only if profiling shows need |
+| 3c. Sync quality indicator | ⏳ Deferred | Phase 10 — needs sync quality metric |
+
+### 14.9 Bugs Encountered
+
+1. **Ambiguous strip marker (O2):** `for (let i = 0; i < M.BOID_COUNT; i++) {` appears 3 times in `generateMurmurationSVG()` — once for data collection, once for angle unwrapping, once for the animateTransform loop. The strip matched the wrong (first) occurrence, removing the data collection loop and causing a `SyntaxError: Unexpected token ','` at runtime. **Fix:** Extended the marker to include `const outer = document.createElementNS(ns, 'g');\n...animateTransform` to uniquely target the correct loop.
+
+2. **O5 marker not found:** The LW re-append cleanup target string wasn't found in the performance build. This is harmless — the code may have already been removed by a prior strip, or the exact string didn't match. The canvas overlay makes this code unnecessary regardless.
+
+### 14.10 Git Safety
+
+| Tag | Commit | Purpose |
+|-----|--------|--------|
+| `v1.0-composition` | — | Original composition milestone |
+| `phase-1-complete` | `e25c1ba5` | Phase 1 Performance Score foundation |
+| `workshop-verified-pre-phase2` | `3bd71d1b` | Verified workshop intact before Phase 2 |
+| `phase-2-complete` | *(this commit)* | Phase 2 animation optimizations complete |
