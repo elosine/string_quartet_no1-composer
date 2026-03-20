@@ -2243,22 +2243,102 @@ If a performer wants larger notation (e.g., for readability on a smaller iPad), 
 
 **The fallback — maintaining same look/feel as master score — is always available** since Option 1 (same layout, filter only) is the default. Rescaling is an additive feature, not a replacement.
 
-#### 12.13.6 Pages-Per-View in Part Mode
+#### 12.13.6 Multi-Page Parts View — Detailed Analysis
 
-In the full score, the performer sees 2 pages at a time (ScoreTop + ScoreBottom). In a single-track expanded view, the notation is 4× larger, so the performer effectively sees the equivalent detail but only for one track.
+##### Why Multi-Page Works
 
-An alternative: in part view, show **more pages** simultaneously by stacking them vertically:
+In full-score mode, each section's vertical space is divided by 4 tracks. Removing 3 tracks frees 75% of vertical space. Instead of wasting it on one enormous track, **repurpose it as additional page rows** — each row shows one page (8 seconds) for the single track:
 
 ```
-Full score: 2 pages visible (top + bottom), 4 tracks each
-Part view option A: 2 pages visible, 1 track expanded to full height
-Part view option B: 4 pages visible (2×2 grid), 1 track at 2× height
-Part view option C: 6 pages visible (3×2 grid), 1 track at ~1.3× height
+Current full score (2 pages visible):          Parts mode (6 pages visible):
+┌──────────────────────────────────┐           ┌──────────────────────────────────┐
+│ Page 0 (ScoreTop)                │           │ Row 1: Page 0  → cursor here →   │ 1 track
+│  Vln I  ──────────────────────── │           ├──────────────────────────────────┤
+│  Vln II ──────────────────────── │ 4 tracks  │ Row 2: Page 1  →                 │ 1 track
+│  Viola  ──────────────────────── │           ├──────────────────────────────────┤
+│  Cello  ──────────────────────── │           │ Row 3: Page 2  →                 │ 1 track
+├──────────────────────────────────┤           ├──────────────────────────────────┤
+│ Page 1 (ScoreBottom)             │           │ Row 4: Page 3  →                 │ 1 track
+│  Vln I  ──────────────────────── │           ├──────────────────────────────────┤
+│  Vln II ──────────────────────── │ 4 tracks  │ Row 5: Page 4  →                 │ 1 track
+│  Viola  ──────────────────────── │           ├──────────────────────────────────┤
+│  Cello  ──────────────────────── │           │ Row 6: Page 5  →                 │ 1 track
+└──────────────────────────────────┘           └──────────────────────────────────┘
+  16 seconds look-ahead                          48 seconds look-ahead
 ```
 
-This is a layout preference — the data and rendering are the same, just the viewport division changes. The cursor and page-turn logic would need to know how many pages are visible to advance correctly.
+**Each row has the exact same horizontal width and 8-second duration.** Nothing is compressed or stretched horizontally. The cursor scrolls right across Row 1, jumps to Row 2, then Row 3, etc. When it exits Row 1, that row reloads with the next upcoming page (circular buffer).
 
-**For now:** Start with same 2-page view (Option A). This is already built and works. Adding more pages is a UI layout change that can be explored after the core part view is working.
+##### Dimension Analysis by Device
+
+**Per-track height at various page counts (compared to current full-score track height):**
+
+| Layout | 12.9" iPad (974px) | 11" iPad (784px) | 1080p (1030px) | Look-ahead |
+|--------|-------------------|------------------|----------------|-----------|
+| **Current full score** (2pg × 4trk) | 119px | 95px | 125px | 16s |
+| **2 pages × 1 track** | 479px (4.0×) | 384px (4.0×) | 507px (4.0×) | 16s |
+| **4 pages × 1 track** | 236px (2.0×) | 188px (2.0×) | 250px (2.0×) | 32s |
+| **6 pages × 1 track** | 154px (1.3×) | 123px (1.3×) | 164px (1.3×) | 48s |
+| **8 pages × 1 track** | 114px (0.96×) | 90px (0.95×) | 121px (0.97×) | 64s |
+
+Key observations:
+- **6 pages:** Notation is **1.3× bigger** than current — more readable AND 3× more look-ahead. Sweet spot.
+- **4 pages:** 2× bigger notation — excellent for practice, sight-reading, accessibility.
+- **8 pages:** Same notation size as current full score — maximum look-ahead (64 seconds).
+
+##### Why Graphics Don't Warp
+
+SVG elements are positioned by:
+- **X:** `referenceSeconds` → `xPercent` within the 8-second page → **same formula, same width**
+- **Y:** `offsetYFraction` (0–1) within the track area → same fraction of a taller/shorter strip
+- **Size:** `heightFraction × staffHeight` → scales proportionally with track height
+
+Since all positioning is relative (time-based X, fraction-based Y), the spatial relationships between elements are preserved at any track height. An element at 45.2 seconds at 30% Y-offset looks identical at any scale — just larger or smaller. SVGs are vector, so quality is lossless.
+
+##### Page-Turn Mechanism: Circular Buffer
+
+Current 2-section ping-pong:
+```
+Time 0–8s:   cursor on Top (page 0), Bottom shows page 1
+Time 8–16s:  cursor on Bottom (page 1), Top reloads → page 2
+Time 16–24s: cursor on Top (page 2), Bottom reloads → page 3
+```
+
+N-section circular buffer (example N=6):
+```
+Time 0–8s:   cursor on Row 1 (page 0), Rows 2–6 show pages 1–5
+Time 8–16s:  cursor on Row 2 (page 1), Row 1 reloads → page 6
+Time 16–24s: cursor on Row 3 (page 2), Row 2 reloads → page 7
+...
+Time 40–48s: cursor on Row 6 (page 5), Row 5 reloads → page 11
+Time 48–56s: cursor wraps to Row 1 (page 6, already loaded), Row 6 reloads → page 12
+```
+
+The cursor flows top-to-bottom through all rows, then wraps back to the top. The row the cursor just left reloads with the next upcoming page content.
+
+##### Implementation: Code Changes Required
+
+| Component | Change | Difficulty |
+|-----------|--------|-----------|
+| **URL params** | `?track=1&pages=6` configures parts mode | Low |
+| **HTML layout** | Create N score sections (flex column) dynamically | Low |
+| **`/ 4` → `/ 1`** | `availableHeight / 4` → `availableHeight` (1 track per section) | Low (~12 occurrences) |
+| **Track filtering** | Skip elements where `track !== selectedTrack` during element loading | Low |
+| **Page turn logic** | Ping-pong (2 sections) → circular buffer (N sections) | Medium |
+| **Canvas overlays** | Create N canvases instead of 2 | Low |
+| **Staff headers** | Show 1 instrument label instead of 4 | Low |
+| **Staff dividers** | Remove the 3 horizontal track dividers | Low |
+| **Cursor** | Draw on whichever of N canvases is active | Low |
+
+##### Configurable Pages Setting
+
+The performer chooses between 4, 6, or 8 pages via URL parameter (later: settings UI toggle). Default: 6 pages.
+
+| Setting | Best For |
+|---------|---------|
+| **4 pages** | Practice, sight-reading, smaller screens, accessibility |
+| **6 pages** | Default — balanced notation size + look-ahead |
+| **8 pages** | Maximum look-ahead, experienced readers, large screens |
 
 ### 12.14 Print Score Output — PDF Generation
 

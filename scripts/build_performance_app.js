@@ -650,6 +650,22 @@ if (fs.existsSync(patchFile)) {
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// PHASE 3: Parts Mode — Multi-page single-track view
+// ═══════════════════════════════════════════════════════════════════════════════
+
+console.log('\n  --- Phase 3: Parts Mode ---');
+
+const partsFile = path.join(__dirname, 'performance_parts_patches.js');
+if (fs.existsSync(partsFile)) {
+    const applyPartsPatches = require(partsFile);
+    html = applyPartsPatches(html);
+    console.log('  ✓ Loaded parts mode patches from performance_parts_patches.js');
+} else {
+    console.log('  ⚠ performance_parts_patches.js not found — skipping Phase 3');
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // WRITE OUTPUT FILES
 // ═══════════════════════════════════════════════════════════════════════════════
 
