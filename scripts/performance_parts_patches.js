@@ -38,6 +38,9 @@ module.exports = function applyPartsPatches(html) {
         var TRACK_NAMES = { 1: 'Violin I', 2: 'Violin II', 3: 'Viola', 4: 'Cello' };
         var STAFF_INDEX = TRACK - 1; // 0-based
 
+        // Cap SVG element and GC sizes: when PAGE_COUNT < this, constrain to this equivalent
+        var MAX_ELEMENT_PAGES = 5;
+
         console.log('[PartsMode] Track ' + TRACK + ' (' + TRACK_NAMES[TRACK] + '), ' + PAGE_COUNT + ' pages');
 
         // ─── Global config ──────────────────────────────────────────────────
@@ -162,7 +165,6 @@ module.exports = function applyPartsPatches(html) {
                 resizeSections();
                 // Only reload GCs if height actually changed
                 if (PM.sectionHeight !== oldH) {
-                    console.debug('[PartsMode] Container resized: section ' + oldH + ' -> ' + PM.sectionHeight);
                     // Resize canvas overlays and update cached dimensions
                     resizeAllCanvases();
                     if (window.StaffCursors) {
@@ -466,17 +468,18 @@ module.exports = function applyPartsPatches(html) {
             }
         };
 
-        // Override onGoto: load N consecutive pages aligned to cursor section
-        // The cursor will land on section (targetPage % PAGE_COUNT), so we must
-        // align sectionPages so that section shows targetPage, not targetPage + offset.
+        // Override onGoto: load pages matching the circular buffer state that
+        // normal playback would have built up by the time the cursor reaches
+        // targetPage. The cursor section shows targetPage, sections ahead show
+        // the next pages, and sections behind the cursor (already passed) show
+        // future pages that will be needed when the cursor wraps back around.
         GraphicTimeline.onGoto = function(targetSeconds) {
             var secondsPerPage = this.getSecondsPerPage();
             var targetPage = Math.floor(targetSeconds / secondsPerPage);
             var targetSi = targetPage % PAGE_COUNT;
-            var basePage = targetPage - targetSi;
 
             for (var i = 0; i < PAGE_COUNT; i++) {
-                PM.sectionPages[i] = basePage + i;
+                PM.sectionPages[i] = targetPage + ((i - targetSi + PAGE_COUNT) % PAGE_COUNT);
             }
             this._lastSectionIndex = targetSi;
             this.currentTopPage = PM.sectionPages[0];
@@ -589,7 +592,11 @@ module.exports = function applyPartsPatches(html) {
             // Parts mode: 1 track fills full available height
             var scoreHeight = scoreEl.clientHeight;
             var availableHeight = scoreHeight - StaffCursors.timelineHeight;
-            var trackDims = { y: StaffCursors.timelineHeight, height: availableHeight };
+            // Cap element sizing at MAX_ELEMENT_PAGES equivalent, center vertically
+            var maxTrackH = (window.innerHeight / MAX_ELEMENT_PAGES) - StaffCursors.timelineHeight;
+            var usedH = (PAGE_COUNT < MAX_ELEMENT_PAGES) ? Math.min(availableHeight, maxTrackH) : availableHeight;
+            var yOff = (availableHeight - usedH) / 2;
+            var trackDims = { y: StaffCursors.timelineHeight + yOff, height: usedH };
             var y = trackDims.y + el.offsetYFraction * trackDims.height;
 
             return { x: x, y: y, page: page, section: section, scoreEl: scoreEl, trackDims: trackDims, secondsPerPage: secondsPerPage, sectionIndex: sectionIndex };
@@ -633,6 +640,7 @@ module.exports = function applyPartsPatches(html) {
                 el._section = pos.section;
 
                 var th = pos.trackDims ? pos.trackDims.height : 0;
+                // trackDims already has the MAX_ELEMENT_PAGES cap applied from calcPixelPosition
                 if (el.heightFraction && el.height && th > 0) {
                     el.scale = (el.heightFraction * th) / el.height;
                 }
@@ -663,18 +671,37 @@ module.exports = function applyPartsPatches(html) {
         }
 
         // Helper: call showContinuationSegment on a maker with swapped references
+        // Saves/restores ALL three element refs (group, path, hitPath) per section
+        // so that multi-section continuations don't cross-contaminate path data.
         function callContinuation(maker, item, page, secondsPerPage, leadInSec, sIdx, groupProp) {
             var origEl = maker.scoreTopEl;
+            var origBotEl = maker.scoreBottomEl;
             var origGroup = maker[groupProp];
             maker.scoreTopEl = PM.sections[sIdx].el;
+            maker.scoreBottomEl = PM.sections[sIdx].el;
             maker[groupProp] = PM.sections[sIdx].el;
-            var savedCont = item.elements.continuationGroupTop;
+            // Save all three continuation refs
+            var savedGroup = item.elements.continuationGroupTop;
+            var savedPath = item.elements.continuationPathTop;
+            var savedHitPath = item.elements.continuationHitPathTop;
+            // Set section-specific refs
             var contKey = '_cont_' + sIdx;
+            var pathKey = '_contPath_' + sIdx;
+            var hitPathKey = '_contHitPath_' + sIdx;
             item.elements.continuationGroupTop = item.elements[contKey] || null;
+            item.elements.continuationPathTop = item.elements[pathKey] || null;
+            item.elements.continuationHitPathTop = item.elements[hitPathKey] || null;
             maker.showContinuationSegment(item, page, secondsPerPage, leadInSec, 'top');
+            // Capture section-specific refs back
             item.elements[contKey] = item.elements.continuationGroupTop;
-            item.elements.continuationGroupTop = savedCont;
+            item.elements[pathKey] = item.elements.continuationPathTop;
+            item.elements[hitPathKey] = item.elements.continuationHitPathTop;
+            // Restore original refs
+            item.elements.continuationGroupTop = savedGroup;
+            item.elements.continuationPathTop = savedPath;
+            item.elements.continuationHitPathTop = savedHitPath;
             maker.scoreTopEl = origEl;
+            maker.scoreBottomEl = origBotEl;
             maker[groupProp] = origGroup;
             if (item.elements[contKey]) {
                 item.elements[contKey].style.display = '';
@@ -683,10 +710,20 @@ module.exports = function applyPartsPatches(html) {
             }
         }
 
+        // === DIAGNOSTIC: sequence counter to detect reload vs visibility ordering ===
+        var _curveSeqCounter = 0;
+        var _lastReloadSeq = 0;
+        var _lastVisibilitySeq = 0;
+
         // Override CurveMaker.updateVisibility — with continuation support
         if (window.CurveMaker) {
             CurveMaker.updateVisibility = function() {
                 if (!window.GraphicTimeline) return;
+                _curveSeqCounter++;
+                _lastVisibilitySeq = _curveSeqCounter;
+                if (_lastReloadSeq > _lastVisibilitySeq - 2) {
+                    console.warn('[CurveDiag ORDER] updateVisibility seq=' + _lastVisibilitySeq + ' right after reloadFromDatabase seq=' + _lastReloadSeq + ' (gap=' + (_lastVisibilitySeq - _lastReloadSeq) + ')');
+                }
                 var secondsPerPage = GraphicTimeline.getSecondsPerPage();
                 var leadInSec = leadInSeconds;
                 var _visLog = [];
@@ -706,17 +743,32 @@ module.exports = function applyPartsPatches(html) {
                     if (startSi >= 0) {
                         _visLog.push('curve ' + curve.id + ' start=' + curve.startSeconds.toFixed(1) + 's page=' + startPage + '→sec' + startSi + ' color=' + curve.color);
                         curve.elements.group.style.display = '';
-                        if (curve.elements.group.parentNode !== PM.sections[startSi].el)
+                        var oldParent = curve.elements.group.parentNode;
+                        if (oldParent !== PM.sections[startSi].el) {
+                            // TEST 2: Log every move — is the curve stuck in bottomCurveGroup?
+                            var oldParentName = 'unknown';
+                            for (var osi = 0; osi < PAGE_COUNT; osi++) { if (PM.sections[osi].el === oldParent) { oldParentName = 'sec' + osi; break; } }
+                            if (oldParent === CurveMaker.topCurveGroup) oldParentName = 'topCurveGroup';
+                            if (oldParent === CurveMaker.bottomCurveGroup) oldParentName = 'bottomCurveGroup';
+                            console.warn('[CurveDiag MOVE] curve ' + curve.id + ' pg=' + startPage + ' MOVING from ' + oldParentName + ' to sec' + startSi);
                             PM.sections[startSi].el.appendChild(curve.elements.group);
+                        }
                         if (isMultiPage) {
-                            // Swap scoreTopEl temporarily for clipCurveToPageEnd
-                            var origEl = this.scoreTopEl;
-                            var origGroup = this.topCurveGroup;
+                            // Swap ALL section refs so clipCurveToPageEnd's page%2
+                            // logic always targets the correct section SVG
+                            var origTopEl = this.scoreTopEl;
+                            var origTopGroup = this.topCurveGroup;
+                            var origBotEl = this.scoreBottomEl;
+                            var origBotGroup = this.bottomCurveGroup;
                             this.scoreTopEl = PM.sections[startSi].el;
                             this.topCurveGroup = PM.sections[startSi].el;
+                            this.scoreBottomEl = PM.sections[startSi].el;
+                            this.bottomCurveGroup = PM.sections[startSi].el;
                             this.clipCurveToPageEnd(curve, startPage, secondsPerPage, leadInSec);
-                            this.scoreTopEl = origEl;
-                            this.topCurveGroup = origGroup;
+                            this.scoreTopEl = origTopEl;
+                            this.topCurveGroup = origTopGroup;
+                            this.scoreBottomEl = origBotEl;
+                            this.bottomCurveGroup = origBotGroup;
                         }
                     } else {
                         curve.elements.group.style.display = 'none';
@@ -743,7 +795,6 @@ module.exports = function applyPartsPatches(html) {
                     if (curve.elements.continuationGroupBottom)
                         curve.elements.continuationGroupBottom.style.display = 'none';
                 }
-                if (_visLog.length > 0) console.debug('[CurveVis] sectionPages=' + JSON.stringify(PM.sectionPages) + ' visible: ' + _visLog.join(' | '));
             };
         }
 
@@ -753,6 +804,9 @@ module.exports = function applyPartsPatches(html) {
         if (window.CurveMaker && CurveMaker.reloadFromDatabase) {
             var origCurveReload = CurveMaker.reloadFromDatabase.bind(CurveMaker);
             CurveMaker.reloadFromDatabase = function() {
+                _curveSeqCounter++;
+                _lastReloadSeq = _curveSeqCounter;
+                console.warn('[CurveDiag] reloadFromDatabase called. seq=' + _lastReloadSeq + ' (lastVis=' + _lastVisibilitySeq + ') Stack:', new Error().stack);
                 for (var ci = 0; ci < this.curves.length; ci++) {
                     var c = this.curves[ci];
                     if (!c.elements) continue;
@@ -767,6 +821,47 @@ module.exports = function applyPartsPatches(html) {
                 origCurveReload();
             };
         }
+
+        // === DIAGNOSTIC: Periodic DOM audit for misplaced curves ===
+        setInterval(function() {
+            if (!window.CurveMaker || !CurveMaker.curves || CurveMaker.curves.length === 0) return;
+            if (!window.AnimationEngine || !AnimationEngine.running) return;
+            var secondsPerPage = GraphicTimeline.getSecondsPerPage();
+            var leadInSec = leadInSeconds;
+            var problems = [];
+            for (var ci = 0; ci < CurveMaker.curves.length; ci++) {
+                var c = CurveMaker.curves[ci];
+                if (!c.elements || !c.elements.group) continue;
+                var grp = c.elements.group;
+                var disp = grp.style.display;
+                var parent = grp.parentNode;
+                // Find which section the group is actually in
+                var actualSi = -1;
+                for (var si = 0; si < PAGE_COUNT; si++) {
+                    if (PM.sections[si].el === parent) { actualSi = si; break; }
+                    // Also check if parent is a child of the section (topCurveGroup/bottomCurveGroup)
+                    if (PM.sections[si].el.contains(parent)) { actualSi = si; break; }
+                }
+                var startActual = c.startSeconds + leadInSec;
+                var startPage = Math.floor(Math.max(0, startActual) / secondsPerPage);
+                var expectedSi = sectionForPage(startPage);
+                // Problem: curve is SHOWN but in wrong section
+                if (disp !== 'none' && actualSi >= 0 && expectedSi >= 0 && actualSi !== expectedSi) {
+                    problems.push('WRONG-SECTION: curve ' + c.id + ' pg=' + startPage + ' expectedSec=' + expectedSi + ' actualSec=' + actualSi);
+                }
+                // Problem: curve is SHOWN but its page is not in sectionPages
+                if (disp !== 'none' && expectedSi === -1) {
+                    problems.push('SHOWN-BUT-INVISIBLE: curve ' + c.id + ' pg=' + startPage + ' actualSec=' + actualSi + ' sectionPages=' + JSON.stringify(PM.sectionPages));
+                }
+                // Problem: curve is HIDDEN but its page IS in sectionPages
+                if (disp === 'none' && expectedSi >= 0) {
+                    problems.push('HIDDEN-BUT-SHOULD-SHOW: curve ' + c.id + ' pg=' + startPage + ' expectedSec=' + expectedSi + ' actualSec=' + actualSi);
+                }
+            }
+            if (problems.length > 0) {
+                console.error('[CurveDiag AUDIT] ' + problems.length + ' problems found: ' + problems.join(' | '));
+            }
+        }, 5000);
 
         // Override MotiveMaker.updateVisibility
         if (window.MotiveMaker) {
@@ -830,13 +925,19 @@ module.exports = function applyPartsPatches(html) {
                         if (lw.elements.group.parentNode !== PM.sections[startSi].el)
                             PM.sections[startSi].el.appendChild(lw.elements.group);
                         if (isMultiPage && this.clipToPageEnd) {
-                            var origEl = this.scoreTopEl;
-                            var origGroup = this.topLWGroup;
+                            var origTopEl = this.scoreTopEl;
+                            var origTopGroup = this.topLWGroup;
+                            var origBotEl = this.scoreBottomEl;
+                            var origBotGroup = this.bottomLWGroup;
                             this.scoreTopEl = PM.sections[startSi].el;
                             this.topLWGroup = PM.sections[startSi].el;
+                            this.scoreBottomEl = PM.sections[startSi].el;
+                            this.bottomLWGroup = PM.sections[startSi].el;
                             this.clipToPageEnd(lw, startPage, secondsPerPage, leadInSec);
-                            this.scoreTopEl = origEl;
-                            this.topLWGroup = origGroup;
+                            this.scoreTopEl = origTopEl;
+                            this.topLWGroup = origTopGroup;
+                            this.scoreBottomEl = origBotEl;
+                            this.bottomLWGroup = origBotGroup;
                         }
                     } else {
                         lw.elements.group.style.display = 'none';
@@ -948,6 +1049,14 @@ module.exports = function applyPartsPatches(html) {
             GCMaker.bottomGCGroup = gcGroups[1];
             PM.gcGroups = gcGroups;
 
+            // Z-order: re-append SVG element containers AFTER GC groups
+            // so notation SVGs render in front of GC trajectory arcs
+            for (var zi = 0; zi < PAGE_COUNT; zi++) {
+                if (SVGElementManager._sectionContainers[zi]) {
+                    PM.sections[zi].el.appendChild(SVGElementManager._sectionContainers[zi]);
+                }
+            }
+
             // Override reloadFromDatabase — use full track height
             var origReloadGC = GCMaker.reloadFromDatabase.bind(GCMaker);
             GCMaker.reloadFromDatabase = function() {
@@ -965,8 +1074,9 @@ module.exports = function applyPartsPatches(html) {
                 var scoreHeight = PM.sectionHeight || PM.sections[0].el.clientHeight || 112;
                 var timelineHeight = 8;
                 var availableHeight = scoreHeight - timelineHeight;
-                // Parts mode: single track fills full available height
-                var staffHeight = availableHeight;
+                // Cap GC trajectory at MAX_ELEMENT_PAGES equivalent
+                var maxGcH = (window.innerHeight / MAX_ELEMENT_PAGES) - timelineHeight;
+                var staffHeight = (PAGE_COUNT < MAX_ELEMENT_PAGES) ? Math.min(availableHeight, maxGcH) : availableHeight;
 
                 for (var di = 0; di < this._importedData.gcs.length; di++) {
                     var gcData = this._importedData.gcs[di];
@@ -1007,11 +1117,6 @@ module.exports = function applyPartsPatches(html) {
                 }
 
                 this.updateVisibility();
-                console.debug('GCMaker: Reloaded ' + this.gcs.length + ' GCs (parts mode, scoreHeight=' + scoreHeight + ', availableHeight=' + availableHeight + ', staffHeight=' + staffHeight + ')');
-                if (this.gcs.length > 0) {
-                    var g0 = this.gcs[0];
-                    console.debug('GCMaker: First GC dropHeightPx=' + g0.dropHeightPx + ', bounceHeightPx=' + g0.bounceHeightPx + ', trackBottom=' + g0.trackBottom + ', trackY=' + g0.trackY);
-                }
             };
 
             // Override renderGC — N sections, full track height
@@ -1026,8 +1131,10 @@ module.exports = function applyPartsPatches(html) {
                 var scoreHeight = PM.sectionHeight || scoreEl.clientHeight || 112;
                 var timelineHeight = 8;
                 var availableHeight = scoreHeight - timelineHeight;
-                // Parts mode: 1 track, full height
-                var trackY = timelineHeight;
+                // Cap GC arc at MAX_ELEMENT_PAGES equivalent, bottom-justified
+                var maxGcH = (window.innerHeight / MAX_ELEMENT_PAGES) - timelineHeight;
+                var usedGcH = (PAGE_COUNT < MAX_ELEMENT_PAGES) ? Math.min(availableHeight, maxGcH) : availableHeight;
+                var trackY = timelineHeight + (availableHeight - usedGcH);
                 var trackBottom = timelineHeight + availableHeight;
                 var impactXPercent = ((impactActual / secondsPerPage) - impactPage) * 100;
                 var impactX = (impactXPercent / 100) * scoreWidth;
@@ -1211,6 +1318,9 @@ module.exports = function applyPartsPatches(html) {
                 // Parts mode: 1 track fills full available height
                 var timelineHeight = 8;
                 var availableHeight = scoreHeight - timelineHeight;
+                // Cap GC trajectory at MAX_ELEMENT_PAGES equivalent, bottom-justified
+                var maxGcH = (window.innerHeight / MAX_ELEMENT_PAGES) - timelineHeight;
+                var usedGcH = (PAGE_COUNT < MAX_ELEMENT_PAGES) ? Math.min(availableHeight, maxGcH) : availableHeight;
                 var trackBottom = timelineHeight + availableHeight;
                 var impactY = trackBottom - 5;
                 var py = impactY - relY;
@@ -1254,7 +1364,9 @@ module.exports = function applyPartsPatches(html) {
                 var scoreHeight = PM.sectionHeight || PM.sections[0].el.clientHeight || 112;
                 var timelineHeight = 8;
                 var availableHeight = scoreHeight - timelineHeight;
-                var staffHeight = availableHeight; // Parts mode: 1 track, full height
+                // Cap GC trajectory at MAX_ELEMENT_PAGES equivalent
+                var maxGcH = (window.innerHeight / MAX_ELEMENT_PAGES) - timelineHeight;
+                var staffHeight = (PAGE_COUNT < MAX_ELEMENT_PAGES) ? Math.min(availableHeight, maxGcH) : availableHeight;
 
                 for (var ri = 0; ri < this.gcs.length; ri++) {
                     var gc = this.gcs[ri];
@@ -1551,9 +1663,182 @@ module.exports = function applyPartsPatches(html) {
         // 9. GlissandoSystem section awareness
         // ═══════════════════════════════════════════════════════════════════════
 
-        if (window.GlissandoSystem && GlissandoSystem.updateAllStaticPitchMarkers) {
-            // Static pitch markers are re-rendered on page turns anyway
-            // Just ensure they check N section pages
+        if (window.GlissandoSystem) {
+            // Override createPitchDisplays: N sections instead of top/bottom
+            var origCreatePitchDisplays = GlissandoSystem.createPitchDisplays.bind(GlissandoSystem);
+            GlissandoSystem.createPitchDisplays = function() {
+                this.pitchDisplays = [];
+                for (var staffIdx = 0; staffIdx < 4; staffIdx++) {
+                    var displayEntry = { staffIndex: staffIdx };
+                    for (var si = 0; si < PAGE_COUNT; si++) {
+                        var img = document.createElement('img');
+                        img.style.position = 'absolute';
+                        img.style.display = 'none';
+                        img.style.pointerEvents = 'none';
+                        img.className = 'glissando-pitch-display';
+                        img.dataset.staffIndex = staffIdx;
+                        img.dataset.sectionIndex = si;
+                        document.body.appendChild(img);
+                        displayEntry['sec' + si] = img;
+                    }
+                    // Backward compat: alias sec0 as top, sec1 as bottom
+                    displayEntry.top = displayEntry.sec0;
+                    displayEntry.bottom = displayEntry.sec1;
+                    this.pitchDisplays.push(displayEntry);
+                }
+            };
+            // Re-create displays with N sections
+            GlissandoSystem.createPitchDisplays();
+
+            // Override updatePitchDisplay: handle N sections
+            GlissandoSystem.updatePitchDisplay = function(staffIndex, section, curveItem, normalizedY, xPercent, trackDims) {
+                if (!curveItem || !curveItem.glissando || staffIndex >= this.pitchDisplays.length) {
+                    this.hidePitchDisplay(staffIndex);
+                    return;
+                }
+                var display = this.pitchDisplays[staffIndex];
+                // Determine section index from section name
+                var sectionIdx = 0;
+                if (section === 'top') sectionIdx = 0;
+                else if (section === 'bottom') sectionIdx = 1;
+                else {
+                    var parsed = parseInt(section.replace('section', ''));
+                    if (!isNaN(parsed)) sectionIdx = parsed;
+                }
+                var imgEl = display['sec' + sectionIdx];
+                if (!imgEl) { this.hidePitchDisplay(staffIndex); return; }
+                // Hide all other section displays for this staff
+                for (var hi = 0; hi < PAGE_COUNT; hi++) {
+                    if (hi !== sectionIdx && display['sec' + hi]) display['sec' + hi].style.display = 'none';
+                }
+                var gliss = curveItem.glissando;
+                var lowIdx = Math.min(gliss.startIndex, gliss.endIndex);
+                var highIdx = Math.max(gliss.startIndex, gliss.endIndex);
+                var pitchRange = highIdx - lowIdx;
+                var currentPitchIndex = lowIdx + Math.round(normalizedY * pitchRange);
+                var clampedIdx = Math.max(0, Math.min(this.pitchList.length - 1, currentPitchIndex));
+                var currentPitch = this.pitchList[clampedIdx];
+                if (!currentPitch) { this.hidePitchDisplay(staffIndex); return; }
+                var svgPath = 'pitchesSVGs/' + gliss.clef + '/' + currentPitch.name + '-cropped.svg';
+                if (imgEl.dataset.currentPitch !== currentPitch.name) {
+                    imgEl.src = svgPath;
+                    imgEl.dataset.currentPitch = currentPitch.name;
+                }
+                // Position relative to correct section SVG
+                var scoreEl = PM.sections[sectionIdx] ? PM.sections[sectionIdx].el : null;
+                if (!scoreEl) { this.hidePitchDisplay(staffIndex); return; }
+                var scoreRect = scoreEl.getBoundingClientRect();
+                var pitchDisplayHeight = trackDims.height * 0.5;
+                var gap = 2;
+                imgEl.style.position = 'fixed';
+                imgEl.style.display = 'block';
+                imgEl.style.height = pitchDisplayHeight + 'px';
+                imgEl.style.width = 'auto';
+                imgEl.style.zIndex = '1000';
+                var actualWidth = imgEl.offsetWidth;
+                if (!actualWidth || actualWidth < 5) actualWidth = pitchDisplayHeight * 0.4;
+                var meterLeftInViewport = scoreRect.left + (xPercent / 100) * scoreRect.width - 11;
+                imgEl.style.left = (meterLeftInViewport - actualWidth - gap) + 'px';
+                var verticalOffset = (trackDims.height - pitchDisplayHeight) / 2;
+                imgEl.style.top = (scoreRect.top + trackDims.y + verticalOffset) + 'px';
+            };
+
+            // Override hidePitchDisplay: hide all N sections
+            GlissandoSystem.hidePitchDisplay = function(staffIndex) {
+                if (staffIndex >= this.pitchDisplays.length) return;
+                var display = this.pitchDisplays[staffIndex];
+                for (var si = 0; si < PAGE_COUNT; si++) {
+                    if (display['sec' + si]) display['sec' + si].style.display = 'none';
+                }
+            };
+
+            // Override renderStaticPitchMarkers: check N section pages
+            var origRenderMarkers = GlissandoSystem.renderStaticPitchMarkers.bind(GlissandoSystem);
+            GlissandoSystem.renderStaticPitchMarkers = function(curve) {
+                this.removeStaticPitchMarkers(curve);
+                if (!curve || !curve.glissando) return;
+                if (!curve.glissando.clef ||
+                    curve.glissando.startIndex === undefined ||
+                    curve.glissando.endIndex === undefined) return;
+                var changePoints = this.calculatePitchChangePoints(curve);
+                if (changePoints.length === 0) return;
+                var clef = curve.glissando.clef;
+                var secondsPerPage = GraphicTimeline.getSecondsPerPage();
+                var leadInSec = leadInSeconds;
+                // Create a marker group per section
+                var markerGroups = [];
+                for (var gi = 0; gi < PAGE_COUNT; gi++) {
+                    var mg = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    mg.setAttribute('class', 'glissando-pitch-markers');
+                    mg.setAttribute('data-curve-id', curve.id);
+                    mg.setAttribute('data-section', gi);
+                    markerGroups.push(mg);
+                }
+                var scoreWidth = PM.sections[0].el.clientWidth;
+                for (var pi = 0; pi < changePoints.length; pi++) {
+                    var point = changePoints[pi];
+                    if (!point.pitch) continue;
+                    var pointTimeActual = point.time + leadInSec;
+                    var pointPage = Math.floor(Math.max(0, pointTimeActual) / secondsPerPage);
+                    // Find which section shows this page
+                    var targetSi = -1;
+                    for (var si = 0; si < PAGE_COUNT; si++) {
+                        if (PM.sectionPages[si] === pointPage) { targetSi = si; break; }
+                    }
+                    if (targetSi < 0) continue;
+                    var targetEl = PM.sections[targetSi].el;
+                    var trackDims = curve.gTrack && window.CompositionPanel
+                        ? CompositionPanel.getTrackDimensions(curve.gTrack, targetEl)
+                        : null;
+                    if (!trackDims) continue;
+                    var pageStartTime = pointPage * secondsPerPage;
+                    var timeOnPage = pointTimeActual - pageStartTime;
+                    var xPct = (timeOnPage / secondsPerPage) * 100;
+                    var xPos = (xPct / 100) * scoreWidth;
+                    var markerHeight = trackDims.height * 0.25;
+                    var estWidth = markerHeight * 0.6;
+                    if (xPos < 0) xPos = 0;
+                    if (xPos + estWidth > scoreWidth) xPos = scoreWidth - estWidth;
+                    var yPos = trackDims.y + (trackDims.height - markerHeight) / 2;
+                    var imgEl = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                    imgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href',
+                        'pitchesSVGs/' + clef + '/' + point.pitch.name + '-cropped.svg');
+                    imgEl.setAttribute('height', markerHeight);
+                    imgEl.setAttribute('x', xPos);
+                    imgEl.setAttribute('y', yPos);
+                    imgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                    imgEl.setAttribute('class', 'pitch-marker');
+                    imgEl.setAttribute('data-pitch', point.pitch.name);
+                    imgEl.style.pointerEvents = 'none';
+                    markerGroups[targetSi].appendChild(imgEl);
+                }
+                // Append non-empty groups to section SVGs, store refs for cleanup
+                curve._pitchMarkerGroups = [];
+                for (var ai = 0; ai < PAGE_COUNT; ai++) {
+                    if (markerGroups[ai].children.length > 0) {
+                        PM.sections[ai].el.appendChild(markerGroups[ai]);
+                    }
+                    curve._pitchMarkerGroups.push(markerGroups[ai]);
+                }
+                // Backward compat
+                curve.pitchMarkerGroupTop = markerGroups[0];
+                curve.pitchMarkerGroupBottom = markerGroups[1];
+            };
+
+            // Override removeStaticPitchMarkers: clean up N section groups
+            var origRemoveMarkers = GlissandoSystem.removeStaticPitchMarkers.bind(GlissandoSystem);
+            GlissandoSystem.removeStaticPitchMarkers = function(curve) {
+                if (curve && curve._pitchMarkerGroups) {
+                    for (var ri = 0; ri < curve._pitchMarkerGroups.length; ri++) {
+                        if (curve._pitchMarkerGroups[ri] && curve._pitchMarkerGroups[ri].remove) {
+                            curve._pitchMarkerGroups[ri].remove();
+                        }
+                    }
+                    delete curve._pitchMarkerGroups;
+                }
+                // Fallback: call original cleanup too
+                origRemoveMarkers(curve);
+            };
         }
 
         // ═══════════════════════════════════════════════════════════════════════
@@ -1566,53 +1851,6 @@ module.exports = function applyPartsPatches(html) {
         }
 
         console.log('[PartsMode] Initialized: ' + PAGE_COUNT + ' sections, track ' + TRACK);
-
-        // ═══ DIAGNOSTIC: Inspect DOM state after 2 seconds ═══
-        setTimeout(function() {
-            console.group('[PartsMode DIAG] DOM state after 2s');
-            console.log('PM.sectionHeight:', PM.sectionHeight);
-            for (var di = 0; di < Math.min(2, PAGE_COUNT); di++) {
-                var el = PM.sections[di].el;
-                console.log('Section ' + di + ': style.height=' + el.style.height +
-                    ', clientHeight=' + el.clientHeight +
-                    ', BCR.height=' + el.getBoundingClientRect().height.toFixed(1) +
-                    ', id=' + el.id);
-            }
-            // Check GC paths
-            if (window.GCMaker && GCMaker.gcs && GCMaker.gcs.length > 0) {
-                var gc0 = GCMaker.gcs[0];
-                console.log('GC[0] trackBottom=' + gc0.trackBottom + ', trackY=' + gc0.trackY +
-                    ', dropH=' + gc0.dropHeightPx + ', bounceH=' + gc0.bounceHeightPx);
-                if (gc0.elements && gc0.elements.group) {
-                    var path = gc0.elements.group.querySelector('path');
-                    if (path) {
-                        var d = path.getAttribute('d');
-                        // Extract first and last Y coordinates from path
-                        var matches = d.match(/[ML]\\s*[\\d.]+\\s+([\\d.]+)/g);
-                        if (matches && matches.length > 0) {
-                            var yVals = matches.map(function(m) { return parseFloat(m.split(/\\s+/)[1]); });
-                            console.log('GC[0] path Y range: min=' + Math.min.apply(null, yVals).toFixed(1) +
-                                ', max=' + Math.max.apply(null, yVals).toFixed(1) +
-                                ', count=' + yVals.length);
-                        }
-                        console.log('GC[0] path d (first 200):', d.substring(0, 200));
-                    } else {
-                        console.log('GC[0] NO path element found in group');
-                    }
-                    console.log('GC[0] group parent:', gc0.elements.group.parentNode ?
-                        gc0.elements.group.parentNode.id || gc0.elements.group.parentNode.className : 'NONE');
-                    console.log('GC[0] group display:', gc0.elements.group.style.display);
-                } else {
-                    console.log('GC[0] has no elements.group');
-                }
-            } else {
-                console.log('No GCs loaded');
-            }
-            // Check original renderGC still overridden
-            console.log('renderGC is override:', GCMaker.renderGC.toString().indexOf('PM.sectionHeight') !== -1);
-            console.log('reloadFromDatabase is override:', GCMaker.reloadFromDatabase.toString().indexOf('PM.sectionHeight') !== -1);
-            console.groupEnd();
-        }, 2000);
     })();
     `;
 

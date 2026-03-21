@@ -2943,6 +2943,149 @@ Compare actual debugging process against §13.2.1–§13.2.4:
 - Tag: `git tag phase-N-complete`
 - Update progress file / decision log if maintained
 
+#### 13.2.7 Pre-Implementation Protocol — "Measure Twice, Cut Once"
+
+**Before implementing any phase, complete this protocol in order.** This was established after Phase 3, where four bugs (ASB-190 through ASB-193) required extended debugging that could have been largely prevented by more careful upfront analysis. The goal is to make the first implementation pass robust enough that debugging is minor cleanup, not major surgery.
+
+**Why this matters:** In standard software engineering, the cost of fixing a bug increases exponentially the later it's found. A bug caught during design costs minutes; the same bug caught during integration testing costs hours; found in production, it costs days. This protocol front-loads the "finding" to the cheapest possible moment — before any code is written.
+
+**Step 1: System Inventory — What Are We Touching?**
+
+Before writing any code, enumerate every system, module, and function that the phase will modify, override, depend on, or interact with.
+
+For each system, document:
+- **What it does** (1-2 sentences)
+- **Where it lives** (file, line range)
+- **What state it reads** (global variables, DOM elements, shared objects)
+- **What state it writes** (same categories)
+- **What other systems call it** (callers)
+- **What it calls** (callees)
+
+*Format:* A simple table or list in the progress file or a scratch document. This doesn't need to be publication-quality — it's a working reference.
+
+*Phase 3 example of what this would have caught:* ASB-192 (GlissandoSystem) was missed because we didn't enumerate ALL systems that use the `top`/`bottom` section concept. A systematic inventory of "every system that references ScoreTop, ScoreBottom, page % 2, 'top', or 'bottom'" would have surfaced GlissandoSystem alongside CurveMaker, LineWedgeMaker, etc.
+
+*Standard practice this implements:* **Impact Analysis** — a core software engineering discipline where you trace all affected code paths before making changes. In large codebases, this is often done with IDE "Find All References" tools. In our monkey-patch architecture, it means grepping the Workshop source for every pattern the override changes.
+
+**Step 2: Source Reading — Understand Before Overriding**
+
+For every Workshop function that will be overridden or called from an override, **read the full source** and document:
+- All parameters and what they mean
+- All internal branches (if/else, switch)
+- All shared state it reads or mutates (especially element references, group containers, display properties)
+- All other functions it calls internally (transitive dependencies)
+- Any assumptions it makes about the environment (e.g., "exactly 2 sections," "page % 2 selects top/bottom")
+
+*This is the single most important step.* Most Phase 3 bugs came from overriding a function without fully understanding what it did internally:
+
+- **ASB-190:** `clipCurveToPageEnd` internally called `page % 2` and re-appended curves to `bottomCurveGroup`. We only swapped `topCurveGroup`, not `bottomCurveGroup`, because we hadn't read the full method.
+- **ASB-193:** `showContinuationSegment` mutated THREE shared element references (`continuationGroupTop`, `continuationPathTop`, `continuationHitPathTop`). We only saved/restored ONE because we hadn't read the full method to see all the refs it touches.
+
+*Standard practice:* **Code Reading** — professional developers spend more time reading code than writing it (estimates range from 5:1 to 10:1 ratio). For override/monkey-patch architectures specifically, reading the source of what you're overriding is non-negotiable. The override must account for every side effect of the original.
+
+**Step 3: Contract Documentation — Define Expected Behavior**
+
+For each override or new function, write a brief **contract** before implementing:
+- **Preconditions:** What must be true before this function runs? (e.g., "PM.sections array is populated," "PM.sectionPages is up to date")
+- **Postconditions:** What must be true after it runs? (e.g., "every curve's group element is a child of the correct section SVG," "no curve is visible in a section that doesn't show its page")
+- **Invariants:** What must ALWAYS be true? (e.g., "PM.sectionPages[i] always matches the page content loaded into section i," "the circular buffer state after onGoto matches what normal playback would produce")
+
+*Phase 3 example:* ASB-191 (onGoto page distribution) would have been caught by the invariant: "after onGoto, `PM.sectionPages` should match the state that normal forward playback would produce when the cursor reaches the target page." The linear assignment `[12,13,14,15,16,17]` violates this — normal playback would have loaded future pages in the sections behind the cursor.
+
+*Standard practice:* **Design by Contract** (Bertrand Meyer, 1986) — specifying preconditions, postconditions, and invariants is a foundational technique for writing correct code. Even informal contracts (comments, not runtime assertions) dramatically reduce bugs by forcing you to think about edge cases before writing the implementation.
+
+**Step 4: Risk Register — What Could Go Wrong?**
+
+For each system being modified, explicitly list:
+- **Known complexity:** What makes this system tricky? (e.g., "Workshop assumes exactly 2 sections in 14 places")
+- **Likely failure modes:** How could the override break? (e.g., "if a Workshop method internally re-appends elements to a hardcoded container, our move-to-section will be undone")
+- **Detection method:** How would we notice if it broke? (e.g., "curves appearing on wrong section = visual, immediately obvious" vs. "subtle timing drift = hard to notice until it accumulates")
+- **Mitigation:** What can we do to prevent or quickly detect this? (e.g., "swap ALL container references, not just top," "add a post-override assertion that checks parent node")
+
+*Standard practice:* **Risk Assessment** — in professional software projects, risk registers are maintained for every feature. Each risk has a probability, impact, and mitigation strategy. For our purposes, a lightweight list is sufficient — the act of thinking through failure modes is more valuable than the format.
+
+**Step 5: Staged Implementation Plan — Build in Testable Increments**
+
+Break the phase into **stages** where each stage:
+1. Adds ONE system or capability
+2. Can be tested in isolation before adding the next
+3. Has a clear "this stage works if..." criterion
+
+*Do NOT implement everything and then test.* This was the Phase 3 pattern: implement all 10 system overrides, then discover bugs in the interaction between them. Instead:
+
+```
+Stage 1: DOM layout (N sections, CSS)
+  → TEST: Sections appear, correct size, correct position
+  
+Stage 2: Cursor + page turns (StaffCursors, GraphicTimeline)
+  → TEST: Cursor scrolls through sections, circular buffer works, onGoto works
+  
+Stage 3: SVG elements (SVGElementManager)
+  → TEST: Elements appear in correct sections, scale correctly
+  
+Stage 4: Curves (CurveMaker)
+  → TEST: Curves render on correct sections, multi-page curves have continuations
+  
+Stage 5: GCs (GCMaker)
+  → TEST: Arcs render, balls track arcs, canvas draws on correct section
+  
+... etc.
+```
+
+Each stage gets a focused test pass. If Stage 4 (Curves) has bugs, you know the bug is in the curve override — you don't have to search across all 10 systems. This **narrows the search space** for any bug from "anywhere in 1900 lines" to "somewhere in this 100-line override."
+
+*Standard practice:* **Incremental Integration** — the industry standard for building complex systems. The opposite (Big Bang Integration, where you build everything and test at the end) is universally recognized as the highest-risk approach. Continuous Integration (CI) in professional teams automates this — every commit is tested against the full suite. For our manual workflow, staged implementation with focused tests between stages achieves the same principle.
+
+**Step 6: Focused Stage Tests**
+
+At each stage boundary, run these checks:
+
+**Automated (AI):**
+- Console errors: none
+- Element counts: match expected
+- DOM structure: elements in correct containers
+- No regressions: previous stages still pass
+
+**Visual (Human):**
+- Quick spot-check of the system just added (e.g., "do curves look right on 2-3 known pages?")
+- Not a full exhaustive review — just a sanity check that the stage is working
+
+**Behavioral:**
+- Exercise the specific behavior that the stage adds (e.g., navigate to a multi-page curve, verify continuation segments)
+- Try at least one edge case per stage (e.g., curve exactly at page boundary, goto to last page)
+
+*The key principle:* Each stage test is **small and focused**. You're not re-testing the entire app — you're testing the one thing you just added. This makes bugs immediately attributable to the most recent change.
+
+**Step 7: Integration Verification — All Stages Together**
+
+After all stages pass individually, do a full integration test:
+- Exercise every feature end-to-end
+- Test interactions between systems (e.g., "does a curve with a GC underneath render correctly with the right z-order?")
+- Test edge cases that span multiple systems
+- This is where the phase's Completion Checkpoint (from §13.4) is applied
+
+**Summary — The Pre-Implementation Checklist**
+
+Before writing the first line of implementation code for any phase:
+
+```
+□ Step 1: System Inventory — all affected systems listed with state/callers/callees
+□ Step 2: Source Reading — every overridden function's full source read and documented
+□ Step 3: Contracts — preconditions, postconditions, invariants for each override
+□ Step 4: Risk Register — failure modes, detection methods, mitigations
+□ Step 5: Staged Plan — implementation broken into testable increments
+```
+
+During implementation:
+```
+□ Step 6: Stage Tests — focused test at each stage boundary
+□ Step 7: Integration Verification — full test after all stages complete
+```
+
+**Time investment:** Steps 1-5 typically take 30-60 minutes for a medium-complexity phase. This is time very well spent — Phase 3 debugging consumed multiple hours across several sessions. Front-loading 30-60 minutes of analysis could have saved the majority of that debugging time.
+
+**When to abbreviate:** For simple phases (e.g., "add a CSS rule," "copy a file"), Steps 1 and 5 may be sufficient. Use judgment — but when in doubt, do the full protocol. The bugs that hurt most are always the ones in "simple" changes that turned out to have hidden complexity.
+
 ### 13.3 Testing Strategy
 
 #### 13.3.1 Testing Types
