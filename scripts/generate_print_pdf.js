@@ -6,11 +6,10 @@
  * Uses the actual app for guaranteed fidelity — same colors, layout, everything.
  *
  * Usage:
- *   node scripts/generate_print_pdf.js                  # Full score PDF
- *   node scripts/generate_print_pdf.js --track 1        # Violin I part
- *   node scripts/generate_print_pdf.js --track 2        # Violin II part
- *   node scripts/generate_print_pdf.js --track 3        # Viola part
- *   node scripts/generate_print_pdf.js --track 4        # Cello part
+ *   node scripts/generate_print_pdf.js                          # Full score PDF
+ *   node scripts/generate_print_pdf.js --track 1 --pages 6      # Violin I, 6 pages/screen
+ *   node scripts/generate_print_pdf.js --track 2 --pages 4      # Violin II, 4 pages/screen
+ *   node scripts/generate_print_pdf.js --all                    # All variants (full + 4 tracks × 3 densities)
  *
  * Prerequisites:
  *   - Run `node scripts/build_performance_app.js` first
@@ -41,6 +40,7 @@ const VIEWPORT_HEIGHT = 1200;
 
 let trackFilter = null;
 let pagesParam = 6;
+let generateAll = false;
 
 for (let i = 2; i < process.argv.length; i++) {
     if (process.argv[i] === '--track' && process.argv[i + 1]) {
@@ -49,6 +49,8 @@ for (let i = 2; i < process.argv.length; i++) {
     } else if (process.argv[i] === '--pages' && process.argv[i + 1]) {
         pagesParam = parseInt(process.argv[i + 1]);
         i++;
+    } else if (process.argv[i] === '--all') {
+        generateAll = true;
     }
 }
 
@@ -161,9 +163,121 @@ function startServer() {
     });
 }
 
-// ─── Main capture function ───────────────────────────────────────────────────
+// ─── Print CSS ──────────────────────────────────────────────────────────────
 
-async function capture() {
+const PRINT_CSS = [
+    '#compositionPanel { display: none !important; }',
+    '#compositionPanelToggle { display: none !important; }',
+    '#cursorMenu { display: none !important; }',
+    '#cursorMenuToggle { display: none !important; }',
+    'canvas { display: none !important; }',
+    'body { background: white !important; }',
+].join('\n');
+
+// ─── Helper: initialize a page for PDF capture ─────────────────────────────
+
+async function initPage(page, track, pages) {
+    var url = 'http://localhost:' + PORT;
+    if (track) {
+        url += '?track=' + track + '&pages=' + pages;
+    }
+
+    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+
+    // Wait for core systems
+    await page.waitForFunction(function() {
+        if (typeof SVGElementManager === 'undefined') return false;
+        if (!SVGElementManager.elements || SVGElementManager.elements.length === 0) return false;
+        var sc = document.getElementById('ScoreContainer');
+        if (!sc || sc.clientHeight === 0) return false;
+        return true;
+    }, { timeout: 15000 });
+
+    // Parts mode: also wait for PartsMode initialization
+    if (track) {
+        await page.waitForFunction(function() {
+            return typeof PartsMode !== 'undefined' && PartsMode.active === true;
+        }, { timeout: 10000 });
+    }
+
+    await page.addStyleTag({ content: PRINT_CSS });
+    await page.emulateMediaType('screen');
+    await new Promise(function(r) { setTimeout(r, 1500); });
+}
+
+// ─── Helper: navigate to a screen and wait for render ───────────────────────
+// Full score: pagesPerScreen=2, screenIndex*2*spp → shows 2 pages
+// Parts mode: pagesPerScreen=4/6/8, screenIndex*M*spp → shows M pages
+
+async function navigateToScreen(pg, screenIndex, pagesPerScreen) {
+    var targetSeconds = screenIndex * pagesPerScreen * secondsPerPage;
+
+    await pg.evaluate(function(sec) {
+        ClockSync.socket.emit('scoreGoto', { seconds: sec });
+    }, targetSeconds);
+
+    await new Promise(function(r) { setTimeout(r, 1200); });
+}
+
+// ─── Generate one PDF variant ───────────────────────────────────────────────
+
+async function generateOnePDF(page, track, pages) {
+    var pagesPerScreen = track ? pages : 2;
+    var totalScreens = Math.ceil(totalPages / pagesPerScreen);
+    var label = track
+        ? TRACK_NAMES[track] + '_' + pages + 'pages'
+        : 'full_score';
+    var pdfFileName = label + '.pdf';
+
+    console.log('\n─── Generating: ' + label + ' (' + totalScreens + ' screens, ' +
+        pagesPerScreen + ' pages/screen) ───');
+
+    // Initialize page with correct URL params
+    await initPage(page, track, pages);
+
+    // Collect single-page PDF buffers
+    var pageBuffers = [];
+    for (var si = 0; si < totalScreens; si++) {
+        await navigateToScreen(page, si, pagesPerScreen);
+
+        var buf = await page.pdf({
+            width: VIEWPORT_WIDTH + 'px',
+            height: VIEWPORT_HEIGHT + 'px',
+            printBackground: true,
+            margin: { top: 0, right: 0, bottom: 0, left: 0 }
+        });
+        pageBuffers.push(buf);
+
+        if ((si + 1) % 4 === 0 || si === totalScreens - 1) {
+            process.stdout.write('  Captured ' + (si + 1) + '/' + totalScreens + '\r');
+        }
+    }
+    console.log('');
+
+    // Merge into one PDF
+    console.log('  Merging ' + pageBuffers.length + ' pages...');
+    var mergedPdf = await PDFDocument.create();
+    for (var mi = 0; mi < pageBuffers.length; mi++) {
+        var srcDoc = await PDFDocument.load(pageBuffers[mi]);
+        var copiedPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
+        copiedPages.forEach(function(pg) { mergedPdf.addPage(pg); });
+    }
+
+    var pdfPath = path.join(OUTPUT_DIR, pdfFileName);
+    var pdfBytes = await mergedPdf.save();
+    fs.writeFileSync(pdfPath, pdfBytes);
+
+    var pdfSizeMB = pdfBytes.length / (1024 * 1024);
+    var pdfSizeKB = pdfBytes.length / 1024;
+    console.log('  ✓ ' + pdfFileName + ' — ' + mergedPdf.getPageCount() + ' pages, ' +
+        (pdfSizeMB > 1 ? pdfSizeMB.toFixed(1) + ' MB' : pdfSizeKB.toFixed(0) + ' KB'));
+
+    return { file: pdfFileName, pages: mergedPdf.getPageCount(), bytes: pdfBytes.length };
+}
+
+// ─── Main ───────────────────────────────────────────────────────────────────
+
+async function main() {
     const server = await startServer();
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
@@ -182,218 +296,42 @@ async function capture() {
         const page = await browser.newPage();
         await page.setViewport({ width: VIEWPORT_WIDTH, height: VIEWPORT_HEIGHT });
 
-        // Build URL
-        let url = 'http://localhost:' + PORT;
-        if (trackFilter) {
-            url += '?track=' + trackFilter + '&pages=' + pagesParam;
-        }
+        if (generateAll) {
+            // ─── Batch mode: full score + 4 tracks × 3 densities = 13 PDFs ──
+            console.log('\n═══ Batch Mode: Generating all PDF variants ═══');
 
-        console.log('  Navigating to: ' + url);
-        await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
-
-        // Wait for the app to fully initialize
-        console.log('  Waiting for app initialization...');
-        await page.waitForFunction(function() {
-            if (typeof SVGElementManager === 'undefined') return false;
-            if (!SVGElementManager.elements || SVGElementManager.elements.length === 0) return false;
-            var sc = document.getElementById('ScoreContainer');
-            if (!sc || sc.clientHeight === 0) return false;
-            return true;
-        }, { timeout: 15000 });
-
-        // Inject print CSS — hide UI panels, toggle handles, and canvas cursors
-        await page.addStyleTag({ content: [
-            '#compositionPanel { display: none !important; }',
-            '#cursorMenu { display: none !important; }',
-            'canvas { display: none !important; }',
-        ].join('\n') });
-        console.log('  Print CSS injected (panels + canvases hidden)');
-
-        // Force screen media so SVGs render normally in page.pdf()
-        await page.emulateMediaType('screen');
-
-        // Additional settle time for rendering
-        await new Promise(function(r) { setTimeout(r, 1500); });
-
-        // ─── Stage 1: Single screenshot test ─────────────────────────────
-        const screenshotPath = path.join(OUTPUT_DIR, 'stage1_test.png');
-        const container = await page.$('#ScoreContainer');
-        if (!container) {
-            throw new Error('#ScoreContainer not found in page');
-        }
-
-        await container.screenshot({ path: screenshotPath });
-        const stats = fs.statSync(screenshotPath);
-        console.log('\n  ✓ Stage 1 screenshot captured');
-        console.log('    Path: ' + screenshotPath);
-        console.log('    Size: ' + (stats.size / 1024).toFixed(1) + ' KB');
-
-        // Report app state
-        const appState = await page.evaluate(function() {
-            var result = {
-                svgElements: SVGElementManager.elements ? SVGElementManager.elements.length : 0,
-                containerWidth: document.getElementById('ScoreContainer').clientWidth,
-                containerHeight: document.getElementById('ScoreContainer').clientHeight,
-            };
-            if (typeof CurveMaker !== 'undefined' && CurveMaker.curves) {
-                result.curves = CurveMaker.curves.length;
+            var variants = [
+                { track: null, pages: null },  // full score
+            ];
+            for (var t = 1; t <= 4; t++) {
+                for (var p = 0; p < 3; p++) {
+                    variants.push({ track: t, pages: [4, 6, 8][p] });
+                }
             }
-            if (typeof GCMaker !== 'undefined' && GCMaker.gcs) {
-                result.gcs = GCMaker.gcs.length;
+
+            var results = [];
+            for (var vi = 0; vi < variants.length; vi++) {
+                var v = variants[vi];
+                var result = await generateOnePDF(page, v.track, v.pages);
+                results.push(result);
             }
-            if (typeof PM !== 'undefined' && PM.sections) {
-                result.partsMode = true;
-                result.sections = PM.sections.length;
-            }
-            return result;
-        });
 
-        console.log('    App state:');
-        console.log('      SVG elements: ' + appState.svgElements);
-        console.log('      Container: ' + appState.containerWidth + '×' + appState.containerHeight);
-        if (appState.curves !== undefined) console.log('      Curves: ' + appState.curves);
-        if (appState.gcs !== undefined) console.log('      GCs: ' + appState.gcs);
-        if (appState.partsMode) console.log('      Parts mode: ' + appState.sections + ' sections');
-
-        console.log('\n═══ Stage 1 Complete ═══');
-        console.log('  Verify screenshot at: ' + screenshotPath);
-
-        // ─── Stage 2: Page navigation test ───────────────────────────────
-
-        // Helper: navigate to a page pair and wait for render
-        // onGoto calculates: targetPage = floor(seconds / secondsPerPage)
-        // Even targetPage → top=page, bottom=page+1 (future) — correct pair
-        // Odd targetPage  → bottom=page, top=page+1 (future) — WRONG pair
-        // So we must land exactly on the even page: seconds = pairIndex * 2 * spp
-        async function navigateToPagePair(pg, pairIndex) {
-            var targetSeconds = pairIndex * 2 * secondsPerPage;
-
-            await pg.evaluate(function(sec) {
-                ClockSync.socket.emit('scoreGoto', { seconds: sec });
-            }, targetSeconds);
-
-            // Wait for render
-            await new Promise(function(r) { setTimeout(r, 1200); });
-
-            var pageState = await pg.evaluate(function() {
-                return {
-                    top: typeof GraphicTimeline !== 'undefined' ? GraphicTimeline.currentTopPage : -1,
-                    bottom: typeof GraphicTimeline !== 'undefined' ? GraphicTimeline.currentBottomPage : -1
-                };
+            console.log('\n═══ Batch Complete: ' + results.length + ' PDFs generated ═══');
+            var totalBytes = 0;
+            results.forEach(function(r) {
+                totalBytes += r.bytes;
+                console.log('  ' + r.file + ' — ' + r.pages + ' pages');
             });
-            return pageState;
-        }
+            console.log('  Total: ' + (totalBytes / (1024 * 1024)).toFixed(1) + ' MB');
 
-        console.log('\n─── Stage 2: Page Navigation Test ───');
-
-        // Test A: boundary pairs (first, middle, last)
-        console.log('  Test A: boundary pairs');
-        var boundaryPairs = [0, Math.floor(pagePairs / 2), pagePairs - 1];
-        for (var ti = 0; ti < boundaryPairs.length; ti++) {
-            var pairIdx = boundaryPairs[ti];
-            var ps = await navigateToPagePair(page, pairIdx);
-            var fname = 'stage2_pair' + pairIdx + '.png';
-            var fpath = path.join(OUTPUT_DIR, fname);
-            await container.screenshot({ path: fpath });
-            var fsize = fs.statSync(fpath).size;
-            var expectedTop = pairIdx * 2;
-            var expectedBot = pairIdx * 2 + 1;
-            var match = (ps.top === expectedTop && ps.bottom === expectedBot) ? '✓' : '✗ MISMATCH';
-            console.log('    Pair ' + pairIdx + ': top=' + ps.top + ' bottom=' + ps.bottom +
-                ' (expect ' + expectedTop + '/' + expectedBot + ') ' + match +
-                ' → ' + (fsize / 1024).toFixed(1) + ' KB');
-        }
-
-        // Test B: consecutive pairs (5,6,7,8) — verify each advances by 2 pages
-        console.log('  Test B: consecutive pairs (verify +2 page advance)');
-        var consecStart = 5;
-        var consecCount = 4;
-        var prevTop = -1, prevBot = -1;
-        var allCorrect = true;
-        for (var ci = 0; ci < consecCount; ci++) {
-            var pairIdx = consecStart + ci;
-            var ps = await navigateToPagePair(page, pairIdx);
-            var fname = 'stage2_consec' + pairIdx + '.png';
-            var fpath = path.join(OUTPUT_DIR, fname);
-            await container.screenshot({ path: fpath });
-            var fsize = fs.statSync(fpath).size;
-            var expectedTop = pairIdx * 2;
-            var expectedBot = pairIdx * 2 + 1;
-            var pageOk = (ps.top === expectedTop && ps.bottom === expectedBot);
-            var advanceOk = (prevTop === -1) || (ps.top === prevTop + 2 && ps.bottom === prevBot + 2);
-            if (!pageOk || !advanceOk) allCorrect = false;
-            var status = (pageOk && advanceOk) ? '✓' : '✗';
-            console.log('    Pair ' + pairIdx + ': top=' + ps.top + ' bottom=' + ps.bottom +
-                ' (expect ' + expectedTop + '/' + expectedBot + ') ' + status +
-                ' → ' + (fsize / 1024).toFixed(1) + ' KB');
-            prevTop = ps.top;
-            prevBot = ps.bottom;
-        }
-        if (allCorrect) {
-            console.log('  ✓ All consecutive pairs advance by exactly 2 pages');
         } else {
-            console.log('  ✗ Page advance error detected — check navigation');
+            // ─── Single variant mode ────────────────────────────────────────
+            await generateOnePDF(page, trackFilter, pagesParam);
         }
-
-        console.log('\n═══ Stage 2 Complete ═══');
-        console.log('  Screenshots in: ' + OUTPUT_DIR);
-        console.log('  Please verify: pair0 (first), pair' + (pagePairs-1) + ' (last), consec5-8 (consecutive)');
-
-        // ─── Stage 3: Full vector PDF assembly ──────────────────────────
-
-        console.log('\n─── Stage 3: Full Vector PDF (' + pagePairs + ' page pairs) ───');
-
-        // Collect single-page PDF buffers, then merge with pdf-lib
-        var pageBuffers = [];
-
-        for (var pi = 0; pi < pagePairs; pi++) {
-            // Navigate using the corrected helper
-            await navigateToPagePair(page, pi);
-
-            // Capture as vector PDF (one page)
-            var buf = await page.pdf({
-                width: VIEWPORT_WIDTH + 'px',
-                height: VIEWPORT_HEIGHT + 'px',
-                printBackground: true,
-                margin: { top: 0, right: 0, bottom: 0, left: 0 }
-            });
-            pageBuffers.push(buf);
-
-            // Progress
-            if ((pi + 1) % 8 === 0 || pi === pagePairs - 1) {
-                process.stdout.write('  Captured ' + (pi + 1) + '/' + pagePairs + '\r');
-            }
-        }
-        console.log('');
-
-        // Merge all single-page PDFs into one document
-        console.log('  Merging ' + pageBuffers.length + ' pages...');
-        var mergedPdf = await PDFDocument.create();
-        for (var mi = 0; mi < pageBuffers.length; mi++) {
-            var srcDoc = await PDFDocument.load(pageBuffers[mi]);
-            var copiedPages = await mergedPdf.copyPages(srcDoc, srcDoc.getPageIndices());
-            copiedPages.forEach(function(pg) { mergedPdf.addPage(pg); });
-        }
-
-        // Save PDF
-        var pdfFileName = trackFilter
-            ? (TRACK_NAMES[trackFilter] || 'Track' + trackFilter) + '_part.pdf'
-            : 'full_score.pdf';
-        var pdfPath = path.join(OUTPUT_DIR, pdfFileName);
-        var pdfBytes = await mergedPdf.save();
-        fs.writeFileSync(pdfPath, pdfBytes);
-
-        var pdfSizeKB = pdfBytes.length / 1024;
-        var pdfSizeMB = pdfSizeKB / 1024;
-        console.log('  ✓ Vector PDF saved: ' + pdfPath);
-        console.log('    Pages: ' + mergedPdf.getPageCount());
-        console.log('    Size: ' + (pdfSizeMB > 1 ? pdfSizeMB.toFixed(1) + ' MB' : pdfSizeKB.toFixed(0) + ' KB'));
-        console.log('    Format: Vector (SVG paths preserved — infinite resolution)');
-
-        console.log('\n═══ Stage 3 Complete ═══');
 
     } catch (err) {
         console.error('\n  ✗ Error: ' + err.message);
+        console.error(err.stack);
         process.exit(1);
     } finally {
         if (browser) await browser.close();
@@ -402,4 +340,4 @@ async function capture() {
     }
 }
 
-capture();
+main();

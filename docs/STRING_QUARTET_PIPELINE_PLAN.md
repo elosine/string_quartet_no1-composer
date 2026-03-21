@@ -3906,8 +3906,8 @@ Phase 1: Foundation ────────────────────
 |-------|------|----------|-----------|----------|---------|
 | **1** | Foundation — Strip & Stabilize | 2–3 | — | Breaking rendering during strip | 🤖→👁️ |
 | **2** | Animation Tier 1 | 1–2 | 1 | Subtle timing bugs | 🤖→👁️ |
-| **3** | Parts Extraction | 1–2 | 1 | Track "A" / string vs int | 🤖→👁️ |
-| **4** | Print Score (Puppeteer) | 2–3 | 1 | Page navigation timing | 🤖→👁️ |
+| **3** | Parts Extraction | ✅ 2 | 1 | Track "A" / string vs int | 🤖→👁️ |
+| **4** | Print Score (Puppeteer) | ✅ 2 | 1 | Page navigation timing, CSS alignment | 🤖→👁️ |
 | **5** | Server — Rooms | 2–3 | 1 | Multi-client state management | 🤖→👁️ |
 | **6** | Sync Tier 1 | 1–2 | 5 | Drift correction tuning | 🤖→👁️ |
 | **7** | Auth & Persistence | 2–3 | 5 | JWT token management | 🤖 |
@@ -4493,4 +4493,283 @@ Cached layout dimensions to eliminate per-frame reflow:
 | `v1.0-composition` | — | Original composition milestone |
 | `phase-1-complete` | `e25c1ba5` | Phase 1 Performance Score foundation |
 | `workshop-verified-pre-phase2` | `3bd71d1b` | Verified workshop intact before Phase 2 |
-| `phase-2-complete` | *(this commit)* | Phase 2 animation optimizations complete |
+| `phase-2-complete` | *(see git log)* | Phase 2 animation optimizations complete |
+| `phase-3-complete` | `ed86d027` | Phase 3 parts mode complete |
+| `phase-4-complete` | `162f83ae` | Phase 4 print score complete — 13 vector PDFs |
+
+---
+
+## 15. Phase 3 Post-Mortem — Parts Mode (N-Section Layout)
+
+**Date:** Mar 19–21, 2026
+**Tag:** `phase-3-complete`
+**Commit:** `ed86d027`
+**Scope:** Full N-section parts mode — merged original Phase 3 (track filtering) + Phase 12 (part views)
+**Workshop impact:** None — `public/index.html` unchanged. All patches in `scripts/performance_parts_patches.js`
+
+> **Full post-mortem details** are in `docs/IMPLEMENTATION_PROGRESS.md` §"Phase 3 Post-Mortem" (Steps A–G). This section captures the key lessons and architecture for the pipeline plan's self-contained reference.
+
+### 15.1 What Was Built
+
+Single-track expanded view activated via URL `?track=N&pages=M` (N=1-4, M=4/6/8, default 6). Ten Workshop systems overridden in `scripts/performance_parts_patches.js` (~1930 lines):
+
+1. **DOM** — N score-row sections dynamically created
+2. **Canvas** — One overlay per section, `resizeAllCanvases()`
+3. **StaffCursors** — Cursor on active section via `totalPages % PAGE_COUNT`
+4. **GraphicTimeline** — Circular buffer page turns, N-section onGoto/reset
+5. **StaffPositions** — `staffHeight = availableHeight` (full height, not /4)
+6. **SVGElementManager** — N containers, `calcPixelPosition` with MAX_ELEMENT_PAGES cap
+7. **CurveMaker** — updateVisibility with bottom-ref swap pattern (ASB-190 fix)
+8. **LineWedgeMaker** — Same bottom-ref swap pattern
+9. **GCMaker** — Trajectory cap, bottom-justified, canvas per section
+10. **GlissandoSystem** — 5 method overrides for N-section pitch display
+
+### 15.2 Key Design Patterns
+
+- **Bottom-ref swap:** Before calling Workshop methods that use `page % 2` to pick top/bottom, swap BOTH `scoreTopEl`+group AND `scoreBottomEl`+group to the correct section SVG. Makes the `page % 2` branch a no-op.
+- **Triple-ref save/restore:** For continuation segments, save/restore all 3 refs (`continuationGroupTop`, `continuationPathTop`, `continuationHitPathTop`) per section.
+- **Circular buffer page distribution:** `sectionPages[i] = targetPage + ((i - targetSi + PAGE_COUNT) % PAGE_COUNT)`
+- **MAX_ELEMENT_PAGES = 5:** Caps SVG element sizes when PAGE_COUNT < 5. GCs are bottom-justified.
+
+### 15.3 Bugs and Lessons
+
+| Bug | Symptom | Root Cause | Fix | Lesson |
+|-----|---------|-----------|-----|--------|
+| ASB-190 | Curves on wrong sections | Workshop's `clipCurveToPageEnd` used `page % 2` | Bottom-ref swap before Workshop call | **Always read full source of overridden functions** |
+| ASB-191 | Goto shows wrong pages | Linear page assignment instead of circular | Modular arithmetic distribution | Test navigation separately before integration |
+| ASB-192 | Glissando on wrong sections | Hardcoded 2-section GlissandoSystem | 5-method N-section override | Inventory ALL systems that reference sections |
+| ASB-193 | Continuation cross-contamination | Incomplete save/restore of shared refs | Save/restore all 3 refs per section | Document shared mutable state explicitly |
+
+**Key lesson (prompted §13.2.7 Pre-Implementation Protocol):** Most bugs came from overriding Workshop functions without fully reading their source. Step 2 (Source Reading) of the pre-implementation protocol is the single most important step — 5:1 read-to-write ratio.
+
+### 15.4 Future Impacts
+
+1. **Phase 4 (Print):** Must handle `?track=N&pages=M` URL params. Wait for `PartsMode.active` before capture.
+2. **Phase 5 (Server):** Socket stub's `scoreGoto` handler modified for N-section alignment — preserve `onGoto` override.
+3. **Phase 10 (Sync T2):** N-canvas architecture means sync corrections need `sectionIndex = totalPages % PAGE_COUNT`.
+4. **Phase 12 (Part Views):** Already substantially complete. Remaining: UI toggle (currently URL-only), "My Part"/"Full Score" runtime switch.
+5. **`page % 2` pattern:** Used in 4+ Workshop places (CurveMaker, LineWedgeMaker, SVGElementManager, GCMaker). All overridden. Any NEW maker using this pattern needs similar override.
+
+---
+
+## 16. Phase 4 Post-Mortem — Print Score PDF via Puppeteer
+
+**Date:** Mar 21, 2026
+**Tag:** `phase-4-complete`
+**Scope:** Generate high-fidelity vector PDFs of the full score and individual parts
+**Workshop impact:** One CSS fix in `public/index.html` — `margin: 5px 5px 5px 0` → `margin: 5px` on `#ScoreTop` and `#ScoreBottom`
+**Sessions used:** 2 (within estimated 2–3)
+
+### 16.1 What Was Built
+
+**Script:** `scripts/generate_print_pdf.js` (~344 lines)
+**Dependencies:** `puppeteer`, `pdf-lib` (added to `package.json`)
+**Output directory:** `builds/print/`
+
+**13 vector PDF variants generated:**
+
+| PDF | Pages | Size | Description |
+|-----|-------|------|-------------|
+| `full_score.pdf` | 32 | 3.0 MB | Full 4-instrument score, 2 pages per screen |
+| `Violin_I_{4,6,8}pages.pdf` | 16 / 11 / 8 | 1.2 / 1.1 / 1.0 MB | Violin I part at 3 densities |
+| `Violin_II_{4,6,8}pages.pdf` | 16 / 11 / 8 | 1.2 / 1.1 / 1.0 MB | Violin II part at 3 densities |
+| `Viola_{4,6,8}pages.pdf` | 16 / 11 / 8 | 1.3 / 1.2 / 1.1 MB | Viola part at 3 densities |
+| `Cello_{4,6,8}pages.pdf` | 16 / 11 / 8 | 1.2 / 1.1 / 1.0 MB | Cello part at 3 densities |
+| **Total** | | **16.5 MB** | |
+
+**CLI interface:**
+```bash
+node scripts/generate_print_pdf.js                          # Full score only
+node scripts/generate_print_pdf.js --track 1 --pages 6      # Single variant
+node scripts/generate_print_pdf.js --all                    # All 13 variants
+```
+
+### 16.2 Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ generate_print_pdf.js                                     │
+│                                                           │
+│  1. Start local HTTP server (port 3002)                   │
+│     serving builds/performance/                           │
+│                                                           │
+│  2. Launch headless Chromium via Puppeteer                 │
+│     Viewport: 1600×1200 (4:3 matching #ScoreContainer)    │
+│                                                           │
+│  3. For each variant:                                     │
+│     a. Navigate to http://localhost:3002[?track=N&pages=M]│
+│     b. Wait for SVGElementManager + PartsMode init        │
+│     c. Inject print CSS (hide UI, white background)       │
+│     d. emulateMediaType('screen') for SVG rendering       │
+│     e. For each screen:                                   │
+│        - scoreGoto(screenIndex × pagesPerScreen × spp)    │
+│        - Wait 1200ms for render                           │
+│        - page.pdf() → single-page vector PDF buffer       │
+│     f. Merge all buffers with pdf-lib → final PDF         │
+│                                                           │
+│  4. Close browser and server                              │
+└──────────────────────────────────────────────────────────┘
+```
+
+**Key technical details:**
+- **Vector output:** `page.pdf()` preserves SVG paths as vector graphics — infinite resolution, no rasterization
+- **`emulateMediaType('screen')`:** Required — without this, `page.pdf()` uses print media type and SVGs don't render
+- **Navigation formula:** `targetSeconds = screenIndex × pagesPerScreen × secondsPerPage`
+  - Full score: `pagesPerScreen = 2` (ScoreTop + ScoreBottom)
+  - Parts mode: `pagesPerScreen = 4, 6, or 8` (N sections)
+- **Print CSS:** Hides `#compositionPanel`, `#compositionPanelToggle`, `#cursorMenu`, `#cursorMenuToggle`, `canvas` overlays; sets `body` background to white
+- **Timing:** Reads `score.json` `tempoHistory[0]` for BPM/beatsPerPage; scans all element `endSeconds` for true max duration (508.1s → 64 pages)
+
+### 16.3 Implementation Stages (Actual)
+
+| Stage | Description | Status | Key Finding |
+|-------|-------------|--------|-------------|
+| 1 | Puppeteer skeleton + server + first screenshot | ✅ | Duration calc must scan `endSeconds` not just `start+duration` — `curves[153].endSeconds=508.05` was the true max |
+| 2 | Page navigation tests | ✅ | Must land on EVEN page: `pairIndex × 2 × spp`. Odd pages cause wrong pair display |
+| 3 | Full vector PDF assembly | ✅ | `page.pdf()` + `emulateMediaType('screen')` + pdf-lib merge → 32 pages, 3.0 MB vector |
+| 4 | Alignment fix (CSS) | ✅ | Root cause: `margin: 5px 5px 5px 0` in Workshop CSS → fixed to `margin: 5px` |
+| 5 | Quality verification | ✅ | 400% zoom: staff lines, noteheads, hairpins, curves, text all crisp vector. 0 raster images confirmed |
+| 6 | Per-track + batch generation | ✅ | `--track`, `--pages`, `--all` flags. 13 PDFs in one run |
+
+### 16.4 Bugs and Lessons
+
+#### Bug 1: Duration Calculation (Stage 1)
+
+**Symptom:** Incorrect total page count — missing the last few pages of the score.
+**Root cause:** Calculated `maxSeconds` from `startSeconds + durationSeconds` for each element, but some curves have an explicit `endSeconds` field that extends beyond `start + duration`. Specifically, `curves[153].endSeconds = 508.05` was the true maximum.
+**Fix:** Scan `endSeconds` as a separate field on all element types (svgElements, curves, GCs, lineWedges).
+**Lesson:** When computing bounds from heterogeneous data, check ALL relevant fields — don't assume one formula covers all element types.
+
+#### Bug 2: Odd Page Navigation (Stage 2)
+
+**Symptom:** Some page pairs showed content from the wrong pages (mixed pair — bottom from target page, top from next page).
+**Root cause:** `GraphicTimeline.onGoto` calculates `targetPage = Math.floor(seconds / secondsPerPage)`. If `targetPage` is even, `currentTopPage = targetPage` and `currentBottomPage = targetPage + 1` — correct pair. If `targetPage` is odd, the top/bottom assignment flips — wrong pair.
+**Fix:** `targetSeconds = pairIndex × 2 × secondsPerPage` — always lands on an even page number.
+**Lesson:** Understand the downstream math before computing navigation targets. The floor division + parity interaction was non-obvious.
+
+#### Bug 3: Asymmetric Margins — Root Cause Discovery (Stage 4)
+
+**Symptom:** Score content was shifted left in PDFs — left grey margin was narrower than right.
+**Root cause:** `#ScoreTop` and `#ScoreBottom` in `public/index.html` had `margin: 5px 5px 5px 0` — zero left margin.
+**Attempted workarounds (all failed or were rejected):**
+1. Puppeteer-injected CSS padding + pdf-lib CropBox → content still shifted due to Puppeteer re-layout
+2. Viewport size matching PDF page dimensions → CSS re-layout in print context produced different results
+3. Absolute positioning with explicit pixel offsets → brittle, didn't match between viewport and print
+**Successful fix:** Changed Workshop CSS to `margin: 5px` — symmetric margins. Single-line change.
+**Lesson:** **Fix the root cause upstream, not downstream.** Puppeteer's `page.pdf()` uses a separate rendering pass that may re-layout CSS differently from the viewport. Any workaround that depends on viewport layout matching print layout is fragile. Fixing the source CSS was a 1-line change vs. hours of workaround attempts.
+
+#### Bug 4: Puppeteer PDF Rendering Context (Stage 4)
+
+**Symptom:** CSS injected via `page.addStyleTag()` behaved differently in `page.pdf()` vs. the live viewport.
+**Root cause:** `page.pdf()` triggers a fresh rendering pass in Chromium's print compositor, which may interpret CSS differently (especially flex layouts, margins, and `calc()` expressions).
+**Lesson:** When using Puppeteer for PDF capture, ensure the source HTML/CSS produces the desired layout in BOTH viewport and print contexts. Don't rely on Puppeteer-injected CSS overrides for layout-critical properties — they work in the viewport but may be re-interpreted during `page.pdf()`.
+
+### 16.5 Key Design Decisions
+
+| Decision | Rationale | Alternative Considered |
+|----------|-----------|----------------------|
+| Vector PDF via `page.pdf()` | Infinite resolution, small file size, true SVG paths preserved | Screenshot embedding (raster, resolution-limited) — rejected |
+| `emulateMediaType('screen')` | Required for SVGs to render in print context | None — without this, SVGs are blank in PDF |
+| pdf-lib for merging | Lightweight, handles copying pages between PDFs | pdfkit (more complex), manual concatenation (fragile) |
+| Fix source CSS over workarounds | 1-line fix vs. hours of complex PDF post-processing | CropBox manipulation, viewport matching, absolute positioning — all failed or fragile |
+| Single browser instance for batch | Faster than relaunching per variant; navigate to new URL between variants | Separate process per variant (slow, resource-heavy) |
+| `--all` flag for batch | Generates all 13 variants in one run (~3 min) | Manual invocation of 13 separate commands |
+
+### 16.6 Pre-Implementation Protocol Assessment
+
+The pre-implementation protocol (§13.2.7) was followed for Phase 4. Assessment:
+
+| Step | Effectiveness | Notes |
+|------|--------------|-------|
+| 1. System Inventory | ✅ Very helpful | Identified all interacting systems upfront (socket stub, DOM, parts mode) |
+| 2. Source Reading | ✅ Critical | Reading `GraphicTimeline.onGoto` revealed the even/odd page issue before it became a hard bug |
+| 3. Contracts | ✅ Useful | Preconditions (build exists) and postconditions (page count, vector format) guided testing |
+| 4. Risk Register | ✅ 4 of 6 risks materialized | App loading, cursor visibility, UI drawer, scoreGoto timing — all caught by mitigations |
+| 5. Staged Plan | ✅ Excellent | 6 stages with tests between each caught bugs early and kept scope manageable |
+| 6. Focused Tests | ✅ Caught all issues | Boundary + consecutive navigation tests (Stage 2) caught the odd-page bug immediately |
+| 7. Integration | ✅ Smooth | Final batch run worked first try — all 13 PDFs generated correctly |
+
+**Process improvement identified:** The alignment bug (Bug 3) was the most time-consuming issue, and it was NOT in the risk register. **Add "source CSS assumptions" to future risk registers** when capturing visual output. The risk was not in Puppeteer or navigation — it was in the source HTML having an asymmetric layout that was invisible in the dark-themed app but obvious in white-background PDF.
+
+### 16.7 Future Impacts
+
+1. **Workshop CSS change is permanent:** The `margin: 5px` fix in `public/index.html` lines 119 and 126 must be preserved. If reverted to `5px 5px 5px 0`, all PDFs will have asymmetric margins. The performance app build inherits this fix automatically.
+
+2. **Rebuilding after score changes:** If the Workshop score is modified:
+   ```bash
+   node scripts/build_performance_app.js   # Rebuild performance app
+   node scripts/generate_print_pdf.js --all  # Regenerate all 13 PDFs
+   ```
+   The script automatically reads timing from `score.json` — no manual updates needed for tempo or duration changes.
+
+3. **New tracks:** If the score is extended beyond 4 tracks, update `TRACK_NAMES` in `generate_print_pdf.js` and the batch variant loop.
+
+4. **Page density options:** Currently supports 4, 6, 8 pages per screen. Adding new densities requires: (a) verifying the performance app handles the new `pages=N` value, and (b) adding the value to the batch variants array in `generate_print_pdf.js`.
+
+5. **Phase 5 (Server):** No impact — `generate_print_pdf.js` uses its own local server on port 3002, independent of the development server (port 5000) or performance server (port 3001).
+
+6. **For a new piece:** The entire print pipeline is portable:
+   - Copy `scripts/generate_print_pdf.js` and `scripts/build_performance_app.js`
+   - Ensure the new piece has a Workshop (`public/index.html`) with the same CSS structure
+   - Build performance app, then run `generate_print_pdf.js --all`
+   - Timing is read from `score.json` automatically — works for any tempo/duration/page count
+
+### 16.8 Repeatability — Step-by-Step Rebuild
+
+```bash
+# Prerequisites
+npm install puppeteer pdf-lib   # (already in package.json)
+
+# 1. Build the performance app (includes all Phase 1-3 patches)
+node scripts/build_performance_app.js
+
+# 2. Generate all PDFs (full score + 4 tracks × 3 densities)
+node scripts/generate_print_pdf.js --all
+
+# 3. Or generate specific variants
+node scripts/generate_print_pdf.js                          # Full score only
+node scripts/generate_print_pdf.js --track 1 --pages 6      # Violin I, 6 pages/screen
+node scripts/generate_print_pdf.js --track 4 --pages 4      # Cello, 4 pages/screen
+
+# Output in builds/print/
+```
+
+**Visual audit checklist (human verification):**
+- [ ] Open `full_score.pdf` — 32 pages, content starts at page 0/1, ends at page 62/63
+- [ ] Zoom to 400% — staff lines, noteheads, hairpins, curves, text are all crisp vectors
+- [ ] Compare first page against Workshop rendering — colors match exactly
+- [ ] Open any part PDF (e.g., `Violin_I_6pages.pdf`) — shows only Violin I notation
+- [ ] Verify page count matches expectation: `ceil(64 / pagesPerScreen)` screens
+- [ ] Check 4-page variant — notation slightly smaller due to `MAX_ELEMENT_PAGES` cap (intentional)
+- [ ] Check 8-page variant — maximum density, notation very small but legible
+- [ ] Verify grey margins are symmetric (equal left and right) on all variants
+- [ ] Verify no UI artifacts (panels, cursors, canvas overlays) visible in any PDF
+
+**Known gotchas:**
+1. Port 3002 must be free — the script's local server uses this port. If another process is using it, the script will error.
+2. `builds/performance/` must exist and be up-to-date — run `build_performance_app.js` first.
+3. Puppeteer needs ~1.5s settle time after page load and ~1.2s after each `scoreGoto` for rendering to complete. These values are tuned for this score's complexity — a much more complex score might need longer waits.
+4. The `margin: 5px` fix in Workshop CSS affects the live Workshop view slightly (adds 5px left margin that was previously 0). This is cosmetically correct and not a regression.
+
+### 16.9 Files Modified/Created
+
+| File | Action | Purpose |
+|------|--------|---------|
+| `scripts/generate_print_pdf.js` | **Created** (Stage 1), modified (Stages 2-6) | Main Puppeteer capture script |
+| `public/index.html` | Modified (Stage 4) | CSS fix: `#ScoreTop`/`#ScoreBottom` margin `5px 5px 5px 0` → `5px` |
+| `builds/performance/index.html` | Regenerated | Inherits the CSS fix |
+| `builds/print/*.pdf` | **Created** | 13 vector PDF output files |
+| `builds/print/stage*.png` | Created (Stages 1-2) | Diagnostic screenshots (can be deleted) |
+| `package.json` | Modified | Added `puppeteer` and `pdf-lib` dependencies |
+| `scripts/_inspect_print.js` | Created then **deleted** | Temporary diagnostic script for alignment debugging |
+
+### 16.10 Git Safety
+
+| Tag | Commit | Purpose |
+|-----|--------|--------|
+| `v1.0-composition` | — | Original composition milestone |
+| `phase-1-complete` | `e25c1ba5` | Phase 1 Performance Score foundation |
+| `workshop-verified-pre-phase2` | `3bd71d1b` | Verified workshop intact before Phase 2 |
+| `phase-2-complete` | `9c1f0701` | Phase 2 animation optimizations |
+| `phase-3-complete` | `ed86d027` | Phase 3 parts mode complete |
+| `phase-4-complete` | *(this commit)* | Phase 4 print score complete |

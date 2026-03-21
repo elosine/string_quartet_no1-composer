@@ -1,9 +1,31 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 4 — Print Score (Puppeteer PDF Capture)
+**Active Phase:** Phase 5 — Server Architecture (Rooms & Multi-Client)
 **Last Session:** Mar 21, 2026
-**Last Commit:** `ed86d027` — `[Phase 3] Parts mode complete` + tag `phase-3-complete`
+**Last Commit:** `162f83ae` — `[Phase 4] Print score complete` + tag `phase-4-complete`
+
+## How to Resume Work (for the human)
+
+### Which documents do what?
+- **This file (`IMPLEMENTATION_PROGRESS.md`)** — your working document. Open it at the start of every session. Scroll to **RESUME HERE** at the bottom for the exact entry point, current stage, and next action.
+- **`STRING_QUARTET_PIPELINE_PLAN.md`** — the architectural reference. Contains the full pipeline design, implementation methodology, pre-implementation protocol template (§13.2.7), and post-mortems with all lessons learned (§14-§16). Self-sufficient for a fresh AI or for reuse on a new piece.
+- **Both are needed.** The pipeline plan is the "why and what." This progress file is the "where we are and what's next."
+
+### Resumption by timeframe
+| Gap | What to do |
+|-----|-----------|
+| **Hours/days** | Open this file → RESUME HERE. AI memories will fill in context automatically. |
+| **Weeks** | Same as above. Memories should still work but verify them against this document if anything seems off. |
+| **Months/year+** | **Do not rely on AI memories** — they may be stale or missing. Have the AI read both this file AND the pipeline plan. Everything critical is captured in the documents. |
+| **New piece entirely** | `STRING_QUARTET_PIPELINE_PLAN.md` alone is sufficient — it contains the full architecture, methodology, and lessons that generalize beyond this specific piece. |
+
+### Three-tier documentation system (§13.1)
+1. **AI Memories** — fast context retrieval for session-to-session continuity. Convenience layer only — every important detail has been written into the documents.
+2. **Git commits + tags** — rollback safety. Each phase has a tag (e.g., `phase-4-complete`). Use `git tag -l` to see all milestones.
+3. **These documents** — permanent, self-sufficient record of truth. If memories disappeared tomorrow, the documents would still be complete.
+
+---
 
 ## Phase Status Table
 | Phase | Status | Completion Date | Notes |
@@ -11,7 +33,7 @@
 | 1. Foundation | ✅ Complete | Mar 18 | All rendering verified, 7 patches + 7 strips |
 | 2. Animation T1 | ✅ Complete | Mar 19 | Continuous time loop, canvas overlay, subscriber pattern, badge freeze |
 | 3. Parts Mode | ✅ Complete | Mar 21 | Full N-section parts view + 4 bug fixes + size constraints |
-| 4. Print Score | 🔄 In Progress | — | Pre-implementation protocol complete, Stage 1 starting |
+| 4. Print Score | ✅ Complete | Mar 21 | 6 stages, 13 vector PDFs (full + 4 tracks × 3 densities), CSS margin fix |
 | 5–14 | ⏳ Pending | — | |
 
 ---
@@ -271,14 +293,20 @@ Stage 3: Full vector PDF assembly (page.pdf() + pdf-lib merge)         ✅ DONE
   → Used page.pdf() with emulateMediaType('screen') for vector output
   → pdf-lib merges 32 single-page PDFs into one multi-page document
 
-Stage 4: Print CSS polish (hide cursor, clean margins)                 ⬅ CURRENT
-  → TEST: No cursor artifacts, clean white score areas, blueGrey border
+Stage 4: Print CSS polish + alignment fix                              ✅ DONE
+  → TEST: No cursor artifacts, clean white score areas, symmetric margins
+  → ROOT CAUSE: Workshop CSS margin: 5px 5px 5px 0 → fixed to 5px
+  → Multiple Puppeteer-side workarounds attempted and failed before source fix
 
-Stage 5: Quality verification at 400% zoom
+Stage 5: Quality verification at 400% zoom                              ✅ DONE
   → TEST: Human spot-check colors, sharpness, compare to live app
+  → RESULT: Staff lines, noteheads, hairpins, curves, text all crisp vector
+  → 0 raster images confirmed in PDF structure
 
-Stage 6: Per-track PDF generation (--track flag)
-  → TEST: 4 separate PDFs, each showing only one track's notation
+Stage 6: Per-track + batch PDF generation                               ✅ DONE
+  → TEST: 13 PDFs generated (full + 4 tracks × 3 densities)
+  → RESULT: --track, --pages, --all flags implemented
+  → Full batch: 13 PDFs, 16.5 MB total, ~3 min runtime
 ```
 
 ### Step 6: Focused Stage Tests
@@ -303,18 +331,188 @@ Stage 6: Per-track PDF generation (--track flag)
 - 👁️ Zoom to 400% — sharp at any zoom (vector) → ✅ (user confirmed on test page)
 
 **Stage 4 tests:**
-- 🤖 No `<canvas>` elements visible in capture
-- 👁️ Pages look clean — no UI remnants
+- 🤖 No `<canvas>` elements visible in capture → ✅
+- 👁️ Pages look clean — no UI remnants → ✅
+- 👁️ Symmetric grey margins (equal left and right) → ✅ (after CSS fix)
 
 **Stage 5 tests:**
-- 👁️ Zoom to 400% — notation sharp, colors match live app
-- 👁️ Compare first page, last page, and 3 random middle pages against Workshop
+- 👁️ Zoom to 400% — notation sharp, colors match live app → ✅ (user confirmed)
+- 👁️ Compare first page, last page, and 3 random middle pages against Workshop → ✅
+- 🤖 0 raster images in PDF, Form XObjects present (vector confirmed) → ✅
 
 **Stage 6 tests:**
-- 🤖 4 PDFs generated, all non-zero size
-- 👁️ Each PDF shows only one track's notation expanded
+- 🤖 13 PDFs generated, all non-zero size → ✅
+- 👁️ Part PDFs show only one track's notation expanded → ✅ (user confirmed Violin_I_6pages)
+- 🤖 Page counts correct: full=32, 4pages=16, 6pages=11, 8pages=8 → ✅
+- 🤖 All 13 variants generated in batch mode → ✅
+
+---
+
+## Phase 4 Post-Mortem Summary
+
+> **Full post-mortem** is in `docs/STRING_QUARTET_PIPELINE_PLAN.md` §16 (Phase 4 Post-Mortem). This is a brief summary.
+
+**What was built:** `scripts/generate_print_pdf.js` — Puppeteer-based PDF generator producing 13 vector PDFs (full score + 4 tracks × 3 page densities). Total output: 16.5 MB in `builds/print/`.
+
+**Key bugs:** (1) Duration calc missed `endSeconds` field, (2) Odd page navigation due to `floor()` parity, (3) Asymmetric CSS margins in Workshop source — root cause fix, not workaround, (4) Puppeteer print context re-layouts CSS differently from viewport.
+
+**Key lesson:** Fix layout issues upstream in source CSS, not downstream in Puppeteer. `page.pdf()` uses a separate rendering pass that may re-interpret CSS.
+
+**Pre-implementation protocol assessment:** Effective — 4 of 6 risks caught by mitigations. Process improvement: add "source CSS assumptions" to future risk registers.
+
+**Decision:** `margin: 5px` fix in `public/index.html` is permanent and must be preserved.
+
+---
+
+## Decisions Log (continued)
+| Date | Phase | Decision | Rationale |
+|------|-------|----------|----------|
+| Mar 21 | 4 | Vector PDF via `page.pdf()` over screenshots | Infinite resolution, small file size, true SVG paths preserved |
+| Mar 21 | 4 | Fix source CSS over Puppeteer workarounds | 1-line fix vs hours of fragile post-processing |
+| Mar 21 | 4 | `--all` flag for batch generation | 13 variants in one run, single browser instance reuse |
+| Mar 21 | 4 | 3 page densities (4, 6, 8) | Matches performance app viewing modes |
+
+---
+
+## Phase 5 Pre-Implementation Protocol
+
+### Step 1: System Inventory
+
+Phase 5 creates a **new Performance Score server** (`scripts/performance_server.js`) that evolves the sync architecture from Workshop's `server.js` into a room-based multi-client system. The Workshop server is NOT modified.
+
+| System | Role | Current State | Phase 5 Change |
+|--------|------|---------------|----------------|
+| Workshop `server.js` (port 5000) | Composition server | ~3600 lines, global sync state, REST APIs for score/curves/GCs/MIDI/LilyPond/audio | **Unchanged** — reference only |
+| Socket stub (build_performance_app.js Patch 1) | Offline play/stop/goto | ~60 lines, local handlers, no server | **Replaced** by real Socket.IO client |
+| `ClockSync` (public/index.html) | Client-side clock offset | Calculates server-client time offset from `clockSync` events | Reused as-is — works with real server |
+| Performance Score app | Static HTML served from `builds/performance/` | Loaded via static file server (port 3001 dev, 3002 print) | Served by new performance server |
+| `GraphicTimeline.onGoto` | Score navigation handler | Overridden by parts patches for N-section support | Must be preserved — server's `scoreGoto` triggers this |
+| `AnimationEngine` | Animation loop | Subscribes StaffCursors, StaffPositions, GraphicTimeline | Unchanged — receives time from ClockSync |
+
+**Global state to scope per-room (from Workshop server.js lines 28-43):**
+- `isPlaying` (bool)
+- `currentScoreTimeMs` (int — frozen score time when stopped)
+- `scoreTimeOffset` (int — `scoreTime = clockTime - offset` when playing)
+- `tempoHistory` (array — `[{scoreTimeMs, bpm, beatsPerPage}]`)
+- `currentBpm`, `currentBeatsPerPage` (ints)
+
+**Socket events to scope per-room (from Workshop server.js lines 3452-3592):**
+- `clockSync` — periodic server time broadcast (1Hz)
+- `scoreState` — sent on connection (initial sync)
+- `scoreGo` — start playback
+- `scoreStop` — stop playback
+- `scoreGoto` — jump to time position
+- `pingRequest`/`pongResponse` — RTT measurement
+- `setBpm`, `setBeatsPerPage` — tempo changes (may defer to Phase 6+)
+
+### Step 2: Source Reading
+
+**Workshop server.js sync architecture (lines 3452-3592):**
+- On connection: sends `clockSync` + `scoreState` (isPlaying, currentScoreTimeMs, scoreTimeOffset, tempoHistory)
+- `scoreGo`: calculates `scoreTimeOffset = now - currentScoreTimeMs`, broadcasts to ALL clients (`io.emit`)
+- `scoreStop`: freezes `currentScoreTimeMs = getScoreTimeMs()`, broadcasts to ALL
+- `scoreGoto`: sets `currentScoreTimeMs = targetMs`, stops, resets tempoHistory, broadcasts to ALL
+- `clockSync` interval: `setInterval(() => io.emit('clockSync', {serverTime: Date.now()}), 1000)`
+
+**Socket stub (build_performance_app.js lines 96-156):**
+- Mimics the above locally — `_trigger()` dispatches events asynchronously via `setTimeout`
+- `scoreGoto` handler: sets `_scoreTimeMs`, triggers event with same payload shape as server
+- `scoreGo`: records `_playStartRealMs = Date.now()`, triggers event
+- `scoreStop`: calculates elapsed from `_playStartRealMs`, triggers event
+
+**Client-side ClockSync (public/index.html):**
+- `ClockSync.socket = io()` — connects to server
+- Listens for `clockSync`, `scoreState`, `scoreGo`, `scoreStop`, `scoreGoto`
+- `ClockSync.now()` returns adjusted time: `Date.now() + this.offset`
+- Used by AnimationEngine for `elapsedMs = ClockSync.now() - this.startTime`
+
+### Step 3: Contracts
+
+- **Precondition:** `builds/performance/` exists with valid `index.html` and `score.json`
+- **Postcondition (single room):** 2+ clients in same room see synchronized playback (scoreGo/Stop/Goto)
+- **Postcondition (room isolation):** Actions in Room A do NOT affect clients in Room B
+- **Postcondition (backward compat):** Single client joining a room works identically to current stub behavior
+- **Invariant:** Parts mode (`?track=N&pages=M`) continues to work — server is agnostic to client rendering mode
+
+### Step 4: Risk Register
+
+| Risk | Probability | Detection | Mitigation |
+|------|------------|-----------|------------|
+| Socket stub removal breaks offline mode | High | Parts mode / print scripts stop working | Keep stub in build; performance_server.js is an alternative connection mode, not a replacement |
+| ClockSync.now() accuracy with real network latency | Medium | Cursor position drift between clients | Phase 6 addresses this; Phase 5 just needs basic broadcast |
+| Room state not cleaned up after disconnect | Medium | Memory leak on server | Grace period + cleanup timer |
+| Multiple clients sending conflicting scoreGo/Stop | Medium | Race condition — score flickers | Only "leader" client can control playback (Phase 8) — for now, last-write-wins |
+| Performance app CSS/JS not loading via new server | Low | Blank page or missing elements | Serve same `builds/performance/` directory with correct MIME types |
+| Parts mode onGoto override not preserved | Medium | Parts mode breaks with real server | Verify: parts patches override runs AFTER ClockSync.socket is set |
+
+### Step 5: Staged Implementation Plan
+
+```
+Stage 1: Create minimal performance_server.js                     ⬅ START HERE
+  - Static file server for builds/performance/ (port 3001)
+  - Socket.IO with global state (no rooms yet — match Workshop behavior)
+  - Events: clockSync, scoreState, scoreGo, scoreStop, scoreGoto
+  → TEST: Single client connects, Play/Stop/Goto work, cursor animates
+
+Stage 2: Build script — real Socket.IO client option
+  - Modify build_performance_app.js: add Patch 1b (real Socket.IO client)
+  - Conditional: if URL has ?server=true or if served by performance_server.js
+  - OR: simpler — always use real socket.io, keep stub as fallback
+  → TEST: Performance app loads via performance_server, Play/Stop work
+
+Stage 3: Room-based state
+  - Replace global state with per-room state objects
+  - joinRoom/leaveRoom events with roomId from URL param
+  - Scope all broadcasts to room: io.to(roomId).emit(...)
+  → TEST: 2 clients in same room sync. 2 clients in different rooms isolated.
+
+Stage 4: Room lifecycle
+  - Room created on first join
+  - Grace period (5 min) after last client disconnects
+  - State persisted during grace period for reconnection
+  → TEST: Disconnect all → reconnect within grace → state restored
+
+Stage 5: Integration verification
+  - Full score mode + parts mode through real server
+  - Print script still works (uses its own server on port 3002)
+  - Workshop server still works independently on port 5000
+  → TEST: End-to-end regression — all Phase 1-4 features still work
+```
+
+### Step 6: Focused Stage Tests
+
+**Stage 1 tests:**
+- 🤖 Server starts on port 3001 without errors
+- 🤖 Static files served (index.html, score.json, staff-headers/, pitch-svgs/)
+- 🤖 Socket.IO connection established, scoreState received
+- 👁️ Score renders in browser, Play/Stop/Goto buttons work
+
+**Stage 2 tests:**
+- 🤖 Performance app connects to real server (not stub)
+- 🤖 ClockSync.offset calculated from server time
+- 👁️ Cursor animates during playback, stops on Stop
+
+**Stage 3 tests:**
+- 🤖 2 tabs in Room A: scoreGo in tab 1 → tab 2 starts playing
+- 🤖 2 tabs in Room B: unaffected by Room A actions
+- 🤖 scoreGoto in one tab → all room members jump
+- 👁️ Visual sync: cursors at same position in both tabs
+
+**Stage 4 tests:**
+- 🤖 Disconnect all clients → room persists for 5 min
+- 🤖 Reconnect within grace → state restored (correct score time)
+- 🤖 Wait beyond grace → room cleaned up
+
+**Stage 5 tests:**
+- 🤖 `node scripts/generate_print_pdf.js` still works (port 3002)
+- 🤖 Parts mode via `?track=1&pages=6` through real server
+- 👁️ Full regression: play, stop, goto, parts mode, all 4 tracks
+
+---
 
 ## RESUME HERE
-**Current stage:** Phase 4 Stage 4 — Print CSS polish
-**Files:** `scripts/generate_print_pdf.js` (main script), `package.json` (puppeteer + pdf-lib added)
-**Output:** `builds/print/full_score.pdf` — 32-page vector PDF, 3.0 MB
+**Current stage:** Phase 5 — Server Architecture (Rooms & Multi-Client)
+**Phase 4 complete:** 13 vector PDFs in `builds/print/`, all verified
+**Next:** Phase 5 Stage 1 — Create minimal `scripts/performance_server.js`
+**Key files:** `server.js` (reference), `scripts/build_performance_app.js` (socket stub at Patch 1), `scripts/performance_server.js` (to create)
+**Pipeline plan:** See §16 for Phase 4 post-mortem, §13.4 Phase 5 for the plan
