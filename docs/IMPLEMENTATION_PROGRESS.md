@@ -7,18 +7,28 @@
 
 ## How to Resume Work (for the human)
 
+### Quick start (any session)
+Type `/session-start` — this triggers a workflow that walks the AI through the full startup ritual. Or simply say "read WORKING_PRINCIPLES.md and IMPLEMENTATION_PROGRESS.md, then tell me where we are."
+
 ### Which documents do what?
-- **This file (`IMPLEMENTATION_PROGRESS.md`)** — your working document. Open it at the start of every session. Scroll to **RESUME HERE** at the bottom for the exact entry point, current stage, and next action.
-- **`STRING_QUARTET_PIPELINE_PLAN.md`** — the architectural reference. Contains the full pipeline design, implementation methodology, pre-implementation protocol template (§13.2.7), and post-mortems with all lessons learned (§14-§16). Self-sufficient for a fresh AI or for reuse on a new piece.
-- **Both are needed.** The pipeline plan is the "why and what." This progress file is the "where we are and what's next."
+| Document | Role | Size | Read when? |
+|----------|------|------|-----------|
+| **`WORKING_PRINCIPLES.md`** | Rubric — distilled lessons, bug-fixing rules, process principles | ~80 lines | **Every session** (short, always internalized) |
+| **This file (`IMPLEMENTATION_PROGRESS.md`)** | Working doc — current status, RESUME HERE, per-phase protocols | ~500 lines | **Every session** (focus on top + bottom) |
+| **`STRING_QUARTET_PIPELINE_PLAN.md`** | Architectural reference — full design, methodology, post-mortems | ~4800 lines | **New phases or long gaps** (selectively, by section) |
 
 ### Resumption by timeframe
 | Gap | What to do |
 |-----|-----------|
-| **Hours/days** | Open this file → RESUME HERE. AI memories will fill in context automatically. |
-| **Weeks** | Same as above. Memories should still work but verify them against this document if anything seems off. |
-| **Months/year+** | **Do not rely on AI memories** — they may be stale or missing. Have the AI read both this file AND the pipeline plan. Everything critical is captured in the documents. |
-| **New piece entirely** | `STRING_QUARTET_PIPELINE_PLAN.md` alone is sufficient — it contains the full architecture, methodology, and lessons that generalize beyond this specific piece. |
+| **Hours/days** | `/session-start` or "read principles + progress." AI memories fill in the rest. |
+| **Weeks** | Same, but tell the AI: "verify your understanding against the documents, don't rely on memories alone." |
+| **Months/year+** | Tell the AI: "Read `docs/WORKING_PRINCIPLES.md`, then `docs/IMPLEMENTATION_PROGRESS.md`, then the relevant phase section of `docs/STRING_QUARTET_PIPELINE_PLAN.md`. Do not rely on memories." |
+| **New piece entirely** | `WORKING_PRINCIPLES.md` (process) + `STRING_QUARTET_PIPELINE_PLAN.md` (architecture) together are self-sufficient. |
+
+### Keeping WORKING_PRINCIPLES.md current
+- **During a session:** If the AI makes a mistake that violates or reveals a missing principle, correct it and say "add this to WORKING_PRINCIPLES.md."
+- **End of phase:** During post-mortem, review whether new principles emerged. Distill them to one-line entries.
+- **Keep it short.** If it grows past ~100 lines of principles, distill further. Long explanations belong in the pipeline plan.
 
 ### Three-tier documentation system (§13.1)
 1. **AI Memories** — fast context retrieval for session-to-session continuity. Convenience layer only — every important detail has been written into the documents.
