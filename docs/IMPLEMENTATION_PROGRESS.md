@@ -1,9 +1,9 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 3 — Parts Mode (Complete, post-mortem in progress)
+**Active Phase:** Phase 4 — Print Score (Puppeteer PDF Capture)
 **Last Session:** Mar 21, 2026
-**Next Phase:** Phase 4 (Print Score) — pending user addition before Phase 4
+**Last Commit:** `ed86d027` — `[Phase 3] Parts mode complete` + tag `phase-3-complete`
 
 ## Phase Status Table
 | Phase | Status | Completion Date | Notes |
@@ -11,7 +11,7 @@
 | 1. Foundation | ✅ Complete | Mar 18 | All rendering verified, 7 patches + 7 strips |
 | 2. Animation T1 | ✅ Complete | Mar 19 | Continuous time loop, canvas overlay, subscriber pattern, badge freeze |
 | 3. Parts Mode | ✅ Complete | Mar 21 | Full N-section parts view + 4 bug fixes + size constraints |
-| 4. Print Score | ⏳ Pending | — | User wants to add something before this phase |
+| 4. Print Score | 🔄 In Progress | — | Pre-implementation protocol complete, Stage 1 starting |
 | 5–14 | ⏳ Pending | — | |
 
 ---
@@ -196,7 +196,125 @@ node -e "const h=require('http'),f=require('fs'),p=require('path'),d='builds/per
 | Mar 21 | 3 | GCs bottom-justified (not centered) | User feedback: impact point should be at track bottom for visual consistency |
 | Mar 21 | 3 | SVG z-order via DOM re-append (not CSS z-index) | SVG elements inside an SVG don't support CSS z-index; DOM order determines paint order |
 
+---
+
+## Phase 4 Pre-Implementation Protocol
+
+### Step 1: System Inventory
+
+Phase 4 is a **new standalone script** (`scripts/generate_print_pdf.js`), not a monkey-patch. It interacts with existing systems only as a consumer:
+
+| System | Role | State it reads | State it writes |
+|--------|------|----------------|-----------------|
+| Puppeteer (new dep) | Headless browser | — | Browser instance |
+| Local HTTP server | Serves `builds/performance/` | Filesystem | HTTP responses |
+| Socket stub `scoreGoto` | Page navigation | `_scoreTimeMs` | Triggers `scoreGoto` event → app repositions |
+| Performance app DOM | `#ScoreContainer`, ScoreTop/Bottom | Score JSON | Rendered SVGs, curves, GCs |
+| Score timing | bpm=60, beatsPerPage=8, leadIn=2s | `score.json` `tempoHistory[0]` | — |
+| Parts mode patches | N-section layout via `?track=N&pages=M` | URL params | Dynamic section SVGs |
+
+**Calculated values:**
+- `secondsPerPage = (60 / 60) × 8 = 8 seconds`
+- Pages come in pairs for full score (ScoreTop=even, ScoreBottom=odd)
+- `maxSeconds = 508.1s` (from `curves[153].endSeconds` — must scan `endSeconds` not just `startSeconds + durationSeconds`)
+- `totalPages = ceil((508.1 + 2) / 8)` = **64 pages** (0–63)
+- **32 page pairs** for full score PDF
+
+### Step 2: Source Reading
+
+Since we're not overriding Workshop functions, this step is light:
+
+- **Socket stub `scoreGoto`** (`build_performance_app.js:112-122`): Takes `{ seconds: N }`, sets `_scoreTimeMs`, triggers event via `ClockSync.socket.emit()`. The app's `GraphicTimeline.onGoto` handler repositions all elements.
+- **Parts mode `onGoto`** — already overridden in `performance_parts_patches.js`, uses circular buffer distribution. Works correctly (ASB-191 fixed).
+- **`#ScoreContainer` CSS** — 4:3 aspect ratio, `max-width: calc((100vh - 10px) * 4 / 3)`. For Puppeteer, set viewport to 1600×1200 so ScoreContainer fills it.
+
+### Step 3: Contracts
+
+- **Precondition:** `builds/performance/` exists with valid `index.html` and `score.json` (run `build_performance_app.js` first)
+- **Postcondition (full score):** PDF has `ceil(totalPages / 2)` = 32 pages, each showing ScoreTop + ScoreBottom with correct notation, no UI artifacts
+- **Postcondition (parts):** PDF has `totalPages / pagesParam` pages, each showing single-track expanded view
+- **Invariant:** Every page in the PDF matches exactly what a human would see in the browser at that navigation point
+
+### Step 4: Risk Register
+
+| Risk | Probability | Detection | Mitigation |
+|------|------------|-----------|------------|
+| App not fully loaded when capture starts | High | Blank or partial pages | Wait for `SVGElementManager.elements.length > 0` |
+| Parts mode DOM not created in time | Medium | Missing sections | Wait for `PM.sections` array populated |
+| Cursor visible in capture | High | Colored rectangle in PDF | Inject CSS: `canvas { display: none }` |
+| Playback UI drawer visible | High | Thin blue/purple rectangle | Inject CSS: `#compositionPanel, #cursorMenu { display: none }` |
+| ScoreContainer doesn't fill viewport | Medium | Margins in PDF | Set viewport to exact 4:3 (1600×1200) |
+| scoreGoto race condition | Medium | Elements from wrong page | Wait + verify `GraphicTimeline.currentTopPage` matches |
+
+### Step 5: Staged Implementation Plan
+
+```
+Stage 1: Puppeteer skeleton + server startup + first screenshot        ✅ DONE
+  → TEST: Screenshot exists, shows score's first page pair
+  → RESULT: 188 KB, 542 elements, 225 curves, 248 GCs, container 1587×1190
+  → FIX: Added print CSS to hide #compositionPanel, #cursorMenu, canvas overlays
+  → FIX: Duration calculation now scans endSeconds (not just start+duration)
+         curves[153].endSeconds=508.05 was the true max → 64 pages, 32 pairs
+
+Stage 2: Page navigation (scoreGoto, boundary + consecutive tests)     ✅ DONE
+  → TEST: Each pair shows correct (2N, 2N+1) pages; consecutive pairs advance by +2
+  → RESULT: 7/7 tests pass — boundary (0, 16, 31) + consecutive (5, 6, 7, 8)
+  → FIX: Navigation bug — must NOT subtract leadInSeconds from target.
+         GraphicTimeline.onGoto calculates targetPage = floor(seconds / spp).
+         Even targetPage → top=page, bottom=page+1 (correct pair).
+         Odd targetPage → bottom=page, top=page+1 (WRONG — shows mixed pair).
+         Fix: targetSeconds = pairIndex * 2 * secondsPerPage (always lands on even page).
+
+Stage 3: Full vector PDF assembly (page.pdf() + pdf-lib merge)         ✅ DONE
+  → TEST: PDF has 32 pages, vector format, pages progress through score
+  → RESULT: full_score.pdf — 32 pages, 3.0 MB, true vector (SVG paths preserved)
+  → Used page.pdf() with emulateMediaType('screen') for vector output
+  → pdf-lib merges 32 single-page PDFs into one multi-page document
+
+Stage 4: Print CSS polish (hide cursor, clean margins)                 ⬅ CURRENT
+  → TEST: No cursor artifacts, clean white score areas, blueGrey border
+
+Stage 5: Quality verification at 400% zoom
+  → TEST: Human spot-check colors, sharpness, compare to live app
+
+Stage 6: Per-track PDF generation (--track flag)
+  → TEST: 4 separate PDFs, each showing only one track's notation
+```
+
+### Step 6: Focused Stage Tests
+
+**Stage 1 tests:**
+- 🤖 Screenshot file exists, size > 0 → ✅ 188 KB
+- 🤖 No Puppeteer errors in console → ✅
+- 👁️ Score visible in screenshot → ✅ (user confirmed)
+- 👁️ No UI artifacts → ✅ Fixed: CSS hides panels + canvases
+
+**Stage 2 tests:**
+- 🤖 Boundary pairs (0, 16, 31) all show correct (2N, 2N+1) pages → ✅
+- 🤖 Consecutive pairs (5, 6, 7, 8) advance by exactly +2 pages → ✅
+- 👁️ First pair (0/1) shows beginning of score → ✅ (user confirmed)
+- 👁️ Last pair (62/63) shows end of score (~sec 496-512) → ✅ (user confirmed)
+- 👁️ Consecutive pairs show advancing, non-repeating content → ✅ (user confirmed)
+
+**Stage 3 tests:**
+- 🤖 PDF file exists, page count = 32 → ✅
+- 🤖 File size reasonable → ✅ 3.0 MB vector
+- 👁️ Open PDF, scroll through — pages progress through score → ✅ (user confirmed)
+- 👁️ Zoom to 400% — sharp at any zoom (vector) → ✅ (user confirmed on test page)
+
+**Stage 4 tests:**
+- 🤖 No `<canvas>` elements visible in capture
+- 👁️ Pages look clean — no UI remnants
+
+**Stage 5 tests:**
+- 👁️ Zoom to 400% — notation sharp, colors match live app
+- 👁️ Compare first page, last page, and 3 random middle pages against Workshop
+
+**Stage 6 tests:**
+- 🤖 4 PDFs generated, all non-zero size
+- 👁️ Each PDF shows only one track's notation expanded
+
 ## RESUME HERE
-**Next step:** User wants to add something before Phase 4. After that discussion, proceed to Phase 4 (Print Score — Puppeteer PDF Capture).
-**Files modified in Phase 3:** `scripts/performance_parts_patches.js` (all parts mode code), `scripts/build_performance_app.js` (parts mode injection)
-**Diagnostic logging still present** — must be removed before Phase 3 commit (Step G action items).
+**Current stage:** Phase 4 Stage 4 — Print CSS polish
+**Files:** `scripts/generate_print_pdf.js` (main script), `package.json` (puppeteer + pdf-lib added)
+**Output:** `builds/print/full_score.pdf` — 32-page vector PDF, 3.0 MB
