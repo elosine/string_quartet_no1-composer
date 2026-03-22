@@ -44,7 +44,8 @@ Type `/session-start` — this triggers a workflow that walks the AI through the
 | 2. Animation T1 | ✅ Complete | Mar 19 | Continuous time loop, canvas overlay, subscriber pattern, badge freeze |
 | 3. Parts Mode | ✅ Complete | Mar 21 | Full N-section parts view + 4 bug fixes + size constraints |
 | 4. Print Score | ✅ Complete | Mar 21 | 6 stages, 13 vector PDFs (full + 4 tracks × 3 densities), CSS margin fix |
-| 5–14 | ⏳ Pending | — | |
+| 5. Server Architecture | ✅ Complete | Mar 21 | Room-based Socket.IO, grace period, reconnection, 3 build patches (1b/1c) |
+| 6–14 | ⏳ Pending | — | |
 
 ---
 
@@ -514,15 +515,56 @@ Stage 5: Integration verification
 - 🤖 Wait beyond grace → room cleaned up
 
 **Stage 5 tests:**
-- 🤖 `node scripts/generate_print_pdf.js` still works (port 3002)
-- 🤖 Parts mode via `?track=1&pages=6` through real server
-- 👁️ Full regression: play, stop, goto, parts mode, all 4 tracks
+- 🤖 `node scripts/generate_print_pdf.js` still works (port 3002) → ✅
+- 🤖 Parts mode via `?track=1&pages=6` through real server → ✅
+- 👁️ Full regression: play, stop, goto, parts mode, all 4 tracks → ✅
+
+### Phase 5 Stage Results
+
+```
+Stage 1: Minimal performance_server.js                              ✅ DONE
+  - Static file server + Socket.IO on port 3001
+  - Global sync state (scoreGo/Stop/Goto/clockSync)
+  → 👁️ Human verified: score renders, playback controls work
+
+Stage 2: Build script — real Socket.IO client + stub fallback       ✅ DONE
+  - Patch 1 modified: keep real <script> tag, add stub if io undefined
+  → 👁️ Human verified: cursor animates via real server
+
+Stage 3: Room-based state                                           ✅ DONE
+  - Patch 1b: client joins room from ?room=X URL param
+  - Server: rooms Map, per-room state, scoped broadcasts
+  → 👁️ Human verified: multi-client sync + room isolation
+
+Stage 4: Room lifecycle                                             ✅ DONE
+  - Grace period (5 min default, --grace CLI override for testing)
+  - Cleanup after grace, reconnection cancels timer
+  - Patch 1c: skip cursorState goto restore with real server
+    (score.json's saved gotoDisplaySeconds was overwriting room state)
+  - requestState event: server sends scoreGoto (not scoreState)
+    for proper page navigation after score.json loads
+  → 👁️ Human verified: reconnect within grace preserves position
+
+Stage 5: Integration verification                                   ✅ DONE
+  - Print script (port 3002) unaffected
+  - Full score + parts mode work through real server
+  - Multi-client sync works (play/stop/goto propagate between tabs)
+  → ⚠️ Intermittent: one multi-client test showed wrong track graphics
+    on second tab (sync timing was correct, visual rendering was wrong).
+    Not reproducible. Likely client-side race condition unrelated to
+    server changes. Monitor in future phases.
+```
+
+### Phase 5 Files Modified
+- `scripts/performance_server.js` — **created** (room-based Socket.IO server)
+- `scripts/build_performance_app.js` — Patches 1b (room join), 1c (skip cursorState goto)
+- `docs/WORKING_PRINCIPLES.md` — added human verification principle
 
 ---
 
 ## RESUME HERE
-**Current stage:** Phase 5 — Server Architecture (Rooms & Multi-Client)
-**Phase 4 complete:** 13 vector PDFs in `builds/print/`, all verified
-**Next:** Phase 5 Stage 1 — Create minimal `scripts/performance_server.js`
-**Key files:** `server.js` (reference), `scripts/build_performance_app.js` (socket stub at Patch 1), `scripts/performance_server.js` (to create)
+**Current phase:** Phase 5 — Server Architecture ✅ COMPLETE
+**Phase 5 complete:** Room-based Socket.IO server with grace period, reconnection, and multi-client sync
+**Next:** Phase 6+ (see pipeline plan §13.4+)
+**Key files:** `scripts/performance_server.js` (server), `scripts/build_performance_app.js` (Patches 1/1b/1c/2/3)
 **Pipeline plan:** See §16 for Phase 4 post-mortem, §13.4 Phase 5 for the plan

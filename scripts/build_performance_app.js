@@ -90,72 +90,131 @@ function replaceOnce(target, replacement, label) {
 // PATCHES 1-3: From build_engraving_app.js v2
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// ─── Patch 1: Replace socket.io with a no-op stub ──────────────────────────
+// ─── Patch 1: Socket.IO — real client + offline stub fallback ────────────────
+//
+// Keep the real <script src="/socket.io/socket.io.js"></script> tag so the
+// Socket.IO client library loads when served by performance_server.js.
+// Add a fallback stub that activates when the real library isn't available
+// (e.g., served by the print script's simple HTTP server on port 3002,
+// or opened as a static file).
 
 const socketTag = '<script src="/socket.io/socket.io.js"></script>';
-const socketStub = [
+const socketWithFallback = [
+    '<script src="/socket.io/socket.io.js"></script>',
     '<script>',
-    '// Performance Score: socket.io stub (no server needed)',
-    'function io() {',
-    '    const handlers = {};',
-    '    let _scoreTimeMs = 0;',
-    '    let _isPlaying = false;',
-    '    const _tempoHistory = [{ scoreTimeMs: 0, bpm: 60, beatsPerPage: 8 }];',
-    '    let _playStartRealMs = 0;',
-    '    let _playStartScoreMs = 0;',
-    '    const sock = {',
-    '        on(event, fn) {',
-    '            if (!handlers[event]) handlers[event] = [];',
-    '            handlers[event].push(fn);',
-    '        },',
-    '        emit(event, data) {',
-    '            if (event === "scoreGoto") {',
-    '                const targetSeconds = data.seconds || 0;',
-    '                _scoreTimeMs = targetSeconds * 1000;',
-    '                _isPlaying = false;',
-    '                sock._trigger("scoreGoto", {',
-    '                    isPlaying: false,',
-    '                    currentScoreTimeMs: _scoreTimeMs,',
-    '                    targetSeconds: targetSeconds,',
-    '                    tempoHistory: _tempoHistory,',
-    '                    serverTime: Date.now()',
-    '                });',
-    '            } else if (event === "scoreGo") {',
-    '                _isPlaying = true;',
-    '                _playStartRealMs = Date.now();',
-    '                _playStartScoreMs = _scoreTimeMs;',
-    '                sock._trigger("scoreGo", {',
-    '                    isPlaying: true,',
-    '                    currentScoreTimeMs: _scoreTimeMs,',
-    '                    scoreTimeOffset: Date.now() - _scoreTimeMs,',
-    '                    tempoHistory: _tempoHistory,',
-    '                    serverTime: Date.now()',
-    '                });',
-    '            } else if (event === "scoreStop") {',
-    '                if (_isPlaying) {',
-    '                    _scoreTimeMs = _playStartScoreMs + (Date.now() - _playStartRealMs);',
+    '// Performance Score: socket.io stub fallback for offline/print mode',
+    '// If real socket.io loaded above (via performance_server.js), this is skipped.',
+    '// If 404 (static file server), this provides offline playback controls.',
+    'if (typeof io === "undefined") {',
+    '    console.log("Socket.IO not available — using offline stub");',
+    '    window.io = function() {',
+    '        const handlers = {};',
+    '        let _scoreTimeMs = 0;',
+    '        let _isPlaying = false;',
+    '        const _tempoHistory = [{ scoreTimeMs: 0, bpm: 60, beatsPerPage: 8 }];',
+    '        let _playStartRealMs = 0;',
+    '        let _playStartScoreMs = 0;',
+    '        const sock = {',
+    '            on(event, fn) {',
+    '                if (!handlers[event]) handlers[event] = [];',
+    '                handlers[event].push(fn);',
+    '            },',
+    '            emit(event, data) {',
+    '                if (event === "scoreGoto") {',
+    '                    const targetSeconds = data.seconds || 0;',
+    '                    _scoreTimeMs = targetSeconds * 1000;',
+    '                    _isPlaying = false;',
+    '                    sock._trigger("scoreGoto", {',
+    '                        isPlaying: false,',
+    '                        currentScoreTimeMs: _scoreTimeMs,',
+    '                        targetSeconds: targetSeconds,',
+    '                        tempoHistory: _tempoHistory,',
+    '                        serverTime: Date.now()',
+    '                    });',
+    '                } else if (event === "scoreGo") {',
+    '                    _isPlaying = true;',
+    '                    _playStartRealMs = Date.now();',
+    '                    _playStartScoreMs = _scoreTimeMs;',
+    '                    sock._trigger("scoreGo", {',
+    '                        isPlaying: true,',
+    '                        currentScoreTimeMs: _scoreTimeMs,',
+    '                        scoreTimeOffset: Date.now() - _scoreTimeMs,',
+    '                        tempoHistory: _tempoHistory,',
+    '                        serverTime: Date.now()',
+    '                    });',
+    '                } else if (event === "scoreStop") {',
+    '                    if (_isPlaying) {',
+    '                        _scoreTimeMs = _playStartScoreMs + (Date.now() - _playStartRealMs);',
+    '                    }',
+    '                    _isPlaying = false;',
+    '                    sock._trigger("scoreStop", {',
+    '                        isPlaying: false,',
+    '                        currentScoreTimeMs: _scoreTimeMs,',
+    '                        tempoHistory: _tempoHistory,',
+    '                        serverTime: Date.now()',
+    '                    });',
     '                }',
-    '                _isPlaying = false;',
-    '                sock._trigger("scoreStop", {',
-    '                    isPlaying: false,',
-    '                    currentScoreTimeMs: _scoreTimeMs,',
-    '                    tempoHistory: _tempoHistory,',
-    '                    serverTime: Date.now()',
-    '                });',
+    '            },',
+    '            _trigger(event, data) {',
+    '                // Async dispatch to match real socket.io behavior',
+    '                // (prevents double-fire from inline onclick + addEventListener)',
+    '                setTimeout(() => { if (handlers[event]) handlers[event].forEach(fn => fn(data)); }, 0);',
     '            }',
-    '        },',
-    '        _trigger(event, data) {',
-    '            // Async dispatch to match real socket.io behavior',
-    '            // (prevents double-fire from inline onclick + addEventListener)',
-    '            setTimeout(() => { if (handlers[event]) handlers[event].forEach(fn => fn(data)); }, 0);',
-    '        }',
+    '        };',
+    '        return sock;',
     '    };',
-    '    return sock;',
     '}',
     '</script>'
 ].join('\n');
 
-replaceOnce(socketTag, socketStub, 'Patch 1: socket.io stub');
+replaceOnce(socketTag, socketWithFallback, 'Patch 1: socket.io + offline stub fallback');
+
+// ─── Patch 1b: Join room on connect (Phase 5, Stage 3) ─────────────────────
+// Parse ?room=X from URL and emit joinRoom after socket connects.
+// Server sends scoreState in response (replaces the auto-sent scoreState from Stage 1).
+
+const connectMarker = "console.log('Connected to server');";
+const connectWithRoom = [
+    "console.log('Connected to server');",
+    "                    // Phase 5: Join room from URL param",
+    "                    var _roomParams = new URLSearchParams(window.location.search);",
+    "                    var _roomId = _roomParams.get('room') || 'default';",
+    "                    this.socket.emit('joinRoom', { roomId: _roomId });",
+    "                    console.log('Joined room: ' + _roomId);"
+].join('\n');
+
+replaceOnce(connectMarker, connectWithRoom, 'Patch 1b: room join on connect');
+
+// ─── Patch 1c: Skip cursorState goto restore when using real server ─────────
+// The score.json contains saved cursorState with gotoDisplaySeconds. On load,
+// distributeData() restores this and calls CursorControls.gotoPosition() which
+// emits scoreGoto to the server — overwriting the room's preserved position.
+// When connected to a real server, the server's room state is authoritative.
+
+const cursorStateGotoMarker = '// Restore score time by emitting scoreGoto';
+const cursorStateGotoBlock = [
+    'if (data.gotoDisplaySeconds !== undefined && window.CursorControls) {',
+    '                            CursorControls.gotoSecondInput.value = data.gotoDisplaySeconds.toFixed(2);',
+    '                            // Small delay to let other systems finish initializing',
+    '                            setTimeout(() => {',
+    '                                CursorControls.gotoPosition();',
+    '                            }, 100);',
+    '                        }'
+].join('\n');
+const cursorStateGotoReplacement = [
+    'if (data.gotoDisplaySeconds !== undefined && window.CursorControls) {',
+    '                            CursorControls.gotoSecondInput.value = data.gotoDisplaySeconds.toFixed(2);',
+    '                            // Phase 5: Skip goto if connected to real server (room state is authoritative)',
+    '                            if (!(ClockSync.socket && typeof ClockSync.socket.id === "string")) {',
+    '                                // Stub/offline mode — restore saved position',
+    '                                setTimeout(() => {',
+    '                                    CursorControls.gotoPosition();',
+    '                                }, 100);',
+    '                            }',
+    '                        }'
+].join('\n');
+
+replaceOnce(cursorStateGotoBlock, cursorStateGotoReplacement, 'Patch 1c: skip cursorState goto with real server');
 
 // ─── Patch 2: Replace ScoreManager auto-load with static JSON fetch ────────
 
@@ -190,9 +249,14 @@ if (html.includes(autoLoadMarker)) {
             "                            console.log('Performance Score: Triggered resize for SVG layout recalculation');",
             '                        });',
             '                        ',
-            '                        // Trigger scoreState to start AnimationEngine',
+            '                        // Sync score state after data loads',
             '                        setTimeout(() => {',
-            '                            if (ClockSync.socket && ClockSync.socket._trigger) {',
+            '                            if (ClockSync.socket && ClockSync.socket.emit && typeof ClockSync.socket.id === "string") {',
+            '                                // Real Socket.IO — request current state from server',
+            "                                ClockSync.socket.emit('requestState');",
+            "                                console.log('Performance Score: Requested state from server');",
+            '                            } else if (ClockSync.socket && ClockSync.socket._trigger) {',
+            '                                // Stub fallback — trigger initial state locally',
             "                                ClockSync.socket._trigger('scoreState', {",
             '                                    isPlaying: false,',
             '                                    currentScoreTimeMs: 0,',

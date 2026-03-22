@@ -44,11 +44,13 @@
 - **Follow the pre-implementation protocol (§13.2.7).** System inventory → source reading → contracts → risk register → staged plan → focused tests → integration. No shortcuts.
 - **One system per stage.** Each stage is independently testable. Never combine two untested changes.
 - **Test at every stage boundary.** Automated + visual + behavioral. Don't accumulate untested work.
+- **Never skip 👁️ human verification.** Present human tests to the user and wait for confirmation before moving to the next stage. *(Phase 5: lesson learned)*
 - **Integration test after all stages.** Full end-to-end regression before declaring a phase complete.
 
 ## Architecture
 
-- **Subtractive, not additive.** Strip the Workshop down rather than rebuilding from scratch. The real renderer is always more faithful than a reimplementation. *(Phase 1: subtractive approach preserved all rendering fidelity)*
+- **Subtractive, not additive — for the client.** Strip the Workshop down rather than rebuilding from scratch. The real renderer is always more faithful than a reimplementation. *(Phase 1: subtractive approach preserved all rendering fidelity)*
+- **Server architecture may evolve freely.** The existing Workshop server is a starting point, not a constraint. New architecture, enhancements, robustness features, and fallbacks are welcome when the current server is insufficient. Refer to §13.9 (Cloud Deployment) for planned evolution.
 - **Patches file, not source modification.** Keep `public/index.html` (Workshop) unchanged when possible. Put overrides in patches files injected by the build script. *(Exception: Phase 4 CSS margin fix was a genuine source bug)*
 - **Guard clause pattern.** Workshop code uses `if (window.X)` guards — this makes stripping safe. Respect this pattern.
 - **Puppeteer `page.pdf()` re-layouts CSS independently.** The print rendering context is NOT the same as the viewport. Never assume injected CSS will behave identically in both contexts. *(Phase 4)*
