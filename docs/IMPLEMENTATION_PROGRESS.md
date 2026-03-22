@@ -1,9 +1,9 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 7 — Authentication & Persistence ✅ COMPLETE
+**Active Phase:** Phase 8 — Rehearsal Mode (Stage 3 next)
 **Last Session:** Mar 22, 2026
-**Last Commit:** Pending — `[Phase 7] Auth — self-service sessions, JWT, per-performer persistence`
+**Last Commit:** `[Phase 8 Stage 2] Controls overlay, split center zone, gesture fixes, Performance Mode plan`
 
 ## How to Resume Work (for the human)
 
@@ -47,7 +47,8 @@ Type `/session-start` — this triggers a workflow that walks the AI through the
 | 5. Server Architecture | ✅ Complete | Mar 21 | Room-based Socket.IO, grace period, reconnection, 3 build patches (1b/1c) |
 | 6. Sync Tier 1 | ✅ Complete | Mar 21 | performance.now(), outlier rejection, connection awareness, drift correction |
 | 7. Auth & Persistence | ✅ Complete | Mar 22 | Self-service sessions, JWT, preferences, 6 API endpoints |
-| 8–14 | ⏳ Pending | — | |
+| 8. Rehearsal Mode | 🔄 In Progress | — | Stage 1-2 complete, Stage 3 next |
+| 9–14 | ⏳ Pending | — | |
 
 ---
 
@@ -735,8 +736,303 @@ Stage 4: Preferences persistence + integration                      ✅ DONE
 
 ---
 
+## Phase 8 Pre-Implementation Protocol
+
+### Step 1: System Inventory
+
+| System | Current State | Phase 8 Change |
+|--------|---------------|----------------|
+| `ScoreContainer` / `ScoreTop` / `ScoreBottom` (DOM) | 2 SVG sections (full score) or N sections (parts mode). No touch listeners. | Attach pointer event handlers for swipe, tap, long press, pinch zoom |
+| `CursorControls` (L3400-3575) | Right-panel toggle, play/stop/goto, socket event listeners | New floating overlay replaces panel for touch; overlay auto-fades after 3s |
+| `GraphicTimeline` (L7570-7807) | Page navigation: `onGoto(targetSeconds)`, `checkPageChange()`, `renderTicks()` | Page swipe gestures call `onGoto()`. Mini-map reads page state. |
+| `GraphicTimeline` — parts mode override (performance_parts_patches.js L448-510) | Overrides `onGoto`, `checkPageChange`, `reset` for N-section circular buffer | Swipe gestures must detect parts mode and use correct page math |
+| `StaffCursors` (L6880-7052) | Cursor position via `getPosition()`, page tracking | Phase 8 reads position for mini-map, position badge |
+| `ScoreZoom` (L7068-7200) | Ctrl+Alt+scroll zoom, Alt+drag pan (mouse only) | Add pinch-zoom gesture. Must coexist with existing mouse zoom. |
+| `ClockSync.socket` | Socket events: scoreGo/Stop/Goto, joinRoom | Overlay emits same events. Leader mode gates who can emit group commands. |
+| `performance_server.js` (~710 lines) | Room-based sync, auth, connectedPerformers[] | Add leader tracking per room, independent mode tracking, recall events |
+| `AnimationEngine` | Subscriber pattern, continuous time loop | Looping hook: check if scoreTime >= loopEnd → emit local goto |
+| `build_performance_app.js` (1008 lines) | 26 patches/strips/inserts for Phases 1-6 | Add Phase 8 patches: gesture system, overlay, mini-map |
+| `PartsMode` (runtime global) | `PM.active`, `PM.sections[]`, `PM.sectionPages[]`, `PM.pageCount` | Gestures must respect parts mode: swipe navigates within N-section buffer |
+| `ScoreTime` (global) | `isPlaying`, `now()`, `currentScoreTimeMs` | Looping reads ScoreTime.now() to detect loop boundary |
+
+### Step 2: Source Reading — Key Findings
+
+**Page navigation (the critical integration point for swipe gestures):**
+- Full score: `GraphicTimeline.onGoto(targetSeconds)` → sets `currentTopPage`/`currentBottomPage`, calls `renderTicks()` + `updateGraphicObjectsVisibility()`
+- Parts mode: `GraphicTimeline.onGoto(targetSeconds)` override → sets `PM.sectionPages[]` for all N sections using circular buffer math: `PM.sectionPages[i] = targetPage + ((i - targetSi + PAGE_COUNT) % PAGE_COUNT)`
+- Page duration: `secondsPerPage = (beatsPerPage / beatsPerMinute) * 60` (global `beatsPerPage`, `beatsPerMinute`)
+- Current page: `StaffCursors.getPosition(0)` returns `{xPercent, section}` (full score) or `{xPercent, section, page, sectionIndex}` (parts mode)
+
+**Playback control (overlay must emit these):**
+- `CursorControls.toggleGoStop()` → `ClockSync.socket.emit('scoreGo')` or `ClockSync.socket.emit('scoreStop')`
+- `CursorControls.gotoPosition()` → reads `gotoSecondInput.value`, adds `leadInSeconds`, emits `scoreGoto({seconds})`
+- Server broadcasts `scoreGo`/`scoreStop`/`scoreGoto` to room → `CursorControls.onScoreGo/Stop/Goto` handlers update `ScoreTime` and UI
+
+**Zoom (must coexist with pinch gesture):**
+- `ScoreZoom.handleWheel(e)` — only fires if `e.ctrlKey && e.altKey`. Pinch-zoom won't conflict (no modifier keys).
+- `ScoreZoom.setZoom(level)` → `applyTransform()` → CSS `translate + scale` on `#ScoreContainer`
+- Range: 50-500%, step 10%
+
+**No existing touch/pointer events** — only `mousedown`/`mousemove`/`mouseup` on ScoreZoom, `click` on buttons/timeline. Phase 8 builds the entire pointer event layer.
+
+**DOM structure:**
+```
+#ScoreContainer
+  .score-row > svg#ScoreTop
+  .score-row > svg#ScoreBottom
+  (parts mode adds: .score-row > svg#ScoreSection2..N-1)
+```
+
+### Step 3: Contracts
+
+- **Swipe left/right** → calls `GraphicTimeline.onGoto(newSeconds)` with correct page math for both full score and parts mode
+- **Tap center** → toggles controls overlay. Overlay auto-fades after 3s. Score tap dismisses.
+- **Tap left/right edge** → previous/next page (same as swipe but from edge zones)
+- **Long press** → context menu (marker creation, loop start/end)
+- **Pinch zoom** → calls `ScoreZoom.setZoom()`. Does NOT conflict with existing Ctrl+Alt+scroll.
+- **Overlay play/stop** → calls `CursorControls.toggleGoStop()` (reuses existing logic)
+- **Overlay goto** → calls `CursorControls.gotoPosition()` or `GraphicTimeline.onGoto()` directly
+- **Looping** → per-client only. AnimationEngine subscriber checks `ScoreTime.now() >= loopEndMs` → emits local `scoreGoto`
+- **Independent mode** → client stops listening to server sync events (`scoreGo/Stop/Goto`). Re-sync restores.
+- **Leader mode** → server tracks `room.leaderId`. Only leader's `scoreGo/Stop/Goto` broadcast to others. Non-leader commands are local-only.
+- **Anonymous fallback** → all Phase 8 features work without auth. Leader is first client if no auth.
+
+### Step 4: Risk Register
+
+| Risk | Mitigation |
+|------|------------|
+| Gesture conflicts with ScoreZoom mouse handlers | Pointer events have `pointerType` — finger gestures use `touch`, mouse events unaffected |
+| Swipe triggers during zoom pinch | Require single-pointer for swipe, two-pointer for pinch. Track active pointers. |
+| Parts mode page math wrong on swipe | Use `GraphicTimeline.onGoto()` which is already overridden in parts mode — don't re-implement page math |
+| Overlay obscures score during playback | Auto-fade after 3s. Semi-transparent. Dismiss on any score tap. |
+| Looping interferes with server sync | Looping is local-only. When synced, disable looping or auto-detach. |
+| Leader disconnect leaves room leaderless | Auto-transfer to next connected performer. Anonymous rooms: first client is leader. |
+| Large patch count makes build_performance_app.js fragile | Extract Phase 8 patches into separate `performance_rehearsal_patches.js` file (like Phase 3) |
+| iPad Safari pointer event quirks | Test with `pointerType` detection early. Safari supports Pointer Events since iOS 13. |
+
+### Step 5: Staged Plan
+
+```
+Stage 1: Touch gesture system + page swipe
+  - Pointer event handlers on ScoreContainer: track active pointers
+  - Swipe left/right detection → GraphicTimeline.onGoto() for page turn
+  - Tap edge zones (left 15% / right 15%) for page turn
+  - Pinch-zoom → ScoreZoom.setZoom()
+  - Works in both full score and parts mode
+  → TEST: 🤖 Simulated pointer events trigger page turns
+  → TEST: 👁️ Swipe pages on desktop (mouse drag), verify on iPad if available
+
+Stage 2: Controls overlay
+  - Floating overlay HTML/CSS (injected via build patch)
+  - Tap center (middle 70%) toggles overlay
+  - Overlay: Play/Stop button, page indicator, Jump To, settings
+  - Auto-fade after 3s of inactivity, dismiss on score tap
+  - Overlay calls existing CursorControls methods
+  → TEST: 🤖 Overlay shows/hides, fade timer works
+  → TEST: 👁️ Overlay is usable, doesn't obscure score
+
+Stage 3: Custom markers + mini-map
+  - Marker data model: {id, name, scoreTimeMs, page, type, color, createdBy}
+  - Marker persistence via Phase 7 preferences API
+  - Long press → "Add Marker" context menu
+  - Mini-map bar: thin horizontal bar at bottom, shows full score, markers as ticks
+  - Tap mini-map to jump. Page badge always visible.
+  → TEST: 🤖 Create marker → persisted → jump to marker → correct position
+  → TEST: 👁️ Mini-map accurately shows position
+
+Stage 4: Looping
+  - Set loop start/end (via long press or controls)
+  - AnimationEngine subscriber: if scoreTime >= loopEnd → local goto loopStart
+  - Loop count display, clear loop button
+  - Per-client only (doesn't broadcast)
+  → TEST: 🤖 Set loop → play → score jumps back at loop end
+  → TEST: 👁️ Loop transition smooth
+
+Stage 5: Synced vs. Independent navigation + Leader privileges
+  - Independent mode: stop listening to server scoreGo/Stop/Goto
+  - Auto-detach on manual page swipe while synced
+  - Re-sync button: jump to server's current position
+  - Leader tracking: server stores room.leaderId
+  - Non-leader play/stop → local only (or rejected with notification)
+  - Leader transfer, recall all
+  → TEST: 🤖 Two clients: one detaches, other still receives sync. Leader transfer.
+  → TEST: 👁️ Detach/re-sync feels responsive
+
+Stage 6: Integration verification
+  - Full regression: all Phase 1-7 features in anonymous mode
+  - Parts mode + gestures test
+  - Multi-client auth + leader test
+  → TEST: 🤖 Anonymous regression. Parts mode regression.
+  → TEST: 👁️ Full flow on desktop. iPad if available.
+```
+
+### Phase 8 Stage 1b: Workshop Interaction Strip — Pre-Implementation Protocol
+
+**Note:** This strip should have been part of **Phase 1** (Foundation). The original S1-S7 strips removed system *definitions* (FlowchartConnector, MidiController, EditCursor, etc.) but left interaction code intact in KEPT rendering systems. Future projects: strip all editing interaction in the same phase that strips editing systems.
+
+#### Step 1: Problem Statement
+
+Score objects (SVGs, curves, motives, LWs, GCs, badges) remain fully interactive in the Performance Score: selectable, draggable, deletable, resizable. The MultiSelect toolbar appears on click. ObjectSelector (Ctrl+Win+Click) is functional. LineWedge nodes are draggable. All of this is Workshop editing behavior that must not exist in the Performance Score.
+
+#### Step 2: Root Cause — Why CSS pointer-events Failed
+
+Initial attempt used CSS `pointer-events: none` on score object CSS classes. This failed because:
+
+1. **SVGElementManager has a manual hit-test** (`_findElementAtPoint`, L4162-4182) — on every `click` on ScoreTop/ScoreBottom, it manually checks bounding boxes of all SVG elements. This **bypasses CSS pointer-events entirely** because the click handler is on ScoreTop itself (L3656-3683), not on the SVG wrappers.
+2. **CurveMaker** attaches `mousedown` listeners directly on hitPath/path/endpoint/bbox elements (L17147-17186). These SVG elements are created at runtime and may not match CSS class selectors.
+3. **MotiveMaker** attaches `click` directly on hitLine elements (L30530-30533).
+4. **LineWedgeMaker** attaches `mousedown` directly on ScoreTop/ScoreBottom (L31048-31049), plus `document.addEventListener('mousemove/mouseup')` for drag.
+5. **GCMaker/BadgeMaker** attach `click` on ScoreTop/ScoreBottom for deselection (L32693-32694).
+6. **Document-level handlers**: `document.addEventListener('mousemove/mouseup')` for drag operations, `document.addEventListener('keydown')` for Delete/Ctrl+Alt+D.
+
+**Key insight**: CSS `pointer-events: none` only blocks events on the targeted element. It does NOT prevent: (a) parent-level click handlers that do manual hit-testing, (b) capturing-phase handlers, (c) document-level handlers.
+
+#### Step 3: System Inventory — All Interactive Pathways
+
+| System | Event Attachment | What It Does | Blocked By |
+|--------|-----------------|--------------|------------|
+| **SVGElementManager** | `scoreTopEl.addEventListener('click')` | Manual hit-test → `selectElement()` | Capture block on ScoreTop |
+| **SVGElementManager** | `scoreBottomEl.addEventListener('click')` | Same for bottom section | Capture block on ScoreBottom |
+| **SVGElementManager** | `wrapper.addEventListener('mousedown')` | `handleElementMouseDown()` → start drag | Capture block (wrapper is child of ScoreTop/Bottom) |
+| **SVGElementManager** | `handle.addEventListener('mousedown')` | `handleResizeMouseDown()` → start resize | Same |
+| **SVGElementManager** | `document.addEventListener('mousemove/mouseup')` | Drag/resize motion | Dead if mousedown blocked |
+| **CurveMaker** | `hitPath/path.addEventListener('mousedown')` | `handleCurveMouseDown()` → select + drag | Capture block |
+| **CurveMaker** | `startPoint/endPoint.addEventListener('mousedown')` | Endpoint drag | Capture block |
+| **CurveMaker** | `bbox.addEventListener('mousedown')` | Select via bounding box | Capture block |
+| **CurveMaker** | `hitPath.addEventListener('click')` (continuation) | Select via click | Capture block |
+| **CurveMaker** | `document.addEventListener('mousemove/mouseup')` (per-drag) | Curve drag motion | Dead if mousedown blocked |
+| **MotiveMaker** | `hitLine.addEventListener('click')` | `selectMotive()` | Capture block |
+| **LineWedgeMaker** | `scoreTopEl.addEventListener('mousedown')` | Node drag start | Capture block |
+| **LineWedgeMaker** | `scoreBottomEl.addEventListener('mousedown')` | Same | Capture block |
+| **LineWedgeMaker** | `document.addEventListener('mousemove/mouseup')` | LW drag motion | Dead if mousedown blocked |
+| **LineWedgeMaker** | `document.addEventListener('keydown')` Ctrl+Alt+D | Duplicate LW | Keyboard block |
+| **GCMaker** | `scoreTopEl/scoreBottomEl.addEventListener('click')` | Deselect GC | Capture block |
+| **BadgeMaker** | `scoreTopEl/scoreBottomEl.addEventListener('click')` | Deselect badge | Capture block |
+| **GraphicTimeline** | `clickArea.addEventListener('click')` | Jump to clicked time | Capture block (replaced by gestures) |
+
+#### Step 4: Correct Approach — JavaScript Event Capture Blocking
+
+**Strategy**: Add **capturing-phase** event listeners on ScoreTop and ScoreBottom that call `stopImmediatePropagation()` for mouse events. Capturing-phase listeners fire BEFORE any other listeners, blocking all downstream handlers.
+
+```
+Runtime patch (in performance_rehearsal_patches.js):
+
+1. ScoreTop + ScoreBottom: capturing listeners for mousedown, click, dblclick
+   → e.stopImmediatePropagation() + e.preventDefault()
+   → Blocks ALL selection, drag-start, hit-test, deselect handlers
+
+2. Document: capturing keydown listener
+   → Block Delete, Backspace, Ctrl+Alt+D when not in input/textarea
+   → Preserves keyboard use in right panel inputs
+
+3. CSS (already done in S8-S11 attempt): 
+   → Hide MultiSelect toolbar, ObjectSelector menu
+   → Hide right panel editing sections
+   → S8-S11 strips + stubs (reduce file size)
+```
+
+**Why this works**:
+- Capturing phase fires BEFORE bubbling phase → blocks all existing listeners
+- `stopImmediatePropagation()` prevents other capturing listeners on same element
+- Mouse events are separate from Pointer events → gesture system (pointerdown/move/up on ScoreContainer) is **completely unaffected**
+- ScoreZoom uses wheel + mousedown on ScoreContainer (parent) → unaffected
+- Right panel buttons are in separate DOM branch → unaffected
+- `document.addEventListener('mousemove/mouseup')` for drag becomes dead code (drag never starts because mousedown is blocked)
+
+#### Step 5: What We Preserve
+
+| Feature | How It Works | Impact |
+|---------|-------------|--------|
+| Phase 8 gestures (swipe/tap/pinch) | Pointer events on `#ScoreContainer` | ✅ Unaffected (different event type) |
+| ScoreZoom (mouse wheel + Alt-drag) | Wheel/mousedown on `#ScoreContainer` | ✅ Unaffected (parent element) |
+| Right panel Play/Stop/Goto | Click handlers on panel buttons | ✅ Unaffected (separate DOM branch) |
+| Score rendering (all systems) | Data → SVG, no events involved | ✅ Unaffected |
+| Animation/playback/cursors | Canvas overlay + AnimationEngine | ✅ Unaffected |
+| Parts mode | Runtime overrides of rendering functions | ✅ Unaffected |
+| Auth/preferences (Phase 7) | Server-side | ✅ Unaffected |
+
+#### Step 6: What We Block
+
+| Blocked Behavior | Mechanism |
+|-----------------|-----------|
+| Click-to-select any score object | Capture block on ScoreTop/ScoreBottom |
+| Drag-to-move SVG elements | mousedown blocked → drag never starts |
+| Resize SVG elements | mousedown on handles blocked |
+| Curve endpoint drag | mousedown on endpoints blocked |
+| Curve slope adjustment | mousedown on curve blocked |
+| Motive selection | click on hitLine blocked |
+| LineWedge node drag | mousedown on ScoreTop/Bottom blocked |
+| GC/Badge selection | click on ScoreTop/Bottom blocked |
+| Delete key for objects | keydown capture |
+| Ctrl+Alt+D duplicate | keydown capture |
+| GraphicTimeline click-to-jump | click on ScoreTop/Bottom blocked (replaced by gesture nav) |
+
+#### Step 7: Risk Assessment
+
+**Confidence: 97%**
+
+| Risk | Likelihood | Mitigation |
+|------|-----------|------------|
+| Capture blocker interferes with gesture system | Very Low | Gesture system uses pointer events (different type), on ScoreContainer (parent). Verified: pointer events fire before mouse events; blocking mouse events doesn't affect pointer events. |
+| Capture blocker breaks ScoreZoom | Very Low | ScoreZoom attaches to ScoreContainer, not ScoreTop/Bottom. Wheel events are not blocked. |
+| Right panel stops working | None | Right panel is in separate DOM subtree (#cursorMenuContent), not inside ScoreTop/Bottom. |
+| Rendering breaks | None | Rendering is one-way data flow (score.json → SVG DOM). No event dependencies. |
+| Score positioning changes | None | Position computed from referenceSeconds + track. No interaction dependency. |
+| Future phases blocked | Very Low | Phase 9 annotation would add new interaction on a new layer, not reuse Workshop editing. |
+| Stale build served | Low | Hard refresh (Ctrl+Shift+R) + verify build timestamp in console. |
+
+**Remaining 3% uncertainty**: Possible obscure interaction between pointer events and mouse events in specific browsers (e.g., older Safari). Mitigated by testing on target platform (iPad Safari).
+
+#### Step 8: Staged Implementation Plan
+
+```
+Stage A: Runtime event capture patch
+  - Add capturing-phase mousedown/click/dblclick blockers on ScoreTop + ScoreBottom
+  - Add capturing-phase keydown blocker on document for Delete/Ctrl+Alt+D
+  - Implement in performance_rehearsal_patches.js (runtime IIFE)
+  → TEST: 🤖 Verify blockers injected in built HTML
+  → TEST: 👁️ Click on SVGs, curves, motives, LWs, GCs, badges — NOTHING selects
+  → TEST: 👁️ Drag attempt on any object — NO movement
+  → TEST: 👁️ Delete key — NO deletion
+  → TEST: 👁️ Ctrl+Alt+D — NO duplication
+
+Stage B: Verify gesture system still works
+  → TEST: 👁️ Right edge tap → page forward
+  → TEST: 👁️ Left edge tap → page back
+  → TEST: 👁️ Swipe left/right → page navigation
+  → TEST: 👁️ Center tap → overlay toggle (console)
+  → TEST: 👁️ Play/Stop button in right panel → playback works
+
+Stage C: Verify rendering integrity
+  → TEST: 👁️ Score looks identical — all notation, curves, motives, LWs, GCs, badges render
+  → TEST: 👁️ Page navigation shows correct content on each page
+  → TEST: 👁️ Parts mode still works (if applicable)
+  → TEST: 👁️ Window resize → score re-renders correctly
+
+Stage D: Keep S8-S11 strips + CSS (already done)
+  - S8-S11 strips reduce file size by 124 KB (pure editing infrastructure removed)
+  - CSS hides MultiSelect toolbar, ObjectSelector menu, editing panel sections
+  - These are belt-and-suspenders alongside the event capture approach
+```
+
+### Architecture Decision Record
+
+**Decision:** Extract Phase 8 patches into `scripts/performance_rehearsal_patches.js` (loaded by build script, like Phase 3's `performance_parts_patches.js`).
+**Rationale:** Phase 8 adds ~7 new patches. Putting them all in `build_performance_app.js` would push it past 1500 lines. Separate file keeps it maintainable and follows the established pattern.
+
+**Decision:** Page swipe calls `GraphicTimeline.onGoto()` rather than manually setting page numbers.
+**Rationale:** `onGoto()` is already overridden by parts mode. By calling it, swipe works correctly in both full score and parts mode without duplicating page math.
+
+**Decision:** Looping is purely client-side (no server involvement).
+**Rationale:** Per §12.10.3, looping is per-client only. Broadcasting loop events would disrupt other performers. Client checks `ScoreTime.now() >= loopEndMs` in AnimationEngine subscriber.
+
+**Decision:** Replace old right panel with overlay, but phase the migration.
+**Rationale:** Stage 2 builds the new overlay alongside the existing right panel (both functional). Once the overlay has full feature parity and is tested, a later sub-stage (5b) hides the old panel via CSS. This avoids breaking anything during development and lets us A/B compare during testing. The old panel's CursorControls JS stays — the overlay calls into it rather than duplicating logic.
+
+---
+
 ## RESUME HERE
-**Current phase:** Phase 7 — Authentication & Persistence ✅ COMPLETE
-**Next:** Phase 8+ (see pipeline plan §13.4+)
-**Key files:** `scripts/performance_server.js`, `scripts/build_performance_app.js`
-**Pipeline plan:** See §13.4 for phase details
+**Current phase:** Phase 8 — Rehearsal Mode (pre-implementation protocol complete)
+**Next:** Stage 1 implementation — touch gesture system + page swipe
+**Key files:** `scripts/build_performance_app.js`, `scripts/performance_server.js`, new `scripts/performance_rehearsal_patches.js`
+**Pipeline plan:** See §12.10 (iPad interface design) and Phase 8 steps in §13.4

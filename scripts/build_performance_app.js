@@ -608,6 +608,37 @@ stripBetween(
 );
 
 
+// ─── S8: GroupManager (editing-only — group/ungroup objects) ─────────────────
+stripBetween(
+    '        // ========================================\n        // GroupManager - Group objects into named groups',
+    '        // ========================================\n        // ObjectSelector - Ctrl+Win+Click to select overlapping objects',
+    'S8: GroupManager'
+);
+
+// ─── S9: ObjectSelector + ObjectRegistry (editing infrastructure) ───────────
+// ObjectSelector: Ctrl+Win+Click object picker. ObjectRegistry: adapter layer
+// used only by MultiSelect (also stripped). Both are pure editing infrastructure.
+stripBetween(
+    '        // ========================================\n        // ObjectSelector - Ctrl+Win+Click to select overlapping objects',
+    '        // ========================================\n        // MultiSelect - Transient group selection with actions',
+    'S9: ObjectSelector + ObjectRegistry'
+);
+
+// ─── S10: MultiSelect (batch select/duplicate/delete/move toolbar) ──────────
+stripBetween(
+    '        // ========================================\n        // MultiSelect - Transient group selection with actions',
+    '        // ============================================\n        // MUSICAL MATERIAL SYSTEM',
+    'S10: MultiSelect'
+);
+
+// ─── S11: MusicalMaterialSystem (composition cataloging) ────────────────────
+stripBetween(
+    '        // ============================================\n        // MUSICAL MATERIAL SYSTEM',
+    '        // Initialize Score Manager (after all other systems)',
+    'S11: MusicalMaterialSystem'
+);
+
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // INSERTS & CLEANUPS
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -716,6 +747,18 @@ const stubsBlock = `
         const OneShotPanelSwitcher = { init() {} }; window.OneShotPanelSwitcher = OneShotPanelSwitcher;
         const PanelSectionManager = { init() {} }; window.PanelSectionManager = PanelSectionManager;
 
+        // S8-S11 stubs: editing infrastructure stripped in Phase 8
+        const GroupManager = { init() {}, refreshUI() {}, selectedGroupId: null, boundingBoxElements: [] };
+        window.GroupManager = GroupManager;
+        const ObjectSelector = { init() {}, hideMenu() {}, getObjectsAtPoint() { return []; }, showMenuAtPoint() {}, showMenuFromObjects() {} };
+        window.ObjectSelector = ObjectSelector;
+        const ObjectRegistry = { adapters: {}, register() {}, getPosition() { return null; }, setTime() {}, setTrack() {}, cloneObj() { return null; }, deleteObj() {}, getBounds() { return null; } };
+        window.ObjectRegistry = ObjectRegistry;
+        const MultiSelect = { selected: [], init() {}, clear() {}, toggleObject() {}, syncSingleSelection() {}, updateVisuals() {}, duplicateAll() {}, deleteAll() {}, changeTrackAll() {} };
+        window.MultiSelect = MultiSelect;
+        const MusicalMaterialSystem = { materials: [], nextId: 1, init() {}, exportData() { return { materials: [], nextId: 1 }; }, importData() {}, captureFromMultiSelect() {} };
+        window.MusicalMaterialSystem = MusicalMaterialSystem;
+
 `;
 
 replaceOnce(
@@ -756,7 +799,35 @@ const perfCss = [
     '        #ccDisplaySelect, label[for="ccDisplaySelect"] { display: none !important; }',
     '        #cursorMenuContent .control-row:has(#ccDisplaySelect) { display: none !important; }',
     '        /* Right panel: hide Score File section */',
-    '        #cursorMenuContent .menu-section:has(#scoreSaveBtn) { display: none !important; }'
+    '        #cursorMenuContent .menu-section:has(#scoreSaveBtn) { display: none !important; }',
+    '        /* ═══ Phase 8: Nuclear strip — disable all Workshop interaction ═══ */',
+    '        /* Disable pointer events on ALL score object groups (rendering unaffected) */',
+    '        .svg-element-wrapper { pointer-events: none !important; cursor: default !important; }',
+    '        .svg-element-wrapper.selected { pointer-events: none !important; }',
+    '        .curve-element, .curve-bounding-box, .curve-endpoint { pointer-events: none !important; cursor: default !important; }',
+    '        .motive-line, .motive-element { pointer-events: none !important; cursor: default !important; }',
+    '        .motive-element line { cursor: default !important; }',
+    '        .lw-group, .lw-node { pointer-events: none !important; cursor: default !important; }',
+    '        .lw-group line, .lw-group circle { cursor: default !important; }',
+    '        .gc-ball, .gc-element { pointer-events: none !important; cursor: default !important; }',
+    '        .badge-wrapper { pointer-events: none !important; cursor: default !important; }',
+    '        /* Override all inline cursor:pointer set by rendering code */',
+    '        #ScoreTop *, #ScoreBottom * { cursor: default !important; }',
+    '        /* Hide MultiSelect toolbar and ObjectSelector menu */',
+    '        #multiSelectToolbar { display: none !important; }',
+    '        #objectSelectorMenu { display: none !important; }',
+    '        /* Right panel: hide ALL editing sections (SVG, Curve, Motive, LW, GC, Badge, Group, Material) */',
+    '        #cursorMenuContent .menu-section:has(#svgLoadBtn) { display: none !important; }',
+    '        #cursorMenuContent .menu-section:has(#curveDeleteBtn) { display: none !important; }',
+    '        #cursorMenuContent .menu-section:has(#motiveDeleteBtn) { display: none !important; }',
+    '        #cursorMenuContent .menu-section:has(#lwDeleteBtn) { display: none !important; }',
+    '        #cursorMenuContent .menu-section:has(#gcDeleteBtn) { display: none !important; }',
+    '        #cursorMenuContent .menu-section:has(#badgeDeleteBtn) { display: none !important; }',
+    '        #cursorMenuContent .menu-section:has(#groupDeleteBtn) { display: none !important; }',
+    '        #cursorMenuContent .menu-section:has(#mmCaptureBtn) { display: none !important; }',
+    '        /* Hide SVG element list panel */',
+    '        #svgElementListContainer { display: none !important; }',
+    '        #svgListToggle { display: none !important; }'
 ].join('\n');
 
 // Insert CSS just before </style>
@@ -933,6 +1004,22 @@ if (fs.existsSync(partsFile)) {
     console.log('  ✓ Loaded parts mode patches from performance_parts_patches.js');
 } else {
     console.log('  ⚠ performance_parts_patches.js not found — skipping Phase 3');
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PHASE 8: Rehearsal Mode — Touch gestures, controls overlay, markers
+// ═══════════════════════════════════════════════════════════════════════════════
+
+console.log('\n  --- Phase 8: Rehearsal Mode ---');
+
+const rehearsalFile = path.join(__dirname, 'performance_rehearsal_patches.js');
+if (fs.existsSync(rehearsalFile)) {
+    const applyRehearsalPatches = require(rehearsalFile);
+    html = applyRehearsalPatches(html);
+    console.log('  ✓ Loaded rehearsal patches from performance_rehearsal_patches.js');
+} else {
+    console.log('  ⚠ performance_rehearsal_patches.js not found — skipping Phase 8');
 }
 
 

@@ -1813,7 +1813,7 @@ Beyond the mini-map, performers need clear context about where they are:
 
 ### 12.11 Performance Mode — Live Concert Features
 
-Performance mode is a stripped-down, fault-resistant version of rehearsal mode. The priorities shift from flexibility to **reliability and simplicity**.
+Performance mode is a stripped-down, fault-resistant version of rehearsal mode. The priorities shift from flexibility to **reliability and simplicity**. Everything is locked down — the score auto-advances, touches are ignored, and only the leader has deliberate emergency controls.
 
 #### 12.11.1 Performance Mode vs. Rehearsal Mode
 
@@ -1825,36 +1825,101 @@ Performance mode is a stripped-down, fault-resistant version of rehearsal mode. 
 | Adding annotations | ✅ | ❌ (read-only) |
 | Score editing | ✅ | ❌ |
 | Page swipe (manual) | ✅ | ❌ (auto-advance only) |
-| Controls overlay | Tap to show | Swipe up from bottom (harder to trigger accidentally) |
-| Emergency menu | Available | Available (dedicated gesture) |
+| All tap/swipe gestures | ✅ | ❌ (completely disabled) |
+| Controls overlay | Tap to show | ❌ (disabled, leader emergency menu only) |
+| Emergency menu | Available | Leader-only (dedicated gesture, see 12.11.3) |
+| Emergency stop | N/A | All performers (3-finger long press 2s, see 12.11.3) |
 | Lead-in countdown | Optional | Required |
-| UI chrome | Normal | Minimal (score fills screen) |
-| Accidental touch protection | Normal | Enhanced (see 12.11.3) |
+| UI chrome | Normal | Minimal (score fills screen, fullscreen enforced) |
+| Accidental touch protection | Normal | Maximum (all touches ignored, see 12.11.3) |
+| Auto-stop at end | ❌ (plays forever) | ✅ (stops at final bar) |
 
-#### 12.11.2 Lead-In / Countdown
+#### 12.11.1b Concert Scenarios
 
-Before the first downbow, performers need a clear visual countdown:
+Performance mode must support two real-world scenarios:
 
-**Configuration (set by leader before performance):**
-- Lead-in duration: 3, 5, 8, or custom seconds
-- Countdown style: numeric ("3... 2... 1..."), visual (pulsing circle), or both
-- Optional: audible click/beep for each count (through earpiece only)
-- Optional: GC ball animation starts immediately (if the piece has an opening GC)
+**Scenario A: Multi-piece concert (staging hours ahead)**
 
-**Implementation:**
+The ensemble soundchecks and stages all pieces during the afternoon. Some pieces use our system, others use third-party score readers on the same iPads. After staging, performers switch between apps during the concert.
+
+- During soundcheck: performers join room, do readiness check, enter fullscreen, verify sync
+- System enters a **"staged" state** — ready to go, waiting for leader start
+- Performers switch to other apps for other pieces. Our browser tab is backgrounded (potentially for hours)
+- When it's time for our piece: performers switch back to browser tab
+- **Tab recovery:** `document.visibilitychange` event detects tab becoming visible → immediate burst re-sync → verify fullscreen → brief "Reconnecting..." overlay (1-2 seconds) → leader sees all performers green again → "Go"
+- Risk: browser may have suspended the tab or killed the WebSocket. Socket.IO auto-reconnects. JWT re-authenticates. Room state is preserved on server.
+
+**Scenario B: Standard pre-performance setup (minutes before)**
+
+The simpler case — performers open the app, do readiness check, leader starts countdown, piece begins. Covered by the standard flow in §12.11.2–12.11.3.
+
+#### 12.11.2 Pre-Performance Readiness & Go Sequence
+
+The complete performance start sequence has three phases: readiness, go, and countdown.
+
+**Phase 1: Readiness Check (minutes or hours before)**
+
+Leader's device shows a readiness panel:
+```
+┌─────────────────────────────────┐
+│  PERFORMANCE READINESS          │
+│                                 │
+│  ✅ Violin I  — Jane (synced)  │
+│  ✅ Violin II — Alex (synced)  │
+│  ✅ Viola     — Sam  (synced)  │
+│  ⚠️ Cello     — (disconnected) │
+│                                 │
+│  Battery warnings: None         │
+│  Sync quality: 🟢 Excellent    │
+│                                 │
+│  [ Begin Performance ]  (grey)  │
+│  ─ waiting for all performers ─ │
+└─────────────────────────────────┘
+```
+
+- Server tracks which slots are occupied and connected (`connectedPerformers[]` from Phase 7)
+- Each performer taps **"Ready"** on their device — this tap also triggers **fullscreen** (`document.documentElement.requestFullscreen()`). This is required because the Fullscreen API requires a user gesture on the same device — the leader cannot remotely trigger fullscreen on other devices.
+- Leader's "Begin Performance" button enables only when all expected performers show green
+- Optional: battery check via `navigator.getBattery()` — warn if any device <20%
+- Optional: screen orientation lock to landscape via `screen.orientation.lock('landscape')` (requires fullscreen)
+- Reminder prompt: "Ensure Do Not Disturb is enabled on all devices" (notifications can break fullscreen)
+- For Scenario A (multi-piece concert): after readiness check, system enters **"staged" state**. Performers can switch away. On return, `document.visibilitychange` triggers re-sync and re-verification.
+
+**Phase 2: Go (leader-only)**
+
+Leader taps "Begin Performance" → confirmation dialog: **"Start in 5 seconds? [Confirm] [Cancel]"**
+
+On confirm, server broadcasts `performanceGo`:
 ```js
-// Performance start sequence:
-function startPerformance(leadInSeconds) {
+// Server:
+function startPerformance(roomId, leadInSeconds) {
+    // Verify all performers still connected
+    const room = rooms[roomId];
+    const allReady = room.slots.every(s => s.connected);
+    if (!allReady) return { error: 'Not all performers connected' };
+
     const startAt = ClockSync.now() + (leadInSeconds * 1000);
     
-    io.to(roomId).emit('performanceCountdown', {
+    io.to(roomId).emit('performanceGo', {
         startAt: startAt,
         leadInSeconds: leadInSeconds
     });
+    
+    room.mode = 'performance';
+    room.performanceStartAt = startAt;
 }
 
 // Client:
-socket.on('performanceCountdown', (data) => {
+socket.on('performanceGo', (data) => {
+    // Enter performance lockdown (disable all gestures)
+    RehearsalGestures.performanceLocked = true;
+    
+    // Ensure fullscreen (re-enter if lost during app switch)
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    }
+    
+    // Show countdown
     showCountdown(data.leadInSeconds);
     
     // Schedule exact start using latency-compensated time (§12.7 Tier 3c)
@@ -1865,35 +1930,48 @@ socket.on('performanceCountdown', (data) => {
 });
 ```
 
-**Visual countdown:**
-- Full-screen overlay that fades from opaque to transparent
-- Large centered number: **3** → **2** → **1** → (overlay disappears, score starts)
-- Optional: the first page of the score is already visible behind the semi-transparent overlay so performers can see what's coming
+Note: The `requestFullscreen()` call on `performanceGo` serves as a safety net for Scenario A (returning from another app). If fullscreen was already entered during readiness, this is a no-op. If fullscreen was lost, this re-enters it — but only if the `performanceGo` handler runs in response to a user gesture chain (which it may not). The primary fullscreen entry point is the readiness "Ready" tap.
 
-#### 12.11.3 Fault-Proof Start / Stop Controls
+**Phase 3: Countdown**
 
-Accidental touches during performance are a real risk. Mitigations:
+- Full-screen semi-transparent overlay with large centered countdown: **5** → **4** → **3** → **2** → **1** → (overlay disappears, score starts)
+- First page of the score is visible behind the overlay so performers can see what's coming
+- Leader can **cancel** during countdown (broadcasts `performanceCancel` to all)
+- Countdown accounts for any fullscreen transition time (~200ms buffer)
+- Configuration: lead-in duration 3, 5, 8, or custom seconds (set by leader before performance)
+- Optional: audible click/beep for each count (through earpiece only)
+- Optional: GC ball animation starts immediately (if the piece has an opening GC)
 
-**Start protection:**
-- Performance start requires **leader confirmation** — leader taps "Begin Performance", then a second confirmation: "Start in 5 seconds? [Confirm] [Cancel]"
-- The countdown provides a grace period — leader can cancel during countdown
-- Non-leader performers cannot start the score
+#### 12.11.3 Touch Lockdown & Emergency Controls
 
-**Accidental touch protection during playback:**
-- **Lock screen gesture:** Once playing, the controls overlay requires a **deliberate gesture** to summon — either swipe up from the very bottom edge (like iOS Control Center) or a **three-finger tap**
-- **No single-tap actions** during playback — taps on the score body are ignored (no accidental page turns, no accidental mode switches)
-- Apple Pencil still works for annotations if enabled (but recommended to disable annotation in performance mode)
-- Page turns are fully automatic — no manual intervention needed
+During performance, the screen is **completely locked down**. No gesture of any kind affects the score — no taps, no swipes, no pinch zoom. The score auto-advances, page turns are automatic, and the performer's only job is to play music.
 
-**Stop protection:**
-- Stop button requires **long press** (1 second) — not a tap
-- Or: leader sends stop command → all clients stop simultaneously
-- Visual confirmation: "Performance stopped at 4:32"
+**Complete touch lockdown during playback:**
+- `RehearsalGestures.performanceLocked = true` — all gesture handlers return immediately
+- No single-tap, double-tap, swipe, or pinch actions fire
+- Controls overlay is disabled (cannot be summoned)
+- Apple Pencil annotation is disabled
+- Page turns are fully automatic — no manual intervention needed or possible
+- The only gestures that bypass lockdown are the emergency gestures below
 
-**Emergency stop (panic button):**
-- **Three-finger long press** (1.5 seconds) anywhere on screen → immediate stop + "EMERGENCY STOP" indicator to all connected performers
-- Available to ALL performers, not just leader (safety measure)
-- After emergency stop: score freezes at current position, can be resumed from that point
+**Leader-only emergency menu:**
+- **Three-finger tap** (leader device only) → opens emergency menu overlay
+- Menu options: "Stop", "Restart from beginning", "Jump to marker...", "Resume from current position"
+- All options broadcast to all synced performers
+- Menu auto-closes after 10 seconds if no action taken
+- Non-leader devices: three-finger tap is ignored (only emergency stop works, see below)
+
+**Emergency stop (all performers — safety measure):**
+- **Three-finger long press (2 seconds)** anywhere on screen → immediate stop + "EMERGENCY STOP" broadcast to all connected performers
+- Available to ALL performers, not just leader — if the leader's device crashes, any performer can halt the score
+- The 2-second threshold is high enough to prevent accidental triggers but low enough for genuine emergencies
+- After emergency stop: score freezes at current position, leader can resume from that point via emergency menu
+- Visual confirmation on all devices: "EMERGENCY STOP at 4:32" (red flash, then persists as small indicator)
+
+**Stop protection (leader normal stop):**
+- Leader's emergency menu → "Stop" requires **long press** (1 second) — not a tap
+- Or: score auto-stops at end (see §12.11.6)
+- Visual confirmation on all devices: "Performance stopped at 4:32"
 
 #### 12.11.4 Emergency Recovery Procedures
 
@@ -1949,8 +2027,49 @@ Log how much time a performer spends on each section. Useful for rehearsal plann
 **5. Prevent finger drawing (from forScore):**
 When Apple Pencil annotation is enabled, disable finger drawing to prevent accidental marks. Only the Pencil can draw; fingers navigate. This is the `pointerType` check mentioned in 12.10.1.
 
-**6. Score dimming / night mode:**
+**6. Tab visibility recovery (critical for Scenario A):**
+Use `document.addEventListener('visibilitychange')` to detect when a backgrounded tab becomes active again. On `visibilityState === 'visible'`: trigger burst re-sync, verify WebSocket connection, re-enter fullscreen if lost, and show a brief "Reconnecting..." overlay until sync quality reaches "good." This handles the multi-piece concert scenario where performers switch between apps.
+
+**7. Score dimming / night mode:**
 For performances in dim venues, offer brightness control and/or a warm-toned dark mode to avoid blinding performers (and audience) with bright white iPads.
+
+#### 12.11.6 Auto-Stop at End of Score
+
+Currently the score plays indefinitely past the last note. In performance mode, the score must automatically stop at the end.
+
+**Implementation:**
+- Server calculates total score duration from tempo history and total beats (already available in room state from `beatsPerPage`, `beatsPerMinute`, and total beat count from score.json)
+- Server sets a timer on `scoreGo`: `setTimeout(() => autoStop(roomId), totalDurationMs - currentPositionMs)`
+- When timer fires: server emits `scoreStop` with `{ reason: 'end-of-score' }` to all clients
+- Client detects `reason: 'end-of-score'` and shows "End of Score" indicator instead of generic stop
+- Timer is cancelled on manual stop or emergency stop
+- Timer is recalculated on `scoreGoto` (jump to different position)
+
+**Edge cases:**
+- If score is already past the calculated end (e.g., after a jump): stop immediately
+- Account for lead-in seconds (don't count those in the total duration)
+- In rehearsal mode: auto-stop is optional (configurable, default off — performers may want to let it run for annotation purposes)
+
+#### 12.11.7 End of Performance Ceremony
+
+After the score auto-stops at the final bar (or is manually stopped by the leader):
+
+**Immediate (automatic):**
+- Score freezes at final position — cursor stays at the last bar
+- Brief "Performance Complete" overlay fades in after 2 seconds (doesn't obscure the final page during the last moments of the piece)
+- Performance lockdown remains active (no accidental touches)
+- Overlay shows: performance duration, timestamp
+
+**Leader options (after overlay appears):**
+- "Return to Rehearsal Mode" — unlocks gestures, exits performance mode
+- "Start Again" — resets to beginning, re-enters countdown sequence
+- "Close Session" — ends the room session, all clients return to join screen
+
+**Automatic actions:**
+- Annotations made before/during performance are auto-saved
+- Optional: performance log saved to server (start time, duration, any emergency events, sync quality stats) — useful for post-concert review
+- Wake Lock released (screen can dim again)
+- Fullscreen can be exited by standard browser gesture (swipe down on iPad, Escape on desktop)
 
 ### 12.12 Annotation System — Design for Small Notation
 
@@ -3699,54 +3818,97 @@ Phase 1: Foundation ────────────────────
 
 #### Phase 11: Performance Mode
 **Depends on:** Phase 8 (Rehearsal Mode), Phase 10 (Sync+Animation T2)
-**Est. sessions:** 2–3
-**Risk level:** Medium — fault-proof controls require careful gesture handling; emergency recovery adds complexity
+**Est. sessions:** 3–4
+**Risk level:** Medium-High — fault-proof controls, fullscreen API constraints, multi-scenario concert support, emergency recovery
 
-**Goal:** Build the stripped-down, fault-resistant performance mode (§12.11): no independent navigation, no editing, enhanced touch protection, lead-in countdown, emergency stop, and recovery procedures.
+**Goal:** Build the stripped-down, fault-resistant performance mode (§12.11): complete touch lockdown, pre-performance readiness check with fullscreen, leader-only Go sequence with countdown, auto-stop at end of score, emergency stop/menu, tab recovery for multi-piece concerts, Service Worker caching, and end-of-performance ceremony.
 
-**Step 11.1: Mode switching (rehearsal ↔ performance)**
-- Add mode selector in admin/leader controls
-- Performance mode: disable independent navigation, looping, annotation editing, manual page turns
-- UI chrome minimized (score fills screen, minimal status indicators)
-- 🤖 *AI Test:* Switch mode → verify disabled features are truly disabled (swipe doesn't turn page, etc.)
+**Step 11.0: Auto-stop at end of score (§12.11.6)**
+- Server calculates total score duration from tempo history and total beats
+- On `scoreGo`: set timer for `totalDurationMs - currentPositionMs`
+- Timer fires → emit `scoreStop` with `{ reason: 'end-of-score' }` to all clients
+- Client shows "End of Score" indicator on `reason: 'end-of-score'`
+- Cancel timer on manual stop, emergency stop, or `scoreGoto`
+- In rehearsal mode: auto-stop is configurable (default off)
+- 🤖 *AI Test:* Play from near-end → score auto-stops at correct time. Jump to 10s before end → timer recalculated. Manual stop → no double-stop.
 
-**Step 11.2: Lead-in countdown**
-- Configurable duration (3, 5, 8, custom seconds)
-- Full-screen overlay with countdown numbers: **3** → **2** → **1** → start
-- Score visible behind semi-transparent overlay
-- Latency-compensated start (§12.7 Tier 3c — schedule start in future so all clients begin simultaneously)
-- 🤖 *AI Test:* Countdown displays, score starts at correct time, all clients start within tolerance
-- 👁️ *Human test:* Countdown is visually clear, transition to playing is smooth
+**Step 11.1: Mode switching + complete lockdown (§12.11.1, §12.11.3)**
+- Add mode selector: URL param `?mode=performance` or leader control
+- `RehearsalGestures.performanceLocked = true` — ALL gesture handlers return immediately (tap, swipe, pinch, long press)
+- Controls overlay disabled (cannot be summoned)
+- Apple Pencil annotation disabled
+- UI chrome minimized (score fills screen)
+- Only gestures that bypass lockdown: three-finger tap (leader emergency menu), three-finger long press 2s (all performers emergency stop)
+- 🤖 *AI Test:* In performance mode: tap → no response, swipe → no page turn, pinch → no zoom, center tap → no overlay. Three-finger tap on leader device → menu opens. Three-finger tap on non-leader → ignored.
 
-**Step 11.3: Fault-proof controls**
-- Start: leader-only, double confirmation, cancelable during countdown
-- During playback: controls require deliberate gesture (swipe from bottom edge or 3-finger tap)
-- Stop: long press (1 second) required
-- No single-tap actions during playback
-- 🤖 *AI Test:* Single tap during playback → no response. Long press → stop triggers. Accidental swipe → no page turn.
-- 👁️ *Human test on iPad:* Deliberately try to trigger accidental actions — none should fire during performance
+**Step 11.2: Pre-performance readiness check (§12.11.2 Phase 1)**
+- Leader device shows readiness panel: all slots with connection status, sync quality, battery warnings
+- Each performer taps "Ready" on their device — this tap triggers fullscreen (`document.documentElement.requestFullscreen()`). Fullscreen API requires user gesture on same device — cannot be triggered remotely.
+- Server tracks ready state per performer (`performerReady` event)
+- Leader's "Begin Performance" button enables only when all expected performers show ✅
+- Optional: battery check via `navigator.getBattery()` — warn if <20%
+- Optional: screen orientation lock to landscape via `screen.orientation.lock('landscape')`
+- Optional: "Ensure Do Not Disturb" reminder prompt
+- For Scenario A (multi-piece concert): after readiness, system enters "staged" state. Performers can switch away.
+- 🤖 *AI Test:* Readiness panel shows correct slot status. Ready tap triggers fullscreen. Button disabled until all green. Battery API called.
+- 👁️ *Human test:* Readiness flow feels natural. Fullscreen enters on Ready tap.
 
-**Step 11.4: Emergency stop**
-- Three-finger long press (1.5s) anywhere → immediate stop for ALL connected performers
-- Available to ALL performers, not just leader
-- Visual indicator: "EMERGENCY STOP" flash → score freezes at current position
-- Can resume from stopped position
-- 🤖→👁️ *AI verifies stop broadcasts to all → Human confirms: emergency stop on one device stops all devices*
+**Step 11.3: Go sequence + countdown (§12.11.2 Phases 2-3)**
+- Leader taps "Begin Performance" → double confirmation: "Start in 5 seconds? [Confirm] [Cancel]"
+- Server verifies all performers still connected, then broadcasts `performanceGo`
+- Client receives `performanceGo`: sets `performanceLocked = true`, re-enters fullscreen if lost, shows countdown
+- Countdown: full-screen semi-transparent overlay, large centered numbers: **5** → **4** → **3** → **2** → **1** → overlay disappears, score starts
+- Score visible behind overlay so performers see first page
+- Latency-compensated start (§12.7 Tier 3c — schedule start at `ClockSync.now() + leadInMs` so all clients begin simultaneously)
+- Leader can cancel during countdown (broadcasts `performanceCancel`)
+- Countdown accounts for fullscreen transition time (~200ms buffer before first number)
+- Configurable lead-in: 3, 5, 8, or custom seconds
+- 🤖 *AI Test:* Countdown displays on all clients. Score starts at correct time. Cancel during countdown works. All clients start within tolerance.
+- 👁️ *Human test:* Countdown is visually clear, transition to playing is smooth, no jarring fullscreen resize during countdown.
 
-**Step 11.5: Emergency recovery**
-- Network loss: local clock fallback (already implemented in Phase 6/10), red indicator
-- App crash/page reload: auto-rejoin room from localStorage, receive current state
-- iPad sleep: Wake Lock API (`navigator.wakeLock.request('screen')`) to prevent sleep
-- Service Worker cache: HTML + score JSON cached for near-instant reload even without network
-- 🤖 *AI Test:* Service Worker installed, cache populated. Simulate offline reload → page loads from cache. Wake Lock acquired.
+**Step 11.4: Emergency controls (§12.11.3)**
+- **Leader emergency menu:** Three-finger tap (leader only) → opens overlay with: "Stop" (long press 1s), "Restart from beginning", "Jump to marker...", "Resume"
+- All menu actions broadcast to all synced performers
+- Menu auto-closes after 10 seconds if no action taken
+- Non-leader devices: three-finger tap ignored
+- **Emergency stop (all performers):** Three-finger long press (2 seconds) → immediate `emergencyStop` broadcast to all
+- Visual: red flash "EMERGENCY STOP at 4:32" on all devices
+- Score freezes at current position, leader can resume via emergency menu
+- 🤖→👁️ *AI verifies: emergency stop broadcasts correctly, menu options work, non-leader can't open menu but CAN emergency stop. Human confirms on real device: 2-second threshold feels right, no accidental triggers.*
+
+**Step 11.5: Tab recovery + Scenario A support (§12.11.1b, §12.11.5 item 6)**
+- `document.addEventListener('visibilitychange')` detects backgrounded tab becoming active
+- On `visibilityState === 'visible'`: burst re-sync, verify WebSocket (Socket.IO auto-reconnects), verify fullscreen, show "Reconnecting..." overlay
+- Overlay clears when sync quality reaches "good" (~1-2 seconds)
+- If room was in "staged" state: re-enter staged mode, leader sees performer back as green
+- If room was in "playing" state: jump to current position, join playback in progress
+- 🤖 *AI Test:* Background tab 30s → foreground → reconnects, re-syncs, overlay clears. Background 5min → foreground → same recovery.
+- 👁️ *Human test:* Switch to another app, wait 2 minutes, switch back → score recovers within 2 seconds.
+
+**Step 11.6: Service Worker + Wake Lock (§12.11.4)**
+- Service Worker caches `index.html`, `score.json`, and all SVG assets for near-instant reload even without network
+- Wake Lock API (`navigator.wakeLock.request('screen')`) acquired on performance start, released on end
+- On app crash/page reload: check localStorage for active room session → auto-rejoin → receive current state → jump to position
+- 🤖 *AI Test:* Service Worker installed, cache populated. Simulate offline reload → page loads from cache. Wake Lock acquired on performance start.
 - 👁️ *Human test:* Force-close app → reopen → auto-rejoins room, score at correct position. Wake Lock prevents dimming during 10-minute idle.
 
+**Step 11.7: End of performance ceremony (§12.11.7)**
+- After auto-stop (or leader manual stop): score freezes at final position
+- "Performance Complete" overlay fades in after 2 seconds (doesn't obscure final page during last moments)
+- Overlay shows: performance duration, timestamp
+- Leader options: "Return to Rehearsal", "Start Again", "Close Session"
+- Performance lockdown remains active until leader exits performance mode
+- Performance log saved to server (start time, duration, emergency events, sync quality stats)
+- Wake Lock released, fullscreen can be exited
+- 🤖 *AI Test:* Auto-stop triggers ceremony. Leader options work. Log saved. Wake Lock released.
+- 👁️ *Human test:* End-of-piece feels clean. Overlay doesn't appear too early. Leader options are clear.
+
 **Phase 11 Completion Checkpoint:**
-- 🤖 Performance mode locks down features correctly. Countdown, fault-proof controls, emergency stop all functional.
-- 🤖 Recovery mechanisms: Service Worker cache, auto-rejoin, Wake Lock
-- 👁️ **Human verification (on iPad):** Performance mode feels safe — no accidental triggers. Countdown is clear. Emergency stop works from any device. Recovery from network loss is seamless.
-- **Regression:** Rehearsal mode still works when not in performance mode
-- Commit: `[Phase 11] Performance mode — lockdown, countdown, emergency, recovery`
+- 🤖 Performance mode locks down ALL touches correctly. Readiness check, Go sequence, countdown, auto-stop, emergency stop/menu, tab recovery, Service Worker, Wake Lock all functional.
+- 🤖 Two scenarios tested: standard setup AND backgrounded-tab recovery (Scenario A)
+- 👁️ **Human verification (on tablet/iPad):** Performance mode feels completely safe — no accidental triggers of any kind. Countdown is clear. Emergency stop works from any device. Recovery from network loss and app switch is seamless. End-of-performance ceremony is clean.
+- **Regression:** Rehearsal mode still works when not in performance mode. All Phases 1-10 features unaffected.
+- Commit: `[Phase 11] Performance mode — lockdown, readiness, countdown, emergency, auto-stop, recovery`
 - Tag: `git tag phase-11-complete`
 
 ---
@@ -3934,7 +4096,7 @@ Phase 1: Foundation ────────────────────
 | **8** | Rehearsal Mode | 4–6 | 5,6,7 | Touch gesture complexity | 👁️ (iPad) |
 | **9** | Annotations | 3–4 | 8 | Pencil coordinate mapping | 👁️ (iPad+Pencil) |
 | **10** | Sync+Animation Tier 2 | 2–3 | 2,6 | Monotonic clock edge cases | 🤖→👁️ |
-| **11** | Performance Mode | 2–3 | 8,10 | Fault-proof control testing | 👁️ (iPad) |
+| **11** | Performance Mode | 3–4 | 8,10 | Fullscreen API, touch lockdown, multi-scenario concert | 👁️ (iPad) |
 | **12** | Part View Enhancements | 1–2 | 3,8 | Layout math at different scales | 🤖→👁️ |
 | **13** | Sync+Animation Tier 3 | 2–3 | 10 | Subtle timing improvements | 🤖→👁️ |
 | **14** | Website & Production | 3–5 | 1-11 | Infrastructure / networking | 🤖→👁️ |
@@ -3951,7 +4113,7 @@ These are hard checkpoints where the system must be fully verified before procee
 | **M2: Printable Score** | 4 | Generate full-score and per-part PDFs | Print quality, color fidelity, completeness |
 | **M3: Multi-Player** | 6 | 2+ browsers synced in same room. Play/stop/goto together. | Sync accuracy < 50ms, room isolation |
 | **M4: Rehearsal-Ready** | 8 | Performers can rehearse on iPads: markers, looping, sync/independent, leader controls | iPad usability test with 2+ people |
-| **M5: Performance-Ready** | 11 | Fully locked-down performance mode with fault tolerance | Stress test: deliberate disconnect, emergency stop, recovery |
+| **M5: Performance-Ready** | 11 | Fully locked-down performance mode: readiness check, Go sequence, auto-stop, emergency controls, tab recovery, Service Worker, end ceremony | Stress test: deliberate disconnect, emergency stop, recovery, Scenario A (backgrounded tab), accidental touch — zero triggers |
 | **M6: Deployed** | 14 | Live on the internet, performers access via invite links | End-to-end remote test with real performers |
 
 ### 13.7 Session Handoff Protocol — Quick Reference
@@ -4793,3 +4955,66 @@ node scripts/generate_print_pdf.js --track 4 --pages 4      # Cello, 4 pages/scr
 | `phase-2-complete` | `9c1f0701` | Phase 2 animation optimizations |
 | `phase-3-complete` | `ed86d027` | Phase 3 parts mode complete |
 | `phase-4-complete` | *(this commit)* | Phase 4 print score complete |
+
+---
+
+## 17. Lessons & Architecture Notes for Future Pieces
+
+*Accumulated during development of String Quartet No. 1. Reference this section when starting `composition-system-v2` or the next piece's Workshop.*
+
+### 17.1 Renderer/Editor Separation (Critical)
+
+**Problem discovered:** Phase 8 Stage 1b. When building the Performance Score, we needed to strip all editing/interaction code while keeping rendering. This was impossible to do cleanly because every score object system (SVGElementManager, CurveMaker, LineWedgeMaker, MotiveMaker, GCMaker, BadgeMaker) has rendering and editing intertwined in a single monolithic object literal.
+
+- `createLineWedge()` serves both data import (rendering) and user creation (editing)
+- `selectElement()` is called from click handlers AND from data reload
+- `init()` sets up DOM containers (rendering) AND attaches event listeners (editing) in one block
+- `document.addEventListener('mousemove/mouseup')` for drag is attached alongside rendering setup
+
+**Result:** Could not strip editing code without risking rendering breakage. Required a runtime event-capture blocker (~20 lines) plus CSS hiding plus 4 system strips as a workaround.
+
+**Architecture for next piece — split each system into two classes:**
+
+| Class | Responsibility | Example Methods |
+|-------|---------------|-----------------|
+| `LineWedgeRenderer` | Data → DOM. Render, re-render, visibility, resize, data import/export | `createFromData(params)`, `render()`, `updateVisibility()`, `reloadFromDatabase()`, `reRenderAll()` |
+| `LineWedgeEditor` | User interaction. Selection, drag, delete, UI panel wiring | `selectLineWedge()`, `handleMouseDown()`, `handleDrag()`, `deleteSelected()`, `createFromUI()` |
+
+**Rules:**
+1. **Editor depends on Renderer, never the reverse.** Renderer never imports, calls, or references Editor.
+2. **Event listeners live in `Editor.init()` only.** `Renderer.init()` creates DOM containers and nothing else.
+3. **Factory split:** `Renderer.createFromData(params)` for data import. `Editor.createFromUI()` reads UI inputs, then calls `Renderer.createFromData()`.
+4. **Selection state lives in Editor only.** Renderer doesn't track `selectedElement`, `selectedCurve`, etc.
+5. **Build script strips all `*Editor` classes** — clean cut, zero rendering risk, no stubs needed.
+
+**Apply to all systems:** SVGElementManager, CurveMaker, LineWedgeMaker, MotiveMaker, GCMaker, BadgeMaker, CompositionPanel, ScoreManager, GraphicTimeline.
+
+### 17.2 Dual Event Binding on Buttons
+
+**Problem discovered:** Phase 1. The Play button had BOTH an `onclick` attribute AND an `addEventListener('click')`. This is a Workshop legacy pattern that causes subtle double-firing issues.
+
+**Rule for next piece:** Never use inline `onclick` attributes. All event binding via `addEventListener` in the Editor class's `init()`.
+
+### 17.3 Strip Editing Interaction in Same Phase as System Definitions
+
+**Problem discovered:** Phase 8 Stage 1b. Phase 1's S1-S7 strips removed system *definitions* (FlowchartConnector, MidiController, EditCursor, etc.) but left all interaction code in KEPT rendering systems. This wasn't caught until Phase 8 when a user noticed they could still select and drag objects.
+
+**Rule for next piece:** When stripping systems for Performance Score, also strip all editing interaction in the same phase. With Renderer/Editor separation (§17.1), this becomes trivial: strip all Editor classes.
+
+### 17.4 Manual Hit-Testing Bypasses CSS pointer-events
+
+**Problem discovered:** Phase 8 Stage 1b. Attempted CSS `pointer-events: none` to block interaction. Failed because SVGElementManager has a manual bounding-box hit-test on ScoreTop/ScoreBottom `click` events — it programmatically checks if clicks land within SVG bounding boxes, completely bypassing CSS.
+
+**Rule for next piece:** Don't use manual hit-testing for selection. Use standard DOM event propagation on the elements themselves. If elements need `pointer-events: none` when unselected, the selection mechanism should not have a fallback hit-test that circumvents it.
+
+### 17.5 Asset Discovery Should Be Automated
+
+**Problem discovered:** Phase 1. Missed `pitchesSVGs/` directory initially — required human visual audit to catch.
+
+**Rule for next piece:** Build script should scan the built HTML for all relative paths (`src=`, `href=`, `url(`) and verify each referenced file exists in the build output directory. Fail the build if any asset is missing.
+
+### 17.6 Score Data Issues Surface in Performance View
+
+**Problem discovered:** Phase 1. Overlapping curves (IDs 209 & 212 on gTrack 1) were never noticed in the Workshop but became obvious in the Performance Score's cleaner layout.
+
+**Rule for next piece:** After each score JSON export from Workshop, run a visual audit in the Performance app. Build this into the reconversion checklist.
