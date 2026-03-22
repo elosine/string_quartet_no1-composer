@@ -1950,6 +1950,7 @@ During performance, the screen is **completely locked down**. No gesture of any 
 - `RehearsalGestures.performanceLocked = true` — all gesture handlers return immediately
 - No single-tap, double-tap, swipe, or pinch actions fire
 - Controls overlay is disabled (cannot be summoned)
+- Mini-map bar is hidden (no navigation during performance)
 - Apple Pencil annotation is disabled
 - Page turns are fully automatic — no manual intervention needed or possible
 - The only gestures that bypass lockdown are the emergency gestures below

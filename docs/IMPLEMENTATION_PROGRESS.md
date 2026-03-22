@@ -1,9 +1,9 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 8 — Rehearsal Mode (Stage 3 next)
+**Active Phase:** Phase 8 — Rehearsal Mode (Stage 6 — integration verification)
 **Last Session:** Mar 22, 2026
-**Last Commit:** `[Phase 8 Stage 2] Controls overlay, split center zone, gesture fixes, Performance Mode plan`
+**Last Commit:** `[Phase 8 Stage 5b] Synced/Independent + Leader, room-based looping, page turn sync, hide right panel`
 
 ## How to Resume Work (for the human)
 
@@ -47,7 +47,7 @@ Type `/session-start` — this triggers a workflow that walks the AI through the
 | 5. Server Architecture | ✅ Complete | Mar 21 | Room-based Socket.IO, grace period, reconnection, 3 build patches (1b/1c) |
 | 6. Sync Tier 1 | ✅ Complete | Mar 21 | performance.now(), outlier rejection, connection awareness, drift correction |
 | 7. Auth & Persistence | ✅ Complete | Mar 22 | Self-service sessions, JWT, preferences, 6 API endpoints |
-| 8. Rehearsal Mode | 🔄 In Progress | — | Stage 1-2 complete, Stage 3 next |
+| 8. Rehearsal Mode | 🔄 In Progress | — | Stages 1-5 complete, Stage 6 integration verification |
 | 9–14 | ⏳ Pending | — | |
 
 ---
@@ -840,28 +840,45 @@ Stage 3: Custom markers + mini-map
   → TEST: 🤖 Create marker → persisted → jump to marker → correct position
   → TEST: 👁️ Mini-map accurately shows position
 
-Stage 4: Looping
-  - Set loop start/end (via long press or controls)
-  - AnimationEngine subscriber: if scoreTime >= loopEnd → local goto loopStart
-  - Loop count display, clear loop button
-  - Per-client only (doesn't broadcast)
-  → TEST: 🤖 Set loop → play → score jumps back at loop end
-  → TEST: 👁️ Loop transition smooth
+Stage 4: Looping (per-client) ✅ COMPLETE
+  - Set loop start/end (via controls overlay)
+  - Loop rewind via local scoreTimeOffset manipulation
+  - Loop count display, clear loop button, page turn blocking
+  - Drift correction suppression, stop/play intercepts
+  - Bugs fixed: drift correction conflict, stop/play position override, page turns
+  → All tests passed — user confirmed Mar 22, 2026
 
-Stage 5: Synced vs. Independent navigation + Leader privileges
-  - Independent mode: stop listening to server scoreGo/Stop/Goto
-  - Auto-detach on manual page swipe while synced
-  - Re-sync button: jump to server's current position
-  - Leader tracking: server stores room.leaderId
-  - Non-leader play/stop → local only (or rejected with notification)
-  - Leader transfer, recall all
-  → TEST: 🤖 Two clients: one detaches, other still receives sync. Leader transfer.
-  → TEST: 👁️ Detach/re-sync feels responsive
+Stage 5a: Room-based looping (replaces per-client loop)             ✅ DONE
+  - Server: loopStartMs/loopEndMs/loopEnabled per room + loopSet/loopToggle/loopClear
+  - Server: 200ms loop check interval — emits scoreGoto+scoreGo on loop boundary
+  - Client: stripped all local loop logic, emits to server, listens for loopState
+  - Stub: handles loop events + 200ms loop check for offline mode
+  - Page turns routed through server (scoreGoto) so remote clients follow
+  → 👁️ Human verified: multi-client looping, stop/play during loop, loop-off, page turn sync
 
-Stage 6: Integration verification
+  ⚠️ DECISION DEFERRED — Default Room Behavior:
+  Decision needed before Phase 11 (Performance Mode) or Phase 14 (Website).
+  Current: auto-join "default" room. Options: require room, auto-create solo, or keep with warning.
+
+Stage 5b: Synced vs. Independent + Leader privileges                 ✅ DONE
+  - Server: leaderId per room, leader-gated events, setLeader, recallAll
+  - Server: leader auto-assigned on join, transferred on disconnect
+  - Client: SyncMode system — isIndependent flag, wraps onScoreGo/Stop/Goto
+  - Client: independent mode → local play/stop/goto/page-turn
+  - Client: syncBar UI — leader badge, sync toggle, re-sync, recall all, toast
+  - Client: auto-detach on swipe during playback
+  - Bugs fixed: (1) independent blocked by room loop (2) anonymous leader transfer
+  → 👁️ Human verified: leader gating, independent, auto-detach, re-sync, recall, transfer
+
+Stage 5c: Hide old right panel                                      ✅ DONE
+  - Single `#cursorMenu { display: none !important; }` replaces granular hiding
+  → 👁️ Human verified: right panel hidden, overlay fully functional
+
+Stage 6: Integration verification                                   ⬅ CURRENT
   - Full regression: all Phase 1-7 features in anonymous mode
   - Parts mode + gestures test
   - Multi-client auth + leader test
+  - Room-based loop regression
   → TEST: 🤖 Anonymous regression. Parts mode regression.
   → TEST: 👁️ Full flow on desktop. iPad if available.
 ```
@@ -1023,16 +1040,123 @@ Stage D: Keep S8-S11 strips + CSS (already done)
 **Decision:** Page swipe calls `GraphicTimeline.onGoto()` rather than manually setting page numbers.
 **Rationale:** `onGoto()` is already overridden by parts mode. By calling it, swipe works correctly in both full score and parts mode without duplicating page math.
 
-**Decision:** Looping is purely client-side (no server involvement).
-**Rationale:** Per §12.10.3, looping is per-client only. Broadcasting loop events would disrupt other performers. Client checks `ScoreTime.now() >= loopEndMs` in AnimationEngine subscriber.
+**Decision:** ~~Looping is purely client-side~~ → **Revised: Looping is server-authoritative (Stage 5a).**
+**Rationale:** Per-client looping conflicted with drift correction (server kept overwriting local rewinds). Server-authoritative looping via `loopSet`/`loopToggle`/`loopClear` events + server-side 200ms loop check interval solved drift conflicts and ensures all room members loop together. The user confirmed "I don't need individual loops in the same room."
 
 **Decision:** Replace old right panel with overlay, but phase the migration.
 **Rationale:** Stage 2 builds the new overlay alongside the existing right panel (both functional). Once the overlay has full feature parity and is tested, a later sub-stage (5b) hides the old panel via CSS. This avoids breaking anything during development and lets us A/B compare during testing. The old panel's CursorControls JS stays — the overlay calls into it rather than duplicating logic.
 
 ---
 
+## Phase 8 Files Modified
+- `scripts/performance_rehearsal_patches.js` — **created** (gesture system, controls overlay, markers, loop UI, mini-map, SyncMode + leader UI)
+- `scripts/performance_server.js` — room loop state, loop events, leader tracking, leader gating, setLeader, recallAll
+- `scripts/build_performance_app.js` — offline stub loop + leader support, `#cursorMenu` hidden via CSS
+- `docs/IMPLEMENTATION_PROGRESS.md` — Phase 8 stage results
+
+### Phase 8 New Socket Events
+| Event | Direction | Leader-gated | Description |
+|-------|-----------|-------------|-------------|
+| `loopSet` | client→server | ✅ | Set loop point A or B |
+| `loopToggle` | client→server | ✅ | Enable/disable loop |
+| `loopClear` | client→server | ✅ | Clear loop region |
+| `loopState` | server→client | — | Broadcast loop state to room |
+| `setLeader` | client→server | ✅ | Transfer leadership |
+| `recallAll` | client→server→all | ✅ | Force all clients to re-sync |
+| `leaderChange` | server→client | — | Broadcast new leader ID |
+| `notLeader` | server→client | — | Rejection notification |
+
+### Phase 8 New Client Systems
+| System | Location | Purpose |
+|--------|----------|---------|
+| `RehearsalGestures` | rehearsal_patches.js | Swipe, tap, pinch-zoom gesture recognition |
+| `ControlsOverlay` | rehearsal_patches.js | Floating play/stop/nav/jump/loop/marker panel |
+| `MarkerSystem` | rehearsal_patches.js | Custom markers with localStorage persistence |
+| `LoopSystem` | rehearsal_patches.js | Server-driven loop UI (setA/setB/toggle/clear) |
+| `MiniMap` | rehearsal_patches.js | Always-visible position bar with markers + loop region |
+| `SyncMode` | rehearsal_patches.js | Independent/synced mode, leader badge, re-sync, recall |
+| `InteractionBlocker` | rehearsal_patches.js | Capture-phase mouse/keyboard blocking on score SVGs |
+
+---
+
 ## RESUME HERE
-**Current phase:** Phase 8 — Rehearsal Mode (pre-implementation protocol complete)
-**Next:** Stage 1 implementation — touch gesture system + page swipe
-**Key files:** `scripts/build_performance_app.js`, `scripts/performance_server.js`, new `scripts/performance_rehearsal_patches.js`
-**Pipeline plan:** See §12.10 (iPad interface design) and Phase 8 steps in §13.4
+**Current phase:** Phase 8 — Rehearsal Mode (Stage 6 — integration verification)
+**Last session:** Mar 22, 2026
+**Status:** Mid-testing. 3 bugs fixed, 5 open bugs + 1 UX issue documented below.
+**Resume testing at:** Section F (Markers) of Parts Mode Testing Protocol
+**Key files:** `scripts/performance_rehearsal_patches.js`, `scripts/performance_server.js`, `scripts/build_performance_app.js`
+
+---
+
+### Bugs Fixed This Session (Mar 22 PM)
+
+| # | Bug | Fix | File |
+|---|-----|-----|------|
+| 1 | Independent client can't jump to markers (gets "not leader" rejection) | Route marker `jumpTo()` through `SyncMode.isIndependent` — local `GraphicTimeline.onGoto()` when independent | rehearsal_patches L760-771 |
+| 2 | Interaction blocker missed parts mode sections 2+ (LW nodes, badges still clickable) | Extended blocker to iterate `PartsMode.sections[]` instead of hardcoding ScoreTop/ScoreBottom | rehearsal_patches L373-405 |
+| 3 | CSS cursor override missed parts mode sections | Changed `#ScoreTop *, #ScoreBottom *` → `#ScoreContainer svg *` | build_app L845-846 |
+
+### Open Bugs (to fix next session)
+
+| ID | Severity | Description | Root Cause (suspected) | Fix Approach |
+|----|----------|-------------|----------------------|--------------|
+| OB-1 | HIGH | **Page flip gestures broken in independent mode** — edge taps and swipes don't turn pages when client is independent | Unknown — gesture detection and nextPage/prevPage code look correct. Needs debugging with console logs to trace where the gesture path fails. | Add diagnostic logging to onTap/onSwipe/nextPage, test in independent mode |
+| OB-2 | HIGH | **Parts mode page total wrong** — overlay shows "Page 23 of 6" and MiniMap shows "P21/6". The total (6) is the section count, not total score pages. | `getPageInfo()` returns `PartsMode.pageCount` which is the number of visible sections (URL `?pages=` param), not the total number of score pages for the track. | Compute actual total pages: `Math.ceil(maxSeconds / secondsPerPage)` or cache from SVGElementManager, similar to full-score path. |
+| OB-3 | MEDIUM | **MiniMap obscures bottommost track** — in both full score and parts mode, the MiniMap bar covers the bottom of the score | MiniMap is absolutely positioned at bottom of viewport, overlapping score content | Options: (A) auto-show/hide on scroll/tap with fade, (B) add bottom margin/padding to score container to make room, (C) collapse to thin line and expand on hover/tap. Recommend (A) or (B). |
+| OB-4 | MEDIUM | **SVG text cut off on remote laptop** — font rendering issue, text in score SVGs is truncated | The score uses a specific font that may not be installed on the remote machine. SVG text relies on the font being available in the browser. | Embed the font via `@font-face` in the built HTML. Need to identify which font the SVGs use, copy the font file to `builds/performance/`, and add a CSS `@font-face` declaration. |
+| OB-5 | LOW | **Parts mode circular buffer page turn is confusing** — advancing pages moves only one band/section at a time, not all 6 simultaneously. The sections show non-sequential page numbers (e.g., 210, 200, 195, 167, 180, 185). | This IS the designed behavior — circular buffer rotates one section at a time for smooth scrolling during playback. But manual page turns make the non-sequential order visible and confusing. | UX options: (A) When manually turning pages (not during playback), jump all sections to sequential pages. (B) Add visual indicator showing which section is "current". (C) Accept current behavior and improve page number labels. Needs user discussion. |
+
+### Multi-Client Sync Test Results (Mar 22 PM — full score)
+
+```
+  [✓] Two tabs: play in one → both play
+  [✓] Page turn in leader → both turn
+  [✓] Loop set in leader → both loop
+  [✓] Non-leader play → "not leader" toast
+  [✓] Non-leader goes independent → can play/stop/navigate locally
+  [?] Auto-detach on swipe during playback — works but user unsure what it is (documented above)
+  [✓] Re-sync button works
+  [✓] Recall All works
+  [✓] Leader transfer on disconnect
+```
+
+### Parts Mode Testing Protocol (resume at section F)
+
+```
+═══ A. RENDERING ═══
+  [not yet tested systematically]
+
+═══ B. INTERACTION BLOCKER ═══
+  [FIXED this session — needs re-verification]
+  B8. Console should show "InteractionBlocker: blocked N score sections"
+
+═══ C. GESTURES — PAGE NAVIGATION ═══
+  [partially tested — page turns work but circular buffer UX is confusing (OB-5)]
+  [page flip in independent mode broken (OB-1)]
+
+═══ D. GESTURES — TAP ZONES ═══
+  [not yet tested]
+
+═══ E. CONTROLS OVERLAY ═══
+  [page display bug found (OB-2)]
+
+═══ F. MARKERS ═══                    ⬅ RESUME HERE
+  F1. [ ] Open marker panel (🔖 button)
+  F2. [ ] Add Marker at current position → appears in list
+  F3. [ ] Jump to marker → score navigates correctly
+  F4. [ ] Delete marker → removed from list
+  F5. [ ] Markers survive page reload (localStorage)
+
+═══ G. LOOP ═══
+  G1-G6 [ ] Not yet tested in parts mode
+
+═══ H. MINIMAP ═══
+  [page total bug found (OB-2)]
+  H1-H7 [ ] Remaining items not yet tested
+
+═══ I. SYNC (two tabs, full score + parts) ═══
+  I1-I6 [ ] Not yet tested
+
+═══ J. TRACK VARIANTS ═══
+  J1-J6 [ ] Not yet tested
+```

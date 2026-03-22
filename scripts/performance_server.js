@@ -336,7 +336,14 @@ function createRoomState() {
         ],
         clientCount: 0,
         connectedPerformers: [], // Phase 7: { performerId, displayName, slot, socketId }
-        graceTimer: null
+        graceTimer: null,
+        // Phase 8 Stage 5b: Leader tracking
+        leaderId: null,       // socket.id of the room leader
+        // Phase 8 Stage 5a: Room-based looping
+        loopStartMs: null,
+        loopEndMs: null,
+        loopEnabled: false,
+        loopCount: 0
     };
 }
 
@@ -381,6 +388,50 @@ function getRoomScoreTimeMs(room) {
     } else {
         return room.currentScoreTimeMs;
     }
+}
+
+// ─── Phase 8 Stage 5b: Leader helpers ────────────────────────────────────────
+
+function assignLeader(roomId, newLeaderId) {
+    var room = rooms.get(roomId);
+    if (!room) return;
+    room.leaderId = newLeaderId;
+    console.log('[' + roomId + '] Leader is now: ' + (newLeaderId || 'none'));
+    io.to(roomId).emit('leaderChange', { leaderId: newLeaderId });
+}
+
+function transferLeaderOnDisconnect(roomId) {
+    var room = rooms.get(roomId);
+    if (!room) return;
+    // Pick next connected performer first
+    if (room.connectedPerformers.length > 0) {
+        assignLeader(roomId, room.connectedPerformers[0].socketId);
+    } else if (room.clientCount > 0) {
+        // Anonymous clients: use Socket.IO room membership to find remaining sockets
+        var roomSockets = io.sockets.adapter.rooms.get(roomId);
+        var oldLeaderId = room.leaderId;
+        if (roomSockets && roomSockets.size > 0) {
+            var nextId = null;
+            for (var sid of roomSockets) {
+                if (sid !== oldLeaderId) { nextId = sid; break; }
+            }
+            if (nextId) {
+                assignLeader(roomId, nextId);
+            } else {
+                room.leaderId = null;
+            }
+        } else {
+            room.leaderId = null;
+        }
+    } else {
+        room.leaderId = null;
+    }
+}
+
+function isLeader(room, socketId) {
+    // If no leader set, first command claims leadership
+    if (!room.leaderId) return true;
+    return room.leaderId === socketId;
 }
 
 // ─── Socket.IO connection handling ──────────────────────────────────────────
@@ -482,6 +533,11 @@ io.on('connection', function(socket) {
         room.clientCount++;
         addPerformerToRoom(roomId);
 
+        // Assign leader if none exists
+        if (!room.leaderId) {
+            assignLeader(roomId, socket.id);
+        }
+
         console.log('Client ' + socket.id + ' joined room ' + roomId + ' (' + room.clientCount + ' clients)');
 
         // Send full score state for initial sync
@@ -491,8 +547,18 @@ io.on('connection', function(socket) {
             scoreTimeOffset: room.scoreTimeOffset,
             tempoHistory: room.tempoHistory,
             connectedPerformers: room.connectedPerformers,
+            leaderId: room.leaderId,
             serverTime: Date.now()
         });
+        // Send loop state if active
+        if (room.loopStartMs !== null || room.loopEndMs !== null || room.loopEnabled) {
+            socket.emit('loopState', {
+                loopStartMs: room.loopStartMs,
+                loopEndMs: room.loopEndMs,
+                loopEnabled: room.loopEnabled,
+                loopCount: room.loopCount
+            });
+        }
     });
 
     // For clients that don't send joinRoom (backward compat), auto-join default
@@ -503,6 +569,11 @@ io.on('connection', function(socket) {
             var room = getRoom(DEFAULT_ROOM);
             room.clientCount++;
             addPerformerToRoom(DEFAULT_ROOM);
+            // Assign leader if none exists
+            if (!room.leaderId) {
+                assignLeader(DEFAULT_ROOM, socket.id);
+            }
+
             console.log('Client ' + socket.id + ' auto-joined default room (' + room.clientCount + ' clients)');
             socket.emit('scoreState', {
                 isPlaying: room.isPlaying,
@@ -510,8 +581,18 @@ io.on('connection', function(socket) {
                 scoreTimeOffset: room.scoreTimeOffset,
                 tempoHistory: room.tempoHistory,
                 connectedPerformers: room.connectedPerformers,
+                leaderId: room.leaderId,
                 serverTime: Date.now()
             });
+            // Send loop state if active
+            if (room.loopStartMs !== null || room.loopEndMs !== null || room.loopEnabled) {
+                socket.emit('loopState', {
+                    loopStartMs: room.loopStartMs,
+                    loopEndMs: room.loopEndMs,
+                    loopEnabled: room.loopEnabled,
+                    loopCount: room.loopCount
+                });
+            }
         }
     }, 500);
 
@@ -543,6 +624,16 @@ io.on('connection', function(socket) {
                     serverTime: Date.now()
                 });
             }
+
+            // Send loop state if active
+            if (room.loopStartMs !== null || room.loopEndMs !== null || room.loopEnabled) {
+                socket.emit('loopState', {
+                    loopStartMs: room.loopStartMs,
+                    loopEndMs: room.loopEndMs,
+                    loopEnabled: room.loopEnabled,
+                    loopCount: room.loopCount
+                });
+            }
         }
     });
 
@@ -554,10 +645,15 @@ io.on('connection', function(socket) {
         });
     });
 
-    // GO — start playback
+    // GO — start playback (leader-gated)
     socket.on('scoreGo', function() {
         if (!socketRoomId) return;
         var room = getRoom(socketRoomId);
+        if (!isLeader(room, socket.id)) {
+            socket.emit('notLeader', { action: 'scoreGo' });
+            return;
+        }
+        if (!room.leaderId) assignLeader(socketRoomId, socket.id);
         if (!room.isPlaying) {
             var now = Date.now();
             room.scoreTimeOffset = now - room.currentScoreTimeMs;
@@ -573,10 +669,15 @@ io.on('connection', function(socket) {
         }
     });
 
-    // STOP — stop playback
+    // STOP — stop playback (leader-gated)
     socket.on('scoreStop', function() {
         if (!socketRoomId) return;
         var room = getRoom(socketRoomId);
+        if (!isLeader(room, socket.id)) {
+            socket.emit('notLeader', { action: 'scoreStop' });
+            return;
+        }
+        if (!room.leaderId) assignLeader(socketRoomId, socket.id);
         if (room.isPlaying) {
             room.currentScoreTimeMs = getRoomScoreTimeMs(room);
             room.isPlaying = false;
@@ -590,10 +691,15 @@ io.on('connection', function(socket) {
         }
     });
 
-    // GOTO — jump to specific time position (stops playback)
+    // GOTO — jump to specific time position (stops playback) (leader-gated)
     socket.on('scoreGoto', function(data) {
         if (!socketRoomId) return;
         var room = getRoom(socketRoomId);
+        if (!isLeader(room, socket.id)) {
+            socket.emit('notLeader', { action: 'scoreGoto' });
+            return;
+        }
+        if (!room.leaderId) assignLeader(socketRoomId, socket.id);
         var targetSeconds = data.seconds || 0;
         var targetMs = targetSeconds * 1000;
 
@@ -612,6 +718,72 @@ io.on('connection', function(socket) {
             targetSeconds: targetSeconds,
             tempoHistory: room.tempoHistory,
             serverTime: Date.now()
+        });
+    });
+
+    // ─── Phase 8 Stage 5a: Room-based looping ─────────────────────────────
+
+    // LOOP SET — client sets loop start/end point (leader-gated)
+    socket.on('loopSet', function(data) {
+        if (!socketRoomId) return;
+        var room = getRoom(socketRoomId);
+        if (!isLeader(room, socket.id)) { socket.emit('notLeader', { action: 'loopSet' }); return; }
+        if (!room.leaderId) assignLeader(socketRoomId, socket.id);
+        if (data.point === 'A') {
+            room.loopStartMs = data.timeMs;
+        } else if (data.point === 'B') {
+            room.loopEndMs = data.timeMs;
+            // Auto-swap if B < A
+            if (room.loopStartMs !== null && room.loopEndMs < room.loopStartMs) {
+                var tmp = room.loopStartMs;
+                room.loopStartMs = room.loopEndMs;
+                room.loopEndMs = tmp;
+            }
+        }
+        room.loopCount = 0;
+        console.log('[' + socketRoomId + '] Loop ' + data.point + ' set to ' + data.timeMs + 'ms by ' + socket.id);
+        io.to(socketRoomId).emit('loopState', {
+            loopStartMs: room.loopStartMs,
+            loopEndMs: room.loopEndMs,
+            loopEnabled: room.loopEnabled,
+            loopCount: room.loopCount
+        });
+    });
+
+    // LOOP TOGGLE — enable/disable loop (leader-gated)
+    socket.on('loopToggle', function() {
+        if (!socketRoomId) return;
+        var room = getRoom(socketRoomId);
+        if (!isLeader(room, socket.id)) { socket.emit('notLeader', { action: 'loopToggle' }); return; }
+        if (!room.leaderId) assignLeader(socketRoomId, socket.id);
+        if (room.loopStartMs === null || room.loopEndMs === null) return;
+        room.loopEnabled = !room.loopEnabled;
+        if (room.loopEnabled) room.loopCount = 0;
+        console.log('[' + socketRoomId + '] Loop ' + (room.loopEnabled ? 'ENABLED' : 'DISABLED') + ' by ' + socket.id);
+        io.to(socketRoomId).emit('loopState', {
+            loopStartMs: room.loopStartMs,
+            loopEndMs: room.loopEndMs,
+            loopEnabled: room.loopEnabled,
+            loopCount: room.loopCount
+        });
+    });
+
+    // LOOP CLEAR — clear loop region entirely (leader-gated)
+    socket.on('loopClear', function() {
+        if (!socketRoomId) return;
+        var room = getRoom(socketRoomId);
+        if (!isLeader(room, socket.id)) { socket.emit('notLeader', { action: 'loopClear' }); return; }
+        if (!room.leaderId) assignLeader(socketRoomId, socket.id);
+        room.loopStartMs = null;
+        room.loopEndMs = null;
+        room.loopEnabled = false;
+        room.loopCount = 0;
+        console.log('[' + socketRoomId + '] Loop CLEARED by ' + socket.id);
+        io.to(socketRoomId).emit('loopState', {
+            loopStartMs: null,
+            loopEndMs: null,
+            loopEnabled: false,
+            loopCount: 0
         });
     });
 
@@ -645,6 +817,44 @@ io.on('connection', function(socket) {
         io.to(socketRoomId).emit('beatsPerPageChange', { beatsPerPage: room.currentBeatsPerPage, scoreTimeMs: scoreTime });
     });
 
+    // ─── Phase 8 Stage 5b: Leader management ──────────────────────────────
+
+    // SET LEADER — transfer leadership to another socket (leader-only)
+    socket.on('setLeader', function(data) {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (!room) return;
+        if (!isLeader(room, socket.id)) {
+            socket.emit('notLeader', { action: 'setLeader' });
+            return;
+        }
+        var targetId = data && data.targetSocketId;
+        if (targetId) {
+            assignLeader(socketRoomId, targetId);
+            console.log('[' + socketRoomId + '] Leader transferred to ' + targetId + ' by ' + socket.id);
+        }
+    });
+
+    // RECALL ALL — leader pulls all independent clients back to synced position
+    socket.on('recallAll', function() {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (!room) return;
+        if (!isLeader(room, socket.id)) {
+            socket.emit('notLeader', { action: 'recallAll' });
+            return;
+        }
+        var currentMs = room.isPlaying ? getRoomScoreTimeMs(room) : room.currentScoreTimeMs;
+        console.log('[' + socketRoomId + '] RECALL ALL by ' + socket.id + ' at ' + currentMs + 'ms');
+        io.to(socketRoomId).emit('recallAll', {
+            currentScoreTimeMs: currentMs,
+            isPlaying: room.isPlaying,
+            scoreTimeOffset: room.scoreTimeOffset,
+            tempoHistory: room.tempoHistory,
+            serverTime: Date.now()
+        });
+    });
+
     socket.on('disconnect', function() {
         if (socketRoomId) {
             var room = rooms.get(socketRoomId);
@@ -652,6 +862,12 @@ io.on('connection', function(socket) {
                 room.clientCount--;
                 removePerformerFromRoom(socketRoomId);
                 console.log('Client ' + socket.id + ' disconnected from room ' + socketRoomId + ' (' + room.clientCount + ' clients)');
+
+                // Transfer leader if disconnecting client was the leader
+                if (room.leaderId === socket.id) {
+                    transferLeaderOnDisconnect(socketRoomId);
+                }
+
                 if (room.clientCount <= 0) {
                     room.clientCount = 0;
                     startGracePeriod(socketRoomId);
@@ -687,6 +903,52 @@ setInterval(function() {
         }
     }
 }, 3000);
+
+// ─── Phase 8 Stage 5a: Server-side loop check (every 200ms) ─────────────────
+
+setInterval(function() {
+    var now = Date.now();
+    for (var [roomId, room] of rooms.entries()) {
+        if (!room.isPlaying || !room.loopEnabled) continue;
+        if (room.loopStartMs === null || room.loopEndMs === null) continue;
+        if (room.clientCount <= 0) continue;
+
+        var scoreTimeMs = now - room.scoreTimeOffset;
+        if (scoreTimeMs >= room.loopEndMs) {
+            // Rewind: jump to loop start and resume playback
+            room.currentScoreTimeMs = room.loopStartMs;
+            room.scoreTimeOffset = now - room.loopStartMs;
+            room.loopCount++;
+
+            // Broadcast goto (stops playback on clients, sets position)
+            io.to(roomId).emit('scoreGoto', {
+                isPlaying: false,
+                currentScoreTimeMs: room.loopStartMs,
+                targetSeconds: room.loopStartMs / 1000,
+                tempoHistory: room.tempoHistory,
+                serverTime: now
+            });
+
+            // Immediately restart playback from loop start
+            io.to(roomId).emit('scoreGo', {
+                isPlaying: true,
+                scoreTimeOffset: room.scoreTimeOffset,
+                currentScoreTimeMs: room.loopStartMs,
+                serverTime: now
+            });
+
+            // Broadcast updated loop count
+            io.to(roomId).emit('loopState', {
+                loopStartMs: room.loopStartMs,
+                loopEndMs: room.loopEndMs,
+                loopEnabled: room.loopEnabled,
+                loopCount: room.loopCount
+            });
+
+            console.log('[' + roomId + '] Loop ' + room.loopCount + ': rewind to ' + (room.loopStartMs / 1000).toFixed(1) + 's');
+        }
+    }
+}, 200);
 
 // ─── Start server ───────────────────────────────────────────────────────────
 

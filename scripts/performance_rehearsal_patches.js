@@ -234,8 +234,13 @@ module.exports = function applyRehearsalPatches(html) {
             },
 
             onSwipe: function(direction) {
-                // During playback, ignore swipe (until Stage 5 adds independent mode)
-                if (window.ScoreTime && ScoreTime.isPlaying) return;
+                // During playback while synced: auto-detach to independent mode
+                if (window.ScoreTime && ScoreTime.isPlaying) {
+                    if (window.SyncMode && !SyncMode.isIndependent) {
+                        SyncMode.isIndependent = true;
+                        SyncMode.showToast('Auto-detached — swipe during playback', 2000);
+                    }
+                }
 
                 if (direction === 'left') {
                     this.nextPage();
@@ -251,7 +256,10 @@ module.exports = function applyRehearsalPatches(html) {
             },
 
             togglePlayPause: function() {
-                if (window.CursorControls && CursorControls.toggleGoStop) {
+                if (window.SyncMode && SyncMode.isIndependent) {
+                    SyncMode.localToggleGoStop();
+                    console.log('[RehearsalGestures] Play/Pause toggled (local)');
+                } else if (window.CursorControls && CursorControls.toggleGoStop) {
                     CursorControls.toggleGoStop();
                     if (window.ControlsOverlay) ControlsOverlay.refresh();
                     console.log('[RehearsalGestures] Play/Pause toggled');
@@ -286,22 +294,36 @@ module.exports = function applyRehearsalPatches(html) {
 
             nextPage: function() {
                 if (!window.GraphicTimeline) return;
+                if (window.LoopSystem && LoopSystem.isEnabled() && !(window.SyncMode && SyncMode.isIndependent)) return;
                 var current = this.getCurrentPage();
                 var step = this.getPageStep();
                 var secondsPerPage = GraphicTimeline.getSecondsPerPage();
                 var targetSeconds = (current + step) * secondsPerPage;
-                GraphicTimeline.onGoto(targetSeconds);
+                if (window.SyncMode && SyncMode.isIndependent) {
+                    GraphicTimeline.onGoto(targetSeconds);
+                } else if (window.ClockSync && ClockSync.socket) {
+                    ClockSync.socket.emit('scoreGoto', { seconds: targetSeconds });
+                } else {
+                    GraphicTimeline.onGoto(targetSeconds);
+                }
                 console.log('[RehearsalGestures] Next page → page ' + (current + step));
             },
 
             prevPage: function() {
                 if (!window.GraphicTimeline) return;
+                if (window.LoopSystem && LoopSystem.isEnabled() && !(window.SyncMode && SyncMode.isIndependent)) return;
                 var current = this.getCurrentPage();
                 var step = this.getPageStep();
                 var newPage = Math.max(0, current - step);
                 var secondsPerPage = GraphicTimeline.getSecondsPerPage();
                 var targetSeconds = newPage * secondsPerPage;
-                GraphicTimeline.onGoto(targetSeconds);
+                if (window.SyncMode && SyncMode.isIndependent) {
+                    GraphicTimeline.onGoto(targetSeconds);
+                } else if (window.ClockSync && ClockSync.socket) {
+                    ClockSync.socket.emit('scoreGoto', { seconds: targetSeconds });
+                } else {
+                    GraphicTimeline.onGoto(targetSeconds);
+                }
                 console.log('[RehearsalGestures] Prev page → page ' + newPage);
             },
 
@@ -349,13 +371,6 @@ module.exports = function applyRehearsalPatches(html) {
     // event listeners. Pointer events (used by gesture system) are unaffected.
     // See IMPLEMENTATION_PROGRESS.md §Phase 8 Stage 1b for full analysis.
     (function initInteractionBlocker() {
-        var scoreTop = document.getElementById('ScoreTop');
-        var scoreBottom = document.getElementById('ScoreBottom');
-        if (!scoreTop || !scoreBottom) {
-            console.error('InteractionBlocker: ScoreTop/ScoreBottom not found');
-            return;
-        }
-
         var blockedMouseEvents = ['mousedown', 'click', 'dblclick'];
 
         function blockEvent(e) {
@@ -363,10 +378,30 @@ module.exports = function applyRehearsalPatches(html) {
             e.preventDefault();
         }
 
+        // Collect ALL score SVG sections: ScoreTop, ScoreBottom,
+        // plus dynamically created parts mode sections (ScoreSection2..N-1)
+        var targets = [];
+        if (window.PartsMode && PartsMode.active && PartsMode.sections) {
+            for (var i = 0; i < PartsMode.sections.length; i++) {
+                if (PartsMode.sections[i].el) targets.push(PartsMode.sections[i].el);
+            }
+        } else {
+            var scoreTop = document.getElementById('ScoreTop');
+            var scoreBottom = document.getElementById('ScoreBottom');
+            if (scoreTop) targets.push(scoreTop);
+            if (scoreBottom) targets.push(scoreBottom);
+        }
+
+        if (targets.length === 0) {
+            console.error('InteractionBlocker: no score sections found');
+            return;
+        }
+
         // Capturing phase (3rd arg = true) fires BEFORE all other listeners
         blockedMouseEvents.forEach(function(type) {
-            scoreTop.addEventListener(type, blockEvent, true);
-            scoreBottom.addEventListener(type, blockEvent, true);
+            targets.forEach(function(el) {
+                el.addEventListener(type, blockEvent, true);
+            });
         });
 
         // Block editing keyboard shortcuts (Delete, Backspace, Ctrl+Alt+D)
@@ -385,7 +420,7 @@ module.exports = function applyRehearsalPatches(html) {
             }
         }, true);
 
-        console.log('InteractionBlocker: all Workshop mouse/keyboard interaction disabled');
+        console.log('InteractionBlocker: blocked ' + targets.length + ' score sections + keyboard shortcuts');
     })();
 
     // ═══ Phase 8 Stage 2: Controls Overlay ═══
@@ -406,6 +441,11 @@ module.exports = function applyRehearsalPatches(html) {
             '    <button class="co-btn co-play" title="Play/Stop">▶ Play</button>',
             '    <span class="co-divider"></span>',
             '    <button class="co-btn co-zoom" title="Reset zoom">⊙ 100%</button>',
+            '    <span class="co-divider"></span>',
+            '    <button class="co-btn co-marker-btn" title="Markers">🔖</button>',
+            '    <button class="co-btn co-loop-btn" title="Loop">🔁</button>',
+            '    <span class="co-divider"></span>',
+            '    <button class="co-btn co-close" title="Close">✕</button>',
             '  </div>',
             '  <div class="co-row co-row-jump">',
             '    <label class="co-jump-label">Jump to</label>',
@@ -420,7 +460,7 @@ module.exports = function applyRehearsalPatches(html) {
         var style = document.createElement('style');
         style.textContent = [
             '#controlsOverlay {',
-            '  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);',
+            '  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);',
             '  z-index: 10000; pointer-events: none;',
             '  opacity: 0; transition: opacity 0.25s ease;',
             '  display: none;',
@@ -464,17 +504,23 @@ module.exports = function applyRehearsalPatches(html) {
             '}',
             '.co-jump-input:focus { outline: none; border-color: rgba(255,255,255,0.5); }',
             '.co-jump-unit { font-size: 13px; opacity: 0.6; }',
-            '.co-zoom { font-size: 13px; opacity: 0.9; }'
+            '.co-zoom { font-size: 13px; opacity: 0.9; }',
+            '.co-close { font-size: 15px; opacity: 0.6; padding: 6px 8px; }',
+            '.co-close:hover, .co-close:active { opacity: 1; }',
+            '.co-marker-btn { font-size: 14px; padding: 6px 8px; }',
+            '.co-loop-btn { font-size: 14px; padding: 6px 8px; }',
+            '.co-loop-btn.co-loop-active { background: rgba(0,147,92,0.5); }'
         ].join('');
         document.head.appendChild(style);
         document.body.appendChild(overlay);
 
         // ─── Overlay controller ──────────────────────────────────────────
-        var FADE_DELAY = 3000;
+        var FADE_DELAY = 4000;
         var fadeTimer = null;
         var isVisible = false;
 
         var panel = overlay.querySelector('.co-panel');
+        var closeBtn = overlay.querySelector('.co-close');
         var playBtn = overlay.querySelector('.co-play');
         var prevBtn = overlay.querySelector('.co-prev');
         var nextBtn = overlay.querySelector('.co-next');
@@ -484,6 +530,7 @@ module.exports = function applyRehearsalPatches(html) {
         var pageNum = overlay.querySelector('.co-page-num');
         var pageTotal = overlay.querySelector('.co-page-total');
 
+        var _cachedTotalPages = 0;
         function getPageInfo() {
             var current = 0;
             var total = 0;
@@ -495,8 +542,19 @@ module.exports = function applyRehearsalPatches(html) {
                 current = GraphicTimeline.currentTopPage || 0;
                 var spp = GraphicTimeline.getSecondsPerPage();
                 if (spp > 0) {
-                    var totalSeconds = (beatsPerPage * 32) / beatsPerMinute * 60;
-                    total = Math.ceil(totalSeconds / spp);
+                    // Compute total from SVGElementManager (cached)
+                    if (_cachedTotalPages === 0 && window.SVGElementManager && SVGElementManager.elements) {
+                        var maxSec = 0;
+                        for (var i = 0; i < SVGElementManager.elements.length; i++) {
+                            var rs = SVGElementManager.elements[i].referenceSeconds || 0;
+                            if (rs > maxSec) maxSec = rs;
+                        }
+                        if (maxSec > 0) {
+                            var maxActualSec = maxSec + (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
+                            _cachedTotalPages = Math.ceil(maxActualSec / spp) + 1;
+                        }
+                    }
+                    total = _cachedTotalPages;
                 }
             }
             return { current: current, total: total };
@@ -507,17 +565,22 @@ module.exports = function applyRehearsalPatches(html) {
             var playing = window.ScoreTime && ScoreTime.isPlaying;
             playBtn.textContent = playing ? '■ Stop' : '▶ Play';
             playBtn.classList.toggle('co-playing', !!playing);
-            // Page
+            // Page (display as spreads in full score: 2 pages per view)
             var info = getPageInfo();
-            pageNum.textContent = info.current;
-            pageTotal.textContent = info.total;
+            if (window.PartsMode && PartsMode.active) {
+                pageNum.textContent = info.current;
+                pageTotal.textContent = info.total;
+            } else {
+                pageNum.textContent = Math.floor(info.current / 2) + 1;
+                pageTotal.textContent = Math.ceil(info.total / 2);
+            }
             // Zoom
             var zoom = (window.ScoreZoom) ? ScoreZoom.zoomLevel : 100;
             zoomBtn.textContent = '⊙ ' + zoom + '%';
             // Jump input: show current display time
             var displaySec = 0;
             if (window.ScoreTime) {
-                displaySec = ((ScoreTime.currentScoreTimeMs || 0) / 1000) - (window.leadInSeconds || 0);
+                displaySec = ((ScoreTime.currentScoreTimeMs || 0) / 1000) - (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
             }
             jumpInput.value = Math.max(0, displaySec).toFixed(1);
         }
@@ -549,9 +612,18 @@ module.exports = function applyRehearsalPatches(html) {
         }
 
         // ─── Button handlers ─────────────────────────────────────────────
+        closeBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            hide();
+        });
+
         playBtn.addEventListener('pointerup', function(e) {
             e.stopPropagation();
-            if (window.CursorControls) CursorControls.toggleGoStop();
+            if (window.SyncMode && SyncMode.isIndependent) {
+                SyncMode.localToggleGoStop();
+            } else if (window.CursorControls) {
+                CursorControls.toggleGoStop();
+            }
             // Update button state after a short delay (server roundtrip)
             setTimeout(refreshState, 150);
             resetFadeTimer();
@@ -581,8 +653,10 @@ module.exports = function applyRehearsalPatches(html) {
         jumpGo.addEventListener('pointerup', function(e) {
             e.stopPropagation();
             var displaySec = parseFloat(jumpInput.value) || 0;
-            var actualSec = displaySec + (window.leadInSeconds || 0);
-            if (window.ClockSync && ClockSync.socket) {
+            var actualSec = displaySec + (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
+            if (window.SyncMode && SyncMode.isIndependent) {
+                if (window.GraphicTimeline) GraphicTimeline.onGoto(actualSec);
+            } else if (window.ClockSync && ClockSync.socket) {
                 ClockSync.socket.emit('scoreGoto', { seconds: actualSec });
             }
             setTimeout(refreshState, 150);
@@ -617,10 +691,896 @@ module.exports = function applyRehearsalPatches(html) {
             show: show,
             hide: hide,
             toggle: toggle,
-            refresh: refreshState
+            refresh: refreshState,
+            clearFadeTimer: function() { clearTimeout(fadeTimer); },
+            resetFadeTimer: resetFadeTimer,
+            panelEl: panel,
+            getPageInfo: getPageInfo
         };
 
         console.log('ControlsOverlay: initialized (center tap to toggle)');
+    })();
+
+    // ═══ Phase 8 Stage 3: Marker System ═══
+    // Custom markers with localStorage persistence, overlay panel, and list.
+    (function initMarkerSystem() {
+
+        var STORAGE_KEY = 'sq1_markers';
+        var COLORS = ['#ff6600', '#00aaff', '#44cc44', '#ff44aa', '#ffcc00', '#aa66ff'];
+        var markers = [];
+        var nextId = 1;
+        var markerPanelVisible = false;
+
+        // ─── Load from localStorage ─────────────────────────────────────
+        function load() {
+            try {
+                var raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    var data = JSON.parse(raw);
+                    markers = data.markers || [];
+                    nextId = data.nextId || 1;
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        function save() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    markers: markers,
+                    nextId: nextId
+                }));
+            } catch (e) { /* ignore */ }
+        }
+
+        load();
+
+        // ─── CRUD ───────────────────────────────────────────────────────
+        function addMarker(name) {
+            var scoreTimeMs = 0;
+            if (window.ScoreTime) {
+                scoreTimeMs = ScoreTime.currentScoreTimeMs || 0;
+            }
+            var displaySec = (scoreTimeMs / 1000) - (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
+            displaySec = Math.max(0, displaySec);
+            var page = 0;
+            if (window.GraphicTimeline) {
+                page = GraphicTimeline.currentTopPage || 0;
+            }
+            var marker = {
+                id: 'm' + nextId++,
+                name: name || ('Marker ' + (markers.length + 1)),
+                scoreTimeMs: scoreTimeMs,
+                displaySec: displaySec,
+                page: page,
+                color: COLORS[markers.length % COLORS.length],
+                type: 'personal'
+            };
+            markers.push(marker);
+            save();
+            renderList();
+            if (window.MiniMap) MiniMap.renderMarkers();
+            console.log('[MarkerSystem] Added: ' + marker.name + ' at ' + displaySec.toFixed(1) + 's');
+            return marker;
+        }
+
+        function removeMarker(id) {
+            markers = markers.filter(function(m) { return m.id !== id; });
+            save();
+            renderList();
+            if (window.MiniMap) MiniMap.renderMarkers();
+        }
+
+        function jumpTo(id) {
+            var m = markers.find(function(mk) { return mk.id === id; });
+            if (!m) return;
+            if (window.SyncMode && SyncMode.isIndependent) {
+                if (window.GraphicTimeline) GraphicTimeline.onGoto(m.scoreTimeMs / 1000);
+            } else if (window.ClockSync && ClockSync.socket) {
+                ClockSync.socket.emit('scoreGoto', { seconds: m.scoreTimeMs / 1000 });
+            }
+            if (window.ControlsOverlay) {
+                setTimeout(function() { ControlsOverlay.refresh(); }, 150);
+            }
+        }
+
+        // ─── Build marker panel DOM ─────────────────────────────────────
+        var panelEl = null;
+        if (window.ControlsOverlay && ControlsOverlay.panelEl) {
+            panelEl = ControlsOverlay.panelEl;
+        }
+
+        // Create marker sub-panel
+        var markerPanel = document.createElement('div');
+        markerPanel.className = 'co-marker-panel';
+        markerPanel.style.display = 'none';
+        markerPanel.innerHTML = [
+            '<div class="co-row co-marker-header">',
+            '  <span class="co-marker-title">Markers</span>',
+            '  <button class="co-btn co-marker-add">+ Mark Here</button>',
+            '</div>',
+            '<div class="co-row co-marker-name-row" style="display:none">',
+            '  <input class="co-marker-name-input" type="text" placeholder="Marker name..." />',
+            '  <button class="co-btn co-marker-save">Save</button>',
+            '  <button class="co-btn co-marker-cancel">✕</button>',
+            '</div>',
+            '<div class="co-marker-list"></div>'
+        ].join('');
+
+        if (panelEl) panelEl.appendChild(markerPanel);
+
+        // Inject CSS for marker panel
+        var mStyle = document.createElement('style');
+        mStyle.textContent = [
+            '.co-marker-panel { margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px; }',
+            '.co-marker-header { justify-content: space-between; }',
+            '.co-marker-title { font-size: 14px; font-weight: 600; }',
+            '.co-marker-add { font-size: 12px; padding: 6px 10px; }',
+            '.co-marker-name-row { margin-top: 6px; }',
+            '.co-marker-name-input {',
+            '  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);',
+            '  color: #fff; border-radius: 6px; padding: 6px 8px; flex: 1;',
+            '  font-size: 13px;',
+            '}',
+            '.co-marker-name-input:focus { outline: none; border-color: rgba(255,255,255,0.5); }',
+            '.co-marker-save, .co-marker-cancel { font-size: 12px; padding: 6px 10px; }',
+            '.co-marker-list { max-height: 150px; overflow-y: auto; margin-top: 6px; }',
+            '.co-marker-item {',
+            '  display: flex; align-items: center; gap: 6px; padding: 6px 8px;',
+            '  border-radius: 6px; cursor: pointer; font-size: 13px;',
+            '  transition: background 0.15s;',
+            '}',
+            '.co-marker-item:active { background: rgba(255,255,255,0.15); }',
+            '.co-marker-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }',
+            '.co-marker-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }',
+            '.co-marker-time { opacity: 0.6; font-size: 12px; white-space: nowrap; }',
+            '.co-marker-del {',
+            '  opacity: 0.4; cursor: pointer; font-size: 14px; padding: 2px 6px;',
+            '  border-radius: 4px;',
+            '}',
+            '.co-marker-del:active { opacity: 1; background: rgba(255,50,50,0.3); }',
+            '.co-marker-empty { text-align: center; opacity: 0.5; padding: 12px; font-size: 13px; }'
+        ].join('');
+        document.head.appendChild(mStyle);
+
+        // ─── DOM references ─────────────────────────────────────────────
+        var markerBtn = document.querySelector('.co-marker-btn');
+        var addBtn = markerPanel.querySelector('.co-marker-add');
+        var nameRow = markerPanel.querySelector('.co-marker-name-row');
+        var nameInput = markerPanel.querySelector('.co-marker-name-input');
+        var saveBtn = markerPanel.querySelector('.co-marker-save');
+        var cancelBtn = markerPanel.querySelector('.co-marker-cancel');
+        var listEl = markerPanel.querySelector('.co-marker-list');
+
+        // ─── Render marker list ─────────────────────────────────────────
+        function formatTime(sec) {
+            var m = Math.floor(sec / 60);
+            var s = (sec % 60).toFixed(1);
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        function renderList() {
+            if (!listEl) return;
+            if (markers.length === 0) {
+                listEl.innerHTML = '<div class="co-marker-empty">No markers yet</div>';
+                return;
+            }
+            var sorted = markers.slice().sort(function(a, b) { return a.scoreTimeMs - b.scoreTimeMs; });
+            listEl.innerHTML = sorted.map(function(m) {
+                return '<div class="co-marker-item" data-id="' + m.id + '">' +
+                    '<span class="co-marker-dot" style="background:' + m.color + '"></span>' +
+                    '<span class="co-marker-name">' + m.name + '</span>' +
+                    '<span class="co-marker-time">' + formatTime(m.displaySec) + '</span>' +
+                    '<span class="co-marker-del" data-del="' + m.id + '">✕</span>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // ─── Event handlers ─────────────────────────────────────────────
+        if (markerBtn) {
+            markerBtn.addEventListener('pointerup', function(e) {
+                e.stopPropagation();
+                markerPanelVisible = !markerPanelVisible;
+                markerPanel.style.display = markerPanelVisible ? 'block' : 'none';
+                if (markerPanelVisible) {
+                    renderList();
+                    if (window.ControlsOverlay) ControlsOverlay.clearFadeTimer();
+                } else {
+                    nameRow.style.display = 'none';
+                    if (window.ControlsOverlay) ControlsOverlay.resetFadeTimer();
+                }
+            });
+        }
+
+        if (addBtn) {
+            addBtn.addEventListener('pointerup', function(e) {
+                e.stopPropagation();
+                nameRow.style.display = 'flex';
+                nameInput.value = 'Marker ' + (markers.length + 1);
+                nameInput.focus();
+                nameInput.select();
+                if (window.ControlsOverlay) ControlsOverlay.clearFadeTimer();
+            });
+        }
+
+        function saveMarker() {
+            var name = nameInput.value.trim() || ('Marker ' + (markers.length + 1));
+            addMarker(name);
+            nameRow.style.display = 'none';
+            nameInput.value = '';
+            if (window.ControlsOverlay) ControlsOverlay.resetFadeTimer();
+        }
+
+        if (saveBtn) {
+            saveBtn.addEventListener('pointerup', function(e) {
+                e.stopPropagation();
+                saveMarker();
+            });
+        }
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('pointerup', function(e) {
+                e.stopPropagation();
+                nameRow.style.display = 'none';
+                if (window.ControlsOverlay) ControlsOverlay.resetFadeTimer();
+            });
+        }
+
+        if (nameInput) {
+            nameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') saveMarker();
+            });
+            nameInput.addEventListener('keydown', function(e) { e.stopPropagation(); });
+            nameInput.addEventListener('focus', function() {
+                if (window.ControlsOverlay) ControlsOverlay.clearFadeTimer();
+            });
+        }
+
+        // Marker list: click to jump, × to delete
+        if (listEl) {
+            listEl.addEventListener('pointerup', function(e) {
+                e.stopPropagation();
+                var delBtn = e.target.closest('[data-del]');
+                if (delBtn) {
+                    removeMarker(delBtn.getAttribute('data-del'));
+                    return;
+                }
+                var item = e.target.closest('.co-marker-item');
+                if (item) {
+                    jumpTo(item.getAttribute('data-id'));
+                }
+                if (window.ControlsOverlay) ControlsOverlay.resetFadeTimer();
+            });
+        }
+
+        // Block pointer events from reaching gesture system
+        markerPanel.addEventListener('pointerdown', function(e) { e.stopPropagation(); });
+        markerPanel.addEventListener('pointerup', function(e) { e.stopPropagation(); });
+        markerPanel.addEventListener('pointermove', function(e) { e.stopPropagation(); });
+
+        // ─── Public API ─────────────────────────────────────────────────
+        window.MarkerSystem = {
+            add: addMarker,
+            remove: removeMarker,
+            jumpTo: jumpTo,
+            getAll: function() { return markers.slice(); },
+            renderList: renderList
+        };
+
+        renderList();
+        console.log('[MarkerSystem] Initialized (' + markers.length + ' markers loaded)');
+    })();
+
+    // ═══ Phase 8 Stage 4: Loop System ═══
+    // Per-client loop: set A/B points, auto-jump at loop end, count display.
+    (function initLoopSystem() {
+
+        var loopStartMs = null;   // scoreTimeMs
+        var loopEndMs = null;     // scoreTimeMs
+        var loopEnabled = false;
+        var loopCount = 0;
+        var maxLoops = Infinity;  // 0 = infinite
+        var loopPanelVisible = false;
+
+        // ─── Build loop panel DOM ───────────────────────────────────────
+        var panelEl = null;
+        if (window.ControlsOverlay && ControlsOverlay.panelEl) {
+            panelEl = ControlsOverlay.panelEl;
+        }
+
+        var loopPanel = document.createElement('div');
+        loopPanel.className = 'co-loop-panel';
+        loopPanel.style.display = 'none';
+        loopPanel.innerHTML = [
+            '<div class="co-row co-loop-header">',
+            '  <span class="co-loop-title">Loop</span>',
+            '  <span class="co-loop-count"></span>',
+            '</div>',
+            '<div class="co-row co-loop-points">',
+            '  <button class="co-btn co-loop-set-a">Set A</button>',
+            '  <span class="co-loop-range">—</span>',
+            '  <button class="co-btn co-loop-set-b">Set B</button>',
+            '</div>',
+            '<div class="co-row co-loop-actions">',
+            '  <button class="co-btn co-loop-toggle" disabled>▶ Loop Off</button>',
+            '  <button class="co-btn co-loop-clear">Clear</button>',
+            '</div>'
+        ].join('');
+
+        if (panelEl) panelEl.appendChild(loopPanel);
+
+        // ─── CSS ────────────────────────────────────────────────────────
+        var lStyle = document.createElement('style');
+        lStyle.textContent = [
+            '.co-loop-panel { margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 8px; }',
+            '.co-loop-header { justify-content: space-between; }',
+            '.co-loop-title { font-size: 14px; font-weight: 600; }',
+            '.co-loop-count { font-size: 12px; opacity: 0.6; }',
+            '.co-loop-points { gap: 6px; }',
+            '.co-loop-set-a, .co-loop-set-b { font-size: 12px; padding: 6px 12px; min-width: 56px; }',
+            '.co-loop-set-a.co-set { background: rgba(0,170,255,0.35); }',
+            '.co-loop-set-b.co-set { background: rgba(255,102,0,0.35); }',
+            '.co-loop-range { font-size: 12px; opacity: 0.6; flex: 1; text-align: center; }',
+            '.co-loop-actions { gap: 6px; margin-top: 4px; }',
+            '.co-loop-toggle { font-size: 12px; padding: 6px 12px; }',
+            '.co-loop-toggle.co-on { background: rgba(0,147,92,0.5); }',
+            '.co-loop-clear { font-size: 12px; padding: 6px 12px; opacity: 0.7; }',
+            '#miniMap .mm-loop-region {',
+            '  position: absolute; top: 0; height: 100%;',
+            '  background: rgba(0,170,255,0.2); border-left: 1px solid rgba(0,170,255,0.6);',
+            '  border-right: 1px solid rgba(255,102,0,0.6); pointer-events: none;',
+            '}'
+        ].join('');
+        document.head.appendChild(lStyle);
+
+        // ─── DOM refs ───────────────────────────────────────────────────
+        var loopBtn = document.querySelector('.co-loop-btn');
+        var setABtn = loopPanel.querySelector('.co-loop-set-a');
+        var setBBtn = loopPanel.querySelector('.co-loop-set-b');
+        var rangeEl = loopPanel.querySelector('.co-loop-range');
+        var toggleBtn = loopPanel.querySelector('.co-loop-toggle');
+        var clearBtn = loopPanel.querySelector('.co-loop-clear');
+        var countEl = loopPanel.querySelector('.co-loop-count');
+
+        // ─── Helpers ────────────────────────────────────────────────────
+        function formatSec(ms) {
+            var s = Math.max(0, (ms / 1000) - (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0));
+            var m = Math.floor(s / 60);
+            var sec = (s % 60).toFixed(1);
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
+        function refreshUI() {
+            // A/B buttons
+            if (loopStartMs !== null) {
+                setABtn.textContent = 'A: ' + formatSec(loopStartMs);
+                setABtn.classList.add('co-set');
+            } else {
+                setABtn.textContent = 'Set A';
+                setABtn.classList.remove('co-set');
+            }
+            if (loopEndMs !== null) {
+                setBBtn.textContent = 'B: ' + formatSec(loopEndMs);
+                setBBtn.classList.add('co-set');
+            } else {
+                setBBtn.textContent = 'Set B';
+                setBBtn.classList.remove('co-set');
+            }
+
+            // Range display
+            if (loopStartMs !== null && loopEndMs !== null) {
+                rangeEl.textContent = formatSec(loopStartMs) + ' → ' + formatSec(loopEndMs);
+                toggleBtn.disabled = false;
+            } else {
+                rangeEl.textContent = loopStartMs !== null ? 'A set, need B' : '—';
+                toggleBtn.disabled = (loopStartMs === null || loopEndMs === null);
+            }
+
+            // Toggle button
+            toggleBtn.textContent = loopEnabled ? '🔁 Looping' : '▶ Start Loop';
+            toggleBtn.classList.toggle('co-on', loopEnabled);
+
+            // Loop button glow
+            if (loopBtn) loopBtn.classList.toggle('co-loop-active', loopEnabled);
+
+            // Count
+            if (loopEnabled && loopCount > 0) {
+                countEl.textContent = 'Loop ' + loopCount + (maxLoops === Infinity ? ' / ∞' : ' / ' + maxLoops);
+            } else {
+                countEl.textContent = '';
+            }
+
+            // Mini-map loop region
+            if (window.MiniMap && MiniMap.renderLoopRegion) MiniMap.renderLoopRegion();
+        }
+
+        // ─── Event handlers ─────────────────────────────────────────────
+        if (loopBtn) {
+            loopBtn.addEventListener('pointerup', function(e) {
+                e.stopPropagation();
+                loopPanelVisible = !loopPanelVisible;
+                loopPanel.style.display = loopPanelVisible ? 'block' : 'none';
+                if (loopPanelVisible) {
+                    refreshUI();
+                    if (window.ControlsOverlay) ControlsOverlay.clearFadeTimer();
+                } else {
+                    if (window.ControlsOverlay) ControlsOverlay.resetFadeTimer();
+                }
+            });
+        }
+
+        // ─── Server-based loop controls ─────────────────────────────────
+        // All loop actions go through the server. The server stores loop
+        // state per room and broadcasts loopState to all clients.
+        // The server's loop check interval handles the rewind (scoreGoto
+        // + scoreGo), so no client-side loop checking or offset hacking
+        // is needed.
+
+        function getSocket() {
+            return (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+        }
+
+        setABtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            var timeMs = (window.ScoreTime) ? (ScoreTime.currentScoreTimeMs || 0) : 0;
+            var sock = getSocket();
+            if (sock) sock.emit('loopSet', { point: 'A', timeMs: timeMs });
+            if (window.ControlsOverlay) ControlsOverlay.clearFadeTimer();
+        });
+
+        setBBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            var timeMs = (window.ScoreTime) ? (ScoreTime.currentScoreTimeMs || 0) : 0;
+            var sock = getSocket();
+            if (sock) sock.emit('loopSet', { point: 'B', timeMs: timeMs });
+            if (window.ControlsOverlay) ControlsOverlay.clearFadeTimer();
+        });
+
+        toggleBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            var sock = getSocket();
+            if (sock) sock.emit('loopToggle');
+            if (window.ControlsOverlay) ControlsOverlay.resetFadeTimer();
+        });
+
+        clearBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            var sock = getSocket();
+            if (sock) sock.emit('loopClear');
+            if (window.ControlsOverlay) ControlsOverlay.resetFadeTimer();
+        });
+
+        // ─── Listen for server loopState broadcasts ─────────────────────
+        function onLoopState(data) {
+            loopStartMs = data.loopStartMs;
+            loopEndMs = data.loopEndMs;
+            loopEnabled = data.loopEnabled;
+            loopCount = data.loopCount || 0;
+            refreshUI();
+        }
+
+        // Register listener (works with both real socket.io and stub)
+        var sock = getSocket();
+        if (sock) {
+            sock.on('loopState', onLoopState);
+        }
+
+        // Block pointer events from reaching gesture system
+        loopPanel.addEventListener('pointerdown', function(e) { e.stopPropagation(); });
+        loopPanel.addEventListener('pointerup', function(e) { e.stopPropagation(); });
+        loopPanel.addEventListener('pointermove', function(e) { e.stopPropagation(); });
+
+        // ─── Public API ─────────────────────────────────────────────────
+        window.LoopSystem = {
+            getRegion: function() {
+                return { startMs: loopStartMs, endMs: loopEndMs, enabled: loopEnabled };
+            },
+            isEnabled: function() { return loopEnabled; },
+            setMaxLoops: function(n) { maxLoops = n; refreshUI(); }
+        };
+
+        console.log('[LoopSystem] Initialized');
+    })();
+
+    // ═══ Phase 8 Stage 3: Mini-Map ═══
+    // Always-visible bar at bottom showing score position, page badge,
+    // marker ticks, and tap-to-jump navigation.
+    (function initMiniMap() {
+
+        // ─── Create DOM ─────────────────────────────────────────────────
+        var bar = document.createElement('div');
+        bar.id = 'miniMap';
+        bar.innerHTML = [
+            '<span class="mm-page-badge">P0/0</span>',
+            '<div class="mm-bar">',
+            '  <div class="mm-progress"></div>',
+            '  <div class="mm-cursor"></div>',
+            '</div>',
+            '<span class="mm-time">0:00</span>'
+        ].join('');
+        document.body.appendChild(bar);
+
+        // ─── CSS ────────────────────────────────────────────────────────
+        var style = document.createElement('style');
+        style.textContent = [
+            '#miniMap {',
+            '  position: fixed; bottom: 0; left: 0; right: 0; height: 28px;',
+            '  background: rgba(10,10,10,0.9); z-index: 9999;',
+            '  display: flex; align-items: center; padding: 0 10px;',
+            '  font-family: -apple-system, BlinkMacSystemFont, sans-serif;',
+            '  user-select: none; -webkit-user-select: none;',
+            '}',
+            '#miniMap .mm-page-badge {',
+            '  color: rgba(255,255,255,0.7); font-size: 11px; white-space: nowrap;',
+            '  min-width: 42px;',
+            '}',
+            '#miniMap .mm-bar {',
+            '  flex: 1; height: 6px; background: rgba(255,255,255,0.1);',
+            '  border-radius: 3px; position: relative; cursor: pointer;',
+            '  margin: 0 8px;',
+            '}',
+            '#miniMap .mm-progress {',
+            '  position: absolute; top: 0; left: 0; height: 100%;',
+            '  background: rgba(0,147,92,0.5); border-radius: 3px;',
+            '  pointer-events: none;',
+            '}',
+            '#miniMap .mm-cursor {',
+            '  position: absolute; top: -3px; width: 3px; height: 12px;',
+            '  background: #fff; border-radius: 2px; pointer-events: none;',
+            '}',
+            '#miniMap .mm-marker {',
+            '  position: absolute; top: -2px; width: 2px; height: 10px;',
+            '  border-radius: 1px; pointer-events: none;',
+            '}',
+            '#miniMap .mm-time {',
+            '  color: rgba(255,255,255,0.5); font-size: 11px; white-space: nowrap;',
+            '  min-width: 42px; text-align: right;',
+            '}'
+        ].join('');
+        document.head.appendChild(style);
+
+        // ─── DOM refs ───────────────────────────────────────────────────
+        var pageBadge = bar.querySelector('.mm-page-badge');
+        var mmBar = bar.querySelector('.mm-bar');
+        var progress = bar.querySelector('.mm-progress');
+        var cursor = bar.querySelector('.mm-cursor');
+        var timeEl = bar.querySelector('.mm-time');
+
+        // ─── Helpers ────────────────────────────────────────────────────
+        function getTotalDurationSec() {
+            if (window.ControlsOverlay && ControlsOverlay.getPageInfo) {
+                var info = ControlsOverlay.getPageInfo();
+                if (info.total > 0 && window.GraphicTimeline) {
+                    return info.total * GraphicTimeline.getSecondsPerPage();
+                }
+            }
+            return 1; // prevent division by zero
+        }
+
+        function getCurrentSec() {
+            if (!window.ScoreTime) return 0;
+            return (ScoreTime.currentScoreTimeMs || 0) / 1000;
+        }
+
+        function formatTime(sec) {
+            var ds = sec - (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
+            ds = Math.max(0, ds);
+            var m = Math.floor(ds / 60);
+            var s = Math.floor(ds % 60);
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        // ─── Render markers on bar ──────────────────────────────────────
+        function renderMarkers() {
+            // Remove existing marker ticks
+            var existing = mmBar.querySelectorAll('.mm-marker');
+            for (var i = 0; i < existing.length; i++) existing[i].remove();
+
+            if (!window.MarkerSystem) return;
+            var all = MarkerSystem.getAll();
+            var total = getTotalDurationSec();
+            all.forEach(function(m) {
+                var sec = m.scoreTimeMs / 1000;
+                var pct = Math.min(100, (sec / total) * 100);
+                var tick = document.createElement('div');
+                tick.className = 'mm-marker';
+                tick.style.left = pct + '%';
+                tick.style.background = m.color;
+                mmBar.appendChild(tick);
+            });
+        }
+
+        // ─── Update loop ────────────────────────────────────────────────
+        function update() {
+            var total = getTotalDurationSec();
+            var current = getCurrentSec();
+            var pct = Math.min(100, (current / total) * 100);
+
+            progress.style.width = pct + '%';
+            cursor.style.left = 'calc(' + pct + '% - 1.5px)';
+            timeEl.textContent = formatTime(current);
+
+            // Page badge (display as spreads in full score mode)
+            if (window.ControlsOverlay && ControlsOverlay.getPageInfo) {
+                var info = ControlsOverlay.getPageInfo();
+                if (window.PartsMode && PartsMode.active) {
+                    pageBadge.textContent = 'P' + info.current + '/' + info.total;
+                } else {
+                    pageBadge.textContent = 'P' + (Math.floor(info.current / 2) + 1) + '/' + Math.ceil(info.total / 2);
+                }
+            }
+        }
+
+        // Update every 200ms (smooth enough, low overhead)
+        setInterval(update, 200);
+        update();
+        renderMarkers();
+
+        // ─── Tap to jump ────────────────────────────────────────────────
+        mmBar.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            var rect = mmBar.getBoundingClientRect();
+            var ratio = (e.clientX - rect.left) / rect.width;
+            ratio = Math.max(0, Math.min(1, ratio));
+            var targetSec = ratio * getTotalDurationSec();
+            if (window.SyncMode && SyncMode.isIndependent) {
+                if (window.GraphicTimeline) GraphicTimeline.onGoto(targetSec);
+            } else if (window.ClockSync && ClockSync.socket) {
+                ClockSync.socket.emit('scoreGoto', { seconds: targetSec });
+            }
+            setTimeout(update, 150);
+        });
+
+        // Block events from reaching gesture system
+        bar.addEventListener('pointerdown', function(e) { e.stopPropagation(); });
+        bar.addEventListener('pointermove', function(e) { e.stopPropagation(); });
+
+        // ─── Loop region rendering ──────────────────────────────────────
+        function renderLoopRegion() {
+            var existing = mmBar.querySelector('.mm-loop-region');
+            if (existing) existing.remove();
+
+            if (!window.LoopSystem) return;
+            var region = LoopSystem.getRegion();
+            if (region.startMs === null || region.endMs === null) return;
+
+            var total = getTotalDurationSec();
+            var startPct = Math.min(100, (region.startMs / 1000 / total) * 100);
+            var endPct = Math.min(100, (region.endMs / 1000 / total) * 100);
+
+            var el = document.createElement('div');
+            el.className = 'mm-loop-region';
+            el.style.left = startPct + '%';
+            el.style.width = (endPct - startPct) + '%';
+            mmBar.appendChild(el);
+        }
+
+        // ─── Public API ─────────────────────────────────────────────────
+        window.MiniMap = {
+            update: update,
+            renderMarkers: renderMarkers,
+            renderLoopRegion: renderLoopRegion
+        };
+
+        console.log('[MiniMap] Initialized');
+    })();
+
+    // ═══ Phase 8 Stage 5b: Sync Mode + Leader ═══
+    // Manages synced vs. independent playback and leader privileges.
+    // Leader: first client in room; only leader can send room-wide commands.
+    // Independent mode: client ignores server scoreGo/Stop/Goto; uses local controls.
+    (function initSyncMode() {
+
+        var _isIndependent = false;
+        var _isLeader = false;
+        var _leaderId = null;
+        var _mySocketId = null;
+        var _toastTimer = null;
+
+        function getSocket() {
+            return (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+        }
+
+        // ─── Determine own socket ID ─────────────────────────────────────
+        // The server sends it implicitly via leaderChange; we match against it
+        var sock = getSocket();
+        if (sock) {
+            // Socket.IO exposes id after connect
+            if (sock.id) _mySocketId = sock.id;
+            sock.on('connect', function() { _mySocketId = sock.id; });
+        }
+
+        // ─── Intercept server events when independent ────────────────────
+        // Wrap CursorControls handlers so they no-op when independent
+        function wrapHandler(obj, methodName) {
+            if (!obj || typeof obj[methodName] !== 'function') return;
+            var orig = obj[methodName].bind(obj);
+            obj[methodName] = function(data) {
+                if (_isIndependent) return; // ignore server event
+                orig(data);
+            };
+        }
+
+        // Wait a tick for CursorControls to be available
+        setTimeout(function() {
+            if (window.CursorControls) {
+                wrapHandler(CursorControls, 'onScoreGo');
+                wrapHandler(CursorControls, 'onScoreStop');
+                wrapHandler(CursorControls, 'onScoreGoto');
+            }
+        }, 100);
+
+        // ─── Local play/stop for independent mode ────────────────────────
+        function localToggleGoStop() {
+            if (!window.ScoreTime || !window.ClockSync) return;
+            if (ScoreTime.isPlaying) {
+                ScoreTime.currentScoreTimeMs = ScoreTime.now();
+                ScoreTime.isPlaying = false;
+            } else {
+                ScoreTime.scoreTimeOffset = ClockSync.now() - ScoreTime.currentScoreTimeMs;
+                ScoreTime.isPlaying = true;
+            }
+            if (window.ControlsOverlay) ControlsOverlay.refresh();
+        }
+
+        // ─── Create UI ──────────────────────────────────────────────────
+        var syncBar = document.createElement('div');
+        syncBar.id = 'syncBar';
+        syncBar.innerHTML = [
+            '<span class="sb-leader-badge"></span>',
+            '<button class="sb-btn sb-sync-toggle" title="Toggle sync mode">🔗 Synced</button>',
+            '<button class="sb-btn sb-resync" title="Re-sync to room" style="display:none">↩ Re-sync</button>',
+            '<button class="sb-btn sb-recall" title="Recall all to your position" style="display:none">📢 Recall All</button>',
+            '<div class="sb-toast" style="display:none"></div>'
+        ].join('');
+
+        var sbStyle = document.createElement('style');
+        sbStyle.textContent = [
+            '#syncBar {',
+            '  position: fixed; top: 8px; right: 8px; z-index: 10001;',
+            '  display: flex; align-items: center; gap: 6px;',
+            '  font-family: -apple-system, BlinkMacSystemFont, sans-serif;',
+            '  user-select: none; -webkit-user-select: none;',
+            '}',
+            '.sb-leader-badge {',
+            '  color: #ffd700; font-size: 12px; font-weight: 600;',
+            '  background: rgba(20,20,20,0.75); border-radius: 8px; padding: 4px 8px;',
+            '}',
+            '.sb-btn {',
+            '  background: rgba(20,20,20,0.75); border: 1px solid rgba(255,255,255,0.15);',
+            '  color: #fff; border-radius: 8px; padding: 6px 10px; font-size: 12px;',
+            '  cursor: pointer; white-space: nowrap;',
+            '}',
+            '.sb-btn:active { background: rgba(60,60,60,0.9); }',
+            '.sb-sync-toggle.sb-independent {',
+            '  background: rgba(200,100,0,0.6); border-color: rgba(255,165,0,0.4);',
+            '}',
+            '.sb-toast {',
+            '  position: fixed; top: 50px; right: 8px;',
+            '  background: rgba(200,50,50,0.85); color: #fff;',
+            '  padding: 8px 14px; border-radius: 8px; font-size: 13px;',
+            '  pointer-events: none; transition: opacity 0.3s;',
+            '}'
+        ].join('');
+        document.head.appendChild(sbStyle);
+        document.body.appendChild(syncBar);
+
+        var leaderBadge = syncBar.querySelector('.sb-leader-badge');
+        var syncToggle = syncBar.querySelector('.sb-sync-toggle');
+        var resyncBtn = syncBar.querySelector('.sb-resync');
+        var recallBtn = syncBar.querySelector('.sb-recall');
+        var toast = syncBar.querySelector('.sb-toast');
+
+        // ─── UI updates ─────────────────────────────────────────────────
+        function refreshSyncUI() {
+            // Sync toggle
+            if (_isIndependent) {
+                syncToggle.textContent = '🔓 Independent';
+                syncToggle.classList.add('sb-independent');
+                resyncBtn.style.display = '';
+            } else {
+                syncToggle.textContent = '🔗 Synced';
+                syncToggle.classList.remove('sb-independent');
+                resyncBtn.style.display = 'none';
+            }
+            // Leader badge
+            if (_isLeader) {
+                leaderBadge.textContent = '⭐ Leader';
+                recallBtn.style.display = '';
+            } else {
+                leaderBadge.textContent = '';
+                recallBtn.style.display = 'none';
+            }
+        }
+
+        function showToast(msg, durationMs) {
+            toast.textContent = msg;
+            toast.style.display = '';
+            toast.style.opacity = '1';
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(function() {
+                toast.style.opacity = '0';
+                setTimeout(function() { toast.style.display = 'none'; }, 300);
+            }, durationMs || 2000);
+        }
+
+        // ─── Event handlers ─────────────────────────────────────────────
+        syncToggle.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            _isIndependent = !_isIndependent;
+            if (_isIndependent) {
+                showToast('Independent mode — local controls only', 2000);
+            }
+            refreshSyncUI();
+        });
+
+        resyncBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            _isIndependent = false;
+            refreshSyncUI();
+            // Request current state from server to re-sync
+            var s = getSocket();
+            if (s) s.emit('requestState');
+            showToast('Re-synced to room', 1500);
+        });
+
+        recallBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            var s = getSocket();
+            if (s) s.emit('recallAll');
+        });
+
+        // Block pointer events from reaching gesture system
+        syncBar.addEventListener('pointerdown', function(e) { e.stopPropagation(); });
+        syncBar.addEventListener('pointermove', function(e) { e.stopPropagation(); });
+
+        // ─── Socket event listeners ─────────────────────────────────────
+        if (sock) {
+            sock.on('leaderChange', function(data) {
+                _leaderId = data.leaderId;
+                _isLeader = (_mySocketId && _leaderId === _mySocketId);
+                console.log('[SyncMode] Leader changed: ' + _leaderId + (_isLeader ? ' (me)' : ''));
+                refreshSyncUI();
+            });
+
+            // scoreState includes leaderId on initial sync
+            sock.on('scoreState', function(data) {
+                if (data.leaderId) {
+                    _leaderId = data.leaderId;
+                    // Try to get our socket id
+                    if (sock.id) _mySocketId = sock.id;
+                    _isLeader = (_mySocketId && _leaderId === _mySocketId);
+                    refreshSyncUI();
+                }
+            });
+
+            sock.on('notLeader', function(data) {
+                showToast('Only the leader can ' + (data.action || 'do that'), 2000);
+                console.log('[SyncMode] Not leader — action rejected: ' + data.action);
+            });
+
+            sock.on('recallAll', function(data) {
+                // Force re-sync regardless of independent mode
+                _isIndependent = false;
+                refreshSyncUI();
+                // Request full state to apply server position
+                sock.emit('requestState');
+                showToast('Leader recalled all — re-synced', 2000);
+                console.log('[SyncMode] Recall all — re-synced to ' + data.currentScoreTimeMs + 'ms');
+            });
+        }
+
+        // ─── Public API ─────────────────────────────────────────────────
+        window.SyncMode = {
+            get isIndependent() { return _isIndependent; },
+            get isLeader() { return _isLeader; },
+            set isIndependent(v) { _isIndependent = !!v; refreshSyncUI(); },
+            localToggleGoStop: localToggleGoStop,
+            showToast: showToast,
+            refreshUI: refreshSyncUI
+        };
+
+        refreshSyncUI();
+        console.log('[SyncMode] Initialized');
     })();
     `;
 
