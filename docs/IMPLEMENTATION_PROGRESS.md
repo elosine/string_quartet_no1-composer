@@ -45,7 +45,8 @@ Type `/session-start` — this triggers a workflow that walks the AI through the
 | 3. Parts Mode | ✅ Complete | Mar 21 | Full N-section parts view + 4 bug fixes + size constraints |
 | 4. Print Score | ✅ Complete | Mar 21 | 6 stages, 13 vector PDFs (full + 4 tracks × 3 densities), CSS margin fix |
 | 5. Server Architecture | ✅ Complete | Mar 21 | Room-based Socket.IO, grace period, reconnection, 3 build patches (1b/1c) |
-| 6–14 | ⏳ Pending | — | |
+| 6. Sync Tier 1 | ✅ Complete | Mar 21 | performance.now(), outlier rejection, connection awareness, drift correction |
+| 7–14 | ⏳ Pending | — | |
 
 ---
 
@@ -562,9 +563,49 @@ Stage 5: Integration verification                                   ✅ DONE
 
 ---
 
+## Phase 6 Stage Results
+
+```
+Stage 1: Monotonic clock — performance.now() anchoring                ✅ DONE
+  - Patch 1d: ClockSync.now() = _syncBase + (performance.now() - _perfBase)
+  - Falls back to Date.now() + offset before first sync
+  → 👁️ Human verified: monotonicity test PASS (10000 samples), playback works
+
+Stage 2: Outlier rejection + weighted averaging                      ✅ DONE
+  - Patch 1d-b: RTT > max(2× median, 10ms) discarded
+  - Weighted avg: lower RTT = higher weight
+  - Bug fix: 10ms minimum threshold (0ms median on localhost was
+    rejecting all 1ms RTT samples)
+  → 🤖 No false rejections on localhost
+
+Stage 3: Connection awareness + burst re-sync + UI indicator         ✅ DONE
+  - Patch 1e: replace requestPing with burstResync (5 pings × 50ms)
+  - Patch 1e-a: disconnect handler
+  - Patch 1e-b: green/yellow/red sync status dot (bottom-right, 10px)
+  → 👁️ Human verified: green dot visible, tooltip shows RTT/offset
+
+Stage 4: Server-authoritative position check + drift correction      ✅ DONE
+  - Server: scorePositionCheck broadcast every 3s during playback
+  - Patch 1f: client compares local vs server position
+  - Smooth correction: drift >50ms → adjust _syncBase over 30 frames
+  - _applyDriftStep() via requestAnimationFrame
+  → 👁️ Human verified: drift <1ms on localhost, no correction triggered
+
+Stage 5: Integration verification                                   ✅ DONE
+  - Full score, parts mode, multi-client sync all work
+  - Print server (port 3002) unaffected
+  → 👁️ Human verified: all modes pass
+```
+
+### Phase 6 Files Modified
+- `scripts/performance_server.js` — added `scorePositionCheck` broadcast (3s interval)
+- `scripts/build_performance_app.js` — Patches 1d, 1d-b, 1e, 1e-a, 1e-b, 1f
+
+---
+
 ## RESUME HERE
-**Current phase:** Phase 5 — Server Architecture ✅ COMPLETE
-**Phase 5 complete:** Room-based Socket.IO server with grace period, reconnection, and multi-client sync
-**Next:** Phase 6+ (see pipeline plan §13.4+)
-**Key files:** `scripts/performance_server.js` (server), `scripts/build_performance_app.js` (Patches 1/1b/1c/2/3)
-**Pipeline plan:** See §16 for Phase 4 post-mortem, §13.4 Phase 5 for the plan
+**Current phase:** Phase 6 — Sync Tier 1 ✅ COMPLETE
+**Phase 6 complete:** Monotonic clock, outlier rejection, connection awareness, drift correction
+**Next:** Phase 7+ (see pipeline plan §13.4+)
+**Key files:** `scripts/performance_server.js`, `scripts/build_performance_app.js` (Patches 1/1b/1c/1d/1d-b/1e/1e-a/1e-b/1f/2/3)
+**Pipeline plan:** See §13.4 for phase details

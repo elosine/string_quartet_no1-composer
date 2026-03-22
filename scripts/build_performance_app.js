@@ -216,6 +216,213 @@ const cursorStateGotoReplacement = [
 
 replaceOnce(cursorStateGotoBlock, cursorStateGotoReplacement, 'Patch 1c: skip cursorState goto with real server');
 
+// ─── Patch 1d: Monotonic clock — performance.now() anchoring (Phase 6) ──────
+// Replace ClockSync.now() and calculateSync() to use performance.now() for
+// local time progression. This is monotonic (never goes backward), has ~5μs
+// precision, and matches the clock requestAnimationFrame timestamps use.
+// Date.now() is still used for RTT calculation (must match server's Date.now()).
+
+const clockSyncNowMarker = [
+    '            // Get the current synchronized time (server time)',
+    '            now() {',
+    '                return Date.now() + this.clockOffset;',
+    '            },'
+].join('\n');
+const clockSyncNowReplacement = [
+    '            // Phase 6: Monotonic clock via performance.now() anchoring',
+    '            _perfBase: 0,       // performance.now() at last successful sync',
+    '            _syncBase: 0,       // estimated server time at _perfBase',
+    '            _perfInitialized: false,',
+    '            ',
+    '            // Get the current synchronized time (server time)',
+    '            // Uses performance.now() for monotonic, sub-ms local progression',
+    '            now() {',
+    '                if (!this._perfInitialized) {',
+    '                    // Before first sync, fall back to Date.now() + offset',
+    '                    return Date.now() + this.clockOffset;',
+    '                }',
+    '                var localElapsed = performance.now() - this._perfBase;',
+    '                return this._syncBase + localElapsed;',
+    '            },'
+].join('\n');
+
+replaceOnce(clockSyncNowMarker, clockSyncNowReplacement, 'Patch 1d: monotonic ClockSync.now() via performance.now()');
+
+// Patch 1d-b: Outlier rejection, weighted averaging, and perfBase anchoring
+const calcSyncMarker = [
+    '                // Add to samples and keep only recent ones',
+    '                this.syncSamples.push(offset);',
+    '                if (this.syncSamples.length > this.maxSamples) {',
+    '                    this.syncSamples.shift();',
+    '                }',
+    '                ',
+    '                // Average the samples for stability',
+    '                this.clockOffset = this.syncSamples.reduce((a, b) => a + b, 0) / this.syncSamples.length;'
+].join('\n');
+const calcSyncReplacement = [
+    '                // Phase 6: Outlier rejection — discard RTT > 2× median',
+    '                if (!this._rttSamples) this._rttSamples = [];',
+    '                if (this._rttSamples.length >= 3) {',
+    '                    var sortedRTTs = this._rttSamples.slice().sort(function(a,b){return a-b;});',
+    '                    var medianRTT = sortedRTTs[Math.floor(sortedRTTs.length / 2)];',
+    '                    var threshold = Math.max(medianRTT * 2, 10);',
+    '                    if (this.roundTripTime > threshold) {',
+    '                        // Spike detected — discard this sample',
+    '                        console.log("ClockSync: RTT spike rejected (" + this.roundTripTime + "ms > 2× median " + medianRTT + "ms)");',
+    '                        return;',
+    '                    }',
+    '                }',
+    '                ',
+    '                // Add to samples and keep only recent ones',
+    '                this.syncSamples.push(offset);',
+    '                this._rttSamples.push(this.roundTripTime);',
+    '                if (this.syncSamples.length > this.maxSamples) {',
+    '                    this.syncSamples.shift();',
+    '                    this._rttSamples.shift();',
+    '                }',
+    '                ',
+    '                // Phase 6: Weighted averaging — lower RTT = higher weight',
+    '                var weightedSum = 0, totalWeight = 0;',
+    '                for (var wi = 0; wi < this.syncSamples.length; wi++) {',
+    '                    var w = 1 / (1 + this._rttSamples[wi]);',
+    '                    weightedSum += this.syncSamples[wi] * w;',
+    '                    totalWeight += w;',
+    '                }',
+    '                this.clockOffset = weightedSum / totalWeight;',
+    '                ',
+    '                // Phase 6: Anchor performance.now() to estimated server time',
+    '                this._perfBase = performance.now();',
+    '                this._syncBase = clientReceiveTime + this.clockOffset;',
+    '                this._perfInitialized = true;'
+].join('\n');
+
+replaceOnce(calcSyncMarker, calcSyncReplacement, 'Patch 1d-b: outlier rejection + weighted avg + perfBase anchor');
+
+// ─── Patch 1e: Connection awareness + burst re-sync (Phase 6, Stage 3) ──────
+// Add disconnect/reconnect handlers, burst 5 pings at 50ms on reconnect,
+// and a sync status UI indicator (green/yellow/red dot).
+
+// Target: the requestPing line inside connect handler (after Patch 1b's room join code)
+const connectPingMarker = "                    this.requestPing(); // Initial ping to calculate RTT";
+const connectPingReplacement = [
+    '                    this.connected = true;',
+    '                    this._burstResync(); // Phase 6: rapid re-sync on connect/reconnect',
+    '                    this._updateSyncUI();'
+].join('\n');
+
+// Add disconnect handler after the connect handler closing brace
+// Target: the _updateSyncUI + }); that Patch 1e just created
+const connectClosingMarker = "                    this._updateSyncUI();\n                });";
+const connectClosingReplacement = [
+    '                    this._updateSyncUI();',
+    '                });',
+    '                ',
+    "                this.socket.on('disconnect', () => {",
+    "                    console.log('Disconnected from server');",
+    '                    this.connected = false;',
+    '                    this._updateSyncUI();',
+    '                });'
+].join('\n');
+
+replaceOnce(connectPingMarker, connectPingReplacement, 'Patch 1e: replace requestPing with burstResync');
+
+// ─── Patch 1f: Drift correction — scorePositionCheck handler (Phase 6, Stage 4) ──
+// Server broadcasts authoritative score position every 3s during playback.
+// Client compares local position, and if drift > 50ms, smoothly corrects over ~500ms.
+
+const pongHandlerMarker = [
+    "                // Handle pong response for RTT calculation",
+    "                this.socket.on('pongResponse', (data) => {"
+].join('\n');
+const pongHandlerWithDriftCheck = [
+    "                // Phase 6: Handle authoritative position check for drift correction",
+    "                this.socket.on('scorePositionCheck', (data) => {",
+    '                    if (!window.ScoreTime || !ScoreTime.isPlaying) return;',
+    '                    var localScoreTime = ScoreTime.now();',
+    '                    var drift = localScoreTime - data.scoreTimeMs;',
+    '                    if (Math.abs(drift) > 50) {',
+    '                        // Smooth correction: adjust scoreTimeOffset gradually',
+    '                        // Spread correction over 30 frames (~500ms at 60fps)',
+    '                        if (!this._driftCorrection) this._driftCorrection = { remaining: 0, perStep: 0 };',
+    '                        this._driftCorrection.remaining = 30;',
+    '                        this._driftCorrection.perStep = drift / 30;',
+    '                        console.log("ClockSync: drift " + drift.toFixed(1) + "ms, correcting " + this._driftCorrection.perStep.toFixed(2) + "ms/frame");',
+    '                        this._applyDriftStep();',
+    '                    }',
+    '                });',
+    '                ',
+    "                // Handle pong response for RTT calculation",
+    "                this.socket.on('pongResponse', (data) => {"
+].join('\n');
+
+replaceOnce(pongHandlerMarker, pongHandlerWithDriftCheck, 'Patch 1f: scorePositionCheck drift correction handler');
+replaceOnce(connectClosingMarker, connectClosingReplacement, 'Patch 1e-a: add disconnect handler');
+
+// Patch 1e-b: Add burst re-sync and UI methods before the closing brace of ClockSync
+const clockSyncGetRTTMarker = [
+    '            // Get the round-trip time',
+    '            getRTT() {',
+    '                return this.roundTripTime;',
+    '            }'
+].join('\n');
+const clockSyncGetRTTReplacement = [
+    '            // Get the round-trip time',
+    '            getRTT() {',
+    '                return this.roundTripTime;',
+    '            },',
+    '            ',
+    '            // Phase 6: Connection state',
+    '            connected: false,',
+    '            ',
+    '            // Phase 6: Burst 5 rapid pings to quickly establish accurate offset',
+    '            _burstResync() {',
+    '                var self = this;',
+    '                var count = 0;',
+    '                var burst = setInterval(function() {',
+    '                    self.requestPing();',
+    '                    count++;',
+    '                    if (count >= 5) {',
+    '                        clearInterval(burst);',
+    '                        self._updateSyncUI();',
+    '                    }',
+    '                }, 50); // 50ms apart = 250ms total burst',
+    '            },',
+    '            ',
+    '            // Phase 6: Apply drift correction — shift _syncBase by perStep each frame',
+    '            _applyDriftStep() {',
+    '                var self = this;',
+    '                if (!this._driftCorrection || this._driftCorrection.remaining <= 0) return;',
+    '                this._syncBase -= this._driftCorrection.perStep;',
+    '                this._driftCorrection.remaining--;',
+    '                if (this._driftCorrection.remaining > 0) {',
+    '                    requestAnimationFrame(function() { self._applyDriftStep(); });',
+    '                }',
+    '            },',
+    '            ',
+    '            // Phase 6: Sync status UI indicator',
+    '            _updateSyncUI() {',
+    '                var el = document.getElementById("syncStatusDot");',
+    '                if (!el) {',
+    '                    el = document.createElement("div");',
+    '                    el.id = "syncStatusDot";',
+    '                    el.style.cssText = "position:fixed;bottom:8px;right:8px;width:10px;height:10px;border-radius:50%;z-index:99999;opacity:0.7;transition:background 0.3s;cursor:help;";',
+    '                    document.body.appendChild(el);',
+    '                }',
+    '                if (this.connected && this._perfInitialized) {',
+    '                    el.style.background = "#0f0";',
+    '                    el.title = "Synced (RTT: " + this.roundTripTime + "ms, offset: " + this.clockOffset.toFixed(1) + "ms)";',
+    '                } else if (this.connected) {',
+    '                    el.style.background = "#ff0";',
+    '                    el.title = "Connected — syncing...";',
+    '                } else {',
+    '                    el.style.background = "#f00";',
+    '                    el.title = "Disconnected — local clock";',
+    '                }',
+    '            }'
+].join('\n');
+
+replaceOnce(clockSyncGetRTTMarker, clockSyncGetRTTReplacement, 'Patch 1e-b: burst re-sync + sync UI indicator methods');
+
 // ─── Patch 2: Replace ScoreManager auto-load with static JSON fetch ────────
 
 const autoLoadMarker = "// Auto-load: check server for latest score first (supports automation),";

@@ -345,6 +345,21 @@ setInterval(function() {
     }
 }, SYNC_INTERVAL_MS);
 
+// ─── Phase 6: Authoritative position check (every 3s during playback) ──────
+
+setInterval(function() {
+    var now = Date.now();
+    for (var [roomId, room] of rooms.entries()) {
+        if (room.isPlaying && room.clientCount > 0) {
+            var scoreTimeMs = now - room.scoreTimeOffset;
+            io.to(roomId).emit('scorePositionCheck', {
+                scoreTimeMs: scoreTimeMs,
+                serverTime: now
+            });
+        }
+    }
+}, 3000);
+
 // ─── Start server ───────────────────────────────────────────────────────────
 
 server.listen(PORT, function() {
