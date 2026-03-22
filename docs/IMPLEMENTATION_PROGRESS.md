@@ -1,9 +1,9 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 5 — Server Architecture (Rooms & Multi-Client)
-**Last Session:** Mar 21, 2026
-**Last Commit:** `162f83ae` — `[Phase 4] Print score complete` + tag `phase-4-complete`
+**Active Phase:** Phase 7 — Authentication & Persistence ✅ COMPLETE
+**Last Session:** Mar 22, 2026
+**Last Commit:** Pending — `[Phase 7] Auth — self-service sessions, JWT, per-performer persistence`
 
 ## How to Resume Work (for the human)
 
@@ -46,7 +46,8 @@ Type `/session-start` — this triggers a workflow that walks the AI through the
 | 4. Print Score | ✅ Complete | Mar 21 | 6 stages, 13 vector PDFs (full + 4 tracks × 3 densities), CSS margin fix |
 | 5. Server Architecture | ✅ Complete | Mar 21 | Room-based Socket.IO, grace period, reconnection, 3 build patches (1b/1c) |
 | 6. Sync Tier 1 | ✅ Complete | Mar 21 | performance.now(), outlier rejection, connection awareness, drift correction |
-| 7–14 | ⏳ Pending | — | |
+| 7. Auth & Persistence | ✅ Complete | Mar 22 | Self-service sessions, JWT, preferences, 6 API endpoints |
+| 8–14 | ⏳ Pending | — | |
 
 ---
 
@@ -603,9 +604,139 @@ Stage 5: Integration verification                                   ✅ DONE
 
 ---
 
+## Phase 7 Pre-Implementation Protocol
+
+### Step 1: System Inventory
+
+| System | Current State | Phase 7 Change |
+|--------|---------------|----------------|
+| `performance_server.js` (382 lines) | Express + Socket.IO, room-based sync, no auth | Add REST API endpoints, JWT auth, session/performer persistence |
+| `build_performance_app.js` (client patches) | Socket stub + room join | Add landing page or auth-aware join flow (Patch 1g) |
+| `package.json` | express, socket.io, pdf-lib, puppeteer | Add `jsonwebtoken` |
+| `data/` directory | Does not exist | Create: `data/sessions/`, `data/performers/`, `data/.jwt-secret` |
+| `.gitignore` | Standard | Add `data/` entry |
+
+### Step 2: Source Reading — Key findings
+
+- **`joinRoom` handler (L143-171):** Takes `{roomId}`, joins socket to room. Integration point for auth.
+- **Room state (L75-88):** Sync-only state. Will add `performers[]` tracking per room.
+- **Express routes (L62-68):** Only static files + GET /. Need new `/api/*` routes.
+- **Dependencies:** `crypto.randomBytes` available (built-in) for token generation. `jsonwebtoken` needed for JWT.
+
+### Step 3: Contracts
+
+- **POST /api/sessions** → returns `{code, shareLink}`, creates `data/sessions/{code}.json`
+- **POST /api/sessions/:code/join** + `{displayName, slot}` → returns `{token}` (JWT)
+- **Anonymous fallback:** no JWT → "default" room, all Phase 1-6 features work
+- **JWT payload:** `{performerId, displayName, slot, sessionId}` — identity-method-agnostic
+
+### Step 4: Risk Register
+
+| Risk | Mitigation |
+|------|------------|
+| JWT secret lost on restart | Persist in `data/.jwt-secret`, auto-generate once |
+| `data/` committed to git | Add to `.gitignore` before creating |
+| Anonymous mode regression | Guard all auth: no JWT → default room |
+| Concurrent JSON writes | Atomic write (temp file + rename) |
+| Express body-parser missing | `express.json()` built-in since 4.16 |
+
+### Step 5: Staged Plan
+
+```
+Stage 1: Data model + session creation API
+  - data/ directory, .gitignore, JWT secret persistence
+  - POST /api/sessions, GET /api/sessions/:code
+  → TEST: 🤖 Create + read session via API
+
+Stage 2: JWT + claim flow
+  - npm install jsonwebtoken
+  - POST /api/sessions/:code/join → issues JWT
+  - Performer profile persistence
+  → TEST: 🤖 Join → get JWT → validate → profile exists
+
+Stage 3: Authenticated room join + slot tracking
+  - Socket.IO JWT validation in handshake
+  - Modify joinRoom for auth, track performers per room
+  - playerJoined/playerLeft events
+  - Anonymous fallback preserved
+  → TEST: 🤖 Auth join + anonymous fallback
+
+Stage 4: Preferences persistence + integration
+  - GET/PUT /api/performers/:id/preferences
+  - Full regression
+  → TEST: 🤖 Preferences round-trip, 👁️ full end-to-end flow
+```
+
+### Architecture Decision Record
+
+**Decision:** Self-service "Zoom model" instead of composer-managed invite system.
+**Rationale:** Composer should not be a bottleneck when multiple ensembles want to use the piece. Performers self-organize by creating sessions and sharing 6-character room codes.
+**Migration path:** Adding email-based gating later is ~50 lines + email service signup. `performerId` is identity-method-agnostic — not tied to any auth method.
+
+---
+
+## Phase 7 Stage Results
+
+```
+Stage 1: Data model + session creation API                           ✅ DONE
+  - data/ directory structure (sessions/, performers/), .gitignore entry
+  - JWT secret auto-generated and persisted in data/.jwt-secret
+  - POST /api/sessions → 6-char room code + shareLink
+  - GET /api/sessions/:code → session info, available slots
+  - Atomic JSON file writes (temp + rename)
+  → 🤖 Create + read session via API: PASS
+
+Stage 2: JWT + claim flow                                            ✅ DONE
+  - npm install jsonwebtoken
+  - POST /api/sessions/:code/join → {displayName, slot} → JWT token
+  - JWT payload: {performerId, displayName, slot, sessionId} — identity-method-agnostic
+  - Performer profile persisted to data/performers/{id}/profile.json
+  - Slot re-claim returns existing performer's token (reconnection support)
+  - GET /api/auth/verify — validate JWT
+  → 🤖 Join, re-claim, verify, validation errors: ALL PASS
+
+Stage 3: Authenticated room join + slot tracking                     ✅ DONE
+  - Socket.IO middleware: extract performer info from JWT in handshake
+  - Authenticated clients auto-join their session's room
+  - connectedPerformers[] tracked per room (slot + displayName + socketId)
+  - playerJoined/playerLeft events broadcast to room
+  - Anonymous fallback preserved: no JWT → default room
+  → 🤖 Auth join, playerJoined/Left events, anonymous fallback, sync: ALL PASS
+
+Stage 4: Preferences persistence + integration                      ✅ DONE
+  - GET/PUT /api/performers/:id/preferences (JWT-authenticated)
+  - Access control: performers can only access their own preferences
+  - Preferences stored as data/performers/{id}/preferences.json
+  - Anonymous regression: play/stop/goto all work without auth
+  → 🤖 Preferences round-trip, auth checks, anonymous regression: ALL PASS
+  → 👁️ Human verified: full end-to-end flow (create session, join, prefs, anonymous sync)
+```
+
+### Phase 7 Architecture Decision
+**Decision:** Self-service "Zoom model" instead of composer-managed invite system.
+**Rationale:** Composer should not be a bottleneck. Performers self-organize.
+**Migration path:** Adding email-based gating later is ~50 lines + email service signup.
+
+### Phase 7 Files Modified
+- `scripts/performance_server.js` — session API, JWT auth, preferences API, Socket.IO middleware
+- `package.json` — added `jsonwebtoken` dependency
+- `.gitignore` — added `data/` entry
+- `docs/STRING_QUARTET_PIPELINE_PLAN.md` — revised §12.9.3 + Phase 7 steps
+
+### Phase 7 New API Endpoints
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/sessions` | — | Create session → 6-char code |
+| GET | `/api/sessions/:code` | — | Session info + available slots |
+| POST | `/api/sessions/:code/join` | — | Claim slot → JWT token |
+| GET | `/api/auth/verify` | Bearer | Validate JWT |
+| GET | `/api/performers/:id/preferences` | Bearer | Load preferences |
+| PUT | `/api/performers/:id/preferences` | Bearer | Save preferences |
+
+---
+
 ## RESUME HERE
-**Current phase:** Phase 6 — Sync Tier 1 ✅ COMPLETE
-**Phase 6 complete:** Monotonic clock, outlier rejection, connection awareness, drift correction
-**Next:** Phase 7+ (see pipeline plan §13.4+)
-**Key files:** `scripts/performance_server.js`, `scripts/build_performance_app.js` (Patches 1/1b/1c/1d/1d-b/1e/1e-a/1e-b/1f/2/3)
+**Current phase:** Phase 7 — Authentication & Persistence ✅ COMPLETE
+**Next:** Phase 8+ (see pipeline plan §13.4+)
+**Key files:** `scripts/performance_server.js`, `scripts/build_performance_app.js`
 **Pipeline plan:** See §13.4 for phase details

@@ -1538,41 +1538,52 @@ io.to(roomId).emit('scoreGo', { ... });
 
 #### 12.9.3 Authentication & Identity
 
-**Lightweight approach (recommended for a small ensemble):**
+**Self-service approach (Zoom model) — performers create their own sessions:**
 
-Rather than a full auth system, use **invite-based access with persistent tokens**:
+The composer publishes the piece; performers self-organize. No manual token distribution.
 
-1. **Composer (you)** creates an ensemble via admin panel
-   - Defines ensemble name ("String Quartet No. 1 — Premiere Ensemble")
-   - Assigns 4 performer slots: Violin I, Violin II, Viola, Cello
-   - Generates unique invite links for each slot
+1. **Performer** visits the website landing page
+   - Clicks "Create Rehearsal" → enters display name → picks instrument slot (Violin I/II/Viola/Cello)
+   - Server creates a session, issues a **6-character room code** (e.g., `XK7M2P`) and a shareable link
+   - Performer shares the code/link with their quartet
 
-2. **Performer** clicks invite link
-   - First visit: prompted for display name, creates local profile
-   - Server issues a JWT token stored in browser (httpOnly cookie + localStorage backup)
-   - Token ties them to their slot (Violin I) in this ensemble
-   - Subsequent visits: auto-authenticated, lands on their dashboard
+2. **Other performers** join via code or link
+   - Enter display name → pick their instrument slot → join the session
+   - Server issues JWT token stored in browser (localStorage)
+   - Subsequent visits to the same link: auto-authenticated, session restored
 
-3. **No passwords needed** — the invite link IS the credential (like a private game lobby link)
-   - Links can be regenerated if compromised
-   - Optional: add a simple PIN per performer for extra security on shared devices
+3. **No passwords, no email, no composer involvement**
+   - The room code IS the credential (like a Zoom meeting link)
+   - JWT persists the browser session across page reloads
+   - Composer can optionally monitor active sessions via admin view
+
+4. **Migration path to email-based gating (future)**
+   - The `performerId` is a random ID, NOT tied to any identity method
+   - Adding email auth later = adding one alternative "front door" (magic link flow)
+   - JWT payload is identity-method-agnostic: `{performerId, displayName, slot, sessionId}`
+   - Adding `email` field to performer profile is optional, non-breaking
+   - Config toggle: `requireEmail: false` → flip to `true` when gating is desired
+   - Estimated effort to add email later: ~50 lines server code + email service signup
 
 **Data model:**
 
 ```
-Ensemble
-  ├── id, name, created_at
-  ├── score_id (which score JSON to load)
-  ├── members[]
+Session (one per rehearsal/performance)
+  ├── id: "XK7M2P" (6-char room code, also used as Socket.IO room ID)
+  ├── created_at, created_by (performerId of creator)
+  ├── performers[]
+  │     ├── performerId: "a1b2c3d4..." (random, identity-method-agnostic)
   │     ├── slot: "violin1" | "violin2" | "viola" | "cello"
   │     ├── display_name: "Sarah"
-  │     ├── invite_token: "abc123..."
-  │     └── annotations_id (reference to their saved annotations)
-  └── sessions[]
-        ├── id, name ("Tuesday rehearsal"), created_at
-        ├── type: "rehearsal" | "performance" | "solo"
-        ├── markers[] (shared bookmarks for this session)
-        └── state: { scoreTimeMs, isPlaying, ... }
+  │     └── joined_at
+  └── state: { scoreTimeMs, isPlaying, tempoHistory, ... }
+
+Performer (one per browser, persisted via JWT)
+  ├── performerId: "a1b2c3d4..."
+  ├── display_name: "Sarah"
+  ├── created_at
+  ├── email: null (optional, for future email-based auth)
+  └── preferences: { ... }
 ```
 
 #### 12.9.4 Persistence & Data Storage
@@ -3461,38 +3472,47 @@ Phase 1: Foundation ────────────────────
 **Est. sessions:** 2–3
 **Risk level:** Low — standard auth patterns, small data volume
 
-**Goal:** Implement invite-based authentication (§12.9.3) and per-performer data persistence (§12.9.4). Performers get persistent identities tied to their instrument slot.
+**Goal:** Implement self-service session creation (§12.9.3 "Zoom model") and per-performer data persistence (§12.9.4). Performers create their own rehearsal sessions and self-organize — no composer involvement needed.
 
-**Step 7.1: Ensemble & performer data model**
-- Create data structure: Ensemble → members[] → sessions[]
-- Store as JSON files on server (one file per ensemble)
-- Admin endpoint: create ensemble, define 4 performer slots
-- 🤖 *AI Test:* Create ensemble via API → JSON file created with correct structure
+**Step 7.1: Data model + session creation API**
+- Create `data/` directory structure (sessions, performers), add to `.gitignore`
+- Auto-generate and persist JWT secret in `data/.jwt-secret`
+- API: `POST /api/sessions` — create session → returns 6-char room code
+- API: `GET /api/sessions/:code` — get session info (available slots, connected performers)
+- Session stored as `data/sessions/{code}.json`
+- 🤖 *AI Test:* POST create session → JSON file created → GET returns it with correct structure
 
-**Step 7.2: Invite-based auth**
-- Generate unique invite links per performer slot (e.g., `/join/abc123def`)
-- First visit: prompt for display name → server issues JWT token
-- Subsequent visits: auto-authenticate from stored token (localStorage + httpOnly cookie)
-- No passwords — the invite link IS the credential
-- 🤖 *AI Test:* Visit invite link → get token → subsequent requests authenticated. Visit wrong link → rejected.
+**Step 7.2: JWT + claim flow**
+- Install `jsonwebtoken` dependency
+- API: `POST /api/sessions/:code/join` — performer sends `{displayName, slot}` → server issues JWT
+- JWT payload: `{performerId, displayName, slot, sessionId}` (identity-method-agnostic)
+- Performer profile stored as `data/performers/{performerId}/profile.json`
+- Subsequent visits: JWT in localStorage → auto-authenticated
+- 🤖 *AI Test:* Join session with name+slot → get JWT → validate JWT → performer profile created
 
-**Step 7.3: Performer slot assignment**
-- Each performer's token ties them to a slot (Violin I, Violin II, Viola, Cello)
-- Room join includes slot info → server validates slot membership
-- Server tracks which slots are occupied in each room
-- 🤖 *AI Test:* Two performers join with different slots → both accepted. Duplicate slot → handled gracefully (second connection or rejection, TBD).
+**Step 7.3: Authenticated room join + slot tracking**
+- Socket.IO auth: validate JWT in handshake (`auth` option)
+- Modify `joinRoom`: extract performer info from JWT, auto-assign to session's room
+- Track connected performers per room (slot + displayName + socketId)
+- Broadcast `playerJoined`/`playerLeft` events to room
+- **Anonymous fallback:** no JWT → join "default" room (backward compat for dev/testing)
+- Duplicate slot handling: allow (same performer reconnecting) or warn (different performer)
+- 🤖 *AI Test:* Two performers join with different slots → both accepted, events broadcast
+- 🤖 *AI Test:* Anonymous client joins default room → works as before (regression)
 
-**Step 7.4: Per-performer preferences persistence**
-- Save UI preferences (display options, part view settings) per performer
-- Auto-load on login
-- JSON file per performer: `data/performers/violin1/preferences.json`
-- 🤖 *AI Test:* Change preference → save → reload → preference persists
+**Step 7.4: Preferences persistence + integration verification**
+- API: `GET /PUT /api/performers/:id/preferences` (JWT-authenticated)
+- Store as `data/performers/{performerId}/preferences.json`
+- Client patch: save/load preferences on connect
+- Full regression test (all Phase 1-6 features in anonymous mode)
+- 🤖 *AI Test:* Save preference → reload → preference loaded
+- 👁️ *Human test:* Full flow: create session → join as Violin I → share code → join as Viola → play together
 
 **Phase 7 Completion Checkpoint:**
-- 🤖 Ensemble creation, invite links, JWT auth all working. Preferences persist.
-- 🤖→👁️ Full flow: create ensemble → generate invite → performer clicks link → enters name → lands on score → assigned to correct slot
+- 🤖 Session creation, JWT auth, slot tracking, preferences persistence all working
+- 🤖→👁️ Full self-service flow: performer creates session → shares code → others join → sync playback works → preferences persist
 - **Regression:** Anonymous (no-auth) mode still works for development/testing
-- Commit: `[Phase 7] Auth — invite-based, JWT, per-performer persistence`
+- Commit: `[Phase 7] Auth — self-service sessions, JWT, per-performer persistence`
 - Tag: `git tag phase-7-complete`
 
 ---

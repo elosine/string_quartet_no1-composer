@@ -18,12 +18,18 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const { Server } = require('socket.io');
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 const ROOT = path.resolve(__dirname, '..');
 const PERF_DIR = path.join(ROOT, 'builds', 'performance');
+const DATA_DIR = path.join(ROOT, 'data');
+const SESSIONS_DIR = path.join(DATA_DIR, 'sessions');
+const PERFORMERS_DIR = path.join(DATA_DIR, 'performers');
+const JWT_SECRET_PATH = path.join(DATA_DIR, '.jwt-secret');
 const SYNC_INTERVAL_MS = 1000; // Clock sync broadcast interval
 const GRACE_PERIOD_MS = 5 * 60 * 1000; // 5 minutes before empty room is cleaned up
 
@@ -53,11 +59,35 @@ if (!fs.existsSync(path.join(PERF_DIR, 'score.json'))) {
     process.exit(1);
 }
 
+// ─── Data directory setup ──────────────────────────────────────────────────
+
+// Ensure data directories exist
+[DATA_DIR, SESSIONS_DIR, PERFORMERS_DIR].forEach(function(dir) {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+        console.log('Created directory: ' + path.relative(ROOT, dir));
+    }
+});
+
+// JWT secret: auto-generate once, persist across restarts
+var jwtSecret;
+if (fs.existsSync(JWT_SECRET_PATH)) {
+    jwtSecret = fs.readFileSync(JWT_SECRET_PATH, 'utf8').trim();
+    console.log('JWT secret loaded from data/.jwt-secret');
+} else {
+    jwtSecret = crypto.randomBytes(32).toString('hex');
+    fs.writeFileSync(JWT_SECRET_PATH, jwtSecret);
+    console.log('JWT secret generated and saved to data/.jwt-secret');
+}
+
 // ─── Express + Socket.IO setup ──────────────────────────────────────────────
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+// Parse JSON request bodies (built into Express 4.16+)
+app.use(express.json());
 
 // Serve static files from builds/performance/
 app.use(express.static(PERF_DIR));
@@ -65,6 +95,228 @@ app.use(express.static(PERF_DIR));
 // Serve index.html for the root route
 app.get('/', function(req, res) {
     res.sendFile(path.join(PERF_DIR, 'index.html'));
+});
+
+// ─── Phase 7: Session management API ───────────────────────────────────────
+
+// Generate a unique 6-character room code (uppercase alphanumeric, no ambiguous chars)
+function generateRoomCode() {
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I/O/0/1
+    var code;
+    do {
+        code = '';
+        var bytes = crypto.randomBytes(6);
+        for (var i = 0; i < 6; i++) {
+            code += chars[bytes[i] % chars.length];
+        }
+    } while (fs.existsSync(path.join(SESSIONS_DIR, code + '.json')));
+    return code;
+}
+
+// Atomic JSON file write (write to temp, then rename)
+function writeJsonAtomic(filePath, data) {
+    var tmp = filePath + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify(data, null, 2));
+    fs.renameSync(tmp, filePath);
+}
+
+// POST /api/sessions — create a new rehearsal session
+app.post('/api/sessions', function(req, res) {
+    var code = generateRoomCode();
+    var session = {
+        id: code,
+        created_at: new Date().toISOString(),
+        created_by: null, // set when first performer joins
+        performers: [],
+        state: {
+            scoreTimeMs: 0,
+            isPlaying: false
+        }
+    };
+    writeJsonAtomic(path.join(SESSIONS_DIR, code + '.json'), session);
+    console.log('Session created: ' + code);
+    res.json({
+        code: code,
+        shareLink: '/session/' + code
+    });
+});
+
+// GET /api/sessions/:code — get session info
+app.get('/api/sessions/:code', function(req, res) {
+    var code = req.params.code.toUpperCase();
+    var sessionPath = path.join(SESSIONS_DIR, code + '.json');
+    if (!fs.existsSync(sessionPath)) {
+        return res.status(404).json({ error: 'Session not found' });
+    }
+    var session = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+    // Return session info with available slots
+    var takenSlots = session.performers.map(function(p) { return p.slot; });
+    var allSlots = ['violin1', 'violin2', 'viola', 'cello'];
+    var availableSlots = allSlots.filter(function(s) { return takenSlots.indexOf(s) === -1; });
+    res.json({
+        id: session.id,
+        created_at: session.created_at,
+        performers: session.performers.map(function(p) {
+            return { slot: p.slot, display_name: p.display_name };
+        }),
+        availableSlots: availableSlots
+    });
+});
+
+// POST /api/sessions/:code/join — performer claims a slot, gets JWT
+app.post('/api/sessions/:code/join', function(req, res) {
+    var code = req.params.code.toUpperCase();
+    var sessionPath = path.join(SESSIONS_DIR, code + '.json');
+    if (!fs.existsSync(sessionPath)) {
+        return res.status(404).json({ error: 'Session not found' });
+    }
+
+    var displayName = (req.body.displayName || '').trim();
+    var slot = (req.body.slot || '').toLowerCase();
+    var validSlots = ['violin1', 'violin2', 'viola', 'cello'];
+
+    if (!displayName) {
+        return res.status(400).json({ error: 'displayName is required' });
+    }
+    if (validSlots.indexOf(slot) === -1) {
+        return res.status(400).json({ error: 'Invalid slot. Must be one of: ' + validSlots.join(', ') });
+    }
+
+    var session = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+
+    // Check if slot is already taken by a different performer
+    var existingPerformer = session.performers.find(function(p) { return p.slot === slot; });
+    if (existingPerformer) {
+        // Same slot — return existing performer's token (allows re-claim)
+        var existingToken = jwt.sign({
+            performerId: existingPerformer.performerId,
+            displayName: existingPerformer.display_name,
+            slot: slot,
+            sessionId: code
+        }, jwtSecret, { expiresIn: '30d' });
+        console.log('Session ' + code + ': ' + slot + ' re-claimed by ' + displayName);
+        return res.json({
+            token: existingToken,
+            performerId: existingPerformer.performerId,
+            slot: slot,
+            sessionId: code,
+            isReconnect: true
+        });
+    }
+
+    // Create new performer
+    var performerId = crypto.randomBytes(16).toString('hex');
+    var performer = {
+        performerId: performerId,
+        slot: slot,
+        display_name: displayName,
+        joined_at: new Date().toISOString()
+    };
+
+    // Add to session
+    session.performers.push(performer);
+    if (!session.created_by) {
+        session.created_by = performerId;
+    }
+    writeJsonAtomic(sessionPath, session);
+
+    // Create performer profile
+    var performerDir = path.join(PERFORMERS_DIR, performerId);
+    if (!fs.existsSync(performerDir)) {
+        fs.mkdirSync(performerDir, { recursive: true });
+    }
+    writeJsonAtomic(path.join(performerDir, 'profile.json'), {
+        performerId: performerId,
+        display_name: displayName,
+        created_at: new Date().toISOString(),
+        email: null,
+        preferences: {}
+    });
+
+    // Issue JWT
+    var token = jwt.sign({
+        performerId: performerId,
+        displayName: displayName,
+        slot: slot,
+        sessionId: code
+    }, jwtSecret, { expiresIn: '30d' });
+
+    console.log('Session ' + code + ': ' + displayName + ' joined as ' + slot + ' (performer ' + performerId.substring(0, 8) + '...)');
+    res.json({
+        token: token,
+        performerId: performerId,
+        slot: slot,
+        sessionId: code,
+        isReconnect: false
+    });
+});
+
+// GET /api/auth/verify — validate a JWT token
+app.get('/api/auth/verify', function(req, res) {
+    var authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'No token provided' });
+    }
+    try {
+        var decoded = jwt.verify(authHeader.substring(7), jwtSecret);
+        res.json({
+            valid: true,
+            performerId: decoded.performerId,
+            displayName: decoded.displayName,
+            slot: decoded.slot,
+            sessionId: decoded.sessionId
+        });
+    } catch (err) {
+        res.status(401).json({ error: 'Invalid or expired token' });
+    }
+});
+
+// Helper: extract and verify JWT from Authorization header
+function authenticateRequest(req) {
+    var authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+    try {
+        return jwt.verify(authHeader.substring(7), jwtSecret);
+    } catch (err) {
+        return null;
+    }
+}
+
+// GET /api/performers/:id/preferences — load performer preferences
+app.get('/api/performers/:id/preferences', function(req, res) {
+    var decoded = authenticateRequest(req);
+    if (!decoded) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    // Performers can only access their own preferences
+    if (decoded.performerId !== req.params.id) {
+        return res.status(403).json({ error: 'Access denied' });
+    }
+    var prefsPath = path.join(PERFORMERS_DIR, decoded.performerId, 'preferences.json');
+    if (!fs.existsSync(prefsPath)) {
+        return res.json({}); // No preferences yet — return empty object
+    }
+    var prefs = JSON.parse(fs.readFileSync(prefsPath, 'utf8'));
+    res.json(prefs);
+});
+
+// PUT /api/performers/:id/preferences — save performer preferences
+app.put('/api/performers/:id/preferences', function(req, res) {
+    var decoded = authenticateRequest(req);
+    if (!decoded) {
+        return res.status(401).json({ error: 'Authentication required' });
+    }
+    if (decoded.performerId !== req.params.id) {
+        return res.status(403).json({ error: 'Access denied' });
+    }
+    var performerDir = path.join(PERFORMERS_DIR, decoded.performerId);
+    if (!fs.existsSync(performerDir)) {
+        fs.mkdirSync(performerDir, { recursive: true });
+    }
+    var prefs = req.body || {};
+    writeJsonAtomic(path.join(performerDir, 'preferences.json'), prefs);
+    console.log('Preferences saved for performer ' + decoded.performerId.substring(0, 8) + '...');
+    res.json({ saved: true });
 });
 
 // ─── Room-based sync state ──────────────────────────────────────────────────
@@ -83,6 +335,7 @@ function createRoomState() {
             { scoreTimeMs: 0, bpm: 60, beatsPerPage: 8 }
         ],
         clientCount: 0,
+        connectedPerformers: [], // Phase 7: { performerId, displayName, slot, socketId }
         graceTimer: null
     };
 }
@@ -132,16 +385,85 @@ function getRoomScoreTimeMs(room) {
 
 // ─── Socket.IO connection handling ──────────────────────────────────────────
 
+// Phase 7: Socket.IO middleware — extract performer info from JWT if present
+// Does NOT reject connections without JWT (anonymous fallback preserved)
+io.use(function(socket, next) {
+    var token = socket.handshake.auth && socket.handshake.auth.token;
+    if (token) {
+        try {
+            var decoded = jwt.verify(token, jwtSecret);
+            socket.performer = {
+                performerId: decoded.performerId,
+                displayName: decoded.displayName,
+                slot: decoded.slot,
+                sessionId: decoded.sessionId
+            };
+        } catch (err) {
+            console.log('Client ' + socket.id + ': invalid JWT (' + err.message + ')');
+            // Don't reject — allow as anonymous
+        }
+    }
+    next();
+});
+
 io.on('connection', function(socket) {
-    console.log('Client connected: ' + socket.id);
+    var isAuth = !!socket.performer;
+    console.log('Client connected: ' + socket.id + (isAuth ? ' (auth: ' + socket.performer.displayName + ' / ' + socket.performer.slot + ')' : ' (anonymous)'));
     var socketRoomId = null;
 
     // Send immediate clock sync
     socket.emit('clockSync', { serverTime: Date.now() });
 
+    // Helper: remove performer from room's connectedPerformers
+    function removePerformerFromRoom(roomId) {
+        var room = rooms.get(roomId);
+        if (room && socket.performer) {
+            room.connectedPerformers = room.connectedPerformers.filter(function(p) {
+                return p.socketId !== socket.id;
+            });
+            socket.to(roomId).emit('playerLeft', {
+                performerId: socket.performer.performerId,
+                displayName: socket.performer.displayName,
+                slot: socket.performer.slot,
+                connectedPerformers: room.connectedPerformers
+            });
+        }
+    }
+
+    // Helper: add performer to room's connectedPerformers
+    function addPerformerToRoom(roomId) {
+        var room = rooms.get(roomId);
+        if (room && socket.performer) {
+            // Remove stale entry for same performerId (reconnection)
+            room.connectedPerformers = room.connectedPerformers.filter(function(p) {
+                return p.performerId !== socket.performer.performerId;
+            });
+            room.connectedPerformers.push({
+                performerId: socket.performer.performerId,
+                displayName: socket.performer.displayName,
+                slot: socket.performer.slot,
+                socketId: socket.id
+            });
+            io.to(roomId).emit('playerJoined', {
+                performerId: socket.performer.performerId,
+                displayName: socket.performer.displayName,
+                slot: socket.performer.slot,
+                connectedPerformers: room.connectedPerformers
+            });
+        }
+    }
+
     // JOIN ROOM — client sends roomId, server joins socket to that room
+    // Authenticated clients: auto-use sessionId from JWT as roomId
     socket.on('joinRoom', function(data) {
-        var roomId = (data && data.roomId) || DEFAULT_ROOM;
+        var roomId;
+        if (socket.performer) {
+            // Authenticated: use session code as room ID
+            roomId = socket.performer.sessionId;
+        } else {
+            // Anonymous: use provided roomId or default
+            roomId = (data && data.roomId) || DEFAULT_ROOM;
+        }
 
         // Leave previous room if switching
         if (socketRoomId && socketRoomId !== roomId) {
@@ -149,6 +471,7 @@ io.on('connection', function(socket) {
             var prevRoom = rooms.get(socketRoomId);
             if (prevRoom) {
                 prevRoom.clientCount--;
+                removePerformerFromRoom(socketRoomId);
                 console.log('Client ' + socket.id + ' left room ' + socketRoomId + ' (' + prevRoom.clientCount + ' clients)');
             }
         }
@@ -157,6 +480,7 @@ io.on('connection', function(socket) {
         socket.join(roomId);
         var room = getRoom(roomId);
         room.clientCount++;
+        addPerformerToRoom(roomId);
 
         console.log('Client ' + socket.id + ' joined room ' + roomId + ' (' + room.clientCount + ' clients)');
 
@@ -166,6 +490,7 @@ io.on('connection', function(socket) {
             currentScoreTimeMs: room.currentScoreTimeMs,
             scoreTimeOffset: room.scoreTimeOffset,
             tempoHistory: room.tempoHistory,
+            connectedPerformers: room.connectedPerformers,
             serverTime: Date.now()
         });
     });
@@ -177,12 +502,14 @@ io.on('connection', function(socket) {
             socket.join(DEFAULT_ROOM);
             var room = getRoom(DEFAULT_ROOM);
             room.clientCount++;
+            addPerformerToRoom(DEFAULT_ROOM);
             console.log('Client ' + socket.id + ' auto-joined default room (' + room.clientCount + ' clients)');
             socket.emit('scoreState', {
                 isPlaying: room.isPlaying,
                 currentScoreTimeMs: room.currentScoreTimeMs,
                 scoreTimeOffset: room.scoreTimeOffset,
                 tempoHistory: room.tempoHistory,
+                connectedPerformers: room.connectedPerformers,
                 serverTime: Date.now()
             });
         }
@@ -323,6 +650,7 @@ io.on('connection', function(socket) {
             var room = rooms.get(socketRoomId);
             if (room) {
                 room.clientCount--;
+                removePerformerFromRoom(socketRoomId);
                 console.log('Client ' + socket.id + ' disconnected from room ' + socketRoomId + ' (' + room.clientCount + ' clients)');
                 if (room.clientCount <= 0) {
                     room.clientCount = 0;
