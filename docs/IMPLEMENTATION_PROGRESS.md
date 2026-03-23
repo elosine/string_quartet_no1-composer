@@ -1,24 +1,54 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 9 — Annotations (next)
+**Active Phase:** Phase 10 (next)
 **Last Session:** Mar 23, 2026
-**Last Commit:** `[Phase 8] Rehearsal mode complete — gestures, overlay, markers, looping, sync, leader`
+**Last Commit:** `[Phase 9] Annotation system — freehand, stamps, text, persistence, undo/redo`
 
 ### ▶ RESUME HERE (next session)
 
-**Phase 8 is COMPLETE.** All 7 systems implemented, 12 bugs fixed, post-mortem done.
+**Phase 9 is COMPLETE.** Phase 10 pre-implementation protocol is next.
+
+**Phase 9 delivered (Annotation System):**
+- Stage 1: SVG overlay layer + pen capture (always-active pen, mouse toggle)
+- Stage 2: Freehand drawing (Catmull-Rom smoothing, live preview, 3 widths)
+- Stage 3: Stamps with LilyPond Emmentaler glyphs (dynamics pppp-ffff, sfz, fp, bowings ⊓∨, articulations, marks)
+- Stage 4: Text annotations (floating input, SVG text rendering, S/M/L sizing)
+- Stage 6: Persistence (localStorage auto-save/load + JSON export/import)
+- Stage 7: Undo/redo (50-deep snapshot stack) + visibility toggle
+- Stage 8: Full integration verified (full score + parts mode)
+- 7 colors (black, red, blue, green, orange, purple, white), 3 widths, 20 stamps
+- Toolbar: draggable (pointer capture), viewport-clamped, duplicate-proof
+- Parts mode: stamps/text scale inversely with section height (min/max bounds)
+- Build: 14 Emmentaler glyph paths generated from svg_component_library.json
 
 **Priority for next session:**
 1. Read `WORKING_PRINCIPLES.md` and this RESUME section
-2. Read Phase 9 plan in `STRING_QUARTET_PIPELINE_PLAN.md`
-3. Run pre-implementation protocol (§13.2.7)
-4. Begin Phase 9 staged implementation
+2. Phase 10 pre-implementation protocol
+3. Begin Phase 10 staged implementation
 
 **Deferred items (not blocking):**
 - SVG font fix: Option B (text-to-paths via opentype.js) recommended. See Font Analysis section below.
 - Parts mode A/B server bug: only shows first 2 screens (low priority)
 - Marker server persistence: upgrade from localStorage when client auth flow is wired
+
+### Annotation Persistence — Future Options
+
+Currently annotations persist via **localStorage** (auto-save) + **JSON export/import** (file download/upload). Two future upgrade paths are documented here for when the need arises:
+
+**Option 2: Server-Side Storage (per-performer)**
+- When a performer joins a room (authenticated via `socket.performer`), save/load annotations through the WebSocket connection
+- Server writes to a JSON file per performer per score (e.g., `annotations/track1_violinI.json`)
+- Annotations sync when the performer reconnects from any device
+- Leverages existing room/auth infrastructure in `performance_server.js`
+- Moderate complexity — requires new socket events (`saveAnnotations`, `loadAnnotations`) and server-side file I/O
+
+**Option 3: Shared Annotations (conductor → performers)**
+- Same as Option 2, but with broadcast mechanism
+- Conductor can push annotations to all performers (e.g., "everyone add a ritardando at bar 47")
+- Each performer has both a **private layer** (their own markings) and a **shared layer** (from conductor)
+- Requires UI for layer visibility toggling and a permission model (who can broadcast)
+- Most complex — needs layer architecture, broadcast events, and conflict resolution
 
 ### Verified this session (Mar 23)
 - ✅ Swipe-down gesture working (30px threshold, 1.5× direction ratio)
@@ -1269,6 +1299,315 @@ All 12 bugs were correctly prioritized:
 **Key files from Phase 8:** `scripts/performance_rehearsal_patches.js` (~1830 lines), `scripts/performance_server.js` (~1010 lines)
 
 **Known open issue:** Parts mode only shows first 2 screens on A/B server (unrelated to Phase 8, low priority)
+
+---
+
+## Phase 9 Pre-Implementation Protocol
+
+### Step 1: System Inventory — What Are We Touching?
+
+| System | What it does | Where it lives | State it reads | State it writes | Phase 9 interaction |
+|--------|-------------|----------------|----------------|-----------------|---------------------|
+| **RehearsalGestures** | Pointer event handler on `#ScoreContainer`. Tracks swipe, tap, pinch. | `rehearsal_patches.js` L28-397 | `pointers{}`, `pointerCount` | gesture callbacks | **Line 92: `if (e.pointerType === 'pen') return;`** — already reserves Apple Pencil for Phase 9. We hook pen events here. |
+| **InteractionBlocker** | Capturing-phase `mousedown/click/dblclick` blockers on ScoreTop/ScoreBottom/SectionN. | `rehearsal_patches.js` L400-455 | Score section elements | `stopImmediatePropagation()` | Mouse events blocked; pointer events unaffected. Annotation uses pointer events → **no conflict**. |
+| **ControlsOverlay** | Floating panel: play/stop/nav/jump/markers/loop. | `rehearsal_patches.js` L457-840 | `ScoreTime`, `GraphicTimeline` | overlay DOM, fade timer | Phase 9 adds an annotation toggle button to this overlay (🖊️). |
+| **ScoreZoom** | CSS transform on `#ScoreContainer`: `translate(panX,panY) scale(zoom/100)`. | `public/index.html` L7068-7200 | `zoomLevel`, `panX`, `panY` | `ScoreContainer.style.transform` | Annotation SVG overlays must be INSIDE `#ScoreContainer` so they scale with zoom. Coordinate mapping must account for current zoom+pan when converting pointer events → SVG coords. |
+| **ScoreContainer DOM** | `#ScoreContainer` > `.score-row` > `svg#ScoreTop` (+ canvas). Same for ScoreBottom. Parts mode adds N-2 more. | `public/index.html` L3126-3173 | — | — | Each `.score-row` gets an annotation SVG overlay (sibling of score SVG + canvas). |
+| **PartsMode** | N-section layout. `PM.sections[i] = { el, row, canvas }`. | `performance_parts_patches.js` L40-109 | `PM.active`, `PM.sections[]`, `PM.sectionPages[]` | section DOMs, page state | Annotation overlay must create one SVG per section. `PM.sectionPages[i]` maps section → page for annotation visibility. |
+| **`calcPixelPosition`** (SVGElementManager) | Maps `{referenceSeconds, track, offsetYFraction}` → `{x, y, page, section}`. | `public/index.html` L3743-3778 | `secondsPerPage`, `leadInSeconds`, track dims | — | **Reference for coordinate system.** Annotations use similar math: `scoreTimeMs → page`, `position.x/y` as fractions of section dimensions. |
+| **`CompositionPanel.getTrackDimensions`** | Returns `{y, height}` for a given track on a given score SVG. | `public/index.html` L10773-10791 | `StaffPositions` | — | Used for track-aware annotation positioning (e.g., "this annotation is on the Violin I staff"). |
+| **StaffCursors** (canvas overlays) | Draws cursor rectangles on canvas overlays. One canvas per score section. | `public/index.html` L6880-7052 | `ScoreTime.now()`, page state | canvas 2D draws | Canvas overlays are siblings of score SVGs in `.score-row`. Annotation SVGs will be a third sibling. Z-order: score SVG < GC canvas < annotation SVG < cursor canvas? Or annotation between? |
+| **Phase 7 Preferences API** | `GET/PUT /api/performers/:id/preferences`. JWT auth. JSON file storage. | `performance_server.js` L285-320 | JWT token, performer ID | `data/performers/{id}/preferences.json` | Annotation persistence target (deferred — use localStorage first, like markers). |
+| **`ClockSync.socket`** | Socket.IO connection to server. Events: scoreGo/Stop/Goto. | `public/index.html` L3178+ | server state | local sync state | Not directly used by annotation system. Annotations are per-performer, local-only. No room sync needed. |
+| **`build_performance_app.js`** | Build script — 29 patches + 12 strips. Injects patches as `<script>` text. | `scripts/build_performance_app.js` | source HTML, patch files | `builds/performance/index.html` | Must add Phase 9 annotation patches file injection (like rehearsal patches). |
+
+### Step 2: Source Reading — Key Findings
+
+**2a. Apple Pencil passthrough in RehearsalGestures (L90-92):**
+```javascript
+onPointerDown: function(e) {
+    // Reserve Apple Pencil for annotation (Phase 9)
+    if (e.pointerType === 'pen') return;
+    // ... finger/mouse gesture handling
+}
+```
+This means pen events currently fall through to NOTHING — they're ignored by the gesture system and blocked on score SVGs by InteractionBlocker (for mouse events, but pointer events are different). So `pointerdown` with `pointerType === 'pen'` on `#ScoreContainer` will propagate normally. Phase 9 needs to:
+1. Add a `pointerdown` listener on the annotation overlay (or ScoreContainer) that captures pen events
+2. NOT interfere with existing finger/mouse gesture handling
+
+**2b. DOM layering in `.score-row`:**
+```
+.score-row (position: relative)
+  ├── svg#ScoreTop (the score notation)
+  ├── canvas (position: absolute, pointer-events: none, z-index: 10) — cursor overlay
+  └── [NEW] svg.annotation-layer (position: absolute, pointer-events: ???)
+```
+The annotation SVG must be:
+- `position: absolute` within `.score-row` (same as canvas)
+- Sized to match the score SVG (100% width, same height)
+- Z-index between score SVG and cursor canvas (so annotations appear ON the score but UNDER the cursor)
+- `pointer-events: none` by DEFAULT (so finger gestures pass through to ScoreContainer)
+- `pointer-events: auto` ONLY when in annotation mode AND only for pen input
+
+**2c. Coordinate mapping — pointer event → annotation position:**
+When the user draws with Apple Pencil:
+1. `e.clientX/clientY` is in viewport coordinates
+2. ScoreZoom applies CSS transform on `#ScoreContainer`: `translate(panX, panY) scale(zoom/100)`
+3. Need to reverse the transform to get coordinates relative to the score section SVG
+4. Store as fractions (0-1) of section width/height for resilience to resize
+
+**Reverse transform math:**
+```javascript
+// Get the annotation SVG's bounding rect (accounts for zoom+pan)
+var rect = annotationSvg.getBoundingClientRect();
+var x = (e.clientX - rect.left) / rect.width;   // 0-1 fraction
+var y = (e.clientY - rect.top) / rect.height;    // 0-1 fraction
+```
+This is clean because `getBoundingClientRect()` already accounts for CSS transforms.
+
+**2d. Page-based annotation visibility:**
+Annotations are anchored to a **page number**. When the user navigates:
+- Full score: ScoreTop shows even pages, ScoreBottom shows odd pages. `GraphicTimeline.currentTopPage` tracks this.
+- Parts mode: `PM.sectionPages[i]` tracks which page each section shows.
+- Annotations on page P are visible only when section S is showing page P.
+- During page turns, annotations must show/hide like score elements do.
+
+**2e. Annotation storage (per §12.12.4):**
+```json
+{
+    "id": "a1",
+    "type": "freehand|stamp|text",
+    "page": 3,
+    "position": { "x": 0.45, "y": 0.32 },
+    "data": { ... type-specific ... }
+}
+```
+The `scoreTimeMs` field from the spec is derivable from `page` and `position.x` via `secondsPerPage`, so we can compute it on demand rather than storing it redundantly. The `track` field is useful for parts mode filtering but optional for rendering (position.y handles placement).
+
+### Step 3: Contracts
+
+**Annotation Overlay:**
+- **Precondition:** Score DOM is fully loaded. ScoreTop/ScoreBottom exist. PartsMode (if active) has populated `PM.sections[]`.
+- **Postcondition:** One transparent SVG overlay exists per score section, sized to match, z-indexed above score SVG and below cursor canvas.
+- **Invariant:** Annotation overlays resize when the window resizes. They scale with ScoreZoom.
+
+**Freehand Drawing:**
+- **Precondition:** Annotation mode is active. Pen pointer is down on an annotation overlay.
+- **Postcondition:** An SVG `<path>` element exists in the overlay, with `d` attribute matching the pen stroke, stored in the annotation data model.
+- **Invariant:** Path coordinates are stored as fractions (0-1) of section dimensions, not pixels. The visual rendering matches at any zoom level.
+
+**Stamp Placement:**
+- **Precondition:** A stamp is selected in the palette. User taps on the score.
+- **Postcondition:** A stamp SVG element (text or symbol) appears at the tapped position. Stored in annotation data model.
+- **Invariant:** Stamp size is proportional to section height (not pixels), so it scales with zoom and resize.
+
+**Persistence:**
+- **Precondition:** Annotations exist in memory.
+- **Postcondition:** After debounced auto-save (2s inactivity), annotations are in localStorage keyed by score ID.
+- **Invariant:** Reload restores all annotations exactly. No data loss on page turn, zoom, or resize.
+
+**Undo/Redo:**
+- **Precondition:** User has performed annotation actions.
+- **Postcondition:** Undo removes the last action. Redo restores it. Stack depth: 50.
+- **Invariant:** Undo/redo state is consistent with what's rendered. After undo, the annotation overlay matches the data model exactly.
+
+**Page Visibility:**
+- **Precondition:** Annotations are loaded. Score is displaying pages P, P+1 (full score) or P..P+N-1 (parts mode).
+- **Postcondition:** Only annotations whose `page` matches a currently visible section page are rendered.
+- **Invariant:** Annotations appear/disappear correctly on every page turn, goto, and loop rewind.
+
+### Step 4: Risk Register
+
+| Risk | Probability | Impact | Detection | Mitigation |
+|------|------------|--------|-----------|------------|
+| **Annotation overlay blocks finger gestures** | High | HIGH — swipe/tap/pinch stop working | 👁️ Touch score → nothing happens | Default `pointer-events: none` on overlay. Only capture `pen` events via a separate listener on ScoreContainer, then draw on the overlay. |
+| **Zoom transform breaks coordinate mapping** | Medium | HIGH — annotations at wrong position | 👁️ Draw at zoom, zoom out → annotation shifted | Use `getBoundingClientRect()` which accounts for transforms. Store fractions, not pixels. Test at 100%, 200%, 400% zoom. |
+| **Page turn doesn't update annotation visibility** | Medium | MEDIUM — stale annotations visible | 👁️ Page forward → old annotations still showing | Hook into same page-turn mechanism as score elements: listen for `onGoto` / `checkPageChange` and re-render visible annotations. |
+| **Parts mode section mismatch** | Medium | MEDIUM — annotations on wrong section | 👁️ Parts mode annotation appears on wrong track | Use `PM.sectionPages[i]` to map section → page. Test thoroughly in parts mode. |
+| **Apple Pencil not available for testing** | High | MEDIUM — can't verify primary input method | — | Implement mouse fallback for annotation mode (toggle via overlay button). Test with mouse, verify pen passthrough logic via `pointerType` check. |
+| **Large number of path points degrades performance** | Low | MEDIUM — laggy drawing | 👁️ Drawing feels sluggish | Simplify paths: Douglas-Peucker algorithm or point sampling (every Nth point). Set max points per path (~500). |
+| **Annotation data grows large in localStorage** | Low | LOW — storage quota exceeded | Console error on save | Estimate: 100 annotations × 500 bytes avg = 50 KB. Well within 5 MB localStorage limit. |
+| **Undo/redo interacts badly with auto-save** | Medium | MEDIUM — undo then auto-save persists wrong state | Undo → wait 2s → reload → annotation back | Auto-save saves the current state (post-undo). This is correct — undo is an action like any other. |
+| **Annotation file conflicts with future shared annotation feature** | Low | LOW — data model change needed later | — | Design data model with `createdBy` field now (empty for anonymous). §12.12.5 says "private by default." |
+| **New patches file increases build complexity** | Low | LOW — build script modification needed | Build fails | Follow exact pattern from rehearsal patches: read file, inject as `<script>`. |
+
+### Step 5: Staged Implementation Plan
+
+```
+Stage 1: Annotation overlay layer + pen capture
+  - Create transparent SVG overlay per score section (ScoreTop, ScoreBottom, parts sections)
+  - Overlay: position absolute, matches section dimensions, z-index 15 (above score, below cursor canvas z:10? — need to check; may need z:5)
+  - Pen event listener on #ScoreContainer: pointerType === 'pen' → capture for drawing
+  - Mouse fallback: annotation mode toggle button in ControlsOverlay (🖊️)
+  - Coordinate mapping: clientX/Y → section-relative fractions via getBoundingClientRect
+  - Data model: in-memory array of annotations per page
+  - No rendering yet — just capture coordinates and log them
+  → TEST: 🤖 Verify overlay SVGs exist in DOM, correct size, correct parent
+  → TEST: 🤖 Verify pen pointerdown fires annotation handler (simulate with pointerType check)
+  → TEST: 🤖 Verify finger/mouse gestures still work (swipe, tap, pinch)
+  → TEST: 👁️ GUT CHECK: Enable annotation mode (click 🖊️), draw with mouse on score
+         → coordinates logged to console in fraction format (0.xx, 0.yy)
+         → Swipe/tap still works when annotation mode is OFF
+  → STOP: Wait for human confirmation before proceeding
+
+Stage 2: Freehand drawing — path rendering
+  - Pen/mouse down → start path, move → extend path, up → end path
+  - Render as SVG <path> in the annotation overlay for the correct section
+  - Smooth path: use SVG cubic bezier (C commands) fitted to sampled points
+  - Color picker: default red (#ff0000), 6-color palette
+  - Stroke width: 2px default (in SVG viewBox coords, scales with zoom)
+  - Path simplification: sample every 3rd point to reduce data size
+  - Store in annotation data model: { id, type:'freehand', page, position, data:{paths:[{points, color, width}]} }
+  → TEST: 🤖 Drawing creates SVG <path> element in correct overlay
+  → TEST: 🤖 Path data stored in annotation model with correct page number
+  → TEST: 🤖 Verify path coordinates are fractions (0-1), not pixels
+  → TEST: 👁️ GUT CHECK: Draw several strokes on the score
+         → Lines appear where the pen/mouse moves
+         → Lines are smooth (not jagged/straight-line segments)
+         → Lines scale correctly when zooming in/out
+         → Drawing on different score sections works
+  → TEST: 👁️ REGRESSION: Finger swipe still navigates pages
+  → STOP: Wait for human confirmation before proceeding
+
+Stage 3: Stamp palette
+  - Floating palette UI: fingering (0-4), bowings (∏, V), dynamics, accents
+  - Palette appears when annotation mode is active
+  - Tap stamp in palette → next tap on score places it
+  - Stamp rendered as SVG <text> or <use> element in annotation overlay
+  - Store: { id, type:'stamp', page, position, data:{symbol, category} }
+  - Stamp size: proportional to section height (e.g., 3% of section height)
+  → TEST: 🤖 Stamp palette appears when annotation mode active
+  → TEST: 🤖 Placed stamp has correct page, position in model
+  → TEST: 👁️ GUT CHECK: Select fingering "2", tap on score → "2" appears at tap point
+         → Stamp is readable at normal zoom
+         → Stamp position is accurate (near where tapped)
+         → Multiple stamps can be placed
+  → TEST: 👁️ REGRESSION: Overlay play/stop still works, page turns still work
+  → STOP: Wait for human confirmation before proceeding
+
+Stage 4: Text annotations
+  - Tap-to-place text: tap on score → text input popup
+  - User types annotation text → placed at position
+  - Rendered as SVG <text> with background rect for readability
+  - Font: system sans-serif, size proportional to section height
+  - Store: { id, type:'text', page, position, data:{text, fontSize} }
+  → TEST: 🤖 Text annotation created with correct data
+  → TEST: 👁️ GUT CHECK: Place text "watch intonation" on score
+         → Text is readable, positioned correctly
+         → Text has semi-transparent background for readability
+  → STOP: Wait for human confirmation before proceeding
+
+Stage 5: Page visibility + annotation rendering on page turn
+  - On page turn (onGoto, checkPageChange): show annotations for visible pages, hide others
+  - Full score: annotations on page P visible when GraphicTimeline shows that page
+  - Parts mode: annotations on page P visible when PM.sectionPages[i] === P
+  - Annotation rendering: on page change, clear overlays, re-render annotations for current pages
+  - Handle loop rewind: annotations refresh on loop boundary
+  → TEST: 🤖 Place annotations on pages 0, 1, 2. Navigate → only correct page's annotations show.
+  → TEST: 🤖 Parts mode: annotations on page 6 visible only on section showing page 6
+  → TEST: 👁️ GUT CHECK: Draw on page 0, navigate forward, come back → drawing still there
+         → Navigate to page with no annotations → overlay is clean
+         → Loop rewind → annotations reappear correctly
+  → TEST: 👁️ REGRESSION: Score elements (notation, curves, GCs) render correctly during page turns
+  → STOP: Wait for human confirmation before proceeding
+
+Stage 6: Persistence — localStorage auto-save + load
+  - Auto-save: debounced 2s after any annotation change
+  - Storage key: 'annotations_' + (scoreId or 'default')
+  - Load on app init: restore all annotations from localStorage
+  - Re-render annotations for currently visible pages after load
+  - Delete annotation: tap to select, delete button (or swipe-to-delete in list)
+  → TEST: 🤖 Create annotations → wait 2s → check localStorage has data
+  → TEST: 🤖 Reload page → annotations restored, visible on correct pages
+  → TEST: 👁️ GUT CHECK: Draw several annotations, reload → all present
+         → Delete one → save → reload → deleted one is gone
+  → TEST: 👁️ REGRESSION: Markers (also localStorage) still work
+  → STOP: Wait for human confirmation before proceeding
+
+Stage 7: Undo/redo + visibility controls
+  - Undo stack: last 50 actions (add, delete, move)
+  - Ctrl+Z / undo button → undo last annotation action
+  - Ctrl+Shift+Z / redo button → redo
+  - Visibility: opacity slider (default 60%), show/hide toggle, category filters
+  - Add controls to annotation panel in ControlsOverlay
+  → TEST: 🤖 Add 3 annotations, undo → last removed, redo → restored
+  → TEST: 🤖 Opacity change reflects in SVG overlay style
+  → TEST: 👁️ GUT CHECK: Toggle annotations off → all hidden. On → all visible.
+         → Opacity slider: 20% → faint. 100% → solid.
+         → Category filter: show only fingerings → only stamps with category 'fingering' visible
+  → STOP: Wait for human confirmation before proceeding
+
+Stage 8: Integration verification
+  - Full regression: all Phase 1-8 features in anonymous mode
+  - Parts mode + annotations test (all 4 tracks, 4/6/8 pages)
+  - Zoom test: draw at 100%, verify at 200% and 400%
+  - Multi-page test: annotations on 5+ different pages, navigate through all
+  - Performance test: 50+ annotations, verify no lag
+  - Server mode test (port 3000): annotations persist locally while sync works
+  → TEST: 🤖 Build succeeds with no errors
+  → TEST: 🤖 All 7 annotation systems present in built HTML
+  → TEST: 👁️ Full flow: enable annotation → draw → stamp → text → page turn → persist → reload → undo
+  → TEST: 👁️ Parts mode: annotations work on individual track views
+  → TEST: 👁️ Regression: gestures, overlay, markers, looping, sync, leader all work
+```
+
+### Step 6: Focused Stage Tests (detailed)
+
+**Stage 1 tests — Overlay + Pen Capture:**
+- 🤖 DOM check: `.annotation-layer` SVG exists as child of each `.score-row`
+- 🤖 Overlay dimensions match score SVG dimensions (within 1px)
+- 🤖 Overlay `pointer-events` is `none` by default
+- 🤖 Pen event fires annotation handler (log test)
+- 👁️ Score renders normally (annotation overlay is transparent)
+- 👁️ Swipe left/right → page turns (gesture system unaffected)
+- 👁️ Tap center → controls overlay (gesture system unaffected)
+- 👁️ Click annotation toggle → mode activates (console log)
+
+**Stage 2 tests — Freehand Drawing:**
+- 🤖 SVG `<path>` element created in overlay after draw stroke
+- 🤖 Path `d` attribute has valid SVG path commands
+- 🤖 Annotation data model has entry with `type: 'freehand'`
+- 🤖 Position coordinates are 0-1 fractions
+- 👁️ Draw at 100% zoom → lines smooth and positioned correctly
+- 👁️ Zoom to 200% → draw → lines still correct at that zoom
+- 👁️ Zoom back to 100% → previous drawing looks correct (not shifted)
+- 👁️ Draw on ScoreTop and ScoreBottom → both work
+
+**Stage 3 tests — Stamp Palette:**
+- 🤖 Palette DOM appears when annotation mode active
+- 🤖 Stamp SVG element created in overlay after tap
+- 🤖 Annotation data model has entry with `type: 'stamp'`
+- 👁️ Fingering "2" placed near tapped position
+- 👁️ Bowing "∏" renders correctly
+- 👁️ Multiple stamps coexist on same page
+
+**Stage 5 tests — Page Visibility (critical):**
+- 🤖 Annotations on page 0: visible when page 0 shown, hidden when page 2 shown
+- 🤖 After page turn, annotation SVG overlay for that section is cleared and re-rendered
+- 🤖 Parts mode: PM.sectionPages mapping correctly used
+- 👁️ Goto page 5 → only page 5 annotations visible
+- 👁️ Return to page 0 → page 0 annotations back
+- 👁️ Loop rewind → annotations refresh
+
+### Architecture Decision Record
+
+**Decision:** Create `scripts/performance_annotation_patches.js` as a new patches file (separate from rehearsal patches).
+**Rationale:** Rehearsal patches are already ~1830 lines. Annotation is a distinct feature domain. Separate file follows the established pattern (parts patches, rehearsal patches) and keeps files maintainable.
+
+**Decision:** Annotation SVG overlays are siblings of score SVGs inside `.score-row`, not children of the score SVGs.
+**Rationale:** The score SVGs have a complex viewBox and coordinate system used by the Workshop. Adding annotation elements inside them would require matching that coordinate system exactly. A sibling SVG with `position: absolute` and its own simple 0-1 coordinate system is much cleaner. This is the same pattern used by canvas cursor overlays.
+
+**Decision:** Coordinates stored as fractions (0-1) of section dimensions, not pixels or score time.
+**Rationale:** Fractions survive zoom, resize, and window size changes. Score-time anchoring (§12.12.4) is a nice-to-have for layout changes, but this score's layout is fixed — fractions are sufficient and simpler.
+
+**Decision:** `pointer-events: none` on overlay by default; pen events captured at ScoreContainer level.
+**Rationale:** If the annotation SVG had `pointer-events: auto`, it would capture all touch/mouse events and break the gesture system underneath. Instead, we listen for pen events on `#ScoreContainer` (where gesture system already listens), check `pointerType === 'pen'`, and draw on the overlay programmatically. For mouse annotation mode, we add a conditional path where the annotation handler runs instead of gestures.
+
+**Decision:** localStorage for persistence (not server prefs API yet).
+**Rationale:** Same decision as markers (Phase 8): client auth flow is not wired yet. localStorage is immediate and works offline. When auth is wired, both markers and annotations can upgrade to server prefs in a single migration.
+
+**Decision:** Mouse fallback for annotation mode (not pen-only).
+**Rationale:** Not all users have an Apple Pencil. Not all development testing happens on iPad. A toggle button in the controls overlay enables annotation mode for mouse input. When annotation mode is active AND the user is using mouse/finger, annotation captures those events instead of the gesture system.
 
 ---
 

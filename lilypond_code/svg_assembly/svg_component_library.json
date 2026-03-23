@@ -670,6 +670,24 @@
           "midY": -0.41625
         }
       },
+      "upbow": {
+        "description": "Upbow mark (V shape). scripts.upbow at fontsize default, scale 0.004. Extracted from public/SVG_graphics/upbow.svg.",
+        "scale": [
+          0.004,
+          -0.004
+        ],
+        "path": "M128 508c2 7 9 12 17 12c10 0 18 -7 18 -17c0 -2 -1 -4 -1 -6L17 12C15 5 8 0 0 0C-8 0 -15 5 -17 12l-145 485v6c0 10 7 17 17 17c8 0 15 -5 17 -12L-40 213L0 49L40 213Z",
+        "bbox": {
+          "left": -0.648,
+          "top": -2.08,
+          "right": 0.652,
+          "bottom": 0,
+          "width": 1.3,
+          "height": 2.08,
+          "midX": 0.002,
+          "midY": -1.04
+        }
+      },
       "marcato": {
         "description": "Marcato accent (W shape pointing down in SVG coords). scripts.umarcato at scale 0.0040.",
         "scale": [

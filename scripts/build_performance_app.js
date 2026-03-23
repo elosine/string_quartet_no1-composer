@@ -1052,6 +1052,148 @@ if (fs.existsSync(rehearsalFile)) {
 
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// Phase 9: Annotation System
+// ═══════════════════════════════════════════════════════════════════════════════
+
+console.log('\n  --- Phase 9: Annotation System ---');
+
+// Generate stamp glyph paths from LilyPond Emmentaler font (svg_component_library.json)
+var stampGlyphScript = '';
+var componentLibPath = path.join(__dirname, '..', 'lilypond_code', 'svg_assembly', 'svg_component_library.json');
+if (fs.existsSync(componentLibPath)) {
+    var compLib = JSON.parse(fs.readFileSync(componentLibPath, 'utf8'));
+    var dynSection = compLib.components.dynamics;
+    var sfzSection = compLib.components.sfzDynamic;
+    var scriptsSection = compLib.components.scripts;
+    var glyphs = {};
+
+    // Shift absolute M commands in SVG path by dx (font units).
+    // Emmentaler glyph paths use absolute M and relative c/l/s/h/v/z,
+    // so only M x-coordinates need shifting for compositing.
+    function shiftPathX(pathStr, dx) {
+        if (dx === 0) return pathStr;
+        return pathStr.replace(/M(-?\d+\.?\d*)\s+(-?\d+\.?\d*)/g, function(m, x, y) {
+            return 'M' + Math.round(parseFloat(x) + dx) + ' ' + y;
+        });
+    }
+
+    // Dynamics scale: 1 font unit = 0.0015 staff-spaces → 1 staff-space = 666.67 font units
+    var dynFU = 1 / 0.0015;  // 666.67 font units per staff-space
+    var sfzFU = 1 / 0.002;   // 500 font units per staff-space
+
+    // Base glyph paths from dynamics section
+    var baseP = dynSection.glyphs.p;
+    var baseF = dynSection.glyphs.f;
+    var baseM = dynSection.glyphs.m;
+
+    // Compose a dynamic marking from glyph sequence + spacing
+    function composeDynamic(glyphList, spacingList, fuPerSS) {
+        var combinedPath = '';
+        for (var gi = 0; gi < glyphList.length; gi++) {
+            var glyph = glyphList[gi];
+            var xOffset = spacingList[gi] * fuPerSS;
+            combinedPath += shiftPathX(glyph.path, Math.round(xOffset));
+        }
+        return combinedPath;
+    }
+
+    // p-family composites (all use p.glyphSpacing = 0.5463)
+    var pSpacing = baseP.glyphSpacing;
+    var composites = {
+        'p':    { glyphs: [baseP], spacing: [0] },
+        'pp':   { glyphs: [baseP, baseP], spacing: [0, pSpacing] },
+        'ppp':  { glyphs: [baseP, baseP, baseP], spacing: [0, pSpacing, pSpacing * 2] },
+        'pppp': { glyphs: [baseP, baseP, baseP, baseP], spacing: [0, pSpacing, pSpacing * 2, pSpacing * 3] },
+    };
+
+    // f-family composites (all use f.glyphSpacing = 0.4097)
+    var fSpacing = baseF.glyphSpacing;
+    composites['f']    = { glyphs: [baseF], spacing: [0] };
+    composites['ff']   = { glyphs: [baseF, baseF], spacing: [0, fSpacing] };
+    composites['fff']  = { glyphs: [baseF, baseF, baseF], spacing: [0, fSpacing, fSpacing * 2] };
+    composites['ffff'] = { glyphs: [baseF, baseF, baseF, baseF], spacing: [0, fSpacing, fSpacing * 2, fSpacing * 3] };
+
+    // mp: m then p (m.glyphSpacingToP)
+    composites['mp'] = { glyphs: [baseM, baseP], spacing: [0, baseM.glyphSpacingToP] };
+    // mf: m then f (m.glyphSpacingToF)
+    composites['mf'] = { glyphs: [baseM, baseF], spacing: [0, baseM.glyphSpacingToF] };
+    // fp: f then p
+    composites['fp'] = { glyphs: [baseF, baseP], spacing: [0, fSpacing] };
+
+    // Generate dynamics glyph paths
+    var dynKeys = Object.keys(composites);
+    for (var di = 0; di < dynKeys.length; di++) {
+        var key = dynKeys[di];
+        var comp = composites[key];
+        var combinedD = composeDynamic(comp.glyphs, comp.spacing, dynFU);
+        // Use bbox from library if available, otherwise approximate
+        var libBbox = (dynSection.composites && dynSection.composites[key]) ? dynSection.composites[key].bbox : null;
+        var cx, cy;
+        if (libBbox) {
+            cx = libBbox.midX * dynFU;
+            cy = libBbox.midY * dynFU;
+        } else {
+            // Approximate center from first and last glyph positions
+            var lastSpacing = comp.spacing[comp.spacing.length - 1] * dynFU;
+            cx = lastSpacing / 2;
+            cy = 0;
+        }
+        glyphs[key] = { d: combinedD, cx: Math.round(cx), cy: Math.round(cy), unitsPerEm: Math.round(dynFU) };
+    }
+
+    // sfz: from sfzDynamic section with its own paths and spacing
+    var sfzComp = sfzSection.composite.sfz;
+    var sfzGlyphMap = { 's': sfzSection.glyphs.s, 'f': sfzSection.glyphs.f, 'z': sfzSection.glyphs.z };
+    var sfzGlyphs = sfzComp.glyphs.map(function(name) { return sfzGlyphMap[name]; });
+    var sfzCombinedD = composeDynamic(sfzGlyphs, sfzComp.spacing, sfzFU);
+    var sfzBbox = sfzComp.bbox;
+    glyphs['sfz'] = {
+        d: sfzCombinedD,
+        cx: Math.round(sfzBbox.midX * sfzFU),
+        cy: Math.round(sfzBbox.midY * sfzFU),
+        unitsPerEm: Math.round(sfzFU)
+    };
+
+    // Down bow: from scripts.downbow (Emmentaler glyph)
+    var downbow = scriptsSection.downbow;
+    var bowFU = 1 / 0.0025; // 400 font units per staff-space
+    glyphs['\u2293'] = {
+        d: downbow.path,
+        cx: Math.round(downbow.bbox.midX * bowFU),
+        cy: Math.round(downbow.bbox.midY * bowFU),
+        unitsPerEm: Math.round(bowFU)
+    };
+
+    // Up bow: from LilyPond Emmentaler scripts.upbow, scale 0.004
+    // Size-matched to downbow: upbow bbox height (2.08ss) vs downbow (0.8325ss).
+    // unitsPerEm = (520 * 400) / 333 ≈ 625 so both render the same visual height.
+    glyphs['\u2228'] = {
+        d: 'M128 508c2 7 9 12 17 12c10 0 18 -7 18 -17c0 -2 -1 -4 -1 -6L17 12C15 5 8 0 0 0C-8 0 -15 5 -17 12l-145 485v6c0 10 7 17 17 17c8 0 15 -5 17 -12L-40 213L0 49L40 213Z',
+        cx: 0, cy: Math.round(260), unitsPerEm: 625
+    };
+
+    stampGlyphScript = '<script>window._STAMP_GLYPH_PATHS=' + JSON.stringify(glyphs) + ';</script>';
+    console.log('  \u2713 Generated ' + Object.keys(glyphs).length + ' stamp glyph paths from Emmentaler font (dynamics + bowings)');
+} else {
+    console.log('  \u26A0 svg_component_library.json not found \u2014 stamp glyphs will use text fallback');
+}
+
+// Inject glyph paths before closing </head>
+if (stampGlyphScript) {
+    html = html.replace('</head>', stampGlyphScript + '</head>');
+}
+
+const annotationFile = path.join(__dirname, 'performance_annotation_patches.js');
+if (fs.existsSync(annotationFile)) {
+    const applyAnnotationPatches = require(annotationFile);
+    html = applyAnnotationPatches(html);
+    console.log('  ✓ Loaded annotation patches from performance_annotation_patches.js');
+} else {
+    console.log('  ⚠ performance_annotation_patches.js not found — skipping Phase 9');
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // WRITE OUTPUT FILES
 // ═══════════════════════════════════════════════════════════════════════════════
 
