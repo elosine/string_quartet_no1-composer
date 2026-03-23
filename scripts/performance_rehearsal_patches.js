@@ -34,6 +34,8 @@ module.exports = function applyRehearsalPatches(html) {
             SWIPE_MIN_DISTANCE: 50,   // px — minimum horizontal travel
             SWIPE_MAX_TIME: 500,      // ms — maximum swipe duration
             SWIPE_DIRECTION_RATIO: 2, // horizontal must be 2× vertical
+            SWIPE_DOWN_MIN_DISTANCE: 30, // px — minimum vertical travel for swipe-down
+            SWIPE_DOWN_RATIO: 1.5,       // vertical must be 1.5× horizontal
             TAP_MAX_DISTANCE: 10,     // px — maximum movement for a tap
             TAP_MAX_TIME: 300,        // ms — maximum duration for a tap
             LONG_PRESS_TIME: 600,     // ms — hold duration for long press
@@ -161,6 +163,11 @@ module.exports = function applyRehearsalPatches(html) {
                                Math.abs(dx) > Math.abs(dy) * this.SWIPE_DIRECTION_RATIO) {
                         // Horizontal swipe gesture
                         this.onSwipe(dx > 0 ? 'right' : 'left');
+                    } else if (dy > this.SWIPE_DOWN_MIN_DISTANCE &&
+                               dt < this.SWIPE_MAX_TIME &&
+                               Math.abs(dy) > Math.abs(dx) * this.SWIPE_DOWN_RATIO) {
+                        // Swipe down → add marker
+                        this.onSwipeDown();
                     }
                 }
 
@@ -250,9 +257,20 @@ module.exports = function applyRehearsalPatches(html) {
             },
 
             onLongPress: function(p) {
-                // Stage 3: context menu (marker creation, loop start/end)
                 console.log('[RehearsalGestures] Long press at (' +
                     Math.round(p.startX) + ', ' + Math.round(p.startY) + ')');
+            },
+
+            onSwipeDown: function() {
+                // Swipe down → add marker at current position
+                if (window.ControlsOverlay) {
+                    ControlsOverlay.show();
+                    ControlsOverlay.clearFadeTimer();
+                }
+                if (window.MarkerSystem && window.MarkerSystem._showAddFlow) {
+                    MarkerSystem._showAddFlow();
+                }
+                console.log('[RehearsalGestures] Swipe down → add marker');
             },
 
             togglePlayPause: function() {
@@ -301,13 +319,17 @@ module.exports = function applyRehearsalPatches(html) {
                 var current = this.getCurrentPage();
                 var step = this.getPageStep();
                 var secondsPerPage = GraphicTimeline.getSecondsPerPage();
-                var targetSeconds = (current + step) * secondsPerPage;
-                if (window.SyncMode && SyncMode.isIndependent) {
-                    GraphicTimeline.onGoto(targetSeconds);
+                var screenDuration = step * secondsPerPage;
+                if (window.SyncMode && SyncMode.isIndependent && window.ScoreTime && ScoreTime.isPlaying) {
+                    // Playing: offset from current time to preserve cursor position within screen
+                    var nowSec = ScoreTime.now() / 1000;
+                    SyncMode.localGoto(nowSec + screenDuration, true);
+                } else if (window.SyncMode && SyncMode.isIndependent) {
+                    SyncMode.localGoto((current + step) * secondsPerPage, true);
                 } else if (window.ClockSync && ClockSync.socket) {
-                    ClockSync.socket.emit('scoreGoto', { seconds: targetSeconds });
+                    ClockSync.socket.emit('scoreGoto', { seconds: (current + step) * secondsPerPage });
                 } else {
-                    GraphicTimeline.onGoto(targetSeconds);
+                    GraphicTimeline.onGoto((current + step) * secondsPerPage);
                 }
                 console.log('[RehearsalGestures] Next page → page ' + (current + step));
             },
@@ -317,17 +339,23 @@ module.exports = function applyRehearsalPatches(html) {
                 if (window.LoopSystem && LoopSystem.isEnabled() && !(window.SyncMode && SyncMode.isIndependent)) return;
                 var current = this.getCurrentPage();
                 var step = this.getPageStep();
-                var newPage = Math.max(0, current - step);
                 var secondsPerPage = GraphicTimeline.getSecondsPerPage();
-                var targetSeconds = newPage * secondsPerPage;
-                if (window.SyncMode && SyncMode.isIndependent) {
-                    GraphicTimeline.onGoto(targetSeconds);
+                var screenDuration = step * secondsPerPage;
+                if (window.SyncMode && SyncMode.isIndependent && window.ScoreTime && ScoreTime.isPlaying) {
+                    // Playing: offset from current time to preserve cursor position within screen
+                    var nowSec = ScoreTime.now() / 1000;
+                    SyncMode.localGoto(Math.max(0, nowSec - screenDuration), true);
+                } else if (window.SyncMode && SyncMode.isIndependent) {
+                    var newPage = Math.max(0, current - step);
+                    SyncMode.localGoto(newPage * secondsPerPage, true);
                 } else if (window.ClockSync && ClockSync.socket) {
-                    ClockSync.socket.emit('scoreGoto', { seconds: targetSeconds });
+                    var newPage = Math.max(0, current - step);
+                    ClockSync.socket.emit('scoreGoto', { seconds: newPage * secondsPerPage });
                 } else {
-                    GraphicTimeline.onGoto(targetSeconds);
+                    var newPage = Math.max(0, current - step);
+                    GraphicTimeline.onGoto(newPage * secondsPerPage);
                 }
-                console.log('[RehearsalGestures] Prev page → page ' + newPage);
+                console.log('[RehearsalGestures] Prev page → page ' + Math.max(0, current - step));
             },
 
             // ─── Pinch zoom ─────────────────────────────────────────────────
@@ -688,7 +716,7 @@ module.exports = function applyRehearsalPatches(html) {
             var displaySec = parseFloat(jumpInput.value) || 0;
             var actualSec = displaySec + (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
             if (window.SyncMode && SyncMode.isIndependent) {
-                if (window.GraphicTimeline) GraphicTimeline.onGoto(actualSec);
+                SyncMode.localGoto(actualSec);
             } else if (window.ClockSync && ClockSync.socket) {
                 ClockSync.socket.emit('scoreGoto', { seconds: actualSec });
             }
@@ -771,7 +799,9 @@ module.exports = function applyRehearsalPatches(html) {
         function addMarker(name) {
             var scoreTimeMs = 0;
             if (window.ScoreTime) {
-                scoreTimeMs = ScoreTime.currentScoreTimeMs || 0;
+                scoreTimeMs = (ScoreTime.isPlaying && typeof ScoreTime.now === 'function')
+                    ? ScoreTime.now()
+                    : (ScoreTime.currentScoreTimeMs || 0);
             }
             var displaySec = (scoreTimeMs / 1000) - (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
             displaySec = Math.max(0, displaySec);
@@ -807,7 +837,7 @@ module.exports = function applyRehearsalPatches(html) {
             var m = markers.find(function(mk) { return mk.id === id; });
             if (!m) return;
             if (window.SyncMode && SyncMode.isIndependent) {
-                if (window.GraphicTimeline) GraphicTimeline.onGoto(m.scoreTimeMs / 1000);
+                SyncMode.localGoto(m.scoreTimeMs / 1000);
             } else if (window.ClockSync && ClockSync.socket) {
                 ClockSync.socket.emit('scoreGoto', { seconds: m.scoreTimeMs / 1000 });
             }
@@ -996,7 +1026,17 @@ module.exports = function applyRehearsalPatches(html) {
             remove: removeMarker,
             jumpTo: jumpTo,
             getAll: function() { return markers.slice(); },
-            renderList: renderList
+            renderList: renderList,
+            _showAddFlow: function() {
+                // Show marker panel, open name input, focus it
+                markerPanelVisible = true;
+                markerPanel.style.display = 'block';
+                nameRow.style.display = 'flex';
+                nameInput.value = 'Marker ' + (markers.length + 1);
+                nameInput.focus();
+                nameInput.select();
+                renderList();
+            }
         };
 
         renderList();
@@ -1395,7 +1435,7 @@ module.exports = function applyRehearsalPatches(html) {
             ratio = Math.max(0, Math.min(1, ratio));
             var targetSec = ratio * getTotalDurationSec();
             if (window.SyncMode && SyncMode.isIndependent) {
-                if (window.GraphicTimeline) GraphicTimeline.onGoto(targetSec);
+                SyncMode.localGoto(targetSec);
             } else if (window.ClockSync && ClockSync.socket) {
                 ClockSync.socket.emit('scoreGoto', { seconds: targetSec });
             }
@@ -1449,18 +1489,36 @@ module.exports = function applyRehearsalPatches(html) {
         var _leaderId = null;
         var _mySocketId = null;
         var _toastTimer = null;
+        var _performers = []; // { socketId, displayName, performerId }
 
         function getSocket() {
             return (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
         }
 
         // ─── Determine own socket ID ─────────────────────────────────────
-        // The server sends it implicitly via leaderChange; we match against it
         var sock = getSocket();
+        function resolveSocketId() {
+            if (_mySocketId) return;
+            if (sock && sock.id) {
+                _mySocketId = sock.id;
+                console.log('[SyncMode] Socket ID resolved: ' + _mySocketId);
+                // Re-check leadership now that we know our ID
+                if (_leaderId) {
+                    _isLeader = (_leaderId === _mySocketId);
+                    refreshSyncUI();
+                }
+            }
+        }
         if (sock) {
-            // Socket.IO exposes id after connect
             if (sock.id) _mySocketId = sock.id;
-            sock.on('connect', function() { _mySocketId = sock.id; });
+            sock.on('connect', function() { _mySocketId = sock.id; resolveSocketId(); });
+            // Poll in case connect already fired
+            if (!_mySocketId) {
+                var idPoll = setInterval(function() {
+                    if (sock.id) { clearInterval(idPoll); resolveSocketId(); }
+                }, 100);
+                setTimeout(function() { clearInterval(idPoll); }, 5000);
+            }
         }
 
         // ─── Intercept server events when independent ────────────────────
@@ -1482,6 +1540,21 @@ module.exports = function applyRehearsalPatches(html) {
                 wrapHandler(CursorControls, 'onScoreGoto');
             }
         }, 100);
+
+        // ─── Local goto for independent mode ───────────────────────────
+        function localGoto(targetSeconds, keepPlaying) {
+            if (!window.ScoreTime) return;
+            var wasPlaying = keepPlaying && ScoreTime.isPlaying;
+            ScoreTime.currentScoreTimeMs = targetSeconds * 1000;
+            ScoreTime.isPlaying = false;
+            if (window.GraphicTimeline) GraphicTimeline.onGoto(targetSeconds);
+            if (window.TrackSystem) TrackSystem.onGoto(targetSeconds);
+            if (wasPlaying && window.ClockSync) {
+                ScoreTime.scoreTimeOffset = ClockSync.now() - ScoreTime.currentScoreTimeMs;
+                ScoreTime.isPlaying = true;
+            }
+            if (window.ControlsOverlay) ControlsOverlay.refresh();
+        }
 
         // ─── Local play/stop for independent mode ────────────────────────
         function localToggleGoStop() {
@@ -1505,6 +1578,8 @@ module.exports = function applyRehearsalPatches(html) {
             '<button class="sb-btn sb-sync-toggle" title="Toggle sync mode">🔗 Synced</button>',
             '<button class="sb-btn sb-resync" title="Re-sync to room" style="display:none">↩ Re-sync</button>',
             '<button class="sb-btn sb-recall" title="Recall all to your position" style="display:none">📢 Recall All</button>',
+            '<button class="sb-btn sb-transfer" title="Transfer leadership" style="display:none">👑 Transfer</button>',
+            '<div class="sb-transfer-list" style="display:none"></div>',
             '<div class="sb-toast" style="display:none"></div>'
         ].join('');
 
@@ -1529,6 +1604,18 @@ module.exports = function applyRehearsalPatches(html) {
             '.sb-sync-toggle.sb-independent {',
             '  background: rgba(200,100,0,0.6); border-color: rgba(255,165,0,0.4);',
             '}',
+            '.sb-transfer { font-size: 11px; padding: 4px 8px; }',
+            '.sb-transfer-list {',
+            '  position: fixed; top: 40px; right: 8px;',
+            '  background: rgba(20,20,20,0.92); border: 1px solid rgba(255,255,255,0.2);',
+            '  border-radius: 8px; padding: 4px 0; min-width: 160px;',
+            '  font-size: 13px; color: #fff; z-index: 10002;',
+            '}',
+            '.sb-transfer-item {',
+            '  padding: 8px 14px; cursor: pointer; white-space: nowrap;',
+            '}',
+            '.sb-transfer-item:active { background: rgba(255,255,255,0.15); }',
+            '.sb-transfer-empty { padding: 8px 14px; opacity: 0.5; font-size: 12px; }',
             '.sb-toast {',
             '  position: fixed; top: 50px; right: 8px;',
             '  background: rgba(200,50,50,0.85); color: #fff;',
@@ -1543,7 +1630,10 @@ module.exports = function applyRehearsalPatches(html) {
         var syncToggle = syncBar.querySelector('.sb-sync-toggle');
         var resyncBtn = syncBar.querySelector('.sb-resync');
         var recallBtn = syncBar.querySelector('.sb-recall');
+        var transferBtn = syncBar.querySelector('.sb-transfer');
+        var transferList = syncBar.querySelector('.sb-transfer-list');
         var toast = syncBar.querySelector('.sb-toast');
+        var transferListVisible = false;
 
         // ─── UI updates ─────────────────────────────────────────────────
         function refreshSyncUI() {
@@ -1557,13 +1647,17 @@ module.exports = function applyRehearsalPatches(html) {
                 syncToggle.classList.remove('sb-independent');
                 resyncBtn.style.display = 'none';
             }
-            // Leader badge
+            // Leader badge + transfer button
             if (_isLeader) {
                 leaderBadge.textContent = '⭐ Leader';
                 recallBtn.style.display = '';
+                transferBtn.style.display = _performers.length > 0 ? '' : 'none';
             } else {
                 leaderBadge.textContent = '';
                 recallBtn.style.display = 'none';
+                transferBtn.style.display = 'none';
+                transferList.style.display = 'none';
+                transferListVisible = false;
             }
         }
 
@@ -1609,6 +1703,42 @@ module.exports = function applyRehearsalPatches(html) {
             if (s) s.emit('recallAll');
         });
 
+        transferBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            transferListVisible = !transferListVisible;
+            if (transferListVisible) {
+                // Build performer list (exclude self)
+                var others = _performers.filter(function(p) { return p.socketId !== _mySocketId; });
+                if (others.length === 0) {
+                    transferList.innerHTML = '<div class="sb-transfer-empty">No other performers</div>';
+                } else {
+                    transferList.innerHTML = others.map(function(p) {
+                        return '<div class="sb-transfer-item" data-sid="' + p.socketId + '">' +
+                            (p.displayName || 'Anonymous') + '</div>';
+                    }).join('');
+                }
+                transferList.style.display = 'block';
+            } else {
+                transferList.style.display = 'none';
+            }
+        });
+
+        transferList.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            var item = e.target.closest('.sb-transfer-item');
+            if (!item) return;
+            var targetSid = item.getAttribute('data-sid');
+            if (targetSid) {
+                var s = getSocket();
+                if (s) s.emit('setLeader', { targetSocketId: targetSid });
+                showToast('Leadership transferred', 2000);
+            }
+            transferList.style.display = 'none';
+            transferListVisible = false;
+        });
+
+        transferList.addEventListener('pointerdown', function(e) { e.stopPropagation(); });
+
         // Block pointer events from reaching gesture system
         syncBar.addEventListener('pointerdown', function(e) { e.stopPropagation(); });
         syncBar.addEventListener('pointermove', function(e) { e.stopPropagation(); });
@@ -1616,21 +1746,40 @@ module.exports = function applyRehearsalPatches(html) {
         // ─── Socket event listeners ─────────────────────────────────────
         if (sock) {
             sock.on('leaderChange', function(data) {
+                resolveSocketId();
                 _leaderId = data.leaderId;
                 _isLeader = (_mySocketId && _leaderId === _mySocketId);
-                console.log('[SyncMode] Leader changed: ' + _leaderId + (_isLeader ? ' (me)' : ''));
+                console.log('[SyncMode] Leader changed: ' + _leaderId + ' myId=' + _mySocketId + (_isLeader ? ' (me)' : ''));
                 refreshSyncUI();
             });
 
-            // scoreState includes leaderId on initial sync
+            // scoreState includes leaderId + roomMembers on initial sync
             sock.on('scoreState', function(data) {
+                resolveSocketId();
                 if (data.leaderId) {
                     _leaderId = data.leaderId;
-                    // Try to get our socket id
-                    if (sock.id) _mySocketId = sock.id;
                     _isLeader = (_mySocketId && _leaderId === _mySocketId);
-                    refreshSyncUI();
                 }
+                if (data.roomMembers) _performers = data.roomMembers;
+                else if (data.connectedPerformers) _performers = data.connectedPerformers;
+                refreshSyncUI();
+            });
+
+            sock.on('roomMembers', function(data) {
+                if (data.roomMembers) _performers = data.roomMembers;
+                refreshSyncUI();
+            });
+
+            sock.on('playerJoined', function(data) {
+                if (data.roomMembers) _performers = data.roomMembers;
+                else if (data.connectedPerformers) _performers = data.connectedPerformers;
+                refreshSyncUI();
+            });
+
+            sock.on('playerLeft', function(data) {
+                if (data.roomMembers) _performers = data.roomMembers;
+                else if (data.connectedPerformers) _performers = data.connectedPerformers;
+                refreshSyncUI();
             });
 
             sock.on('notLeader', function(data) {
@@ -1654,6 +1803,7 @@ module.exports = function applyRehearsalPatches(html) {
             get isIndependent() { return _isIndependent; },
             get isLeader() { return _isLeader; },
             set isIndependent(v) { _isIndependent = !!v; refreshSyncUI(); },
+            localGoto: localGoto,
             localToggleGoStop: localToggleGoStop,
             showToast: showToast,
             refreshUI: refreshSyncUI

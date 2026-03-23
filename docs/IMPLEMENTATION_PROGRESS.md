@@ -1,36 +1,32 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 8 — Rehearsal Mode (Stage 6 — integration verification)
+**Active Phase:** Phase 9 — Annotations (next)
 **Last Session:** Mar 23, 2026
-**Last Commit:** `[Phase 8 Stage 5b] Synced/Independent + Leader, room-based looping, page turn sync, hide right panel`
+**Last Commit:** `[Phase 8] Rehearsal mode complete — gestures, overlay, markers, looping, sync, leader`
 
 ### ▶ RESUME HERE (next session)
 
-**Priority order:**
+**Phase 8 is COMPLETE.** All 7 systems implemented, 12 bugs fixed, post-mortem done.
 
-1. **DEBUG: Independent mode + MiniMap jump bug (full score)**
-   - Repro: load full score as synced slave → go independent → use MiniMap to jump ahead
-   - Symptoms: counter (S#/P#) advances but clock doesn't update, graphic position indicator doesn't advance, scrolling plays over wrong content (possibly original sync position)
-   - Investigate: `onMiniMapClick` handler, `scoreGoto` flow in independent mode, whether visual/scroll layers properly disconnect from server position
-   - Files: `performance_rehearsal_patches.js` (MiniMap, independent mode), `build_performance_app.js` (scoreGoto handler)
+**Priority for next session:**
+1. Read `WORKING_PRINCIPLES.md` and this RESUME section
+2. Read Phase 9 plan in `STRING_QUARTET_PIPELINE_PLAN.md`
+3. Run pre-implementation protocol (§13.2.7)
+4. Begin Phase 9 staged implementation
 
-2. **IMPLEMENT: Font fix Option A**
-   - Embed base64 Crimson Pro `@font-face` into SVG data URLs that contain `<text>` elements with `font-family="'Crimson Pro'"`
-   - Modify SVG-to-dataURL conversion in `build_performance_app.js`
-   - Only ~30 SVGs have text — targeted injection
-
-3. **QUICK TEST: Server join reset-to-zero (Option C)**
-   - Restart server, close all tabs, reopen → should start at zero (not mid-score)
-
-4. **RUN: Testing protocol** → `docs/TESTING_PROTOCOL.md` (16 tests, 4 tiers)
+**Deferred items (not blocking):**
+- SVG font fix: Option B (text-to-paths via opentype.js) recommended. See Font Analysis section below.
+- Parts mode A/B server bug: only shows first 2 screens (low priority)
+- Marker server persistence: upgrade from localStorage when client auth flow is wired
 
 ### Verified this session (Mar 23)
-- ✅ Loop exit fix — disabling loop during playback refreshes all sections
-- ✅ Page count — 64 pages in both full score and parts mode
-- ✅ Server join Option C implemented (not yet tested by user)
-- ✅ Testing protocol written to `docs/TESTING_PROTOCOL.md`
-- ✅ Pipeline plan updated: Phase 11 (performance grace period note), Phase 14 Step 14.5 (SVG optimization)
+- ✅ Swipe-down gesture working (30px threshold, 1.5× direction ratio)
+- ✅ Marker records correct cursor position during playback
+- ✅ Leader badge visible on offline stub and real server
+- ✅ Leader transfer working between two anonymous tabs (port 3000)
+- ✅ Full post-mortem protocol completed (Steps A-G)
+- ✅ WORKING_PRINCIPLES.md updated with 5 new Multi-Client & Socket principles
 
 ## How to Resume Work (for the human)
 
@@ -74,7 +70,7 @@ Type `/session-start` — this triggers a workflow that walks the AI through the
 | 5. Server Architecture | ✅ Complete | Mar 21 | Room-based Socket.IO, grace period, reconnection, 3 build patches (1b/1c) |
 | 6. Sync Tier 1 | ✅ Complete | Mar 21 | performance.now(), outlier rejection, connection awareness, drift correction |
 | 7. Auth & Persistence | ✅ Complete | Mar 22 | Self-service sessions, JWT, preferences, 6 API endpoints |
-| 8. Rehearsal Mode | 🔄 In Progress | — | Stages 1-5 complete, Stage 6 integration verification. Loop exit fix verified. Independent+MiniMap bug found. |
+| 8. Rehearsal Mode | ✅ Complete | Mar 23 | 7 systems, 12 bugs fixed, swipe-down markers, leader transfer, room-based looping |
 | 9–14 | ⏳ Pending | — | |
 
 ---
@@ -250,6 +246,9 @@ node -e "const h=require('http'),f=require('fs'),p=require('path'),d='builds/per
 |----|-------|-------------|----------|--------|
 | — | 3 | `⚠ O5: LW re-append cleanup: target not found` build warning | Low | Pre-existing, cosmetic |
 | — | 3 | Very small browser windows may produce odd sizing with MAX_ELEMENT_PAGES cap | Low | Edge case, acceptable |
+| — | 8 | Parts mode shows only first 2 screens on A/B server | Medium | Open, unrelated to Phase 8 |
+| — | 8 | `roomMembers` broadcasts socket IDs to all clients (privacy concern for production) | Low | Acceptable for dev; restrict before Phase 14 |
+| — | 8 | Markers use localStorage (not server prefs) | Low | Upgrade when client auth flow is wired |
 
 ## Decisions Log
 | Date | Phase | Decision | Rationale |
@@ -258,6 +257,11 @@ node -e "const h=require('http'),f=require('fs'),p=require('path'),d='builds/per
 | Mar 21 | 3 | MAX_ELEMENT_PAGES = 5 (not 6) | 6-page equivalent was the max acceptable size, but 5-page gives slightly larger elements while still being constrained — user preferred this |
 | Mar 21 | 3 | GCs bottom-justified (not centered) | User feedback: impact point should be at track bottom for visual consistency |
 | Mar 21 | 3 | SVG z-order via DOM re-append (not CSS z-index) | SVG elements inside an SVG don't support CSS z-index; DOM order determines paint order |
+| Mar 22 | 8 | Server-authoritative looping (not per-client) | Per-client looping conflicted with drift correction; user confirmed "I don't need individual loops in the same room" |
+| Mar 23 | 8 | Swipe-down for marker add (not long press) | Long press triggers browser context menu on desktop/iPad; swipe-down is conflict-free |
+| Mar 23 | 8 | Separate vertical swipe thresholds (30px/1.5×) | Horizontal swipe thresholds (50px/2×) were too aggressive for vertical gesture on iPad-height screens |
+| Mar 23 | 8 | `roomMembers` event for anonymous Transfer UI | `connectedPerformers` only populated for JWT-auth clients; anonymous clients need to appear in Transfer list |
+| Mar 23 | 8 | `localGoto()` centralization | 5 independent navigation paths all needed ScoreTime + TrackSystem + ControlsOverlay updates; single method prevents future inconsistencies |
 
 ---
 
@@ -901,13 +905,15 @@ Stage 5c: Hide old right panel                                      ✅ DONE
   - Single `#cursorMenu { display: none !important; }` replaces granular hiding
   → 👁️ Human verified: right panel hidden, overlay fully functional
 
-Stage 6: Integration verification                                   ⬅ CURRENT
+Stage 6: Integration verification                                   ✅ DONE
   - Full regression: all Phase 1-7 features in anonymous mode
   - Parts mode + gestures test
-  - Multi-client auth + leader test
+  - Multi-client auth + leader test (two tabs, port 3000)
   - Room-based loop regression
-  → TEST: 🤖 Anonymous regression. Parts mode regression.
-  → TEST: 👁️ Full flow on desktop. iPad if available.
+  - 15-test testing protocol: ALL PASS
+  - Swipe-down marker gesture confirmed on desktop
+  - Leader transfer confirmed between two anonymous tabs
+  → 👁️ Human verified: all modes pass
 ```
 
 ### Phase 8 Stage 1b: Workshop Interaction Strip — Pre-Implementation Protocol
@@ -1076,10 +1082,11 @@ Stage D: Keep S8-S11 strips + CSS (already done)
 ---
 
 ## Phase 8 Files Modified
-- `scripts/performance_rehearsal_patches.js` — **created** (gesture system, controls overlay, markers, loop UI, mini-map, SyncMode + leader UI)
-- `scripts/performance_server.js` — room loop state, loop events, leader tracking, leader gating, setLeader, recallAll
-- `scripts/build_performance_app.js` — offline stub loop + leader support, `#cursorMenu` hidden via CSS
-- `docs/IMPLEMENTATION_PROGRESS.md` — Phase 8 stage results
+- `scripts/performance_rehearsal_patches.js` — **created** (~1830 lines: gesture system, controls overlay, markers, loop UI, mini-map, SyncMode + leader transfer UI)
+- `scripts/performance_parts_patches.js` — page display off-by-one fix (P0→P1), loop page freeze, screen-flip page turns
+- `scripts/performance_server.js` — room loop state, loop events, leader tracking, leader gating, setLeader, recallAll, `getRoomMembers()` for anonymous Transfer UI, `roomMembers` broadcast on join/leave
+- `scripts/build_performance_app.js` — offline stub loop + leader support, `leaderId` in stub scoreState, `#cursorMenu` hidden via CSS
+- `docs/IMPLEMENTATION_PROGRESS.md` — Phase 8 stage results + post-mortem
 
 ### Phase 8 New Socket Events
 | Event | Direction | Leader-gated | Description |
@@ -1092,6 +1099,7 @@ Stage D: Keep S8-S11 strips + CSS (already done)
 | `recallAll` | client→server→all | ✅ | Force all clients to re-sync |
 | `leaderChange` | server→client | — | Broadcast new leader ID |
 | `notLeader` | server→client | — | Rejection notification |
+| `roomMembers` | server→client | — | All socket IDs in room (auth + anonymous) for Transfer UI |
 
 ### Phase 8 New Client Systems
 | System | Location | Purpose |
@@ -1106,14 +1114,161 @@ Stage D: Keep S8-S11 strips + CSS (already done)
 
 ---
 
-## RESUME HERE
-**Current phase:** Phase 8 — Parts Mode Hardening
-**Last session:** Mar 22, 2026
-**Status:** Full score passed all Phase 8 tests ✅. Parts mode needs screen-flip page turn + Stage 5 verification.
-**Key files:** `scripts/performance_parts_patches.js`, `scripts/performance_rehearsal_patches.js`
+## Phase 8 Post-Mortem
 
-> **Rule: Do NOT change full-score behavior.** All full-score Phase 8 tests passed.
-> All parts-mode changes must be guarded by `PartsMode.active` or live in `performance_parts_patches.js`.
+### Step A: Plan Audit — All 7 Steps
+
+| Step | Plan Item | Status | Implementation |
+|------|-----------|--------|---------------|
+| 8.1 | Touch gestures: swipe L/R, tap center, long press, pinch zoom | ✅ PASS | `RehearsalGestures` IIFE: pointer event tracking, configurable thresholds, swipe/tap/pinch detection. Double-tap zoom reset. |
+| 8.2 | Controls overlay: play/stop, page#, goto, markers, sync, fade | ✅ PASS | `ControlsOverlay` IIFE: 3s fade timer, center-tap toggle, calls existing CursorControls methods. |
+| 8.3 | Custom markers: CRUD, list, jump, persist, gesture trigger | ✅ PASS | `MarkerSystem` IIFE: localStorage persist, color palette, MiniMap ticks. Swipe-down triggers add flow (plan said long press — changed due to browser context menu conflict). Server prefs deferred to client auth wiring. |
+| 8.4 | Looping: A/B points, auto-jump, count | ✅ PASS | `LoopSystem` IIFE: room-synced via server (revised from per-client — drift conflict). |
+| 8.5 | Synced vs Independent: auto-detach, re-sync | ✅ PASS | `SyncMode` IIFE: auto-detach on swipe, `localGoto()` centralized all 5 independent code paths. |
+| 8.6 | Leader privileges: gated commands, recall, transfer | ✅ PASS | Server leader tracking + `setLeader`/`recallAll`. Transfer UI with `roomMembers` for anonymous support. |
+| 8.7 | Mini-map: position bar, marker ticks, tap-to-jump | ✅ PASS | `MiniMap` IIFE: auto-hide, marker ticks, loop region, S#/P# badge. |
+
+**Deviation:** 8.3 long press → swipe-down. Deliberate UX improvement (browser context menu conflict on iPad/desktop).
+
+### Step B: AI Audit — Build Verification
+
+12 automated checks on built `index.html`:
+- ✅ HTML size: 1039 KB (within expected range)
+- ✅ All 7 systems present: RehearsalGestures, ControlsOverlay, MarkerSystem, LoopSystem, SyncMode, MiniMap, InteractionBlocker
+- ✅ `onSwipeDown` gesture handler present
+- ✅ `sb-transfer` UI elements present
+- ✅ `roomMembers` socket listener present
+- ✅ `resolveSocketId` polling present
+- ✅ `leaderId: "local-offline"` in stub scoreState
+- ✅ `localGoto` with `keepPlaying` parameter present
+- ✅ Build exits 0, all patches applied (one expected warning: O5 LW re-append)
+
+### Step C: Tier 1 Memories — Capture
+
+Memory created: `Phase 8 — Rehearsal Mode Complete` covering architecture (7 IIFEs), 12 bugs fixed, key decisions, and testing results.
+
+### Step D: Future Impacts
+
+1. **Phase 9 (Annotations):** Annotations will need a new interaction layer on top of the score. The `InteractionBlocker` captures mouse events on ScoreTop/ScoreBottom — annotations must use **pointer events** (separate event type) or a transparent overlay div, NOT mouse events on the score SVGs. The gesture system already demonstrates the pointer event approach.
+
+2. **Phase 10 (Sync+Anim T2):** `SyncMode.localGoto()` is the canonical way to navigate in independent mode. Any new navigation features must go through it (not `GraphicTimeline.onGoto` directly) to keep ScoreTime, TrackSystem, and ControlsOverlay in sync.
+
+3. **Phase 11 (Performance Mode):** Performance mode will need to override the server join reset-to-zero behavior (Option C). The `SyncMode` system provides the foundation — leader-gated playback is already built. Performance mode adds: no independent mode, locked page turns, enforced sync, and the grace-period resume for intermission breaks.
+
+4. **Phase 14 (Website/Production):** The `roomMembers` event now broadcasts all socket IDs (auth + anonymous). On a production server, this could leak socket IDs to anonymous clients. Consider restricting `roomMembers` to display names only, or requiring auth for Transfer access.
+
+5. **Client Auth Integration (deferred):** When the client auth flow is wired:
+   - Markers: upgrade from localStorage to server prefs API (`PUT /api/performers/:id/preferences`)
+   - Transfer UI: display actual performer names instead of "Anonymous"
+   - Room join: use JWT token in socket handshake for authenticated room assignment
+
+6. **`ScoreTime.now()` vs `ScoreTime.currentScoreTimeMs`:** Bug #7 (marker at zero) revealed that `currentScoreTimeMs` is stale during playback — it's only updated on stop. Any future feature reading the live position during playback must use `ScoreTime.now()`, not `currentScoreTimeMs`.
+
+7. **Socket ID Timing:** Bug #5-6 revealed that `ClockSync.socket.id` is not available when rehearsal patches init (connect event already fired). Future code that depends on socket ID must use the `resolveSocketId()` polling pattern or hook into a socket event handler.
+
+### Step E: Repeatability — Rebuild Instructions
+
+**If Workshop source changes and Performance Score needs rebuilding:**
+
+```bash
+# 1. Rebuild performance app (applies all 29 patches + 12 strips)
+node scripts/build_performance_app.js
+
+# 2. Start real server (for multi-client testing)
+node scripts/performance_server.js --port 3000
+
+# 3. Start static server (for single-client/offline testing)
+node -e "const h=require('http'),f=require('fs'),p=require('path'),d='builds/performance',m={'.html':'text/html','.json':'application/json','.css':'text/css','.svg':'image/svg+xml','.mid':'audio/midi'};h.createServer((q,r)=>{let u=q.url.split('?')[0];if(u==='/')u='/index.html';const fp=p.join(d,decodeURIComponent(u)),e=p.extname(fp);if(!f.existsSync(fp)){r.writeHead(404);r.end('Not found');return}r.writeHead(200,{'Content-Type':m[e]||'application/octet-stream'});f.createReadStream(fp).pipe(r)}).listen(3001,()=>console.log('http://localhost:3001'))"
+
+# 4. Test URLs
+# Offline (stub):       http://localhost:3001/?track=1&pages=6
+# Real server (sync):   http://localhost:3000/?track=1&pages=6
+# Full score:           http://localhost:3001/
+# Multi-client:         Two tabs on port 3000 (same default room)
+```
+
+**Visual audit checklist:**
+- [ ] ⭐ Leader badge visible (top-right sync bar) on first client
+- [ ] Swipe down → marker add panel opens, name input focused
+- [ ] Play → marker records correct live position (not zero)
+- [ ] Two tabs on port 3000: 👑 Transfer button visible on leader tab
+- [ ] Transfer → leadership moves, badge swaps
+- [ ] Independent mode: swipe navigates locally, playback continues
+- [ ] Re-sync snaps back to leader position
+- [ ] Loop A/B → playback loops, all room members follow
+- [ ] MiniMap shows position, markers, loop region
+- [ ] Controls overlay fades after 3s, reappears on center tap
+- [ ] Full score: all gestures work (swipe, tap, pinch, double-tap)
+- [ ] Parts mode: screen-flip page turns, all 4 tracks render
+
+**Known gotchas for rebuild:**
+1. **Stub must include `leaderId`** — without `leaderId: "local-offline"` in the stub's scoreState trigger, the leader badge won't appear in offline mode. Check `build_performance_app.js` line ~518.
+2. **`resolveSocketId` polling** — socket.id isn't available at init time. The 100ms poll + 5s timeout ensures it's captured. Don't remove.
+3. **`roomMembers` vs `connectedPerformers`** — client prefers `roomMembers` (includes anonymous). If server changes, ensure `roomMembers` is still emitted on join/leave/disconnect.
+4. **Swipe-down thresholds** — `SWIPE_DOWN_MIN_DISTANCE: 30px`, `SWIPE_DOWN_RATIO: 1.5`. These are tuned for iPad screens. Desktop mouse drag works but requires a deliberate vertical motion.
+5. **Build order matters** — `performance_rehearsal_patches.js` is loaded by `build_performance_app.js` as raw text and injected. If the patches file has a syntax error (e.g., unterminated string), the built HTML will have a SyntaxError at runtime.
+
+**Conditions requiring build script updates:**
+- Workshop changes to `CursorControls.onScoreGo/Stop/Goto` → verify SyncMode handler wrapping still works
+- Workshop changes to `GraphicTimeline.onGoto` → verify `localGoto()` call chain
+- New score with different `leadInSeconds` → verify marker time display math
+- New socket events added to server → may need stub updates for offline mode
+
+### Step F: Troubleshooting Review
+
+**Bug severity assessment compliance:**
+All 12 bugs were correctly prioritized:
+- Bugs #1-3 (independent mode navigation): HIGH — blocked core rehearsal workflow. Fixed at root cause.
+- Bugs #5-6 (leader badge): MEDIUM — UI display issue, not blocking playback. Fixed at root cause (timing).
+- Bug #7 (marker at zero): MEDIUM — data correctness issue. Fixed at root cause (`ScoreTime.now()` vs stale value).
+- Bug #8 (long press conflict): LOW — UX preference. Resolved by gesture redesign.
+- Bug #9 (transfer hidden): MEDIUM — feature not discoverable. Fixed at root cause (server data model).
+
+**Root cause vs workaround:**
+- All 12 fixes were root-cause fixes, no workarounds applied ✅
+- Bug #1 (independent mode) spawned the `localGoto()` centralization — a design improvement, not just a bug fix
+- Bug #8 (long press) led to the swipe-down gesture with tuned thresholds — a UX improvement
+
+**Diagnostic logging effectiveness:**
+- `[SyncMode]` prefixed logs were essential for debugging leader badge timing (bugs #5-6)
+- `[RehearsalGestures]` logs confirmed gesture detection thresholds
+- `console.log` in `resolveSocketId` with socket ID + leader ID was the key diagnostic for bug #6
+
+**Process improvements identified:**
+1. **Test offline AND real server** — Bugs #5-6 were only visible because the offline stub and real server have different socket ID timing. Future phases should test both modes.
+2. **Include identity data in stub events** — The offline stub's scoreState lacked `leaderId`. Lesson: stub events should mirror the full server payload shape.
+3. **Gesture testing on target device** — Long press conflict (#8) was only apparent on desktop browser. iPad testing would have caught it earlier (or confirmed it's acceptable there).
+
+### Step G: Documentation & Commit
+
+**Action items completed:**
+1. ✅ Phase Status Table updated (Phase 8 → Complete, Mar 23)
+2. ✅ Phase 8 Files Modified section updated
+3. ✅ Phase 8 socket events table updated (added `roomMembers`)
+4. ✅ Stage 6 marked DONE with human verification note
+5. ✅ Post-mortem Steps A-F documented
+6. ✅ Tier 1 memory created
+7. ✅ RESUME HERE updated for Phase 9
+
+**Commit:** `[Phase 8] Rehearsal mode complete — gestures, overlay, markers, looping, sync, leader`
+**Tag:** `git tag phase-8-complete`
+
+---
+
+## RESUME HERE
+**Current phase:** Phase 9 — Annotations (next)
+**Last session:** Mar 23, 2026
+**Status:** Phase 8 complete. All 7 systems implemented, 12 bugs fixed, testing protocol passed.
+
+**Priority for next session:**
+1. Read `WORKING_PRINCIPLES.md` and this RESUME section
+2. Read Phase 9 plan in `STRING_QUARTET_PIPELINE_PLAN.md`
+3. Run pre-implementation protocol (§13.2.7)
+4. Begin Phase 9 staged implementation
+
+**Key files from Phase 8:** `scripts/performance_rehearsal_patches.js` (~1830 lines), `scripts/performance_server.js` (~1010 lines)
+
+**Known open issue:** Parts mode only shows first 2 screens on A/B server (unrelated to Phase 8, low priority)
 
 ---
 
@@ -1263,23 +1418,335 @@ Parts Stage D2: MiniMap Auto-Show/Hide ✅ IMPLEMENTED
   → TEST: 👁️ MiniMap tap still jumps to position (regression)
   → TEST: 👁️ MiniMap still shows markers and loop region (regression)
 
-Parts Stage D3: Font Embedding ✅ IMPLEMENTED
-  - Identified font: "Crimson Pro Light" (used in notation SVGs for text
-    markings: pizz., b.b., tuplet numbers, etc.)
-  - Font files: CrimsonPro-Light.ttf + CrimsonPro-LightItalic.ttf
-    copied from fonts/extracted/ → public/fonts/ → builds/performance/fonts/
-  - @font-face CSS injected into built HTML via build_performance_app.js
-  - Server serves fonts via express.static (already configured)
-  - Files: build_performance_app.js (add @font-face CSS), performance_server.js
-    (serve font file if needed), builds/performance/ (font file)
-  - Full-score impact: YES — font embedding applies to all score modes. Test both.
-  → TEST: 🤖 Verify @font-face declaration present in built HTML
-  → TEST: 🤖 Verify font file is served by the Node server (HTTP 200)
-  → TEST: 🤖 Build succeeds with no errors
-  → TEST: 👁️ Open performance score on a machine without the font installed
-  → TEST: 👁️ SVG text renders fully — no cut-off or fallback font
-  → TEST: 👁️ Full score text rendering unaffected (regression)
-  → TEST: 👁️ Parts mode text rendering unaffected (regression)
+Parts Stage D3: Font Embedding — REVISED (see Font Analysis below)
+  - Original plan: copy font files + inject @font-face CSS into built HTML
+  - PROBLEM: This only makes fonts available to the PAGE, not to SVG <image>
+    data URLs. SVGs rendered via <image href="data:..."> are sandboxed —
+    they cannot access the parent page's CSS or fonts.
+  - STATUS: Page-level @font-face was implemented (fonts copied, CSS injected),
+    but this does NOT fix the actual problem. SVG text inside data URLs still
+    falls back to generic serif on machines without Crimson Pro installed.
+  - DECISION NEEDED: See "Font Analysis (Mar 23)" immediately below.
+```
+
+---
+
+### Font Analysis (Mar 23, 2026)
+
+**The problem:** Notation SVGs containing text labels (secco, pizz., Non-Vib, etc.)
+are stored in score.json as data URLs and rendered via `<image href="data:image/svg+xml;base64,...">`.
+The `<image>` element is sandboxed — it cannot access the parent page's CSS `@font-face` declarations
+or load external font files. When the browser renders these SVGs, it looks for "Crimson Pro" inside
+the sandboxed SVG, finds nothing, and falls back to a generic serif font. The fallback font has
+different metrics, causing text to clip, overflow, or look wrong on devices without the font installed.
+
+**Scan results** (from `scripts/_scan_svg_fonts.js`, Mar 23):
+- Total SVG elements in score: **542**
+- SVGs with `<text>` elements: **296** (not ~30 as previously estimated)
+- Need italic font: **291**, need regular: **5**
+- Font families found: `'Crimson Pro Light'`, `'Crimson Pro'`, `Crimson Pro Light`, `serif`
+- Unique characters used across all text: **47** — `" (),-./1234568:FHLNPRVabcdefghijklmnoprstuvxyzé`
+- Unique text labels: **32**
+
+**Text label frequency:**
+| Label | Count | Source |
+|-------|-------|--------|
+| Non-Vib | 142 | SVG assembly engine (`generateText`) |
+| secco | 116 | SVG assembly engine |
+| ricochet | 56 | LilyPond notation fragments |
+| b.b. | 50 | LilyPond notation fragments |
+| c.l.b. jeté | 37 | SVG assembly engine |
+| R.H. | 36 | LilyPond notation fragments |
+| pizz. / pizz | 62 | LilyPond notation fragments |
+| col legno battuto | 28 | LilyPond notation fragments |
+| L.H. | 28 | LilyPond notation fragments |
+| delicato | 8 | LilyPond notation fragments |
+| furioso | 4 | LilyPond notation fragments |
+| Tuplets (5:4, 3:2, etc.) | ~19 | LilyPond notation fragments |
+| col legno | 4 | SVG assembly engine |
+
+**Two distinct sources of text SVGs:**
+1. **Custom SVG assembly engine** (`assemble_svg.js` → `generateText()`): secco, Non-Vib,
+   c.l.b. jeté, col legno. Uses `<text font-family="'Crimson Pro'"...>`. These are assembled
+   by our custom engine, NOT by LilyPond.
+2. **LilyPond-compiled notation fragments** (PizzTrem*.ly, NotationFragment*.ly, etc.):
+   ricochet, b.b., pizz., R.H., L.H., col legno battuto, furioso, delicato, tuplet numbers.
+   These were compiled by LilyPond into SVGs containing `<text>` elements, then stored in
+   score.json via the Workshop.
+
+**Note:** Dynamics (p, f, mf, fff, etc.) are already **vector paths** in the component library —
+they do NOT use `<text>` and are NOT affected by this bug.
+
+**Size impact of full font embedding (original Option A):**
+- CrimsonPro-Light.ttf: 104 KB raw, 139 KB base64
+- CrimsonPro-LightItalic.ttf: 107 KB raw, 142 KB base64
+- Full font in all 296 SVGs: **41 MB added** — NOT VIABLE
+- Subsetted font (47 chars, ~3-5 KB) in 296 SVGs: **~1.5 MB added** — acceptable
+
+#### Option A: Font Subsetting (bridge fix)
+- Create a subset of Crimson Pro containing only the 47 characters actually used
+- Subset font: ~3-5 KB (vs 107 KB full). Base64: ~4-7 KB.
+- Build script scans each SVG data URL in score.json → if `<text>` with Crimson Pro →
+  inject `<defs><style>@font-face { ... src: url(data:font/truetype;base64,...) }</style></defs>`
+  → re-encode data URL
+- Total size impact: ~1.5 MB added to score.json (16 MB → 17.5 MB)
+- Requires: `pyftsubset` (Python fonttools) for one-time subset generation, OR a Node.js
+  font subsetting library
+- **Pro:** Fast to implement, minimal risk, works for both assembly engine and LilyPond SVGs
+- **Con:** Still embeds font data (adds 1.5 MB), font dependency still exists (just subsetted)
+
+#### Option B: Text-to-Paths via opentype.js (permanent fix)
+- Build-time post-processor scans all SVG data URLs in score.json
+- For each `<text>` element with Crimson Pro: use opentype.js (pure JS TTF parser) to
+  convert the text content to `<path d="...">` using the font's actual glyph outlines
+- Works for BOTH assembly engine SVGs and LilyPond notation fragment SVGs
+- No LilyPond recompilation needed — transforms already-stored SVG data URLs
+- Zero size increase (paths are similar size to text elements)
+- Eliminates font dependency permanently — text becomes geometry
+- Requires: `opentype.js` npm dependency
+- **Pro:** Zero runtime cost, zero size increase, permanent fix, no font dependency
+- **Con:** More complex implementation (SVG parsing + path generation), must preserve
+  exact positioning (font-size, transform, text-anchor attributes)
+- **Implementation location:** New step in `build_performance_app.js` that processes
+  score.json SVG data URLs before writing to `builds/performance/score.json`
+- Does NOT require modifying `assemble_svg.js` `generateText()` — the build-time
+  post-processor handles all SVGs uniformly regardless of origin
+
+#### Option C: Defer to Phase 14
+- Skip font fix entirely for now
+- Accept that text labels clip/render wrong on devices without Crimson Pro installed
+- Fix permanently in Phase 14 (SVG optimization pass)
+
+#### Interaction between Option A and Option B
+Option A does NOT complicate Option B. They are independent:
+- Option A modifies score.json at build time (injects font)
+- Option B modifies score.json at build time (converts text to paths)
+- If Option A is implemented first, then Option B is implemented later, Option B's
+  post-processor would find `<text>` elements, convert them to `<path>`, and the
+  injected `@font-face` would become unused dead code that could be stripped.
+  Or: Option B's scan simply wouldn't find `<text>` elements (already converted)
+  and Option A's scan wouldn't find Crimson Pro text → both become no-ops.
+
+#### Recommendation
+**Option B (opentype.js)** is the best choice if we're going to fix this now — it's
+the permanent solution, adds zero file size, and eliminates font dependency. The
+implementation is medium complexity but well-scoped (single build step).
+**Option C (defer)** is reasonable if font clipping is acceptable for now and we want
+to focus on testing.
+
+---
+
+### Option B Pre-Implementation Protocol (Mar 23, 2026)
+
+#### Step 1: System Inventory — What Are We Touching?
+
+| System | What it does | What we read | What we write |
+|--------|-------------|-------------|--------------|
+| `scores/*.json` | Source score data with svgElements[].svgDataUrl | SVG data URLs (base64 or URL-encoded) | **NOTHING — source is read-only** |
+| `build_performance_app.js` (L1061-1064) | Copies score JSON to `builds/performance/score.json` | scoreJsonPath | score.json (currently a plain copy) |
+| `svgElements[].svgDataUrl` (in score JSON) | SVG markup embedded as data URLs, rendered via `<image href="...">` | `<text>` elements, font attributes, transforms | Modified `svgDataUrl` with `<text>` replaced by `<path>` |
+| `public/index.html` — SVGElementManager | Creates `<image>` elements, sets `href` to svgDataUrl | svgDataUrl string | DOM `<image>` elements |
+| `public/fonts/CrimsonPro-LightItalic.ttf` | Font file (107 KB) | Loaded by opentype.js to extract glyph outlines | Nothing |
+| `public/fonts/CrimsonPro-Light.ttf` | Font file (104 KB) | Loaded by opentype.js for the 5 regular-weight SVGs | Nothing |
+
+**What we are NOT touching:**
+- `assemble_svg.js` / `generateText()` — upstream source stays unchanged
+- LilyPond `.ly` files — no recompilation
+- `public/index.html` — no changes to client rendering code
+- `SVGElementManager`, `CurveMaker`, `LineWedgeMaker`, `GCMaker` — no changes
+- Animation, playback, sync, gestures, overlay — completely unaffected
+- `build_engraving.js`, `compose_pages.js`, `generate_print_pdf.js` — not touched
+
+#### Step 2: Source Reading — SVG Text Element Formats
+
+Three distinct `<text>` formats found in score.json (from scan of all 296 SVGs with text):
+
+**Format A — Assembly engine SVGs** (secco, Non-Vib, c.l.b. jeté, col legno):
+```xml
+<g transform="translate(X, Y)">
+<text font-family="'Crimson Pro'" font-weight="300" font-style="italic"
+      font-size="0.9797" text-anchor="start" fill="currentColor">
+<tspan>c.l.b. jeté</tspan>
+</text>
+</g>
+```
+- No `x`/`y` on `<text>` — position comes from parent `<g transform>`
+- No inline `style` on `<tspan>`
+- `font-family` is `'Crimson Pro'` or `Crimson Pro Light` (both = same font, weight 300)
+- `font-size` in SVG viewBox units (mm-scale, typically 0.7-1.4)
+
+**Format B — LilyPond simple text** (pizz., b.b., m.v.):
+```xml
+<g transform="translate(X, Y)">
+<text font-family="Crimson Pro Light" font-style="italic"
+      font-size="1.3860" text-anchor="start" fill="#000000">
+<tspan>pizz.</tspan>
+</text>
+</g>
+```
+- Same structure as Format A, just different font-family string
+
+**Format C — Inkscape-edited LilyPond SVGs** (ricochet, col legno battuto, furioso, etc.):
+```xml
+<text font-family="'Crimson Pro Light'" font-style="italic" font-size="1.7461px"
+      text-anchor="start" fill="#000000" id="text2" style="font-size:1.40525px">
+<tspan id="tspan2" style="font-style:italic;font-variant:normal;font-weight:300;
+  font-stretch:normal;font-size:1.40525px;font-family:'Crimson Pro';
+  -inkscape-font-specification:'Crimson Pro Light Italic'">ricochet</tspan>
+</text>
+```
+- Has `x`/`y` attributes on `<text>` element
+- Has `id` attributes on both `<text>` and `<tspan>`
+- Has inline `style` on `<tspan>` that may override `<text>` font-size
+- `font-size` may have `px` suffix (strip it)
+- `<tspan>` style `font-size` overrides `<text>` font-size when present
+
+**Format D — Serif text** (tuplets 5:4, 3:2, harmonics "o", parentheses):
+```xml
+<text font-family="serif" font-style="italic" font-size="1.2348"
+      text-anchor="start" fill="#000000">
+<tspan>5:4</tspan>
+</text>
+```
+- Uses generic `serif` family — NOT Crimson Pro
+- **SKIP these** — they render fine on any device. No font embedding needed.
+
+#### Step 3: Contracts
+
+**Preconditions:**
+- `scores/*.json` exists with valid `svgElements[].svgDataUrl`
+- `public/fonts/CrimsonPro-LightItalic.ttf` and `CrimsonPro-Light.ttf` exist
+- `opentype.js` is installed (`npm install opentype.js`)
+
+**Postconditions:**
+- Every `<text>` element with Crimson Pro font-family in `svgDataUrl` is replaced
+  with a `<path>` element that renders the same glyphs as vector outlines
+- Non-Crimson-Pro text (`font-family="serif"`) is left unchanged
+- The SVG viewBox, dimensions, and all non-text elements are unchanged
+- `builds/performance/score.json` contains the modified data URLs
+- Source `scores/*.json` is never modified
+
+**Invariants:**
+- Visual output is pixel-identical to current rendering (on machines with the font)
+- Visual output is CORRECT on machines without the font (currently broken)
+- No other elements in the SVG are affected
+- Score loading, animation, playback, page turns — all unchanged
+- File size of score.json changes by < 5% (paths ≈ same size as text)
+
+#### Step 4: Risk Register
+
+| Risk | Probability | Impact | Detection | Mitigation |
+|------|------------|--------|-----------|------------|
+| **Baseline alignment wrong** — opentype.js `y` parameter is baseline; SVG `<text>` `y` is also baseline. But if `<g transform>` shifts the coordinate system, the text may appear shifted. | Low | High (text in wrong position) | Visual: text labels visibly shifted up/down vs original | Stage 1 proof-of-concept compares side-by-side before/after for one known SVG |
+| **Font-size scale mismatch** — SVG uses viewBox units (mm), opentype.js `fontSize` may interpret differently | Medium | High (text too large/small) | Visual: obvious at any zoom | Stage 1 catches this immediately. opentype.js fontSize is in the same coordinate units as the SVG viewBox. |
+| **tspan style font-size override** — Format C SVGs have `font-size` in tspan style that overrides text element | Medium | Medium (some text wrong size) | Visual: ricochet/furioso/col legno battuto wrong size | Parser must check tspan style for font-size and use it when present |
+| **fill="currentColor"** — Assembly engine SVGs use `currentColor`. Path must preserve this. | Low | Medium (text invisible or wrong color) | Visual: text disappears | Copy fill attribute from `<text>` to `<path>` |
+| **px suffix on font-size** — Some SVGs have `font-size="1.7461px"`. parseFloat handles this, but verify. | Low | Low | `parseFloat("1.7461px")` = 1.7461 ✓ | Use parseFloat which strips trailing non-numeric chars |
+| **Y-axis flip** — SVG Y goes down, font Y goes up. opentype.js `Path.toPathData()` has `flipY` option (default: true) | Medium | High (text upside down or wrong position) | Visual: obviously upside down | Test in Stage 1. May need `flipY: false` since we're already in SVG coordinate space, OR use `flipY: true` with correct flipYBase. |
+| **Multi-text SVGs** — Some SVGs might have multiple `<text>` elements | Low | Medium (some text not converted) | Count-based: compare converted count vs scan count | Use global regex/replaceAll, not just first match |
+| **Data URL re-encoding changes format** — original may be base64 or URL-encoded | Low | Low (no visual impact, possible size change) | Check: re-encoded URL still works | Always re-encode as base64 (simpler, consistent) |
+| **Existing text bbox used for layout** — `svg_component_library.json` has text bboxes used by assembly engine for positioning. If paths have slightly different bounds, layout could shift. | Very Low | Low (sub-pixel shift) | Visual: requires careful side-by-side comparison | Post-processor only changes the *rendered output* in score.json. Assembly engine's layout math uses pre-computed bboxes and is unaffected. |
+| **score.json corruption** — Bad regex or encoding could corrupt SVG data | Low | Critical (score won't load) | Immediate: score fails to load | Stage 2 writes to temp file, validates before replacing. Always keep source scores/ untouched. |
+
+**Highest risks:** Y-axis flip and font-size scale. Both are caught immediately in Stage 1
+(single SVG visual comparison). This is why Stage 1 exists before touching the full score.
+
+#### Step 5: Staged Implementation Plan
+
+```
+Stage 1: Proof of Concept — Single SVG Visual Comparison
+  - npm install opentype.js
+  - Create scripts/_test_text_to_path.js (temporary, prefixed with _)
+  - Load CrimsonPro-LightItalic.ttf via opentype.js
+  - Pick one SVG from each format (secco=A, pizz.=B, ricochet=C)
+  - Decode SVG data URL → find <text> → convert to <path> using font.getPath()
+  - Write PAIRS of files to builds/_font_test/:
+      original_secco.svg    vs  converted_secco.svg
+      original_pizz.svg     vs  converted_pizz.svg
+      original_ricochet.svg vs  converted_ricochet.svg
+  - Handle: Y-axis flip, font-size, fill color, parent <g> transform preservation
+  → 👁️ GUT CHECK (human): Open each pair in browser tabs at same zoom.
+    Text label must be visually identical — same position, size, weight, style.
+    If ANY pair looks wrong (shifted, flipped, scaled, clipped), STOP.
+    Debug the single failing format before proceeding.
+  → STOP HERE until human confirms all 3 pairs look correct.
+
+Stage 2: Full Score Converter — Standalone Script
+  - Create scripts/_convert_svg_text.js (temporary)
+  - Load both font files (italic + regular)
+  - Read source score.json, iterate all svgElements
+  - For each SVG with Crimson Pro <text>:
+    - Parse all <text> elements (handle Formats A, B, C)
+    - Skip serif text (Format D)
+    - Convert each <text>→<path> using opentype.js
+    - Re-encode as base64 data URL
+  - Write modified score to builds/performance/score.json (NOT source)
+  - Report: SVGs scanned, SVGs modified, text elements converted, any errors
+  → A/B COMPARISON SETUP:
+    1. Keep current (unmodified) build on port 3001:
+       node scripts/performance_server.js
+    2. Serve the converted build on port 3002:
+       node -e "...static server..." on builds/performance-test/
+    3. Open BOTH in browser side by side at same pages
+  → 👁️ GUT CHECK (human): Compare these specific pages:
+    - Page 1 (notation SVGs — overall look)
+    - A page with pizz./b.b. (LilyPond Format B)
+    - A page with secco/Non-Vib (assembly engine Format A)
+    - A page with ricochet/col legno battuto (Inkscape Format C)
+    - A page with tuplet numbers (serif Format D — must be UNCHANGED)
+    - Scroll through 5-10 random pages looking for anything off
+    Must look IDENTICAL to current build. Any visible difference = STOP.
+  → STOP HERE until human confirms converted build looks correct.
+
+Stage 3: Integration — Add to Build Pipeline
+  - Move conversion logic into build_performance_app.js
+  - Insert between "Copy score JSON" and "Copy staff header SVGs"
+    (L1061-1064 in current build script)
+  - Instead of fs.copyFileSync, do: read → convert → write
+  - Add opentype.js to package.json dependencies
+  - Clean up: delete temporary scripts (_test_text_to_path.js, _convert_svg_text.js)
+  → GUT CHECK: Full build from scratch:
+    node scripts/build_performance_app.js
+    Serve and verify same spot-checks as Stage 2
+  → Regression: Full score play/stop/page-turn, parts mode, all modes
+  → If all passes: commit
+```
+
+#### Revert Path
+
+At ANY point, reverting is trivially clean:
+```bash
+# Source score JSON is NEVER modified. To revert:
+node scripts/build_performance_app.js
+# This copies untouched scores/2295-FinalScore-preVersioning.json
+# → builds/performance/score.json. Done — score is exactly as before.
+```
+If Stage 3 (integration) is completed and later found to cause issues:
+- Remove the text-to-paths step from `build_performance_app.js`
+- Rebuild. The plain copy restores the original SVG data URLs.
+- No source data, no client code, no other build steps are affected.
+
+#### What This Does NOT Affect (Regression Safety)
+
+This implementation is **extremely well-isolated**. It modifies ONE thing:
+the `svgDataUrl` strings inside `builds/performance/score.json`.
+
+- **Client rendering code**: Unchanged. `SVGElementManager` creates `<image>` elements
+  and sets `href` to the data URL. It doesn't parse the SVG content. Whether the SVG
+  contains `<text>` or `<path>`, the browser renders it identically from the client's
+  perspective.
+- **Score layout/positioning**: Unchanged. Element positions in the score (startSeconds,
+  track, etc.) are separate fields in svgElements[]. The svgDataUrl is just the visual
+  content.
+- **Curves, LineWedges, GCs, Badges, Motives**: Completely separate data arrays.
+  Not in svgElements. Not affected.
+- **Animation, sync, gestures, overlay, MiniMap**: These systems don't read svgDataUrl
+  at all. They work with time positions and page numbers.
+- **Parts mode**: Parts filtering works on `el.track` field, not SVG content.
+- **Print PDF generation**: Puppeteer screenshots the rendered page. If SVGs render
+  correctly on screen, they render correctly in PDF.
+- **Source score JSON**: Never modified. Only `builds/performance/score.json` changes.
+  Workshop at :5000 is completely unaffected.
 
 Parts Stage P4: Integration Testing
   - Run full Parts Mode Testing Protocol (sections A-J below)

@@ -465,6 +465,23 @@ io.on('connection', function(socket) {
     // Send immediate clock sync
     socket.emit('clockSync', { serverTime: Date.now() });
 
+    // Helper: get all room members (auth + anonymous) for Transfer UI
+    function getRoomMembers(roomId) {
+        var room = rooms.get(roomId);
+        if (!room) return [];
+        var members = [];
+        var roomSockets = io.sockets.adapter.rooms.get(roomId);
+        if (roomSockets) {
+            for (var sid of roomSockets) {
+                var s = io.sockets.sockets.get(sid);
+                var name = 'Anonymous';
+                if (s && s.performer) name = s.performer.displayName;
+                members.push({ socketId: sid, displayName: name });
+            }
+        }
+        return members;
+    }
+
     // Helper: remove performer from room's connectedPerformers
     function removePerformerFromRoom(roomId) {
         var room = rooms.get(roomId);
@@ -476,7 +493,8 @@ io.on('connection', function(socket) {
                 performerId: socket.performer.performerId,
                 displayName: socket.performer.displayName,
                 slot: socket.performer.slot,
-                connectedPerformers: room.connectedPerformers
+                connectedPerformers: room.connectedPerformers,
+                roomMembers: getRoomMembers(roomId)
             });
         }
     }
@@ -499,7 +517,8 @@ io.on('connection', function(socket) {
                 performerId: socket.performer.performerId,
                 displayName: socket.performer.displayName,
                 slot: socket.performer.slot,
-                connectedPerformers: room.connectedPerformers
+                connectedPerformers: room.connectedPerformers,
+                roomMembers: getRoomMembers(roomId)
             });
         }
     }
@@ -547,6 +566,9 @@ io.on('connection', function(socket) {
             assignLeader(roomId, socket.id);
         }
 
+        // Broadcast updated room members to all (covers anonymous clients)
+        io.to(roomId).emit('roomMembers', { roomMembers: getRoomMembers(roomId) });
+
         console.log('Client ' + socket.id + ' joined room ' + roomId + ' (' + room.clientCount + ' clients)');
 
         // Send full score state for initial sync
@@ -556,6 +578,7 @@ io.on('connection', function(socket) {
             scoreTimeOffset: room.scoreTimeOffset,
             tempoHistory: room.tempoHistory,
             connectedPerformers: room.connectedPerformers,
+            roomMembers: getRoomMembers(roomId),
             leaderId: room.leaderId,
             serverTime: Date.now()
         });
@@ -877,6 +900,10 @@ io.on('connection', function(socket) {
             if (room) {
                 room.clientCount--;
                 removePerformerFromRoom(socketRoomId);
+
+                // Broadcast updated room members
+                io.to(socketRoomId).emit('roomMembers', { roomMembers: getRoomMembers(socketRoomId) });
+
                 console.log('Client ' + socket.id + ' disconnected from room ' + socketRoomId + ' (' + room.clientCount + ' clients)');
 
                 // Transfer leader if disconnecting client was the leader

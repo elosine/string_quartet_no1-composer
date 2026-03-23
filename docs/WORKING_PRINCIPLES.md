@@ -1,7 +1,7 @@
 # Working Principles
 
 > **Purpose:** A short, high-signal rubric read at the start of every AI session.
-> Distilled from hard-won lessons across Phases 1–4 of the String Quartet Performance Score project.
+> Distilled from hard-won lessons across Phases 1–8 of the String Quartet Performance Score project.
 > This is NOT comprehensive documentation — that lives in `STRING_QUARTET_PIPELINE_PLAN.md`.
 > This IS the set of principles that prevent repeated mistakes.
 
@@ -68,9 +68,18 @@
 - **Duration calculations must scan all fields.** Don't assume `startSeconds + duration` — check `endSeconds` explicitly. *(Phase 4: curves[153].endSeconds=508.05 was the true end)*
 - **Workshop `page % 2` pattern.** Used in 4+ maker systems (Curve, LineWedge, SVG, GC). Any new system using this pattern needs the bottom-ref swap override. *(Phase 3)*
 
+## Multi-Client & Socket
+
+- **`ScoreTime.now()` for live position, not `currentScoreTimeMs`.** `currentScoreTimeMs` is only updated on stop — it's stale during playback. *(Phase 8: marker-at-zero bug)*
+- **Socket ID is not available at init.** `ClockSync.socket.id` isn't set when patches init (connect event already fired). Use polling + event hooks to resolve it. *(Phase 8: leader badge bug)*
+- **Stub events must mirror full server payload shape.** If the server sends `leaderId` in `scoreState`, the offline stub must too. Missing fields cause silent feature failures. *(Phase 8: offline leader badge)*
+- **Test offline stub AND real server.** They have different timing characteristics. A feature that works on one may break on the other. *(Phase 8: bugs #5-6)*
+- **Centralize navigation through a single function.** Multiple code paths calling `GraphicTimeline.onGoto()` directly leads to state inconsistency. Route through `SyncMode.localGoto()`. *(Phase 8: 5 independent paths → 1)*
+
 ---
 
 ## Changelog
 | Date | Phase | Addition |
 |------|-------|---------|
 | Mar 21, 2026 | 1–4 | Initial document — distilled from all Phase 1–4 post-mortems |
+| Mar 23, 2026 | 8 | Added Multi-Client & Socket section (5 principles from Phase 8 post-mortem) |

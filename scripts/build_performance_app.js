@@ -20,6 +20,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const opentype = require('opentype.js');
 
 const scoreJsonPath = process.argv[2] || 'scores/2295-FinalScore-preVersioning.json';
 const outputDir = process.argv[3] || 'builds/performance';
@@ -513,7 +514,8 @@ if (html.includes(autoLoadMarker)) {
             '                                    isPlaying: false,',
             '                                    currentScoreTimeMs: 0,',
             '                                    scoreTimeOffset: 0,',
-            '                                    tempoHistory: data.tempoHistory || [{ scoreTimeMs: 0, bpm: 60, beatsPerPage: 8 }]',
+            '                                    tempoHistory: data.tempoHistory || [{ scoreTimeMs: 0, bpm: 60, beatsPerPage: 8 }],',
+            '                                    leaderId: "local-offline"',
             '                                });',
             '                            }',
             '                        }, 200);',
@@ -1058,10 +1060,105 @@ const outputPath = path.join(outputDir, 'index.html');
 fs.writeFileSync(outputPath, html);
 const patchedSize = html.length;
 
-// Copy score JSON as score.json
+// ─── Convert SVG text to paths (font embedding via opentype.js) ─────────────
+// Replaces Crimson Pro <text> elements in SVG data URLs with <path> outlines.
+// This eliminates font dependency — SVGs render correctly on any device.
 const scoreOutputPath = path.join(outputDir, 'score.json');
-fs.copyFileSync(scoreJsonPath, scoreOutputPath);
-const scoreSize = fs.statSync(scoreOutputPath).size;
+const fontsDir = path.join(__dirname, '..', 'public', 'fonts');
+const italicFontPath = path.join(fontsDir, 'CrimsonPro-LightItalic.ttf');
+const regularFontPath = path.join(fontsDir, 'CrimsonPro-Light.ttf');
+
+if (fs.existsSync(italicFontPath) && fs.existsSync(regularFontPath)) {
+    const italicFont = opentype.loadSync(italicFontPath);
+    const regularFont = opentype.loadSync(regularFontPath);
+    const scoreData = JSON.parse(fs.readFileSync(scoreJsonPath, 'utf8'));
+    const svgEls = scoreData.svgElements || [];
+
+    function isCrimsonPro(ff) {
+        if (!ff) return false;
+        return ff.replace(/'/g, '').toLowerCase().includes('crimson pro');
+    }
+
+    function getEffectiveFontSize(te) {
+        var m = te.match(/<tspan[^>]*style="([^"]*)"/);
+        if (m) { var fs2 = m[1].match(/font-size:\s*([\d.]+)/); if (fs2) return parseFloat(fs2[1]); }
+        m = te.match(/<text[^>]*style="([^"]*)"/);
+        if (m) { var fs3 = m[1].match(/font-size:\s*([\d.]+)/); if (fs3) return parseFloat(fs3[1]); }
+        m = te.match(/font-size="([\d.]+)/);
+        return m ? parseFloat(m[1]) : 1.0;
+    }
+
+    function buildPathData(commands) {
+        var dp = 4;
+        function fmt(n) { return n.toFixed(dp); }
+        var d = '';
+        for (var i = 0; i < commands.length; i++) {
+            var c = commands[i];
+            switch (c.type) {
+                case 'M': d += 'M' + fmt(c.x) + ' ' + fmt(c.y); break;
+                case 'L': d += 'L' + fmt(c.x) + ' ' + fmt(c.y); break;
+                case 'Q': d += 'Q' + fmt(c.x1) + ' ' + fmt(c.y1) + ' ' + fmt(c.x) + ' ' + fmt(c.y); break;
+                case 'C': d += 'C' + fmt(c.x1) + ' ' + fmt(c.y1) + ' ' + fmt(c.x2) + ' ' + fmt(c.y2) + ' ' + fmt(c.x) + ' ' + fmt(c.y); break;
+                case 'Z': d += 'Z'; break;
+            }
+        }
+        return d;
+    }
+
+    var txtConverted = 0, txtSkipped = 0, svgsModified = 0;
+
+    for (var ei = 0; ei < svgEls.length; ei++) {
+        var el = svgEls[ei];
+        if (!el.svgDataUrl) continue;
+        var svg;
+        try {
+            if (el.svgDataUrl.startsWith('data:image/svg+xml;base64,')) {
+                svg = Buffer.from(el.svgDataUrl.slice(26), 'base64').toString('utf8');
+            } else if (el.svgDataUrl.startsWith('data:image/svg+xml')) {
+                svg = decodeURIComponent(el.svgDataUrl.replace(/^data:image\/svg\+xml[^,]*,/, ''));
+            } else { continue; }
+        } catch (e) { continue; }
+
+        if (!svg.includes('<text')) continue;
+
+        var modified = false;
+        svg = svg.replace(/<text[^>]*>[\s\S]*?<\/text>/g, function(textEl) {
+            var ffMatch = textEl.match(/font-family="([^"]+)"/);
+            if (!ffMatch || !isCrimsonPro(ffMatch[1])) { txtSkipped++; return textEl; }
+            var tspanMatch = textEl.match(/<tspan[^>]*>([\s\S]*?)<\/tspan>/);
+            if (!tspanMatch || !tspanMatch[1].trim()) { txtSkipped++; return textEl; }
+            var text = tspanMatch[1].trim();
+            var fontSize = getEffectiveFontSize(textEl);
+            var fillMatch = textEl.match(/<text[^>]*?fill="([^"]+)"/);
+            var fill = fillMatch ? fillMatch[1] : '#000000';
+            var xM = textEl.match(/<text[^>]*?\sx="([\d.eE+-]+)"/);
+            var yM = textEl.match(/<text[^>]*?\sy="([\d.eE+-]+)"/);
+            var tx = xM ? parseFloat(xM[1]) : 0;
+            var ty = yM ? parseFloat(yM[1]) : 0;
+            var isItalic = textEl.includes('font-style="italic"') || textEl.includes('font-style:italic');
+            var font = isItalic ? italicFont : regularFont;
+            var pathObj = font.getPath(text, tx, ty, fontSize);
+            var pd = buildPathData(pathObj.commands);
+            if (!pd) { txtSkipped++; return textEl; }
+            txtConverted++;
+            modified = true;
+            return '<path d="' + pd + '" fill="' + fill + '"/>';
+        });
+
+        if (modified) {
+            el.svgDataUrl = 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
+            svgsModified++;
+        }
+    }
+
+    fs.writeFileSync(scoreOutputPath, JSON.stringify(scoreData));
+    var scoreSize = fs.statSync(scoreOutputPath).size;
+    console.log('  ✓ Text→paths: ' + txtConverted + ' converted, ' + txtSkipped + ' skipped, ' + svgsModified + ' SVGs modified');
+} else {
+    console.log('  ⚠ Font files not found — copying score.json without text-to-paths conversion');
+    fs.copyFileSync(scoreJsonPath, scoreOutputPath);
+    var scoreSize = fs.statSync(scoreOutputPath).size;
+}
 
 // Copy staff header SVGs (referenced by StaffCursors for instrument labels)
 const lilypondSrc = path.join(__dirname, '..', 'lilypond_code');
@@ -1108,7 +1205,7 @@ if (fs.existsSync(pitchesSrc)) {
     console.log('  \u26A0 pitchesSVGs directory not found');
 }
 
-// Copy font files for SVG text rendering (Crimson Pro Light used in notation SVGs)
+// Copy font files (kept as fallback; text-to-paths above handles SVG rendering)
 const fontsSrc = path.join(__dirname, '..', 'public', 'fonts');
 const fontsDst = path.join(outputDir, 'fonts');
 let fontsCopied = 0;

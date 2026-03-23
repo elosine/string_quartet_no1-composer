@@ -441,7 +441,7 @@ module.exports = function applyPartsPatches(html) {
             label.setAttribute('font-size', pgFontSize);
             label.setAttribute('font-weight', 'bold');
             label.setAttribute('fill', '#000');
-            label.textContent = 'p' + pageNumber;
+            label.textContent = 'P' + (pageNumber + 1);
             group.appendChild(label);
         };
 
