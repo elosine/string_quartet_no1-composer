@@ -382,6 +382,7 @@ const pongHandlerWithDriftCheck = [
     "                // Phase 6: Handle authoritative position check for drift correction",
     "                this.socket.on('scorePositionCheck', (data) => {",
     '                    if (!window.ScoreTime || !ScoreTime.isPlaying) return;',
+    '                    if (window.SyncMode && SyncMode.isIndependent) return;',
     '                    var localScoreTime = ScoreTime.now();',
     '                    var drift = localScoreTime - data.scoreTimeMs;',
     '                    if (Math.abs(drift) > 50) {',
@@ -824,6 +825,9 @@ replaceOnce(
 // This ensures the toggle button is hidden and the panel can't be opened.
 // Also hides MIDI-specific elements in the right panel.
 const perfCss = [
+    '        /* Font embedding: Crimson Pro Light for SVG notation text */',
+    '        @font-face { font-family: "Crimson Pro Light"; font-style: normal; font-weight: 300; src: url("fonts/CrimsonPro-Light.ttf") format("truetype"); }',
+    '        @font-face { font-family: "Crimson Pro Light"; font-style: italic; font-weight: 300; src: url("fonts/CrimsonPro-LightItalic.ttf") format("truetype"); }',
     '        /* Performance Score: hide composition-only UI */',
     '        #compositionPanelToggle { display: none !important; }',
     '        #compositionPanel { transform: translateX(-100%) !important; pointer-events: none; }',
@@ -1102,6 +1106,22 @@ if (fs.existsSync(pitchesSrc)) {
     console.log('  \u2713 Copied ' + pitchSvgsCopied + ' pitch SVGs (3 clefs)');
 } else {
     console.log('  \u26A0 pitchesSVGs directory not found');
+}
+
+// Copy font files for SVG text rendering (Crimson Pro Light used in notation SVGs)
+const fontsSrc = path.join(__dirname, '..', 'public', 'fonts');
+const fontsDst = path.join(outputDir, 'fonts');
+let fontsCopied = 0;
+if (fs.existsSync(fontsSrc)) {
+    fs.mkdirSync(fontsDst, { recursive: true });
+    const fontFiles = fs.readdirSync(fontsSrc).filter(f => f.endsWith('.ttf') || f.endsWith('.woff2') || f.endsWith('.woff'));
+    for (const file of fontFiles) {
+        fs.copyFileSync(path.join(fontsSrc, file), path.join(fontsDst, file));
+        fontsCopied++;
+    }
+    console.log('  ✓ Copied ' + fontsCopied + ' font files');
+} else {
+    console.log('  ⚠ public/fonts directory not found — SVG text may not render on remote machines');
 }
 
 console.log('\n═══ Build Complete ═══');

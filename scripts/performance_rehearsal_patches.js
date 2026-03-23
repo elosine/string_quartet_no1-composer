@@ -280,16 +280,19 @@ module.exports = function applyRehearsalPatches(html) {
             // ─── Page navigation ────────────────────────────────────────────
             getCurrentPage: function() {
                 if (window.PartsMode && PartsMode.active) {
+                    // Return the base page of the current screen (first visible page)
+                    // so manual turns advance by a full screenful
                     var pos = window.StaffCursors ? StaffCursors.getPosition(0) : null;
-                    return pos ? (pos.page || 0) : 0;
+                    var curPage = pos ? (pos.page || 0) : 0;
+                    return Math.floor(curPage / PartsMode.pageCount) * PartsMode.pageCount;
                 }
                 // Full score: top page (even number) is the reference
                 return window.GraphicTimeline ? GraphicTimeline.currentTopPage : 0;
             },
 
             getPageStep: function() {
-                // Full score shows 2 pages (top+bottom), parts mode 1 page per section
-                return (window.PartsMode && PartsMode.active) ? 1 : 2;
+                // Full score shows 2 pages (top+bottom); parts mode advances one full screen
+                return (window.PartsMode && PartsMode.active) ? PartsMode.pageCount : 2;
             },
 
             nextPage: function() {
@@ -531,33 +534,68 @@ module.exports = function applyRehearsalPatches(html) {
         var pageTotal = overlay.querySelector('.co-page-total');
 
         var _cachedTotalPages = 0;
+        function computeTotalPages(spp) {
+            if (_cachedTotalPages > 0) return _cachedTotalPages;
+            var leadIn = typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0;
+            var maxEnd = 0;
+            // SVG element start + offset (approximation of visual extent)
+            if (window.SVGElementManager && SVGElementManager.elements) {
+                for (var i = 0; i < SVGElementManager.elements.length; i++) {
+                    var el = SVGElementManager.elements[i];
+                    var t = (el.referenceSeconds || 0) + (el.offsetSeconds || 0);
+                    if (t > maxEnd) maxEnd = t;
+                }
+            }
+            // Curves: use endSeconds
+            if (window.CurveMaker && CurveMaker.curves) {
+                for (var c = 0; c < CurveMaker.curves.length; c++) {
+                    var ce = CurveMaker.curves[c].endSeconds || 0;
+                    if (ce > maxEnd) maxEnd = ce;
+                }
+            }
+            // Line wedges: use endSeconds
+            if (window.LineWedgeMaker && LineWedgeMaker.lineWedges) {
+                for (var l = 0; l < LineWedgeMaker.lineWedges.length; l++) {
+                    var le = LineWedgeMaker.lineWedges[l].endSeconds || 0;
+                    if (le > maxEnd) maxEnd = le;
+                }
+            }
+            // GCs: use endSeconds
+            if (window.GCMaker && GCMaker.gcs) {
+                for (var g = 0; g < GCMaker.gcs.length; g++) {
+                    var ge = GCMaker.gcs[g].endSeconds || 0;
+                    if (ge > maxEnd) maxEnd = ge;
+                }
+            }
+            if (maxEnd > 0) {
+                var maxActualSec = maxEnd + leadIn;
+                _cachedTotalPages = Math.floor(maxActualSec / spp) + 1;
+            }
+            return _cachedTotalPages;
+        }
         function getPageInfo() {
             var current = 0;
             var total = 0;
+            var currentScreen = 0;
+            var totalScreens = 0;
+            var pagesPerScreen = 1;
             if (window.PartsMode && PartsMode.active) {
                 var pos = window.StaffCursors ? StaffCursors.getPosition(0) : null;
                 current = pos ? (pos.page || 0) : 0;
-                total = window.PartsMode ? (PartsMode.pageCount || 0) : 0;
+                pagesPerScreen = PartsMode.pageCount || 1;
+                if (window.GraphicTimeline) {
+                    var spp = GraphicTimeline.getSecondsPerPage();
+                    if (spp > 0) total = computeTotalPages(spp);
+                }
             } else if (window.GraphicTimeline) {
                 current = GraphicTimeline.currentTopPage || 0;
+                pagesPerScreen = 2;
                 var spp = GraphicTimeline.getSecondsPerPage();
-                if (spp > 0) {
-                    // Compute total from SVGElementManager (cached)
-                    if (_cachedTotalPages === 0 && window.SVGElementManager && SVGElementManager.elements) {
-                        var maxSec = 0;
-                        for (var i = 0; i < SVGElementManager.elements.length; i++) {
-                            var rs = SVGElementManager.elements[i].referenceSeconds || 0;
-                            if (rs > maxSec) maxSec = rs;
-                        }
-                        if (maxSec > 0) {
-                            var maxActualSec = maxSec + (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
-                            _cachedTotalPages = Math.ceil(maxActualSec / spp) + 1;
-                        }
-                    }
-                    total = _cachedTotalPages;
-                }
+                if (spp > 0) total = computeTotalPages(spp);
             }
-            return { current: current, total: total };
+            currentScreen = Math.floor(current / pagesPerScreen) + 1;
+            totalScreens = total > 0 ? Math.ceil(total / pagesPerScreen) : 0;
+            return { current: current, total: total, currentScreen: currentScreen, totalScreens: totalScreens, pagesPerScreen: pagesPerScreen };
         }
 
         function refreshState() {
@@ -567,13 +605,8 @@ module.exports = function applyRehearsalPatches(html) {
             playBtn.classList.toggle('co-playing', !!playing);
             // Page (display as spreads in full score: 2 pages per view)
             var info = getPageInfo();
-            if (window.PartsMode && PartsMode.active) {
-                pageNum.textContent = info.current;
-                pageTotal.textContent = info.total;
-            } else {
-                pageNum.textContent = Math.floor(info.current / 2) + 1;
-                pageTotal.textContent = Math.ceil(info.total / 2);
-            }
+            pageNum.textContent = 'S' + info.currentScreen + ' of ' + info.totalScreens + ' | P' + (info.current + 1);
+            pageTotal.textContent = info.total;
             // Zoom
             var zoom = (window.ScoreZoom) ? ScoreZoom.zoomLevel : 100;
             zoomBtn.textContent = '⊙ ' + zoom + '%';
@@ -1151,11 +1184,18 @@ module.exports = function applyRehearsalPatches(html) {
 
         // ─── Listen for server loopState broadcasts ─────────────────────
         function onLoopState(data) {
+            var wasEnabled = loopEnabled;
             loopStartMs = data.loopStartMs;
             loopEndMs = data.loopEndMs;
             loopEnabled = data.loopEnabled;
             loopCount = data.loopCount || 0;
             refreshUI();
+            // When loop disables during playback, sections may be stale
+            // from the frozen circular buffer — refresh all sections
+            if (wasEnabled && !loopEnabled && window.ScoreTime && ScoreTime.isPlaying) {
+                var currentSec = ScoreTime.now() / 1000;
+                if (window.GraphicTimeline) GraphicTimeline.onGoto(currentSec);
+            }
         }
 
         // Register listener (works with both real socket.io and stub)
@@ -1208,6 +1248,15 @@ module.exports = function applyRehearsalPatches(html) {
             '  display: flex; align-items: center; padding: 0 10px;',
             '  font-family: -apple-system, BlinkMacSystemFont, sans-serif;',
             '  user-select: none; -webkit-user-select: none;',
+            '  transition: height 0.25s ease, opacity 0.25s ease;',
+            '  overflow: hidden;',
+            '}',
+            '#miniMap.mm-collapsed {',
+            '  height: 3px; opacity: 0.3; cursor: pointer;',
+            '}',
+            '#miniMapHoverZone {',
+            '  position: fixed; bottom: 0; left: 0; right: 0; height: 30px;',
+            '  z-index: 9998; pointer-events: auto;',
             '}',
             '#miniMap .mm-page-badge {',
             '  color: rgba(255,255,255,0.7); font-size: 11px; white-space: nowrap;',
@@ -1244,6 +1293,33 @@ module.exports = function applyRehearsalPatches(html) {
         var progress = bar.querySelector('.mm-progress');
         var cursor = bar.querySelector('.mm-cursor');
         var timeEl = bar.querySelector('.mm-time');
+
+        // ─── Auto-show/hide ─────────────────────────────────────────────
+        var hoverZone = document.createElement('div');
+        hoverZone.id = 'miniMapHoverZone';
+        document.body.appendChild(hoverZone);
+
+        var mmHideTimer = null;
+        function showMiniMap() {
+            bar.classList.remove('mm-collapsed');
+            clearTimeout(mmHideTimer);
+            mmHideTimer = setTimeout(hideMiniMap, 3000);
+        }
+        function hideMiniMap() {
+            bar.classList.add('mm-collapsed');
+            clearTimeout(mmHideTimer);
+        }
+
+        // Start collapsed
+        bar.classList.add('mm-collapsed');
+
+        // Hover/touch triggers
+        hoverZone.addEventListener('pointerenter', showMiniMap);
+        bar.addEventListener('pointerenter', showMiniMap);
+        bar.addEventListener('pointerleave', function() {
+            clearTimeout(mmHideTimer);
+            mmHideTimer = setTimeout(hideMiniMap, 3000);
+        });
 
         // ─── Helpers ────────────────────────────────────────────────────
         function getTotalDurationSec() {
@@ -1302,11 +1378,7 @@ module.exports = function applyRehearsalPatches(html) {
             // Page badge (display as spreads in full score mode)
             if (window.ControlsOverlay && ControlsOverlay.getPageInfo) {
                 var info = ControlsOverlay.getPageInfo();
-                if (window.PartsMode && PartsMode.active) {
-                    pageBadge.textContent = 'P' + info.current + '/' + info.total;
-                } else {
-                    pageBadge.textContent = 'P' + (Math.floor(info.current / 2) + 1) + '/' + Math.ceil(info.total / 2);
-                }
+                pageBadge.textContent = 'S' + info.currentScreen + '/' + info.totalScreens + ' P' + (info.current + 1) + '/' + info.total;
             }
         }
 
@@ -1358,7 +1430,9 @@ module.exports = function applyRehearsalPatches(html) {
         window.MiniMap = {
             update: update,
             renderMarkers: renderMarkers,
-            renderLoopRegion: renderLoopRegion
+            renderLoopRegion: renderLoopRegion,
+            show: showMiniMap,
+            hide: hideMiniMap
         };
 
         console.log('[MiniMap] Initialized');
@@ -1420,6 +1494,7 @@ module.exports = function applyRehearsalPatches(html) {
                 ScoreTime.isPlaying = true;
             }
             if (window.ControlsOverlay) ControlsOverlay.refresh();
+            if (ScoreTime.isPlaying && window.MiniMap) MiniMap.show();
         }
 
         // ─── Create UI ──────────────────────────────────────────────────
@@ -1509,6 +1584,11 @@ module.exports = function applyRehearsalPatches(html) {
             _isIndependent = !_isIndependent;
             if (_isIndependent) {
                 showToast('Independent mode — local controls only', 2000);
+            } else {
+                // Re-sync with server when returning to synced mode
+                var s = getSocket();
+                if (s) s.emit('requestState');
+                showToast('Re-synced to room', 1500);
             }
             refreshSyncUI();
         });

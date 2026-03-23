@@ -2,8 +2,35 @@
 
 ## Current Status
 **Active Phase:** Phase 8 — Rehearsal Mode (Stage 6 — integration verification)
-**Last Session:** Mar 22, 2026
+**Last Session:** Mar 23, 2026
 **Last Commit:** `[Phase 8 Stage 5b] Synced/Independent + Leader, room-based looping, page turn sync, hide right panel`
+
+### ▶ RESUME HERE (next session)
+
+**Priority order:**
+
+1. **DEBUG: Independent mode + MiniMap jump bug (full score)**
+   - Repro: load full score as synced slave → go independent → use MiniMap to jump ahead
+   - Symptoms: counter (S#/P#) advances but clock doesn't update, graphic position indicator doesn't advance, scrolling plays over wrong content (possibly original sync position)
+   - Investigate: `onMiniMapClick` handler, `scoreGoto` flow in independent mode, whether visual/scroll layers properly disconnect from server position
+   - Files: `performance_rehearsal_patches.js` (MiniMap, independent mode), `build_performance_app.js` (scoreGoto handler)
+
+2. **IMPLEMENT: Font fix Option A**
+   - Embed base64 Crimson Pro `@font-face` into SVG data URLs that contain `<text>` elements with `font-family="'Crimson Pro'"`
+   - Modify SVG-to-dataURL conversion in `build_performance_app.js`
+   - Only ~30 SVGs have text — targeted injection
+
+3. **QUICK TEST: Server join reset-to-zero (Option C)**
+   - Restart server, close all tabs, reopen → should start at zero (not mid-score)
+
+4. **RUN: Testing protocol** → `docs/TESTING_PROTOCOL.md` (16 tests, 4 tiers)
+
+### Verified this session (Mar 23)
+- ✅ Loop exit fix — disabling loop during playback refreshes all sections
+- ✅ Page count — 64 pages in both full score and parts mode
+- ✅ Server join Option C implemented (not yet tested by user)
+- ✅ Testing protocol written to `docs/TESTING_PROTOCOL.md`
+- ✅ Pipeline plan updated: Phase 11 (performance grace period note), Phase 14 Step 14.5 (SVG optimization)
 
 ## How to Resume Work (for the human)
 
@@ -47,7 +74,7 @@ Type `/session-start` — this triggers a workflow that walks the AI through the
 | 5. Server Architecture | ✅ Complete | Mar 21 | Room-based Socket.IO, grace period, reconnection, 3 build patches (1b/1c) |
 | 6. Sync Tier 1 | ✅ Complete | Mar 21 | performance.now(), outlier rejection, connection awareness, drift correction |
 | 7. Auth & Persistence | ✅ Complete | Mar 22 | Self-service sessions, JWT, preferences, 6 API endpoints |
-| 8. Rehearsal Mode | 🔄 In Progress | — | Stages 1-5 complete, Stage 6 integration verification |
+| 8. Rehearsal Mode | 🔄 In Progress | — | Stages 1-5 complete, Stage 6 integration verification. Loop exit fix verified. Independent+MiniMap bug found. |
 | 9–14 | ⏳ Pending | — | |
 
 ---
@@ -1080,83 +1107,299 @@ Stage D: Keep S8-S11 strips + CSS (already done)
 ---
 
 ## RESUME HERE
-**Current phase:** Phase 8 — Rehearsal Mode (Stage 6 — integration verification)
+**Current phase:** Phase 8 — Parts Mode Hardening
 **Last session:** Mar 22, 2026
-**Status:** Mid-testing. 3 bugs fixed, 5 open bugs + 1 UX issue documented below.
-**Resume testing at:** Section F (Markers) of Parts Mode Testing Protocol
-**Key files:** `scripts/performance_rehearsal_patches.js`, `scripts/performance_server.js`, `scripts/build_performance_app.js`
+**Status:** Full score passed all Phase 8 tests ✅. Parts mode needs screen-flip page turn + Stage 5 verification.
+**Key files:** `scripts/performance_parts_patches.js`, `scripts/performance_rehearsal_patches.js`
+
+> **Rule: Do NOT change full-score behavior.** All full-score Phase 8 tests passed.
+> All parts-mode changes must be guarded by `PartsMode.active` or live in `performance_parts_patches.js`.
 
 ---
 
-### Bugs Fixed This Session (Mar 22 PM)
+### Full Score Status — PASSED ✅
+
+All Phase 8 stages tested and verified for full score (anonymous mode):
+- Stage 1b: Interaction blocker ✅
+- Stage 2: Controls overlay ✅
+- Stage 3: Custom markers ✅
+- Stage 4: Looping ✅
+- Stage 5a: Room-based looping ✅
+- Stage 5b: Synced/Independent + Leader ✅
+- Stage 5c: Hide right panel ✅
+- Multi-client sync (all items) ✅
+
+### Bugs Fixed (Mar 22)
 
 | # | Bug | Fix | File |
 |---|-----|-----|------|
-| 1 | Independent client can't jump to markers (gets "not leader" rejection) | Route marker `jumpTo()` through `SyncMode.isIndependent` — local `GraphicTimeline.onGoto()` when independent | rehearsal_patches L760-771 |
-| 2 | Interaction blocker missed parts mode sections 2+ (LW nodes, badges still clickable) | Extended blocker to iterate `PartsMode.sections[]` instead of hardcoding ScoreTop/ScoreBottom | rehearsal_patches L373-405 |
-| 3 | CSS cursor override missed parts mode sections | Changed `#ScoreTop *, #ScoreBottom *` → `#ScoreContainer svg *` | build_app L845-846 |
+| 1 | Independent client can't jump to markers | Route `jumpTo()` through `SyncMode.isIndependent` | rehearsal_patches L760-771 |
+| 2 | Interaction blocker missed parts sections 2+ | Iterate `PartsMode.sections[]` | rehearsal_patches L373-405 |
+| 3 | CSS cursor override missed parts sections | `#ScoreContainer svg *` | build_app L845-846 |
 
-### Open Bugs (to fix next session)
+---
 
-| ID | Severity | Description | Root Cause (suspected) | Fix Approach |
-|----|----------|-------------|----------------------|--------------|
-| OB-1 | HIGH | **Page flip gestures broken in independent mode** — edge taps and swipes don't turn pages when client is independent | Unknown — gesture detection and nextPage/prevPage code look correct. Needs debugging with console logs to trace where the gesture path fails. | Add diagnostic logging to onTap/onSwipe/nextPage, test in independent mode |
-| OB-2 | HIGH | **Parts mode page total wrong** — overlay shows "Page 23 of 6" and MiniMap shows "P21/6". The total (6) is the section count, not total score pages. | `getPageInfo()` returns `PartsMode.pageCount` which is the number of visible sections (URL `?pages=` param), not the total number of score pages for the track. | Compute actual total pages: `Math.ceil(maxSeconds / secondsPerPage)` or cache from SVGElementManager, similar to full-score path. |
-| OB-3 | MEDIUM | **MiniMap obscures bottommost track** — in both full score and parts mode, the MiniMap bar covers the bottom of the score | MiniMap is absolutely positioned at bottom of viewport, overlapping score content | Options: (A) auto-show/hide on scroll/tap with fade, (B) add bottom margin/padding to score container to make room, (C) collapse to thin line and expand on hover/tap. Recommend (A) or (B). |
-| OB-4 | MEDIUM | **SVG text cut off on remote laptop** — font rendering issue, text in score SVGs is truncated | The score uses a specific font that may not be installed on the remote machine. SVG text relies on the font being available in the browser. | Embed the font via `@font-face` in the built HTML. Need to identify which font the SVGs use, copy the font file to `builds/performance/`, and add a CSS `@font-face` declaration. |
-| OB-5 | LOW | **Parts mode circular buffer page turn is confusing** — advancing pages moves only one band/section at a time, not all 6 simultaneously. The sections show non-sequential page numbers (e.g., 210, 200, 195, 167, 180, 185). | This IS the designed behavior — circular buffer rotates one section at a time for smooth scrolling during playback. But manual page turns make the non-sequential order visible and confusing. | UX options: (A) When manually turning pages (not during playback), jump all sections to sequential pages. (B) Add visual indicator showing which section is "current". (C) Accept current behavior and improve page number labels. Needs user discussion. |
+### Phase 8 Parts Mode — Pre-Implementation Plan
 
-### Multi-Client Sync Test Results (Mar 22 PM — full score)
+> **Rule: Do NOT change full-score behavior.** All full-score Phase 8 tests passed.
+> All parts-mode changes must be guarded by `PartsMode.active` or live in `performance_parts_patches.js`.
 
-```
-  [✓] Two tabs: play in one → both play
-  [✓] Page turn in leader → both turn
-  [✓] Loop set in leader → both loop
-  [✓] Non-leader play → "not leader" toast
-  [✓] Non-leader goes independent → can play/stop/navigate locally
-  [?] Auto-detach on swipe during playback — works but user unsure what it is (documented above)
-  [✓] Re-sync button works
-  [✓] Recall All works
-  [✓] Leader transfer on disconnect
-```
+#### What already works in parts mode (user-tested)
 
-### Parts Mode Testing Protocol (resume at section F)
+- ✅ **Playback scrolling** — circular buffer rotates sections correctly during playback
+- ✅ **Goto** — `onGoto()` lays out N sequential pages (fixed this session)
+- ✅ **Controls overlay** — shows/hides, play/stop works (Stage 2 — skip)
+- ✅ **Custom markers** — create, jump, delete, persist (Stage 3 — skip)
+- ✅ **Looping** — set A/B, toggle, clear, loop rewinds (Stage 4 — works)
+- ✅ **Interaction blocker** — extended to all N sections (Stage 1b — fixed)
+- ✅ **Right panel hidden** — CSS global hide works in parts mode (Stage 5c — skip)
+
+#### Staged Plan
 
 ```
-═══ A. RENDERING ═══
-  [not yet tested systematically]
+Parts Stage P1: Screen-Flip Page Turn + ScoreTime Sync ✅ IMPLEMENTED
+  - Change onGoto to sequential layout (DONE)
+  - Change getCurrentPage → screen base page (DONE)
+  - Change getPageStep → PartsMode.pageCount (DONE)
+  - Add ScoreTime update in parts onGoto (DONE): sets currentScoreTimeMs
+    (stopped) or scoreTimeOffset (playing)
+  - Add force-render after onGoto (DONE): calls TrackSystem.update()
+    so notation re-renders when animation loop isn't running
+  - Add ControlsOverlay.refresh() after onGoto (DONE): page display updates
+  - Files: performance_parts_patches.js (onGoto), performance_rehearsal_patches.js
+  - Full-score impact: NONE — all changes guarded by PartsMode.active or in parts file
+  → TEST: 🤖 Verify getCurrentPage returns screen-aligned base (0, 6, 12…)
+  → TEST: 🤖 Verify getPageStep returns PAGE_COUNT (6) in parts mode
+  → TEST: 🤖 Verify onGoto sets sequential sectionPages [basePage…basePage+N-1]
+  → TEST: 🤖 Build succeeds with no errors
+  → TEST: 👁️ Stopped: tap right edge → all 6 sections show pages 6-11 (was 0-5)
+  → TEST: 👁️ Tap right edge again → all 6 show pages 12-17
+  → TEST: 👁️ Tap left edge → back to pages 6-11
+  → TEST: 👁️ Swipe left/right → same as edge taps
+  → TEST: 👁️ Overlay ▶/◀ buttons → same behavior
+  → TEST: 👁️ Jump-to (overlay input) → sections show correct page set
+  → TEST: 👁️ Marker jump → sections show correct page set
+  → TEST: 👁️ MiniMap tap → sections show correct page set
+  → TEST: 👁️ Notation content (SVGs, curves, LWs, GCs, badges) re-renders on all sections
+  → TEST: 👁️ During playback: circular buffer still rotates one section at a time
+  → TEST: 👁️ Manual page turn during playback: sections update, playback continues from new position
+  → TEST: 👁️ Full score page turns still work correctly (regression)
+
+Parts Stage P2: Page Display Fix (OB-2) ✅ IMPLEMENTED
+  - Fix getPageInfo() (DONE): computes actual total pages from
+    SVGElementManager maxSec + getSecondsPerPage (same as full score)
+  - Display BOTH screen and page (DONE): overlay shows "S1 of 7 | P3",
+    MiniMap badge shows "S1/7 P3/42"
+  - All changes guarded by PartsMode.active
+  - Files: performance_rehearsal_patches.js (getPageInfo, overlay refresh, MiniMap badge)
+  - Full-score impact: NONE — guarded by PartsMode.active
+  → TEST: 🤖 Verify getPageInfo returns correct totalPages and totalScreens
+  → TEST: 🤖 Build succeeds with no errors
+  → TEST: 👁️ Overlay shows "S1 of 7 | P1 of 42" (example values, check correctness)
+  → TEST: 👁️ MiniMap badge shows correct screen/page totals
+  → TEST: 👁️ Page/screen numbers update after manual page turn
+  → TEST: 👁️ Page/screen numbers update during playback
+  → TEST: 👁️ Full score overlay still shows correct page numbers (regression)
+
+Parts Stage P3: Sync & Leader for Parts (mirrors Stage 5a/5b/5c) ✅ VERIFIED
+  - Source reading DONE: CursorControls.onScoreGoto (index.html L3546)
+    → sets ScoreTime → calls GraphicTimeline.onGoto() → parts override runs ✅
+  - Source reading DONE: requestState → server emits scoreGoto → same path ✅
+  - No bridge needed: onScoreGoto already calls onGoto directly
+  - Verify room-based looping works for parts clients (expect: already working)
+  - Verify leader gating works when parts client attempts leader-only actions
+  - Verify auto-detach on swipe → independent page turns work (depends on P1)
+  - Verify re-sync snaps parts client back to leader position
+  - Verify recall-all forces parts client to re-sync
+  - Verify leader transfer on disconnect
+  - Files: performance_parts_patches.js (possible bridge), performance_rehearsal_patches.js (if needed)
+  - Full-score impact: NONE — any bridge is guarded by PartsMode.active
+  → TEST: 🤖 Trace CursorControls.onScoreGoto call chain — document in console logs
+  → TEST: 🤖 Trace requestState response handler — document
+  → TEST: 🤖 Build succeeds with no errors
+  → TEST: 👁️ Two tabs: Tab 1 full score (leader), Tab 2 parts (?track=1&pages=6)
+  → TEST: 👁️ Leader plays → parts client plays in sync
+  → TEST: 👁️ Leader stops → parts client stops
+  → TEST: 👁️ Leader page turn → parts client jumps to correct position, all sections update
+  → TEST: 👁️ Non-leader (parts) play attempt → "not leader" toast
+  → TEST: 👁️ Parts client goes independent → can play/stop/navigate locally
+  → TEST: 👁️ Parts client swipes during playback → auto-detach, screen-flip page turns work
+  → TEST: 👁️ Parts client re-syncs → snaps to leader position, all sections update
+  → TEST: 👁️ Leader recalls all → parts client re-syncs
+  → TEST: 👁️ Leader disconnects → leadership transfers to remaining client
+  → TEST: 👁️ Two parts clients (track 1 + track 2) in same room → both follow leader
+  → TEST: 👁️ Leader sets loop → parts client loops in sync
+  → TEST: 👁️ Loop toggle/clear propagates to parts client
+  → TEST: 👁️ Right panel not visible in parts mode (regression)
+  → TEST: 👁️ Controls overlay is the only control interface (regression)
+
+Parts Stage D1: Loop Page Freeze ✅ IMPLEMENTED
+  - Fix (DONE): in checkPageChange, when LoopSystem.isEnabled(), skip the
+    section flip (don't replace departed section with future content).
+    Server's scoreGoto on loop rewind calls onGoto for full layout.
+  - Files: performance_parts_patches.js (checkPageChange override)
+  - Full-score impact: NONE — parts-only override
+  → TEST: 🤖 Verify checkPageChange skips section flip when LoopSystem.isEnabled()
+  → TEST: 🤖 Build succeeds with no errors
+  → TEST: 👁️ Set loop spanning 2 adjacent pages on same screen → pages stay static during loop
+  → TEST: 👁️ Set loop spanning a screen boundary → screen-flip occurs on rewind (via onGoto)
+  → TEST: 👁️ Playback without loop → circular buffer rotates normally (regression)
+  → TEST: 👁️ Full score looping unaffected (regression)
+
+Parts Stage D2: MiniMap Auto-Show/Hide ✅ IMPLEMENTED
+  - MiniMap starts collapsed (3px, 0.3 opacity) with CSS transition
+  - Invisible hover zone at bottom triggers expand on pointerenter
+  - Auto-hides after 3s (same pattern as controls overlay)
+  - Shows briefly on local play start via MiniMap.show() API
+  - Files: performance_rehearsal_patches.js (MiniMap section)
+  - Full-score impact: YES — this affects both full score and parts. Test both.
+  → TEST: 🤖 Verify MiniMap starts in collapsed state
+  → TEST: 🤖 Verify auto-hide timer is set (3000-4000ms)
+  → TEST: 🤖 Build succeeds with no errors
+  → TEST: 👁️ Full score: MiniMap hidden on load, appears on hover/touch near bottom
+  → TEST: 👁️ Full score: MiniMap auto-hides after ~3s
+  → TEST: 👁️ Full score: bottom track notation fully visible when MiniMap is hidden
+  → TEST: 👁️ Parts mode: same behavior — bottom section notation fully visible
+  → TEST: 👁️ MiniMap tap still jumps to position (regression)
+  → TEST: 👁️ MiniMap still shows markers and loop region (regression)
+
+Parts Stage D3: Font Embedding ✅ IMPLEMENTED
+  - Identified font: "Crimson Pro Light" (used in notation SVGs for text
+    markings: pizz., b.b., tuplet numbers, etc.)
+  - Font files: CrimsonPro-Light.ttf + CrimsonPro-LightItalic.ttf
+    copied from fonts/extracted/ → public/fonts/ → builds/performance/fonts/
+  - @font-face CSS injected into built HTML via build_performance_app.js
+  - Server serves fonts via express.static (already configured)
+  - Files: build_performance_app.js (add @font-face CSS), performance_server.js
+    (serve font file if needed), builds/performance/ (font file)
+  - Full-score impact: YES — font embedding applies to all score modes. Test both.
+  → TEST: 🤖 Verify @font-face declaration present in built HTML
+  → TEST: 🤖 Verify font file is served by the Node server (HTTP 200)
+  → TEST: 🤖 Build succeeds with no errors
+  → TEST: 👁️ Open performance score on a machine without the font installed
+  → TEST: 👁️ SVG text renders fully — no cut-off or fallback font
+  → TEST: 👁️ Full score text rendering unaffected (regression)
+  → TEST: 👁️ Parts mode text rendering unaffected (regression)
+
+Parts Stage P4: Integration Testing
+  - Run full Parts Mode Testing Protocol (sections A-J below)
+  - Run full-score regression (verify nothing broke)
+  - Test with multiple track/page variants
+  → TEST: 🤖 Build with no errors or warnings
+  → TEST: 👁️ All items in Parts Mode Testing Protocol (A-J) pass
+  → TEST: 👁️ Full score: play, stop, page turn, loop, markers, sync all work (regression)
+  → TEST: 👁️ Track variants: ?track=1-4, ?pages=4/6/8 all render correctly
+```
+
+---
+
+### Parts Mode Testing Protocol
+
+**URL:** `http://localhost:3001?track=1&pages=6`
+
+```
+═══ A. RENDERING (visual inspection) ═══
+
+  A1.  [ ] Score loads with single track (Violin I) — no other instrument visible
+  A2.  [ ] 6 sections visible, each showing one page of the part
+  A3.  [ ] Staff headers show correct instrument name on each section
+  A4.  [ ] Notation elements (noteheads, stems, beamlines) render on all 6 sections
+  A5.  [ ] Curves render on correct sections (including multi-page curves)
+  A6.  [ ] Line wedges render correctly, clip at page boundaries
+  A7.  [ ] GC arcs appear at correct size (bottom-justified)
+  A8.  [ ] GC bouncing balls visible during playback
+  A9.  [ ] Badges render on correct sections
+  A10. [ ] SVG notation appears IN FRONT of GC arcs
+  A11. [ ] No console errors on load (check DevTools)
 
 ═══ B. INTERACTION BLOCKER ═══
-  [FIXED this session — needs re-verification]
-  B8. Console should show "InteractionBlocker: blocked N score sections"
+  ⚠ FIXED last session — needs re-verification
+
+  B1. [ ] Click on an SVG element (notehead) — NOTHING selects
+  B2. [ ] Click on a curve — NO selection highlight, no draggable endpoints
+  B3. [ ] Click on a line wedge — NO node handles appear
+  B4. [ ] Click on a badge — NO highlight/selection
+  B5. [ ] Click on a GC arc — NO selection
+  B6. [ ] Attempt to drag any object — NO movement
+  B7. [ ] Press Delete key — NO deletion
+  B8. [ ] Console shows "InteractionBlocker: blocked 6 score sections"
 
 ═══ C. GESTURES — PAGE NAVIGATION ═══
-  [partially tested — page turns work but circular buffer UX is confusing (OB-5)]
-  [page flip in independent mode broken (OB-1)]
+
+  C1.  [ ] Swipe LEFT on score → all 6 sections advance one screen
+  C2.  [ ] Swipe RIGHT on score → all 6 sections go back one screen
+  C3.  [ ] Tap RIGHT edge (rightmost 15%) → next screen
+  C4.  [ ] Tap LEFT edge (leftmost 15%) → previous screen
+  C5.  [ ] Overlay ▶ (next) button → next screen
+  C6.  [ ] Overlay ◀ (prev) button → previous screen
+  C7.  [ ] After page turn, all 6 sections show consecutive pages
+  C8.  [ ] Notation content re-renders on all sections
+  C9.  [ ] Page/screen numbers in overlay update correctly after each turn
+  C10. [ ] MiniMap page badge updates correctly
 
 ═══ D. GESTURES — TAP ZONES ═══
-  [not yet tested]
+
+  D1. [ ] Tap center (middle 70%) → controls overlay appears
+  D2. [ ] Tap center again → overlay disappears
+  D3. [ ] Double-tap top-center → play/stop toggles
+  D4. [ ] Overlay auto-fades after ~4 seconds
 
 ═══ E. CONTROLS OVERLAY ═══
-  [page display bug found (OB-2)]
 
-═══ F. MARKERS ═══                    ⬅ RESUME HERE
+  E1. [ ] Play/Stop button works — cursor animates through sections
+  E2. [ ] Cursor scrolls left-to-right through all N sections, wraps to top
+  E3. [ ] Jump-to input → enter a time → Go → score jumps to that position
+  E4. [ ] All 6 sections reload with correct page content after jump
+  E5. [ ] Zoom reset button works
+  E6. [ ] Close button hides overlay
+  E7. [ ] Page display shows both "S_ of _" and "P_ of _" with correct totals
+
+═══ F. MARKERS ═══
+
   F1. [ ] Open marker panel (🔖 button)
   F2. [ ] Add Marker at current position → appears in list
-  F3. [ ] Jump to marker → score navigates correctly
+  F3. [ ] Jump to marker → score navigates correctly, all sections update
   F4. [ ] Delete marker → removed from list
   F5. [ ] Markers survive page reload (localStorage)
 
 ═══ G. LOOP ═══
-  G1-G6 [ ] Not yet tested in parts mode
+
+  G1. [ ] Open loop panel (🔁 button)
+  G2. [ ] Set A point → Set B point → loop region marked
+  G3. [ ] Toggle loop on → playback loops between A and B
+  G4. [ ] Page turns blocked during active loop (when synced)
+  G5. [ ] Clear loop → region removed, page turns unblocked
+  G6. [ ] MiniMap shows loop region highlight
+  G7. [ ] Pages stay static during loop rewind (no section flips)
 
 ═══ H. MINIMAP ═══
-  [page total bug found (OB-2)]
-  H1-H7 [ ] Remaining items not yet tested
 
-═══ I. SYNC (two tabs, full score + parts) ═══
-  I1-I6 [ ] Not yet tested
+  H1. [ ] MiniMap hidden by default, appears on hover/touch near bottom
+  H2. [ ] Progress cursor moves during playback
+  H3. [ ] Page badge shows correct screen/page totals
+  H4. [ ] Time display updates during playback
+  H5. [ ] Tap on MiniMap bar → score jumps to that position
+  H6. [ ] Marker ticks visible on MiniMap
+  H7. [ ] Loop region visible on MiniMap (when set)
+  H8. [ ] Bottom track notation fully visible when MiniMap is hidden
+
+═══ I. SYNC (two tabs: one full score leader, one parts) ═══
+
+  I1. [ ] Tab 1 (full score leader) plays → Tab 2 (parts) plays in sync
+  I2. [ ] Leader page turn → parts client follows (jumps to equivalent position)
+  I3. [ ] Leader loop set → parts client loops in sync
+  I4. [ ] Parts client goes independent → can navigate locally
+  I5. [ ] Parts client re-syncs → snaps back to leader position
+  I6. [ ] SyncBar UI visible in parts mode (leader badge, sync toggle)
+  I7. [ ] Leader recalls all → parts client re-syncs
+  I8. [ ] Leader disconnects → leadership transfers
 
 ═══ J. TRACK VARIANTS ═══
-  J1-J6 [ ] Not yet tested
+
+  J1. [ ] ?track=1&pages=6 — Violin I, 6 sections
+  J2. [ ] ?track=2&pages=6 — Violin II, correct track
+  J3. [ ] ?track=3&pages=6 — Viola, correct track
+  J4. [ ] ?track=4&pages=6 — Cello, correct track
+  J5. [ ] ?track=1&pages=4 — 4 sections
+  J6. [ ] ?track=1&pages=8 — 8 sections
 ```

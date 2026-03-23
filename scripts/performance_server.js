@@ -530,6 +530,15 @@ io.on('connection', function(socket) {
         socketRoomId = roomId;
         socket.join(roomId);
         var room = getRoom(roomId);
+        // Reset to zero when first client joins an empty room (new session).
+        // Mid-session reconnects (other clients still present) keep position.
+        // Performance mode will override this with full grace-period resume.
+        if (room.clientCount === 0) {
+            room.currentScoreTimeMs = 0;
+            room.scoreTimeOffset = 0;
+            room.isPlaying = false;
+            console.log('Room ' + roomId + ': reset to zero (first client join)');
+        }
         room.clientCount++;
         addPerformerToRoom(roomId);
 
@@ -567,6 +576,13 @@ io.on('connection', function(socket) {
             socketRoomId = DEFAULT_ROOM;
             socket.join(DEFAULT_ROOM);
             var room = getRoom(DEFAULT_ROOM);
+            // Reset to zero when first client joins an empty room
+            if (room.clientCount === 0) {
+                room.currentScoreTimeMs = 0;
+                room.scoreTimeOffset = 0;
+                room.isPlaying = false;
+                console.log('Room ' + DEFAULT_ROOM + ': reset to zero (first client auto-join)');
+            }
             room.clientCount++;
             addPerformerToRoom(DEFAULT_ROOM);
             // Assign leader if none exists

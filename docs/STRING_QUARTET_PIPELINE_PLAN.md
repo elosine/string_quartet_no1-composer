@@ -3824,6 +3824,8 @@ Phase 1: Foundation ────────────────────
 
 **Goal:** Build the stripped-down, fault-resistant performance mode (§12.11): complete touch lockdown, pre-performance readiness check with fullscreen, leader-only Go sequence with countdown, auto-stop at end of score, emergency stop/menu, tab recovery for multi-piece concerts, Service Worker caching, and end-of-performance ceremony.
 
+**Note (added Phase 8 session, Mar 23 2026):** In rehearsal mode, the server now resets score position to zero when the first client joins an empty room (Option C). Performance mode must override this: when `?mode=performance` is active, the server should preserve the frozen score position during the full grace period so performers can reconnect mid-performance without losing their place. Consider extending the grace period duration for performance mode (e.g., 15–30 minutes). See `performance_server.js` joinRoom handler — the `if (room.clientCount === 0)` reset block needs a performance-mode bypass.
+
 **Step 11.0: Auto-stop at end of score (§12.11.6)**
 - Server calculates total score duration from tempo history and total beats
 - On `scoreGo`: set timer for `totalDurationMs - currentPositionMs`
@@ -4027,7 +4029,14 @@ Phase 1: Foundation ────────────────────
 - Room list showing active sessions
 - 🤖→👁️ *AI verifies flows → Human confirms UX is clear for non-technical performers*
 
-**Step 14.5: Performance capture / logging (nice-to-have)**
+**Step 14.5: SVG optimization & font embedding (added Phase 8 session, Mar 23 2026)**
+- **Text-to-paths (Option B):** Recompile all LilyPond notation SVGs with text rendered as vector paths instead of `<text>` elements. Eliminates font dependency inside `<image>` data URLs. Currently, SVGs with text labels (secco, furioso, delicato, etc.) use Crimson Pro — this font is not available inside `<image>` data URLs, causing text clipping on devices without the font installed locally. Text-to-paths is the zero-runtime-cost permanent fix.
+- **SVG minification:** Strip LilyPond editor metadata (`textedit://` links), unnecessary attributes, whitespace. Reduces file size and parse time.
+- **Consider pre-inlining:** Evaluate rendering SVGs as inline `<svg>` elements instead of `<image>` data URLs. This would allow parent document `@font-face` to apply, improving text rendering without recompilation. Trade-off: inline SVGs participate in the main document's DOM (potential style conflicts, larger DOM tree).
+- **Interim fix (Option A, implemented in Phase 8):** Build script injects base64 `@font-face` into SVG data URLs that contain Crimson Pro text. Targeted (~30 SVGs), adds ~50KB per affected SVG. This is the bridge until text-to-paths recompilation.
+- 🤖 *AI Test:* All SVGs render correctly on devices without Crimson Pro installed. No text clipping. File sizes reduced vs. current.
+
+**Step 14.6: Performance capture / logging (nice-to-have)**
 - Log each performance: start time, duration, participants, sync quality over time
 - Optional: record score position timeline for later analysis
 - Store in data files on server

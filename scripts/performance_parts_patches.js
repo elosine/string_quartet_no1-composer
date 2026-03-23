@@ -452,8 +452,12 @@ module.exports = function applyPartsPatches(html) {
 
             var si = position.sectionIndex;
             if (si !== this._lastSectionIndex) {
-                // Reload the section we just left with future content
-                if (this._lastSectionIndex !== undefined && this._lastSectionIndex !== null) {
+                // When loop is active, suppress section flips — pages stay static.
+                // The server's scoreGoto on loop rewind calls onGoto for full layout.
+                var loopActive = window.LoopSystem && LoopSystem.isEnabled();
+
+                if (!loopActive && this._lastSectionIndex !== undefined && this._lastSectionIndex !== null) {
+                    // Reload the section we just left with future content
                     var prev = this._lastSectionIndex;
                     PM.sectionPages[prev] = position.page + PAGE_COUNT - 1;
                     this._renderSectionTicks(prev);
@@ -468,16 +472,21 @@ module.exports = function applyPartsPatches(html) {
             }
         };
 
-        // Override onGoto: load pages matching the circular buffer state that
-        // normal playback would have built up by the time the cursor reaches
-        // targetPage. The cursor section shows targetPage, sections ahead show
-        // the next pages, and sections behind the cursor (already passed) show
-        // future pages that will be needed when the cursor wraps back around.
+        // Override onGoto: sequential layout — all N sections show consecutive
+        // pages starting from the screen that contains targetPage.
+        // Section 0 = basePage, section N-1 = basePage + N - 1.
+        // The circular buffer (checkPageChange) handles continuous playback
+        // separately — it rotates one section at a time as the cursor passes.
         GraphicTimeline.onGoto = function(targetSeconds) {
             var secondsPerPage = this.getSecondsPerPage();
             var targetPage = Math.floor(targetSeconds / secondsPerPage);
             var targetSi = targetPage % PAGE_COUNT;
 
+            // Circular buffer layout: target page on its natural section,
+            // sections ahead get upcoming pages, sections behind (already
+            // passed) get future pages — matches normal playback state.
+            // For screen-aligned targets (manual page turn), targetSi=0
+            // and this reduces to sequential [basePage..basePage+N-1].
             for (var i = 0; i < PAGE_COUNT; i++) {
                 PM.sectionPages[i] = targetPage + ((i - targetSi + PAGE_COUNT) % PAGE_COUNT);
             }
@@ -485,8 +494,24 @@ module.exports = function applyPartsPatches(html) {
             this.currentTopPage = PM.sectionPages[0];
             this.currentBottomPage = PM.sectionPages[1];
 
+            // Sync ScoreTime so cursor matches and checkPageChange won't revert
+            var targetMs = targetSeconds * 1000;
+            if (window.ScoreTime) {
+                if (ScoreTime.isPlaying && window.ClockSync) {
+                    ScoreTime.scoreTimeOffset = ClockSync.now() - targetMs;
+                } else {
+                    ScoreTime.currentScoreTimeMs = targetMs;
+                }
+            }
+
             for (var j = 0; j < PAGE_COUNT; j++) this._renderSectionTicks(j);
             this.updateGraphicObjectsVisibility();
+
+            // Force staff content re-render (animation loop may not be running)
+            if (window.TrackSystem) TrackSystem.update();
+
+            // Update overlay and minimap page display
+            if (window.ControlsOverlay) ControlsOverlay.refresh();
         };
 
         // Override reset
@@ -1472,6 +1497,12 @@ module.exports = function applyPartsPatches(html) {
                     });
                     this.renderAllTracks();
                 };
+
+                // Override onGoto: no-op in parts mode.
+                // The original Workshop TrackSystem.onGoto sets a 2-page (top/bottom) layout
+                // and calls renderAllTracks(), which corrupts our 6-section layout.
+                // GraphicTimeline.onGoto already calls TrackSystem.update() for all sections.
+                TrackSystem.onGoto = function() {};
 
                 // Override update for circular buffer page turns
                 TrackSystem.update = function() {
