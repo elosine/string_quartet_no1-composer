@@ -108,6 +108,7 @@ const socketWithFallback = [
     '// If 404 (static file server), this provides offline playback controls.',
     'if (typeof io === "undefined") {',
     '    console.log("Socket.IO not available — using offline stub");',
+    '    window._OFFLINE_STUB = true;',
     '    window.io = function() {',
     '        const handlers = {};',
     '        let _scoreTimeMs = 0;',
@@ -274,20 +275,24 @@ const clockSyncNowMarker = [
     '            },'
 ].join('\n');
 const clockSyncNowReplacement = [
-    '            // Phase 6: Monotonic clock via performance.now() anchoring',
+    '            // Phase 10: Monotonic clock via performance.now() anchoring',
     '            _perfBase: 0,       // performance.now() at last successful sync',
     '            _syncBase: 0,       // estimated server time at _perfBase',
     '            _perfInitialized: false,',
+    '            _lastNow: 0,        // Phase 10: monotonicity guarantee',
     '            ',
     '            // Get the current synchronized time (server time)',
     '            // Uses performance.now() for monotonic, sub-ms local progression',
     '            now() {',
     '                if (!this._perfInitialized) {',
-    '                    // Before first sync, fall back to Date.now() + offset',
     '                    return Date.now() + this.clockOffset;',
     '                }',
     '                var localElapsed = performance.now() - this._perfBase;',
-    '                return this._syncBase + localElapsed;',
+    '                var result = this._syncBase + localElapsed;',
+    '                // Phase 10: monotonicity — never return a value less than previous',
+    '                if (result < this._lastNow) result = this._lastNow;',
+    '                this._lastNow = result;',
+    '                return result;',
     '            },'
 ].join('\n');
 
@@ -338,7 +343,29 @@ const calcSyncReplacement = [
     '                // Phase 6: Anchor performance.now() to estimated server time',
     '                this._perfBase = performance.now();',
     '                this._syncBase = clientReceiveTime + this.clockOffset;',
-    '                this._perfInitialized = true;'
+    '                this._perfInitialized = true;',
+    '                ',
+    '                // Phase 10: Compute offset variance for quality metric + adaptive ping',
+    '                if (this.syncSamples.length >= 3) {',
+    '                    var mean = this.clockOffset;',
+    '                    var sumSq = 0;',
+    '                    for (var vi = 0; vi < this.syncSamples.length; vi++) {',
+    '                        var d = this.syncSamples[vi] - mean;',
+    '                        sumSq += d * d;',
+    '                    }',
+    '                    this._offsetVariance = Math.sqrt(sumSq / this.syncSamples.length);',
+    '                    // Adaptive ping interval with hysteresis',
+    '                    var oldInterval = this._pingInterval || 5000;',
+    '                    if (this._offsetVariance < 5) {',
+    '                        this._pingInterval = Math.min(oldInterval + 1000, 10000);',
+    '                    } else if (this._offsetVariance > 20) {',
+    '                        this._pingInterval = Math.max(oldInterval - 1000, 200);',
+    '                    } else {',
+    '                        // Converge toward 2000ms',
+    '                        this._pingInterval = oldInterval + (2000 - oldInterval) * 0.3;',
+    '                    }',
+    '                }',
+    '                this._updateSyncUI();'
 ].join('\n');
 
 replaceOnce(calcSyncMarker, calcSyncReplacement, 'Patch 1d-b: outlier rejection + weighted avg + perfBase anchor');
@@ -351,6 +378,7 @@ replaceOnce(calcSyncMarker, calcSyncReplacement, 'Patch 1d-b: outlier rejection 
 const connectPingMarker = "                    this.requestPing(); // Initial ping to calculate RTT";
 const connectPingReplacement = [
     '                    this.connected = true;',
+    '                    this._hideOfflineBanner(); // Phase 10: dismiss banner on reconnect',
     '                    this._burstResync(); // Phase 6: rapid re-sync on connect/reconnect',
     '                    this._updateSyncUI();'
 ].join('\n');
@@ -366,10 +394,17 @@ const connectClosingReplacement = [
     "                    console.log('Disconnected from server');",
     '                    this.connected = false;',
     '                    this._updateSyncUI();',
+    '                    // Phase 10: Show offline banner after 5s debounce',
+    '                    this._offlineTimer = setTimeout(() => { this._showOfflineBanner(); }, 5000);',
     '                });'
 ].join('\n');
 
 replaceOnce(connectPingMarker, connectPingReplacement, 'Patch 1e: replace requestPing with burstResync');
+
+// ─── Patch 1g: Replace fixed 5s ping interval with adaptive _schedulePing (Phase 10) ──
+const fixedPingMarker = "setInterval(() => this.requestPing(), 5000);";
+const fixedPingReplacement = "this._schedulePing(); // Phase 10: adaptive ping interval";
+replaceOnce(fixedPingMarker, fixedPingReplacement, 'Patch 1g: adaptive ping interval');
 
 // ─── Patch 1f: Drift correction — scorePositionCheck handler (Phase 6, Stage 4) ──
 // Server broadcasts authoritative score position every 3s during playback.
@@ -445,8 +480,46 @@ const clockSyncGetRTTReplacement = [
     '                }',
     '            },',
     '            ',
-    '            // Phase 6: Sync status UI indicator',
+    '            // Phase 10: Offline banner — shown after 5s disconnect, dismissed on reconnect',
+    '            _offlineTimer: null,',
+    '            _showOfflineBanner() {',
+    '                if (window._OFFLINE_STUB) return;',
+    '                if (document.getElementById("offlineBanner")) return;',
+    '                var banner = document.createElement("div");',
+    '                banner.id = "offlineBanner";',
+    '                banner.style.cssText = "position:fixed;top:0;left:0;right:0;padding:6px 0;background:rgba(0,0,0,0.85);color:#ff8;font-family:sans-serif;font-size:13px;text-align:center;z-index:99999;pointer-events:none;transition:opacity 0.3s;";',
+    '                banner.textContent = "OFFLINE \u2014 local clock";',
+    '                document.body.appendChild(banner);',
+    '            },',
+    '            _hideOfflineBanner() {',
+    '                if (this._offlineTimer) { clearTimeout(this._offlineTimer); this._offlineTimer = null; }',
+    '                var banner = document.getElementById("offlineBanner");',
+    '                if (banner) {',
+    '                    banner.style.opacity = "0";',
+    '                    setTimeout(function() { if (banner.parentNode) banner.parentNode.removeChild(banner); }, 300);',
+    '                }',
+    '            },',
+    '            ',
+    '            // Phase 10: Adaptive ping scheduling — uses _pingInterval set by calculateSync',
+    '            _pingInterval: 5000,',
+    '            _pingTimer: null,',
+    '            _schedulePing() {',
+    '                var self = this;',
+    '                if (this._pingTimer) clearTimeout(this._pingTimer);',
+    '                this._pingTimer = setTimeout(function() {',
+    '                    self.requestPing();',
+    '                    self._schedulePing();',
+    '                }, this._pingInterval);',
+    '            },',
+    '            ',
+    '            // Phase 10: Offset variance and quality level',
+    '            _offsetVariance: 0,',
+    '            _syncQuality: "unknown",',
+    '            ',
+    '            // Phase 10: Sync status UI — 4-level quality metric',
     '            _updateSyncUI() {',
+    '                // Hide dot entirely in offline stub mode — no real sync',
+    '                if (window._OFFLINE_STUB) return;',
     '                var el = document.getElementById("syncStatusDot");',
     '                if (!el) {',
     '                    el = document.createElement("div");',
@@ -454,15 +527,29 @@ const clockSyncGetRTTReplacement = [
     '                    el.style.cssText = "position:fixed;bottom:8px;right:8px;width:10px;height:10px;border-radius:50%;z-index:99999;opacity:0.7;transition:background 0.3s;cursor:help;";',
     '                    document.body.appendChild(el);',
     '                }',
-    '                if (this.connected && this._perfInitialized) {',
-    '                    el.style.background = "#0f0";',
-    '                    el.title = "Synced (RTT: " + this.roundTripTime + "ms, offset: " + this.clockOffset.toFixed(1) + "ms)";',
-    '                } else if (this.connected) {',
+    '                if (!this.connected) {',
+    '                    el.style.background = "#f00";',
+    '                    this._syncQuality = "disconnected";',
+    '                    el.title = "Disconnected — local clock";',
+    '                } else if (!this._perfInitialized) {',
     '                    el.style.background = "#ff0";',
+    '                    this._syncQuality = "connecting";',
     '                    el.title = "Connected — syncing...";',
     '                } else {',
-    '                    el.style.background = "#f00";',
-    '                    el.title = "Disconnected — local clock";',
+    '                    // 4-level quality from offset variance',
+    '                    var v = this._offsetVariance || 0;',
+    '                    var color, label;',
+    '                    if (v < 5) { color = "#0f0"; label = "excellent"; }',
+    '                    else if (v < 10) { color = "#8f0"; label = "good"; }',
+    '                    else if (v < 20) { color = "#ff0"; label = "fair"; }',
+    '                    else { color = "#f80"; label = "poor"; }',
+    '                    this._syncQuality = label;',
+    '                    el.style.background = color;',
+    '                    el.title = "Sync: " + label +',
+    '                        " | RTT: " + this.roundTripTime + "ms" +',
+    '                        " | offset: " + this.clockOffset.toFixed(1) + "ms" +',
+    '                        " | variance: " + v.toFixed(1) + "ms" +',
+    '                        " | ping: " + Math.round(this._pingInterval / 1000) + "s";',
     '                }',
     '            }'
 ].join('\n');

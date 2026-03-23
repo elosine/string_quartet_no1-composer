@@ -1,31 +1,26 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 10 (next)
+**Active Phase:** Phase 11 (next)
 **Last Session:** Mar 23, 2026
-**Last Commit:** `[Phase 9] Annotation system — freehand, stamps, text, persistence, undo/redo`
+**Last Commit:** `[Phase 10] Sync & Animation Tier 2 — monotonic clock, adaptive ping, quality UI, offline banner`
 
 ### ▶ RESUME HERE (next session)
 
-**Phase 9 is COMPLETE.** Phase 10 pre-implementation protocol is next.
+**Phase 10 is COMPLETE.** Phase 11 pre-implementation protocol is next.
 
-**Phase 9 delivered (Annotation System):**
-- Stage 1: SVG overlay layer + pen capture (always-active pen, mouse toggle)
-- Stage 2: Freehand drawing (Catmull-Rom smoothing, live preview, 3 widths)
-- Stage 3: Stamps with LilyPond Emmentaler glyphs (dynamics pppp-ffff, sfz, fp, bowings ⊓∨, articulations, marks)
-- Stage 4: Text annotations (floating input, SVG text rendering, S/M/L sizing)
-- Stage 6: Persistence (localStorage auto-save/load + JSON export/import)
-- Stage 7: Undo/redo (50-deep snapshot stack) + visibility toggle
-- Stage 8: Full integration verified (full score + parts mode)
-- 7 colors (black, red, blue, green, orange, purple, white), 3 widths, 20 stamps
-- Toolbar: draggable (pointer capture), viewport-clamped, duplicate-proof
-- Parts mode: stamps/text scale inversely with section height (min/max bounds)
-- Build: 14 Emmentaler glyph paths generated from svg_component_library.json
+**Phase 10 delivered (Sync & Animation — Tier 2):**
+- Stage 1: MonotonicScoreClock — _lastNow guard (slewing attempted, reverted due to visible stutter)
+- Stage 2+3: Adaptive ping rate (variance-based interval with hysteresis) + 4-level sync quality UI (dot + tooltip)
+- Stage 4: Offline banner — "OFFLINE — local clock" after 5s disconnect, auto-dismiss on reconnect
+- New Patch 1g: Dynamic _schedulePing replaces fixed 5s setInterval
+- Offline stub detection: window._OFFLINE_STUB flag
+- Known: Server restart stops playback (correct — server authoritative). Deferred to Phase 11.
 
 **Priority for next session:**
 1. Read `WORKING_PRINCIPLES.md` and this RESUME section
-2. Phase 10 pre-implementation protocol
-3. Begin Phase 10 staged implementation
+2. Phase 11 pre-implementation protocol
+3. Begin Phase 11 staged implementation
 
 **Deferred items (not blocking):**
 - SVG font fix: Option B (text-to-paths via opentype.js) recommended. See Font Analysis section below.
@@ -2209,3 +2204,121 @@ Parts Stage P4: Integration Testing
   J5. [ ] ?track=1&pages=4 — 4 sections
   J6. [ ] ?track=1&pages=8 — 8 sections
 ```
+
+---
+
+## Phase 10 Pre-Implementation Protocol
+
+**Spec:** §13.4 Phase 10: Sync & Animation — Tier 2 (pipeline plan L3763-3816)
+**Goal:** Production-ready sync for rehearsals with real performers. Monotonic clock with slewing, adaptive ping rate, quality metric UI, graceful offline degradation.
+
+### Step 1: System Inventory — What Are We Touching?
+
+| System | What it does | Where it lives | State reads | State writes | Phase 10 interaction |
+|--------|-------------|----------------|-------------|--------------|---------------------|
+| **ClockSync** | WebSocket-based time sync. Pings server, calculates offset, provides `now()`. | Workshop source (patched by `build_performance_app.js` Patches 1d–1f) | `syncSamples[]`, `_rttSamples[]`, `roundTripTime`, `clockOffset` | `_perfBase`, `_syncBase`, `clockOffset`, `connected` | **Primary target.** Add slewing to `now()`, adaptive ping interval, quality metric. |
+| **ClockSync._updateSyncUI** | Green/yellow/red dot showing connection state. | Patch 1e-b (build L448-467) | `connected`, `_perfInitialized`, `roundTripTime`, `clockOffset` | DOM: `#syncStatusDot` | **Upgrade:** Replace 3-state dot with 4-level quality metric based on offset variance. |
+| **ClockSync._burstResync** | Burst 5 pings at 50ms on connect/reconnect. | Patch 1e-b (build L424-435) | — | `requestPing()` calls | **Extend:** Also fires on reconnect after offline period. |
+| **ClockSync._applyDriftStep** | Smooth drift correction via `_syncBase` adjustment over 30 frames. | Patch 1e-b (build L438-446) | `_driftCorrection.remaining`, `.perStep` | `_syncBase` | **Replace:** Integrate into MonotonicScoreClock slewing. |
+| **ScoreTime** | Score playback clock. `now()` returns current score position in ms. | Workshop source | `isPlaying`, `scoreTimeOffset` | `scoreTimeOffset` | **Consumer** of ClockSync corrections. |
+| **AnimationEngine** | rAF loop with subscriber pattern. | Patched in Phase 2 (AE1-AE3) | Subscribers array | Calls subscriber fns each frame | **No changes needed** — already uses subscriber pattern (Step 10.7 ✅). |
+| **Canvas overlay** | Renders cursors, GC balls, followers on HTML5 canvas. | `performance_canvas_patches.js` | Section dimensions, cursor position | Canvas draw calls | **No changes needed** — already GPU-composited (Step 10.6 ✅). |
+
+### Step 2: Source Reading — What Already Exists
+
+**Already implemented (Phase 2/6):**
+- ✅ **Step 10.5** (rAF dual-clock): `performance.now()` anchoring in `ClockSync.now()` (Patch 1d). `_perfBase` + `_syncBase` architecture already separates local clock from server verification.
+- ✅ **Step 10.6** (CSS transforms/GPU): Canvas overlay renders all animated elements. Zero per-frame SVG mutations. `will-change` not needed since canvas is inherently composited.
+- ✅ **Step 10.7** (Subscriber pattern): `AnimationEngine.subscribe(name, fn, priority)` already in place (Patches AE1, AE3a-c).
+
+**Partially implemented:**
+- 🔶 **Step 10.1** (MonotonicScoreClock): `performance.now()` is monotonic locally, but `_syncBase` can jump on each `calculateSync()` call. Spec requires slewing (rate adjustment) instead of jumps. Current `_applyDriftStep` does gradual correction for server drift checks but `calculateSync` re-anchors abruptly.
+- 🔶 **Step 10.3** (Sync quality UI): Basic 3-state dot exists (green/yellow/red = synced/connecting/disconnected). Spec wants 4-level quality metric from offset variance (excellent/good/fair/poor) with RTT and drift tooltip.
+- 🔶 **Step 10.4** (Graceful degradation): Disconnect handler exists, dot goes red. Missing: "OFFLINE — local clock" banner, auto-dismiss on reconnect.
+
+**Not yet implemented:**
+- ❌ **Step 10.2** (Adaptive sync rate): Pings are at fixed interval. Spec: variance < 5ms → slow to 10s; variance > 20ms → speed to 200ms.
+
+### Step 3: Contracts
+
+**MonotonicScoreClock.now():**
+- **Precondition:** `_perfInitialized === true` (at least one sync completed)
+- **Postcondition:** Return value ≥ any previous return value (strict monotonicity)
+- **Invariant:** Corrections applied as rate slewing, never backward jumps. If server says we're 50ms ahead, clock slows down slightly over ~500ms rather than jumping back.
+
+**Adaptive sync rate:**
+- **Precondition:** At least 3 offset samples exist
+- **Postcondition:** `_pingInterval` is between 200ms (unstable) and 10000ms (stable)
+- **Invariant:** Variance computed from last N offset deltas. Transitions are smooth (not ping-ponging between rates).
+
+**Sync quality metric:**
+- **Postcondition:** Quality is one of: excellent (variance < 5ms), good (< 10ms), fair (< 20ms), poor (≥ 20ms)
+- **Display:** Colored dot + tooltip with RTT, offset, variance, quality label
+
+**Offline banner:**
+- **Precondition:** `connected === false` for > 5 seconds
+- **Postcondition:** Non-intrusive banner visible. Score continues on local clock.
+- **On reconnect:** Banner disappears, burst resync fires, quality metric updates.
+
+### Step 4: Risk Register
+
+| Risk | Likelihood | Impact | Detection | Mitigation |
+|------|-----------|--------|-----------|------------|
+| Slewing makes clock inaccurate after large correction | Medium | Medium | Sync quality metric shows poor; position drift visible | Cap slew rate (max 2× or 0.5× speed). Large jumps (>500ms) override slewing with a hard reset. |
+| Adaptive ping rate oscillates (variance crosses threshold repeatedly) | Low | Low | Console log shows rapid interval changes | Hysteresis: different thresholds for speeding up vs slowing down |
+| Offline banner appears during brief network hiccups | Medium | Low | Banner flashing | 5-second debounce before showing banner |
+| Performance regression from variance computation | Very Low | Low | Frame timing | Compute variance only on new sync sample, not every frame |
+
+### Step 5: Staged Implementation Plan
+
+```
+Stage 1: MonotonicScoreClock — monotonicity guard ✅
+  DECISION: Slewing (rate multiplier) was attempted and caused visible
+  stutter — the rate persisted between sync samples, distorting playback
+  speed for seconds at a time. Reverted to Phase 6 direct re-anchoring
+  (which works well because weighted averaging keeps jumps to 1-5ms).
+  Added _lastNow monotonicity guard: now() never returns a value less
+  than its previous return. This satisfies the spec's core requirement
+  (strict monotonicity) without the risk of rate-based distortion.
+  Slewing could be revisited with a proper time-bounded decay if needed.
+  → TEST: Human confirmed playback smooth after revert. ✅
+
+Stage 2+3: Adaptive sync rate + sync quality UI ✅
+  Combined into one stage (Stage 2 has no human-visible output).
+  - Variance computed in calculateSync from recent offset samples.
+  - Ping interval adjusts with hysteresis: stable→10s, unstable→200ms.
+  - Replaced fixed setInterval(5000) with dynamic _schedulePing() (Patch 1g).
+  - Sync dot upgraded: 4-level quality (excellent/good/fair/poor) with
+    detailed tooltip (RTT, offset, variance, quality, ping interval).
+  - Dot hidden in offline stub mode (window._OFFLINE_STUB flag).
+  - NOTE: Dev-env edge case — dot appears on port 3001 when port 3000
+    server is also running (browser caches Socket.IO client JS). Not a
+    production issue; only happens with both servers on localhost.
+  → TEST: Human confirmed dot + tooltip on port 3000. ✅
+
+Stage 4: Graceful degradation — offline banner ✅
+  - "OFFLINE — local clock" banner appears after 5s disconnect debounce.
+  - Non-intrusive: black bar at top, yellow text, pointer-events:none.
+  - Auto-dismisses on reconnect (fade out 300ms) + burst resync fires.
+  - Score continues playing on local performance.now() clock during offline.
+  - KNOWN: Server restart (fresh state) stops playback on reconnect.
+    This is correct (server is authoritative). Wi-Fi drop with server
+    still running would reconnect seamlessly. Server-crash recovery
+    deferred to Phase 11 (Performance Mode / emergency recovery).
+  → TEST: Human confirmed kill→banner→restart→dismiss cycle. ✅
+
+Stage 5: Integration verification ✅
+  All stages verified together on port 3000.
+  → Playback smooth, page turns correct, no regressions.
+  → Sync dot shows quality metric with tooltip.
+  → Offline banner appears/dismisses correctly.
+  → Phases 1-9 features unaffected.
+```
+
+### Step 6: Key Files
+
+| File | Role | Changes needed |
+|------|------|---------------|
+| `scripts/build_performance_app.js` | Build patches for ClockSync | Modify Patches 1d, 1d-b, 1e-b for slewing, adaptive rate, quality metric, banner |
+| `scripts/performance_server.js` | Server-side sync | May need `scorePositionCheck` interval adjustment |
+| `builds/performance/index.html` | Built output | Rebuilt after each stage |

@@ -1,0 +1,6 @@
+taskkill /PID 16068 /F
+netstat -ano | findstr ":3000" | findstr "LISTENING"
+
+node scripts/performance_server.js --port 3000
+
+taskkill /IM node.exe /F
