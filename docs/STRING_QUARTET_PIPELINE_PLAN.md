@@ -4002,6 +4002,15 @@ Phase 1: Foundation ────────────────────
 
 **Goal:** Deploy the Performance Score as a production website (§12.9): hosting, domain, SSL, admin panel, session management UI. This is the final step — making the system available to performers over the internet.
 
+**Step 14.0: Performance instructions page**
+- Develop a standalone HTML page with performance instructions for performers
+- How to connect, device requirements, recommended browsers, screen orientation
+- How performance mode works: readiness check, countdown, locked playback
+- Emergency controls (2-finger long press), what to do if tab crashes
+- Rehearsal mode features: gestures, markers, loops, annotations
+- URL parameters reference (track, pages, mode)
+- This page should be linkable from the performer dashboard (Step 14.4)
+
 **Step 14.1: Hosting infrastructure**
 - Choose hosting: cloud VM (DigitalOcean, AWS Lightsail), or PaaS (Railway, Render, Fly.io)
 - Set up Node.js server with PM2 (process manager) for auto-restart
