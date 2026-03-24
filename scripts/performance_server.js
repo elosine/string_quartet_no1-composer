@@ -343,7 +343,14 @@ function createRoomState() {
         loopStartMs: null,
         loopEndMs: null,
         loopEnabled: false,
-        loopCount: 0
+        loopCount: 0,
+        // Phase 11: Auto-stop
+        totalDurationMs: 0,     // reported by client
+        autoStopTimer: null,    // setTimeout ID for end-of-score stop
+        // Phase 11 Stage 2: Performance mode readiness
+        mode: 'rehearsal',      // 'rehearsal' or 'performance'
+        readyPerformers: {},    // socketId → true
+        performanceModeClients: {} // socketId → true (clients in readiness/performance)
     };
 }
 
@@ -388,6 +395,64 @@ function getRoomScoreTimeMs(room) {
     } else {
         return room.currentScoreTimeMs;
     }
+}
+
+// ─── Phase 11: Auto-stop helpers ──────────────────────────────────────────────
+
+function scheduleAutoStop(roomId) {
+    var room = rooms.get(roomId);
+    if (!room || !room.isPlaying || room.totalDurationMs <= 0) return;
+    cancelAutoStop(roomId);
+
+    var currentMs = getRoomScoreTimeMs(room);
+    var remainingMs = room.totalDurationMs - currentMs;
+    if (remainingMs <= 0) {
+        // Already past end — stop immediately
+        remainingMs = 0;
+    }
+
+    console.log('[' + roomId + '] Auto-stop scheduled in ' + (remainingMs / 1000).toFixed(1) + 's');
+    room.autoStopTimer = setTimeout(function() {
+        room.autoStopTimer = null;
+        if (!room.isPlaying) return; // already stopped
+        room.currentScoreTimeMs = room.totalDurationMs;
+        room.isPlaying = false;
+
+        console.log('[' + roomId + '] Auto-stop: end of score at ' + (room.totalDurationMs / 1000).toFixed(1) + 's');
+        io.to(roomId).emit('scoreStop', {
+            isPlaying: false,
+            currentScoreTimeMs: room.currentScoreTimeMs,
+            reason: 'end-of-score',
+            serverTime: Date.now()
+        });
+        // Stage 7: Reset room mode so reconnecting clients don't auto-rejoin
+        room.mode = 'rehearsal';
+        room.readyPerformers = {};
+        room.performanceModeClients = {};
+    }, remainingMs);
+}
+
+function cancelAutoStop(roomId) {
+    var room = rooms.get(roomId);
+    if (room && room.autoStopTimer) {
+        clearTimeout(room.autoStopTimer);
+        room.autoStopTimer = null;
+    }
+}
+
+// ─── Phase 11 Stage 2: Readiness helpers ─────────────────────────────────────
+
+function broadcastReadiness(roomId) {
+    var room = rooms.get(roomId);
+    if (!room) return;
+    var readyList = Object.keys(room.readyPerformers);
+    var perfCount = Object.keys(room.performanceModeClients).length;
+    io.to(roomId).emit('readinessUpdate', {
+        readyPerformers: readyList,
+        readyCount: readyList.length,
+        totalCount: perfCount,
+        allReady: readyList.length >= perfCount && perfCount > 0
+    });
 }
 
 // ─── Phase 8 Stage 5b: Leader helpers ────────────────────────────────────────
@@ -580,6 +645,7 @@ io.on('connection', function(socket) {
             connectedPerformers: room.connectedPerformers,
             roomMembers: getRoomMembers(roomId),
             leaderId: room.leaderId,
+            mode: room.mode,  // Phase 11 Stage 5: tab recovery
             serverTime: Date.now()
         });
         // Send loop state if active
@@ -684,6 +750,16 @@ io.on('connection', function(socket) {
         });
     });
 
+    // Phase 11: Client reports total score duration for auto-stop
+    socket.on('reportScoreDuration', function(data) {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (room && data && data.totalDurationMs > 0) {
+            room.totalDurationMs = data.totalDurationMs;
+            console.log('[' + socketRoomId + '] Score duration reported: ' + (data.totalDurationMs / 1000).toFixed(1) + 's by ' + socket.id);
+        }
+    });
+
     // GO — start playback (leader-gated)
     socket.on('scoreGo', function() {
         if (!socketRoomId) return;
@@ -705,6 +781,9 @@ io.on('connection', function(socket) {
                 currentScoreTimeMs: room.currentScoreTimeMs,
                 serverTime: now
             });
+
+            // Phase 11: Schedule auto-stop at end of score
+            scheduleAutoStop(socketRoomId);
         }
     });
 
@@ -718,6 +797,7 @@ io.on('connection', function(socket) {
         }
         if (!room.leaderId) assignLeader(socketRoomId, socket.id);
         if (room.isPlaying) {
+            cancelAutoStop(socketRoomId); // Phase 11
             room.currentScoreTimeMs = getRoomScoreTimeMs(room);
             room.isPlaying = false;
 
@@ -742,6 +822,7 @@ io.on('connection', function(socket) {
         var targetSeconds = data.seconds || 0;
         var targetMs = targetSeconds * 1000;
 
+        cancelAutoStop(socketRoomId); // Phase 11
         room.isPlaying = false;
         room.currentScoreTimeMs = targetMs;
 
@@ -894,11 +975,125 @@ io.on('connection', function(socket) {
         });
     });
 
+    // ─── Phase 11 Stage 2: Readiness tracking ──────────────────────────────
+
+    socket.on('enterReadiness', function() {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (!room) return;
+        room.performanceModeClients[socket.id] = true;
+        console.log('[' + socketRoomId + '] Client entered readiness: ' + socket.id + ' (' + Object.keys(room.performanceModeClients).length + ' in perf mode)');
+        broadcastReadiness(socketRoomId);
+    });
+
+    socket.on('exitReadiness', function() {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (!room) return;
+        delete room.performanceModeClients[socket.id];
+        delete room.readyPerformers[socket.id];
+        console.log('[' + socketRoomId + '] Client exited readiness: ' + socket.id);
+        broadcastReadiness(socketRoomId);
+    });
+
+    socket.on('performerReady', function() {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (!room) return;
+        room.readyPerformers[socket.id] = true;
+        console.log('[' + socketRoomId + '] Performer READY: ' + socket.id + ' (' + Object.keys(room.readyPerformers).length + '/' + room.clientCount + ')');
+        broadcastReadiness(socketRoomId);
+    });
+
+    socket.on('performerUnready', function() {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (!room) return;
+        delete room.readyPerformers[socket.id];
+        console.log('[' + socketRoomId + '] Performer UNREADY: ' + socket.id);
+        broadcastReadiness(socketRoomId);
+    });
+
+    // Leader starts performance — countdown then auto-play
+    socket.on('performanceStart', function() {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (!room) return;
+        if (!isLeader(room, socket.id)) {
+            socket.emit('notLeader', { action: 'performanceStart' });
+            return;
+        }
+        room.mode = 'performance';
+
+        // Reset score position to beginning
+        room.currentScoreTimeMs = 0;
+        room.isPlaying = false;
+        cancelAutoStop(socketRoomId);
+
+        var COUNTDOWN_SECONDS = 3;
+        var now = Date.now();
+        var goTime = now + (COUNTDOWN_SECONDS * 1000);
+
+        console.log('[' + socketRoomId + '] PERFORMANCE START by leader ' + socket.id + ' — countdown ' + COUNTDOWN_SECONDS + 's');
+
+        // Broadcast goto-zero so all clients navigate to start
+        io.to(socketRoomId).emit('scoreGoto', {
+            isPlaying: false,
+            currentScoreTimeMs: 0,
+            targetSeconds: 0,
+            tempoHistory: room.tempoHistory,
+            serverTime: now
+        });
+
+        // Broadcast countdown to all clients
+        io.to(socketRoomId).emit('performanceStart', {
+            serverTime: now,
+            countdownSeconds: COUNTDOWN_SECONDS,
+            goTime: goTime
+        });
+
+        // Schedule scoreGo after countdown
+        setTimeout(function() {
+            if (!room || room.mode !== 'performance') return;
+            var goNow = Date.now();
+            room.scoreTimeOffset = goNow - 0; // start from 0ms
+            room.isPlaying = true;
+            room.currentScoreTimeMs = 0;
+
+            console.log('[' + socketRoomId + '] PERFORMANCE GO — playback starting');
+            io.to(socketRoomId).emit('scoreGo', {
+                isPlaying: true,
+                scoreTimeOffset: room.scoreTimeOffset,
+                currentScoreTimeMs: 0,
+                serverTime: goNow
+            });
+
+            scheduleAutoStop(socketRoomId);
+        }, COUNTDOWN_SECONDS * 1000);
+    });
+
+    // Leader ends performance — returns to rehearsal
+    socket.on('performanceEnd', function() {
+        if (!socketRoomId) return;
+        var room = rooms.get(socketRoomId);
+        if (!room) return;
+        if (!isLeader(room, socket.id)) {
+            socket.emit('notLeader', { action: 'performanceEnd' });
+            return;
+        }
+        room.mode = 'rehearsal';
+        room.readyPerformers = {};
+        console.log('[' + socketRoomId + '] PERFORMANCE END by leader ' + socket.id);
+        io.to(socketRoomId).emit('performanceEnd', { serverTime: Date.now() });
+    });
+
     socket.on('disconnect', function() {
         if (socketRoomId) {
             var room = rooms.get(socketRoomId);
             if (room) {
                 room.clientCount--;
+                delete room.readyPerformers[socket.id];
+                delete room.performanceModeClients[socket.id];
                 removePerformerFromRoom(socketRoomId);
 
                 // Broadcast updated room members

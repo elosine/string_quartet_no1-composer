@@ -309,6 +309,8 @@ module.exports = function applyAnnotationPatches(html) {
 
             // ─── Pointer event handlers ──────────────────────────────────
             _onPointerDown: function(e) {
+                // Phase 11: Block all annotation input in performance mode
+                if (window.PerformanceMode && PerformanceMode.locked) return;
                 // Pen is always captured for annotation
                 var isPen = (e.pointerType === 'pen');
                 // Mouse/touch only captured when annotation mode is active

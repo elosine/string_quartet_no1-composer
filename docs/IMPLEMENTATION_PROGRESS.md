@@ -1,26 +1,38 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 11 (next)
+**Active Phase:** Phase 12 (next)
 **Last Session:** Mar 23, 2026
-**Last Commit:** `[Phase 10] Sync & Animation Tier 2 — monotonic clock, adaptive ping, quality UI, offline banner`
+**Last Commit:** `[Phase 11] Performance Mode — 8 stages: auto-stop, lockdown, readiness, countdown, emergency, tab recovery, wake lock, ceremony`
 
 ### ▶ RESUME HERE (next session)
 
-**Phase 10 is COMPLETE.** Phase 11 pre-implementation protocol is next.
+**Phase 11 is COMPLETE.** Full performance mode with 8 stages.
+
+**Phase 11 delivered (Performance Mode):**
+- Stage 0: Auto-stop at end of score (server-scheduled, `reason: 'end-of-score'`)
+- Stage 1: Mode switching (`?mode=performance`) + complete UI lockdown
+- Stage 2: Readiness panel + mandatory fullscreen + server `performanceModeClients` tracking
+- Stage 3: Countdown overlay (3...2...1) + auto-play via `scoreGo`
+- Stage 4: Emergency controls (2-finger long press, 2s) + native gesture suppression + contextmenu block
+- Stage 5: Tab recovery — auto-rejoin performance on reconnect via `mode` in `scoreState`
+- Stage 6: Wake Lock API — screen stays on during performance
+- Stage 7: End-of-performance ceremony — fullscreen overlay with "Return to Rehearsal"
+
+**Key decisions:**
+- 2-finger long press (not 3-finger) — OS gestures on Win/Mac intercept 3-finger
+- Any performer can emergency-stop locally; only leader broadcasts stop to all
+- Service Worker deferred to Phase 14 (requires HTTPS)
 
 **Phase 10 delivered (Sync & Animation — Tier 2):**
 - Stage 1: MonotonicScoreClock — _lastNow guard (slewing attempted, reverted due to visible stutter)
 - Stage 2+3: Adaptive ping rate (variance-based interval with hysteresis) + 4-level sync quality UI (dot + tooltip)
 - Stage 4: Offline banner — "OFFLINE — local clock" after 5s disconnect, auto-dismiss on reconnect
-- New Patch 1g: Dynamic _schedulePing replaces fixed 5s setInterval
-- Offline stub detection: window._OFFLINE_STUB flag
-- Known: Server restart stops playback (correct — server authoritative). Deferred to Phase 11.
 
 **Priority for next session:**
 1. Read `WORKING_PRINCIPLES.md` and this RESUME section
-2. Phase 11 pre-implementation protocol
-3. Begin Phase 11 staged implementation
+2. Decide whether to proceed with Phase 12, 13, or 14
+3. Phase 12 = Part View Enhancements, Phase 13 = Sync+Animation Tier 3 (optional), Phase 14 = Website & Production
 
 **Deferred items (not blocking):**
 - SVG font fix: Option B (text-to-paths via opentype.js) recommended. See Font Analysis section below.
@@ -2322,3 +2334,194 @@ Stage 5: Integration verification ✅
 | `scripts/build_performance_app.js` | Build patches for ClockSync | Modify Patches 1d, 1d-b, 1e-b for slewing, adaptive rate, quality metric, banner |
 | `scripts/performance_server.js` | Server-side sync | May need `scorePositionCheck` interval adjustment |
 | `builds/performance/index.html` | Built output | Rebuilt after each stage |
+
+---
+
+## Phase 11: Performance Mode — Pre-Implementation Protocol (§13.2.7)
+
+### Step 1: System Inventory — What Are We Touching?
+
+Phase 11 adds performance mode: complete touch lockdown, readiness check, countdown, auto-stop, emergency controls, tab recovery, Service Worker, Wake Lock, and end-of-performance ceremony. This touches or extends 8 existing systems and adds 6 new ones.
+
+#### Existing Systems Modified
+
+| System | File | What it does | State reads | State writes | Callers | Callees |
+|--------|------|-------------|-------------|-------------|---------|---------|
+| **RehearsalGestures** | `performance_rehearsal_patches.js:28-396` | Pointer event system: swipe, tap, pinch, long-press | `pointers`, `pointerCount`, `isPinching`, `container` | Same + DOM events | ScoreContainer pointer events | `nextPage`, `prevPage`, `togglePlayPause`, `ControlsOverlay.toggle`, `ScoreZoom.setZoom` |
+| **ControlsOverlay** | `performance_rehearsal_patches.js:460-763` | Floating touch panel: play/stop, page nav, goto, zoom | `overlay` DOM element, fade timer, page info | DOM visibility, fade state | `RehearsalGestures.onCenterTap`, marker/loop systems | `CursorControls.toggleGoStop`, `GraphicTimeline.onGoto`, `RehearsalGestures.nextPage/prevPage` |
+| **AnnotationSystem** | `performance_annotation_patches.js` | SVG overlay for freehand, stamps, text | `_annotMode`, pen/mouse state, annotation data | SVG overlay DOM, localStorage | Pen events, toolbar buttons | localStorage, SVG DOM |
+| **performance_server.js** (room state) | `performance_server.js:322-392` | Room-based sync: isPlaying, scoreTime, leader, loop | `rooms` Map, room.isPlaying, room.leaderId, etc. | Same | Socket.IO events | `io.to(roomId).emit(...)`, `getRoomScoreTimeMs()` |
+| **performance_server.js** (leader system) | `performance_server.js:393-435` | Leader election, transfer, gating | `room.leaderId`, socket.id | `room.leaderId` | `joinRoom`, `disconnect`, `scoreGo/Stop/Goto`, `setLeader` | `assignLeader`, `transferLeaderOnDisconnect`, `io.to().emit('leaderChange')` |
+| **performance_server.js** (joinRoom reset) | `performance_server.js:552-560` | Reset to zero when first client joins empty room | `room.clientCount` | `room.currentScoreTimeMs`, `room.isPlaying` | `joinRoom` handler | — |
+| **ClockSync** (client) | `build_performance_app.js` patches | Clock sync, adaptive ping, quality UI, offline banner | `clockOffset`, `_perfInitialized`, `connected`, `_offsetVariance` | Same + sync dot DOM, offline banner DOM | AnimationEngine (via `ClockSync.now()`), socket events | `requestPing`, `_updateSyncUI`, `_showOfflineBanner` |
+| **GraphicTimeline** | `public/index.html:~5860-7800` | Page calculation, cursor positioning, page turns | `currentTopPage`, `currentBottomPage`, tempo vars | Same + SVG transforms | AnimationEngine subscriber, `onGoto` | `getSecondsPerPage()`, `calculateTotalPages()`, `checkPageChange()` |
+
+#### New Systems Added
+
+| System | Where | Purpose |
+|--------|-------|---------|
+| **PerformanceMode** | New IIFE in `performance_rehearsal_patches.js` or new file | Mode state machine: rehearsal ↔ performance. Lockdown flag, readiness tracking, countdown, ceremony |
+| **Auto-stop timer** | `performance_server.js` | Server calculates total score duration, sets timer on `scoreGo`, emits `scoreStop` with `reason: 'end-of-score'` |
+| **Emergency controls** | Client-side in PerformanceMode | Three-finger tap (leader menu), three-finger long-press 2s (all-performer emergency stop) |
+| **Service Worker** | New `builds/performance/sw.js` | Cache index.html, score.json, SVGs for offline reload |
+| **Wake Lock** | Client-side in PerformanceMode | `navigator.wakeLock.request('screen')` during performance |
+| **Tab recovery** | Client-side in PerformanceMode | `visibilitychange` listener, burst re-sync, "Reconnecting..." overlay |
+
+### Step 2: Source Reading — Understand Before Overriding
+
+#### RehearsalGestures — Lockdown entry points
+
+Every gesture goes through `onPointerDown` → `onPointerMove` → `onPointerUp`. The `onPointerUp` method (line 142) evaluates: tap vs swipe vs pinch. A single guard at the top of `onPointerDown` would block ALL gestures except emergency (3-finger).
+
+Key observation: `pointerCount` tracks active fingers. We need 3-finger detection, which means we must let `onPointerDown` count to 3 before checking for emergency gestures. So the lockdown guard must be in `onPointerUp` (for taps/swipes) and `startPinch` (for zoom), NOT in `onPointerDown`.
+
+Apple Pencil (`pointerType === 'pen'`) is already filtered at line 92. Performance mode must also block pen events (annotation disabled).
+
+#### ControlsOverlay — Suppression
+
+`ControlsOverlay.toggle()` is called by `RehearsalGestures.onCenterTap()`. In performance mode, center tap is blocked by the gesture lockdown. But the overlay can also be shown programmatically. The overlay DOM should be hidden (display: none) in performance mode as a second safety layer.
+
+#### Server joinRoom reset — Performance mode bypass
+
+Lines 552-560: when `room.clientCount === 0`, room resets to zero. The Phase 11 note in the spec explicitly says: "Performance mode must override this: when `?mode=performance` is active, the server should preserve the frozen score position during the full grace period." This means room state needs a `mode` field ('rehearsal' | 'performance'), and the reset logic checks it.
+
+#### Score duration calculation
+
+`GraphicTimeline.getSecondsPerPage()` = `(beatsPerPage / beatsPerMinute) * 60`. Default: `(8/60)*60 = 8` seconds/page. Total pages computed in `computeTotalPages()` (performance_rehearsal_patches.js:565-602) by scanning SVG elements for max endSeconds. Server needs this same computation OR the client sends total duration on readiness confirmation.
+
+Simpler approach: client computes total duration client-side and reports it during readiness. Server uses leader's reported duration. This avoids duplicating score-parsing logic on the server.
+
+### Step 3: Contract Documentation
+
+#### PerformanceMode state machine
+
+```
+States: REHEARSAL → READINESS → STAGED → COUNTDOWN → PLAYING → CEREMONY
+                                                          ↓
+                                                    EMERGENCY_STOP → (leader resumes or exits)
+
+Preconditions per transition:
+  REHEARSAL → READINESS:  Leader activates performance mode (URL param or control)
+  READINESS → STAGED:     All expected performers show ✅, leader taps "Begin Performance"
+  STAGED → COUNTDOWN:     Server verifies all connected, broadcasts performanceGo
+  COUNTDOWN → PLAYING:    Countdown reaches 0, latency-compensated start fires
+  PLAYING → CEREMONY:     Auto-stop timer fires (end of score), OR leader manual stop
+  PLAYING → EMERGENCY_STOP: Any performer 3-finger long-press 2s
+  EMERGENCY_STOP → PLAYING: Leader taps "Resume" from emergency menu
+  Any → REHEARSAL:        Leader exits performance mode
+```
+
+Invariants:
+- `performanceLocked === true` in states COUNTDOWN, PLAYING, EMERGENCY_STOP, CEREMONY
+- `performanceLocked === false` in states REHEARSAL, READINESS (partially — readiness panel interactive)
+- All gesture handlers return immediately when `performanceLocked === true` EXCEPT 3-finger tap/hold
+- Auto-stop timer is active ONLY in PLAYING state; cancelled on any stop/goto/emergency
+- Wake Lock held from COUNTDOWN through CEREMONY
+- Fullscreen entered on performer's "Ready" tap (requires user gesture)
+
+#### Auto-stop contract
+
+Preconditions: room.isPlaying === true, totalDurationMs > 0
+Postconditions: room.isPlaying === false, all clients receive scoreStop with `reason: 'end-of-score'`
+Invariant: timer cancelled on manual stop, emergency stop, scoreGoto, or disconnect-all
+
+#### Emergency stop contract
+
+Preconditions: performance mode active, any performer holds 3 fingers for 2s
+Postconditions: ALL clients stop, red flash "EMERGENCY STOP at X:XX", score frozen
+Invariant: emergency stop works regardless of leader status (any performer can trigger)
+
+### Step 4: Risk Register
+
+| Risk | Probability | Impact | Detection | Mitigation |
+|------|------------|--------|-----------|------------|
+| Gesture lockdown misses a code path | Medium | High — accidental page turn during concert | Immediate visual | Guard at `onPointerDown` level + `onPointerUp` level + `ControlsOverlay` hidden |
+| Fullscreen API rejected (user gesture required) | High | Medium — performers see browser chrome | Visual — URL bar visible | Fullscreen on "Ready" tap (guaranteed user gesture); re-enter on `performanceGo` |
+| Wake Lock not supported (older iOS) | Low | Low — screen dims but score continues | Visual — screen goes dark | Graceful degradation — log warning, no crash |
+| Service Worker caching stale version | Medium | High — wrong score loaded | Hard to detect | Version hash in SW, `skipWaiting()`, cache-bust on build |
+| Auto-stop timer drift on long pieces | Low | Medium — stops 100ms early/late | Timing check | Use server time (`Date.now()`) not setTimeout accuracy; verify with position check |
+| 3-finger gesture conflicts with iPad gestures | Medium | High — triggers iOS app switcher | iPad-specific testing | CSS `touch-action: none` already set; may need `gesturestart` preventDefault |
+| Server restart during performance | Low | Critical — all state lost | Red dot + offline banner | Phase 10 already handles; Phase 11 adds grace period bypass for performance mode |
+| joinRoom reset during performer reconnect | Medium | High — position lost mid-concert | Score jumps to zero | Performance mode bypass: skip reset when `room.mode === 'performance'` |
+| Countdown fires but not all clients received it | Low | High — some performers start late | Sync quality check | Server verifies all sockets in room received `performanceGo` before countdown |
+
+### Step 5: Staged Implementation Plan
+
+```
+Stage 0: Auto-stop at end of score (§12.11.6)
+  Server: calculate totalDurationMs from room tempo + client-reported page count.
+  On scoreGo: set timer for (totalDurationMs - currentPositionMs).
+  Timer fires → emit scoreStop({ reason: 'end-of-score' }).
+  Client: show "End of Score" indicator on reason === 'end-of-score'.
+  Cancel timer on manual stop, emergency stop, scoreGoto.
+  → TEST: Play from near end → auto-stops. Manual stop → no double-stop.
+
+Stage 1: Mode switching + complete lockdown (§12.11.1, §12.11.3)
+  Add PerformanceMode object with state machine.
+  URL param ?mode=performance activates.
+  performanceLocked = true → ALL gesture handlers return (tap, swipe, pinch, long-press).
+  ControlsOverlay disabled. Annotation pen disabled.
+  3-finger tap (leader) → emergency menu.
+  3-finger long-press 2s (anyone) → emergency stop.
+  → TEST: In perf mode: tap/swipe/pinch → no response. 3-finger → works.
+
+Stage 2: Pre-performance readiness check (§12.11.2)
+  Leader readiness panel: performer slots, connection status, sync quality.
+  Each performer taps "Ready" → triggers fullscreen on THEIR device.
+  Server tracks performerReady per socket.
+  Leader's "Begin Performance" enables when all green.
+  → TEST: Ready tap → fullscreen. Panel shows status. Button disabled until all ready.
+
+Stage 3: Go sequence + countdown (§12.11.2)
+  Leader confirms → server broadcasts performanceGo.
+  Client: lockdown on, re-enter fullscreen, show 5-4-3-2-1 countdown overlay.
+  Score visible behind semi-transparent overlay.
+  Latency-compensated start: schedule at ClockSync.now() + leadInMs.
+  Leader can cancel during countdown.
+  → TEST: Countdown on all clients. Score starts simultaneously. Cancel works.
+
+Stage 4: Emergency controls (§12.11.3)
+  Leader 3-finger tap → overlay with Stop, Restart, Jump, Resume.
+  All-performer 3-finger long-press 2s → emergencyStop broadcast.
+  Red flash "EMERGENCY STOP at X:XX" on all devices.
+  Menu auto-closes after 10s.
+  → TEST: Emergency stop broadcasts. Menu works. Non-leader can't open menu.
+
+Stage 5: Tab recovery (§12.11.1b, §12.11.5)
+  visibilitychange listener: on visible → burst re-sync, verify socket, verify fullscreen.
+  "Reconnecting..." overlay clears when sync quality reaches "good".
+  Handle staged/playing state on recovery.
+  → TEST: Background 30s → foreground → recovers. Background 5min → same.
+
+Stage 6: Service Worker + Wake Lock (§12.11.4)
+  SW caches index.html, score.json, SVGs.
+  Wake Lock acquired on performance start, released on end.
+  localStorage session recovery: auto-rejoin on reload.
+  → TEST: SW installed, cache works. Wake Lock prevents dimming.
+
+Stage 7: End of performance ceremony (§12.11.7)
+  After auto-stop: "Performance Complete" overlay after 2s delay.
+  Shows duration, timestamp. Leader options: Return to Rehearsal, Start Again, Close.
+  Performance log saved to server.
+  Wake Lock released, fullscreen exits.
+  → TEST: Auto-stop → ceremony. Leader options work. Log saved.
+```
+
+### Step 6: Key Files
+
+| File | Role | Changes needed |
+|------|------|---------------|
+| `scripts/performance_rehearsal_patches.js` | Gesture system, controls overlay | Add lockdown guard to RehearsalGestures, PerformanceMode IIFE, emergency gestures, countdown/ceremony overlays |
+| `scripts/performance_server.js` | Room state, events | Add performanceMode to room state, auto-stop timer, readiness tracking, performanceGo/emergencyStop events, grace period bypass |
+| `scripts/build_performance_app.js` | Build pipeline | May need new patches for client-side perf mode init, or inject via rehearsal patches |
+| `builds/performance/sw.js` | Service Worker | New file — cache strategy for offline reload |
+| `docs/IMPLEMENTATION_PROGRESS.md` | Documentation | Stage-by-stage completion tracking |
+
+### Step 7: Integration Verification
+
+Phase 11 Completion Checkpoint (from pipeline plan):
+- 🤖 Performance mode locks down ALL touches correctly
+- 🤖 Readiness check, Go sequence, countdown, auto-stop, emergency stop/menu, tab recovery, Service Worker, Wake Lock all functional
+- 🤖 Two scenarios tested: standard setup AND backgrounded-tab recovery
+- 👁️ **Human verification (on tablet/iPad):** Performance mode feels completely safe — no accidental triggers. Countdown is clear. Emergency stop works from any device. Recovery from network loss and app switch is seamless. End-of-performance ceremony is clean.
+- **Regression:** Rehearsal mode still works when not in performance mode. All Phases 1-10 features unaffected.

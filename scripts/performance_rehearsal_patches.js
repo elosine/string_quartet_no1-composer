@@ -101,6 +101,24 @@ module.exports = function applyRehearsalPatches(html) {
                 };
                 this.pointerCount++;
 
+                // Phase 11: Track pointers but skip gesture initiation when performance locked
+                if (window.PerformanceMode && PerformanceMode.locked) {
+                    // Stage 4: 2-finger long press (2s) for emergency menu
+                    if (this.pointerCount === 2) {
+                        var self = this;
+                        this._emergencyTimer = setTimeout(function() {
+                            self._emergencyTimer = null;
+                            if (self.pointerCount === 2 && window.PerformanceMode.showEmergencyMenu) {
+                                PerformanceMode.showEmergencyMenu();
+                            }
+                        }, 2000);
+                    } else if (this.pointerCount !== 2 && this._emergencyTimer) {
+                        clearTimeout(this._emergencyTimer);
+                        this._emergencyTimer = null;
+                    }
+                    return;
+                }
+
                 if (this.pointerCount === 1) {
                     // Single pointer — start long press timer
                     var self = this;
@@ -131,6 +149,11 @@ module.exports = function applyRehearsalPatches(html) {
                         clearTimeout(this.longPressTimer);
                         this.longPressTimer = null;
                     }
+                    // Stage 4: Cancel emergency timer if fingers move
+                    if (this._emergencyTimer) {
+                        clearTimeout(this._emergencyTimer);
+                        this._emergencyTimer = null;
+                    }
                 }
 
                 // Update pinch zoom if active
@@ -148,8 +171,15 @@ module.exports = function applyRehearsalPatches(html) {
                     this.longPressTimer = null;
                 }
 
+                // Phase 11 Stage 4: Cancel emergency timer when fingers lift
+                if (this._emergencyTimer && this.pointerCount < 2) {
+                    clearTimeout(this._emergencyTimer);
+                    this._emergencyTimer = null;
+                }
+
                 // Evaluate gesture only for single-pointer (non-pinch) interactions
-                if (p && this.pointerCount === 1 && !this.isPinching && !this.wasPinching) {
+                if (p && this.pointerCount === 1 && !this.isPinching && !this.wasPinching &&
+                    !(window.PerformanceMode && PerformanceMode.locked)) {
                     var dx = p.currentX - p.startX;
                     var dy = p.currentY - p.startY;
                     var dt = Date.now() - p.startTime;
@@ -221,9 +251,18 @@ module.exports = function applyRehearsalPatches(html) {
 
                 if (xRatio < this.EDGE_ZONE) {
                     // Left edge tap → previous page (immediate, no double-tap conflict)
+                    // Auto-detach during playback (same as swipe) so page turn doesn't stop playback
+                    if (window.ScoreTime && ScoreTime.isPlaying && window.SyncMode && !SyncMode.isIndependent) {
+                        SyncMode.isIndependent = true;
+                        SyncMode.showToast('Auto-detached — tap during playback', 2000);
+                    }
                     this.prevPage();
                 } else if (xRatio > (1 - this.EDGE_ZONE)) {
                     // Right edge tap → next page (immediate, no double-tap conflict)
+                    if (window.ScoreTime && ScoreTime.isPlaying && window.SyncMode && !SyncMode.isIndependent) {
+                        SyncMode.isIndependent = true;
+                        SyncMode.showToast('Auto-detached — tap during playback', 2000);
+                    }
                     this.nextPage();
                 } else {
                     // Center zone — defer action to allow double-tap detection
@@ -1811,6 +1850,775 @@ module.exports = function applyRehearsalPatches(html) {
 
         refreshSyncUI();
         console.log('[SyncMode] Initialized');
+    })();
+
+    // ═══ Phase 11 Stage 0: Auto-stop at end of score ═══
+    // Reports total score duration to server. Shows "End of Score" indicator on auto-stop.
+    (function initAutoStop() {
+
+        // ─── Compute and report score duration ──────────────────────────
+        var LEAD_OUT_SECONDS = 4; // silence after last gesture before auto-stop
+
+        function computeScoreDurationMs() {
+            var maxEnd = 0;
+            if (window.SVGElementManager && SVGElementManager.elements) {
+                for (var i = 0; i < SVGElementManager.elements.length; i++) {
+                    var el = SVGElementManager.elements[i];
+                    var t = (el.referenceSeconds || 0) + (el.offsetSeconds || 0);
+                    if (t > maxEnd) maxEnd = t;
+                }
+            }
+            if (window.CurveMaker && CurveMaker.curves) {
+                for (var c = 0; c < CurveMaker.curves.length; c++) {
+                    var ce = CurveMaker.curves[c].endSeconds || 0;
+                    if (ce > maxEnd) maxEnd = ce;
+                }
+            }
+            if (window.LineWedgeMaker && LineWedgeMaker.lineWedges) {
+                for (var l = 0; l < LineWedgeMaker.lineWedges.length; l++) {
+                    var le = LineWedgeMaker.lineWedges[l].endSeconds || 0;
+                    if (le > maxEnd) maxEnd = le;
+                }
+            }
+            if (window.GCMaker && GCMaker.gcs) {
+                for (var g = 0; g < GCMaker.gcs.length; g++) {
+                    var ge = GCMaker.gcs[g].endSeconds || 0;
+                    if (ge > maxEnd) maxEnd = ge;
+                }
+            }
+            if (maxEnd <= 0) return 0;
+            // Convert score time → actual time (add leadIn), then add lead-out buffer
+            var leadIn = typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0;
+            return (maxEnd + leadIn + LEAD_OUT_SECONDS) * 1000;
+        }
+
+        function reportDuration() {
+            var durationMs = computeScoreDurationMs();
+            if (durationMs <= 0) return;
+            var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+            if (sock && typeof sock.emit === 'function') {
+                sock.emit('reportScoreDuration', { totalDurationMs: durationMs });
+                console.log('[AutoStop] Reported score duration: ' + (durationMs / 1000).toFixed(1) + 's');
+            }
+        }
+
+        // Report after score data loads (retry until data available)
+        var _reportAttempts = 0;
+        function tryReport() {
+            _reportAttempts++;
+            var hasData = (window.CurveMaker && CurveMaker.curves && CurveMaker.curves.length > 0) ||
+                          (window.GCMaker && GCMaker.gcs && GCMaker.gcs.length > 0);
+            if (hasData) {
+                reportDuration();
+            } else if (_reportAttempts < 20) {
+                setTimeout(tryReport, 500);
+            }
+        }
+        setTimeout(tryReport, 1000);
+
+        // ─── End of Score indicator ─────────────────────────────────────
+        function showEndOfScoreIndicator() {
+            if (document.getElementById('endOfScoreBanner')) return;
+            var banner = document.createElement('div');
+            banner.id = 'endOfScoreBanner';
+            banner.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);padding:20px 40px;background:rgba(0,0,0,0.85);color:#fff;font-family:sans-serif;font-size:20px;text-align:center;z-index:99999;border-radius:8px;pointer-events:none;opacity:0;transition:opacity 0.5s;';
+            banner.textContent = 'End of Score';
+            document.body.appendChild(banner);
+            // Fade in
+            requestAnimationFrame(function() { banner.style.opacity = '1'; });
+            // Fade out after 5 seconds
+            setTimeout(function() {
+                banner.style.opacity = '0';
+                setTimeout(function() { if (banner.parentNode) banner.parentNode.removeChild(banner); }, 500);
+            }, 5000);
+        }
+
+        // Wrap CursorControls.onScoreStop to detect end-of-score reason
+        function hookScoreStop() {
+            if (!window.CursorControls) {
+                setTimeout(hookScoreStop, 500);
+                return;
+            }
+            var origStop = CursorControls.onScoreStop.bind(CursorControls);
+            CursorControls.onScoreStop = function(data) {
+                origStop(data);
+                if (data && data.reason === 'end-of-score') {
+                    // Stage 7: If in performance mode PLAYING, transition to ceremony
+                    if (window.PerformanceMode && PerformanceMode.state === 'PLAYING') {
+                        console.log('[AutoStop] End of score in performance — entering CEREMONY');
+                        if (PerformanceMode.enterCeremony) PerformanceMode.enterCeremony();
+                    } else {
+                        showEndOfScoreIndicator();
+                    }
+                    console.log('[AutoStop] End of score reached');
+                }
+            };
+            console.log('[AutoStop] Hooked onScoreStop for end-of-score detection');
+        }
+        hookScoreStop();
+
+        console.log('[AutoStop] Initialized');
+    })();
+
+    // ═══ Phase 11 Stages 1-2: Performance Mode + Readiness Panel ═══
+    // State machine for rehearsal ↔ performance transition.
+    // READINESS state shows fullscreen + ready panel.
+    // PLAYING/COUNTDOWN/CEREMONY states are locked (all gestures blocked).
+    (function initPerformanceMode() {
+
+        var STATES = {
+            REHEARSAL: 'REHEARSAL',
+            READINESS: 'READINESS',
+            COUNTDOWN: 'COUNTDOWN',
+            PLAYING: 'PLAYING',
+            EMERGENCY_STOP: 'EMERGENCY_STOP',
+            CEREMONY: 'CEREMONY'
+        };
+
+        var _state = STATES.REHEARSAL;
+        var _locked = false;
+        var _isFullscreen = false;
+        var _isReady = false;
+        var _readyCount = 0;
+        var _totalCount = 0;
+        var _allReady = false;
+        var _panel = null;
+
+        // ─── Lockdown helpers ───────────────────────────────────────────
+        function applyLockdown() {
+            if (window.ControlsOverlay) ControlsOverlay.hide();
+            var toolbar = document.getElementById('annotationToolbar');
+            if (toolbar) toolbar.style.display = 'none';
+            if (window.AnnotationSystem && AnnotationSystem._isAnnotationMode) {
+                AnnotationSystem._isAnnotationMode = false;
+            }
+            var minimap = document.getElementById('miniMap');
+            if (minimap) minimap.style.display = 'none';
+            var mmHover = document.getElementById('miniMapHoverZone');
+            if (mmHover) mmHover.style.display = 'none';
+            var syncBar = document.getElementById('syncBar');
+            if (syncBar) syncBar.style.display = 'none';
+        }
+
+        function releaseLockdown() {
+            var toolbar = document.getElementById('annotationToolbar');
+            if (toolbar) toolbar.style.display = '';
+            var minimap = document.getElementById('miniMap');
+            if (minimap) minimap.style.display = '';
+            var mmHover = document.getElementById('miniMapHoverZone');
+            if (mmHover) mmHover.style.display = '';
+            var syncBar = document.getElementById('syncBar');
+            if (syncBar) syncBar.style.display = '';
+        }
+
+        // ─── State machine ──────────────────────────────────────────────
+        function setState(newState) {
+            var oldState = _state;
+            _state = newState;
+            _locked = (newState === STATES.COUNTDOWN ||
+                       newState === STATES.PLAYING ||
+                       newState === STATES.EMERGENCY_STOP ||
+                       newState === STATES.CEREMONY);
+            console.log('[PerformanceMode] ' + oldState + ' → ' + newState + (_locked ? ' (LOCKED)' : ''));
+
+            if (_locked) {
+                applyLockdown();
+                blockNativeGestures();
+                requestWakeLock();
+                destroyPanel();
+            } else if (newState === STATES.READINESS) {
+                applyLockdown(); // also lock during readiness (panel is the only UI)
+                blockNativeGestures();
+                requestWakeLock();
+                createPanel();
+            } else {
+                releaseLockdown();
+                unblockNativeGestures();
+                releaseWakeLock();
+                destroyPanel();
+                destroyEmergencyMenu();
+                destroyCountdown();
+                destroyCeremony();
+            }
+        }
+
+        // ─── Fullscreen ─────────────────────────────────────────────────
+        function requestFullscreen() {
+            var el = document.documentElement;
+            var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+            if (req) {
+                req.call(el).then(function() {
+                    _isFullscreen = true;
+                    updatePanel();
+                    console.log('[PerformanceMode] Fullscreen entered');
+                }).catch(function(err) {
+                    console.warn('[PerformanceMode] Fullscreen failed:', err.message);
+                    // Allow proceeding anyway (iOS Safari doesn't support fullscreen)
+                    _isFullscreen = true;
+                    updatePanel();
+                });
+            } else {
+                // No fullscreen API (iOS Safari) — allow proceeding
+                _isFullscreen = true;
+                updatePanel();
+                console.log('[PerformanceMode] Fullscreen API not available — skipping');
+            }
+        }
+
+        function checkFullscreen() {
+            return !!(document.fullscreenElement || document.webkitFullscreenElement);
+        }
+
+        // Listen for fullscreen changes (user may exit via Esc)
+        document.addEventListener('fullscreenchange', function() {
+            if (_state === STATES.READINESS) {
+                _isFullscreen = checkFullscreen();
+                if (!_isFullscreen && _isReady) {
+                    // Exited fullscreen while ready — unready
+                    _isReady = false;
+                    var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+                    if (sock) sock.emit('performerUnready');
+                }
+                updatePanel();
+            }
+        });
+
+        // ─── Readiness panel ────────────────────────────────────────────
+        function createPanel() {
+            if (_panel) return;
+            _panel = document.createElement('div');
+            _panel.id = 'perfReadinessPanel';
+            _panel.innerHTML = [
+                '<div class="prp-content">',
+                '  <h1 class="prp-title">Performance Mode</h1>',
+                '  <div class="prp-status-box">',
+                '    <div class="prp-step prp-step-fs">',
+                '      <span class="prp-icon">⬜</span>',
+                '      <button class="prp-btn prp-fs-btn">Go Fullscreen</button>',
+                '    </div>',
+                '    <div class="prp-step prp-step-ready">',
+                '      <span class="prp-icon">⬜</span>',
+                '      <button class="prp-btn prp-ready-btn" disabled>Ready</button>',
+                '    </div>',
+                '  </div>',
+                '  <div class="prp-readiness-list"></div>',
+                '  <div class="prp-leader-section" style="display:none">',
+                '    <button class="prp-btn prp-begin-btn" disabled>Begin Performance</button>',
+                '  </div>',
+                '  <button class="prp-btn prp-back-btn">← Back to Rehearsal</button>',
+                '</div>'
+            ].join('\\n');
+
+            var style = document.createElement('style');
+            style.id = 'perfReadinessPanelStyle';
+            style.textContent = [
+                '#perfReadinessPanel {',
+                '  position: fixed; top: 0; left: 0; right: 0; bottom: 0;',
+                '  background: rgba(0,0,0,0.95); z-index: 100000;',
+                '  display: flex; align-items: center; justify-content: center;',
+                '  font-family: -apple-system, BlinkMacSystemFont, sans-serif;',
+                '  color: #fff; user-select: none; -webkit-user-select: none;',
+                '}',
+                '.prp-content { text-align: center; max-width: 400px; padding: 30px; }',
+                '.prp-title { font-size: 28px; font-weight: 300; margin: 0 0 30px; letter-spacing: 1px; }',
+                '.prp-status-box { margin: 0 0 30px; }',
+                '.prp-step { display: flex; align-items: center; gap: 12px; margin: 12px 0; justify-content: center; }',
+                '.prp-icon { font-size: 20px; width: 28px; text-align: center; }',
+                '.prp-btn {',
+                '  padding: 10px 24px; border: 1px solid rgba(255,255,255,0.3);',
+                '  border-radius: 6px; background: transparent; color: #fff;',
+                '  font-size: 16px; cursor: pointer; transition: all 0.2s;',
+                '}',
+                '.prp-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); }',
+                '.prp-btn:disabled { opacity: 0.3; cursor: default; }',
+                '.prp-fs-btn.prp-done { border-color: #00934c; color: #00934c; }',
+                '.prp-ready-btn.prp-active {',
+                '  background: rgba(0,147,76,0.3); border-color: #00934c; color: #00ffaa;',
+                '}',
+                '.prp-begin-btn {',
+                '  padding: 14px 36px; font-size: 18px; font-weight: 600;',
+                '  border-color: rgba(255,215,0,0.5); color: #ffd700;',
+                '}',
+                '.prp-begin-btn:hover:not(:disabled) { background: rgba(255,215,0,0.15); }',
+                '.prp-readiness-list {',
+                '  margin: 20px 0; padding: 12px; border-radius: 8px;',
+                '  background: rgba(255,255,255,0.05); min-height: 40px;',
+                '  font-size: 14px; color: rgba(255,255,255,0.6);',
+                '}',
+                '.prp-readiness-list .prp-ready-dot {',
+                '  display: inline-block; width: 8px; height: 8px; border-radius: 50%;',
+                '  margin-right: 6px; vertical-align: middle;',
+                '}',
+                '.prp-readiness-list .prp-performer { margin: 4px 0; }',
+                '.prp-back-btn { margin-top: 20px; font-size: 13px; opacity: 0.5; border: none; }',
+                '.prp-back-btn:hover { opacity: 0.8; }'
+            ].join('\\n');
+            document.head.appendChild(style);
+            document.body.appendChild(_panel);
+
+            // Wire up buttons
+            var fsBtn = _panel.querySelector('.prp-fs-btn');
+            var readyBtn = _panel.querySelector('.prp-ready-btn');
+            var beginBtn = _panel.querySelector('.prp-begin-btn');
+            var backBtn = _panel.querySelector('.prp-back-btn');
+
+            fsBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                requestFullscreen();
+            });
+
+            readyBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (!_isFullscreen) return;
+                _isReady = !_isReady;
+                var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+                if (sock) {
+                    sock.emit(_isReady ? 'performerReady' : 'performerUnready');
+                }
+                updatePanel();
+            });
+
+            beginBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (!_allReady) return;
+                var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+                if (sock) sock.emit('performanceStart');
+            });
+
+            backBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                _isReady = false;
+                var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+                if (sock) {
+                    sock.emit('performerUnready');
+                    sock.emit('exitReadiness');
+                }
+                // Exit fullscreen if active
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                setState(STATES.REHEARSAL);
+            });
+
+            updatePanel();
+
+            // Tell server we're in performance mode
+            var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+            if (sock) sock.emit('enterReadiness');
+
+            console.log('[PerformanceMode] Readiness panel created');
+        }
+
+        function updatePanel() {
+            if (!_panel) return;
+            // Fullscreen step
+            var fsIcon = _panel.querySelector('.prp-step-fs .prp-icon');
+            var fsBtn = _panel.querySelector('.prp-fs-btn');
+            if (_isFullscreen) {
+                fsIcon.textContent = '✅';
+                fsBtn.textContent = 'Fullscreen ✓';
+                fsBtn.classList.add('prp-done');
+                fsBtn.disabled = true;
+            } else {
+                fsIcon.textContent = '⬜';
+                fsBtn.textContent = 'Go Fullscreen';
+                fsBtn.classList.remove('prp-done');
+                fsBtn.disabled = false;
+            }
+            // Ready step
+            var readyIcon = _panel.querySelector('.prp-step-ready .prp-icon');
+            var readyBtn = _panel.querySelector('.prp-ready-btn');
+            readyBtn.disabled = !_isFullscreen;
+            if (_isReady) {
+                readyIcon.textContent = '✅';
+                readyBtn.textContent = 'Ready ✓';
+                readyBtn.classList.add('prp-active');
+            } else {
+                readyIcon.textContent = '⬜';
+                readyBtn.textContent = 'Ready';
+                readyBtn.classList.remove('prp-active');
+            }
+            // Readiness list
+            var listEl = _panel.querySelector('.prp-readiness-list');
+            if (_totalCount > 0) {
+                listEl.textContent = _readyCount + ' of ' + _totalCount + ' performers ready';
+            } else {
+                listEl.textContent = 'Waiting for connection...';
+            }
+            // Leader section
+            var leaderSection = _panel.querySelector('.prp-leader-section');
+            var beginBtn = _panel.querySelector('.prp-begin-btn');
+            var isLeader = window.SyncMode && SyncMode.isLeader;
+            leaderSection.style.display = isLeader ? '' : 'none';
+            beginBtn.disabled = !_allReady;
+        }
+
+        function destroyPanel() {
+            if (_panel && _panel.parentNode) {
+                _panel.parentNode.removeChild(_panel);
+            }
+            _panel = null;
+            var style = document.getElementById('perfReadinessPanelStyle');
+            if (style && style.parentNode) style.parentNode.removeChild(style);
+        }
+
+        // ─── Countdown overlay ──────────────────────────────────────────
+        var _countdownEl = null;
+
+        function showCountdown(seconds) {
+            // Create countdown overlay
+            _countdownEl = document.createElement('div');
+            _countdownEl.id = 'perfCountdown';
+            _countdownEl.style.cssText = [
+                'position: fixed; top: 0; left: 0; right: 0; bottom: 0;',
+                'background: rgba(0,0,0,0.85); z-index: 100001;',
+                'display: flex; align-items: center; justify-content: center;',
+                'font-family: -apple-system, BlinkMacSystemFont, sans-serif;',
+                'color: #fff; user-select: none; -webkit-user-select: none;'
+            ].join(' ');
+
+            var numEl = document.createElement('div');
+            numEl.style.cssText = [
+                'font-size: 120px; font-weight: 200; letter-spacing: -4px;',
+                'transition: opacity 0.3s ease, transform 0.3s ease;'
+            ].join(' ');
+            numEl.textContent = seconds;
+            _countdownEl.appendChild(numEl);
+            document.body.appendChild(_countdownEl);
+
+            var remaining = seconds;
+            var interval = setInterval(function() {
+                remaining--;
+                if (remaining > 0) {
+                    numEl.style.opacity = '0';
+                    numEl.style.transform = 'scale(0.8)';
+                    setTimeout(function() {
+                        numEl.textContent = remaining;
+                        numEl.style.opacity = '1';
+                        numEl.style.transform = 'scale(1)';
+                    }, 150);
+                } else {
+                    clearInterval(interval);
+                    numEl.style.opacity = '0';
+                    numEl.style.transform = 'scale(1.5)';
+                    // scoreGo from server will transition us to PLAYING
+                    // Keep overlay briefly to cover any network delay
+                    setTimeout(function() {
+                        destroyCountdown();
+                    }, 1500);
+                }
+            }, 1000);
+
+            console.log('[PerformanceMode] Countdown: ' + seconds);
+        }
+
+        function destroyCountdown() {
+            if (_countdownEl && _countdownEl.parentNode) {
+                _countdownEl.parentNode.removeChild(_countdownEl);
+            }
+            _countdownEl = null;
+        }
+
+        // ─── Stage 6: Wake Lock ─────────────────────────────────────────
+        var _wakeLock = null;
+
+        function requestWakeLock() {
+            if (_wakeLock) return; // already held
+            if (!('wakeLock' in navigator)) {
+                console.log('[PerformanceMode] Wake Lock API not supported');
+                return;
+            }
+            navigator.wakeLock.request('screen').then(function(lock) {
+                _wakeLock = lock;
+                _wakeLock.addEventListener('release', function() {
+                    console.log('[PerformanceMode] Wake lock released');
+                    _wakeLock = null;
+                });
+                console.log('[PerformanceMode] Wake lock acquired — screen will stay on');
+            }).catch(function(err) {
+                console.warn('[PerformanceMode] Wake lock failed:', err.message);
+            });
+        }
+
+        function releaseWakeLock() {
+            if (_wakeLock) {
+                _wakeLock.release();
+                _wakeLock = null;
+            }
+        }
+
+        // Re-acquire wake lock when tab becomes visible again (browser releases on hide)
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && _state !== STATES.REHEARSAL) {
+                requestWakeLock();
+            }
+        });
+
+        // ─── Stage 4: Native gesture suppression ─────────────────────────
+        var _gestureBlocker = null;
+        var _contextMenuBlocker = null;
+        function blockNativeGestures() {
+            if (_gestureBlocker) return;
+            // CSS: prevent touch-action, overscroll, selection
+            var style = document.createElement('style');
+            style.id = 'perfGestureBlock';
+            style.textContent = [
+                'html, body {',
+                '  touch-action: none !important;',
+                '  overscroll-behavior: none !important;',
+                '  -webkit-overflow-scrolling: auto !important;',
+                '  -webkit-user-select: none !important;',
+                '  user-select: none !important;',
+                '}'
+            ].join('\\n');
+            document.head.appendChild(style);
+            // Block touchmove (prevents pull-to-refresh, Safari swipe nav, pinch zoom)
+            _gestureBlocker = function(e) { e.preventDefault(); };
+            document.addEventListener('touchmove', _gestureBlocker, { passive: false });
+            // Block context menu (long-press right-click)
+            _contextMenuBlocker = function(e) { e.preventDefault(); };
+            document.addEventListener('contextmenu', _contextMenuBlocker);
+            // Update viewport meta
+            var vp = document.querySelector('meta[name="viewport"]');
+            if (vp) {
+                vp._origContent = vp.content;
+                vp.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+            }
+            console.log('[PerformanceMode] Native gestures blocked');
+        }
+
+        function unblockNativeGestures() {
+            var style = document.getElementById('perfGestureBlock');
+            if (style && style.parentNode) style.parentNode.removeChild(style);
+            if (_gestureBlocker) {
+                document.removeEventListener('touchmove', _gestureBlocker);
+                _gestureBlocker = null;
+            }
+            if (_contextMenuBlocker) {
+                document.removeEventListener('contextmenu', _contextMenuBlocker);
+                _contextMenuBlocker = null;
+            }
+            var vp = document.querySelector('meta[name="viewport"]');
+            if (vp && vp._origContent) {
+                vp.content = vp._origContent;
+                delete vp._origContent;
+            }
+            console.log('[PerformanceMode] Native gestures unblocked');
+        }
+
+        // ─── Stage 4: Emergency menu (3-finger) ─────────────────────────
+        var _emergencyEl = null;
+
+        function showEmergencyMenu() {
+            if (_emergencyEl) return;
+            console.log('[PerformanceMode] Emergency menu triggered (3-finger)');
+
+            _emergencyEl = document.createElement('div');
+            _emergencyEl.id = 'perfEmergency';
+            _emergencyEl.innerHTML = [
+                '<div class="pe-content">',
+                '  <h2 class="pe-title">⚠ Emergency Menu</h2>',
+                '  <button class="pe-btn pe-stop">Stop Performance</button>',
+                '  <button class="pe-btn pe-resume">Resume</button>',
+                '</div>'
+            ].join('\\n');
+
+            var style = document.createElement('style');
+            style.id = 'perfEmergencyStyle';
+            style.textContent = [
+                '#perfEmergency {',
+                '  position: fixed; top: 0; left: 0; right: 0; bottom: 0;',
+                '  background: rgba(0,0,0,0.9); z-index: 100002;',
+                '  display: flex; align-items: center; justify-content: center;',
+                '  font-family: -apple-system, BlinkMacSystemFont, sans-serif;',
+                '  color: #fff; user-select: none; -webkit-user-select: none;',
+                '}',
+                '.pe-content { text-align: center; }',
+                '.pe-title { font-size: 22px; font-weight: 400; margin: 0 0 30px; }',
+                '.pe-btn {',
+                '  display: block; width: 220px; margin: 12px auto; padding: 14px 24px;',
+                '  border-radius: 8px; font-size: 16px; cursor: pointer;',
+                '  border: none; transition: all 0.2s;',
+                '}',
+                '.pe-stop {',
+                '  background: rgba(200,40,40,0.8); color: #fff;',
+                '}',
+                '.pe-stop:hover { background: rgba(220,50,50,0.95); }',
+                '.pe-resume {',
+                '  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);',
+                '  border: 1px solid rgba(255,255,255,0.2);',
+                '}',
+                '.pe-resume:hover { background: rgba(255,255,255,0.2); }'
+            ].join('\\n');
+            document.head.appendChild(style);
+            document.body.appendChild(_emergencyEl);
+
+            _emergencyEl.querySelector('.pe-stop').addEventListener('click', function(e) {
+                e.stopPropagation();
+                destroyEmergencyMenu();
+                // Exit performance mode locally (any performer can do this)
+                // Leader also stops playback for everyone
+                var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+                if (sock && window.SyncMode && SyncMode.isLeader) {
+                    sock.emit('scoreStop');
+                    sock.emit('performanceEnd');
+                }
+                exitPerformanceMode();
+            });
+
+            _emergencyEl.querySelector('.pe-resume').addEventListener('click', function(e) {
+                e.stopPropagation();
+                destroyEmergencyMenu();
+            });
+        }
+
+        function destroyEmergencyMenu() {
+            if (_emergencyEl && _emergencyEl.parentNode) {
+                _emergencyEl.parentNode.removeChild(_emergencyEl);
+            }
+            _emergencyEl = null;
+            var style = document.getElementById('perfEmergencyStyle');
+            if (style && style.parentNode) style.parentNode.removeChild(style);
+        }
+
+        // ─── Stage 7: End-of-performance ceremony ─────────────────────────
+        var _ceremonyEl = null;
+
+        function showCeremony() {
+            if (_ceremonyEl) return;
+            _ceremonyEl = document.createElement('div');
+            _ceremonyEl.innerHTML = [
+                '<div style="position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:100000;',
+                'display:flex;flex-direction:column;align-items:center;justify-content:center;',
+                'font-family:sans-serif;color:#fff;text-align:center;">',
+                '  <div style="font-size:14px;letter-spacing:3px;text-transform:uppercase;',
+                '    opacity:0.5;margin-bottom:12px;">Performance Complete</div>',
+                '  <div style="font-size:48px;font-weight:200;margin-bottom:40px;',
+                '    opacity:0;animation:ceremonyFadeIn 1.5s ease forwards;">&#10003;</div>',
+                '  <button class="pc-exit" style="margin-top:20px;padding:14px 36px;',
+                '    font-size:16px;border:none;border-radius:6px;cursor:pointer;',
+                '    background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);',
+                '    border:1px solid rgba(255,255,255,0.2);transition:background 0.2s;">',
+                '    Return to Rehearsal</button>',
+                '</div>'
+            ].join('');
+            var style = document.createElement('style');
+            style.id = 'perfCeremonyStyle';
+            style.textContent = '@keyframes ceremonyFadeIn { from { opacity:0; transform:scale(0.5); } to { opacity:1; transform:scale(1); } } .pc-exit:hover { background:rgba(255,255,255,0.25) !important; }';
+            document.head.appendChild(style);
+            document.body.appendChild(_ceremonyEl);
+
+            _ceremonyEl.querySelector('.pc-exit').addEventListener('click', function(e) {
+                e.stopPropagation();
+                destroyCeremony();
+                exitPerformanceMode();
+            });
+        }
+
+        function destroyCeremony() {
+            if (_ceremonyEl && _ceremonyEl.parentNode) {
+                _ceremonyEl.parentNode.removeChild(_ceremonyEl);
+            }
+            _ceremonyEl = null;
+            var style = document.getElementById('perfCeremonyStyle');
+            if (style && style.parentNode) style.parentNode.removeChild(style);
+        }
+
+        function enterCeremony() {
+            setState(STATES.CEREMONY);
+            showCeremony();
+        }
+
+        // ─── Socket event hooks ─────────────────────────────────────────
+        function hookSocketEvents() {
+            var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+            if (!sock) {
+                setTimeout(hookSocketEvents, 500);
+                return;
+            }
+
+            // Stage 5: Tab recovery — if room is in performance mode, auto-rejoin
+            sock.on('scoreState', function(data) {
+                if (!startInPerfMode) return; // only for ?mode=performance clients
+                if (data && data.mode === 'performance' && _state === STATES.REHEARSAL) {
+                    console.log('[PerformanceMode] Tab recovery — room is in performance mode, auto-entering PLAYING');
+                    _isFullscreen = checkFullscreen();
+                    setState(STATES.PLAYING);
+                }
+            });
+
+            sock.on('readinessUpdate', function(data) {
+                _readyCount = data.readyCount || 0;
+                _totalCount = data.totalCount || 0;
+                _allReady = !!data.allReady;
+                updatePanel();
+            });
+
+            sock.on('scoreGo', function() {
+                if (_state === STATES.COUNTDOWN) {
+                    console.log('[PerformanceMode] scoreGo received — entering PLAYING');
+                    destroyCountdown();
+                    setState(STATES.PLAYING);
+                }
+            });
+
+            sock.on('performanceStart', function(data) {
+                console.log('[PerformanceMode] Countdown started');
+                _isReady = false;
+                destroyPanel();
+                setState(STATES.COUNTDOWN);
+                showCountdown(data && data.countdownSeconds ? data.countdownSeconds : 3);
+            });
+
+            sock.on('performanceEnd', function() {
+                console.log('[PerformanceMode] Performance ended by leader');
+                _isReady = false;
+                _isFullscreen = false;
+                setState(STATES.REHEARSAL);
+            });
+
+            console.log('[PerformanceMode] Socket events hooked');
+        }
+        hookSocketEvents();
+
+        // ─── Public API ─────────────────────────────────────────────────
+        function enterPerformanceMode() {
+            if (_state !== STATES.REHEARSAL) return;
+            setState(STATES.READINESS);
+        }
+
+        function exitPerformanceMode() {
+            _isReady = false;
+            _isFullscreen = false;
+            var sock = (window.ClockSync && ClockSync.socket) ? ClockSync.socket : null;
+            if (sock) {
+                sock.emit('performerUnready');
+                sock.emit('exitReadiness');
+            }
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            setState(STATES.REHEARSAL);
+        }
+
+        // ─── URL param detection ────────────────────────────────────────
+        var urlParams = new URLSearchParams(window.location.search);
+        var startInPerfMode = urlParams.get('mode') === 'performance';
+
+        window.PerformanceMode = {
+            get state() { return _state; },
+            get locked() { return _locked; },
+            STATES: STATES,
+            enter: enterPerformanceMode,
+            exit: exitPerformanceMode,
+            setState: setState,
+            showEmergencyMenu: showEmergencyMenu,
+            enterCeremony: enterCeremony
+        };
+
+        if (startInPerfMode) {
+            setTimeout(function() { enterPerformanceMode(); }, 500);
+        }
+
+        console.log('[PerformanceMode] Initialized' + (startInPerfMode ? ' — will enter readiness' : ''));
     })();
     `;
 
