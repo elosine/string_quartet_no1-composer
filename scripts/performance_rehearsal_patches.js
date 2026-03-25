@@ -198,6 +198,11 @@ module.exports = function applyRehearsalPatches(html) {
                                Math.abs(dy) > Math.abs(dx) * this.SWIPE_DOWN_RATIO) {
                         // Swipe down → add marker
                         this.onSwipeDown();
+                    } else if (-dy > this.SWIPE_DOWN_MIN_DISTANCE &&
+                               dt < this.SWIPE_MAX_TIME &&
+                               Math.abs(dy) > Math.abs(dx) * this.SWIPE_DOWN_RATIO) {
+                        // Swipe up → toggle part/full score view (Phase 12)
+                        this.onSwipeUp();
                     }
                 }
 
@@ -310,6 +315,50 @@ module.exports = function applyRehearsalPatches(html) {
                     MarkerSystem._showAddFlow();
                 }
                 console.log('[RehearsalGestures] Swipe down → add marker');
+            },
+
+            onSwipeUp: function() {
+                // Swipe up → toggle between part view and full score (Phase 12)
+                // Uses URL reload with position preservation via ?goto= param
+                var currentSec = 0;
+                if (window.ScoreTime) {
+                    currentSec = (ScoreTime.currentScoreTimeMs || 0) / 1000;
+                }
+
+                var params = new URLSearchParams(window.location.search);
+
+                if (window.PartsMode && PartsMode.active) {
+                    // Currently in parts mode → switch to full score
+                    params.delete('track');
+                    params.delete('pages');
+                    console.log('[RehearsalGestures] Swipe up → switching to full score');
+                } else {
+                    // Currently in full score → switch to parts mode
+                    // Default to track 1, 6 pages (performer can change via ControlsOverlay)
+                    var lastTrack = localStorage.getItem('sq1_lastPartTrack') || '1';
+                    var lastPages = localStorage.getItem('sq1_lastPartPages') || '6';
+                    params.set('track', lastTrack);
+                    params.set('pages', lastPages);
+                    console.log('[RehearsalGestures] Swipe up → switching to parts mode (track ' + lastTrack + ', ' + lastPages + ' pages)');
+                }
+
+                // Preserve position
+                params.set('goto', currentSec.toFixed(2));
+
+                // Save current parts mode settings for round-trip
+                if (window.PartsMode && PartsMode.active) {
+                    localStorage.setItem('sq1_lastPartTrack', String(PartsMode.track));
+                    localStorage.setItem('sq1_lastPartPages', String(PartsMode.pageCount));
+                }
+
+                // Stop playback before reload
+                if (window.ScoreTime && ScoreTime.isPlaying) {
+                    if (window.CursorControls && CursorControls.toggleGoStop) {
+                        CursorControls.toggleGoStop();
+                    }
+                }
+
+                window.location.search = params.toString();
             },
 
             togglePlayPause: function() {
@@ -512,6 +561,10 @@ module.exports = function applyRehearsalPatches(html) {
             '    <span class="co-divider"></span>',
             '    <button class="co-btn co-zoom" title="Reset zoom">⊙ 100%</button>',
             '    <span class="co-divider"></span>',
+            '    <button class="co-btn co-view-btn" title="Toggle Part/Full view">📄</button>',
+            '    <button class="co-btn co-track-btn" title="Switch instrument" style="display:none">Vln I</button>',
+            '    <button class="co-btn co-pages-btn" title="Pages per screen" style="display:none">6p</button>',
+            '    <span class="co-divider"></span>',
             '    <button class="co-btn co-marker-btn" title="Markers">🔖</button>',
             '    <button class="co-btn co-loop-btn" title="Loop">🔁</button>',
             '    <span class="co-divider"></span>',
@@ -579,7 +632,11 @@ module.exports = function applyRehearsalPatches(html) {
             '.co-close:hover, .co-close:active { opacity: 1; }',
             '.co-marker-btn { font-size: 14px; padding: 6px 8px; }',
             '.co-loop-btn { font-size: 14px; padding: 6px 8px; }',
-            '.co-loop-btn.co-loop-active { background: rgba(0,147,92,0.5); }'
+            '.co-loop-btn.co-loop-active { background: rgba(0,147,92,0.5); }',
+            '.co-view-btn { font-size: 13px; padding: 8px 12px; }',
+            '.co-view-btn.co-parts-active { background: rgba(0,120,200,0.4); }',
+            '.co-pages-btn { font-size: 13px; padding: 8px 12px; font-weight: 600; }',
+            '.co-track-btn { font-size: 13px; padding: 8px 12px; font-weight: 600; }'
         ].join('');
         document.head.appendChild(style);
         document.body.appendChild(overlay);
@@ -599,6 +656,10 @@ module.exports = function applyRehearsalPatches(html) {
         var jumpGo = overlay.querySelector('.co-jump-go');
         var pageNum = overlay.querySelector('.co-page-num');
         var pageTotal = overlay.querySelector('.co-page-total');
+        var viewBtn = overlay.querySelector('.co-view-btn');
+        var trackBtn = overlay.querySelector('.co-track-btn');
+        var pagesBtn = overlay.querySelector('.co-pages-btn');
+        var TRACK_NAMES = ['Vln I', 'Vln II', 'Vla', 'Vc'];
 
         var _cachedTotalPages = 0;
         function computeTotalPages(spp) {
@@ -677,6 +738,16 @@ module.exports = function applyRehearsalPatches(html) {
             // Zoom
             var zoom = (window.ScoreZoom) ? ScoreZoom.zoomLevel : 100;
             zoomBtn.textContent = '⊙ ' + zoom + '%';
+            // View toggle + Pages
+            var inParts = window.PartsMode && PartsMode.active;
+            viewBtn.textContent = inParts ? '📄 Full' : '📄 Part';
+            viewBtn.classList.toggle('co-parts-active', !!inParts);
+            trackBtn.style.display = inParts ? '' : 'none';
+            pagesBtn.style.display = inParts ? '' : 'none';
+            if (inParts) {
+                trackBtn.textContent = TRACK_NAMES[(PartsMode.track || 1) - 1] || 'T' + PartsMode.track;
+                pagesBtn.textContent = (PartsMode.pageCount || 6) + 'p';
+            }
             // Jump input: show current display time
             var displaySec = 0;
             if (window.ScoreTime) {
@@ -777,6 +848,62 @@ module.exports = function applyRehearsalPatches(html) {
         });
         jumpInput.addEventListener('input', function() {
             clearTimeout(fadeTimer);
+        });
+
+        viewBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            // Same as swipe-up: toggle Part ↔ Full via URL reload
+            if (window.RehearsalGestures && RehearsalGestures.onSwipeUp) {
+                RehearsalGestures.onSwipeUp();
+            }
+        });
+
+        trackBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            if (!window.PartsMode || !PartsMode.active) return;
+            // Cycle track: 1 → 2 → 3 → 4 → 1
+            var current = PartsMode.track || 1;
+            var next = (current % 4) + 1;
+            var currentSec = 0;
+            if (window.ScoreTime) {
+                currentSec = (ScoreTime.currentScoreTimeMs || 0) / 1000;
+            }
+            var params = new URLSearchParams(window.location.search);
+            params.set('track', String(next));
+            params.set('goto', currentSec.toFixed(2));
+            localStorage.setItem('sq1_lastPartTrack', String(next));
+            // Stop playback before reload
+            if (window.ScoreTime && ScoreTime.isPlaying) {
+                if (window.CursorControls && CursorControls.toggleGoStop) {
+                    CursorControls.toggleGoStop();
+                }
+            }
+            console.log('[ControlsOverlay] Track: ' + TRACK_NAMES[current - 1] + ' → ' + TRACK_NAMES[next - 1]);
+            window.location.search = params.toString();
+        });
+
+        pagesBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            if (!window.PartsMode || !PartsMode.active) return;
+            // Cycle pages: 4 → 6 → 8 → 4
+            var current = PartsMode.pageCount || 6;
+            var next = current === 4 ? 6 : current === 6 ? 8 : 4;
+            var currentSec = 0;
+            if (window.ScoreTime) {
+                currentSec = (ScoreTime.currentScoreTimeMs || 0) / 1000;
+            }
+            var params = new URLSearchParams(window.location.search);
+            params.set('pages', String(next));
+            params.set('goto', currentSec.toFixed(2));
+            localStorage.setItem('sq1_lastPartPages', String(next));
+            // Stop playback before reload
+            if (window.ScoreTime && ScoreTime.isPlaying) {
+                if (window.CursorControls && CursorControls.toggleGoStop) {
+                    CursorControls.toggleGoStop();
+                }
+            }
+            console.log('[ControlsOverlay] Pages: ' + current + ' → ' + next);
+            window.location.search = params.toString();
         });
 
         // Prevent overlay interactions from bubbling to gesture system
@@ -2619,6 +2746,57 @@ module.exports = function applyRehearsalPatches(html) {
         }
 
         console.log('[PerformanceMode] Initialized' + (startInPerfMode ? ' — will enter readiness' : ''));
+    })();
+
+    // ═══ Phase 12: URL goto param — restore position after view toggle ═══
+    // Uses event-based timing: listens for the initial scoreState/scoreGoto
+    // event (fired after score loads), then emits scoreGoto through the socket
+    // to override position. Using socket.emit (not localGoto) is critical —
+    // it updates the stub's internal _scoreTimeMs so subsequent Play starts
+    // from the correct position.
+    (function initGotoParam() {
+        var params = new URLSearchParams(window.location.search);
+        var gotoSec = parseFloat(params.get('goto'));
+        if (isNaN(gotoSec) || gotoSec <= 0) return;
+
+        console.log('[GotoParam] Will navigate to ' + gotoSec.toFixed(2) + 's after score loads');
+
+        var fired = false;
+        function doGoto() {
+            if (fired) return;
+            fired = true;
+            // Small delay to let all handlers for the initial event finish
+            setTimeout(function() {
+                if (window.ClockSync && ClockSync.socket) {
+                    ClockSync.socket.emit('scoreGoto', { seconds: gotoSec });
+                }
+                if (window.ControlsOverlay) ControlsOverlay.refresh();
+                console.log('[GotoParam] Navigated to ' + gotoSec.toFixed(2) + 's');
+
+                // Clean the goto param from URL without reload
+                params.delete('goto');
+                var cleanSearch = params.toString();
+                var cleanUrl = window.location.pathname + (cleanSearch ? '?' + cleanSearch : '');
+                window.history.replaceState(null, '', cleanUrl);
+            }, 150);
+        }
+
+        // Poll for socket availability, then attach one-shot listeners.
+        // Stub fires 'scoreState' ~200ms after distributeData().
+        // Real server responds to requestState with 'scoreGoto'.
+        var attempts = 0;
+        var maxAttempts = 300; // 15 seconds at 50ms intervals
+        var poll = setInterval(function() {
+            attempts++;
+            if (window.ClockSync && ClockSync.socket && ClockSync.socket.on) {
+                clearInterval(poll);
+                ClockSync.socket.on('scoreState', doGoto);
+                ClockSync.socket.on('scoreGoto', doGoto);
+            } else if (attempts >= maxAttempts) {
+                clearInterval(poll);
+                console.warn('[GotoParam] Timed out waiting for socket');
+            }
+        }, 50);
     })();
     `;
 

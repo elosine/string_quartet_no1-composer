@@ -1,38 +1,41 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 12 (next)
-**Last Session:** Mar 23, 2026
-**Last Commit:** `[Phase 11] Performance Mode — 8 stages: auto-stop, lockdown, readiness, countdown, emergency, tab recovery, wake lock, ceremony`
+**Active Phase:** Phase 13 or 14 (next)
+**Last Session:** Mar 25, 2026
+**Last Commit:** `[Phase 12] Part View Enhancements — goto param, swipe-up toggle, track/pages/view buttons, gesture reference`
 
 ### ▶ RESUME HERE (next session)
 
-**Phase 11 is COMPLETE.** Full performance mode with 8 stages.
+**Phase 12 is COMPLETE.** Part ↔ Full Score toggle with full UI controls.
 
-**Phase 11 delivered (Performance Mode):**
-- Stage 0: Auto-stop at end of score (server-scheduled, `reason: 'end-of-score'`)
-- Stage 1: Mode switching (`?mode=performance`) + complete UI lockdown
-- Stage 2: Readiness panel + mandatory fullscreen + server `performanceModeClients` tracking
-- Stage 3: Countdown overlay (3...2...1) + auto-play via `scoreGo`
-- Stage 4: Emergency controls (2-finger long press, 2s) + native gesture suppression + contextmenu block
-- Stage 5: Tab recovery — auto-rejoin performance on reconnect via `mode` in `scoreState`
-- Stage 6: Wake Lock API — screen stays on during performance
-- Stage 7: End-of-performance ceremony — fullscreen overlay with "Return to Rehearsal"
+**Phase 12 delivered (Part View Enhancements):**
+- `?goto=SECONDS` URL param — event-based timing (listens for scoreState/scoreGoto), socket emit to sync stub state
+- Swipe-up gesture — Part ↔ Full Score toggle via URL reload with position preservation
+- 📄 View toggle button in ControlsOverlay — button fallback for swipe-up gesture
+- Track selector button (Vln I / Vln II / Vla / Vc) — cycles instrument, parts mode only
+- Pages cycle button (4p / 6p / 8p) — cycles pages-per-screen, parts mode only
+- §13.10 Gesture Reference — full catalog in pipeline plan, cross-referenced from Phase 14 Step 14.0
+
+**Key bugs fixed:**
+- Socket stub state desync: `localGoto()` doesn't update stub's `_scoreTimeMs` → Play starts from 0. Fix: use `socket.emit('scoreGoto')` instead (see §18.1)
+- Goto race condition: `getSecondsPerPage()` valid before score loads → goto fires too early. Fix: event-based timing (see §18.2)
 
 **Key decisions:**
-- 2-finger long press (not 3-finger) — OS gestures on Win/Mac intercept 3-finger
-- Any performer can emergency-stop locally; only leader broadcasts stop to all
-- Service Worker deferred to Phase 14 (requires HTTPS)
+- URL reload (not runtime toggle) for Part ↔ Full switch — reuses all tested init code, avoids teardown of ~20 overrides
+- Swipe-up (1 finger) for toggle — avoids Windows 2-finger tap (right-click) and 3-finger (Task View) conflicts
+- Button fallbacks for all gesture actions (§13.10.6 principle #7)
+
+**Phase 11 delivered (Performance Mode):**
+- 8 stages: auto-stop, lockdown, readiness, countdown, emergency, tab recovery, wake lock, ceremony
 
 **Phase 10 delivered (Sync & Animation — Tier 2):**
-- Stage 1: MonotonicScoreClock — _lastNow guard (slewing attempted, reverted due to visible stutter)
-- Stage 2+3: Adaptive ping rate (variance-based interval with hysteresis) + 4-level sync quality UI (dot + tooltip)
-- Stage 4: Offline banner — "OFFLINE — local clock" after 5s disconnect, auto-dismiss on reconnect
+- MonotonicScoreClock, adaptive ping, sync quality UI, offline banner
 
 **Priority for next session:**
 1. Read `WORKING_PRINCIPLES.md` and this RESUME section
-2. Decide whether to proceed with Phase 12, 13, or 14
-3. Phase 12 = Part View Enhancements, Phase 13 = Sync+Animation Tier 3 (optional), Phase 14 = Website & Production
+2. Decide whether to proceed with Phase 13 or 14
+3. Phase 13 = Sync+Animation Tier 3 (optional — implement only if real-world testing shows need), Phase 14 = Website & Production
 
 **Deferred items (not blocking):**
 - SVG font fix: Option B (text-to-paths via opentype.js) recommended. See Font Analysis section below.

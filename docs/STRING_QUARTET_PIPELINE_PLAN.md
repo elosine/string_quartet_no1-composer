@@ -4008,7 +4008,8 @@ Phase 1: Foundation ────────────────────
 - How performance mode works: readiness check, countdown, locked playback
 - Emergency controls (2-finger long press), what to do if tab crashes
 - Rehearsal mode features: gestures, markers, loops, annotations
-- URL parameters reference (track, pages, mode)
+- Full gesture reference: **see §13.10** for comprehensive catalog of all touch/pointer gestures, OS conflicts, and design principles
+- URL parameters reference (track, pages, mode, room)
 - This page should be linkable from the performer dashboard (Step 14.4)
 
 **Step 14.1: Hosting infrastructure**
@@ -4591,6 +4592,103 @@ The single-server setup handles the expected load easily (one quartet, maybe a f
 - **CDN:** Put score.json behind Cloudflare (free tier) for global edge caching. 9 MB served from edge instead of origin.
 - **Database migration:** If JSON files become unwieldy (unlikely at this scale), migrate to SQLite (zero-config, single file) or PostgreSQL.
 
+### 13.10 Gesture Reference — Performance Score Touch & Pointer Interactions
+
+**Created:** Mar 25, 2026 (Phase 12 pre-implementation)
+**Purpose:** Comprehensive catalog of all gestures in the Performance Score app, organized by mode. Used for Phase 14 Step 14.0 (performer instructions) and as a conflict reference when adding new gestures.
+
+#### 13.10.1 Rehearsal Mode Gestures (default mode)
+
+All gestures use Pointer Events. Apple Pencil (`pointerType === 'pen'`) is reserved for annotation (Phase 9) and bypasses the gesture system entirely.
+
+| Gesture | Fingers | Zone | Action | Notes |
+|---------|---------|------|--------|-------|
+| Tap | 1 | Left edge (15%) | Previous page | Immediate, no double-tap delay |
+| Tap | 1 | Right edge (15%) | Next page | Immediate, no double-tap delay |
+| Tap | 1 | Center-top (70%, upper half) | Play / Pause | Deferred 300ms for double-tap detection |
+| Tap | 1 | Center-bottom (70%, lower half) | Toggle Controls Overlay | Deferred 300ms for double-tap detection |
+| Double-tap | 1 | Center (70%) | Reset zoom to 100% | <300ms between taps, <30px apart |
+| Swipe left | 1 | Anywhere | Next page | >50px horizontal, <500ms, 2× direction ratio |
+| Swipe right | 1 | Anywhere | Previous page | Same thresholds as swipe left |
+| Swipe down | 1 | Anywhere | Add marker (opens name flow) | >30px vertical, 1.5× direction ratio |
+| Swipe up | 1 | Anywhere | Toggle Part ↔ Full Score view | >30px vertical, 1.5× direction ratio (Phase 12) |
+| Long press | 1 | Anywhere | (Reserved — currently logs only) | 600ms hold, <10px movement |
+| Pinch | 2 | Anywhere | Zoom in / out | Continuous scale from initial distance |
+
+**During playback while synced:** Swipe and edge-tap gestures auto-detach the client to independent mode (SyncMode) so page turns don't affect other performers.
+
+#### 13.10.2 Performance Mode Gestures (locked mode)
+
+During performance (COUNTDOWN, PLAYING, EMERGENCY_STOP, CEREMONY states), all normal gestures are suppressed. Only the emergency gesture works:
+
+| Gesture | Fingers | Action | Notes |
+|---------|---------|--------|-------|
+| 2-finger long press (2s) | 2 | Open emergency menu | Hold 2 fingers still for 2 seconds. Menu offers "Stop Performance" and "Resume". |
+
+Native gestures are also suppressed during locked mode:
+- `touch-action: none` on ScoreContainer
+- `overscroll-behavior: none` on body
+- `touchmove` + `contextmenu` preventDefault
+- Viewport meta: `user-scalable=no, maximum-scale=1.0`
+
+#### 13.10.3 Controls Overlay Buttons
+
+The Controls Overlay (toggled by center-bottom tap) provides button-based access to features:
+
+| Button | Action |
+|--------|--------|
+| ◀ / ▶ | Previous / Next page |
+| ▶ Play / ■ Stop | Toggle playback |
+| ⊙ 100% | Reset zoom |
+| 📄 Part / 📄 Full | Toggle Part ↔ Full Score view (URL reload with position preservation) (Phase 12) |
+| Vln I / Vln II / Vla / Vc | Cycle instrument track: 1 → 2 → 3 → 4 → 1 (parts mode only) (Phase 12) |
+| 6p (4p / 8p) | Cycle pages-per-screen: 4 → 6 → 8 → 4 (parts mode only) (Phase 12) |
+| 🔖 | Toggle marker panel (add, list, jump-to, delete) |
+| 🔁 | Toggle loop panel (set A/B, enable/disable, count) |
+| Jump to [sec] Go | Jump to specific time |
+| ✕ | Close overlay |
+
+Auto-fades after 4 seconds of inactivity.
+
+#### 13.10.4 Other Interaction Surfaces
+
+| Surface | Interaction | Action |
+|---------|------------|--------|
+| MiniMap bar (bottom) | Tap on progress bar | Jump to that position in score |
+| MiniMap bar | Hover / touch bottom edge | Expand from collapsed state |
+| Annotation canvas | Apple Pencil draw | Freehand annotation (Phase 9) |
+| Annotation canvas | Apple Pencil tap | Stamp or text annotation (Phase 9) |
+
+#### 13.10.5 Windows OS Touch Gesture Conflicts
+
+Windows 10/11 intercepts certain touch gestures at the OS level, before they reach the browser. These **cannot be suppressed** by web code:
+
+| Windows Gesture | Fingers | OS Action | Conflict with our app? |
+|----------------|---------|-----------|----------------------|
+| Tap | 1 | Left click | No — we handle via Pointer Events |
+| Double-tap | 1 | Double-click | Minor — our 300ms deferred detection handles this |
+| Tap-and-hold | 1 | Right-click (context menu) | We suppress `contextmenu` event; our long press at 600ms may overlap |
+| Two-finger tap | 2 | Right-click (context menu) | **YES** — unreliable for app gestures; OS may intercept |
+| Two-finger scroll | 2 | Scroll / pan | Suppressed by `touch-action: none` on ScoreContainer |
+| Pinch | 2 | Zoom | We handle ourselves; OS zoom suppressed by `touch-action: none` |
+| Three-finger tap | 3 | Action Center / notification | **Intercepted by OS** — cannot use for app gestures |
+| Three-finger swipe up | 3 | Task View | **Intercepted by OS** |
+| Three-finger swipe down | 3 | Show desktop | **Intercepted by OS** |
+| Four-finger tap | 4 | Action Center (Win 11) | **Intercepted by OS** |
+| Four-finger swipe | 4 | Switch virtual desktops | **Intercepted by OS** |
+
+**iPad/macOS equivalents:** Three-finger gestures trigger Mission Control (swipe up) or App Exposé (swipe down). Four-finger swipe switches apps. Same constraint: OS intercepts before browser.
+
+#### 13.10.6 Design Principles for Future Gestures
+
+1. **Avoid 2-finger taps** — Windows maps these to right-click; unreliable in browser
+2. **Avoid 3+ finger gestures** — OS intercepts on both Windows and macOS/iPadOS
+3. **1-finger gestures are safest** — only conflict is tap-and-hold → right-click, mitigated by `contextmenu` suppression
+4. **Direction-based disambiguation** — swipe left/right/up/down with direction ratio thresholds avoids accidental triggers
+5. **Zone-based disambiguation** — edge zones (15%) vs center (70%) separates page-turn from toggle actions
+6. **Deferred single-tap** — 300ms delay in center zone allows double-tap detection without sacrificing edge-tap responsiveness
+7. **Always provide button fallback** — every gesture-triggered action should also be accessible via Controls Overlay button for discoverability and accessibility
+
 ---
 
 ## 14. Phase 2 Post-Mortem — Animation Performance Optimizations
@@ -5077,3 +5175,41 @@ node scripts/generate_print_pdf.js --track 4 --pages 4      # Cello, 4 pages/scr
 **Problem discovered:** Phase 1. Overlapping curves (IDs 209 & 212 on gTrack 1) were never noticed in the Workshop but became obvious in the Performance Score's cleaner layout.
 
 **Rule for next piece:** After each score JSON export from Workshop, run a visual audit in the Performance app. Build this into the reconversion checklist.
+
+---
+
+## 18. Phase 12 Post-Mortem — Part View Enhancements
+
+**Date:** Mar 25, 2026
+**Tag:** `phase-12-complete`
+
+**Scope:** Part ↔ Full Score toggle (swipe-up + buttons), URL `?goto=` param, track selector, pages cycle, gesture reference documentation.
+**Workshop impact:** None — all changes in `scripts/performance_rehearsal_patches.js` and docs.
+
+### 18.1 Key Bug: Socket Stub State Desync
+
+**Symptom:** After using `?goto=54` to navigate, Play started from second 0 instead of 54.
+
+**Root cause:** `SyncMode.localGoto()` sets `ScoreTime.currentScoreTimeMs` on the client but does NOT update the offline stub's internal `_scoreTimeMs`. When Play fires `scoreGo` through the socket, the stub calculates `scoreTimeOffset: Date.now() - _scoreTimeMs` using its stale `_scoreTimeMs = 0`, so playback starts from position 0.
+
+**Fix:** Use `ClockSync.socket.emit('scoreGoto', { seconds: gotoSec })` instead of `localGoto()`. This goes through the socket stub, updating `_scoreTimeMs` so subsequent `scoreGo` events use the correct position.
+
+**Rule:** Any code that sets score position must go through the socket (emit `scoreGoto`) rather than directly manipulating `ScoreTime` properties — unless using the fully independent playback path (`localGoto` + `localToggleGoStop`). Mixing direct state manipulation with socket-based Play causes desync.
+
+### 18.2 Timing Bug: Polling for Score Readiness
+
+**Symptom:** `?goto=` briefly jumped to correct position, then snapped back to 0.
+
+**Root cause:** Initial poll condition `GraphicTimeline.getSecondsPerPage() > 0` uses global constants (`beatsPerPage / beatsPerMinute * 60`) that are valid *before* the score loads. So the goto fired ~400ms after page load, well before `fetch('score.json')` (14MB) completed. Then the stub's `scoreState` event (200ms after `distributeData()`) reset position to 0.
+
+**Fix progression:**
+1. Poll for `ScoreManager.currentScoreName === 'performance'` + 600ms delay → better but still timing-dependent
+2. **Event-based:** Listen for `scoreState`/`scoreGoto` events on the socket, then fire goto 150ms after → deterministic, no race condition
+
+**Rule:** When a feature needs to fire after score initialization, listen for the actual `scoreState` or `scoreGoto` event rather than polling for derived state. The event is the authoritative signal that initialization is complete.
+
+### 18.3 Design Decision: URL Reload vs Runtime Toggle
+
+Chose URL reload with `?goto=` position preservation over a true runtime toggle (destroy/recreate DOM sections, restore overrides). The runtime approach would require teardown of ~20 method overrides and multiple DOM sections — high risk for low benefit. URL reload reuses all existing tested initialization code.
+
+**Tradeoff:** ~1-2s reload flash. Acceptable for a toggle used occasionally, not during playback.
