@@ -1,30 +1,38 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 13 or 14 (next)
+**Active Phase:** Phase 14 (next)
 **Last Session:** Mar 25, 2026
-**Last Commit:** `[Phase 12] Part View Enhancements — goto param, swipe-up toggle, track/pages/view buttons, gesture reference`
+**Last Commit:** `Speed control: local playback speed scaling (0.5x-2.0x)`
 
 ### ▶ RESUME HERE (next session)
 
-**Phase 12 is COMPLETE.** Part ↔ Full Score toggle with full UI controls.
+**Phase 13 delivered (Sync+Animation Tier 3):**
+- Latency-compensated starts — `scheduledStartTime` in scoreGo, clients delay to synchronized moment
+- Server heartbeat (500ms) + client watchdog (3s timeout) for lost-connection detection
+- NTP-style offset calculation — best-quartile RTT selection, weighted averaging
+- Speed control — local playback speed scaling (0.5x–2.0x) with anchored formula
+
+**Speed control details (Step 8.8 / Phase 13 enhancement):**
+- SpeedControl IIFE in `performance_rehearsal_patches.js` — overrides `ScoreTime.now()`
+- Anchored formula: `speedTime = (origNow - refOrig) * speed + refScore`
+- Fast path: zero overhead when speed never changed (`_everUsedSpeed`)
+- `_hasOffset` flag derived from state at each play-start — tracks client divergence from server
+- Stop wrapper saves speed-adjusted position; goto wrapper clears stale speed state
+- Drift correction guard skips when `speed !== 1.0 || hasOffset`
+- Speed button in ControlsOverlay with fade timer reset
+
+**Speed control bugs fixed (4 iterations):**
+1. Overlay fade timer hiding before user finishes cycling speeds → added `resetFadeTimer()` to speed button handler
+2. Drift correction firing after returning to 1x from non-1x → added `SpeedControl.hasOffset` check to drift guard
+3. `_hasOffset` cleared unconditionally at play-start (even when speed was 2x) → only clear when `_speed === 1.0`
+4. After goto, stale `_speedStopPos` overrode goto position → goto wrapper clears `_speedStopPos` and `_hasOffset`
+5. After goto at non-1x, `_hasOffset` not re-established → derive `_hasOffset = (_speed !== 1.0)` at every play-start
+
+**Key lesson:** `_hasOffset` must be **derived from current state** at each play-start transition, not preserved across events. Events (goto, stop, speed change) can clear/set it independently, leading to stale values. Deriving it eliminates the entire class of synchronization bugs.
 
 **Phase 12 delivered (Part View Enhancements):**
-- `?goto=SECONDS` URL param — event-based timing (listens for scoreState/scoreGoto), socket emit to sync stub state
-- Swipe-up gesture — Part ↔ Full Score toggle via URL reload with position preservation
-- 📄 View toggle button in ControlsOverlay — button fallback for swipe-up gesture
-- Track selector button (Vln I / Vln II / Vla / Vc) — cycles instrument, parts mode only
-- Pages cycle button (4p / 6p / 8p) — cycles pages-per-screen, parts mode only
-- §13.10 Gesture Reference — full catalog in pipeline plan, cross-referenced from Phase 14 Step 14.0
-
-**Key bugs fixed:**
-- Socket stub state desync: `localGoto()` doesn't update stub's `_scoreTimeMs` → Play starts from 0. Fix: use `socket.emit('scoreGoto')` instead (see §18.1)
-- Goto race condition: `getSecondsPerPage()` valid before score loads → goto fires too early. Fix: event-based timing (see §18.2)
-
-**Key decisions:**
-- URL reload (not runtime toggle) for Part ↔ Full switch — reuses all tested init code, avoids teardown of ~20 overrides
-- Swipe-up (1 finger) for toggle — avoids Windows 2-finger tap (right-click) and 3-finger (Task View) conflicts
-- Button fallbacks for all gesture actions (§13.10.6 principle #7)
+- `?goto=SECONDS` URL param, swipe-up Part↔Full toggle, track/pages/view buttons, gesture reference
 
 **Phase 11 delivered (Performance Mode):**
 - 8 stages: auto-stop, lockdown, readiness, countdown, emergency, tab recovery, wake lock, ceremony
@@ -34,8 +42,7 @@
 
 **Priority for next session:**
 1. Read `WORKING_PRINCIPLES.md` and this RESUME section
-2. Decide whether to proceed with Phase 13 or 14
-3. Phase 13 = Sync+Animation Tier 3 (optional — implement only if real-world testing shows need), Phase 14 = Website & Production
+2. Proceed with Phase 14 = Website & Production
 
 **Deferred items (not blocking):**
 - SVG font fix: Option B (text-to-paths via opentype.js) recommended. See Font Analysis section below.
@@ -111,7 +118,12 @@ Type `/session-start` — this triggers a workflow that walks the AI through the
 | 6. Sync Tier 1 | ✅ Complete | Mar 21 | performance.now(), outlier rejection, connection awareness, drift correction |
 | 7. Auth & Persistence | ✅ Complete | Mar 22 | Self-service sessions, JWT, preferences, 6 API endpoints |
 | 8. Rehearsal Mode | ✅ Complete | Mar 23 | 7 systems, 12 bugs fixed, swipe-down markers, leader transfer, room-based looping |
-| 9–14 | ⏳ Pending | — | |
+| 9. Annotations | ✅ Complete | Mar 23 | Pen + stamp system, localStorage + JSON export/import, page visibility hooks |
+| 10. Sync+Anim T2 | ✅ Complete | Mar 24 | MonotonicScoreClock, adaptive ping, sync quality UI, offline banner |
+| 11. Performance Mode | ✅ Complete | Mar 24 | Auto-stop, lockdown, readiness, countdown, emergency, tab recovery, wake lock, ceremony |
+| 12. Part View Enhancements | ✅ Complete | Mar 25 | goto param, swipe-up toggle, track/pages/view buttons, gesture reference |
+| 13. Sync+Anim T3 | ✅ Complete | Mar 25 | Latency-compensated starts, heartbeat/watchdog, NTP offset, speed control (0.5x–2.0x) |
+| 14. Website & Production | ⏳ Pending | — | |
 
 ---
 
@@ -302,6 +314,10 @@ node -e "const h=require('http'),f=require('fs'),p=require('path'),d='builds/per
 | Mar 23 | 8 | Separate vertical swipe thresholds (30px/1.5×) | Horizontal swipe thresholds (50px/2×) were too aggressive for vertical gesture on iPad-height screens |
 | Mar 23 | 8 | `roomMembers` event for anonymous Transfer UI | `connectedPerformers` only populated for JWT-auth clients; anonymous clients need to appear in Transfer list |
 | Mar 23 | 8 | `localGoto()` centralization | 5 independent navigation paths all needed ScoreTime + TrackSystem + ControlsOverlay updates; single method prevents future inconsistencies |
+| Mar 25 | 13 | Local-only speed control (Option A) | No server interaction needed for rehearsal speed changes; avoids sync complexity for ensemble speed control |
+| Mar 25 | 13 | Anchored formula using `_origNow()` reference | Using original `ScoreTime.now()` as clock reference ensures consistency with system's time management (scoreTimeOffset, drift correction) |
+| Mar 25 | 13 | `_hasOffset` derived at play-start (not preserved) | Multiple events can independently clear/set the flag; deriving from current state eliminates stale-value bugs |
+| Mar 25 | 13 | Drift correction disabled when `hasOffset` true | Client intentionally diverges from server at non-1x speeds; drift correction would fight the speed offset causing oscillation |
 
 ---
 

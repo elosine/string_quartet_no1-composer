@@ -3696,6 +3696,17 @@ Phase 1: Foundation ────────────────────
 - Page number badge always visible in corner
 - 🤖→👁️ *AI verifies mini-map data matches score → Human confirms visual: mini-map accurately shows position and markers*
 
+**Step 8.8: Speed control (local playback speed scaling)**
+- Local-only speed control: 0.5x, 0.75x, 1.0x, 1.25x, 1.5x, 2.0x — no server interaction
+- Speed button in ControlsOverlay cycles through options, fade timer resets on click
+- SpeedControl IIFE overrides `ScoreTime.now()` with anchored formula: `speedTime = (origNow - refOrig) * speed + refScore`
+- Fast path: zero overhead when speed never changed (`_everUsedSpeed` flag)
+- `_hasOffset` flag tracks client position divergence from server — derived from state at each play-start (not preserved across events)
+- Stop wrapper saves speed-adjusted position for seamless resume at non-1x speeds
+- Goto wrapper clears stale speed state so repositioning works correctly
+- Drift correction guard in `build_performance_app.js` skips when `speed !== 1.0` or `hasOffset === true`
+- 🤖→👁️ *AI verifies formula correctness → Human confirms: stop/play at various speeds, mid-playback speed changes, goto at non-1x, overlay fade, no drift correction interference*
+
 **Phase 8 Completion Checkpoint:**
 - 🤖 All gesture handlers, overlay, markers, looping, sync modes, leader privileges functional
 - 🤖 Multi-client test: 2-4 clients in a room, synced and independent modes work correctly
