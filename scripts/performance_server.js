@@ -775,11 +775,13 @@ io.on('connection', function(socket) {
             room.isPlaying = true;
 
             console.log('[' + socketRoomId + '] Score GO by ' + socket.id + ' — starting from ' + room.currentScoreTimeMs + 'ms');
+            var scheduledStart = now + 150; // Phase 13: 150ms buffer for latency-compensated start
             io.to(socketRoomId).emit('scoreGo', {
                 isPlaying: true,
                 scoreTimeOffset: room.scoreTimeOffset,
                 currentScoreTimeMs: room.currentScoreTimeMs,
-                serverTime: now
+                serverTime: now,
+                scheduledStartTime: scheduledStart
             });
 
             // Phase 11: Schedule auto-stop at end of score
@@ -1061,11 +1063,13 @@ io.on('connection', function(socket) {
             room.currentScoreTimeMs = 0;
 
             console.log('[' + socketRoomId + '] PERFORMANCE GO — playback starting');
+            var scheduledStart = goNow + 150; // Phase 13: latency-compensated start
             io.to(socketRoomId).emit('scoreGo', {
                 isPlaying: true,
                 scoreTimeOffset: room.scoreTimeOffset,
                 currentScoreTimeMs: 0,
-                serverTime: goNow
+                serverTime: goNow,
+                scheduledStartTime: scheduledStart
             });
 
             scheduleAutoStop(socketRoomId);
@@ -1126,6 +1130,17 @@ setInterval(function() {
         io.to(roomId).emit('clockSync', { serverTime: now });
     }
 }, SYNC_INTERVAL_MS);
+
+// ─── Phase 13: Server heartbeat (every 500ms) — fast disconnect detection ────
+
+var heartbeatSeq = 0;
+setInterval(function() {
+    var now = Date.now();
+    for (var roomId of rooms.keys()) {
+        io.to(roomId).emit('heartbeat', { seq: heartbeatSeq, serverTime: now });
+    }
+    heartbeatSeq++;
+}, 500);
 
 // ─── Phase 6: Authoritative position check (every 3s during playback) ──────
 

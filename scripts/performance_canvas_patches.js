@@ -130,7 +130,8 @@ module.exports = function applyCanvasPatches(html) {
     );
 
     const newUpdateBlock = `            update() {
-                const currentScoreTimeMs = ScoreTime.now();
+                // Phase 13: Predictive rendering — +8ms lookahead during playback
+                const currentScoreTimeMs = ScoreTime.now() + (ScoreTime.isPlaying ? 8 : 0);
                 const totalPagesTraveled = this.calculateTotalPages(currentScoreTimeMs);
                 this.updateStaticMotiveWindows(currentScoreTimeMs, totalPagesTraveled);
                 const positionInCycle = totalPagesTraveled % 2;
@@ -380,7 +381,8 @@ module.exports = function applyCanvasPatches(html) {
 
     const newGCUpdate = `// Phase 2: Draw GC balls on StaffCursors canvas overlay
             update() {
-                const currentScoreTimeMs = ScoreTime.now();
+                // Phase 13: Predictive rendering — +8ms lookahead during playback
+                const currentScoreTimeMs = ScoreTime.now() + (ScoreTime.isPlaying ? 8 : 0);
                 const currentDisplayTimeSec = (currentScoreTimeMs / 1000) - leadInSeconds;
                 const totalPagesTraveled = StaffCursors.calculateTotalPages(currentScoreTimeMs);
                 const positionInCycle = totalPagesTraveled % 2;

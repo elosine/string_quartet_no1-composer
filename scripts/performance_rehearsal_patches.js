@@ -1704,6 +1704,19 @@ module.exports = function applyRehearsalPatches(html) {
                 wrapHandler(CursorControls, 'onScoreGo');
                 wrapHandler(CursorControls, 'onScoreStop');
                 wrapHandler(CursorControls, 'onScoreGoto');
+
+                // Phase 13: Latency-compensated starts — delay scoreGo until scheduledStartTime
+                var _wrappedScoreGo = CursorControls.onScoreGo;
+                CursorControls.onScoreGo = function(data) {
+                    if (data && data.scheduledStartTime && window.ClockSync) {
+                        var delay = data.scheduledStartTime - ClockSync.now();
+                        if (delay > 0 && delay < 5000) {
+                            setTimeout(function() { _wrappedScoreGo(data); }, delay);
+                            return;
+                        }
+                    }
+                    _wrappedScoreGo(data);
+                };
             }
         }, 100);
 

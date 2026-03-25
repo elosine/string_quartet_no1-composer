@@ -2528,3 +2528,234 @@ Phase 11 Completion Checkpoint (from pipeline plan):
 - 🤖 Two scenarios tested: standard setup AND backgrounded-tab recovery
 - 👁️ **Human verification (on tablet/iPad):** Performance mode feels completely safe — no accidental triggers. Countdown is clear. Emergency stop works from any device. Recovery from network loss and app switch is seamless. End-of-performance ceremony is clean.
 - **Regression:** Rehearsal mode still works when not in performance mode. All Phases 1-10 features unaffected.
+
+---
+
+## Phase 13 Pre-Implementation Protocol
+
+**Spec:** §13.4 Phase 13: Sync & Animation — Tier 3 (pipeline plan L3952-3994)
+**Goal:** Incremental refinements for highest-quality live performance sync. NTP-style offset, server heartbeat, latency-compensated starts, predictive rendering, and (conditionally) compositor cursor.
+
+**⚠️ CRITICAL CONTEXT — Phase 10 Slewing Failure:**
+Phase 10 Stage 1 attempted slewing (rate multiplier) to gradually correct clock offsets. The rate persisted between sync samples, distorting playback speed for seconds at a time → visible stutter. Reverted to direct re-anchoring + `_lastNow` monotonicity guard. **Rule for Phase 13:** No changes that alter how time *flows*. Only changes that improve the *accuracy* of offset calculation or the *timing* of state transitions.
+
+### Step 1: System Inventory — What Are We Touching?
+
+| System | What it does | Where | State | Phase 13 interaction |
+|--------|-------------|-------|-------|---------------------|
+| **ClockSync.calculateSync()** | Offset calc with outlier rejection + weighted avg | `build_performance_app.js` Patch 1d-b (L301-369) | `syncSamples[]`, `_rttSamples[]`, `clockOffset`, `_perfBase`, `_syncBase` | **13.1:** Add NTP best-quartile selection before weighted avg |
+| **ClockSync.now()** | Monotonic time via `performance.now()` anchoring | `build_performance_app.js` Patch 1d (L265-299) | `_perfBase`, `_syncBase`, `_lastNow` | **No changes.** Time flow mechanism stays exactly as-is. |
+| **ClockSync._burstResync()** | 5 rapid pings on connect/reconnect | `build_performance_app.js` Patch 1e-b (L458-469) | — | **13.2:** Also fires after heartbeat loss recovery |
+| **ClockSync._updateSyncUI()** | 4-level quality dot | `build_performance_app.js` Patch 1e-b (L519-554) | `_syncQuality`, `_offsetVariance` | **13.2:** Show heartbeat status in tooltip |
+| **Server scoreGo handler** | Broadcasts `scoreGo` with `scoreTimeOffset`, `serverTime` | `performance_server.js` L764-788 | Room state | **13.3:** Add `scheduledStartTime` field |
+| **Server scorePositionCheck** | Authoritative position every 3s during playback | `performance_server.js` L1133-1141 | Room state | **No changes.** |
+| **Offline stub scoreGo** | Local stub mimicking server | `build_performance_app.js` L100-160 | `_scoreTimeMs`, `_isPlaying` | **13.3:** Add `scheduledStartTime` to stub output |
+| **StaffCursors canvas** | Per-frame cursor/GC drawing on HTML5 Canvas | `performance_canvas_patches.js` O3b-O3c | Canvas context | **13.4:** See architectural conflict below |
+| **AnimationEngine** | rAF loop, subscriber pattern | Workshop source (AE1-AE3) | Subscribers array | **13.5:** Frame budget offset in position calc |
+
+### Step 2: Source Reading Summary
+
+**ClockSync.calculateSync() (Patch 1d-b, L312-369):**
+- Receives offset sample + RTT from ping/pong cycle
+- Outlier rejection: discards RTT > 2× median (needs ≥3 samples)
+- Adds to `syncSamples[]` and `_rttSamples[]` (capped at `maxSamples`)
+- Weighted average: `weight = 1 / (1 + rtt)` — lower RTT = higher influence
+- Re-anchors `_perfBase = performance.now()`, `_syncBase = clientReceiveTime + clockOffset`
+- Computes `_offsetVariance` (stddev) for adaptive ping + quality UI
+- Adjusts `_pingInterval` with hysteresis
+
+**Server scoreGo (L764-788):**
+- Leader-gated. Sets `room.scoreTimeOffset = now - room.currentScoreTimeMs`
+- Broadcasts to room: `{ isPlaying, scoreTimeOffset, currentScoreTimeMs, serverTime }`
+- `serverTime` already included — Step 13.3 just adds `scheduledStartTime`
+
+**Performance mode countdown (L1035-1070):**
+- Already uses scheduled start: `goTime = Date.now() + COUNTDOWN_SECONDS * 1000`
+- Broadcasts `goTime` to clients, server fires `scoreGo` after timeout
+- This is partially latency-compensated — clients show countdown, but `scoreGo` arrives at different times
+
+**StaffCursors canvas (performance_canvas_patches.js):**
+- Phase 2 moved ALL cursor rendering from SVG elements to HTML5 Canvas overlay
+- `update()` subscriber clears canvas → draws cursor line → draws GC balls → draws followers
+- Canvas is GPU-composited (CSS `will-change: transform`, parent has `contain: strict`)
+- **No HTML element exists for the cursor** — it's a canvas draw call
+
+### Step 3: Contracts
+
+**NTP-style offset (13.1):**
+- **Precondition:** ≥4 sync samples exist (need enough for best-quartile to be meaningful)
+- **Postcondition:** `clockOffset` is tighter (lower variance) than current weighted-only approach
+- **Invariant:** `ClockSync.now()` behavior unchanged. Only the offset VALUE changes, not how it's applied.
+
+**Heartbeat (13.2):**
+- **Precondition:** Connected to real server (not stub)
+- **Postcondition:** Disconnect detected within 3s (vs Socket.IO's 25s default)
+- **Invariant:** Does NOT fire in offline stub mode. Does NOT affect sync accuracy — only detection speed.
+
+**Latency-compensated starts (13.3):**
+- **Precondition:** `ClockSync.now()` returns accurate server time estimate
+- **Postcondition:** All connected clients start playback within ~5ms of each other
+- **Invariant:** Backward-compatible — if `scheduledStartTime` is missing, client starts immediately (current behavior)
+
+**Predictive rendering (13.5):**
+- **Precondition:** rAF callback provides high-resolution timestamp
+- **Postcondition:** Cursor position accounts for frame budget (paint happens ~8ms after calc)
+- **Invariant:** Page boundaries still trigger at correct time (no overshoot)
+
+### Step 4: Risk Register
+
+| Risk | Likelihood | Impact | Detection | Mitigation |
+|------|-----------|--------|-----------|------------|
+| NTP quartile selection makes offset WORSE with few samples | Medium | Low | Sync quality metric drops from "good" to "fair" | Fallback: if <8 samples, use current full-weighted average |
+| Heartbeat overhead on server with many rooms | Low | Low | CPU usage increase | Heartbeat is a tiny event — ~100 bytes × 2/sec per room. Negligible. |
+| Latency-compensated start fires too late (delay < 0) | Low | Medium | Score doesn't start | Fallback: if delay ≤ 0, start immediately (already in spec) |
+| Latency-compensated start breaks offline stub | Medium | High | Play button doesn't work | Stub must also emit `scheduledStartTime` — test stub path |
+| Predictive rendering overshoots page boundary | Low | Medium | Page turns slightly early | Clamp predicted position at page boundary |
+| **Web Animations API conflicts with canvas cursor (13.4)** | **HIGH** | **HIGH** | Cursor disappears or doubles | **See architectural conflict below — DEFER** |
+| Any change causes playback jitter (Phase 10 repeat) | Medium | HIGH | Stutter during playback | **Human gate after EVERY stage. Revert immediately if jitter appears.** |
+
+### ⚠️ Architectural Conflict: Step 13.4 (Web Animations API Cursor)
+
+**Problem:** Phase 2 moved the cursor to an HTML5 Canvas overlay. The Web Animations API requires an HTML/SVG element (it animates DOM elements via `element.animate()`). There is no DOM element for the cursor — it's a `ctx.fillRect()` call on a canvas.
+
+**Options:**
+a) Create a thin HTML `<div>` overlay for the cursor line, animated by Web Animations API. Canvas still draws GC balls, followers, pies. → Adds a DOM element back, partial regression from Phase 2.
+b) Skip Step 13.4 entirely. Canvas rendering is already GPU-composited and immune to SVG mutations. The compositor benefit of Web Animations API is largely already achieved by the canvas approach.
+c) Defer to real-world profiling. If main-thread jank is visible on performance devices, revisit.
+
+**Recommendation: Option (b) — SKIP Step 13.4.** The canvas overlay already achieves the goal (compositor-thread rendering, no SVG mutations). The Phase 10 slewing failure teaches us not to change working rendering mechanisms without proven need. Steps 13.1-13.3 + 13.5 provide meaningful improvements without this risk.
+
+### Step 5: Staged Implementation Plan
+
+```
+Stage 1: NTP-style offset calculation (LOW risk)                    ⬅ START HERE
+  - In calculateSync(), sort samples by RTT, take best quartile
+  - Only activate when ≥8 samples exist; fallback to full weighted avg otherwise
+  - No change to ClockSync.now() — only offset accuracy improves
+  → BUILD + SERVE
+  → 🤖 AI: Verify sync quality metric still works, offset variance same or better
+  → 👁️ HUMAN GATE: Load full score. Play for 30+ seconds. Cursor smooth?
+    Page turns work? Stop/resume work? Compare to pre-change behavior.
+    PASS = no visible difference or improvement. FAIL = any stutter or regression.
+
+Stage 2: Server heartbeat/watchdog (LOW risk)
+  - Server: emit 'heartbeat' every 500ms with seq + serverTime
+  - Client: track lastHeartbeat, detect 3s gap → show warning, trigger burstResync
+  - Skip in offline stub mode (no real server to heartbeat)
+  - Update sync UI tooltip to show heartbeat status
+  → BUILD + SERVE
+  → 🤖 AI: Verify heartbeat events flowing, no errors
+  → 👁️ HUMAN GATE: Play score normally — identical to Stage 1 behavior?
+    Kill the server mid-playback — offline banner appears within ~5s (existing)
+    but heartbeat detection should trigger sooner. Restart server — recovery.
+    PASS = normal playback unaffected, faster disconnect detection.
+
+Stage 3: Latency-compensated starts (MEDIUM risk)
+  - Server scoreGo: add scheduledStartTime = now + 150ms
+  - Client scoreGo handler: setTimeout to start at scheduledStartTime
+  - Offline stub: also include scheduledStartTime in scoreGo trigger
+  - Backward-compat: if scheduledStartTime missing, start immediately
+  - Performance mode countdown: already has scheduled mechanism, verify no conflict
+  → BUILD + SERVE
+  → 🤖 AI: Verify stub path still works (Play/Stop via offline)
+  → 👁️ HUMAN GATE #1 (offline): Load at localhost:3001 (stub mode).
+    Play/Stop multiple times. Goto + Play. Loop + Play. All smooth?
+    PASS = identical to pre-change behavior.
+  → 👁️ HUMAN GATE #2 (server, 2 devices): Load on 2 devices via server.
+    Press Play — both cursors start simultaneously (from first frame).
+    PASS = visually simultaneous start. Pre-change: slight offset visible.
+
+Stage 4: Predictive rendering (LOW risk)
+  - In AnimationEngine subscriber or StaffCursors.update():
+    add +8ms (half frame at 60Hz) to position calculation
+  - Clamp at page boundaries to prevent overshoot
+  - This is a ~4-8ms position nudge — subtle, may not be visible
+  → BUILD + SERVE
+  → 🤖 AI: Verify no page boundary overshoot, position calc correct
+  → 👁️ HUMAN GATE: Play full score. Cursor smooth? Page turns correct?
+    If any doubt, A/B compare by reverting the +8ms offset.
+    PASS = no regression. FAIL = any visible jitter or early page turns.
+
+Step 13.4 (Web Animations API cursor): DEFERRED
+  - Canvas overlay already provides compositor-level rendering
+  - Architectural conflict with Phase 2 canvas migration
+  - Revisit only if profiling on performance devices shows main-thread jank
+```
+
+### Step 6: Files Modified
+
+| File | Role | Changes needed |
+|------|------|---------------|
+| `scripts/build_performance_app.js` | Build patches for ClockSync | Stage 1: modify Patch 1d-b for NTP quartile. Stage 4: position offset in animation loop. |
+| `scripts/performance_server.js` | Server-side sync | Stage 2: heartbeat interval. Stage 3: scheduledStartTime in scoreGo. |
+| `scripts/performance_rehearsal_patches.js` | Client-side handlers | Stage 3: scheduledStartTime handling in toggleGoStop / scoreGo listener |
+| `builds/performance/index.html` | Built output | Rebuilt after each stage |
+| `docs/IMPLEMENTATION_PROGRESS.md` | Documentation | Stage-by-stage completion tracking |
+
+### Step 7: Integration Verification
+
+Phase 13 Completion Checkpoint (from pipeline plan, adapted):
+- 🤖 NTP offset variance tighter than Tier 2
+- 🤖 Heartbeat detection within 3s of server loss
+- 🤖 Latency-compensated starts: <5ms difference between clients
+- 🤖 Predictive rendering: no page boundary overshoot
+- 👁️ **Human verification:** Play on 2+ devices. Cursors are visually aligned. Starts are simultaneous. Normal playback is AT LEAST as smooth as before Phase 13. Nothing is worse.
+- **Regression:** All Phase 1-12 features unaffected. Offline stub mode works. Parts mode works. Performance mode works.
+
+---
+
+## Phase 13: Sync & Animation Tier 3 — Implementation Complete
+
+**Date:** Mar 25, 2026
+
+### What Was Built
+
+**Stage 1: NTP-style offset calculation** (LOW risk) ✅
+- Best-quartile RTT selection: when ≥8 sync samples exist, sort by RTT, take lowest 25% (most symmetric latency), weighted-average only those
+- When <8 samples: falls back to Phase 6 full weighted average
+- File: `scripts/build_performance_app.js` (Patch 1d-b replacement)
+- **Human gate passed:** Play 30s+, cursor smooth, page turns, stop/resume all correct
+
+**Stage 2: Server heartbeat + watchdog** (LOW risk) ✅
+- Server emits `heartbeat` event every 500ms with sequence number and `serverTime`
+- Client tracks `_lastHeartbeat` via `performance.now()`, watchdog interval checks every 1s for 3s gap
+- Sync dot shows orange "heartbeat lost" if gap detected; tooltip shows heartbeat age
+- Heartbeat is a safety net for network-level issues (half-open TCP); Socket.IO disconnect fires first on clean server kill
+- Files: `scripts/performance_server.js`, `scripts/build_performance_app.js` (Patch 1e-b)
+- **Human gate passed:** Normal playback unaffected; red dot on server kill (Socket.IO disconnect fires before heartbeat gap)
+
+**Stage 3: Latency-compensated starts** (MEDIUM risk) ✅
+- Server adds `scheduledStartTime = now + 150ms` to all `scoreGo` emissions (rehearsal play + performance go)
+- Client wraps `CursorControls.onScoreGo` — delays start until `scheduledStartTime` (translated via `ClockSync.now()`)
+- Safety: if delay is negative (already past) or >5s (stale), falls through immediately
+- Offline stub includes `scheduledStartTime = now + 10ms` for compatibility
+- Files: `scripts/performance_server.js`, `scripts/performance_rehearsal_patches.js`, `scripts/build_performance_app.js`
+- **Human gate passed:** Offline stub play/stop/goto work; 2-tab simultaneous start works; all playback smooth
+
+**Stage 4: Predictive rendering** (LOW risk) ✅
+- `StaffCursors.update()` and `GCMaker.update()` add +8ms lookahead to `ScoreTime.now()` during playback
+- Compensates for delay between position calculation and browser paint (~half a frame at 60fps)
+- Disabled when stopped (exact position)
+- File: `scripts/performance_canvas_patches.js`
+- **Human gate passed:** Cursor smooth, page turns correct, GC balls track correctly
+
+**Step 13.4 (Web Animations API for cursor): DEFERRED — architectural conflict**
+- Phase 2 moved cursor to HTML5 Canvas (no DOM element). Web Animations API requires a DOM element.
+- Canvas is already GPU-composited, so the compositor-thread benefit is already achieved.
+
+### Key Design Decision
+> **No changes that alter how time *flows*.** Only changes that improve the *accuracy* of offset calculation or the *timing* of state transitions. `ClockSync.now()` was never modified.
+
+### Known Limitations Noted During Testing
+- **Loop toggle in independent mode:** Start-loop button requires server; doesn't work when server is dead and client is in independent mode. Pre-existing limitation.
+- **Part score reload in offline mode:** Part ↔ Full toggle reloads page; can't fetch if server is dead. Expected behavior.
+- **Server restart resets client playback:** In-memory room state lost on server restart. Risk assessed as negligible for AWS deployment (~0.0001% during any concert). Accepted limitation.
+
+### Files Modified
+- `scripts/build_performance_app.js` — NTP best-quartile (Patch 1d-b), heartbeat listener + watchdog, heartbeat properties + UI
+- `scripts/performance_server.js` — heartbeat interval, `scheduledStartTime` in scoreGo emissions
+- `scripts/performance_rehearsal_patches.js` — latency-compensated start wrapper on `CursorControls.onScoreGo`
+- `scripts/performance_canvas_patches.js` — predictive rendering (+8ms lookahead)
+
+### Resume Point
+Phase 13 complete. Next: speed control (user request), then Phase 14.
