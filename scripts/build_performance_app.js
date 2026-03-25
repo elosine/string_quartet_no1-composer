@@ -435,6 +435,7 @@ const pongHandlerWithDriftCheck = [
     "                this.socket.on('scorePositionCheck', (data) => {",
     '                    if (!window.ScoreTime || !ScoreTime.isPlaying) return;',
     '                    if (window.SyncMode && SyncMode.isIndependent) return;',
+    '                    if (window.SpeedControl && (SpeedControl.speed !== 1.0 || SpeedControl.hasOffset)) return;',
     '                    var localScoreTime = ScoreTime.now();',
     '                    var drift = localScoreTime - data.scoreTimeMs;',
     '                    if (Math.abs(drift) > 50) {',

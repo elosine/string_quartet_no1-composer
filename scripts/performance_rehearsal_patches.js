@@ -567,6 +567,7 @@ module.exports = function applyRehearsalPatches(html) {
             '    <span class="co-divider"></span>',
             '    <button class="co-btn co-marker-btn" title="Markers">🔖</button>',
             '    <button class="co-btn co-loop-btn" title="Loop">🔁</button>',
+            '    <button class="co-btn co-speed-btn" title="Playback speed">1.0x</button>',
             '    <span class="co-divider"></span>',
             '    <button class="co-btn co-close" title="Close">✕</button>',
             '  </div>',
@@ -636,7 +637,9 @@ module.exports = function applyRehearsalPatches(html) {
             '.co-view-btn { font-size: 13px; padding: 8px 12px; }',
             '.co-view-btn.co-parts-active { background: rgba(0,120,200,0.4); }',
             '.co-pages-btn { font-size: 13px; padding: 8px 12px; font-weight: 600; }',
-            '.co-track-btn { font-size: 13px; padding: 8px 12px; font-weight: 600; }'
+            '.co-track-btn { font-size: 13px; padding: 8px 12px; font-weight: 600; }',
+            '.co-speed-btn { font-size: 13px; padding: 8px 12px; font-weight: 600; }',
+            '.co-speed-btn.co-speed-active { background: rgba(200,120,0,0.5); }'
         ].join('');
         document.head.appendChild(style);
         document.body.appendChild(overlay);
@@ -659,6 +662,7 @@ module.exports = function applyRehearsalPatches(html) {
         var viewBtn = overlay.querySelector('.co-view-btn');
         var trackBtn = overlay.querySelector('.co-track-btn');
         var pagesBtn = overlay.querySelector('.co-pages-btn');
+        var speedBtn = overlay.querySelector('.co-speed-btn');
         var TRACK_NAMES = ['Vln I', 'Vln II', 'Vla', 'Vc'];
 
         var _cachedTotalPages = 0;
@@ -754,6 +758,10 @@ module.exports = function applyRehearsalPatches(html) {
                 displaySec = ((ScoreTime.currentScoreTimeMs || 0) / 1000) - (typeof leadInSeconds !== 'undefined' ? leadInSeconds : 0);
             }
             jumpInput.value = Math.max(0, displaySec).toFixed(1);
+            // Speed button
+            var spd = window.SpeedControl ? SpeedControl.speed : 1.0;
+            speedBtn.textContent = spd + 'x';
+            speedBtn.classList.toggle('co-speed-active', spd !== 1.0);
         }
 
         function show() {
@@ -906,6 +914,20 @@ module.exports = function applyRehearsalPatches(html) {
             window.location.search = params.toString();
         });
 
+        var SPEED_OPTIONS = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+        speedBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            if (!window.SpeedControl) return;
+            var current = SpeedControl.speed;
+            var idx = SPEED_OPTIONS.indexOf(current);
+            var next = SPEED_OPTIONS[(idx + 1) % SPEED_OPTIONS.length];
+            SpeedControl.setSpeed(next);
+            speedBtn.textContent = next + 'x';
+            speedBtn.classList.toggle('co-speed-active', next !== 1.0);
+            resetFadeTimer();
+            console.log('[ControlsOverlay] Speed: ' + current + 'x → ' + next + 'x');
+        });
+
         // Prevent overlay interactions from bubbling to gesture system
         panel.addEventListener('pointerdown', function(e) { e.stopPropagation(); });
         panel.addEventListener('pointerup', function(e) { e.stopPropagation(); });
@@ -926,6 +948,103 @@ module.exports = function applyRehearsalPatches(html) {
         };
 
         console.log('ControlsOverlay: initialized (center tap to toggle)');
+    })();
+
+    // ═══ Speed Control: Local playback speed scaling ═══
+    // Formula: speedTime = (_origNow() - _refOrig) * speed + _refScore
+    // At speed=1.0 with matching refs, this equals _origNow(). No overhead path when speed never used.
+    (function initSpeedControl() {
+        if (!window.ScoreTime) { console.warn('SpeedControl: ScoreTime not found'); return; }
+
+        var _speed = 1.0;
+        var _refOrig = 0;           // _origNow() value at reference point
+        var _refScore = 0;          // desired score position at reference point
+        var _wasPlaying = false;
+        var _speedStopPos = null;   // saved speed-adjusted position from last stop
+        var _everUsedSpeed = false; // fast path: skip formula if speed was never changed
+        var _hasOffset = false;     // true when client position has diverged from server
+        var _origNow = ScoreTime.now.bind(ScoreTime);
+
+        function currentSpeedPos() {
+            return (_origNow() - _refOrig) * _speed + _refScore;
+        }
+
+        ScoreTime.now = function() {
+            if (!this.isPlaying) {
+                _wasPlaying = false;
+                return this.currentScoreTimeMs;
+            }
+            // Fast path: speed was never changed
+            if (!_everUsedSpeed) {
+                _wasPlaying = true;
+                return _origNow();
+            }
+            // Detect play-start transition: set reference point
+            if (!_wasPlaying) {
+                _wasPlaying = true;
+                _refOrig = _origNow();
+                if (_speedStopPos !== null) {
+                    _refScore = _speedStopPos;
+                    _speedStopPos = null;
+                    _hasOffset = true; // Position is offset from server
+                } else {
+                    _refScore = _origNow();
+                    _hasOffset = (_speed !== 1.0); // Offset if speed isn't 1x
+                }
+            }
+            return currentSpeedPos();
+        };
+
+        // Wrap CursorControls.onScoreStop to save speed-adjusted position
+        function hookStopWrapper() {
+            if (!window.CursorControls || !CursorControls.onScoreStop) {
+                setTimeout(hookStopWrapper, 500); return;
+            }
+            var _prevStop = CursorControls.onScoreStop;
+            CursorControls.onScoreStop = function(data) {
+                if (_hasOffset && ScoreTime.isPlaying && _wasPlaying) {
+                    _speedStopPos = currentSpeedPos();
+                }
+                _prevStop(data);
+                if (_speedStopPos !== null) {
+                    ScoreTime.currentScoreTimeMs = _speedStopPos;
+                }
+            };
+        }
+        hookStopWrapper();
+
+        // Wrap CursorControls.onScoreGoto to clear stale speed position
+        function hookGotoWrapper() {
+            if (!window.CursorControls || !CursorControls.onScoreGoto) {
+                setTimeout(hookGotoWrapper, 500); return;
+            }
+            var _prevGoto = CursorControls.onScoreGoto;
+            CursorControls.onScoreGoto = function(data) {
+                _speedStopPos = null;
+                _hasOffset = false;
+                _prevGoto(data);
+            };
+        }
+        hookGotoWrapper();
+
+        window.SpeedControl = {
+            get speed() { return _speed; },
+            get hasOffset() { return _hasOffset; },
+            setSpeed: function(val) {
+                if (val === _speed) return;
+                _everUsedSpeed = true;
+                if (ScoreTime.isPlaying && _wasPlaying) {
+                    // Capture current position at old speed, then re-anchor
+                    _refScore = currentSpeedPos();
+                    _refOrig = _origNow();
+                }
+                if (val !== 1.0) _hasOffset = true;
+                _speed = val;
+                console.log('[SpeedControl] Speed set to ' + val + 'x');
+            }
+        };
+
+        console.log('SpeedControl: initialized (default 1.0x)');
     })();
 
     // ═══ Phase 8 Stage 3: Marker System ═══
