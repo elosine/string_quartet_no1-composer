@@ -76,9 +76,11 @@
 
         <a id="launch-btn" class="btn primary" href="/score">Open Score</a>
 
+        <a id="perf-mode-btn" class="btn perf-mode" href="/score?mode=performance" style="display:none;">🎭 Start Performance</a>
+
         <p class="or-divider">or</p>
 
-        <a class="btn full-score" href="/score">Full Score (all parts)</a>
+        <a id="full-score-btn" class="btn full-score" href="/score">Full Score (all parts)</a>
 
     </section>
 
@@ -140,6 +142,8 @@
     var instrumentBtns = document.querySelectorAll('.instrument-btn');
     var pagesBtns = document.querySelectorAll('.pages-btn');
     var launchBtn = document.getElementById('launch-btn');
+    var perfModeBtn = document.getElementById('perf-mode-btn');
+    var fullScoreBtn = document.getElementById('full-score-btn');
     var createBtn = document.getElementById('create-room-btn');
     var joinBtn = document.getElementById('join-room-btn');
     var codeInput = document.getElementById('room-code-input');
@@ -175,6 +179,21 @@
         if (roomCode) params.push('room=' + roomCode);
         var url = '/score' + (params.length ? '?' + params.join('&') : '');
         launchBtn.href = url;
+
+        // Full Score link — include room code if joined
+        var fullParams = [];
+        if (roomCode) fullParams.push('room=' + roomCode);
+        fullScoreBtn.href = '/score' + (fullParams.length ? '?' + fullParams.join('&') : '');
+
+        // Performance Mode button — only show when in a room
+        if (roomCode) {
+            var perfParams = params.slice();
+            perfParams.push('mode=performance');
+            perfModeBtn.href = '/score?' + perfParams.join('&');
+            perfModeBtn.style.display = 'inline-block';
+        } else {
+            perfModeBtn.style.display = 'none';
+        }
     }
 
     // ─── Room management ─────────────────────────────────────────────────────
