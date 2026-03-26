@@ -20,6 +20,8 @@ const fs = require('fs');
 const http = require('http');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { Server } = require('socket.io');
 
 // ─── Config ──────────────────────────────────────────────────────────────────
@@ -87,8 +89,15 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Parse JSON request bodies (built into Express 4.16+)
-app.use(express.json());
+// ─── Security middleware ──────────────────────────────────────────────────
+
+// Security headers (X-Frame-Options, HSTS, CSP, etc.)
+app.use(helmet({
+    contentSecurityPolicy: false // CSP breaks inline scripts in score app
+}));
+
+// Parse JSON request bodies with size limit (prevent payload DoS)
+app.use(express.json({ limit: '100kb' }));
 
 // Serve landing page static files (CSS, etc.)
 app.use('/landing', express.static(LANDING_DIR));
@@ -116,6 +125,40 @@ app.use('/docs/technical-manual', express.static(path.join(DOCS_DIR, 'technical_
 // Print score PDFs
 app.use('/print', express.static(path.join(ROOT, 'builds', 'print')));
 
+// ─── Security: Rate limiting ─────────────────────────────────────────────────
+
+// Rate limit session creation: max 10 per minute per IP
+var sessionCreateLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 10,
+    message: { error: 'Too many sessions created. Try again later.' }
+});
+
+// Rate limit join attempts: max 20 per minute per IP (allows retries)
+var sessionJoinLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 20,
+    message: { error: 'Too many join attempts. Try again later.' }
+});
+
+// General API rate limit: max 60 per minute per IP
+var apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 60,
+    message: { error: 'Too many requests. Try again later.' }
+});
+app.use('/api/', apiLimiter);
+
+// ─── Security: Input sanitization ────────────────────────────────────────────
+
+// Validate room code: alphanumeric only, 4-6 chars (prevents path traversal)
+function sanitizeCode(code) {
+    if (!code || typeof code !== 'string') return null;
+    var cleaned = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (cleaned.length < 4 || cleaned.length > 6) return null;
+    return cleaned;
+}
+
 // ─── Phase 7: Session management API ───────────────────────────────────────
 
 // Generate a unique 6-character room code (uppercase alphanumeric, no ambiguous chars)
@@ -140,7 +183,7 @@ function writeJsonAtomic(filePath, data) {
 }
 
 // POST /api/sessions — create a new rehearsal session
-app.post('/api/sessions', function(req, res) {
+app.post('/api/sessions', sessionCreateLimiter, function(req, res) {
     var code = generateRoomCode();
     var session = {
         id: code,
@@ -162,7 +205,8 @@ app.post('/api/sessions', function(req, res) {
 
 // GET /api/sessions/:code — get session info
 app.get('/api/sessions/:code', function(req, res) {
-    var code = req.params.code.toUpperCase();
+    var code = sanitizeCode(req.params.code);
+    if (!code) return res.status(400).json({ error: 'Invalid room code' });
     var sessionPath = path.join(SESSIONS_DIR, code + '.json');
     if (!fs.existsSync(sessionPath)) {
         return res.status(404).json({ error: 'Session not found' });
@@ -183,14 +227,15 @@ app.get('/api/sessions/:code', function(req, res) {
 });
 
 // POST /api/sessions/:code/join — performer claims a slot, gets JWT
-app.post('/api/sessions/:code/join', function(req, res) {
-    var code = req.params.code.toUpperCase();
+app.post('/api/sessions/:code/join', sessionJoinLimiter, function(req, res) {
+    var code = sanitizeCode(req.params.code);
+    if (!code) return res.status(400).json({ error: 'Invalid room code' });
     var sessionPath = path.join(SESSIONS_DIR, code + '.json');
     if (!fs.existsSync(sessionPath)) {
         return res.status(404).json({ error: 'Session not found' });
     }
 
-    var displayName = (req.body.displayName || '').trim();
+    var displayName = (req.body.displayName || '').trim().substring(0, 50);
     var slot = (req.body.slot || '').toLowerCase();
     var validSlots = ['violin1', 'violin2', 'viola', 'cello'];
 
@@ -333,6 +378,11 @@ app.put('/api/performers/:id/preferences', function(req, res) {
         fs.mkdirSync(performerDir, { recursive: true });
     }
     var prefs = req.body || {};
+    // Limit preferences size to prevent storage abuse
+    var prefsStr = JSON.stringify(prefs);
+    if (prefsStr.length > 50000) {
+        return res.status(400).json({ error: 'Preferences too large (max 50KB)' });
+    }
     writeJsonAtomic(path.join(performerDir, 'preferences.json'), prefs);
     console.log('Preferences saved for performer ' + decoded.performerId.substring(0, 8) + '...');
     res.json({ saved: true });
@@ -773,7 +823,7 @@ io.on('connection', function(socket) {
     socket.on('reportScoreDuration', function(data) {
         if (!socketRoomId) return;
         var room = rooms.get(socketRoomId);
-        if (room && data && data.totalDurationMs > 0) {
+        if (room && data && typeof data.totalDurationMs === 'number' && data.totalDurationMs > 0 && data.totalDurationMs < 86400000) {
             room.totalDurationMs = data.totalDurationMs;
             console.log('[' + socketRoomId + '] Score duration reported: ' + (data.totalDurationMs / 1000).toFixed(1) + 's by ' + socket.id);
         }
@@ -840,7 +890,8 @@ io.on('connection', function(socket) {
             return;
         }
         if (!room.leaderId) assignLeader(socketRoomId, socket.id);
-        var targetSeconds = data.seconds || 0;
+        var targetSeconds = Number(data.seconds) || 0;
+        if (targetSeconds < 0 || targetSeconds > 86400) targetSeconds = 0;
         var targetMs = targetSeconds * 1000;
 
         cancelAutoStop(socketRoomId); // Phase 11
@@ -930,10 +981,12 @@ io.on('connection', function(socket) {
 
     // BPM change
     socket.on('setBpm', function(data) {
-        if (!socketRoomId) return;
+        if (!socketRoomId || !data) return;
+        var bpm = Number(data.bpm);
+        if (!bpm || bpm < 1 || bpm > 999) return;
         var room = getRoom(socketRoomId);
         var scoreTime = getRoomScoreTimeMs(room);
-        room.currentBpm = data.bpm;
+        room.currentBpm = bpm;
         room.tempoHistory.push({
             scoreTimeMs: scoreTime,
             bpm: room.currentBpm,
@@ -945,10 +998,12 @@ io.on('connection', function(socket) {
 
     // Beats per page change
     socket.on('setBeatsPerPage', function(data) {
-        if (!socketRoomId) return;
+        if (!socketRoomId || !data) return;
+        var bpp = Number(data.beatsPerPage);
+        if (!bpp || bpp < 1 || bpp > 100) return;
         var room = getRoom(socketRoomId);
         var scoreTime = getRoomScoreTimeMs(room);
-        room.currentBeatsPerPage = data.beatsPerPage;
+        room.currentBeatsPerPage = bpp;
         room.tempoHistory.push({
             scoreTimeMs: scoreTime,
             bpm: room.currentBpm,
