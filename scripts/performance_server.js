@@ -211,7 +211,9 @@ app.get('/api/sessions/:code', function(req, res) {
     if (!fs.existsSync(sessionPath)) {
         return res.status(404).json({ error: 'Session not found' });
     }
-    var session = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+    var session;
+    try { session = JSON.parse(fs.readFileSync(sessionPath, 'utf8')); }
+    catch (e) { return res.status(500).json({ error: 'Session data corrupted' }); }
     // Return session info with available slots
     var takenSlots = session.performers.map(function(p) { return p.slot; });
     var allSlots = ['violin1', 'violin2', 'viola', 'cello'];
@@ -246,26 +248,14 @@ app.post('/api/sessions/:code/join', sessionJoinLimiter, function(req, res) {
         return res.status(400).json({ error: 'Invalid slot. Must be one of: ' + validSlots.join(', ') });
     }
 
-    var session = JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+    var session;
+    try { session = JSON.parse(fs.readFileSync(sessionPath, 'utf8')); }
+    catch (e) { return res.status(500).json({ error: 'Session data corrupted' }); }
 
-    // Check if slot is already taken by a different performer
+    // Check if slot is already taken
     var existingPerformer = session.performers.find(function(p) { return p.slot === slot; });
     if (existingPerformer) {
-        // Same slot — return existing performer's token (allows re-claim)
-        var existingToken = jwt.sign({
-            performerId: existingPerformer.performerId,
-            displayName: existingPerformer.display_name,
-            slot: slot,
-            sessionId: code
-        }, jwtSecret, { expiresIn: '30d' });
-        console.log('Session ' + code + ': ' + slot + ' re-claimed by ' + displayName);
-        return res.json({
-            token: existingToken,
-            performerId: existingPerformer.performerId,
-            slot: slot,
-            sessionId: code,
-            isReconnect: true
-        });
+        return res.status(409).json({ error: 'Slot ' + slot + ' is already taken by ' + existingPerformer.display_name });
     }
 
     // Create new performer
@@ -360,7 +350,9 @@ app.get('/api/performers/:id/preferences', function(req, res) {
     if (!fs.existsSync(prefsPath)) {
         return res.json({}); // No preferences yet — return empty object
     }
-    var prefs = JSON.parse(fs.readFileSync(prefsPath, 'utf8'));
+    var prefs;
+    try { prefs = JSON.parse(fs.readFileSync(prefsPath, 'utf8')); }
+    catch (e) { return res.status(500).json({ error: 'Preferences data corrupted' }); }
     res.json(prefs);
 });
 
@@ -921,10 +913,12 @@ io.on('connection', function(socket) {
         var room = getRoom(socketRoomId);
         if (!isLeader(room, socket.id)) { socket.emit('notLeader', { action: 'loopSet' }); return; }
         if (!room.leaderId) assignLeader(socketRoomId, socket.id);
+        var timeMs = Number(data.timeMs);
+        if (isNaN(timeMs) || timeMs < 0 || timeMs > 86400000) return;
         if (data.point === 'A') {
-            room.loopStartMs = data.timeMs;
+            room.loopStartMs = timeMs;
         } else if (data.point === 'B') {
-            room.loopEndMs = data.timeMs;
+            room.loopEndMs = timeMs;
             // Auto-swap if B < A
             if (room.loopStartMs !== null && room.loopEndMs < room.loopStartMs) {
                 var tmp = room.loopStartMs;

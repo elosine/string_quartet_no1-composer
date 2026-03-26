@@ -4285,10 +4285,54 @@ A standalone HTML document explaining non-standard notation and graphic score sy
 - Tone: procedural, explicit, no assumed context
 - 🤖→👁️ *AI drafts guide → Human reviews for accuracy and missing knowledge*
 
+**Step 16.6: Ongoing Maintenance Tasks**
+- **Primary deliverable:** A maintenance checklist (`docs/MAINTENANCE.md`) covering all recurring tasks the composer/operator must perform to keep the app healthy in production
+- Should cover:
+
+**Weekly / after each rehearsal cycle:**
+- Check server logs for errors or unusual activity (`pm2 logs`)
+- Verify disk usage — session files accumulate in `data/sessions/` and are never auto-cleaned
+- Delete stale session files older than 30 days: `find data/sessions -name '*.json' -mtime +30 -delete` (Linux) or equivalent
+- Delete orphaned performer profiles in `data/performers/` for sessions that no longer exist
+
+**Monthly:**
+- Run `npm audit` and `npm audit fix` to patch dependency vulnerabilities
+- Check for Node.js security updates — update if a patch release is available
+- Review rate limit thresholds — adjust if legitimate users are being blocked or if abuse patterns appear
+- Check SSL certificate expiry (if using Let's Encrypt, `certbot renew` handles this automatically via cron)
+- Review server uptime and restart count (`pm2 status`)
+
+**Before each performance:**
+- Verify server is running and accessible from performer devices
+- Test the full flow: landing page → create room → join → open score → performance mode
+- Ensure all devices can reach the server on the venue's network
+- Check battery / power for all performer devices
+- Confirm Do Not Disturb is enabled on all devices
+
+**After major score changes (new revision, new piece):**
+- Re-run `node scripts/build_performance_app.js` to rebuild the performance app
+- Re-run `node scripts/generate_doc_pdfs.js` to regenerate documentation PDFs (server must be running)
+- Re-capture print score PDFs if page layouts changed
+- Restart server to pick up new build: `pm2 restart performance-server`
+- Verify score renders correctly on at least one device
+
+**Security maintenance:**
+- JWT secret (`data/.jwt-secret`): if compromised, delete the file and restart the server — a new secret is auto-generated, but all existing performer tokens become invalid
+- If suspicious activity appears in logs (rapid session creation, unfamiliar IPs), review rate limit settings and consider IP blocking at the nginx level
+- Never commit `data/` directory to git — verify `.gitignore` still excludes it
+
+**Backup:**
+- The only persistent data is in `data/` (sessions, performer profiles, JWT secret)
+- The score itself is in `builds/performance/score.json` — regenerated from source on each build
+- For production, back up `data/` periodically if session continuity matters
+- The git repository IS the primary backup for all source code and documentation
+
+- 🤖→👁️ *AI drafts maintenance checklist → Human reviews for completeness and adds venue-specific items*
+
 **Phase 16 Completion Checkpoint:**
 - 🤖 Repository is clean, tagged, and documented
-- 🤖 Pipeline and onboarding documents are complete and AI-executable
-- 👁️ **Human verification:** Can a new AI session follow the pipeline docs to rebuild the production app from source? Can a new piece be started from the template?
+- 🤖 Pipeline, onboarding, and maintenance documents are complete and AI-executable
+- 👁️ **Human verification:** Can a new AI session follow the pipeline docs to rebuild the production app from source? Can a new piece be started from the template? Are maintenance tasks clear and actionable?
 - Commit: `[Phase 16] Project cleanup, documentation & archive`
 - Tag: `git tag phase-16-archive`
 
