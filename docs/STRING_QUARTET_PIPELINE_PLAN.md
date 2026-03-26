@@ -4087,6 +4087,19 @@ A standalone HTML document explaining non-standard notation and graphic score sy
 - Configure nginx or Caddy as reverse proxy
 - 🤖 *AI Test:* HTTPS works, certificate valid, WebSocket upgrades succeed through proxy
 
+**Step 14.2a: Security audit (before going live)**
+- **Static file exposure:** Audit what `express.static` serves. Currently serves all of `builds/performance/` — ensure only `index.html`, `score.json`, and necessary assets are accessible. Remove or exclude: test files, build artifacts, source maps, dev scripts.
+- **`public/` folder:** The Workshop source (`public/index.html`) and all composition tools must NOT be served in production. Verify the server only serves from `builds/performance/`, `landing/`, `docs/`, and `builds/print/` — never `public/`.
+- **`data/` folder:** Contains `.jwt-secret`, session JSON files, performer preferences. Must NOT be served via any static route. Verify no `express.static` mount exposes it.
+- **JWT secret management:** Currently stored in `data/.jwt-secret` as a plain file. For production: consider environment variable or secrets manager. Ensure the secret is not committed to git (verify `.gitignore`).
+- **Rate limiting:** Add basic rate limiting on API endpoints (`/api/sessions`, `/api/sessions/:code/join`) to prevent abuse (brute-force room codes, session creation spam).
+- **Input validation:** Audit all `req.params` and `req.body` inputs for injection or overflow. Room codes are already constrained to 6 alphanumeric chars. Verify performer names and other user input are sanitized.
+- **Socket.IO security:** Review socket event handlers for unexpected payloads. Ensure room isolation — a client in one room cannot emit events affecting another room.
+- **CORS / Origin:** Configure Socket.IO and Express CORS to restrict to the production domain once deployed.
+- **Dependency audit:** Run `npm audit` and update any packages with known vulnerabilities.
+- **HTTP headers:** Add security headers via helmet.js or manually: `X-Content-Type-Options`, `X-Frame-Options`, `Strict-Transport-Security` (once HTTPS is live).
+- 🤖→👁️ *AI performs audit and documents findings → Human reviews and approves before going live*
+
 **Step 14.3: Admin panel**
 - Simple web interface for the composer (you):
   - Create/manage ensembles
@@ -4205,6 +4218,82 @@ A standalone HTML document explaining non-standard notation and graphic score sy
 
 ---
 
+#### Phase 16: Cleanup, Document & Archive Project
+**Depends on:** Phase 14 (production deployment complete), Phase 15 (notes finalized)
+**Est. sessions:** 2–4
+**Risk level:** Low — organizational/documentation work, no live code changes
+
+**Goal:** Close out the String Quartet No. 1 project with clean version control, complete documentation, and a reusable pipeline for future pieces. Produce an AI-readable, implementable set of procedures for moving from a new Workshop composition to a production-ready Performance Score web app.
+
+**Step 16.1: Git repository management & versioning**
+- Final review of all uncommitted or WIP branches
+- Clean commit history: squash/rebase where appropriate, ensure meaningful commit messages
+- Create a definitive tagged release: `git tag v1.0-release`
+- Archive any experimental branches (delete or tag as `archive/...`)
+- Verify `.gitignore` covers all generated artifacts, secrets, and dev-only files
+- Create `CHANGELOG.md` summarizing all phases and major milestones
+- 🤖→👁️ *AI audits repo structure → Human confirms clean state*
+
+**Step 16.2: Project documentation audit**
+- Verify all documentation is current:
+  - `STRING_QUARTET_PIPELINE_PLAN.md` — reflects actual implementation, not just original spec
+  - `IMPLEMENTATION_PROGRESS.md` — final status of all phases
+  - Technical Manual — covers all features as shipped
+  - Performance Instructions — complete and PDF-generated
+- Remove or archive stale documentation, TODOs, and placeholder content
+- Add a top-level `README.md` if not present — project overview, how to run, how to build, how to deploy
+- 🤖→👁️ *AI reviews all docs for accuracy → Human confirms completeness*
+
+**Step 16.3: Workshop → Performance Score pipeline documentation**
+- **Primary deliverable:** A single, AI-readable procedure document (`docs/BUILD_PIPELINE.md`) that describes the complete path from Workshop composition to production web app
+- Should cover, step by step:
+  1. **Score export:** How `scores/*.json` is produced from the Workshop
+  2. **Build:** `build_performance_app.js` — what it strips, patches, and injects (with phase references)
+  3. **SVG text-to-paths:** The opentype.js build step for font independence
+  4. **Print score generation:** Puppeteer capture → PDF parts + full score
+  5. **Notation instructions / documentation:** SVG capture → Inkscape editing → HTML assembly → PDF generation
+  6. **Server deployment:** Express server config, static routes, Socket.IO, JWT auth
+  7. **Landing page:** Structure, room management, performer detection
+  8. **Cloud deployment:** VPS setup, nginx, SSL, PM2, security audit checklist
+- Each step should include: **inputs**, **outputs**, **command to run**, **what to verify**, and **common failure modes**
+- Written so a future AI assistant can execute the pipeline from scratch with minimal ambiguity
+- 🤖→👁️ *AI drafts document → Human reviews for completeness and accuracy*
+
+**Step 16.4: Prepare composition system for next piece**
+- Identify which parts of the codebase are piece-specific vs. reusable infrastructure:
+  - **Piece-specific:** `scores/*.json`, `public/SVG_graphics/`, notation instructions content, score-specific CSS
+  - **Reusable:** Workshop engine (`public/index.html` + all JS systems), build scripts, server, landing page template, rehearsal/performance mode, sync, annotations
+- Create a clean "starter template" repository (or branch) for the next piece:
+  - Empty `scores/` directory with schema documentation
+  - Build scripts with configurable paths
+  - Server with placeholder routes
+  - Landing page template (title, composer, instrument list configurable)
+  - Documentation templates
+- Document any Workshop systems that need modification for a new piece (e.g., different instrumentation, different page layouts, different notation types)
+- 🤖→👁️ *AI creates template repo structure → Human reviews and confirms it's sufficient for next piece*
+
+**Step 16.5: AI-readable "New Piece Onboarding" guide**
+- **Primary deliverable:** `docs/NEW_PIECE_GUIDE.md`
+- Written for a future AI assistant starting a new piece in the system
+- Covers:
+  - How the Workshop composition environment works (high-level architecture)
+  - How to create a new score and populate it with musical material
+  - How to configure the build pipeline for different instrumentation
+  - How to run the full Workshop → Performance Score → Production pipeline
+  - Known gotchas, edge cases, and lessons learned from String Quartet No. 1
+  - References to relevant source files and pipeline plan sections
+- Tone: procedural, explicit, no assumed context
+- 🤖→👁️ *AI drafts guide → Human reviews for accuracy and missing knowledge*
+
+**Phase 16 Completion Checkpoint:**
+- 🤖 Repository is clean, tagged, and documented
+- 🤖 Pipeline and onboarding documents are complete and AI-executable
+- 👁️ **Human verification:** Can a new AI session follow the pipeline docs to rebuild the production app from source? Can a new piece be started from the template?
+- Commit: `[Phase 16] Project cleanup, documentation & archive`
+- Tag: `git tag phase-16-archive`
+
+---
+
 ### 13.5 Phase Summary Table
 
 | Phase | Name | Sessions | Depends On | Key Risk | Testing |
@@ -4224,7 +4313,8 @@ A standalone HTML document explaining non-standard notation and graphic score sy
 | **13** | Sync+Animation Tier 3 | 2–3 | 10 | Subtle timing improvements | 🤖→👁️ |
 | **14** | Website & Production | 3–5 | 1-11 | Infrastructure / networking | 🤖→👁️ |
 | **15** | Composition & Performance Notes | 1–2 | 14 (content anytime) | Minimal — static content | 🤖→👁️ |
-| | **TOTAL** | **~33–50** | | | |
+| **16** | Cleanup, Document & Archive | 2–4 | 14, 15 | Minimal — organizational | 🤖→👁️ |
+| | **TOTAL** | **~35–54** | | | |
 
 ### 13.6 Milestone Gates
 

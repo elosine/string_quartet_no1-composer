@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>String Quartet No. 1 — Performance Score</title>
+    <link rel="stylesheet" href="/landing/landing.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ═══ Identity ═════════════════════════════════════════════════════ -->
+
+    <header>
+        <h1>String Quartet No. 1</h1>
+        <p class="composer">Justin Yang</p>
+    </header>
+
+    <a class="video-link" href="#" target="_blank" rel="noopener">▶ Watch Demo Video</a>
+
+    <!-- ═══ Welcome Back (hidden by default, shown if JWT found) ═══════ -->
+
+    <section class="welcome-section" id="welcome-section" style="display:none;">
+        <p class="welcome-msg">Welcome back, <strong id="welcome-name"></strong> (<span id="welcome-slot"></span>)</p>
+        <p class="welcome-room">Room: <strong id="welcome-room"></strong></p>
+        <a id="rejoin-btn" class="btn primary" href="/score">Rejoin</a>
+        <br>
+        <button id="start-fresh-btn" class="btn-text">Start fresh</button>
+    </section>
+
+    <!-- ═══ Unified Launch Flow ══════════════════════════════════════════ -->
+
+    <section class="launch-section">
+
+        <div class="flow-step">
+            <p class="label">Your name:</p>
+            <input type="text" id="performer-name" placeholder="e.g. Sarah" maxlength="30" autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="flow-step">
+            <p class="label">Select your instrument:</p>
+            <div class="instrument-buttons">
+                <button class="instrument-btn" data-track="1">Violin I</button>
+                <button class="instrument-btn" data-track="2">Violin II</button>
+                <button class="instrument-btn" data-track="3">Viola</button>
+                <button class="instrument-btn" data-track="4">Cello</button>
+            </div>
+        </div>
+
+        <div class="flow-step">
+            <p class="label">Pages per screen:</p>
+            <div class="pages-buttons">
+                <button class="pages-btn" data-pages="4">4</button>
+                <button class="pages-btn active" data-pages="6">6</button>
+                <button class="pages-btn" data-pages="8">8</button>
+            </div>
+        </div>
+
+        <div class="flow-step room-step">
+            <p class="label">Rehearsal room <span class="optional">(optional)</span>:</p>
+            <div class="room-actions">
+                <button id="create-room-btn" class="btn-small">Create Room</button>
+                <span class="or-inline">or</span>
+                <div class="join-row-inline">
+                    <input type="text" id="room-code-input" placeholder="CODE" maxlength="6" autocomplete="off" spellcheck="false">
+                    <button id="join-room-btn" class="btn-small">Join</button>
+                </div>
+            </div>
+            <p class="room-result" id="room-created" style="display:none;">
+                Room: <strong id="room-code-display"></strong>
+                <span class="hint">— share this code with your ensemble</span>
+            </p>
+            <p class="room-result error" id="join-error" style="display:none;"></p>
+        </div>
+
+        <a id="launch-btn" class="btn primary" href="/score">Open Score</a>
+
+        <p class="or-divider">or</p>
+
+        <a class="btn full-score" href="/score">Full Score (all parts)</a>
+
+    </section>
+
+    <!-- ═══ Documentation ════════════════════════════════════════════════ -->
+
+    <section class="docs-section">
+        <h2>Documentation</h2>
+        <ul class="doc-links">
+            <li>
+                <a href="/docs/notation-instructions/" target="_blank" rel="noopener">Music Performance Instructions</a>
+                <a href="/docs/notation-instructions/Music_Performance_Instructions.pdf" class="pdf-link" target="_blank" rel="noopener">PDF</a>
+                <br><span class="doc-desc">Notation guide &amp; graphic score symbols</span>
+            </li>
+            <li>
+                <a href="/docs/technical-manual/" target="_blank" rel="noopener">Technical Manual</a>
+                <a href="/docs/technical-manual/Technical_Manual.pdf" class="pdf-link" target="_blank" rel="noopener">PDF</a>
+                <br><span class="doc-desc">How to use the web app</span>
+            </li>
+        </ul>
+    </section>
+
+    <!-- ═══ Print Score ══════════════════════════════════════════════════ -->
+
+    <section class="print-section">
+        <h2>Print Score (PDF)</h2>
+        <div class="print-links">
+            <div class="print-group">
+                <p class="label">Parts:</p>
+                <ul>
+                    <li><a href="/print/Violin_I_6pages.pdf" target="_blank" rel="noopener">Violin I</a></li>
+                    <li><a href="/print/Violin_II_6pages.pdf" target="_blank" rel="noopener">Violin II</a></li>
+                    <li><a href="/print/Viola_6pages.pdf" target="_blank" rel="noopener">Viola</a></li>
+                    <li><a href="/print/Cello_6pages.pdf" target="_blank" rel="noopener">Cello</a></li>
+                </ul>
+            </div>
+            <div class="print-group">
+                <p class="label">Full Score:</p>
+                <ul>
+                    <li><a href="/print/full_score.pdf" target="_blank" rel="noopener">Full Score</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+(function() {
+    var TOKEN_KEY = 'sq1_performer_token';
+    var SLOT_MAP = { '1': 'violin1', '2': 'violin2', '3': 'viola', '4': 'cello' };
+    var SLOT_LABELS = { violin1: 'Violin I', violin2: 'Violin II', viola: 'Viola', cello: 'Cello' };
+    var TRACK_FROM_SLOT = { violin1: '1', violin2: '2', viola: '3', cello: '4' };
+
+    var selectedTrack = null;
+    var selectedPages = 6;
+    var roomCode = null;
+
+    // ─── DOM refs ────────────────────────────────────────────────────────────
+    var instrumentBtns = document.querySelectorAll('.instrument-btn');
+    var pagesBtns = document.querySelectorAll('.pages-btn');
+    var launchBtn = document.getElementById('launch-btn');
+    var createBtn = document.getElementById('create-room-btn');
+    var joinBtn = document.getElementById('join-room-btn');
+    var codeInput = document.getElementById('room-code-input');
+    var nameInput = document.getElementById('performer-name');
+    var codeDisplay = document.getElementById('room-code-display');
+    var roomCreated = document.getElementById('room-created');
+    var joinError = document.getElementById('join-error');
+    var welcomeSection = document.getElementById('welcome-section');
+
+    // ─── Instrument selection ────────────────────────────────────────────────
+    instrumentBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            instrumentBtns.forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            selectedTrack = btn.getAttribute('data-track');
+            updateLaunchUrl();
+        });
+    });
+
+    pagesBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            pagesBtns.forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            selectedPages = btn.getAttribute('data-pages');
+            updateLaunchUrl();
+        });
+    });
+
+    function updateLaunchUrl() {
+        var params = [];
+        if (selectedTrack) params.push('track=' + selectedTrack);
+        if (selectedTrack) params.push('pages=' + selectedPages);
+        if (roomCode) params.push('room=' + roomCode);
+        var url = '/score' + (params.length ? '?' + params.join('&') : '');
+        launchBtn.href = url;
+    }
+
+    // ─── Room management ─────────────────────────────────────────────────────
+
+    function getNameAndSlot() {
+        var name = (nameInput.value || '').trim();
+        var slot = selectedTrack ? SLOT_MAP[selectedTrack] : null;
+        return { name: name, slot: slot };
+    }
+
+    function showRoomError(msg) {
+        joinError.textContent = msg;
+        joinError.classList.remove('success');
+        joinError.classList.add('error');
+        joinError.style.display = 'block';
+    }
+
+    function showRoomSuccess(msg) {
+        joinError.textContent = msg;
+        joinError.classList.remove('error');
+        joinError.classList.add('success');
+        joinError.style.display = 'block';
+    }
+
+    function joinSession(code, name, slot) {
+        return fetch('/api/sessions/' + code + '/join', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ displayName: name, slot: slot })
+        }).then(function(r) {
+            if (!r.ok) return r.json().then(function(d) { throw new Error(d.error || 'Join failed'); });
+            return r.json();
+        }).then(function(data) {
+            // Store JWT
+            localStorage.setItem(TOKEN_KEY, data.token);
+            roomCode = code;
+            updateLaunchUrl();
+            return data;
+        });
+    }
+
+    // Create Room
+    createBtn.addEventListener('click', function() {
+        var info = getNameAndSlot();
+        if (!info.name) { showRoomError('Please enter your name.'); return; }
+        if (!info.slot) { showRoomError('Please select your instrument.'); return; }
+        joinError.style.display = 'none';
+
+        createBtn.disabled = true;
+        createBtn.textContent = 'Creating...';
+
+        fetch('/api/sessions', { method: 'POST' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.code) throw new Error('No room code returned');
+                codeDisplay.textContent = data.code;
+                roomCreated.style.display = 'block';
+                // Auto-join the room we just created
+                return joinSession(data.code, info.name, info.slot);
+            })
+            .then(function(joinData) {
+                createBtn.disabled = false;
+                createBtn.textContent = 'Create Room';
+                showRoomSuccess('Room created and joined! Tap "Open Score" to launch.');
+            })
+            .catch(function(err) {
+                createBtn.disabled = false;
+                createBtn.textContent = 'Create Room';
+                showRoomError('Failed: ' + err.message);
+            });
+    });
+
+    // Auto-uppercase room code input
+    codeInput.addEventListener('input', function() {
+        codeInput.value = codeInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    });
+
+    // Join Room
+    joinBtn.addEventListener('click', function() {
+        var code = codeInput.value.trim().toUpperCase();
+        if (code.length < 4) { showRoomError('Please enter a valid room code.'); return; }
+        var info = getNameAndSlot();
+        if (!info.name) { showRoomError('Please enter your name.'); return; }
+        if (!info.slot) { showRoomError('Please select your instrument.'); return; }
+        joinError.style.display = 'none';
+
+        joinBtn.disabled = true;
+        joinBtn.textContent = 'Joining...';
+
+        joinSession(code, info.name, info.slot)
+            .then(function(data) {
+                joinBtn.disabled = false;
+                joinBtn.textContent = 'Join';
+                showRoomSuccess('Joined room ' + code + '! Tap "Open Score" to launch.');
+            })
+            .catch(function(err) {
+                joinBtn.disabled = false;
+                joinBtn.textContent = 'Join';
+                showRoomError(err.message);
+            });
+    });
+
+    // Enter key on room code input
+    codeInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') joinBtn.click();
+    });
+
+    // ─── Returning performer detection ───────────────────────────────────────
+    var storedToken = localStorage.getItem(TOKEN_KEY);
+    if (storedToken) {
+        fetch('/api/auth/verify', {
+            headers: { 'Authorization': 'Bearer ' + storedToken }
+        })
+        .then(function(r) {
+            if (!r.ok) throw new Error('Token invalid');
+            return r.json();
+        })
+        .then(function(data) {
+            // Show welcome back UI
+            document.getElementById('welcome-name').textContent = data.displayName;
+            document.getElementById('welcome-slot').textContent = SLOT_LABELS[data.slot] || data.slot;
+            document.getElementById('welcome-room').textContent = data.sessionId;
+
+            var track = TRACK_FROM_SLOT[data.slot] || '1';
+            var rejoinUrl = '/score?track=' + track + '&pages=6&room=' + data.sessionId;
+            document.getElementById('rejoin-btn').href = rejoinUrl;
+
+            welcomeSection.style.display = 'block';
+        })
+        .catch(function() {
+            // Token invalid/expired — clear it
+            localStorage.removeItem(TOKEN_KEY);
+        });
+    }
+
+    // Start fresh — clear token
+    document.getElementById('start-fresh-btn').addEventListener('click', function() {
+        localStorage.removeItem(TOKEN_KEY);
+        welcomeSection.style.display = 'none';
+    });
+})();
+</script>
+
+</body>
+</html>

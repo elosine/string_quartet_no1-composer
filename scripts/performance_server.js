@@ -26,6 +26,7 @@ const { Server } = require('socket.io');
 
 const ROOT = path.resolve(__dirname, '..');
 const PERF_DIR = path.join(ROOT, 'builds', 'performance');
+const LANDING_DIR = path.join(ROOT, 'landing');
 const DATA_DIR = path.join(ROOT, 'data');
 const SESSIONS_DIR = path.join(DATA_DIR, 'sessions');
 const PERFORMERS_DIR = path.join(DATA_DIR, 'performers');
@@ -89,13 +90,31 @@ const io = new Server(server);
 // Parse JSON request bodies (built into Express 4.16+)
 app.use(express.json());
 
-// Serve static files from builds/performance/
-app.use(express.static(PERF_DIR));
+// Serve landing page static files (CSS, etc.)
+app.use('/landing', express.static(LANDING_DIR));
 
-// Serve index.html for the root route
+// Serve static files from builds/performance/ (score.json, etc.)
+// index: false prevents express.static from serving index.html for '/' — 
+// our explicit route handlers control which HTML is served for / and /score
+app.use(express.static(PERF_DIR, { index: false }));
+
+// Landing page at root
 app.get('/', function(req, res) {
+    res.sendFile(path.join(LANDING_DIR, 'index.html'));
+});
+
+// Score app at /score
+app.get('/score', function(req, res) {
     res.sendFile(path.join(PERF_DIR, 'index.html'));
 });
+
+// Documentation pages
+var DOCS_DIR = path.join(ROOT, 'docs');
+app.use('/docs/notation-instructions', express.static(path.join(DOCS_DIR, 'notation_instructions')));
+app.use('/docs/technical-manual', express.static(path.join(DOCS_DIR, 'technical_manual')));
+
+// Print score PDFs
+app.use('/print', express.static(path.join(ROOT, 'builds', 'print')));
 
 // ─── Phase 7: Session management API ───────────────────────────────────────
 

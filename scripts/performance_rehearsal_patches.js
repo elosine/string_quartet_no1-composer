@@ -569,6 +569,7 @@ module.exports = function applyRehearsalPatches(html) {
             '    <button class="co-btn co-loop-btn" title="Loop">🔁</button>',
             '    <button class="co-btn co-speed-btn" title="Playback speed">1.0x</button>',
             '    <span class="co-divider"></span>',
+            '    <button class="co-btn co-home-btn" title="Back to home">🏠</button>',
             '    <button class="co-btn co-close" title="Close">✕</button>',
             '  </div>',
             '  <div class="co-row co-row-jump">',
@@ -926,6 +927,15 @@ module.exports = function applyRehearsalPatches(html) {
             speedBtn.classList.toggle('co-speed-active', next !== 1.0);
             resetFadeTimer();
             console.log('[ControlsOverlay] Speed: ' + current + 'x → ' + next + 'x');
+        });
+
+        // Home button — navigate back to landing page (rehearsal mode only)
+        var homeBtn = panel.querySelector('.co-home-btn');
+        homeBtn.addEventListener('pointerup', function(e) {
+            e.stopPropagation();
+            // Hide in performance mode — only allow in rehearsal
+            if (window.PerformanceMode && PerformanceMode.locked) return;
+            window.location.href = '/';
         });
 
         // Prevent overlay interactions from bubbling to gesture system

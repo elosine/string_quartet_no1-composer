@@ -1,0 +1,374 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    color: #222;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+}
+
+.container {
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+}
+
+/* ─── Identity ─────────────────────────────────────────────────────────────── */
+
+h1 {
+    font-weight: 700;
+    font-size: 32px;
+    margin-bottom: 2px;
+}
+
+.composer {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.video-link {
+    display: inline-block;
+    font-size: 15px;
+    color: #2266aa;
+    text-decoration: none;
+    margin-bottom: 40px;
+}
+.video-link:hover { text-decoration: underline; }
+
+/* ─── Welcome Back ─────────────────────────────────────────────────────────── */
+
+.welcome-section {
+    background: #f0f6ff;
+    border: 1px solid #c8ddf0;
+    border-radius: 6px;
+    padding: 20px 24px;
+    margin-bottom: 8px;
+}
+
+.welcome-msg {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.welcome-room {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 14px;
+}
+
+.btn-text {
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    color: #888;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-top: 8px;
+    text-decoration: underline;
+}
+.btn-text:hover {
+    color: #555;
+}
+
+/* ─── Sections ─────────────────────────────────────────────────────────────── */
+
+h2 {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #444;
+}
+
+section {
+    margin-bottom: 40px;
+    padding-top: 24px;
+    border-top: 1px solid #e8e8e8;
+}
+
+/* ─── Instrument & Pages buttons ───────────────────────────────────────────── */
+
+.label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.instrument-buttons, .pages-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.instrument-btn, .pages-btn {
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.instrument-btn:hover, .pages-btn:hover {
+    border-color: #999;
+    background: #f8f8f8;
+}
+
+.instrument-btn.active, .pages-btn.active {
+    background: #222;
+    color: #fff;
+    border-color: #222;
+}
+
+.launch-section {
+    border-top: none;
+    padding-top: 0;
+}
+
+/* ─── Buttons ──────────────────────────────────────────────────────────────── */
+
+.btn {
+    display: inline-block;
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 12px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+}
+
+.btn.primary {
+    background: #222;
+    color: #fff;
+}
+.btn.primary:hover {
+    background: #444;
+}
+.btn.primary:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+.btn.full-score {
+    display: inline-block;
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2266aa;
+    text-decoration: none;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.btn.full-score:hover {
+    text-decoration: underline;
+}
+
+.or-divider {
+    font-size: 13px;
+    color: #aaa;
+    margin: 12px 0;
+}
+
+/* ─── Flow steps ───────────────────────────────────────────────────────────── */
+
+.flow-step {
+    margin-bottom: 20px;
+}
+
+#performer-name {
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    text-align: center;
+    width: 200px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+#performer-name:focus {
+    outline: none;
+    border-color: #222;
+}
+
+/* ─── Room step (inline layout) ────────────────────────────────────────────── */
+
+.room-step .label .optional {
+    font-weight: 300;
+    color: #aaa;
+}
+
+.room-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.join-row-inline {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.or-inline {
+    font-size: 13px;
+    color: #aaa;
+}
+
+.btn-small {
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.btn-small:hover {
+    border-color: #999;
+    background: #f8f8f8;
+}
+.btn-small:disabled {
+    color: #999;
+    cursor: not-allowed;
+}
+
+#room-code-input {
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-align: center;
+    width: 80px;
+    padding: 8px 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+#room-code-input:focus {
+    outline: none;
+    border-color: #222;
+}
+
+.room-result {
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.room-result .hint {
+    font-size: 13px;
+    color: #888;
+}
+
+#room-code-display {
+    font-size: 16px;
+    letter-spacing: 0.1em;
+}
+
+.room-result.error {
+    color: #c44;
+}
+.room-result.success {
+    color: #2a7a2a;
+}
+
+/* ─── Documentation ────────────────────────────────────────────────────────── */
+
+.doc-links {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.doc-links li {
+    margin-bottom: 10px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.doc-links a {
+    color: #2266aa;
+    text-decoration: none;
+    font-weight: 700;
+}
+.doc-links a:hover {
+    text-decoration: underline;
+}
+
+.pdf-link {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: #888;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-left: 6px;
+    text-decoration: none;
+    vertical-align: middle;
+}
+.pdf-link:hover {
+    background: #666;
+    text-decoration: none;
+}
+
+.doc-desc {
+    font-size: 13px;
+    color: #888;
+    font-weight: 300;
+}
+
+/* ─── Print Score ──────────────────────────────────────────────────────────── */
+
+.print-links {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+}
+
+.print-group {
+    text-align: left;
+}
+
+.print-group ul {
+    list-style: none;
+    padding: 0;
+}
+
+.print-group li {
+    margin-bottom: 6px;
+    font-size: 15px;
+}
+
+.print-group a {
+    color: #2266aa;
+    text-decoration: none;
+    font-weight: 400;
+}
+.print-group a:hover {
+    text-decoration: underline;
+}

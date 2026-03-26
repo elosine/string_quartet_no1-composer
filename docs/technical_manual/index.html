@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Manual — String Quartet No. 1</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>Technical Manual</h1>
+<p class="subtitle">String Quartet No. 1 — Performance Score Web App</p>
+
+<div class="toc">
+    <h3>Contents</h3>
+    <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#requirements">Device Requirements</a></li>
+        <li><a href="#getting-started">Getting Started — Sessions &amp; Rooms</a></li>
+        <li><a href="#score-views">Score Views — Full Score &amp; Parts</a></li>
+        <li><a href="#rehearsal-mode">Rehearsal Mode</a></li>
+        <li><a href="#gestures">Touch Gestures</a></li>
+        <li><a href="#controls-overlay">Controls Overlay</a></li>
+        <li><a href="#markers">Markers</a></li>
+        <li><a href="#looping">Looping</a></li>
+        <li><a href="#speed-control">Speed Control</a></li>
+        <li><a href="#sync">Synchronization &amp; Independent Mode</a></li>
+        <li><a href="#annotations">Annotations (Apple Pencil)</a></li>
+        <li><a href="#minimap">MiniMap</a></li>
+        <li><a href="#performance-mode">Performance Mode</a></li>
+        <li><a href="#emergency">Emergency Controls</a></li>
+        <li><a href="#url-parameters">URL Parameters Reference</a></li>
+        <li><a href="#music-instructions">Music Performance Instructions</a></li>
+    </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="overview">1. Overview</h2>
+
+<p>The Performance Score is a web-based application that displays the scrolling graphic score for String Quartet No. 1. All four performers read from the same app, each on their own device. The score scrolls automatically during playback, with animated elements — curves, gravitational conductors, line wedges, and notation fragments — appearing and disappearing in real time.</p>
+
+<p>The app has two operating modes:</p>
+<ul>
+    <li><strong>Rehearsal Mode</strong> — Full interactivity: touch gestures, markers, looping, speed control, independent navigation. This is the default mode.</li>
+    <li><strong>Performance Mode</strong> — Locked-down playback for live concerts. All touch interaction is disabled except emergency controls. The score plays from start to finish with synchronized start and automatic stop.</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="requirements">2. Device Requirements</h2>
+
+<p>The app runs in any modern web browser. Recommended setup for performers:</p>
+
+<table>
+    <tr><th>Requirement</th><th>Recommendation</th></tr>
+    <tr><td>Device</td><td>iPad (any recent model) or laptop/tablet with 10"+ screen</td></tr>
+    <tr><td>Browser</td><td>Safari (iPad), Chrome, or Edge. Firefox is supported but Safari/Chrome are preferred for Wake Lock and fullscreen APIs.</td></tr>
+    <tr><td>Orientation</td><td>Landscape</td></tr>
+    <tr><td>Network</td><td>Wi-Fi connection to the same network as the server (for synchronized rehearsal/performance). The app also works offline for solo practice.</td></tr>
+    <tr><td>Battery</td><td>Fully charged or plugged in for performances. The app will keep the screen awake during performance mode.</td></tr>
+</table>
+
+<div class="note">
+    <strong>Tip:</strong> Enable Do Not Disturb on your device before rehearsals and performances to prevent notifications from interrupting the score display.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="getting-started">3. Getting Started — The Landing Page</h2>
+
+<p>When you navigate to the app's URL, you arrive at the <strong>landing page</strong> — a single-page flow that guides you from setup to launching the score.</p>
+
+<h3>The Launch Flow</h3>
+
+<p>The landing page presents a simple top-to-bottom flow:</p>
+<ol>
+    <li><strong>Your name</strong> — Enter your display name (e.g., "Sarah"). This identifies you to other performers in your room.</li>
+    <li><strong>Select your instrument</strong> — Tap one of four buttons: Violin I, Violin II, Viola, or Cello. This determines which part you see in Parts View.</li>
+    <li><strong>Pages per screen</strong> — Choose 4, 6, or 8 pages visible at once (default: 6).</li>
+    <li><strong>Rehearsal room (optional)</strong> — Create a new room or join an existing one with a 6-character code. Skip this step for solo practice.</li>
+    <li><strong>Open Score</strong> — Launches the score app with your selected instrument, pages, and room.</li>
+</ol>
+
+<p>Below the launch flow, you can also tap <strong>Full Score (all parts)</strong> to open the full score without selecting a specific instrument.</p>
+
+<h3>Creating a Room</h3>
+
+<p>Tap <strong>Create Room</strong>. A unique 6-character room code is generated (e.g., <code>HK7W3N</code>). Share this code with your ensemble — each performer enters it on their own device to join the same synchronized session.</p>
+
+<h3>Joining a Room</h3>
+
+<p>Enter the room code shared by the session creator into the code field and tap <strong>Join</strong>. You must have your name and instrument selected before joining.</p>
+
+<h3>Returning Performers</h3>
+
+<p>If you have previously joined a room, the landing page recognizes you on your next visit. A <strong>Welcome back</strong> banner appears showing your name, instrument, and room code, with a <strong>Rejoin</strong> button that takes you directly back to the score. Tap <strong>Start fresh</strong> to clear your session and set up from scratch.</p>
+
+<h3>Returning to the Landing Page</h3>
+
+<p>From within the score app, open the Controls Overlay and tap the <strong>🏠 Home</strong> button to return to the landing page. This button is only available in rehearsal mode — it is hidden during performance mode.</p>
+
+<h3>Room Lifecycle</h3>
+
+<p>A room is created when the first performer joins and remains active as long as at least one performer is connected. If all performers disconnect, the room persists for a 5-minute grace period — if someone reconnects within that window, the room state (playback position, markers, etc.) is restored. After the grace period, the room is cleaned up.</p>
+
+<h3>Documentation &amp; Print Scores</h3>
+
+<p>The landing page also provides links to:</p>
+<ul>
+    <li><strong>Music Performance Instructions</strong> — notation guide and graphic score symbols (HTML + PDF download)</li>
+    <li><strong>Technical Manual</strong> — this document (HTML + PDF download)</li>
+    <li><strong>Print Score PDFs</strong> — downloadable PDF parts for each instrument and a full score PDF, for printing or offline reference</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="score-views">4. Score Views — Full Score &amp; Parts</h2>
+
+<p>The app offers two views of the score:</p>
+
+<h3>Full Score</h3>
+<p>All four instrument tracks displayed simultaneously, stacked vertically. This is the default view when no track parameter is specified. Each track occupies one quarter of the screen height.</p>
+
+<h3>Parts View (Single Track)</h3>
+<p>A single instrument track expanded to fill the entire screen height, making the notation approximately 4× larger than in full score view. Parts view also supports configurable page density — 4, 6, or 8 pages visible per screen (default: 6).</p>
+
+<p>To switch between views:</p>
+<ul>
+    <li><strong>Swipe up</strong> (1 finger) — toggles between Part and Full Score view</li>
+    <li><strong>📄 View button</strong> in the Controls Overlay — same toggle via button</li>
+</ul>
+
+<p>When switching views, the app preserves your current position in the score. There is a brief reload (~1–2 seconds) during the transition.</p>
+
+<h3>Track Selection (Parts View)</h3>
+<p>In parts view, use the <strong>Track button</strong> in the Controls Overlay to cycle through instruments: Vln I → Vln II → Vla → Vc → Vln I. The button label shows the currently selected instrument.</p>
+
+<h3>Pages Per Screen (Parts View)</h3>
+<p>Use the <strong>Pages button</strong> in the Controls Overlay to cycle through page densities: 4p → 6p → 8p → 4p. More pages shows more of the score at once but with smaller notation.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="rehearsal-mode">5. Rehearsal Mode</h2>
+
+<p>Rehearsal mode is the default operating mode. It provides full interactivity for practice and group rehearsal: touch gestures for navigation, a controls overlay with playback controls, custom markers, looping, speed adjustment, and annotation support.</p>
+
+<p>When connected to a server with other performers in the same room, playback is synchronized — pressing Play on the leader's device starts playback for all connected performers. Individual performers can detach to navigate independently and re-sync at any time.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="gestures">6. Touch Gestures</h2>
+
+<p>All gestures use finger touch. Apple Pencil input is reserved for annotations and bypasses the gesture system entirely.</p>
+
+<table class="gesture-table">
+    <tr><th>Gesture</th><th>Zone</th><th>Action</th></tr>
+    <tr><td>Tap</td><td>Left edge (15%)</td><td>Previous page (immediate)</td></tr>
+    <tr><td>Tap</td><td>Right edge (15%)</td><td>Next page (immediate)</td></tr>
+    <tr><td>Tap</td><td>Center top (70%, upper half)</td><td>Play / Pause</td></tr>
+    <tr><td>Tap</td><td>Center bottom (70%, lower half)</td><td>Toggle Controls Overlay</td></tr>
+    <tr><td>Double-tap</td><td>Center (70%)</td><td>Reset zoom to 100%</td></tr>
+    <tr><td>Swipe left</td><td>Anywhere</td><td>Next page</td></tr>
+    <tr><td>Swipe right</td><td>Anywhere</td><td>Previous page</td></tr>
+    <tr><td>Swipe down</td><td>Anywhere</td><td>Add marker at current position</td></tr>
+    <tr><td>Swipe up</td><td>Anywhere</td><td>Toggle Part ↔ Full Score view</td></tr>
+    <tr><td>Pinch</td><td>Anywhere</td><td>Zoom in / out</td></tr>
+</table>
+
+<div class="note">
+    <strong>During synced playback:</strong> Swiping or tapping the edge to turn pages automatically detaches you to independent mode so your navigation doesn't affect other performers. A brief toast notification confirms: "Auto-detached."
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="controls-overlay">7. Controls Overlay</h2>
+
+<p>Tap the center-bottom area of the screen to open the Controls Overlay — a floating panel of buttons for all major actions. The overlay auto-fades after 4 seconds of inactivity. Tap anywhere on the overlay to reset the fade timer.</p>
+
+<table>
+    <tr><th>Button</th><th>Action</th></tr>
+    <tr><td>▶ Play / ■ Stop</td><td>Toggle playback</td></tr>
+    <tr><td>◀ / ▶</td><td>Previous / Next page</td></tr>
+    <tr><td>⊙ 100%</td><td>Reset zoom to 100%</td></tr>
+    <tr><td>📄 Part / Full</td><td>Toggle Part ↔ Full Score view</td></tr>
+    <tr><td>Vln I / Vln II / Vla / Vc</td><td>Cycle instrument track (parts view only)</td></tr>
+    <tr><td>4p / 6p / 8p</td><td>Cycle pages per screen (parts view only)</td></tr>
+    <tr><td>🔖 Markers</td><td>Open marker panel (add, list, jump to, delete)</td></tr>
+    <tr><td>🔁 Loop</td><td>Open loop panel (set A/B points, enable/disable)</td></tr>
+    <tr><td>Jump to [sec] Go</td><td>Jump to a specific time in seconds</td></tr>
+    <tr><td>Speed (1x)</td><td>Cycle playback speed</td></tr>
+    <tr><td>🏠 Home</td><td>Return to landing page (rehearsal mode only)</td></tr>
+    <tr><td>✕</td><td>Close overlay</td></tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="markers">8. Markers</h2>
+
+<p>Markers let you bookmark specific positions in the score for quick navigation.</p>
+
+<h3>Adding a Marker</h3>
+<p><strong>Swipe down</strong> anywhere on the score. A name prompt appears — type a short label (e.g., "pizz section", "cue after fermata") and confirm. The marker is saved at your current playback position. Markers work both during playback and while stopped.</p>
+
+<h3>Viewing and Jumping to Markers</h3>
+<p>Open the Controls Overlay and tap <strong>🔖 Markers</strong> to see your marker list. Tap any marker to jump to that position.</p>
+
+<h3>Deleting Markers</h3>
+<p>In the marker panel, each marker has a delete button to remove it.</p>
+
+<h3>Persistence</h3>
+<p>Markers are saved in your browser's local storage. They persist across page reloads on the same device. Markers also appear as colored ticks on the MiniMap bar at the bottom of the screen.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="looping">9. Looping</h2>
+
+<p>Looping lets you repeat a section of the score for practice.</p>
+
+<h3>Setting a Loop</h3>
+<p>Open the Controls Overlay and tap <strong>🔁 Loop</strong>. Set the loop start (A) and end (B) points using the controls. Enable the loop to begin looping — when playback reaches point B, it jumps back to point A.</p>
+
+<h3>Loop Count</h3>
+<p>The loop panel displays the current loop iteration count. You can set a fixed number of loops or loop indefinitely.</p>
+
+<p>Looping is per-client — it does not affect other performers in the room. When connected to a room, loop state is synchronized so all performers in the room see the same loop boundaries if set by the leader.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="speed-control">10. Speed Control</h2>
+
+<p>Adjust playback speed for practice. Available speeds: <strong>0.5×</strong>, <strong>0.75×</strong>, <strong>1.0×</strong> (normal), <strong>1.25×</strong>, <strong>1.5×</strong>, <strong>2.0×</strong>.</p>
+
+<p>Access the speed button through the Controls Overlay. Each tap cycles to the next speed. The current speed is displayed on the button.</p>
+
+<div class="note">
+    Speed control is local only — it does not affect other performers. At non-1.0× speeds, the automatic drift correction system is paused to avoid interference.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="sync">11. Synchronization &amp; Independent Mode</h2>
+
+<h3>Synced Mode (Default)</h3>
+<p>When you join a room, you are in synced mode by default. The <strong>leader's</strong> playback controls (Play, Stop, Jump To) apply to all synced performers in the room. All cursors advance together in real time.</p>
+
+<h3>Leader</h3>
+<p>The first performer to join a room becomes the leader. The leader can:</p>
+<ul>
+    <li>Start and stop playback for all synced performers</li>
+    <li>Jump to a specific position for all synced performers</li>
+    <li>Transfer leader status to another performer</li>
+</ul>
+
+<h3>Independent Mode</h3>
+<p>You can detach from the group to navigate freely. This happens:</p>
+<ul>
+    <li><strong>Automatically</strong> — when you swipe or tap an edge to turn pages during synced playback</li>
+    <li><strong>Manually</strong> — via a sync/detach toggle in the Controls Overlay</li>
+</ul>
+<p>While independent, you control your own playback and page navigation without affecting others. A toast notification appears: "Auto-detached — tap 🔗 to re-sync."</p>
+
+<h3>Re-syncing</h3>
+<p>Tap the sync button in the Controls Overlay to rejoin the group. Your score jumps to the leader's current position.</p>
+
+<h3>Sync Quality Indicator</h3>
+<p>A small colored dot indicates your synchronization quality with the server:</p>
+<table>
+    <tr><th>Color</th><th>Meaning</th></tr>
+    <tr><td>🟢 Green</td><td>Excellent — tight sync, low latency</td></tr>
+    <tr><td>🟡 Yellow</td><td>Fair — some jitter, still usable</td></tr>
+    <tr><td>🔴 Red</td><td>Poor — significant drift, may need to re-sync</td></tr>
+</table>
+
+<h3>Offline Mode</h3>
+<p>If the network connection is lost, a non-intrusive "OFFLINE — local clock" banner appears. The score continues playing on your device's local clock. When the connection is restored, the banner disappears and synchronization resumes automatically.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="annotations">12. Annotations (Apple Pencil)</h2>
+
+<p>On iPad, Apple Pencil input is handled separately from finger touch — you can draw on the score without triggering any gestures.</p>
+
+<h3>Drawing</h3>
+<p>Touch the Pencil to the score and draw freely. Annotations are rendered as colored strokes on a transparent overlay above the score.</p>
+
+<h3>Stamps</h3>
+<p>A stamp palette provides common musical symbols that can be placed with a single Pencil tap.</p>
+
+<h3>Saving</h3>
+<p>Annotations auto-save to your browser's local storage. You can also export annotations as a JSON file (for backup or transfer to another device) and import them back.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="minimap">13. MiniMap</h2>
+
+<p>A thin horizontal progress bar at the bottom of the screen shows your position in the full score. The current playback position is highlighted, and your markers appear as colored ticks along the bar.</p>
+
+<p><strong>Tap anywhere on the MiniMap</strong> to jump directly to that position in the score. The MiniMap collapses to a minimal state when not in use and expands when you hover or touch near the bottom edge.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="performance-mode">14. Performance Mode</h2>
+
+<p>Performance mode is a locked-down state designed for live concerts. It disables all touch interaction (no accidental page turns, no zoom, no overlays) and provides a structured flow from readiness check through countdown to synchronized playback and end-of-performance ceremony.</p>
+
+<h3>Entering Performance Mode</h3>
+<p>Performance mode is activated by the leader or via the URL parameter <code>?mode=performance</code>. When activated, all connected performers enter the readiness flow.</p>
+
+<h3>Step 1: Readiness Check</h3>
+<p>A readiness panel appears on every performer's screen. Each performer taps <strong>"Ready"</strong> — this also triggers fullscreen mode on their device (fullscreen must be activated by a user gesture on each device; it cannot be triggered remotely).</p>
+<p>The leader's panel shows the ready count and a <strong>"Begin Performance"</strong> button that enables only when all performers are ready.</p>
+
+<h3>Step 2: Countdown</h3>
+<p>When the leader taps "Begin Performance," a countdown overlay appears on all devices: <strong>3… 2… 1…</strong> The score is visible behind the countdown so performers can see the first page. All devices use latency-compensated timing to begin playback simultaneously.</p>
+
+<h3>Step 3: Locked Playback</h3>
+<p>During playback, the score scrolls automatically. All touch gestures are completely disabled:</p>
+<ul>
+    <li>No taps, swipes, or pinches</li>
+    <li>No Controls Overlay</li>
+    <li>No markers or looping</li>
+    <li>No annotation</li>
+    <li>Screen stays awake (Wake Lock)</li>
+</ul>
+<p>The only available interaction is the <strong>emergency control</strong> (see below).</p>
+
+<h3>Step 4: Auto-Stop &amp; Ceremony</h3>
+<p>When the score reaches the end, playback stops automatically on all devices. A "Performance Complete" overlay fades in, showing the performance duration. The leader can then choose to return to rehearsal mode, start again, or close the session.</p>
+
+<p>Performance lockdown remains active until the leader explicitly exits performance mode.</p>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="emergency">15. Emergency Controls</h2>
+
+<div class="warning">
+    <strong>Important:</strong> This is the only interaction available during performance mode. Practice it before your first performance so you can use it confidently if needed.
+</div>
+
+<h3>Emergency Menu — 2-Finger Long Press (2 seconds)</h3>
+<p>Press and hold <strong>two fingers</strong> anywhere on the screen for <strong>2 seconds</strong>. An emergency menu appears with two options:</p>
+<ul>
+    <li><strong>Stop Performance</strong> — If you are the leader, this stops playback for all performers. If you are not the leader, this exits performance mode on your device only.</li>
+    <li><strong>Resume</strong> — Closes the emergency menu and returns to locked playback.</li>
+</ul>
+
+<div class="note">
+    <strong>Why 2 fingers for 2 seconds?</strong> This threshold prevents accidental triggers. A brief touch or a single finger will never open the emergency menu. The gesture was chosen because operating systems intercept 3-finger gestures (Windows: Task View; iPad: Mission Control) before they reach the browser.
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="url-parameters">16. URL Parameters Reference</h2>
+
+<p>The app accepts URL parameters to configure its behavior. These are appended to the base URL as query parameters (e.g., <code>?track=1&pages=6</code>).</p>
+
+<table>
+    <tr><th>Parameter</th><th>Values</th><th>Description</th></tr>
+    <tr><td><code>track</code></td><td><code>1</code>, <code>2</code>, <code>3</code>, <code>4</code></td><td>Show a single instrument track in parts view. 1 = Violin I, 2 = Violin II, 3 = Viola, 4 = Cello. Omit for full score.</td></tr>
+    <tr><td><code>pages</code></td><td><code>4</code>, <code>6</code>, <code>8</code></td><td>Number of pages visible per screen in parts view. Default: 6.</td></tr>
+    <tr><td><code>mode</code></td><td><code>performance</code></td><td>Start directly in performance mode (readiness flow). Omit for rehearsal mode.</td></tr>
+    <tr><td><code>goto</code></td><td>seconds (e.g., <code>54.5</code>)</td><td>Jump to a specific time on load. Useful for deep-linking to a particular section.</td></tr>
+    <tr><td><code>room</code></td><td>6-char code (e.g., <code>HK7W3N</code>)</td><td>Join a specific rehearsal room on load.</td></tr>
+</table>
+
+<h3>Examples</h3>
+<ul>
+    <li><code>/score?track=3&amp;pages=8</code> — Viola part, 8 pages per screen</li>
+    <li><code>/score?track=1&amp;goto=120</code> — Violin I part, starting at 2:00</li>
+    <li><code>/score?mode=performance</code> — Enter performance mode immediately</li>
+    <li><code>/score?track=2&amp;room=HK7W3N</code> — Violin II in room HK7W3N</li>
+    <li><code>/score</code> — Full score, rehearsal mode (default)</li>
+</ul>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<h2 id="music-instructions">17. Music Performance Instructions</h2>
+
+<p>A separate document explains the non-standard notation and graphic score symbols used in the piece — curves, gravitational conductors, line wedges, notation fragments, and compound techniques.</p>
+
+<p>You can access this document from the landing page under <strong>Documentation</strong>, or directly at:</p>
+<ul>
+    <li><strong>Web version:</strong> <a href="/docs/notation-instructions/">Music Performance Instructions</a></li>
+    <li><strong>PDF download:</strong> <a href="/docs/notation-instructions/Music_Performance_Instructions.pdf">Music_Performance_Instructions.pdf</a></li>
+</ul>
+
+<p>The Music Performance Instructions cover:</p>
+<ul>
+    <li>Curve-based crescendos and glissandos</li>
+    <li>Gravitational conductor system (bouncing ball ictus)</li>
+    <li>Line wedges (density/intensity indicators)</li>
+    <li>Ensemble texture indicators (flocking badges)</li>
+    <li>Notation fragments and how to read them</li>
+    <li>Conducted articulations</li>
+    <li>Special techniques: harmonic flutter, harmonic tremolo, pizzicato storm, unmeasured tremolo, two-hand pizzicato clusters</li>
+</ul>
+
+<hr>
+
+<p><em>String Quartet No. 1 — Justin Yang</em></p>
+
+</body>
+</html>
