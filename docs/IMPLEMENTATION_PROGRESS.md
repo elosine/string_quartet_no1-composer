@@ -2,10 +2,23 @@
 
 ## Current Status
 **Active Phase:** Phase 14 (next)
-**Last Session:** Mar 25, 2026
-**Last Commit:** `Speed control: local playback speed scaling (0.5x-2.0x)`
+**Last Session:** Mar 26, 2026
+**Last Commit:** `Music performance instructions: 9 entries complete, SVG capture improvements, pipeline documentation`
 
 ### ▶ RESUME HERE (next session)
+
+**Step 14.0a delivered (Music Performance Instructions):**
+- 9 entries documenting non-standard notation and graphic score symbols
+- SVG capture script enhanced: inner SVG→G conversion, tight viewBox, track-based filtering, pitch tracker synthesis
+- SVG capture workflow documented in pipeline plan (Step 14.0a) for reuse in future pieces
+- Files: `docs/notation_instructions/index.html`, `styles.css`, `images/`
+
+**Next task: Technical Manual for Web App (Step 14.0)**
+- Create performer-facing guide for using the Performance Score web app
+- AI to attempt first draft independently by reading pipeline plan (§13.10 gestures, Phase 11 performance mode, Phase 8 rehearsal mode, Phase 12 part view) and implementation code
+- Cover: rooms, performance mode, emergency controls, rehearsal gestures, device requirements, URL params, speed control, sync indicators
+- Leave placeholder for front-end web page (not yet designed)
+- See memory "Tomorrow's Task: Technical Manual for Web App" for full prompt
 
 **Phase 13 delivered (Sync+Animation Tier 3):**
 - Latency-compensated starts — `scheduledStartTime` in scoreGo, clients delay to synchronized moment
