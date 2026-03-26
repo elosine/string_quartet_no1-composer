@@ -771,6 +771,7 @@ module.exports = function applyRehearsalPatches(html) {
             overlay.classList.add('co-visible');
             refreshState();
             resetFadeTimer();
+            if (window.SyncMode && SyncMode.resetFade) SyncMode.resetFade();
         }
 
         function hide() {
@@ -1894,7 +1895,7 @@ module.exports = function applyRehearsalPatches(html) {
         var sbStyle = document.createElement('style');
         sbStyle.textContent = [
             '#syncBar {',
-            '  position: fixed; top: 8px; right: 8px; z-index: 10001;',
+            '  position: fixed; top: 8px; right: 8px; z-index: 10001; transition: opacity 0.4s;',
             '  display: flex; align-items: center; gap: 6px;',
             '  font-family: -apple-system, BlinkMacSystemFont, sans-serif;',
             '  user-select: none; -webkit-user-select: none;',
@@ -1934,6 +1935,33 @@ module.exports = function applyRehearsalPatches(html) {
         document.head.appendChild(sbStyle);
         document.body.appendChild(syncBar);
 
+        // Option A: Hide entirely when solo (no room param)
+        var _hasRoom = new URLSearchParams(window.location.search).has('room');
+        if (!_hasRoom) {
+            syncBar.style.display = 'none';
+        }
+
+        // Option C: Auto-fade after inactivity (only in room mode)
+        var _sbFadeTimer = null;
+        var SB_FADE_DELAY = 4000;
+
+        function resetSyncBarFade() {
+            if (!_hasRoom) return;
+            syncBar.style.opacity = '1';
+            syncBar.style.pointerEvents = '';
+            clearTimeout(_sbFadeTimer);
+            _sbFadeTimer = setTimeout(function() {
+                syncBar.style.opacity = '0';
+                syncBar.style.pointerEvents = 'none';
+            }, SB_FADE_DELAY);
+        }
+
+        syncBar.addEventListener('pointerenter', function() {
+            resetSyncBarFade();
+        });
+
+        if (_hasRoom) resetSyncBarFade();
+
         var leaderBadge = syncBar.querySelector('.sb-leader-badge');
         var syncToggle = syncBar.querySelector('.sb-sync-toggle');
         var resyncBtn = syncBar.querySelector('.sb-resync');
@@ -1967,9 +1995,11 @@ module.exports = function applyRehearsalPatches(html) {
                 transferList.style.display = 'none';
                 transferListVisible = false;
             }
+            resetSyncBarFade();
         }
 
         function showToast(msg, durationMs) {
+            resetSyncBarFade();
             toast.textContent = msg;
             toast.style.display = '';
             toast.style.opacity = '1';
@@ -2114,7 +2144,8 @@ module.exports = function applyRehearsalPatches(html) {
             localGoto: localGoto,
             localToggleGoStop: localToggleGoStop,
             showToast: showToast,
-            refreshUI: refreshSyncUI
+            refreshUI: refreshSyncUI,
+            resetFade: resetSyncBarFade
         };
 
         refreshSyncUI();
