@@ -4023,6 +4023,58 @@ Phase 1: Foundation ────────────────────
 - URL parameters reference (track, pages, mode, room)
 - This page should be linkable from the performer dashboard (Step 14.4)
 
+**Step 14.0a: Music Performance Instructions (✅ COMPLETED Mar 26, 2026)**
+
+A standalone HTML document explaining non-standard notation and graphic score symbols used in the piece. This is separate from Step 14.0 (web app usage instructions) — it covers musical interpretation, not technology.
+
+**Files:**
+- `docs/notation_instructions/index.html` — main document
+- `docs/notation_instructions/styles.css` — stylesheet (Lato font, responsive)
+- `docs/notation_instructions/images/` — all SVG images
+- `scripts/capture_score_images.js` — automated SVG extraction tool
+
+**Completed entries:**
+1. Curve-Based Crescendo (hero image with synthetic playback elements)
+2. Like-Walking-on-a-Carpet-of-Twigs (hero + 4 breakdown rows)
+3. Pizzicato Storm
+4. Acoustic Beating (two images + Dynamics subheading)
+5. Curve-Based Crescendos with Glissandos
+6. Vibrato Speed
+7. Notation Fragments (8 LilyPond fragments with proportional px/mm sizing)
+8. Unmeasured Pizzicato Tremolo (two side-by-side images)
+9. Quiet Two-Hand Pizzicato Cluster
+
+**SVG Capture Workflow (reusable for future pieces):**
+
+1. **Identify region:** Choose display seconds and track number in the Workshop score
+2. **Run capture script:**
+   ```
+   node scripts/capture_score_images.js --from START --to END --track N --name OUTPUT_NAME --svg
+   ```
+   - `--from`/`--to`: display seconds range (typically ±2s around target)
+   - `--track`: 1-4 (filters elements by track using database lookups)
+   - `--name`: output filename (without .svg)
+   - `--svg`: vector output mode
+   - `--playat N`: optional — injects synthetic playback elements (cursor, meter, follower, countdown dial, LW meter ring)
+3. **Script processing:** The capture script automatically:
+   - Navigates Puppeteer to the target time, clips the track region
+   - Filters elements by track using `data-curve-id`, `data-gc-id`, `data-lw-id` → database lookup → `gTrack`
+   - Strips UI artifacts (hit paths, node handles, yellow highlights, animateTransform)
+   - Converts inner LilyPond `<svg>` elements to `<g>` with equivalent transforms (fixes Inkscape bounding boxes)
+   - Computes tight `viewBox` using `getBBox()` with 5px padding
+   - Normalizes `rgba()` → `rgb()` for Inkscape compatibility
+   - Outputs to `docs/notation_instructions/images/`
+4. **Edit in Inkscape:** Open SVG, delete unwanted elements (other-track remnants, extraneous objects), crop as needed. "Resize document to content" works correctly thanks to the `<svg>`→`<g>` conversion.
+5. **Add to document:** Insert `<img>` tag in `index.html` with appropriate sizing
+
+**Image Sizing Techniques:**
+- **Captured SVGs:** Use default `max-width: 100%` from CSS, or explicit pixel `width` for overrides
+- **LilyPond notation fragments (mm units):** Convert natural mm width to px using a consistent px/mm factor (currently 9px/mm). This preserves relative notehead sizes across fragments of different dimensions.
+- **Side-by-side images with different aspect ratios:** Use equal `height` (not equal width) to match staff heights and thus notehead scale
+- **Small standalone SVGs:** Use explicit pixel `width` with `max-width: none` to override CSS cap
+
+**Writing style:** Succinct, functional, direct. Only explain non-standard notation. 1-2 short paragraphs per entry. See `docs/notation_instructions/` for examples.
+
 **Step 14.1: Hosting infrastructure**
 - Choose hosting: cloud VM (DigitalOcean, AWS Lightsail), or PaaS (Railway, Render, Fly.io)
 - Set up Node.js server with PM2 (process manager) for auto-restart

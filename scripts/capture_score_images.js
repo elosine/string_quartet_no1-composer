@@ -364,7 +364,7 @@ async function main() {
         if (outputSVG) {
             // ─── SVG vector export ───────────────────────────────────────
             console.log('  Extracting SVG...');
-            var svgString = await page.evaluate(function(fromSec, toSec, trackMin, trackMax, pad, playAt) {
+            var svgString = await page.evaluate(async function(fromSec, toSec, trackMin, trackMax, pad, playAt) {
                 var leadIn = 2;
                 var fromMs = (fromSec + leadIn) * 1000;
                 var toMs = (toSec + leadIn) * 1000;
@@ -493,12 +493,25 @@ async function main() {
                     });
                 }
 
-                // 3. Filter curves — remove hidden + out-of-range
+                // 3. Filter curves — remove hidden + wrong track + out-of-range
+                // Build track lookup from CurveDatabase
+                var curveTrackMap = {};
+                if (window.CurveDatabase) {
+                    CurveDatabase.getAll().forEach(function(c) {
+                        curveTrackMap[c.id] = parseInt(c.gTrack) || 0;
+                    });
+                }
                 clone.querySelectorAll('.curve-container').forEach(function(cg) {
                     Array.from(cg.children).forEach(function(child) {
                         // Remove curves hidden by visibility system (other pages)
                         var display = child.style ? child.style.display : '';
                         if (display === 'none') { child.remove(); return; }
+                        // Remove curves from wrong track
+                        var curveId = parseInt(child.getAttribute('data-curve-id') || '0');
+                        if (curveId && curveTrackMap[curveId] !== undefined) {
+                            var cTrack = curveTrackMap[curveId];
+                            if (cTrack < trackMin || cTrack > trackMax) { child.remove(); return; }
+                        }
                         // Check curve bounding box rect for X position
                         var bbox = child.querySelector('.curve-bounding-box');
                         if (bbox) {
@@ -520,11 +533,23 @@ async function main() {
                     });
                 });
 
-                // 3b. Filter GC arcs — remove hidden + out-of-range
+                // 3b. Filter GC arcs — remove hidden + wrong track + out-of-range
+                var gcTrackMap = {};
+                if (window.GCMaker && GCMaker.gcs) {
+                    GCMaker.gcs.forEach(function(gc) {
+                        gcTrackMap[gc.id] = parseInt(gc.gTrack) || 0;
+                    });
+                }
                 clone.querySelectorAll('.gc-container').forEach(function(cg) {
                     Array.from(cg.children).forEach(function(child) {
                         var display = child.style ? child.style.display : '';
                         if (display === 'none') { child.remove(); return; }
+                        // Remove GCs from wrong track
+                        var gcId = parseInt(child.getAttribute('data-gc-id') || '0');
+                        if (gcId && gcTrackMap[gcId] !== undefined) {
+                            var gTrack = gcTrackMap[gcId];
+                            if (gTrack < trackMin || gTrack > trackMax) { child.remove(); return; }
+                        }
                         var bbox = child.querySelector('.gc-bounding-box') || child.querySelector('rect[class*="bounding"]');
                         if (bbox) {
                             var bx = parseFloat(bbox.getAttribute('x') || 'NaN');
@@ -540,11 +565,23 @@ async function main() {
                     });
                 });
 
-                // 3c. Filter line wedges — remove hidden + out-of-range
+                // 3c. Filter line wedges — remove hidden + wrong track + out-of-range
+                var lwTrackMap = {};
+                if (window.LineWedgeMaker && LineWedgeMaker.lineWedges) {
+                    LineWedgeMaker.lineWedges.forEach(function(lw) {
+                        lwTrackMap[lw.id] = parseInt(lw.gTrack) || 0;
+                    });
+                }
                 clone.querySelectorAll('.linewedge-container').forEach(function(cg) {
                     Array.from(cg.children).forEach(function(child) {
                         var display = child.style ? child.style.display : '';
                         if (display === 'none') { child.remove(); return; }
+                        // Remove LWs from wrong track
+                        var lwId = parseInt(child.getAttribute('data-lw-id') || '0');
+                        if (lwId && lwTrackMap[lwId] !== undefined) {
+                            var lwTrack = lwTrackMap[lwId];
+                            if (lwTrack < trackMin || lwTrack > trackMax) { child.remove(); return; }
+                        }
                         // Check Y position from path d-attribute to filter by track
                         var paths = child.querySelectorAll('path');
                         var inYRange = false;
@@ -696,20 +733,33 @@ async function main() {
                             }
                         }
 
-                        // Track colors (matching StaffCursors.colors)
+                        // Track colors (matching StaffCursors.colors) — hex for Inkscape
                         var trackColors = [
-                            'rgb(153,255,0)',       // Staff 1: Lime Green
-                            'rgb(255, 21, 160)',    // Staff 2: Neon Magenta
-                            'rgba(56,126,211,255)', // Staff 3: Bright Blue
-                            'rgba(240,75,0,255)'    // Staff 4: Bright Orange
+                            '#99FF00',  // Staff 1: Lime Green
+                            '#FF15A0',  // Staff 2: Neon Magenta
+                            '#387ED3',  // Staff 3: Bright Blue
+                            '#F04B00'   // Staff 4: Bright Orange
                         ];
                         var trackColor = trackColors[staffIdx] || trackColors[0];
+
+                        // Local color map fallback (hex values for Inkscape compatibility)
+                        var localColorMap = {
+                            limeGreen: '#99FF00', brightBlue: '#387ED3',
+                            neonMagenta: '#FF15A0', brightOrange: '#F04B00',
+                            brightRed: '#E52A19', plum: '#522C55',
+                            lavander: '#A27EC6', mustard: '#F4B600',
+                            green: '#00935C', navyBlue: '#1C4879',
+                            yellow: '#FED500', brightGreen: '#31D196',
+                            black: '#000000'
+                        };
 
                         // Curve color (from the curve item, e.g. limeGreen)
                         var curveColor = trackColor; // fallback
                         if (foundCurve && foundCurve.color) {
                             var colorMap = window.ColorMap || {};
-                            curveColor = colorMap[foundCurve.color] || foundCurve.color;
+                            curveColor = localColorMap[foundCurve.color]
+                                || colorMap[foundCurve.color]
+                                || foundCurve.color;
                         }
 
                         // -- Cursor line (3px wide, full staff height, TRACK color) --
@@ -821,6 +871,70 @@ async function main() {
                             handLine.setAttribute('stroke-width', '1');
                             handLine.setAttribute('stroke-linecap', 'round');
                             clone.appendChild(handLine);
+
+                            // 5a-ii. Pitch tracker SVG (glissando pitch display)
+                            if (foundCurve.glissando && window.GlissandoSystem) {
+                                try {
+                                    var gl = foundCurve.glissando;
+                                    var pList = GlissandoSystem.pitchList;
+                                    var lowIdx = Math.min(gl.startIndex, gl.endIndex);
+                                    var highIdx = Math.max(gl.startIndex, gl.endIndex);
+                                    var pRange = highIdx - lowIdx;
+                                    var curPitchIdx = lowIdx + Math.round(normalizedY * pRange);
+                                    curPitchIdx = Math.max(0, Math.min(pList.length - 1, curPitchIdx));
+                                    var curPitch = pList[curPitchIdx];
+                                    if (curPitch) {
+                                        var svgUrl = 'pitchesSVGs/' + gl.clef + '/' + curPitch.name + '-cropped.svg';
+                                        var resp = await fetch(svgUrl);
+                                        if (resp.ok) {
+                                            var svgText = await resp.text();
+                                            var parser = new DOMParser();
+                                            var doc = parser.parseFromString(svgText, 'image/svg+xml');
+                                            var srcSvg = doc.documentElement;
+
+                                            // Get source dimensions from viewBox or width/height
+                                            var vb = srcSvg.getAttribute('viewBox');
+                                            var srcW, srcH;
+                                            if (vb) {
+                                                var parts = vb.split(/[\s,]+/);
+                                                srcW = parseFloat(parts[2]);
+                                                srcH = parseFloat(parts[3]);
+                                            } else {
+                                                srcW = parseFloat(srcSvg.getAttribute('width')) || 40;
+                                                srcH = parseFloat(srcSvg.getAttribute('height')) || 80;
+                                            }
+
+                                            // Size: 50% of staff height, preserve aspect ratio
+                                            var pitchH = staffHeight2 * 0.5;
+                                            var pitchW = pitchH * (srcW / srcH);
+
+                                            // Position: left of dial, centered vertically
+                                            var pitchX = dialX - pitchW - 2;
+                                            var pitchY = yPos + (staffHeight2 - pitchH) / 2;
+
+                                            // Create inline <svg> element with the pitch content
+                                            var pitchSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                                            pitchSvg.setAttribute('x', pitchX);
+                                            pitchSvg.setAttribute('y', pitchY);
+                                            pitchSvg.setAttribute('width', pitchW);
+                                            pitchSvg.setAttribute('height', pitchH);
+                                            if (vb) pitchSvg.setAttribute('viewBox', vb);
+                                            else pitchSvg.setAttribute('viewBox', '0 0 ' + srcW + ' ' + srcH);
+                                            pitchSvg.setAttribute('overflow', 'visible');
+
+                                            // Copy children from parsed SVG
+                                            while (srcSvg.firstChild) {
+                                                pitchSvg.appendChild(srcSvg.firstChild);
+                                            }
+                                            clone.appendChild(pitchSvg);
+
+                                            console.log('Pitch tracker: ' + curPitch.name + ' (' + gl.clef + ') at x=' + pitchX.toFixed(1));
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.log('Pitch tracker error: ' + e.message);
+                                }
+                            }
                         }
 
                         // 5b. Line-wedge meter (donut ring) — if no curve, check for active LW
@@ -919,6 +1033,64 @@ async function main() {
                         }
                     }
                 }
+
+                // Convert inner notation <svg> elements to <g> with equivalent transforms
+                // This eliminates inner viewports so Inkscape shows accurate bounding boxes
+                var wrapperSvgs = clone.querySelectorAll('.svg-element-wrapper > svg');
+                wrapperSvgs.forEach(function(innerSvg) {
+                    var vb = innerSvg.getAttribute('viewBox');
+                    var w = parseFloat(innerSvg.getAttribute('width'));
+                    var h = parseFloat(innerSvg.getAttribute('height'));
+                    if (!vb || !w || !h) return;
+
+                    var parts = vb.split(/[\s,]+/).map(Number);
+                    var vbX = parts[0], vbY = parts[1], vbW = parts[2], vbH = parts[3];
+
+                    // Compute meet scaling (preserveAspectRatio="xMidYMid meet")
+                    var scaleVal = Math.min(w / vbW, h / vbH);
+                    var tx = (w - vbW * scaleVal) / 2 - vbX * scaleVal;
+                    var ty = (h - vbH * scaleVal) / 2 - vbY * scaleVal;
+
+                    // Create replacement <g> with equivalent transform
+                    var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    g.setAttribute('transform', 'translate(' + tx + ',' + ty + ') scale(' + scaleVal + ')');
+
+                    // Move all children from <svg> to <g>
+                    while (innerSvg.firstChild) {
+                        g.appendChild(innerSvg.firstChild);
+                    }
+
+                    // Replace <svg> with <g> in parent
+                    innerSvg.parentNode.replaceChild(g, innerSvg);
+                });
+
+                // Tighten viewBox to actual content bounds
+                // Temporarily insert clone into DOM so getBBox() works
+                clone.style.position = 'absolute';
+                clone.style.left = '-9999px';
+                clone.style.top = '-9999px';
+                document.body.appendChild(clone);
+                try {
+                    var bbox = clone.getBBox();
+                    if (bbox.width > 0 && bbox.height > 0) {
+                        var tbPad = 5; // small padding around content
+                        var tightX = bbox.x - tbPad;
+                        var tightY = bbox.y - tbPad;
+                        var tightW = bbox.width + tbPad * 2;
+                        var tightH = bbox.height + tbPad * 2;
+                        clone.setAttribute('viewBox', tightX + ' ' + tightY + ' ' + tightW + ' ' + tightH);
+                        clone.setAttribute('width', tightW);
+                        clone.setAttribute('height', tightH);
+                        console.log('Tight viewBox: ' + tightX.toFixed(1) + ' ' + tightY.toFixed(1) +
+                            ' ' + tightW.toFixed(1) + ' ' + tightH.toFixed(1));
+                    }
+                } catch (e) {
+                    console.log('getBBox failed, keeping original viewBox: ' + e.message);
+                }
+                document.body.removeChild(clone);
+                clone.style.position = '';
+                clone.style.left = '';
+                clone.style.top = '';
 
                 // Serialize
                 var serializer = new XMLSerializer();

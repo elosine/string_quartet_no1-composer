@@ -61,6 +61,14 @@ p {
     page-break-inside: avoid;
 }
 
+.notation-section + .notation-section {
+    margin-top: -1.5em;
+}
+
+.notation-section + h4 {
+    margin-top: -1.5em;
+}
+
 .notation-section .caption {
     font-size: 0.9em;
     color: #666;
