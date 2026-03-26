@@ -5410,3 +5410,76 @@ node scripts/generate_print_pdf.js --track 4 --pages 4      # Cello, 4 pages/scr
 Chose URL reload with `?goto=` position preservation over a true runtime toggle (destroy/recreate DOM sections, restore overrides). The runtime approach would require teardown of ~20 method overrides and multiple DOM sections — high risk for low benefit. URL reload reuses all existing tested initialization code.
 
 **Tradeoff:** ~1-2s reload flash. Acceptable for a toggle used occasionally, not during playback.
+
+---
+
+## 19. Phase 14 Post-Mortem — Website & Production Deployment
+
+**Date:** Mar 26, 2026
+**Tag:** `phase-14-complete` (pending)
+**Scope:** Landing page, documentation, security audit, cloud deployment, production infrastructure
+**Workshop impact:** None — `public/index.html` unchanged
+
+> **Full post-mortem details** are in `docs/IMPLEMENTATION_PROGRESS.md` §"Phase 14 Post-Mortem" (Steps A–G). This section captures the key architecture and lessons for the pipeline plan's self-contained reference.
+
+### 19.1 What Was Built
+
+- **Landing page** (`landing/index.html`): Performer entry — name, instrument, pages, room create/join, returning performer detection (JWT), YouTube demo link
+- **Technical Manual** (`docs/technical_manual/`): Performer guide for the web app
+- **Music Performance Instructions** (`docs/notation_instructions/`): Notation guide with SVG captures
+- **Security hardening**: helmet.js, rate limiting, input validation, CORS
+- **Cloud deployment**: Hetzner VPS (CPX11, Ashburn), nginx reverse proxy, Let's Encrypt SSL, PM2 process management
+- **Git sparse clone deployment**: Server pulls only production-relevant files (~45 MB vs ~30 GB full repo)
+- **Sync bar improvements**: Hidden in solo mode, auto-fade after 4s in rooms
+
+### 19.2 Production Architecture
+
+```
+[User Browser] → HTTPS → [nginx :443] → proxy → [Node.js :3001 (PM2)]
+                                                      ↓
+                                              /home/deploy/sq1/
+                                              (git sparse clone)
+```
+
+- **Server:** Hetzner CPX11, IP 5.161.233.35, domain justinwenloyang.com
+- **Process:** PM2 `sq1-server` → `scripts/performance_server.js` (Express + Socket.IO)
+- **Build:** `builds/` directory is gitignored; rebuilt on server via `node scripts/build_performance_app.js`
+- **Data:** `data/` not in git — JWT secret, sessions, performer prefs (persistent runtime state)
+
+### 19.3 Deployment Pipeline (Ongoing Updates)
+
+```
+LOCAL: edit → rebuild → test → git push
+SERVER: git pull → rebuild → (pm2 restart if server.js changed)
+```
+
+One-liner deploy from Windows PowerShell:
+```
+ssh -i C:\Users\jwloy\.ssh\id_ed25519 root@5.161.233.35 "su - deploy -c 'cd /home/deploy/sq1 && git pull && node scripts/build_performance_app.js'"
+```
+
+### 19.4 Key Issue: Initial SCP-based Deployment
+
+The initial cloud deployment used manual `scp` to copy files to the server instead of `git clone`. This was likely due to the 30+ GB repo size causing clone failures. The result was a server with no git connection — every update required individually SCP'ing changed files.
+
+**Fix:** Replaced with `git sparse-checkout` + `--depth 1` (shallow clone). Only ~45 MB of production-relevant directories are checked out. The server can now receive updates via `git pull`.
+
+**Lesson for future projects:** Establish git-based deployment from day one. Use `.gitignore` or Git LFS for large binary files (audio, score backups) to keep the repo clone-friendly.
+
+### 19.5 Descoped Items
+
+| Step | Item | Reason for Descoping |
+|------|------|---------------------|
+| 14.3 | Admin panel (composer dashboard) | Landing page handles room creation; no immediate need |
+| 14.6 | Performance capture/logging | Analytics nice-to-have; zero functional impact |
+
+Both can be added later without architectural changes.
+
+### 19.6 Future Consideration: Multi-Piece Architecture
+
+Currently the root URL (`/`) serves String Quartet No. 1's landing page directly. When a second piece exists, the recommended approach is **path-based routing**:
+- Move SQ1 under `/string-quartet-no1/`
+- Add a portfolio page at `/`
+- Each piece gets its own path prefix
+
+This is a ~30-minute routing change. No need to architect it now.

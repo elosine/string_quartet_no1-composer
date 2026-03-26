@@ -1,24 +1,23 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 14 (next)
-``**Last Session:** Mar 26, 2026
-**Last Commit:** `Music performance instructions: 9 entries complete, SVG capture improvements, pipeline documentation`
+**Active Phase:** Phase 14 complete. Next: Phase 15 (Composition & Performance Notes) or Phase 16 (Cleanup & Archive)
+**Last Session:** Mar 26, 2026
+**Last Commit:** `YouTube demo link + sync bar: hide solo, auto-fade in rooms`
+**Production:** Live at `justinwenloyang.com` — Hetzner VPS with git sparse clone + PM2
 
 ### ▶ RESUME HERE (next session)
 
-**Step 14.0a delivered (Music Performance Instructions):**
-- 9 entries documenting non-standard notation and graphic score symbols
-- SVG capture script enhanced: inner SVG→G conversion, tight viewBox, track-based filtering, pitch tracker synthesis
-- SVG capture workflow documented in pipeline plan (Step 14.0a) for reuse in future pieces
-- Files: `docs/notation_instructions/index.html`, `styles.css`, `images/`
+**Phase 14 complete.** See "Phase 14 Post-Mortem" section at end of this file for full details.
 
-**Next task: Technical Manual for Web App (Step 14.0)**
-- Create performer-facing guide for using the Performance Score web app
-- AI to attempt first draft independently by reading pipeline plan (§13.10 gestures, Phase 11 performance mode, Phase 8 rehearsal mode, Phase 12 part view) and implementation code
-- Cover: rooms, performance mode, emergency controls, rehearsal gestures, device requirements, URL params, speed control, sync indicators
-- Leave placeholder for front-end web page (not yet designed)
-- See memory "Tomorrow's Task: Technical Manual for Web App" for full prompt
+**Deferred (nice-to-have, not blocking):**
+- Step 14.3: Admin panel (composer dashboard) — manage ensembles, invite links, status
+- Step 14.6: Performance capture/logging — session analytics
+- Multi-piece portfolio page at justinwenloyang.com (when second piece exists)
+
+**Possible next tasks:**
+- Phase 15: Composition & Performance Notes (program notes, composer commentary)
+- Phase 16: Cleanup, Document & Archive (git management, pipeline docs, new piece template)
 
 **Phase 13 delivered (Sync+Animation Tier 3):**
 - Latency-compensated starts — `scheduledStartTime` in scoreGo, clients delay to synchronized moment
@@ -2788,3 +2787,343 @@ Phase 13 Completion Checkpoint (from pipeline plan, adapted):
 
 ### Resume Point
 Phase 13 complete. Next: speed control (user request), then Phase 14.
+
+---
+
+## Phase 14: Website & Production — Post-Mortem
+
+**Date:** Mar 26, 2026
+**Tag:** `phase-14-complete` (pending)
+**Scope:** Landing page, documentation, security audit, cloud deployment, production infrastructure
+**Workshop impact:** None — `public/index.html` unchanged
+
+---
+
+### Step A: Audit — What Was Planned vs What Was Built
+
+| Step | Plan | Status | Notes |
+|------|------|--------|-------|
+| 14.0 | Technical Manual (performer guide) | ✅ Done | `docs/technical_manual/index.html` |
+| 14.0a | Music Performance Instructions (notation) | ✅ Done | `docs/notation_instructions/index.html` + SVG capture pipeline |
+| 14.1 | Hosting infrastructure (VPS, Node.js, PM2) | ✅ Done | Hetzner CPX11, PM2 `sq1-server` |
+| 14.2 | Domain & SSL (nginx, Let's Encrypt) | ✅ Done | justinwenloyang.com, HTTPS, auto-renew |
+| 14.2a | Security audit | ✅ Done | Commits `272205c3`, `e57d47e9` — helmet, rate limiting, input validation |
+| 14.3 | Admin panel (composer dashboard) | ❌ Descoped | Landing page handles room creation; no immediate need |
+| 14.4 | Session management UI (performer dashboard) | ✅ Fulfilled | Landing page serves this role: name, instrument, pages, room create/join, rejoin |
+| 14.5 | SVG text-to-paths (Crimson Pro font fix) | ✅ Done | Build script converts text→paths via opentype.js (614 converted, 292 SVGs modified) |
+| 14.6 | Performance capture/logging | ❌ Descoped | Analytics nice-to-have; zero functional impact |
+
+**Descoped items (14.3 and 14.6)** are documented in the pipeline plan for future revisiting. Neither affects performers or the core product.
+
+---
+
+### Step B: Production Server — Current State (as of Mar 26, 2026)
+
+#### Infrastructure
+
+| Property | Value |
+|----------|-------|
+| **Provider** | Hetzner Cloud |
+| **Plan** | CPX11 (2 vCPU, 2GB RAM, 40GB SSD) |
+| **Location** | Ashburn, US East |
+| **IP** | 5.161.233.35 |
+| **Server name** | sq1-server |
+| **OS** | Ubuntu (Debian-based) |
+| **Node.js** | v20.20.0 |
+| **Domain** | justinwenloyang.com (Cloudflare Registrar) |
+| **SSL** | Let's Encrypt via Certbot (auto-renew) |
+
+#### Access
+
+| Method | Command |
+|--------|---------|
+| **SSH (from Windows)** | `ssh -i C:\Users\jwloy\.ssh\id_ed25519 root@5.161.233.35` |
+| **SSH key** | `C:\Users\jwloy\.ssh\id_ed25519` (ed25519) |
+| **Users** | `root` (SSH login), `deploy` (runs the app) |
+
+#### Server Directory Structure
+
+```
+/home/deploy/sq1/                    ← Git sparse clone of elosine/string_quartet_no1-composer
+├── .git/                            ← Shallow sparse clone (--depth 1)
+├── scripts/
+│   ├── performance_server.js        ← Express + Socket.IO server (the ONLY server script)
+│   ├── build_performance_app.js     ← Build script (strips Workshop → Performance)
+│   ├── performance_canvas_patches.js
+│   ├── performance_parts_patches.js
+│   ├── performance_rehearsal_patches.js
+│   ├── performance_annotation_patches.js
+│   └── generate_doc_pdfs.js
+├── public/
+│   ├── index.html                   ← Workshop source (BUILD INPUT — never served to users)
+│   ├── fonts/                       ← CrimsonPro TTF files (for text-to-paths conversion)
+│   └── pitchesSVGs/                 ← Pitch SVGs (copied into build output)
+├── scores/
+│   └── 2295-FinalScore-preVersioning.json  ← Score data (BUILD INPUT — 16 MB)
+├── builds/                          ← BUILD OUTPUT (gitignored, rebuilt on server)
+│   ├── performance/
+│   │   ├── index.html               ← The Performance Score app (~1.2 MB, served at /score)
+│   │   ├── score.json               ← Score data with text→paths applied (~14 MB)
+│   │   ├── fonts/                   ← Font files (fallback)
+│   │   ├── pitchesSVGs/             ← Pitch SVGs
+│   │   └── lilypond_code/           ← Staff header SVGs
+│   └── print/                       ← Print score PDFs (served at /print/)
+├── landing/
+│   ├── index.html                   ← Landing page (served at /)
+│   └── landing.css
+├── docs/
+│   ├── notation_instructions/       ← Served at /docs/notation-instructions/
+│   └── technical_manual/            ← Served at /docs/technical-manual/
+├── lilypond_code/                   ← Staff SVGs + component library (BUILD INPUT)
+├── data/                            ← NOT in git — persistent runtime data
+│   ├── .jwt-secret                  ← Auto-generated JWT signing key
+│   ├── performers/                  ← Per-performer preferences + annotations
+│   └── sessions/                    ← Active room session files
+├── package.json
+├── package-lock.json
+└── node_modules/                    ← npm install --production
+```
+
+#### What Express Serves (and ONLY what it serves)
+
+| URL Pattern | Server Directory | Content |
+|-------------|-----------------|---------|
+| `/` | `landing/index.html` | Landing page |
+| `/landing/*` | `landing/` | Landing page CSS |
+| `/score` | `builds/performance/index.html` | The score app |
+| `/*` (static fallback) | `builds/performance/` | score.json, fonts, SVGs |
+| `/docs/notation-instructions/*` | `docs/notation_instructions/` | Notation guide |
+| `/docs/technical-manual/*` | `docs/technical_manual/` | Technical manual |
+| `/print/*` | `builds/print/` | Print score PDFs |
+| `/api/sessions/*` | (API routes) | Room create/join/leave |
+
+**Security:** `public/`, `scripts/`, `scores/`, `data/`, `node_modules/` are NOT served. Only `builds/`, `landing/`, `docs/` directories are mounted by Express.
+
+#### Process Management
+
+| Property | Value |
+|----------|-------|
+| **Process manager** | PM2 |
+| **Process name** | `sq1-server` |
+| **Systemd service** | `pm2-deploy.service` (auto-start on reboot) |
+| **Runs as user** | `deploy` |
+| **Port** | 3001 (internal; nginx proxies 443 → 3001) |
+| **Auto-restart on crash** | Yes (PM2 built-in) |
+| **PM2 commands** | `su - deploy -c 'pm2 list'`, `pm2 logs sq1-server`, `pm2 restart sq1-server` |
+
+#### Nginx Configuration
+
+```
+server {
+    server_name justinwenloyang.com www.justinwenloyang.com;
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;        ← WebSocket support
+        proxy_set_header Connection "upgrade";          ← Required for Socket.IO
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    listen 443 ssl;                                     ← Let's Encrypt cert
+}
+```
+
+#### Git Sparse Checkout — What's On the Server
+
+The server clone uses `git sparse-checkout` with `--depth 1` (shallow) to avoid downloading the full 30+ GB repo. Only production-relevant directories are checked out:
+
+**Included:** `scripts/`, `landing/`, `docs/`, `lilypond_code/`, `public/index.html`, `public/fonts/`, `public/pitchesSVGs/`, `scores/2295-FinalScore-preVersioning.json`, `package.json`, `package-lock.json`
+
+**Excluded (saves ~30 GB):**
+- `StrQtrNo1-AudioRender-2026-03-16/` — 648 MB audio WAVs
+- `scoresBackUp/` — ~1.3 GB old score versions
+- `scores/*` (all except the one score file) — ~28 GB
+- `public/audio_files/` — 1 GB
+- All other dev directories: `Diagonistic/`, `JY_oldCode/`, `Reaper/`, `SVG_drafts/`, `SVG_graphics/`, `ai files/`, `curve_library/`, `gc_library/`, `midi files/`, `midi_exports/`, `misc/`, `motive_library/`, `old_archived/`, `tools/`, `fonts/`, `svg_compositions/`, `server.js`, `index.js`
+
+---
+
+### Step C: Key Decisions Made During Phase 14
+
+1. **Subtractive architecture confirmed.** The performance app is built by stripping the Workshop source, not by maintaining a separate codebase. `build_performance_app.js` reads `public/index.html`, applies patches/strips, and outputs `builds/performance/index.html`. This means Workshop edits flow through automatically on rebuild.
+
+2. **Sparse clone over full clone.** The repo is ~30+ GB due to audio, score backups, and accumulated development files. A full clone would consume most of the 40 GB SSD. Sparse checkout limits the server to ~45 MB of source + whatever npm installs.
+
+3. **Build on server, not locally.** The build script runs on the server after `git pull`. This avoids SCP'ing the 1.2 MB built HTML each time and ensures the server always has a build matching its source.
+
+4. **Landing page fulfills session management UI (14.4).** No separate "performer dashboard" was needed — the landing page handles name, instrument, pages, room management, and returning performer detection.
+
+5. **Text-to-paths in build script (14.5).** Using `opentype.js` to convert `<text>` elements to `<path>` outlines at build time. Eliminates runtime font dependency for 614 text elements across 292 SVGs.
+
+6. **Descoped admin panel (14.3) and logging (14.6).** Neither has user-facing impact. Can be added later without architectural changes.
+
+7. **PM2 over raw node.** Provides auto-restart on crash, auto-start on reboot, log management. Already set up by initial deployment.
+
+---
+
+### Step D: Bugs and Issues Encountered
+
+1. **Initial deployment used SCP, not git clone.** The previous AI session attempted deployment but likely hit issues with the 30+ GB repo size. It pivoted to manually SCP'ing individual files to the server. This worked but left the server with no git connection — updates required SCP'ing each changed file individually. **Fix:** Replaced with git sparse clone (this session).
+
+2. **PowerShell ↔ SSH quoting conflicts.** Running complex bash commands via SSH from PowerShell mangles `$()`, nested quotes, and special characters. **Fix:** Write commands to a `.sh` script, SCP it to the server, then execute it remotely.
+
+3. **PM2 auto-restart during migration.** When stopping the node process to replace files, PM2 kept respawning it. **Fix:** Use `pm2 stop sq1-server` instead of `kill`.
+
+4. **`builds/` is gitignored.** The performance app lives in `builds/performance/` which is in `.gitignore`. This means `git pull` alone won't update the served app — must also run the build script. This is by design (build outputs shouldn't be in git).
+
+---
+
+### Step E: Repeatability — How to Deploy Changes
+
+#### Scenario 1: Code/UI Change (landing page, sync bar, patches, etc.)
+
+```
+LOCAL MACHINE:
+1. Edit the source files (landing/index.html, scripts/*.js, etc.)
+2. Rebuild locally to test: node scripts/build_performance_app.js
+3. Test at http://localhost:3000 (start server with: node scripts/performance_server.js)
+4. git add . && git commit -m "Description" && git push
+
+DEPLOY TO SERVER (one command from local PowerShell):
+ssh -i C:\Users\jwloy\.ssh\id_ed25519 root@5.161.233.35 "su - deploy -c 'cd /home/deploy/sq1 && git pull && node scripts/build_performance_app.js'"
+
+If performance_server.js changed, also restart PM2:
+ssh -i C:\Users\jwloy\.ssh\id_ed25519 root@5.161.233.35 "su - deploy -c 'pm2 restart sq1-server'"
+```
+
+#### Scenario 2: Score Revision (changed notes, timing, SVGs in Workshop)
+
+```
+LOCAL MACHINE:
+1. Make changes in the Workshop (public/index.html running via server.js)
+2. Save the score (writes to scores/ directory)
+3. Rebuild: node scripts/build_performance_app.js
+4. Test locally
+5. git add . && git commit -m "Score revision: [description]" && git push
+
+DEPLOY:
+Same one-liner as Scenario 1 — git pull gets the new score JSON, build script bakes it in.
+```
+
+#### Scenario 3: Major Score Change (new SVGs, new notation, structural changes)
+
+Same as Scenario 2, but also:
+- If new notation types were added → update `docs/notation_instructions/`
+- If page layout changed → re-capture print score PDFs
+- If new LilyPond elements → regenerate SVGs via the notation fragment pipeline
+- After deploy, verify on a real device (iPad) that rendering is correct
+
+#### Scenario 4: Server Infrastructure Change (nginx, SSL, Node.js update)
+
+```
+SSH into server:
+ssh -i C:\Users\jwloy\.ssh\id_ed25519 root@5.161.233.35
+
+Common tasks:
+- View logs:         su - deploy -c 'pm2 logs sq1-server --lines 50'
+- Restart server:    su - deploy -c 'pm2 restart sq1-server'
+- Check status:      su - deploy -c 'pm2 list'
+- Renew SSL:         certbot renew (auto-renewal should handle this)
+- Update Node.js:    apt update && apt upgrade (or nvm if installed)
+- Check disk:        df -h
+- Check memory:      free -h
+```
+
+#### Scenario 5: New Piece — Full Production Pipeline from Scratch
+
+This is the "if you write a new piece in 6 months" scenario:
+
+```
+1. COMPOSE in Workshop
+   - Create/modify score in the Workshop (public/index.html + server.js)
+   - All musical material, SVGs, timing, etc. in the Workshop environment
+   - Save score JSON to scores/ directory
+
+2. BUILD Performance Score
+   - node scripts/build_performance_app.js [score_json_path] [output_dir]
+   - Build script: reads Workshop HTML → strips editing UI → applies patches → outputs standalone app
+   - If new notation types exist, may need new patch files or updates to existing ones
+
+3. CREATE Documentation
+   - Music Performance Instructions: docs/notation_instructions/ (notation guide for performers)
+   - Technical Manual: docs/technical_manual/ (web app usage guide)
+   - SVG capture pipeline for notation examples (see Step 14.0a in pipeline plan)
+
+4. CREATE Landing Page
+   - landing/index.html — performer entry point
+   - Instrument list, room management, score links
+   - Update for new piece title, instruments, etc.
+
+5. CONFIGURE Server
+   - performance_server.js — Express routes, Socket.IO, auth
+   - If reusing same server: update routes, maybe add path prefix (e.g., /new-piece/)
+   - If new server: provision VPS, install Node.js, nginx, PM2, SSL (see §13.9 in pipeline plan)
+
+6. DEPLOY
+   - Push to GitHub
+   - Clone (sparse) on server
+   - npm install, build, start PM2
+
+7. VERIFY
+   - Landing page loads, room creation works
+   - Score renders correctly on iPad
+   - Multi-device sync works
+   - Performance mode: readiness check, countdown, auto-stop, emergency controls all function
+```
+
+**Key files to study for a new piece:**
+- `docs/STRING_QUARTET_PIPELINE_PLAN.md` — the complete architecture reference
+- `scripts/build_performance_app.js` — how the Workshop→Performance transformation works
+- `scripts/performance_rehearsal_patches.js` — all rehearsal/performance mode features
+- `scripts/performance_server.js` — server architecture, routes, Socket.IO events
+
+---
+
+### Step F: Future Impacts — Lessons Learned
+
+1. **Large binary files in git are problematic for deployment.** The repo grew to 30+ GB from audio WAVs, score backups, and accumulated files. For a new piece, consider using `.gitignore` or Git LFS for audio files and score backups from the start.
+
+2. **Sparse checkout works but is fragile.** The sparse-checkout set must be updated if the build script starts reading new directories. If a future phase adds a new dependency (e.g., a new font directory, a new patch file), the sparse-checkout list on the server must be updated too. Document this when adding new build inputs.
+
+3. **The deployment was initially opaque.** The SCP-based deployment left no audit trail. Git sparse clone fixes this — every change on the server is traceable via `git log`. For future projects, establish the git-based deployment from day one.
+
+4. **PM2 should be set up at infrastructure creation time.** The raw `node` process worked but had no auto-restart or logging. PM2 was already installed but the initial deployment didn't use it properly.
+
+5. **PowerShell + SSH is awkward.** Complex remote commands break due to quoting. Best practice: write multi-step operations to a `.sh` script, SCP + execute. Or keep a set of one-liner deploy commands documented (as above).
+
+6. **Multi-piece architecture consideration.** Currently the root URL serves String Quartet No. 1 directly. When a second piece exists, the recommended approach is path-based routing: move SQ1 under `/string-quartet-no1/`, add a portfolio page at `/`. This is a ~30-minute change. See deferred item in RESUME HERE section.
+
+7. **The `builds/` directory is gitignored.** This is correct — build outputs shouldn't be in version control. But it means every deploy requires a rebuild on the server. The rebuild takes ~5 seconds, so this is fine.
+
+---
+
+### Step G: Files Modified/Created in Phase 14
+
+| File | Action | Purpose |
+|------|--------|---------|
+| `landing/index.html` | **New** | Landing page: name, instrument, pages, room management |
+| `landing/landing.css` | **New** | Landing page styles |
+| `docs/technical_manual/index.html` | **New** | Technical manual (performer guide) |
+| `docs/technical_manual/styles.css` | **New** | Technical manual styles |
+| `docs/technical_manual/Technical_Manual.pdf` | **New** | PDF version |
+| `docs/notation_instructions/index.html` | **New** | Music performance instructions (notation guide) |
+| `docs/notation_instructions/styles.css` | **New** | Notation instructions styles |
+| `docs/notation_instructions/Music_Performance_Instructions.pdf` | **New** | PDF version |
+| `scripts/generate_doc_pdfs.js` | **New** | Puppeteer PDF generation for docs |
+| `scripts/performance_server.js` | Modified | Routing restructure, doc routes, print route, security (helmet, rate limiting) |
+| `scripts/performance_rehearsal_patches.js` | Modified | Home button, sync bar solo-hide + auto-fade |
+| `docs/STRING_QUARTET_PIPELINE_PLAN.md` | Modified | Step 14.2a, Phase 16 placeholder, deployment docs |
+| `docs/IMPLEMENTATION_PROGRESS.md` | Modified | Phase 14 post-mortem (this document) |
+
+### Key Commits
+
+| Commit | Description |
+|--------|-------------|
+| `cf4724c8` | Landing page, doc PDFs, performer detection, home nav, technical manual |
+| `0930c1b4` | Performance Mode button, Full Score room code fix, technical manual update |
+| `272205c3` | Security audit — hardening for cloud deployment |
+| `e57d47e9` | Security round 2 + Phase 16 maintenance tasks |
+| `d2501322` | npm audit dependency updates |
+| `3d4dffa4` | YouTube demo link + sync bar: hide solo, auto-fade in rooms |
