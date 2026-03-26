@@ -5475,11 +5475,42 @@ The initial cloud deployment used manual `scp` to copy files to the server inste
 
 Both can be added later without architectural changes.
 
-### 19.6 Future Consideration: Multi-Piece Architecture
+### 19.6 Multi-Piece Architecture — Implemented
 
-Currently the root URL (`/`) serves String Quartet No. 1's landing page directly. When a second piece exists, the recommended approach is **path-based routing**:
-- Move SQ1 under `/string-quartet-no1/`
-- Add a portfolio page at `/`
-- Each piece gets its own path prefix
+The portfolio/homepage architecture was implemented in the same session:
 
-This is a ~30-minute routing change. No need to architect it now.
+**Routing (current):**
+| URL | Content |
+|-----|---------|
+| `/` | Homepage — composer name, works list, social links |
+| `/string-quartet-no1` | SQ1 landing page (instrument picker, rooms, docs, print) |
+| `/score` | SQ1 score app |
+| `/docs/*`, `/print/*`, `/api/*` | Unchanged |
+
+**Files added:**
+- `homepage/index.html` — minimal portfolio page (name, works cards, social links)
+- `homepage/homepage.css` — styles (Lato font, matching existing aesthetic)
+
+**Files modified:**
+- `scripts/performance_server.js` — added HOMEPAGE_DIR, `/` → homepage, `/string-quartet-no1` → landing
+- `scripts/performance_rehearsal_patches.js` — Home button now navigates to `/string-quartet-no1`
+- `landing/index.html` — added `← justinwenloyang.com` back-link at top
+- `landing/landing.css` — `.home-link` styling
+
+**Navigation flow:**
+```
+justinwenloyang.com (homepage)
+  → click "String Quartet No. 1" card
+    → justinwenloyang.com/string-quartet-no1 (SQ1 landing)
+      → "Open Score" → /score (the app)
+        → Home button (Controls Overlay) → /string-quartet-no1
+      → "← justinwenloyang.com" → / (back to homepage)
+```
+
+**Adding a new piece:** Create a new work-card `<a>` in `homepage/index.html` pointing to the new piece's landing URL. Add a new route in `performance_server.js`.
+
+**Social links:** YouTube (@justinwenloyang), Bandcamp (justinyang.bandcamp.com), Instagram (@justinwenloyang)
+
+**Direct share URL for SQ1:** `justinwenloyang.com/string-quartet-no1`
+
+**Sparse checkout updated:** `homepage/` added to server's sparse-checkout set via `git sparse-checkout add homepage`.

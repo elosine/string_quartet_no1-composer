@@ -3116,6 +3116,8 @@ This is the "if you write a new piece in 6 months" scenario:
 | `scripts/performance_rehearsal_patches.js` | Modified | Home button, sync bar solo-hide + auto-fade |
 | `docs/STRING_QUARTET_PIPELINE_PLAN.md` | Modified | Step 14.2a, Phase 16 placeholder, deployment docs |
 | `docs/IMPLEMENTATION_PROGRESS.md` | Modified | Phase 14 post-mortem (this document) |
+| `homepage/index.html` | **New** | Portfolio homepage: name, works list, social links |
+| `homepage/homepage.css` | **New** | Homepage styles |
 
 ### Key Commits
 
@@ -3127,3 +3129,5 @@ This is the "if you write a new piece in 6 months" scenario:
 | `e57d47e9` | Security round 2 + Phase 16 maintenance tasks |
 | `d2501322` | npm audit dependency updates |
 | `3d4dffa4` | YouTube demo link + sync bar: hide solo, auto-fade in rooms |
+| `7608b112` | Phase 14 post-mortem: deployment architecture, repeatability guide |
+| `ac6e5173` | Homepage: portfolio page at /, SQ1 landing moved to /string-quartet-no1 |
