@@ -936,7 +936,7 @@ module.exports = function applyRehearsalPatches(html) {
             e.stopPropagation();
             // Hide in performance mode — only allow in rehearsal
             if (window.PerformanceMode && PerformanceMode.locked) return;
-            window.location.href = '/';
+            window.location.href = '/string-quartet-no1';
         });
 
         // Prevent overlay interactions from bubbling to gesture system

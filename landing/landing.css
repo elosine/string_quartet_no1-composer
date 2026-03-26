@@ -19,6 +19,20 @@ body {
     text-align: center;
 }
 
+/* ─── Home link ────────────────────────────────────────────────────────────── */
+
+.home-link {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 400;
+    color: #999;
+    text-decoration: none;
+    margin-bottom: 24px;
+}
+.home-link:hover {
+    color: #222;
+}
+
 /* ─── Identity ─────────────────────────────────────────────────────────────── */
 
 h1 {

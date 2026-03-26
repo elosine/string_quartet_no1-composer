@@ -29,6 +29,7 @@ const { Server } = require('socket.io');
 const ROOT = path.resolve(__dirname, '..');
 const PERF_DIR = path.join(ROOT, 'builds', 'performance');
 const LANDING_DIR = path.join(ROOT, 'landing');
+const HOMEPAGE_DIR = path.join(ROOT, 'homepage');
 const DATA_DIR = path.join(ROOT, 'data');
 const SESSIONS_DIR = path.join(DATA_DIR, 'sessions');
 const PERFORMERS_DIR = path.join(DATA_DIR, 'performers');
@@ -99,6 +100,9 @@ app.use(helmet({
 // Parse JSON request bodies with size limit (prevent payload DoS)
 app.use(express.json({ limit: '100kb' }));
 
+// Serve homepage static files (CSS)
+app.use('/homepage', express.static(HOMEPAGE_DIR));
+
 // Serve landing page static files (CSS, etc.)
 app.use('/landing', express.static(LANDING_DIR));
 
@@ -107,8 +111,13 @@ app.use('/landing', express.static(LANDING_DIR));
 // our explicit route handlers control which HTML is served for / and /score
 app.use(express.static(PERF_DIR, { index: false }));
 
-// Landing page at root
+// Homepage at root
 app.get('/', function(req, res) {
+    res.sendFile(path.join(HOMEPAGE_DIR, 'index.html'));
+});
+
+// SQ1 landing page
+app.get('/string-quartet-no1', function(req, res) {
     res.sendFile(path.join(LANDING_DIR, 'index.html'));
 });
 
