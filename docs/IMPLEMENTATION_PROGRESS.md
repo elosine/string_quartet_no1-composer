@@ -11,10 +11,10 @@
 **Phases 14 and 15 complete.** Phase 16 (Cleanup, Document & Archive) in progress.
 
 **Phase 16 Stages:**
-- Stage 1: Git housekeeping (tags, .gitignore, branches, README) — in progress
-- Stage 2: PROJECT_JOURNAL.md — consolidated 4-part document (AI quick-start, Workshop dev, Performance pipeline, Operations + New Piece guide)
-- Stage 3: New piece repository creation (surgical clone with reusable infrastructure)
-- Stage 4: Final wrap-up (MAINTENANCE.md, phase-16-archive tag, deploy)
+- Stage 1: Git housekeeping (tags, .gitignore, branches, README) — **complete**
+- Stage 2: PROJECT_JOURNAL.md — consolidated 4-part document — **complete** (639 lines, covers AI quick-start, Workshop dev, Performance pipeline, Operations, New Piece guide)
+- Stage 3: New piece repository creation script (`scripts/create_new_piece.sh`) — **complete**
+- Stage 4: Final wrap-up (MAINTENANCE.md, phase-16-archive tag) — **complete**
 
 **Deferred (nice-to-have, not blocking):**
 - Step 14.3: Admin panel (composer dashboard) — manage ensembles, invite links, status
