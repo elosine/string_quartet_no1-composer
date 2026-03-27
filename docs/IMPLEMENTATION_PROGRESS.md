@@ -1,23 +1,24 @@
 # Implementation Progress
 
 ## Current Status
-**Active Phase:** Phase 14 complete. Next: Phase 15 (Composition & Performance Notes) or Phase 16 (Cleanup & Archive)
+**Active Phase:** Phase 16 — Cleanup, Document & Archive
 **Last Session:** Mar 26, 2026
-**Last Commit:** `YouTube demo link + sync bar: hide solo, auto-fade in rooms`
-**Production:** Live at `justinwenloyang.com` — Hetzner VPS with git sparse clone + PM2
+**Last Commit:** `Docs: homepage architecture + updated post-mortem commit table`
+**Production:** Live at `justinwenloyang.com` — homepage at `/`, SQ1 at `/string-quartet-no1`
 
 ### ▶ RESUME HERE (next session)
 
-**Phase 14 complete.** See "Phase 14 Post-Mortem" section at end of this file for full details.
+**Phases 14 and 15 complete.** Phase 16 (Cleanup, Document & Archive) in progress.
+
+**Phase 16 Stages:**
+- Stage 1: Git housekeeping (tags, .gitignore, branches, README) — in progress
+- Stage 2: PROJECT_JOURNAL.md — consolidated 4-part document (AI quick-start, Workshop dev, Performance pipeline, Operations + New Piece guide)
+- Stage 3: New piece repository creation (surgical clone with reusable infrastructure)
+- Stage 4: Final wrap-up (MAINTENANCE.md, phase-16-archive tag, deploy)
 
 **Deferred (nice-to-have, not blocking):**
 - Step 14.3: Admin panel (composer dashboard) — manage ensembles, invite links, status
 - Step 14.6: Performance capture/logging — session analytics
-- Multi-piece portfolio page at justinwenloyang.com (when second piece exists)
-
-**Possible next tasks:**
-- Phase 15: Composition & Performance Notes (program notes, composer commentary)
-- Phase 16: Cleanup, Document & Archive (git management, pipeline docs, new piece template)
 
 **Phase 13 delivered (Sync+Animation Tier 3):**
 - Latency-compensated starts — `scheduledStartTime` in scoreGo, clients delay to synchronized moment
