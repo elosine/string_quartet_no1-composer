@@ -87,16 +87,25 @@
 
 | # | Item | Status | Date |
 |---|------|--------|------|
-| 1 | Dependency integrity | ✅ Partial (npm install done, npm ci + audit pending) | Apr 15 |
-| 2 | PM2 crash history | ⬜ Not started | |
-| 3 | Deploy script | ⬜ Not started | |
-| 4 | Health endpoint | ⬜ Not started | |
-| 5 | Uptime monitoring | ⬜ Not started | |
-| 6 | Nginx hardening | ⬜ Not started | |
-| 7 | Log management | ⬜ Not started | |
-| 8 | node_modules protection | ⬜ Not started | |
-| 9 | SSL renewal | ⬜ Not started | |
-| 10 | Security scan | ⬜ Not started | |
+| 1 | Dependency integrity | ✅ Done — `npm install` restored 86 packages, `npm ls` clean, `npm audit` reviewed | Apr 15 |
+| 2 | PM2 crash history | ✅ Done — 16 restarts from missing deps + trust proxy error. PM2 autostart fixed (`pm2-deploy.service` active) | Apr 15 |
+| 3 | Deploy script | ✅ Done — `/home/deploy/sq1/deploy.sh` (pull, npm install, build, restart, health check) | Apr 15 |
+| 4 | Health endpoint | ✅ Done — `GET /health` returns status, uptime, socketio, scoreFile, memoryMB | Apr 15 |
+| 5 | Uptime monitoring | ⬜ Not started — set up UptimeRobot or Cloudflare to ping `/health` | |
+| 6 | Nginx hardening | ✅ Done — `proxy_pass` changed to `127.0.0.1`, added connect/read/send timeouts | Apr 15 |
+| 7 | Log management | ✅ Done — `pm2-logrotate` installed (10MB max, 10 retained, compressed) | Apr 15 |
+| 8 | node_modules protection | ✅ Done — removed 977 tracked files from git (`git rm -r --cached node_modules`). Root cause of original incident. | Apr 15 |
+| 9 | SSL renewal | ✅ Verified — certbot timer active, next run Apr 16, cert valid till Jun 24, 2026 | Apr 15 |
+| 10 | Security scan | ✅ Partial — `trust proxy` fixed, server bound to 127.0.0.1, port 3001 no longer exposed. `npm audit`: 2 high (basic-ftp in Puppeteer, path-to-regexp in Express — low risk). Session spam bots noted. | Apr 15 |
+
+## Deploy Process (Updated)
+
+**New one-liner (replaces old manual steps):**
+```
+ssh -i C:\Users\jwloy\.ssh\id_ed25519 root@5.161.233.35 "su - deploy -c '/home/deploy/sq1/deploy.sh'"
+```
+
+The script handles: `git pull` → `npm install` → build → restart → health check → `pm2 save`.
 
 ---
 
@@ -104,6 +113,14 @@
 
 ### Apr 15, 2026 — Missing node_modules packages
 - **Symptom:** 502 errors on all sub-resources (socket.io.js, score.json, staff SVGs). HTML page loaded but score was blank.
-- **Root cause:** 86 npm packages missing from `node_modules`, including `socket.io`. Server process (19 days uptime) had socket.io loaded in memory but couldn't serve client JS from disk. Nginx cascade: first empty reply marked upstream dead → all subsequent requests got "no live upstreams" → 502.
-- **Fix:** `npm install` + `pm2 restart sq1-server`
-- **Prevention:** Items 1, 3, 4, 5 above.
+- **Root cause found:** 977 `node_modules` files were **tracked in git** (committed before `.gitignore` existed). Every `git pull` overwrote installed packages with stale tracked versions, corrupting the dependency tree. The old deploy one-liner did not run `npm install`, so corrupted packages persisted.
+- **Chain of failure:** Missing `socket.io` → empty reply on `/socket.io/socket.io.js` → nginx marked upstream dead → cascade 502 on all subsequent requests in the batch.
+- **Fix:** `git rm -r --cached node_modules` (untrack), `npm install` (restore), `pm2 restart` (reload).
+- **Prevention:** Items 1, 3, 4, 8 — deploy script now always runs `npm install`, node_modules untracked from git.
+
+### Additional issues found and fixed
+- **`express-rate-limit` trust proxy error:** Server behind nginx but `trust proxy` not set → rate limiter couldn't identify real IPs. Fixed: `app.set('trust proxy', 1)`.
+- **Server listening on all interfaces:** Port 3001 was directly accessible from internet without SSL. Fixed: bound to `127.0.0.1`.
+- **Nginx IPv6 resolution:** `proxy_pass http://localhost:3001` resolved to `::1` first, failing. Fixed: explicit `127.0.0.1`.
+- **PM2 autostart broken:** `pm2-deploy.service` was `inactive (dead)`. Fixed: killed PM2, restarted via systemd, verified `enabled`.
+- **No log rotation:** PM2 logs growing unbounded. Fixed: `pm2-logrotate` with 10MB/10 file limits.
