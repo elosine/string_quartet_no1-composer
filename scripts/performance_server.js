@@ -87,6 +87,7 @@ if (fs.existsSync(JWT_SECRET_PATH)) {
 // ─── Express + Socket.IO setup ──────────────────────────────────────────────
 
 const app = express();
+app.set('trust proxy', 1); // Behind nginx — trust first proxy for real client IPs
 const server = http.createServer(app);
 const io = new Server(server);
 
@@ -1280,9 +1281,26 @@ setInterval(function() {
     }
 }, 200);
 
+// ─── Health check endpoint ──────────────────────────────────────────────────
+
+app.get('/health', function(req, res) {
+    var scoreExists = fs.existsSync(path.join(PERF_DIR, 'score.json'));
+    var socketioOk = typeof io !== 'undefined' && io.engine;
+    var status = scoreExists && socketioOk ? 'ok' : 'degraded';
+    var code = status === 'ok' ? 200 : 503;
+    res.status(code).json({
+        status: status,
+        uptime: Math.floor(process.uptime()),
+        socketio: !!socketioOk,
+        scoreFile: scoreExists,
+        memoryMB: Math.round(process.memoryUsage().rss / 1024 / 1024),
+        timestamp: new Date().toISOString()
+    });
+});
+
 // ─── Start server ───────────────────────────────────────────────────────────
 
-server.listen(PORT, function() {
+server.listen(PORT, '127.0.0.1', function() {
     console.log('\n═══ Performance Score Server ═══');
     console.log('  URL: http://localhost:' + PORT);
     console.log('  Serving: builds/performance/');
