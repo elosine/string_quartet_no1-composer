@@ -10,6 +10,39 @@
 
 ---
 
+## §2 Resume Here
+
+> The cold-start block that `/session-start` reads. Everything below it (Parts 0–IV) is the consolidated history up to April 2026.
+
+### LAST SESSION — 2026-10-08, Claude Code
+
+- **The goal: a submission print score for the JACK Quartet reading call** — they ask for a PDF and a recording; the YouTube film exists; he expects the readings in December. The full performance score and parts come later, slotted by him among the pieces that need them.
+- **The print PDFs of 2026-03-21 are now tracked.** `builds/` is gitignored, so they went in with `git add -f`: `builds/print/full_score.pdf` and the twelve parts. The five test PDFs there (`stage4_*`, `test_vector`) were left untracked. A new PDF in `builds/print/` needs `-f` too.
+- **`submissions/Jack_Quartet_2026/String_Quartet_No_1-JYang.pdf`** — for now a byte copy of `builds/print/full_score.pdf` (32 pages, 1200 × 900 pt). The assembled version replaces it.
+- **The cover, in the house style.** The generator is `septet_LGMF_2026/print/cover/make_cover.ps1`, copied whole. Words: `print/cover/cover.json`. Sheet: `print/formats.json` (`score-landscape` = the score's own 1200 × 900 pt, so every page of the PDF is one size). `node scripts/render_cover.js` prints the SVG to `print/cover/cover-score-landscape.pdf` and fails if the face (EngraversGothic BT) fell back. First draft: title + name, no subtitle.
+- **The performance instructions already exist as a page:** `docs/notation_instructions/index.html`, served at `http://localhost:3001/docs/notation-instructions/` by `node scripts/performance_server.js`. `docs/Performance_Instructions.md` is older prose (the feel of the gravitational conductor, aligning a fragment with it, the two-handed pizzicato cluster) that is not all on the page.
+- **A look at a draft PDF** = copy it into `builds/print/` and open `http://localhost:3001/print/<name>.pdf` (the server already serves that folder; `builds/print/cover_draft.pdf` is such a copy, untracked).
+
+### NEXT UP
+
+1. His edits to the instructions page.
+2. The instructions laid out on the score's sheet, the way Recombination's print front does it (columns on a landscape sheet; nothing clipped).
+3. Assemble cover + instructions + score → `print/score/String_Quartet_No_1-JYang.pdf`, then a copy into `submissions/Jack_Quartet_2026/`.
+
+### OPEN AT SESSION END
+
+- The cover's first draft and the instructions page are both waiting for his look.
+
+### OPEN QUESTIONS
+
+- The cover: a subtitle, or title and name only?
+
+### BLOCKERS
+
+- None.
+
+---
+
 ## Table of Contents
 
 - [Part 0: AI Quick-Start](#part-0-ai-quick-start)

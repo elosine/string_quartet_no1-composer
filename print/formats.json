@@ -1,0 +1,8 @@
+{
+  "_doc": "THE SHEETS -- one source for the cover generator (print/cover/make_cover.ps1) and the print-score assembly, so the cover is drawn at exactly the sheet the score prints on. w x h in `unit` (mm or in), landscape. Same shape as septet_LGMF_2026/print/formats.json, where the generator comes from.",
+  "_score": "THE QUARTET'S SHEET IS THE CAPTURED SCREEN: scripts/generate_print_pdf.js prints the performance app at 1600 x 1200 px, which Chrome writes as a 1200 x 900 pt MediaBox = 16.667 x 12.5 in, landscape 4:3 (measured off builds/print/full_score.pdf, 2026-10-08). The cover and the instructions are drawn at that sheet so every page of the PDF is one size.",
+  "default": "score-landscape",
+  "formats": {
+    "score-landscape": { "w": 16.6666667, "h": 12.5, "unit": "in", "label": "Score sheet, landscape 4:3 (1200 x 900 pt = 16.667 x 12.5 in)" }
+  }
+}
