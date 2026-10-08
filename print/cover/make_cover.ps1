@@ -16,6 +16,11 @@
 #   piece #4's two numbers; A3 comes to 98.8), then shrunk in half points until EVERY line fits the margins
 #   (piece #5's lesson: a long ensemble line at 0.65 x title can be wider than the title itself)
 #
+# THE BLOCK'S PLACE (String Quartet No. 1, 2026-10-08, the composer's ask): cover.json may carry `"vertical": "centre"`.
+#   Then the whole block -- the cap-top of the first line to the baseline of the last -- is centred between the sheet's
+#   top and bottom edges, the spacing inside it unchanged. Without the key the block stays where the house has it
+#   (the first baseline 27.1 % down). A title and a name alone, with no subtitle, sit high at the house place.
+#
 # The sheet's size comes from print/formats.json, the file the exporter reads, so the cover is drawn at exactly
 # the sheet that is printed. Its history: piece #4's make_cover.ps1 (four trial sheets into a scratch folder) and
 # piece #5's make_cover_septet.ps1 (one sheet, the words inside the script) -- both in their own repositories.
@@ -57,6 +62,9 @@ $titleLines = @(); if ($cfg.title) { $titleLines = @($cfg.title) }
 $subLines = @(); if ($cfg.subtitle) { $subLines = @($cfg.subtitle) }
 $NAME = [string]$cfg.name
 if ($titleLines.Count -lt 1) { throw "$Words has no title" }
+$VERT = "house"; if ($cfg.vertical) { $VERT = ([string]$cfg.vertical).ToLower() }
+if ($VERT -eq "center") { $VERT = "centre" }
+if (@("house", "centre") -notcontains $VERT) { throw "${Words}: vertical is '$VERT' -- it is 'house' (the default) or 'centre'" }
 
 # ---- the face, and a way to measure it
 try { $fam = New-Object System.Drawing.FontFamily($FONT) }
@@ -68,6 +76,12 @@ function Get-W { param([string]$Txt, [double]$Pt)
   $f = New-Object System.Drawing.Font($fam, $Pt, [System.Drawing.FontStyle]::Regular, [System.Drawing.GraphicsUnit]::Point)
   $w = $g.MeasureString($Txt, $f, 100000, $sf).Width * 72.0 / $g.DpiX
   $f.Dispose(); return [double]$w
+}
+# the height of a capital at a given size, off the outline of an H (flat top, flat foot), in pt
+function Get-CapH { param([double]$Pt)
+  $gp = New-Object System.Drawing.Drawing2D.GraphicsPath
+  $gp.AddString("H", $fam, [int][System.Drawing.FontStyle]::Regular, [single]$Pt, (New-Object System.Drawing.PointF(0, 0)), $sf)
+  $h = [double]$gp.GetBounds().Height; $gp.Dispose(); return $h
 }
 # the widest line at a given title size, each line at its own ratio
 function Get-Widest { param([double]$Tp)
@@ -97,20 +111,31 @@ function Add-Line { param([string]$Txt, [double]$Y, [double]$Pt)
   $w = [math]::Round((Get-W $Txt $Pt), 1)
   return "    <text x=""$cx"" y=""$([math]::Round($Y,2))"" font-size=""$([math]::Round($Pt,2))"" data-w=""$w"">$t</text>"
 }
-$lines = @()
+# every line as (text, baseline, size) first: the block is placed as a whole, then drawn
+$rows = @()
 $y = $hpt * $FIRST_FRAC
 for ($i = 0; $i -lt $titleLines.Count; $i++) {
   if ($i -gt 0) { $y = $y + $titlePt * $LINE_ADV }
-  $lines += Add-Line $titleLines[$i] $y $titlePt
+  $rows += ,@($titleLines[$i], $y, $titlePt)
 }
 for ($i = 0; $i -lt $subLines.Count; $i++) {
   if ($i -eq 0) { $y = $y + $titlePt * $SUB_DROP } else { $y = $y + $subPt * $LINE_ADV }
-  $lines += Add-Line $subLines[$i] $y $subPt
+  $rows += ,@($subLines[$i], $y, $subPt)
 }
 if ($NAME) {
   $y = $y + $titlePt * $NAME_DROP
-  $lines += Add-Line $NAME $y $namePt
+  $rows += ,@($NAME, $y, $namePt)
 }
+# the block's place: 'house' leaves it; 'centre' moves it so its ink is centred on the sheet's height
+$shift = 0.0
+if ($VERT -eq "centre") {
+  $top = [double]$rows[0][1] - (Get-CapH ([double]$rows[0][2]))
+  $bot = [double]$rows[$rows.Count - 1][1]
+  $shift = $hpt / 2 - ($top + $bot) / 2
+}
+$lines = @()
+foreach ($r in $rows) { $lines += Add-Line ([string]$r[0]) ([double]$r[1] + $shift) ([double]$r[2]) }
+$y = $y + $shift
 
 if (-not $Out) { $Out = Join-Path $PSScriptRoot "cover-$Format.svg" }
 $doc = "<svg xmlns=""http://www.w3.org/2000/svg"" width=""${wpt}pt"" height=""${hpt}pt"" viewBox=""0 0 $wpt $hpt"">`n" +
@@ -122,6 +147,7 @@ $doc = "<svg xmlns=""http://www.w3.org/2000/svg"" width=""${wpt}pt"" height=""${
 $widest = Get-Widest $titlePt
 "cover-{0}   {1:N2} x {2:N2} in   title {3:N1}  subtitle {4:N1}  name {5:N1} pt   (the house size for this sheet {6:N1})" -f $Format, $WIn, $HIn, $titlePt, $subPt, $namePt, $housePt
 "widest line {0:N0} pt of {1:N0} available   last baseline {2:N0} pt ({3:P0} down)" -f $widest, $maxWpt, $y, ($y / $hpt)
+if ($VERT -eq "centre") { "block centred on the sheet's height: moved {0:N1} pt from the house place; first baseline {1:N0} pt ({2:P0} down)" -f $shift, ([double]$rows[0][1] + $shift), (([double]$rows[0][1] + $shift) / $hpt) }
 if ($titlePt -lt $housePt) { "NOTE  the type was shrunk from {0:N1} to {1:N1} pt so that every line fits -- a long subtitle may read better as two lines (a list in cover.json)" -f $housePt, $titlePt }
 $g.Dispose(); $bmp.Dispose()
 "wrote $Out"

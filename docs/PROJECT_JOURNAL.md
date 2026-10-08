@@ -12,34 +12,65 @@
 
 ## §2 Resume Here
 
-> The cold-start block that `/session-start` reads. Everything below it (Parts 0–IV) is the consolidated history up to April 2026.
+> The cold-start block that `/session-start` reads. §3 – §6 follow it; everything after them (Parts 0–IV) is the consolidated history up to April 2026.
 
-### LAST SESSION — 2026-10-08, Claude Code
+### LAST SESSION — 2026-10-08 (session 1 of the October work; Claude Code — Fable 5.1, then Opus 5.5)
 
-- **The goal: a submission print score for the JACK Quartet reading call** — they ask for a PDF and a recording; the YouTube film exists; he expects the readings in December. The full performance score and parts come later, slotted by him among the pieces that need them.
-- **The print PDFs of 2026-03-21 are now tracked.** `builds/` is gitignored, so they went in with `git add -f`: `builds/print/full_score.pdf` and the twelve parts. The five test PDFs there (`stage4_*`, `test_vector`) were left untracked. A new PDF in `builds/print/` needs `-f` too.
-- **`submissions/Jack_Quartet_2026/String_Quartet_No_1-JYang.pdf`** — for now a byte copy of `builds/print/full_score.pdf` (32 pages, 1200 × 900 pt). The assembled version replaces it.
-- **The cover, in the house style.** The generator is `septet_LGMF_2026/print/cover/make_cover.ps1`, copied whole. Words: `print/cover/cover.json`. Sheet: `print/formats.json` (`score-landscape` = the score's own 1200 × 900 pt, so every page of the PDF is one size). `node scripts/render_cover.js` prints the SVG to `print/cover/cover-score-landscape.pdf` and fails if the face (EngraversGothic BT) fell back. First draft: title + name, no subtitle.
-- **The performance instructions already exist as a page:** `docs/notation_instructions/index.html`, served at `http://localhost:3001/docs/notation-instructions/` by `node scripts/performance_server.js`. `docs/Performance_Instructions.md` is older prose (the feel of the gravitational conductor, aligning a fragment with it, the two-handed pizzicato cluster) that is not all on the page.
-- **A look at a draft PDF** = copy it into `builds/print/` and open `http://localhost:3001/print/<name>.pdf` (the server already serves that folder; `builds/print/cover_draft.pdf` is such a copy, untracked).
+- **The goal: a submission print score for the "2026 JACK Studio Readings"** (the JACK Quartet reads existing quartets; sessions December 2026, New York; **application deadline 2026-10-22, 11:59 pm ET**; `https://www.jackquartet.com/studio`). A Google Form: a LINK to the score (required), a link to a recording (optional), title, duration as h:mm, year, played before, technical needs. **He fills and submits it himself.**
+- **The print score is assembled: `print/score/String_Quartet_No_1-JYang.pdf` — 36 pages, every one 1200 × 900 pt: cover 1 + performance instructions 3 + score 32.** A byte copy is in `submissions/Jack_Quartet_2026/`. Build: `node scripts/build_print_score.js` (`print/README.md` has the steps).
+- **Everything new lives in `print/`; the originals are untouched** — `docs/notation_instructions/` (the live site's page, byte-identical to the site on this day) and `builds/print/` (the March PDFs, now tracked with `git add -f`).
+- **Three updates to the score as sent, all his:** the Line Wedge figure replaced by a wedge that changes thickness · an opening paragraph taken from Recombination's instructions · a final barline at the right edge of the last system. `print/instructions/UPDATES.md` lists the instruction changes.
+- **To look at anything in `print/`:** `node print/preview_server.js` → `http://localhost:3003/score/String_Quartet_No_1-JYang.pdf` · `/instructions/` · `/cover/cover-score-landscape.pdf`. (The servers started this session were stopped at its end.)
 
 ### NEXT UP
 
-1. His edits to the instructions page.
-2. The instructions laid out on the score's sheet, the way Recombination's print front does it (columns on a landscape sheet; nothing clipped).
-3. Assemble cover + instructions + score → `print/score/String_Quartet_No_1-JYang.pdf`, then a copy into `submissions/Jack_Quartet_2026/`.
+1. **His:** the form. The AI flagged three entries from his screenshots, his to settle — the duration typed `8:35` where the form wants h:mm (the score runs 508 s = 8:28, so `0:09`) · the title `String Quartet Number 1` against `No. 1` on the cover · technical needs `none` for a score read from four screens over the internet.
+2. **His:** the Drive copy must be the latest build (2026-10-08 10:30, 3,491,043 bytes) and viewable by anyone with the link. The AI offered to check through his Drive; not asked.
+3. Any further findings on the draft: fix together on his go, rebuild, re-copy to `submissions/Jack_Quartet_2026/`.
+4. **Later, slotted by him among the other pieces:** the full performance score and parts — a separate build, when the originals are finalized.
 
 ### OPEN AT SESSION END
 
-- The cover's first draft and the instructions page are both waiting for his look.
+- **Not pushed.** Two local commits on `main`. See the deploy note in §3 before the next deploy.
+- The final barline is in the ASSEMBLED PDF only — not in `builds/print/full_score.pdf`, the parts, the Workshop score or the live site.
 
 ### OPEN QUESTIONS
 
-- The cover: a subtitle, or title and name only?
+- The deadline (2026-10-22) is NOT on his imminent list (`composition-planning-and-notes/docs/next.md`). Asked in chat; add only at his word.
+- A demo-recording link in the instructions, as Recombination has after its opening paragraph? Offered; he has not said.
 
 ### BLOCKERS
 
 - None.
+
+## §3 Principles
+
+*Lessons of the October 2026 session. The older ones are in `docs/WORKING_PRINCIPLES.md`.*
+
+- **Draw onto a PDF page from the PDF's own measurements, not the screen's.** Chrome lays the page out again for print: in `full_score.pdf` the score SVG runs x 11.99 → 1589.01, on screen 11.67 → 1588.33. A third of a pixel at the left, more than a pixel at the right. *(the final barline)*
+- **A PDF page can be measured without poppler:** crop it to a few pixels with pdf-lib (`setMediaBox` + `setCropBox`), open the crop in headless Chrome's own PDF viewer, screenshot, read the colour edges in a canvas. Good to a few hundredths of a pixel.
+- **`builds/` is gitignored.** A PDF there that must be kept goes in with `git add -f`. New print work goes in `print/`.
+- **DEPLOY NOTE: `builds/print/*.pdf` are now tracked, and the live server holds its own untracked copies** (the landing page links `/print/full_score.pdf` and the four 6-page parts). The server is a sparse clone; if its sparse patterns include `builds/`, the next `git pull` there will refuse to overwrite them. Look at `.git/info/sparse-checkout` on the server before deploying. Not checked this session — no deploy was made.
+- **A Bash heredoc on this machine halves backslashes** (`\\s` arrived as `\s`, then JavaScript made it `s` — a regex silently stopped matching). A script with a regex goes to disk with the Write tool, or builds the backslash with `String.fromCharCode(92)`. And a Bash command over ~8 KB fails with a false quote error — Write tool again.
+- **Recombination's server answers 404 for a bare folder URL** — ask for `/docs/notation_instructions/index.html`.
+
+## §4 Decisions
+
+- **D-Oct-1 · The October 2026 updates live in `print/`; the originals are not touched** (his ask). He keeps `docs/notation_instructions/` and `builds/print/` as posted until the performance score and parts are finalized in a separate build. *Rejected:* editing the live page in place (a deploy would change the site); an `updates/` folder apart from the cover (two homes for one job). `print/instructions/UPDATES.md` is the list of changes; each is marked in the page as `[update 2026-10 #N]`.
+- **D-Oct-2 · The March print PDFs are tracked in place** — `builds/print/full_score.pdf` and the twelve parts, force-added. The five test PDFs there (`stage4_*`, `test_vector`) are left untracked.
+- **D-Oct-3 · The cover is the house's, with the block centred** (his ask). Generator copied whole from `septet_LGMF_2026/print/cover/make_cover.ps1`; words in `print/cover/cover.json`; title + name, no subtitle; `"vertical": "centre"` is a key added to THIS repo's copy (cap-top of the first line to the baseline of the last, centred on the sheet's height). Without it the block sits at the house place, 27.1 % down. The sheet is the score's own, 1200 × 900 pt (`print/formats.json`).
+- **D-Oct-4 · The instructions print in the house dress, two columns** (he: "as in Recombination… one column or two, your discernment"). The sheet is 1600 × 1200 px — slightly LARGER than A3 landscape. Title bar and rule, column-fill auto, Crimson Pro Light, text 13 px. Each block keeps its on-screen layout (an 840 px column) and is scaled whole to the print column, 87.4 %; a block never breaks. **The eight notation fragments stand two to a row at 82 % of their page size** — *rejected:* one under the other, as on the web page: four sheets, the last with a single entry. Now three.
+- **D-Oct-5 · Line Wedge: the flat line replaced by the swell** (his choice among keep-both / replace / a taper). `images/lineWedge_hairpin_264.svg` = the original folder's unused `lineWedge_hairpin_from 264.svg`.
+- **D-Oct-6 · The instructions open with Recombination's first paragraph**, word for word, the piece's name changed (his ask).
+- **D-Oct-7 · The final barline: at the last system's right edge, in the assembled PDF only** (his ask, placed by him on a second pass). The thick bar's right edge 10 px inside the page's white (he said "15… maybe about 10"); from 10 px under the timeline's numbers down to the same margin above the system's foot (y 625.1 → 1169.9, x to 1579.0). Weights are the house's (`septet_LGMF_2026` rules.json `finalBarLine`): thin 0.19 · gap 0.30 · thick 0.60 staff space, the instrument staves' own staff space (6.65 px) → 1.26 / 3.99 px, solid black. *Replaced:* the first pass, at the curves' end (508.05 s, 75.6 % across) with the extent of the opening system line. *Not done:* putting it in the Workshop score — that would reach the live site and the parts.
+
+## §5 Done
+
+- **2026-10-08** — the print score for the JACK Studio Readings assembled: cover, instructions, score, final barline. 36 pages.
+
+## §6 Human Notes
+
+- *(2026-10-08)* The form and the upload are his. Deadline 2026-10-22, 11:59 pm ET.
 
 ---
 

@@ -1,5 +1,6 @@
 {
-  "_doc": "THE COVER'S WORDS. print/cover/make_cover.ps1 draws print/cover/cover-<format>.svg from these in the house style (the generator is septet_LGMF_2026's, copied whole 2026-10-08). `title` and `subtitle` are each ONE string or a LIST of lines (drawn stacked, centred); `subtitle` may be left out. Edit, then run:  powershell -ExecutionPolicy Bypass -File print/cover/make_cover.ps1",
+  "_doc": "THE COVER'S WORDS. print/cover/make_cover.ps1 draws print/cover/cover-<format>.svg from these in the house style (the generator is septet_LGMF_2026's, copied whole 2026-10-08). `title` and `subtitle` are each ONE string or a LIST of lines (drawn stacked, centred); `subtitle` may be left out. `vertical`: \"centre\" centres the whole block on the sheet's height; leave it out for the house place (first baseline 27.1 % down). Edit, then run:  powershell -ExecutionPolicy Bypass -File print/cover/make_cover.ps1   and then:  node scripts/render_cover.js",
   "title": "String Quartet No. 1",
-  "name": "Justin Yang"
+  "name": "Justin Yang",
+  "vertical": "centre"
 }

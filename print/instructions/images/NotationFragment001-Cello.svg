@@ -1,0 +1,361 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.2" width="50.96mm" height="32.28mm" viewBox="-0.4431 0.9527 29.0000 18.3666">
+<style type="text/css">
+<![CDATA[
+tspan { white-space: pre; }
+]]>
+</style>
+<g transform="translate(0.0569, 13.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="2.0000" x2="28.0000" y2="2.0000"/>
+</g>
+<g transform="translate(0.0569, 13.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="1.0000" x2="28.0000" y2="1.0000"/>
+</g>
+<g transform="translate(0.0569, 13.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-0.0000" x2="28.0000" y2="-0.0000"/>
+</g>
+<g transform="translate(0.0569, 13.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-1.0000" x2="28.0000" y2="-1.0000"/>
+</g>
+<g transform="translate(0.0569, 13.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1000" stroke="currentColor" x1="0" y1="-2.0000" x2="28.0000" y2="-2.0000"/>
+</g>
+<g transform="translate(0.5691, 10.7775)">
+<rect x="20.2235" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 9.7775)">
+<rect x="17.4169" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 10.7775)">
+<rect x="17.4169" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 16.7775)">
+<rect x="12.7171" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 17.7775)">
+<rect x="12.7171" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 8.7775)">
+<rect x="8.2745" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 9.7775)">
+<rect x="8.2745" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 10.7775)">
+<rect x="8.2745" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 9.7775)">
+<rect x="2.4288" y="-0.1000" width="1.2833" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<g transform="translate(0.5691, 10.7775)">
+<rect x="2.3821" y="-0.1000" width="1.3299" height="0.2000" ry="0.1000" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:141:13:14">
+<g transform="translate(21.0143, 13.2775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(17.1647, 9.2775)">
+<path transform="scale(0.0025, -0.0025)" d="M-8 375c9 5 18 7 28 7s19 -2 28 -7l-3 -202l97 26c2 0 3 1 5 1c11 0 20 -9 20 -20l7 -555c-9 -5 -17 -7 -27 -7s-19 2 -28 7l3 202l-97 -26c-2 0 -3 -1 -5 -1c-11 0 -20 9 -20 20zM126 108l-82 -22l-3 -194l82 22z" fill="currentColor"/>
+</g>
+<g transform="translate(17.1647, 12.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M0 112c0 13 8 25 20 30l34 13v148c0 13 10 24 23 24s24 -11 24 -24v-129l73 29v148c0 13 11 24 24 24s23 -11 23 -24v-129l10 4c4 2 8 2 12 2c17 0 32 -14 32 -32v-46c0 -13 -8 -24 -20 -29l-34 -14v-148l10 4c4 2 8 3 12 3c17 0 32 -14 32 -32v-46c0 -13 -8 -25 -20 -30
+l-34 -13v-148c0 -13 -10 -24 -23 -24s-24 11 -24 24v129l-73 -29v-148c0 -13 -11 -24 -24 -24s-23 11 -23 24v129l-10 -4c-4 -2 -8 -2 -12 -2c-17 0 -32 14 -32 32v46c0 13 8 24 20 29l34 14v148l-10 -4c-4 -2 -8 -3 -12 -3c-17 0 -32 14 -32 32v46zM174 89l-73 -30v-148
+l73 30v148z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:141:7:8">
+<g transform="translate(21.0143, 10.2775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:141:10:11">
+<g transform="translate(21.0143, 11.7775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(21.8359, 13.7775)">
+<rect x="-0.0650" y="-9.1900" width="0.1300" height="8.5795" ry="0.0400" fill="currentColor"/>
+</g>
+<g transform="translate(20.1603, 11.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M34 33l-1 -58v-10c0 -21 2 -43 5 -64c41 38 85 80 85 136c0 31 -13 63 -40 63c-31 0 -48 -33 -49 -67zM32 441l-8 -333c25 27 60 42 97 42c49 0 79 -52 79 -106c0 -76 -78 -117 -133 -169c-19 -18 -27 -52 -55 -52c-17 0 -30 17 -30 35l-14 583c10 6 21 9 32 9
+s22 -3 32 -9z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:143:6:7">
+<g transform="translate(23.8209, 13.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M213 112c25 0 42 57 67 57c10 0 17 -5 20 -12l-171 -657c-11 -9 -24 -14 -38 -14s-27 5 -38 14l102 325c-31 -11 -63 -21 -96 -21c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58c15 0 47 48 52 63l47 150c-31 -11 -64 -21 -97 -21
+c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:131:6:7">
+<g transform="translate(13.5078, 17.7775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:132:6:7">
+<g transform="translate(13.5078, 10.7162)">
+<text font-family="serif" font-size="1.5555" text-anchor="start" fill="currentColor">
+<tspan>o</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:133:29:30">
+<g transform="translate(13.5078, 13.7775)">
+<path stroke-width="0.1000" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor" fill="currentColor" d="M1.0866 4.5000C1.5488 5.0418 2.4877 5.0418 2.9498 4.5000L2.9498 4.5000C2.4877 4.9418 1.5488 4.9418 1.0866 4.5000z"/>
+</g>
+</a>
+<g transform="translate(14.3294, 13.7775)">
+<rect x="-0.0650" y="-2.0000" width="0.1300" height="5.8895" ry="0.0400" fill="currentColor"/>
+</g>
+<g transform="translate(14.3944, 11.8175)">
+<path transform="scale(0.0040, -0.0040)" d="M0 0c0 -177 201 -293 201 -470c0 -33 -9 -65 -23 -95c18 -37 29 -75 29 -117c0 -63 -15 -125 -41 -183c-5 -8 -13 -12 -20 -12c-13 0 -26 11 -23 27c26 52 42 110 42 168c0 97 -94 190 -165 257v-75h-16v500h16zM151 -517c5 15 8 31 8 47c0 96 -91 190 -159 257
+c0 -118 90 -206 151 -304z" fill="currentColor"/>
+</g>
+<g transform="translate(19.0293, 13.7775)">
+<rect x="-0.0650" y="-9.1900" width="0.1300" height="8.0795" ry="0.0400" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:139:6:7">
+<g transform="translate(15.6577, 13.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M60 -250l120 325c-31 -11 -65 -21 -98 -21c-47 0 -87 34 -87 79c0 41 35 72 76 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58c12 0 45 34 51 45c4 8 12 12 20 12c10 0 17 -5 20 -12l-114 -407c-11 -9 -24 -14 -38 -14s-27 5 -38 14z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:140:7:8">
+<g transform="translate(18.2076, 9.2775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:140:10:11">
+<g transform="translate(18.2076, 11.2775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:140:12:13">
+<g transform="translate(18.2076, 12.7775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:108:4:5">
+<g transform="translate(2.0569, 4.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="5.8524" y1="-0.0000" x2="5.8524" y2="0.7000"/>
+</g>
+<g transform="translate(2.0569, 4.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="-0.2000" y1="-0.0000" x2="-0.2000" y2="0.7000"/>
+</g>
+<g transform="translate(2.0569, 4.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="5.8524" y1="-0.0000" x2="4.2456" y2="-0.0000"/>
+</g>
+<g transform="translate(2.0569, 4.7775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="-0.2000" y1="-0.0000" x2="1.6068" y2="-0.0000"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:108:4:5">
+<g transform="translate(4.0637, 5.1790)">
+<text font-family="serif" font-style="italic" font-size="1.2348" text-anchor="start" fill="currentColor">
+<tspan>5:4</tspan>
+</text>
+</g>
+</a>
+<g transform="translate(3.9295, 6.2775)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="2.4839 -0.2000 2.4839 0.2000 0.0400 0.2000 0.0400 -0.2000"/>
+</g>
+<g transform="translate(3.9295, 7.0875)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="2.4839 -0.2000 2.4839 0.2000 0.0400 0.2000 0.0400 -0.2000"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:126:4:5">
+<g transform="translate(8.2093, 2.2775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="6.3851" y1="-0.0000" x2="6.3851" y2="0.7000"/>
+</g>
+<g transform="translate(8.2093, 2.2775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="-0.2000" y1="-0.0000" x2="-0.2000" y2="0.7000"/>
+</g>
+<g transform="translate(8.2093, 2.2775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="6.3851" y1="-0.0000" x2="4.5120" y2="-0.0000"/>
+</g>
+<g transform="translate(8.2093, 2.2775)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="-0.2000" y1="-0.0000" x2="1.8731" y2="-0.0000"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:126:4:5">
+<g transform="translate(10.4824, 2.6875)">
+<text font-family="serif" font-style="italic" font-size="1.2348" text-anchor="start" fill="currentColor">
+<tspan>6:4</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:138:4:5">
+<g transform="translate(15.6577, 3.3065)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="11.6357" y1="-0.0000" x2="11.6357" y2="0.7000"/>
+</g>
+<g transform="translate(15.6577, 3.3065)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="-0.2000" y1="-0.0000" x2="-0.2000" y2="0.7000"/>
+</g>
+<g transform="translate(15.6577, 3.3065)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="11.6357" y1="-0.0000" x2="7.1373" y2="-0.0000"/>
+</g>
+<g transform="translate(15.6577, 3.3065)">
+<line stroke-linejoin="round" stroke-linecap="round" stroke-width="0.1600" stroke="currentColor" x1="-0.2000" y1="-0.0000" x2="4.4984" y2="-0.0000"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:138:4:5">
+<g transform="translate(20.5561, 3.7080)">
+<text font-family="serif" font-style="italic" font-size="1.2348" text-anchor="start" fill="currentColor">
+<tspan>5:4</tspan>
+</text>
+</g>
+</a>
+<g transform="translate(18.9643, 4.5875)">
+<polygon stroke-linejoin="round" stroke-linecap="round" stroke-width="0.0800" fill="currentColor" stroke="currentColor" points="2.8966 -0.2000 2.8966 0.2000 0.0400 0.2000 0.0400 -0.2000"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:143:11:12">
+<g transform="translate(25.0768, 11.2775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:143:14:15">
+<g transform="translate(25.0768, 12.7775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:143:17:18">
+<g transform="translate(25.0768, 14.7775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:143:22:23">
+<g transform="translate(24.9056, 17.1167)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M180 219c0 6 6 12 6 18c0 10 -8 19 -19 19c-21 0 -42 -11 -42 -30c0 -16 16 -26 31 -33c34 -17 69 -39 69 -76c0 -66 -55 -117 -122 -117c-43 0 -77 36 -77 80c0 21 12 42 31 42c18 0 32 -15 32 -33c0 -13 -22 -16 -22 -29s15 -19 29 -19c35 0 69 17 69 48
+c0 55 -101 54 -101 109c0 51 40 94 90 94c60 0 85 -36 85 -64c0 -17 -10 -31 -27 -31c-18 0 -32 11 -32 22z" fill="currentColor"/>
+
+<path transform="translate(0.3073, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.7853, 0.0000) scale(0.0015, -0.0015)" d="M128 192c-24 0 -50 -7 -71 -7c-9 0 -15 3 -15 12c0 30 28 70 57 70c34 0 60 -34 94 -34c13 0 24 6 33 15c5 4 9 7 14 7c11 0 21 -11 21 -22c0 -5 -2 -10 -7 -15l-152 -147c26 -5 47 -30 74 -30c33 0 59 23 59 49c0 7 -4 15 -4 22c0 12 10 20 21 20c25 0 34 -55 34 -77
+c0 -63 -70 -97 -140 -97c-35 0 -38 59 -73 59c-14 0 -28 -2 -38 -11c-5 -4 -9 -6 -14 -6c-11 0 -21 10 -21 21c0 5 1 10 6 15l161 156h-3h-36z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<g transform="translate(25.8985, 13.7775)">
+<rect x="-0.0650" y="-8.2500" width="0.1300" height="9.1395" ry="0.0400" fill="currentColor"/>
+</g>
+<g transform="translate(25.9635, 5.5675)">
+<path transform="scale(0.0040, -0.0040)" d="M0 0c0 -177 201 -293 201 -470c0 -33 -9 -65 -23 -95c18 -37 29 -75 29 -117c0 -63 -15 -125 -41 -183c-5 -8 -13 -12 -20 -12c-13 0 -26 11 -23 27c26 52 42 110 42 168c0 97 -94 190 -165 257v-75h-16v500h16zM151 -517c5 15 8 31 8 47c0 96 -91 190 -159 257
+c0 -118 90 -206 151 -304z" fill="currentColor"/>
+</g>
+<g transform="translate(24.2229, 11.2775)">
+<path transform="scale(0.0025, -0.0025)" d="M34 33l-1 -58v-10c0 -21 2 -43 5 -64c41 38 85 80 85 136c0 31 -13 63 -40 63c-31 0 -48 -33 -49 -67zM32 441l-8 -333c25 27 60 42 97 42c49 0 79 -52 79 -106c0 -76 -78 -117 -133 -169c-19 -18 -27 -52 -55 -52c-17 0 -30 17 -30 35l-14 583c10 6 21 9 32 9
+s22 -3 32 -9z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:145:6:7">
+<g transform="translate(26.4635, 13.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M60 -250l120 325c-31 -11 -65 -21 -98 -21c-47 0 -87 34 -87 79c0 41 35 72 76 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58c12 0 45 34 51 45c4 8 12 12 20 12c10 0 17 -5 20 -12l-114 -407c-11 -9 -24 -14 -38 -14s-27 5 -38 14z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:118:6:7">
+<g transform="translate(3.1723, 17.1167)">
+<g>
+<path transform="scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+
+<path transform="translate(0.4097, 0.0000) scale(0.0015, -0.0015)" d="M250 221l-47 -153c-30 -99 -121 -255 -218 -255c-48 0 -87 39 -87 88c0 39 17 77 52 77c24 0 44 -19 44 -43c0 -30 -38 -25 -38 -55c0 -10 11 -11 23 -11h6c42 0 62 45 73 89l66 263h-37c-16 0 -29 13 -29 29s13 29 29 29h53c34 92 119 181 210 181c48 0 87 -40 87 -89
+c0 -39 -17 -77 -52 -77c-24 0 -44 20 -44 44c0 30 38 25 38 55c0 10 -10 10 -22 10h-7c-52 0 -68 -67 -83 -124h42c16 0 29 -13 29 -29s-13 -29 -29 -29h-59z" fill="currentColor"/>
+</g>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:111:11:12">
+<g transform="translate(3.6162, 10.2775)">
+<path transform="scale(0.0040, -0.0040)" d="M-50 0c0 28 22 50 50 50s50 -22 50 -50s-22 -50 -50 -50s-50 22 -50 50z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(3.9945, 13.7775)">
+<rect x="-0.0650" y="-7.5000" width="0.1300" height="2.8895" ry="0.0400" fill="currentColor"/>
+</g>
+<g transform="translate(2.1299, 9.2775)">
+<path transform="scale(0.0025, -0.0025)" d="M0 112c0 13 8 25 20 30l34 13v148c0 13 10 24 23 24s24 -11 24 -24v-129l73 29v148c0 13 11 24 24 24s23 -11 23 -24v-129l10 4c4 2 8 2 12 2c17 0 32 -14 32 -32v-46c0 -13 -8 -24 -20 -29l-34 -14v-148l10 4c4 2 8 3 12 3c17 0 32 -14 32 -32v-46c0 -13 -8 -25 -20 -30
+l-34 -13v-148c0 -13 -10 -24 -23 -24s-24 11 -24 24v129l-73 -29v-148c0 -13 -11 -24 -24 -24s-23 11 -23 24v129l-10 -4c-4 -2 -8 -2 -12 -2c-17 0 -32 14 -32 32v46c0 13 8 24 20 29l34 14v148l-10 -4c-4 -2 -8 -3 -12 -3c-17 0 -32 14 -32 32v46zM174 89l-73 -30v-148
+l73 30v148z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:112:6:7">
+<g transform="translate(1.1729, 3.0879)">
+<text font-family="Crimson Pro Light" font-style="italic" font-size="1.3860" text-anchor="start" fill="currentColor">
+<tspan>pizz.</tspan>
+</text>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:119:6:7">
+<g transform="translate(4.3201, 11.7775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:119:9:10">
+<g transform="translate(4.7634, 13.2775)">
+<path transform="scale(0.0040, -0.0040)" d="M-50 0c0 28 22 50 50 50s50 -22 50 -50s-22 -50 -50 -50s-50 22 -50 50z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(5.1417, 13.7775)">
+<rect x="-0.0650" y="-7.5000" width="0.1300" height="5.3895" ry="0.0400" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:120:6:7">
+<g transform="translate(5.5667, 15.2775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:109:6:7">
+<g transform="translate(2.0569, 13.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M213 112c25 0 42 57 67 57c10 0 17 -5 20 -12l-171 -657c-11 -9 -24 -14 -38 -14s-27 5 -38 14l102 325c-31 -11 -63 -21 -96 -21c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58c15 0 47 48 52 63l47 150c-31 -11 -64 -21 -97 -21
+c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:111:6:7">
+<g transform="translate(3.1729, 9.2775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(9.8869, 13.7775)">
+<rect x="-0.0650" y="-10.5000" width="0.1300" height="5.3895" ry="0.0400" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:127:6:7">
+<g transform="translate(8.2093, 13.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M213 112c25 0 42 57 67 57c10 0 17 -5 20 -12l-171 -657c-11 -9 -24 -14 -38 -14s-27 5 -38 14l102 325c-31 -11 -63 -21 -96 -21c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58c15 0 47 48 52 63l47 150c-31 -11 -64 -21 -97 -21
+c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:120:11:12">
+<g transform="translate(6.0100, 16.2775)">
+<path transform="scale(0.0040, -0.0040)" d="M-50 0c0 28 22 50 50 50s50 -22 50 -50s-22 -50 -50 -50s-50 22 -50 50z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:128:6:7">
+<g transform="translate(9.0652, 8.7775)">
+<path transform="scale(0.0027, -0.0027)" d="M208 139c61 0 117 -33 117 -99c0 -71 -52 -119 -99 -147c-34 -20 -71 -32 -110 -32c-61 0 -116 33 -116 99c0 71 51 119 98 147c34 20 71 32 110 32z" fill="currentColor"/>
+</g>
+</a>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:128:10:11">
+<g transform="translate(9.5086, 9.3275)">
+<path transform="scale(0.0040, -0.0040)" d="M130 -20h-260c-11 0 -20 9 -20 20s9 20 20 20h260c11 0 20 -9 20 -20s-9 -20 -20 -20z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(10.4019, 8.2775)">
+<path transform="scale(0.0040, -0.0040)" d="M0 0c0 31 25 56 56 56s56 -25 56 -56s-25 -56 -56 -56s-56 25 -56 56z" fill="currentColor"/>
+</g>
+<g transform="translate(9.9519, 3.3175)">
+<path transform="scale(0.0040, -0.0040)" d="M0 0v-250h-16v250h16zM0 0c0 -197 207 -336 207 -533c0 -71 -15 -141 -41 -207c-5 -8 -13 -12 -20 -12c-13 0 -26 11 -23 27c26 61 42 126 42 192c0 103 -94 208 -165 283v250z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:129:6:7">
+<g transform="translate(12.6519, 13.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M213 112c25 0 42 57 67 57c10 0 17 -5 20 -12l-171 -657c-11 -9 -24 -14 -38 -14s-27 5 -38 14l102 325c-31 -11 -63 -21 -96 -21c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58c15 0 47 48 52 63l47 150c-31 -11 -64 -21 -97 -21
+c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58z" fill="currentColor"/>
+</g>
+</a>
+<g transform="translate(6.3883, 13.7775)">
+<rect x="-0.0650" y="-7.5000" width="0.1300" height="8.8895" ry="0.0400" fill="currentColor"/>
+</g>
+<g transform="translate(4.7128, 15.2775)">
+<path transform="scale(0.0025, -0.0025)" d="M34 33l-1 -58v-10c0 -21 2 -43 5 -64c41 38 85 80 85 136c0 31 -13 63 -40 63c-31 0 -48 -33 -49 -67zM32 441l-8 -333c25 27 60 42 97 42c49 0 79 -52 79 -106c0 -76 -78 -117 -133 -169c-19 -18 -27 -52 -55 -52c-17 0 -30 17 -30 35l-14 583c10 6 21 9 32 9
+s22 -3 32 -9z" fill="currentColor"/>
+</g>
+<a style="color:inherit;" xlink:href="textedit://C:/Users/jwloy/OneDrive/Documents/GitHub/string_quartet_no1-composer/lilypond_code/NotationFragment001-Cello.ly:121:6:7">
+<g transform="translate(6.9533, 13.7775)">
+<path transform="scale(0.0025, -0.0025)" d="M213 112c25 0 42 57 67 57c10 0 17 -5 20 -12l-171 -657c-11 -9 -24 -14 -38 -14s-27 5 -38 14l102 325c-31 -11 -63 -21 -96 -21c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58c15 0 47 48 52 63l47 150c-31 -11 -64 -21 -97 -21
+c-47 0 -87 34 -87 79c0 41 34 72 75 72c25 0 49 -12 57 -35c10 -26 3 -58 31 -58z" fill="currentColor"/>
+</g>
+</a>
+</svg>
