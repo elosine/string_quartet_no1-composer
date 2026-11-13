@@ -14,6 +14,62 @@
 
 > The cold-start block that `/session-start` reads. §3 – §6 follow it; everything after them (Parts 0–IV) is the consolidated history up to April 2026.
 
+> **► CURRENT POSITION (2026-11-12): ACCEPTED TO THE 2026 JACK STUDIO READINGS — THE READING IS 2026-11-23.
+> THE READINESS PLAN AGREED (top line below). ► NEXT: step 1, prove the live app today on the real devices.**
+> Written as the handoff from the tubas/septet session of 2026-11-12 (its RUNNING_LOG 122); the septet's design
+> sitting is paused at its proofing pass until after the readings.
+
+### THE DECISION (2026-11-12, the composer's "yes")
+
+- **The readings run on THIS repo's own performance system as it is** — the first generation: the Workshop builds
+  into the performance app (`scripts/build_performance_app.js`), served by `scripts/performance_server.js`
+  (Express + Socket.IO, rooms, sync, the parts view, rehearsal and performance modes, annotations), live on the box
+  as `sq1-server` and linked from the site. **The new stand built for Tempus and the tubas (the seams, the room
+  client, the strip, the remote, the display, the floor clock) is NOT ported before the 23rd:** its recipe
+  (`for_seven_tubas/docs/PORTING.md`) assumes a notation library, an IR and a registry, and this piece's notation
+  lives in the Workshop's canvas engine with LilyPond fragments, curves and the GC library — a port is weeks. It
+  comes later, as the tubas' plan 9q foresees.
+- **The composer's words:** *"it's just almost like a sight reading. I have a feeling they might not rehearse very
+  much before. So that will be the main thing, is to have everything really robust and ready to go, and they can
+  just play through the piece. … My slot is 45 minutes, so there might be a little bit of start and stop. So I
+  need to be able to do some of that. As a secondary consideration, they may want to look at it beforehand. …
+  the whole sort of follow the leader was confusing for me … we just need to simplify things and make sure
+  everything's robust, make sure it's performable, but we can do some start and stop on the day, and then also
+  see if we can have a rehearsal version ready as well."*
+
+### THE TOP LINE (agreed 2026-11-12 — each step gets its own talk when reached; nothing built before that)
+
+1. **Prove it today.** The live app on the composer's iPad and laptop, end to end: a room, four parts, play, stop,
+   a jump, sync. Collect every fault, one line each, here.
+2. **Fix what blocks, then harden the server.** The April audit's leftovers (`docs/SERVER_AUDIT.md`: the restart
+   causes, a health check, a deploy script, log rotation), so it stays up through a 45-minute slot.
+3. **Simplify the control.** One plain way for the composer to start, stop and jump; the players only follow. One
+   page of instructions for the day.
+4. **The look-ahead version.** A link each player can open any time before the 23rd — their part or the full score,
+   playing on its own — with the instructions.
+5. **The handouts.** One link or QR per player, the Technical Manual (`docs/technical_manual/`), the print score
+   (`print/score/String_Quartet_No_1-JYang.pdf`, 36 pp) and the parts (`builds/print/`).
+6. **A dress run at home.** iPad, laptop and phone as players, with start and stop as on the day.
+
+### HOW TO WORK HERE (carried from the other pieces)
+
+- The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the
+  README: Workshop `node C:\Users\jwloy\GitHub\string_quartet_no1-composer\server.js` → `http://localhost:3000` ·
+  the performance app locally: build with `node C:\Users\jwloy\GitHub\string_quartet_no1-composer\scripts\build_performance_app.js`,
+  then `node C:\Users\jwloy\GitHub\string_quartet_no1-composer\scripts\performance_server.js` → `http://localhost:3001` ·
+  live: `https://justinwenloyang.com/string-quartet-no1` (the box: `/home/deploy/sq1`, PM2 `sq1-server`; the
+  deploy line and the sparse-clone warning are in the README and §3's DEPLOY NOTE).
+- Tests only when make-or-break; one verification per claim, on the real device; plain words; every reply ends
+  with "Your steps"; findings collected as named, fixed together on the composer's go.
+- Journal as the work happens (a RUNNING_LOG-style trail belongs in this §2 or a new `docs/RUNNING_LOG.md`).
+
+### OPEN, CARRIED
+
+- Two local commits of 2026-10-08 were never pushed until the handoff commit (see git log); the §3 DEPLOY NOTE
+  (the server's sparse clone and the tracked PDFs) applies before the next deploy.
+
+---
+
 ### LAST SESSION — 2026-10-08 (session 1 of the October work; Claude Code — Fable 5.1, then Opus 5.5)
 
 - **The goal: a submission print score for the "2026 JACK Studio Readings"** (the JACK Quartet reads existing quartets; sessions December 2026, New York; **application deadline 2026-10-22, 11:59 pm ET**; `https://www.jackquartet.com/studio`). A Google Form: a LINK to the score (required), a link to a recording (optional), title, duration as h:mm, year, played before, technical needs. **He fills and submits it himself.**
@@ -55,6 +111,8 @@
 - **Recombination's server answers 404 for a bare folder URL** — ask for `/docs/notation_instructions/index.html`.
 
 ## §4 Decisions
+
+- **2026-11-12 — THE READINGS RUN ON THE FIRST-GENERATION SYSTEM AS IT IS;** the new stand (Tempus, the tubas) comes to the quartet after the readings. The composer: "I think I agree with you if we can keep that system, as long as we can make sure it's robust and runs well on the iPads."
 
 - **D-Oct-1 · The October 2026 updates live in `print/`; the originals are not touched** (his ask). He keeps `docs/notation_instructions/` and `builds/print/` as posted until the performance score and parts are finalized in a separate build. *Rejected:* editing the live page in place (a deploy would change the site); an `updates/` folder apart from the cover (two homes for one job). `print/instructions/UPDATES.md` is the list of changes; each is marked in the page as `[update 2026-10 #N]`.
 - **D-Oct-2 · The March print PDFs are tracked in place** — `builds/print/full_score.pdf` and the twelve parts, force-added. The five test PDFs there (`stage4_*`, `test_vector`) are left untracked.
