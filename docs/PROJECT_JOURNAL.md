@@ -554,6 +554,50 @@ parts are unchanged · the site's landing page still links the old app.
   1600 × 1200. Same test each: a reload, [Play all] from the start, a photo of the readout. `gaps` and `off`
   are the numbers to compare.
 
+- **The two trial films are made (b801a595 pushed):** `stand/films/a/violin1.mp4` — 2048 × 1536, 60 fps, no
+  B-frames, one reference frame, a key frame a second, 54.1 MB · `stand/films/b/violin1.mp4` — the same at
+  1600 × 1200 (level 4.2), 44.1 MB. Both transcoded from the present film (`-preset medium -crf 17
+  -x264-params ref=1:bframes=0:keyint=60:min-keyint=60:scenecut=0`); the frames' times are identical to the
+  original's (checked at both ends: 0 … 511.983 s, 30,722 frames). A link with `?film=a` or `?film=b` plays
+  them; the readout's last line names the version. ► HIS: the deploy line, the two folders copied to the box,
+  then Violin I with `?film=a` and with `?film=b`, a photo of the readout after each.
+
+- **THE TWO TRIAL FILMS ON THE iPAD (his two photos, 4:41 and 4:42, each about twenty seconds of [Play all]
+  from the start; the readout's last line, which names the film, is cut off in both):**
+  · `trim 18 max 5.0% at 0,0,8,14,15 off 217ms` · `gaps 44 max 146ms` · `steps 0` · `clock locked cal rtt 117
+    pend 5.7 corr 1/15ms` · `motor −2000ppm nearest`
+  · `trim 21 max 5.0% at 0,2,8,13,14 off 133ms` · `gaps 42 max 110ms` · `steps 0` · `clock holdover cal rtt 78
+    trip 1` · `motor −2000ppm nearest`
+  **THE LIGHTER FILMS DID NOT HELP — the "iPad cannot decode this film" reading is REFUTED** (the smaller,
+  plainer film has as many late frames as the full one). **What the numbers DO show: the servo took hold of
+  the film's speed about ONCE A SECOND (18 and 21 times in twenty seconds), each time at its full 5 %, and its
+  learned drift is pinned at its limit.** It is hunting: speed up, let go, fall behind, speed up. And [Play
+  alone], where nothing touches the speed, he called smooth. **The reading now (to be tested, not proved): on
+  Safari every change of playbackRate costs the film a moment, so the servo's corrections make the lag they
+  then correct** — the first-minute stutters AND "the lack of cursor smoothness throughout", which he saw
+  playing in the room. (The servo is the tubas' test-kit one; here its trim limit was raised from 2 % to 5 %
+  on 2026-11-15, which made each grab harder.)
+  **THE TEST (building): IN THE ROOM THE FILM RUNS FREE** — started on the room's instant (the start is
+  already within 6–21 ms on the iPad), then left at exactly the room's speed with no trimming; if it is ever
+  more than 120 ms out for half a second, one aimed seek. Two tablets' clocks differ by tens of parts per
+  million, so a free film stays within a frame or two over the whole piece. `?servo=on` on a link brings the
+  old behaviour back for a comparison.
+
+- **His eye on the two trial films:** "Both films have a fair bit of jitter, probably as bad as the original.
+  And number B probably is a little less worse, but a few seconds in, it had a significant jitter. And they
+  all sort of start out quite jittery … the cursor's quite jittery." His eye and the numbers agree: the
+  encoding is not the cause.
+- **BUILT (PC-verified only): IN THE ROOM THE FILM RUNS FREE.** No trimming of the speed at all (the servo
+  stays in the page, behind `?servo=on`, for a comparison). A stand: (1) at the door, after the warm-up, times
+  one more start — play() to the first new frame — and takes that as its own start time (`door` in the
+  readout; a kept, learned value still wins); (2) calls play() that long before the room's instant; (3) in the
+  first four seconds puts itself on the place by a seek if it is more than 40 ms out (twice at most, the aim
+  learned from where the last seek landed); (4) after that is left alone unless 120 ms out for a quarter
+  second. `film_check` 33 ok: two stands within 11.8 ms of the room at 100 %, 1.8 ms at 70 %, with no trim.
+  The readout's new line: `free off <ms>`. **This is the test of the reading that the servo's speed changes
+  are what the iPad stutters on. ► HIS: the deploy line, a reload, [Play all] from the start, his eye, a
+  photo.** (The trial films `a/` and `b/` stay on the box, unused unless a link asks.)
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the
