@@ -170,6 +170,8 @@
     local: { playing: false, pos: 0, at: 0, rate: 1 },   // this stand's own transport: pos (s) at performance.now() = at, moving at rate
     opened: false, servo: null, seeking: false, lastSeekAt: 0, seekEst: 0.15, chased: false, typing: false, wake: null,
     playErr: null, plays: 0, stuckSince: null, stuck: false, debug: false,
+    startEst: 0.12,               // s: how long this device takes from play() to a moving film (learned, kept)
+    startCalledAt: 0, startT0: null, startMeasured: true, wasMoving: false, lastStartErr: null, seekCount: 0,
   };
 
   // ---- the two clocks --------------------------------------------------------------
@@ -187,10 +189,13 @@
       const sn = S.room.serverNow(now);
       const waiting = sn != null && sn < S.tuple.anchorServerTime;
       const p = roomPos(now);
-      return { pos: p, moving: !waiting && p < dur(), waitMs: waiting ? S.tuple.anchorServerTime - sn : 0, all: true, rate: S.tuple.rate || 1 };
+      const waitMs = waiting ? S.tuple.anchorServerTime - sn : 0;
+      return { pos: p, moving: !waiting && p < dur(), waitMs, all: true, rate: S.tuple.rate || 1,
+        pre: waiting && waitMs <= S.startEst * 1000 && p < dur() };    // call play() this long before the room's instant
+
     }
     const p = localPos(now);
-    return { pos: p, moving: S.local.playing && p < dur(), waitMs: 0, all: false, rate: S.local.rate };
+    return { pos: p, moving: S.local.playing && p < dur(), waitMs: 0, all: false, rate: S.local.rate, pre: false };
   }
   function setLocal(pos, playing) { S.local = { playing: !!playing, pos: clamp(pos), at: performance.now(), rate: S.speed }; S.jumpPending = !!playing; }
 
@@ -198,6 +203,7 @@
   const hasRVFC = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
   function seekTo(sec) {
     S.seeking = true; S.lastSeekAt = performance.now(); S.lastSeekTo = clamp(sec);
+    if (!v.paused) S.seekCount++;
     if (S.servo) S.servo.reset();
     try { v.currentTime = clamp(sec); } catch (e) { S.seeking = false; }
   }
@@ -245,7 +251,10 @@
     if (alone && !isSeeking() && v.readyState >= 2) { S.local.pos = clamp(v.currentTime); S.local.at = now; }
     if (alone && localPos(now) >= dur()) setLocal(dur(), false);   // alone, the end: stopped there
     const t = target(now);
-    if (!t.moving) {
+    // the room's start, seen from this stand: the instant it begins to move, for the start's measurement
+    if (t.all && t.moving && !S.wasMoving) { S.startT0 = now; S.startMeasured = !(S.startCalledAt && now - S.startCalledAt < 1500 && S.lastSeekAt < S.startCalledAt); }
+    S.wasMoving = t.all && t.moving;
+    if (!t.moving && !t.pre) {
       if (!v.paused) v.pause();
       setRate(1);
       // a stopped film sits on the place; a browser that snaps a seek to a frame is not asked twice for the same place
@@ -257,8 +266,8 @@
       // aimed ahead by this device's own seek time, then play whatever it landed on — never seek after seek
       // (a slow seeker chasing a moving clock that way never starts: the iPad, 2026-11-15).
       if (!isSeeking()) {
-        if (t.all && Math.abs(v.currentTime - t.pos) > 0.25 && !S.chased) { S.chased = true; seekTo(t.pos + S.seekEst * t.rate + 0.02); }
-        else if (now - (S.lastPlayAt || 0) > 400) { S.lastPlayAt = now; S.chased = false; setRate(t.rate); playFilm(); if (S.servo) S.servo.reset(); }   // asked again every 0.4 s, not every frame
+        if (t.all && Math.abs(v.currentTime - t.pos) > 0.25 && !S.chased) { S.chased = true; seekTo(t.moving ? t.pos + S.seekEst * t.rate + 0.02 : t.pos); }
+        else if (now - (S.lastPlayAt || 0) > 400) { S.lastPlayAt = now; S.chased = false; setRate(t.rate); if (t.all) S.startCalledAt = now; playFilm(); if (S.servo) S.servo.reset(); }   // asked again every 0.4 s, not every frame
       }
     } else if (!hasRVFC && !isSeeking()) {
       // no frame callbacks: a plain proportional trim on the media clock
@@ -288,6 +297,13 @@
     if (!t.moving) return;
     if (!t.all) { setRate(t.rate); return; }       // alone: the film leads, at the stand's speed, untouched
     const mediaMs = md.mediaTime * 1000, targetMs = t.pos * 1000;
+    if (!S.startMeasured && S.startT0 != null && at - S.startT0 > 300) {
+      S.startMeasured = true;
+      S.lastStartErr = mediaMs - targetMs;                       // − = the film set off late
+      S.startEst = Math.max(0, Math.min(0.6, S.startEst - 0.6 * S.lastStartErr / 1000));
+      try { localStorage.setItem('sq1:startEst', S.startEst.toFixed(3)); } catch (e) { /* not kept */ }
+      lastPaint = '';
+    }
     if (Math.abs(mediaMs - targetMs) > SEEK_GAP_MS) {
       if (performance.now() - S.lastSeekAt > SEEK_EVERY_MS) seekTo(t.pos + S.seekEst * t.rate + 0.03);
       return;
@@ -304,7 +320,7 @@
   let lastPaint = '';
   function paint(t) {
     const all = t.all;
-    const key = [all, S.local.playing, Math.floor(t.pos * 5), Math.ceil(t.waitMs / 1000), S.online, S.canLead, S.tuple && S.tuple.by, S.typing, t.rate, S.speed, S.stuck, S.debug, (S.stuck || S.debug) ? [v.paused, v.seeking, v.readyState, S.plays, S.playErr, Math.floor(performance.now() / 500)].join() : ''].join('|');
+    const key = [all, S.local.playing, Math.floor(t.pos * 5), Math.ceil(t.waitMs / 1000), S.online, S.canLead, S.tuple && S.tuple.by, S.typing, t.rate, S.speed, S.stuck, S.debug, (S.stuck || S.debug) ? [v.paused, v.seeking, v.readyState, S.plays, S.playErr, S.seekCount, S.lastStartErr, Math.floor(performance.now() / 500)].join() : ''].join('|');
     if (key === lastPaint) return;
     lastPaint = key;
     document.body.classList.toggle('all', all);
@@ -324,6 +340,7 @@
       $('net').textContent = 'paused ' + (v.paused ? 1 : 0) + ' seek ' + (v.seeking ? 1 : 0) + '/' + (S.seeking ? 1 : 0) + ' ready ' + v.readyState + ' net ' + v.networkState +
         '\nfilm ' + v.currentTime.toFixed(2) + ' want ' + t.pos.toFixed(2) + ' rate ' + v.playbackRate.toFixed(2) +
         '\nplays ' + S.plays + ' ' + (S.playErr || 'no error') + (v.error ? ' media ' + v.error.code : '') +
+        '\nstart ' + (S.lastStartErr == null ? '-' : S.lastStartErr.toFixed(0) + 'ms') + ' est ' + (S.startEst * 1000).toFixed(0) + ' seeks ' + S.seekCount +
         '\nseekEst ' + S.seekEst.toFixed(2) + (S.online ? ' on' : ' off') + (navigator.standalone ? ' app' : ' tab') + ' ' + (S.source || '?') + (S.fellBack ? ' (' + S.fellBack + ')' : '');
     } else $('net').textContent = !TOKEN ? 'no room (a test link)' : (S.online ? 'connected' : 'not connected — alone only');
     $('net').classList.toggle('bad', !dbg && !!TOKEN && !S.online);
@@ -564,7 +581,20 @@
   }
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.opened) keepAwake(); });
   $('doorGo').addEventListener('click', async () => {
-    try { S.plays++; const p = v.play(); if (p && p.then) await p; v.pause(); } catch (e) { S.playErr = 'door: ' + ((e && e.name) || String(e)); }
+    // THE DOOR WARMS THE FILM: a dozen frames are really played behind the door, so the first play that matters
+    // is not the decoder's first (which is slow on a tablet, and set the film off behind the room).
+    $('doorGo').disabled = true; $('doorMsg').textContent = 'Preparing…';
+    try {
+      S.plays++; const p = v.play(); if (p && p.then) await p;
+      await new Promise(res => {
+        const t0 = performance.now(); let k = 0, over = false;
+        const done = () => { if (!over) { over = true; res(); } };
+        if (hasRVFC) { const cb = () => { if (++k >= 12 || performance.now() - t0 > 900) done(); else v.requestVideoFrameCallback(cb); }; v.requestVideoFrameCallback(cb); }
+        setTimeout(done, hasRVFC ? 1300 : 500);
+      });
+      v.pause();
+    } catch (e) { S.playErr = 'door: ' + ((e && e.name) || String(e)); }
+    try { const kept = parseFloat(localStorage.getItem('sq1:startEst')); if (kept >= 0 && kept <= 0.6) S.startEst = kept; } catch (e) { /* none kept */ }
     S.servo = new TK.Servo({ fps: S.film.fps, posture: 'performance', maxTrim: 0.05 });
     if (hasRVFC) v.requestVideoFrameCallback(onFrame);
     S.opened = true; S.openedAt = performance.now();

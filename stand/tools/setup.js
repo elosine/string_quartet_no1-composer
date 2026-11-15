@@ -39,6 +39,11 @@ async function call(op, body) {
   let ens = list[0];
   if (!ens) { ens = (await call('ensemble.create', { name: NAME, piece: piece.id })).ensemble; console.log('ensemble ' + ens.name + ' made (' + ens.id + ')'); }
   else console.log('ensemble ' + ens.name + ' (' + ens.id + '), kept');
+  // the links themselves, to copy (a link is a key: whoever holds it can open that part and move the room)
+  const full = (await call('ensemble/' + ens.id)).ensemble;
+  console.log('');
+  for (const r of full.rows) console.log('  ' + String(r.part).padEnd(11) + r.link);
+  console.log('  ' + 'Full score'.padEnd(11) + full.gatekeeperLink);
   console.log('');
   console.log('The links, a QR code each — open this on this computer:');
   console.log('  ' + SERVER + '/admin/sheet?key=' + KEY);

@@ -436,6 +436,38 @@ parts are unchanged · the site's landing page still links the old app.
   **► NEXT: the later-deploy line, then his iPad again — alone, and above all [Play all] across devices over
   the internet, which is what the reading needs and has not yet been tried from the box.**
 
+- ✓ The later-deploy line (`deploy.sh` on the box) ran: "it ends with OK" — the box now serves b9ae308c (alone,
+  the film is the clock). The script's own listing of the five films passed with it.
+
+- **✓ THE JITTER IS GONE — his word, 2026-11-15, the iPad from the box, alone: "it's smooth now."**
+- `setup.js` now also prints the five links as text (he asked for the box's links in the chat; the AI does not
+  hold the box's key, so he runs the line and pastes what he wants). Not yet committed.
+
+- **[PLAY ALL] FROM THE BOX, three devices (2026-11-15):** his first report: "bad jitter at same place on violin
+  1 with 1st gc" (the iPad). The AI tracked the cursor frame by frame through the first GC in the film
+  (`violin1.mp4`, film 4–8 s, 240 frames): forward 4.2 px every frame, never back, never still — **the film is
+  clean there.** Then his: **"2nd time and 3rd time gone."** So it came ONCE, on the first play after opening,
+  and not again. **Cause NOT found, NOT reproduced.** The AI's guess, unproved: something that settles once in
+  the first minute of a stand's life (the clock's lock and its calibration at about 30 s move the room's time
+  a little; or the device's decoder warming). OPEN, to watch for in the dress run. The page keeps no record of
+  its own seeks, so a recurrence leaves no trace — a small event log in the readout would fix that (proposed,
+  not built). Whether the three STARTED, STAYED and STOPPED together: not yet said by him.
+
+- **IT REPRODUCES (his report + a screenshot of the iPad, 2026-11-15):** all three stands reloaded, [Play all]
+  pressed on the iPad from the start: "it consistently stutters when it gets to about here" — the cursor at
+  second 3, "as it approaches the GC", "not at exactly the same spot". Before today's change it stuttered
+  DURING the GC ("that made that impossible to play"); now BEFORE it. So it is tied to TIME SINCE THE START
+  (about five seconds in), not to a place — and it comes on the first play after a reload ("2nd time and 3rd
+  time gone"). **The AI's reading, unmeasured:** the first play() after a page load is slow on the iPad (the
+  decoder starting), so the film sets off a few tenths of a second behind the room; the servo then runs it 5 %
+  fast for several seconds to catch up, and a film run 5 % fast drops a frame in twenty — the stutter; before
+  today's change the same gap tripped a seek instead, a second later (during the GC).
+  **Built on that reading (PC-verified only):** (1) THE DOOR WARMS THE FILM — [Open] plays a dozen frames
+  behind the door ("Preparing…") so the first real play is not the decoder's first; (2) THE START IS CALLED
+  EARLY by the device's own start time (`startEst`, learned from each clean start's error, kept in the
+  browser) — play() goes out that long before the room's instant; (3) the readout shows the last start's
+  error, the estimate, and a count of seeks while playing.
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the
