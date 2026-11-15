@@ -26,3 +26,7 @@ data/
 # Logs
 *.log
 npm-debug.log*
+
+# The film stand (stand/): films are built, never committed; the registry and admin key are runtime data
+stand/films/
+stand/server/data/

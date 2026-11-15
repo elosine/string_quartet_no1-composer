@@ -1,0 +1,26 @@
+{
+  "id": "sq1",
+  "title": "String Quartet No. 1",
+  "version": "1",
+  "parts": [
+    "Violin I",
+    "Violin II",
+    "Viola",
+    "Cello"
+  ],
+  "everyoneLeads": true,
+  "film": {
+    "parts": [
+      "violin1.mp4",
+      "violin2.mp4",
+      "viola.mp4",
+      "cello.mp4"
+    ],
+    "score": "fullscore.mp4",
+    "duration": 512,
+    "leadIn": 2,
+    "fps": 60,
+    "rowSeconds": 8,
+    "rows": 6
+  }
+}

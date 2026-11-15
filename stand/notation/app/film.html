@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="String Quartet No. 1">
+<title>String Quartet No. 1</title>
+<!--
+  film.html — THE FILM STAND (string_quartet_no1-composer, 2026-11; journal §2).
+
+  One page for every link. A player's link (/s/<token>) plays that part's FILM; the
+  gatekeeper's plays the full score film. The film is the old Performance Score
+  filmed frame by frame (scripts/film_part.js): film second t = score second t.
+
+  Two transports, one film:
+    ALONE   the stand's own clock. [Play alone], the row buttons and the time bar
+            move this stand only.
+    ALL     the room's clock (the server's tuple, read through roomclient.js and
+            the floor clock). [Play all] starts the room one second before where this stand is;
+            every stand snaps to it and wears the band; [Stop all] stops everyone
+            and leaves every stand at that place.
+  Every player has both buttons (the piece registers with everyoneLeads).
+
+  The film keeps time by the frame servo (testkit/js/servo.js): each presented
+  frame is compared with the clock and playbackRate is trimmed; a big gap seeks.
+
+  Dev, no room:  /notation/app/film.html?part=1   (1-4; 0 = the full score)
+-->
+<style>
+  :root { --bar: #17191d; --ink: #e9e6df; --dim: #8b8f98; --line: #2c3037; --alone: #4c8dff; --all: #e8862a; --bad: #d9534f; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: #000; color: var(--ink); overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-user-select: none; user-select: none; touch-action: manipulation; overscroll-behavior: none; }
+  #app { position: fixed; inset: 0; display: flex; flex-direction: row; }
+  #stage { position: relative; flex: 1 1 auto; min-width: 0; min-height: 0; background: #000; display: flex; align-items: center; justify-content: center; }
+  #film { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+  #frame { position: absolute; pointer-events: none; border: 0 solid var(--all); transition: border-width .12s; }
+  body.all #frame { border-width: 6px; }
+  /* shown only when the film should be moving and the device has not let it start */
+  #tap { display: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); min-width: 260px; min-height: 96px; font-size: 26px;
+    background: var(--ink); color: #111; border: 0; border-radius: 16px; box-shadow: 0 6px 30px rgba(0,0,0,.45); z-index: 5; }
+  #net.dbg { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10px; text-align: left; color: #cfd3da; white-space: pre-line; line-height: 1.35; }
+
+  /* the controls: a column at the side when the screen is wider than the film, else a bar underneath */
+  #panel { flex: 0 0 auto; background: var(--bar); display: flex; gap: 10px; padding: 10px; align-items: stretch; }
+  body.side #app { flex-direction: row; }
+  body.side #panel { flex-direction: column; width: 132px; border-left: 1px solid var(--line); padding: 10px 8px; }
+  body.side button { padding: 0 4px; font-size: 14px; }
+  body.under #app { flex-direction: column; }
+  body.under #panel { flex-direction: row; height: 72px; border-top: 1px solid var(--line); align-items: center; }
+
+  #who { font-size: 15px; font-weight: 600; line-height: 1.2; }
+  #who small { display: block; font-weight: 400; font-size: 11px; color: var(--dim); margin-top: 2px; }
+  #state { font-size: 13px; font-weight: 700; letter-spacing: .06em; padding: 6px 8px; border-radius: 6px; background: #23262c; color: var(--dim); text-align: center; }
+  body.alone-playing #state { background: var(--alone); color: #fff; }
+  body.all #state { background: var(--all); color: #1b1206; }
+  #state small { display: block; font-weight: 600; letter-spacing: 0; font-size: 11px; opacity: .85; }
+  /* the time is a box, in SECONDS as the score's own timeline counts them: tap it, type a number, Go */
+  #timeWrap { display: block; }
+  #timeWrap small { display: block; text-align: center; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin-bottom: 3px; }
+  body.under #timeWrap small { display: none; }
+  #time { font: inherit; font-size: 26px; font-weight: 300; font-variant-numeric: tabular-nums; text-align: center; color: var(--ink);
+    background: #1f2227; border: 1px solid #3a3f48; border-radius: 10px; min-height: 48px; width: 100%; padding: 0 4px; margin: 0;
+    -webkit-user-select: text; user-select: text; -webkit-appearance: none; appearance: none; outline: none; }
+  #time:focus { border-color: var(--ink); background: #000; }
+  #time.bad { border-color: var(--bad); }
+
+  button { font: inherit; color: var(--ink); background: #2a2e35; border: 1px solid #3a3f48; border-radius: 10px; padding: 0 10px; min-height: 52px;
+    font-size: 15px; font-weight: 600; cursor: pointer; touch-action: manipulation; }
+  button:active { filter: brightness(1.35); }
+  button[disabled] { opacity: .35; }
+  #bAlone { border-color: var(--alone); }
+  body.alone-playing #bAlone { background: var(--alone); color: #fff; }
+  #bAll { border-color: var(--all); color: #ffd9b0; }
+  body.all #bAll { background: var(--all); color: #1b1206; }
+  .rowbtns { display: flex; gap: 8px; }
+  .rowbtns button { flex: 1 1 0; min-height: 46px; font-size: 20px; padding: 0; }
+  #bTop { min-height: 40px; font-size: 13px; font-weight: 500; color: var(--dim); }
+  #bSpeed { min-height: 46px; font-variant-numeric: tabular-nums; }
+  #bSpeed.slow { border-color: #c9b458; color: #f1e3a0; }
+  body.under #bSpeed { min-width: 70px; }
+  body.side .grow { flex: 1 1 auto; }
+  body.under .grow { display: none; }
+  body.under #who { min-width: 96px; }
+  body.under #state { min-width: 92px; }
+  body.under #time { width: 96px; font-size: 22px; }
+  body.under .rowbtns { width: 120px; }
+  body.under button { min-height: 50px; }
+  body.under #bAlone, body.under #bAll { min-width: 104px; }
+  #net { font-size: 11px; color: var(--dim); text-align: center; }
+  #net.bad { color: var(--bad); font-weight: 600; }
+  body.under #net { display: none; }
+  body.all #bAlone, body.all .rowbtns button, body.all #bTop { opacity: .35; pointer-events: none; }
+  body.all #bSpeed { pointer-events: none; }
+  body.all #time { pointer-events: none; border-color: transparent; background: transparent; }
+
+  /* the door */
+  #door { position: fixed; inset: 0; background: #101114; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; z-index: 10; padding: 24px; text-align: center; }
+  #door h1 { font-size: 34px; font-weight: 300; margin: 0; letter-spacing: .01em; }
+  #door h2 { font-size: 22px; font-weight: 600; margin: 0; color: #fff; }
+  #door p { margin: 0; color: var(--dim); font-size: 15px; max-width: 30em; line-height: 1.45; }
+  #doorBar { width: min(420px, 70vw); height: 6px; background: #2a2e35; border-radius: 3px; overflow: hidden; }
+  #doorBar i { display: block; height: 100%; width: 0; background: var(--ink); }
+  #doorGo { min-width: 220px; min-height: 60px; font-size: 19px; background: var(--ink); color: #111; border: 0; }
+  #doorGo[disabled] { opacity: .3; }
+</style>
+</head>
+<body class="side">
+<div id="app">
+  <div id="stage">
+    <video id="film" muted playsinline webkit-playsinline preload="auto" disablepictureinpicture disableremoteplayback></video>
+    <div id="frame"></div>
+    <button id="tap">Tap to play</button>
+  </div>
+  <div id="panel">
+    <div id="who">&nbsp;<small>&nbsp;</small></div>
+    <div id="state">STOPPED</div>
+    <label id="timeWrap"><small>seconds</small><input id="time" type="text" inputmode="numeric" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" value="0" aria-label="The time in seconds. Tap, type a number of seconds, then Go."></label>
+    <button id="bAlone">Play alone</button>
+    <button id="bAll">Play all</button>
+    <div class="rowbtns"><button id="bBack" aria-label="Back a row">&#9664;</button><button id="bFwd" aria-label="Forward a row">&#9654;</button></div>
+    <button id="bSpeed" aria-label="Speed">100%</button>
+    <button id="bTop">To the start</button>
+    <div class="grow"></div>
+    <div id="net">&nbsp;</div>
+  </div>
+</div>
+<div id="door">
+  <h1 id="doorTitle">String Quartet No. 1</h1>
+  <h2 id="doorPart">&nbsp;</h2>
+  <div id="doorBar"><i></i></div>
+  <p id="doorMsg">Loading&hellip;</p>
+  <button id="doorGo" disabled>Open</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/testkit/js/syncclock.js"></script>
+<script src="/testkit/js/servo.js"></script>
+<script src="/notation/lib/roomclient.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const Q = new URLSearchParams(location.search);
+  const mTok = /^\/s\/([A-Za-z0-9_-]{8,64})$/.exec(location.pathname);
+  const TOKEN = mTok ? mTok[1] : null;
+  const v = $('film');
+
+  // [Play all]: no count-down. The room starts ONE SECOND BEFORE the place the player is on, so the cursor's own
+  // run-in is the cue (the composer, 2026-11-15). LEAD_MS is only the moment every stand needs to hear the
+  // message and put its film on that place, so that all start on the same instant.
+  const RUNUP_S = 1;
+  const LEAD_MS = 300;            // was 800: he saw it as a pause. A stand that is not ready by then joins a moment late (the catch-up below).
+  const SEEK_GAP_MS = 350;        // playing: a gap beyond this is closed by a seek, not a trim
+  const DEFAULT_FILM = { parts: ['violin1.mp4', 'violin2.mp4', 'viola.mp4', 'cello.mp4'], score: 'fullscore.mp4', duration: 512, leadIn: 2, fps: 60, rowSeconds: 8, rows: 6 };
+  const DEFAULT_PARTS = ['Violin I', 'Violin II', 'Viola', 'Cello'];
+
+  const S = {
+    film: DEFAULT_FILM, title: 'String Quartet No. 1', partName: '', isScore: false, file: null,
+    room: null, online: false, canLead: false,
+    tuple: null,                  // the room's transport, as last heard
+    speed: 1,                     // this stand's speed setting: what [Play alone] runs at, and what [Play all] gives the room
+    local: { playing: false, pos: 0, at: 0, rate: 1 },   // this stand's own transport: pos (s) at performance.now() = at, moving at rate
+    opened: false, servo: null, seeking: false, lastSeekAt: 0, seekEst: 0.15, chased: false, typing: false, wake: null,
+    playErr: null, plays: 0, stuckSince: null, stuck: false, debug: false,
+  };
+
+  // ---- the two clocks --------------------------------------------------------------
+  const dur = () => S.film.duration;
+  const clamp = t => Math.max(0, Math.min(dur(), t));
+  const roomLive = () => !!(S.tuple && S.tuple.playing);
+  function localPos(now) { return S.local.playing ? clamp(S.local.pos + ((now == null ? performance.now() : now) - S.local.at) / 1000 * S.local.rate) : S.local.pos; }
+  function roomPos(now) {
+    const sn = S.room ? S.room.serverNow(now) : null;
+    return clamp(NotationRoom.positionAt(S.tuple, sn));
+  }
+  // where the film should be at local instant `now`, and whether it is moving then
+  function target(now) {
+    if (roomLive()) {
+      const sn = S.room.serverNow(now);
+      const waiting = sn != null && sn < S.tuple.anchorServerTime;
+      const p = roomPos(now);
+      return { pos: p, moving: !waiting && p < dur(), waitMs: waiting ? S.tuple.anchorServerTime - sn : 0, all: true, rate: S.tuple.rate || 1 };
+    }
+    const p = localPos(now);
+    return { pos: p, moving: S.local.playing && p < dur(), waitMs: 0, all: false, rate: S.local.rate };
+  }
+  function setLocal(pos, playing) { S.local = { playing: !!playing, pos: clamp(pos), at: performance.now(), rate: S.speed }; }
+
+  // ---- the film follows the clock ------------------------------------------------------
+  const hasRVFC = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
+  function seekTo(sec) {
+    S.seeking = true; S.lastSeekAt = performance.now(); S.lastSeekTo = clamp(sec);
+    if (S.servo) S.servo.reset();
+    try { v.currentTime = clamp(sec); } catch (e) { S.seeking = false; }
+  }
+  // how long this device's seeks take, learned as they happen (a tablet's are slower than a desktop's)
+  v.addEventListener('seeked', () => {
+    if (S.seeking) { const took = (performance.now() - S.lastSeekAt) / 1000; S.seekEst = Math.max(0.03, Math.min(0.8, 0.6 * S.seekEst + 0.4 * took)); }
+    S.seeking = false;
+  });
+  // a seek is over when the browser says so — or when the film is plainly no longer seeking, or after 2 s:
+  // a 'seeked' that never comes must not leave the stand waiting for ever
+  function isSeeking() {
+    if (!S.seeking) return false;
+    const age = performance.now() - S.lastSeekAt;
+    if ((age > 150 && !v.seeking) || age > 2000) S.seeking = false;
+    return S.seeking;
+  }
+  // the film held in memory will not play here: take it from the server instead, and put it back on the place
+  function useServer(why) {
+    if (S.source !== 'memory' || !S.url) return;
+    S.source = 'server'; S.fellBack = why;
+    S.seeking = false; S.chased = false; S.lastSeekTo = null;
+    v.src = S.url; v.load();
+    lastPaint = '';
+  }
+  v.addEventListener('error', () => useServer('media error ' + (v.error ? v.error.code : '?')));
+  function playFilm() {
+    S.plays++;
+    let p;
+    try { p = v.play(); } catch (e) { S.playErr = (e && e.name) || String(e); return; }
+    if (p && p.then) p.then(() => { S.playErr = null; }, e => { S.playErr = (e && e.name) || String(e); });
+  }
+  function setRate(r) { if (Math.abs(v.playbackRate - r) > 1e-4) { try { v.playbackRate = r; } catch (e) { /* out of range: left as is */ } } }
+
+  // called on every animation frame: start, stop and place the film
+  function drive() {
+    requestAnimationFrame(drive);
+    if (!S.opened) return;
+    const now = performance.now();
+    if (!roomLive() && S.local.playing && localPos(now) >= dur()) setLocal(dur(), false);   // alone, the end: stopped there
+    const t = target(now);
+    if (!t.moving) {
+      if (!v.paused) v.pause();
+      setRate(1);
+      // a stopped film sits on the place; a browser that snaps a seek to a frame is not asked twice for the same place
+      S.chased = false;
+      if (!isSeeking() && Math.abs(v.currentTime - t.pos) > 0.02 && S.lastSeekTo !== t.pos) seekTo(t.pos);
+    } else if (v.paused) {
+      // THE START. On the place (or near it): play, and the servo closes what is left. Far from it: ONE seek,
+      // aimed ahead by this device's own seek time, then play whatever it landed on — never seek after seek
+      // (a slow seeker chasing a moving clock that way never starts: the iPad, 2026-11-15).
+      if (!isSeeking()) {
+        if (Math.abs(v.currentTime - t.pos) > 0.25 && !S.chased) { S.chased = true; seekTo(t.pos + S.seekEst * t.rate + 0.02); }
+        else if (now - (S.lastPlayAt || 0) > 400) { S.lastPlayAt = now; S.chased = false; setRate(t.rate); playFilm(); if (S.servo) S.servo.reset(); }   // asked again every 0.4 s, not every frame
+      }
+    } else if (!hasRVFC && !isSeeking()) {
+      // no frame callbacks: a plain proportional trim on the media clock
+      const errMs = (v.currentTime - t.pos) * 1000;
+      if (Math.abs(errMs) > SEEK_GAP_MS) { if (performance.now() - S.lastSeekAt > 700) seekTo(t.pos + S.seekEst * t.rate + 0.03); }
+      else setRate(t.rate * (1 - Math.max(-0.03, Math.min(0.03, errMs * 0.0006))));
+    }
+    // THE FILM WILL NOT START: it should be moving and has sat paused for over a second. Offer the tap
+    // (a touch always may start a film), and show the readout.
+    // "Not started" is judged by the FILM'S OWN TIME standing still, not by `paused`: a refused play() flips
+    // `paused` off and on again, and a stalled film says it is playing (the iPad, 2026-11-15: no button came).
+    if (t.moving) {
+      if (S.stuckSince == null || Math.abs(v.currentTime - S.lastCt) > 0.004) { S.stuckSince = now; S.lastCt = v.currentTime; }
+    } else S.stuckSince = null;
+    if (S.source === 'memory' && S.openedAt && now - S.openedAt > 4000 && v.readyState < 2) useServer('no frame after 4 s');
+    const stuck = S.stuckSince != null && now - S.stuckSince > 1200;
+    if (stuck !== S.stuck) { S.stuck = stuck; $('tap').style.display = stuck ? 'block' : 'none'; lastPaint = ''; }
+    paint(t);
+  }
+
+  // every presented frame: the servo trims the rate (testkit/js/servo.js)
+  function onFrame(cbNow, md) {
+    v.requestVideoFrameCallback(onFrame);
+    if (!S.opened || v.paused || isSeeking()) return;
+    const at = md.expectedDisplayTime;
+    const t = target(at);
+    if (!t.moving) return;
+    const mediaMs = md.mediaTime * 1000, targetMs = t.pos * 1000;
+    if (Math.abs(mediaMs - targetMs) > SEEK_GAP_MS) {
+      if (performance.now() - S.lastSeekAt > 700) seekTo(t.pos + S.seekEst * t.rate + 0.03);
+      return;
+    }
+    const out = S.servo.update({ mediaMs, targetMs, nowMs: at, targetRate: t.rate, clockMs: v.currentTime * 1000 + (at - cbNow) * v.playbackRate });
+    if (out.action === 'rate') setRate(out.rate);
+    S.lastErrMs = mediaMs - targetMs;
+  }
+
+  // ---- what the player sees ----------------------------------------------------------------
+  // the timeline's seconds, whole: 96; in the lead-in, −2 and −1
+  const secs = s => (s < 0 ? '\u2212' + Math.ceil(-s) : String(Math.floor(s + 1e-6)));
+  const mmss = s => { const neg = s < 0; s = Math.abs(s); const m = Math.floor(s / 60), r = Math.floor(s % 60); return (neg ? '−' : '') + m + ':' + String(r).padStart(2, '0'); };
+  let lastPaint = '';
+  function paint(t) {
+    const all = t.all;
+    const key = [all, S.local.playing, Math.floor(t.pos * 5), Math.ceil(t.waitMs / 1000), S.online, S.canLead, S.tuple && S.tuple.by, S.typing, t.rate, S.speed, S.stuck, S.debug, (S.stuck || S.debug) ? [v.paused, v.seeking, v.readyState, S.plays, S.playErr, Math.floor(performance.now() / 500)].join() : ''].join('|');
+    if (key === lastPaint) return;
+    lastPaint = key;
+    document.body.classList.toggle('all', all);
+    document.body.classList.toggle('alone-playing', !all && S.local.playing);
+    if (!S.typing) $('time').value = secs(t.pos - S.film.leadIn);
+    const by = all && S.tuple.by ? S.tuple.by : '';
+    const shown = all ? t.rate : S.speed;                 // the room's speed while it plays, else this stand's setting
+    $('state').innerHTML = all ? 'ALL' + (shown !== 1 ? ' \u00b7 ' + pct(shown) : '') + (by ? '<small>started by ' + esc(by) + '</small>' : '') : (S.local.playing ? 'ALONE' : 'STOPPED');
+    $('bSpeed').textContent = pct(shown);
+    $('bSpeed').classList.toggle('slow', shown !== 1);
+    $('bAlone').textContent = (!all && S.local.playing) ? 'Stop' : 'Play alone';
+    $('bAll').textContent = all ? 'Stop all' : 'Play all';
+    $('bAll').disabled = !(S.online && S.canLead);
+    const dbg = S.stuck || S.debug;
+    $('net').classList.toggle('dbg', dbg);
+    if (dbg) {
+      $('net').textContent = 'paused ' + (v.paused ? 1 : 0) + ' seek ' + (v.seeking ? 1 : 0) + '/' + (S.seeking ? 1 : 0) + ' ready ' + v.readyState + ' net ' + v.networkState +
+        '\nfilm ' + v.currentTime.toFixed(2) + ' want ' + t.pos.toFixed(2) + ' rate ' + v.playbackRate.toFixed(2) +
+        '\nplays ' + S.plays + ' ' + (S.playErr || 'no error') + (v.error ? ' media ' + v.error.code : '') +
+        '\nseekEst ' + S.seekEst.toFixed(2) + (S.online ? ' on' : ' off') + (navigator.standalone ? ' app' : ' tab') + ' ' + (S.source || '?') + (S.fellBack ? ' (' + S.fellBack + ')' : '');
+    } else $('net').textContent = !TOKEN ? 'no room (a test link)' : (S.online ? 'connected' : 'not connected — alone only');
+    $('net').classList.toggle('bad', !dbg && !!TOKEN && !S.online);
+  }
+  const pct = r => Math.round(r * 100) + '%';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function layout() {
+    const W = window.innerWidth, H = window.innerHeight;
+    const spare = W - H * 4 / 3;             // the room beside a 4:3 film
+    const side = spare >= 84;                // enough for the column (an 11-inch iPad, full screen, has 87)
+    $('panel').style.width = side ? Math.min(132, Math.floor(spare)) + 'px' : '';
+    document.body.classList.toggle('side', side);
+    document.body.classList.toggle('under', !side);
+    // the band's frame sits on the film's own rectangle, not the letterbox
+    const st = $('stage').getBoundingClientRect();
+    const fw = Math.min(st.width, st.height * 4 / 3), fh = fw * 3 / 4;
+    const f = $('frame');
+    f.style.width = fw + 'px'; f.style.height = fh + 'px';
+    f.style.left = (st.width - fw) / 2 + 'px'; f.style.top = (st.height - fh) / 2 + 'px';
+  }
+  window.addEventListener('resize', layout);
+  window.addEventListener('orientationchange', () => setTimeout(layout, 200));
+
+  // ---- the buttons ------------------------------------------------------------------------------
+  // A ROW on screen is 8 s of FILM time counted from the film's own zero: row k = film [8k, 8k+8) — so its left
+  // edge is timeline second 8k − 2 (seen in the film, 2026-11-15: the row that holds "10" runs from 6 to 14).
+  // Until then the arrows landed two seconds INTO a row, a quarter of the way across.
+  const rowStart = k => k * S.film.rowSeconds;
+  const rowOf = pos => Math.floor((pos + 1e-6) / S.film.rowSeconds);
+  function stepRow(dir) {
+    if (roomLive()) return;
+    const pos = localPos();
+    let k = rowOf(pos);
+    if (dir < 0) k = (pos - rowStart(k) > 1.0) ? k : k - 1; else k = k + 1;
+    const to = k < 0 ? 0 : rowStart(k);
+    if (to >= dur()) return;
+    setLocal(to, S.local.playing);
+  }
+  $('bBack').addEventListener('click', () => stepRow(-1));
+  $('bFwd').addEventListener('click', () => stepRow(+1));
+  $('bTop').addEventListener('click', () => { if (!roomLive()) setLocal(0, false); });
+  // THE SPEED: one button, four steps (the room's own: 100 · 85 · 70 · 50). It sets this stand's speed;
+  // [Play alone] runs at it, and [Play all] gives it to the room. Changed while playing alone, it takes at once.
+  $('tap').addEventListener('click', () => { S.seeking = false; S.chased = false; playFilm(); });
+  $('net').addEventListener('click', () => { S.debug = !S.debug; lastPaint = ''; });
+
+  // THE TAP: a touch on the score puts the cursor there — ONLY while this stand is stopped (not playing alone,
+  // not while the room plays), and exactly where the finger is (the composer, 2026-11-15). A part's screen is
+  // six rows; a row is 8 s of film from its left edge to its right; the screen shows pages p … p+5 (p = the
+  // cursor's page), page q in row (q mod 6). The film's own frame, measured on a 1600 × 1200 frame: the rows
+  // start 6.2 px in from the left and run 1587.2 px; the first row's top is at 3 px and each is 198.4 px high.
+  const TAP = { x0: 6.2 / 1600, w: 1587.2 / 1600, y0: 3 / 1200, rowH: 198.4 / 1200 };
+  function timeAt(clientX, clientY) {
+    const r = $('frame').getBoundingClientRect();
+    if (!r.width || !r.height) return null;
+    const xf = (clientX - r.left) / r.width, yf = (clientY - r.top) / r.height;
+    if (xf < 0 || xf > 1 || yf < 0 || yf > 1) return null;
+    const row = Math.max(0, Math.min(S.film.rows - 1, Math.floor((yf - TAP.y0) / TAP.rowH)));
+    const f = Math.max(0, Math.min(1, (xf - TAP.x0) / TAP.w));
+    const p = rowOf(localPos());
+    const q = p + (((row - p) % S.film.rows) + S.film.rows) % S.film.rows;
+    const t = (q + f) * S.film.rowSeconds;
+    return t <= dur() ? t : null;
+  }
+  let down = null;
+  $('stage').addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, at: performance.now(), id: e.pointerId }; });
+  $('stage').addEventListener('pointerup', e => {
+    const d = down; down = null;
+    if (!d || d.id !== e.pointerId || performance.now() - d.at > 700 || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 14) return;   // a tap, not a drag or a rest
+    if (!S.opened || S.isScore || roomLive() || S.local.playing || e.target === $('tap')) return;
+    const t = timeAt(e.clientX, e.clientY);
+    if (t != null) setLocal(t, false);
+  });
+  $('stage').addEventListener('pointercancel', () => { down = null; });
+  const SPEED_STEPS = [1, 0.85, 0.7, 0.5];
+  $('bSpeed').addEventListener('click', () => {
+    if (roomLive()) return;
+    const here = localPos();
+    S.speed = SPEED_STEPS[(SPEED_STEPS.indexOf(S.speed) + 1) % SPEED_STEPS.length];
+    setLocal(here, S.local.playing);
+    if (S.servo) S.servo.reset();
+    lastPaint = '';
+  });
+  $('bAlone').addEventListener('click', () => {
+    if (roomLive()) return;
+    // the film is started INSIDE the touch itself, which a device always allows (the frame loop then keeps it)
+    if (!S.local.playing && S.opened) { setRate(S.speed); S.lastPlayAt = performance.now(); playFilm(); }
+    const pos = localPos();
+    setLocal(pos >= dur() - 0.05 ? 0 : pos, !S.local.playing);
+  });
+  $('bAll').addEventListener('click', async () => {
+    if (!S.room || !S.online) return;
+    if (roomLive()) { await S.room.send({ playing: false, by: S.partName }); return; }
+    let pos = localPos();
+    if (pos >= dur() - 0.05) pos = 0;
+    pos = Math.max(0, pos - RUNUP_S);          // the run-up: one second before the place
+    setLocal(pos, false);
+    const sn = S.room.serverNow();
+    const req = { playing: true, anchorScoreTime: Math.round(pos * 1000) / 1000, rate: S.speed, by: S.partName };
+    if (sn != null) req.anchorServerTime = sn + LEAD_MS;
+    await S.room.send(req);
+  });
+  // THE TIME BOX: tap, type, Go. A number is SECONDS on the score's timeline (96; 96.5 is taken too), the
+  // numbers printed along the top of every row. With a colon it is read as minutes:seconds (1:36).
+  function parseTime(txt) {
+    const x = String(txt).trim().replace(',', '.');
+    let sec;
+    if (/^\d{1,3}(\.\d{1,3})?$/.test(x)) sec = parseFloat(x);
+    else if (/^\d{1,2}:\d{1,2}$/.test(x)) { const p = x.split(':'); if (+p[1] > 59) return null; sec = +p[0] * 60 + +p[1]; }
+    else return null;
+    const t = sec + S.film.leadIn;
+    return t <= dur() ? t : null;
+  }
+  const timeBox = $('time');
+  timeBox.addEventListener('focus', () => { if (roomLive()) { timeBox.blur(); return; } S.typing = true; timeBox.classList.remove('bad'); setTimeout(() => { try { timeBox.select(); } catch (e) { /* not selectable here */ } }, 0); });
+  timeBox.addEventListener('blur', () => { S.typing = false; timeBox.classList.remove('bad'); lastPaint = ''; });
+  timeBox.addEventListener('input', () => timeBox.classList.remove('bad'));
+  timeBox.addEventListener('keydown', e => {
+    e.stopPropagation();
+    if (e.key === 'Escape') { timeBox.blur(); return; }
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const t = parseTime(timeBox.value);
+    if (t == null || roomLive()) { timeBox.classList.add('bad'); return; }
+    setLocal(t, S.local.playing);
+    timeBox.blur();
+  });
+  document.addEventListener('keydown', e => {
+    if (S.typing) return;
+    if (e.code === 'Space') { e.preventDefault(); $('bAlone').click(); }
+    else if (e.code === 'ArrowLeft') stepRow(-1);
+    else if (e.code === 'ArrowRight') stepRow(+1);
+  });
+
+  // ---- the room ---------------------------------------------------------------------------------------
+  function onTuple(tp) {
+    const was = roomLive();
+    const prev = S.tuple;
+    S.tuple = tp;
+    if (roomLive()) { S.local.playing = false; if (S.servo) S.servo.reset(); }   // the room took over
+    else if (was || !prev) setLocal(tp ? tp.anchorScoreTime : 0, false);         // the room stopped: every stand stays at that place
+  }
+  function connectRoom() {
+    if (!TOKEN) return;
+    S.room = NotationRoom.makeRoomClient({
+      token: TOKEN, io: window.io, SyncClock: TK.SyncClock, posture: 'rehearsal',
+      on: {
+        welcome: w => { applyWelcome(w); S.online = true; onTuple(w.roomState); lastPaint = ''; },
+        state: tp => { onTuple(tp); lastPaint = ''; },
+        mode: m => { if (m && m.roomState) onTuple(m.roomState); },
+        status: st => { S.online = !!st.online; lastPaint = ''; },
+        refused: r => { $('doorMsg').textContent = (r && r.message) || 'This link was not accepted.'; $('door').style.display = 'flex'; },
+      },
+    });
+    const cached = S.room.cachedWelcome();
+    if (cached) applyWelcome(cached);
+    S.room.connect();
+  }
+  function applyWelcome(w) {
+    if (w.piece && w.piece.film) S.film = Object.assign({}, DEFAULT_FILM, w.piece.film);
+    if (w.piece && w.piece.title) S.title = w.piece.title;
+    S.isScore = w.role === 'gatekeeper';
+    S.partName = S.isScore ? 'Score' : (w.part || '');
+    S.canLead = w.leader !== false;
+    S.file = S.isScore ? S.film.score : S.film.parts[w.partIndex];
+    whoAmI();
+    loadFilm();
+  }
+  function whoAmI() {
+    document.title = S.title + (S.partName ? ' — ' + S.partName : '');
+    $('doorTitle').textContent = S.title;
+    $('doorPart').textContent = S.isScore ? 'Full score' : S.partName;
+    $('who').innerHTML = esc(S.isScore ? 'Full score' : S.partName) + '<small>' + esc(S.title) + '</small>';
+  }
+
+  // ---- the film file: all of it on the device before the door opens ------------------------------------
+  let loading = null;
+  function loadFilm() {
+    if (loading === S.file || !S.file) return;
+    loading = S.file;
+    const url = '/films/' + S.file;
+    S.url = url;
+    const bar = $('doorBar').firstElementChild, msg = $('doorMsg');
+    const ready = src => {
+      v.src = src;
+      v.addEventListener('loadedmetadata', () => { if (isFinite(v.duration) && v.duration > 1) S.film.duration = Math.min(S.film.duration, v.duration - 0.02); }, { once: true });
+      v.load();
+      bar.style.width = '100%';
+      msg.textContent = S.isScore ? 'The full score is ready.' : 'Your part is ready.';
+      $('doorGo').disabled = false;
+    };
+    // A HOME SCREEN APP (navigator.standalone) plays the film straight from the server: there, a film held in
+    // memory (a blob) does not play (the iPad, 2026-11-15 — it played in Safari's tab and not from the icon).
+    if (navigator.standalone === true || Q.get('direct') === '1') { S.source = 'server'; ready(url); return; }
+    (async () => {
+      try {
+        msg.textContent = 'Loading the film…';
+        let res = null, cache = null;
+        if (window.caches) {
+          try {
+            cache = await caches.open('sq1-films-v1');
+            const hit = await cache.match(url);
+            if (hit) {
+              // the stored copy is used if the server still has a file of that size (or cannot be asked)
+              let same = true;
+              try { const h = await fetch(url, { method: 'HEAD', cache: 'no-store' }); if (h.ok) same = h.headers.get('content-length') === hit.headers.get('x-film-length'); } catch (e) { same = true; }
+              if (same) res = hit; else await cache.delete(url);
+            }
+          } catch (e) { cache = null; }
+        }
+        let blob;
+        if (res) { bar.style.width = '100%'; blob = await res.blob(); }
+        else {
+          const r = await fetch(url, { cache: 'no-store' });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          const total = parseInt(r.headers.get('content-length') || '0', 10);
+          const reader = r.body.getReader(); const chunks = []; let got = 0;
+          for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); got += value.length;
+            if (total) { bar.style.width = (100 * got / total).toFixed(1) + '%'; msg.textContent = 'Loading the film… ' + Math.round(100 * got / total) + ' %'; } }
+          blob = new Blob(chunks, { type: 'video/mp4' });
+          if (cache) { try { await cache.put(url, new Response(blob, { headers: { 'content-type': 'video/mp4', 'x-film-length': String(blob.size) } })); } catch (e) { /* no room to keep it: it is still in memory */ } }
+        }
+        S.source = 'memory'; ready(URL.createObjectURL(blob));
+      } catch (e) {
+        // could not hold the whole file: play it straight from the server
+        msg.textContent = 'Playing from the network.';
+        S.source = 'server'; ready(url);
+      }
+    })();
+  }
+
+  // ---- the door: one tap, so the device lets the film play by itself later ----------------------------------
+  async function keepAwake() {
+    try { if (navigator.wakeLock && document.visibilityState === 'visible') S.wake = await navigator.wakeLock.request('screen'); } catch (e) { /* not offered here */ }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.opened) keepAwake(); });
+  $('doorGo').addEventListener('click', async () => {
+    try { S.plays++; const p = v.play(); if (p && p.then) await p; v.pause(); } catch (e) { S.playErr = 'door: ' + ((e && e.name) || String(e)); }
+    S.servo = new TK.Servo({ fps: S.film.fps, posture: 'performance', maxTrim: 0.05 });
+    if (hasRVFC) v.requestVideoFrameCallback(onFrame);
+    S.opened = true; S.openedAt = performance.now();
+    $('door').style.display = 'none';
+    keepAwake();
+    layout();
+    lastPaint = '';
+  });
+
+  // ---- start -----------------------------------------------------------------------------------------------------
+  window.__film = { S, target, v, isSeeking };      // for the headless check
+  layout();
+  if (TOKEN) connectRoom();
+  else {
+    const n = parseInt(Q.get('part') || '1', 10);
+    S.isScore = n === 0; S.partName = S.isScore ? 'Score' : (DEFAULT_PARTS[n - 1] || DEFAULT_PARTS[0]);
+    S.file = S.isScore ? S.film.score : (S.film.parts[n - 1] || S.film.parts[0]);
+    whoAmI(); loadFilm();
+  }
+  requestAnimationFrame(drive);
+})();
+</script>
+</body>
+</html>

@@ -51,6 +51,316 @@
    (`print/score/String_Quartet_No_1-JYang.pdf`, 36 pp) and the parts (`builds/print/`).
 6. **A dress run at home.** iPad, laptop and phone as players, with start and stop as on the day.
 
+### STEP 1 TRAIL (prove it on the real devices)
+
+- **2026-11-13 — the two-device pass: "all work"** (his words). The live site; the laptop made the room as
+  Violin I, the iPad joined as Cello in Safari; play, stop, a jump to 120 s, and play on from there, as the
+  Technical Manual describes them. No fault named. *Not yet done:* all four parts at once; a long run (the
+  whole 8:28); the Start Performance path.
+
+- **2026-11-13 — the four-player pass (three laptop tabs/windows + the iPad): FAILED.** His words: "its a mess,
+  unacceptable, pages are wrong, animation corresponds to different pages, different tabs at different times; I
+  remember these problems." Three faults: (1) the pages shown are wrong · (2) the animation belongs to a different
+  page than the one shown · (3) the players are at different times. He asked for an assessment of moving the score
+  onto the new stand instead ("the time might be similar to fixing these problems, and might be a better fit");
+  the current build of the stand is in the tuba repo, close to finished.
+
+- **2026-11-13 — the AI's assessment of the move to the new stand (given in chat, NOT yet agreed).** Read: the
+  file lists and call sites only, no code in depth. (a) The newest stand is in `septet_2026` (stand.html 52 KB
+  with `roomclient.js`, `strip.js`, `seams.js`, `remote.html`, `leader.html`), not in `for_seven_tubas` (its
+  stand.html is the 2026-11-01 one, 23 KB). (b) The stand's server, rooms, clock, links, strip and remote do not
+  care what the notation is. (c) Its drawing (`layout.js` → `render.js` → `seams.js` → `animlive.js`) reads an
+  IR this piece does not have. (d) This piece's score (`builds/performance/score.json`, 14.6 MB) is objects
+  placed by time on four tracks: 542 notation images · 225 curves · 248 GCs · 75 line wedges · 32 badges.
+  **The route proposed: do not translate to the IR; give the stand a second, small drawing module for this
+  piece** — a row of N seconds drawn from score.json, the moving things (cursor, GC balls) on top. The handoff's
+  "a port is weeks" assumed the translation. Rough size, a guess: 4–6 working days. *Not checked:* whether the
+  four-tab test itself made part of the mess (a browser slows tabs that are not in front).
+
+- **2026-11-13 — his ask on the route:** both a dynamic rehearsal version and a VIDEO-based performance version,
+  **the video version first.** His picture of the new system: "a set of clippings like the print score and then
+  with an animation overlay on top" (the AI: yes, that is its shape). Found: the stand's video renderer is plan
+  item 9l in `for_seven_tubas/docs/PLAN.md`, status `todo` — designed (`ENGINE_BRIEF.md` § C) and measured in
+  the test kit (T4), not built into the stand; the tubas' `tools/export_video.js` films the IR renderer, not
+  this piece. The AI's thought, NOT checked: film each part from the OLD app stepped frame by frame (it drew
+  correctly on two devices; `scripts/capture_score_images.js` exists), and play the films on the new shell.
+
+- **2026-11-13 — his flag:** this piece has animations the new stand does not — "mostly just the dial/pie
+  animation to countdown the line wedges, there may be others." A film of the old app carries them as they
+  are; a live drawing on the new stand would have to build each one. The list of them is not yet made.
+
+### THE NEW TOP LINE (agreed 2026-11-13, his "yes pls start" — REPLACES the top line above)
+
+The reading runs on FILMS of the parts, played by the new stand's shell on one clock. Video first; the live
+rehearsal version only if days remain.
+
+1. **A test film.** Thirty seconds of one part, filmed from the old app. Done when he says the drawing and the
+   animations are right. (The gate: if the old app cannot be filmed cleanly, the road changes to drawing the
+   clippings fresh.)
+2. **The four films** — each part, the whole piece — plus the full score.
+3. **The stand's shell into this repo** — server, rooms, clock, one link per player (from `septet_2026`, by
+   `for_seven_tubas/docs/PORTING.md` § 5).
+4. **The video player on the stand** — play, stop, jump, all films on one clock (the tubas' plan 9l, unbuilt).
+5. **Prove it on his devices** — the whole piece, with stops and jumps.
+6. **Onto the box** — its own address, a link or QR per player.
+7. **The handouts and the look-ahead link.**
+8. **A dress run at home.**
+9. **The live rehearsal version,** only if days remain.
+
+### STEP 1 OF THE NEW TOP LINE — THE TEST FILM (2026-11-13)
+
+- **Built: `scripts/film_part.js`** — films the old app alone, frame by frame, into an mp4 (`builds/film/`,
+  gitignored). The app runs on its offline stub (no server, no room, no sync); the page's clock (Date.now,
+  performance.now, setTimeout, setInterval, requestAnimationFrame) is replaced before its code runs by one the
+  tool steps a frame at a time, so frame N is the app at exactly N / fps of score time (checked every frame,
+  to 0.5 ms). `node scripts/film_part.js --track 1 --from 0 --to 32 --name test_violin1_0-30`.
+- **The test film: `builds/film/test_violin1_0-30.mp4`** — Violin I, 6 pages a screen, score 0 → 32 s (the
+  timeline's 0:00 is score second 2, the lead-in), 1600 × 1200, 30 fps, 960 frames, 3.2 MB, 48 s to make.
+  **► WAITING ON HIS EYE: are the drawing and the animations right?** The AI looked at two frames only: at 0:05
+  the cursor and the line wedge's dial are there; at 0:18 the cursor, a GC ball at its impact, and rows 1–2
+  already showing pages 7–8.
+- **✓ STEP 1 DONE — his eye, 2026-11-13: "test looks good."** The gate is open: the films come from the old
+  app. ► NEXT: step 2, the four films and the full score (its talk first: pages a screen, size, frame rate).
+- **STEP 2, the look, settled 2026-11-13:** 6 rows a screen (his "6 good") · 2048 × 1536 (the test's 1600 × 1200
+  layout at scale 1.28) · 60 frames a second · the 2 s lead-in stays in the film (the AI's three, not objected
+  to). **Violin I whole is filming** (detached, log `builds/film/violin1.log`): score 0 → 516 s, 30,960 frames
+  at about 13 a second, so about 40 minutes a part at this size. The tool now ends the film cleanly if the
+  score stops itself at its end.
+- **Violin I whole: `builds/film/violin1.mp4`** — 30,960 frames, score 0 → 516 s, 48.6 MB, 35 minutes to film
+  (65 ms a frame). ► WAITING ON HIS EYE. The AI looked at three frames: 4:08 a busy spot, right; 8:27 the last
+  curve ending with its dial; 8:34 the cursor running on over empty rows — **the score does not stop itself
+  when filmed alone, so the film's end is a cut to choose** (the last ink is at about 8:28 on the timeline;
+  a cut needs no re-filming). **Violin II, Viola and Cello are filming one after another** (detached, logs
+  beside the films, about two hours), started before his look because a fault he finds would mean re-filming
+  all four anyway. The full score is NOT started: its view is a different layout and wants its own short test.
+- **✓ Violin I whole — his eye, 2026-11-13, on the iPad (a 26 MB copy sent through the chat; the chat's limit
+  is 30 MB): "all looks good."** **THE FILM'S END, his choice: 8:30 on the timeline** = score second 512 = a
+  film of exactly 512 s (2 s lead-in + 8:30), 30,720 frames. The cut films go in `builds/film/cut/`
+  (`ffmpeg -i <part>.mp4 -t 512 -c copy`); `cut/violin1.mp4` is made.
+- **The full score view films too** (`--track 0`): `builds/film/test_fullscore_0-30.mp4`, 30 s, 5 MB — two
+  systems a screen, four parts each, a coloured cursor on every part. Sent to him; ✓ his eye, 2026-11-13: "full score test looks fine."
+  The whole full score is filming (detached, `builds/film/fullscore.log`) beside the three parts.
+- **Two things the filming found.** (1) Filmed alone, the app drew no cursor and no animation: its drawing
+  loop (`AnimationEngine.start`) is started only by the server's `scoreState` message, which the offline stub
+  never sends. The tool starts it. (2) A headless screenshot took 1.4 s with Chrome's GPU on and 45 ms with
+  `--disable-gpu` — the tool's default now. At 50 ms a frame the whole piece (514 s) is about 13 minutes a part.
+- **Hidden in the film:** the controls overlay, the sync dot, the annotation button and toolbar, the offline
+  banner. The mini-map bar at the foot is left in.
+- **Not yet decided:** the film's size and frame rate for the iPad · whether the lead-in is in the film ·
+  whether the mini-map stays.
+
+### STEP 4's SHAPE — HIS ASK (2026-11-13, said while the films ran; not yet built, its talk still to come)
+
+- **ONE version for everything** — the look-ahead at home, the run-throughs in the slot, and the reading. His
+  words: "like the orig rehearsal but with the video version, so players can move about independantly and play
+  etc but the leader plays and all snaps … it isnt ideal if they do some run thrus in one version and then have
+  to open another version for the performance." And: "I don't nesessarily want to introduce to much new build."
+- **The AI's reading (from `septet_2026/notation/lib/roomclient.js`'s header and the tubas' journal, not a deep
+  read):** this is the new stand's own design — a stand has a LOCAL transport (alone: play, swipe, jump) and
+  the ROOM's transport, swapped in while the room plays; the composer checked exactly this on Tempus ("play ·
+  stop · speeds · local play · swipes · the block while playing · jump to 3:55 · AGAIN"). So the new build is
+  only the film player obeying whichever transport is live; a seek is needed for jumps anyway.
+
+- **WHO MOVES THE ROOM (his answer, 2026-11-13):** NOT the composer — "I don't think I'll be involved at all,
+  probably just an observer, maybe answer questions, but they should control the score." So the room's controls
+  sit with the players. **EVERY player has the room's buttons** (his "yes everyone has buttons") — no leader
+  to choose; on each stand, one button plays alone and one plays for everyone. The composer's own screen just
+  follows the room (the full score film). *Rejected:* one named leader (Violin I) — a role to explain and manage.
+
+### STEP 3 — THE STAND'S SHELL IN THIS REPO: BUILT + PC-VERIFIED (2026-11-13)
+
+- **Where: `stand/`** — apart from the old system, which is untouched. Copied from `septet_2026` @ 6fda30d:
+  `stand/server/` (clock, marks, protocol, ratelimit, registry, rooms, server) · `stand/tools/admin.js` ·
+  `stand/notation/lib/roomclient.js` · `stand/testkit/js/syncclock.js` (the folder names are the stand's own
+  URLs, kept so nothing in the room client moves). NOT copied: the notation library, stand.html, strip.js,
+  remote.html, the IR, deploy.sh / README / nginx (those are renamed at step 6, the box).
+- **The quartet's changes, each marked `[sq1]`:** the port **5302** (tubas 5300, septet 5301) · `/films/` is
+  served, with Range · every link opens ONE page, `notation/app/film.html` (step 4 — not written yet) ·
+  `registry.js`: a piece may register with no IR when it gives its parts and a `film` block · a piece with
+  `everyoneLeads` lets every player's stand move the room (`protocol.js` isLeader) · `admin.js register-file`.
+- **The piece: `stand/piece.json`** — id `sq1`, "String Quartet No. 1", Violin I · Violin II · Viola · Cello,
+  everyoneLeads, film { the five file names, duration 512, leadIn 2, fps 60, rowSeconds 8, rows 6 }.
+- **The films go in `stand/films/`** (gitignored, with `stand/server/data/`). How they reach the box is step 6's
+  question — five files of about 50 MB, not for git.
+- **Proved: `node stand/tools/shell_check.js` → 20 ok, 0 failed** (its own server on port 5399, a scratch
+  data folder): the piece registers · four named player links and a gatekeeper link · every player welcomed to
+  their part and told they may move the room · EACH of the four plays and stops the room and all five stands
+  hear it · a jump lands everyone on the same place · a film is served with Range · nothing outside the stand's
+  folders is served. No device has touched it yet.
+- **His question while this ran, for step 4's talk:** "how do they know if they are playing by themselves or
+  for the group?"
+
+- **HOW A PLAYER KNOWS — decided 2026-11-13 (his "2 buttons good"):** two buttons named for what they do,
+  [Play alone] and [Play all] · alone looks quiet and changes nobody else's screen · while the room plays every
+  stand wears a band ("ALL · started by Viola"), the alone button is gone and only [Stop all] shows · a player
+  practising alone is pulled in when someone presses [Play all]. The band's wording and colour are the AI's
+  first proposal, for his eye on the iPad.
+
+### STEP 4 — THE FILM PAGE: BUILT + PC-VERIFIED (2026-11-13). ► NEXT: HIS HANDS, at the desktop with the iPad
+
+- **`stand/notation/app/film.html`** — one page for every link. A player's link plays that part's film, the
+  gatekeeper's the full score film. The DOOR first (the piece, the part, the film loading with a bar, one
+  [Open] tap — the tap lets the device start the film by itself later, and asks it to stay awake); the whole
+  film is fetched onto the device (and kept in the browser's cache where the page is on https or localhost).
+- **Two transports, one film.** ALONE = the stand's own clock: [Play alone] / [Stop], a row back, a row
+  forward (a row = 8 s; rows start at 2 + 8k film seconds), the time bar, [To the start]. ALL = the room's
+  clock: [Play all] starts the room FROM WHERE THAT STAND IS, with a 4-second count on every stand (COUNT_MS);
+  every stand jumps there, wears the orange frame and "ALL · started by <part>", loses its alone controls,
+  and shows [Stop all]; [Stop all] leaves every stand on that place. There is no separate "jump everyone": go
+  there alone, press [Play all]. Blue = alone playing; orange = all.
+- **Keeping time:** the tubas' frame servo (`stand/testkit/js/servo.js`, copied as is) trims playbackRate on
+  every presented frame; a gap over 350 ms is closed by a seek; a stopped film is seeked onto its place.
+- **The controls sit BESIDE the film** when the screen is wider than 4:3 by 84 px or more (an 11-inch iPad
+  full screen has 87; Safari with its toolbar has more), else in a 72 px bar under it (a 4:3 iPad full screen).
+- **`rooms.js`**: a state request may carry `by` (who moved the room) — it rides in the tuple.
+- **The link sheet:** `GET /admin/sheet?key=<admin key>` — every ensemble's links with a QR code each
+  (`qrcode` added to package.json); opened as localhost it prints the LAN address so a tablet can scan it.
+  **`node stand/tools/setup.js`** registers the piece, makes "Home test" if there is no ensemble, and prints
+  the sheet's address.
+- **Proved on the PC:** `node stand/tools/film_check.js` → **17 ok, 0 failed** (two headless stands, an
+  11-inch iPad's size, the real films): the door · alone moves one stand only, within 7 ms of its clock · the
+  row buttons · [Play all] from Violin II: both count down on Violin II's place, then both run within 7.3 ms
+  of the room's clock over five seconds · [Play alone] dead while the room plays · [Stop all] from Violin I:
+  both stopped on one place. `shell_check` 22 ok. **NOT proved: anything on a real iPad or over real Wi-Fi —
+  Safari's start, its seeks, the wake lock, the 50 MB load.** That is his test, step 5.
+- **✓ STEP 2 DONE — ALL FIVE FILMS are in `stand/films/`** (gitignored), each 2048 × 1536, 60 fps, 512.03 s:
+  violin1 50.9 MB · violin2 53.0 · viola 51.9 · cello 50.4 · fullscore 66.3 (273 MB together). The uncut
+  originals (516 s) are in `builds/film/`. The cut: `ffmpeg -i builds/film/<part>.mp4 -t 512 -c copy -movflags
+  +faststart stand/films/<part>.mp4`. His eye has been on Violin I whole and on the full score's first 30 s;
+  Violin II, Viola, Cello and the rest of the full score are unseen by anyone.
+- **His two questions, answered 2026-11-13:** no local server at the reading (the box, step 6; a spare laptop
+  is possible, not set up) · the film can be loaded any day before (kept in the browser over https; Safari may
+  clear it after about a week unvisited; untested on an iPad).
+
+### STEP 5 TRAIL — HIS DEVICES (begun 2026-11-15)
+
+- **His desktop has TWO LAN addresses: 10.2.0.2 (a VPN's, the AI's reading) and 192.168.1.15 (the home
+  Wi-Fi — his "the 192").** The link sheet printed its QR codes with the FIRST one, which a tablet cannot
+  reach. Fixed in `server.js` linkSheet: 192.168.x first, then 172.16–31.x, then 10.x. The server must be
+  restarted to take it. *Not checked:* whether the VPN or Windows' firewall lets the iPad reach port 5302.
+
+- **2026-11-15 — the Violin I link OPENS on his iPad** over home Wi-Fi from the QR sheet (after the restart).
+  He has "some design things" — NOT yet named; held for THE DESIGN CONVERSATION, which comes after step 5's
+  function test and before the box. Step 5 tests function only: does it work on the real devices.
+
+- **2026-11-15 — three stands open and work: iPad (Violin I), laptop (Violin II), desktop (Cello)** — his
+  "they all work." **NOTED, not to fix now (his word): a bit of a stutter on the DESKTOP only** (Windows 10;
+  he guesses the graphics or the many open windows). Not diagnosed. The iPad and the laptop are smooth.
+  *Not yet said by him:* whether [Play all] / [Stop all] across the three was tried, and the screen staying on.
+
+- **✓ STEP 5's FUNCTION TEST — his word, 2026-11-15: "everything works … all the buttons and everything
+  work"** on the iPad, the laptop and the desktop, [Play all] and [Stop all] included. The iPad's screen stayed
+  on "for a few minutes at least"; the whole piece played through is still to do (he will, later).
+
+### THE DESIGN CONVERSATION (opened 2026-11-15 — DISCUSS FIRST, build only on his go)
+
+His notes, as he said them, about the controls column:
+1. **It should take less space — about HALF the width.** "I think just smaller on the side is better than on
+   the top."
+2. **The state box** ("STOPPED"): a smaller font — "that seems to be the limiting factor."
+3. **[Play alone] / [Play all]:** smaller font, the two words stacked, the button about half the width.
+4. **The two arrow buttons stacked** one over the other, not side by side.
+5. **A NUMBER BOX in place of the time slider,** "so they can type in a time."
+6. **[To the start] → "Start",** half width.
+7. **The header:** just the part's name ("Viola"); not "String Quartet No. 1".
+8. **To evaluate: a SPEED control,** "maybe like a slider"; sliders "haven't worked great" in the past and want
+   better calibration.
+9. **His first question, before any of it:** on the iPad, does a thinner column show MORE of the score, or is
+   the score already as big as it will ever be? (On the laptop there is black space, so nothing to gain.)
+
+**Settled 2026-11-15:** on his iPad there is no black above or below the score (only the time-and-battery
+bar), so the score is at its full height and a thinner column gains nothing. **He WITHDREW notes 1–4, 6, 7**
+("you can disregard the things I said"). **KEPT: note 5, the number box in place of the slider — build it.
+Note 8, the speed — to discuss.** (The AI's point that Safari's toolbar costs about a tenth of the height, and
+that the Home Screen's full screen would win it back, was made and not taken up.)
+
+**BUILT 2026-11-15 — THE TIME BOX** (`film.html`; the slider is gone): the time shown IS the box — tap it,
+type, Go (ENTER). With a colon it is minutes:seconds (`2:10`); digits alone read the same way, the last two as
+seconds (`136` = 1:36, `45` = 0:45, `830` = 8:30); a full stop, comma or space serves as the colon. The time is
+the timeline's (0:00 = the first beat; the film adds its 2 s lead-in). A time that is not one, or past the end,
+turns the box's border red and moves nothing. Dead while the room plays. `film_check` **21 ok, 0 failed** (four
+new: 2:10 · 45 · a refused 9:99 · 136). NOT yet tried on the iPad's own keyboard. The stands take it on a
+reload; the server needs no restart.
+
+**BUILT 2026-11-15, on his three words** ("lets display and type in seconds and go for speed", then the run-up):
+- **THE TIME IS IN SECONDS** — the box shows the timeline's whole seconds (96; −2 and −1 in the lead-in), the
+  numbers printed along every row, under a small "seconds" label; a typed number is seconds (96, 96.5). A
+  colon form (1:36) is still read. *Replaces* the m:ss box of an hour earlier.
+- **THE SPEED** — one button cycling 100 · 85 · 70 · 50 % (the server's own four; the AI's steps, not a slider —
+  he said "go for speed" after that recommendation). It is the STAND's setting: [Play alone] runs at it;
+  [Play all] gives it to the room and the band reads "ALL · 70%"; after [Stop all] each stand keeps its own.
+- **[Play all]: NO COUNT-DOWN; A ONE-SECOND RUN-UP** (his rule: "I type in 490 … it starts at 489"; with the
+  cursor just in place, "the cursor jumps back 1 second from where it is and then starts playing"). RUNUP_S = 1.
+  A lead of 0.8 s (LEAD_MS) stays, unshown, so every stand can hear the message and put its film on the place
+  before all start on one instant — so the place itself arrives about 1.8 s after the press. [Play alone] is
+  unchanged (no run-up) — he spoke of [Play all] only.
+- `film_check` **27 ok, 0 failed**: the room at 100 % within 7.1 ms, at 70 % within 7.2 ms, alone at 50 % three
+  seconds of film in six. None of the three is yet seen on the iPad.
+
+**► OPEN FAULT (2026-11-15): ON THE iPAD THE FILM DOES NOT PLAY** — his words: "the other cursors play, and the
+iPad cursor doesn't play regardless of whether I hit play all or play alone, or if it started from another
+part. Only on the iPad." It played on the iPad before the seconds / speed / run-up build. **Cause NOT found;**
+the AI cannot see the iPad. What was done, all PC-verified only (`film_check` 27 ok):
+- *the start can no longer chase its own seeks* (one aimed seek, then play; the seek's end is no longer taken
+  on the browser's word alone — `isSeeking()`; each device's seek time is learned, `seekEst`; the servo may
+  trim 5 %). This answers [Play all] reaching a slow seeker, NOT a film that will not play alone.
+- *LEAD_MS 800 → 300* — his second point: the pause before the run-up ("the cursor jumps back 1 second and
+  starts playing immediately … if it can't be fixed, just leave it"). It cannot be zero; a stand not ready in
+  0.3 s joins a moment late.
+- *when the film should move and has sat paused for 1.2 s:* a [Tap to play] button over the score (a touch may
+  always start a film) and a four-line READOUT in the corner (paused · seeking · ready state · film time against
+  wanted · the count of play() calls and the browser's refusal by name · tab or Home Screen app). Tapping the
+  corner line shows the readout at any time. **► NEXT: his reload, and what the readout says.**
+
+- **His answer: the iPad's part is now opened from a HOME SCREEN ICON** ("is it possible that I did add to home
+  screen? I'm using that button"); the earlier, working test was in Safari's tab. "I reloaded the iPad and
+  nothing's changed." **The AI's GUESS, not proved:** a Home Screen app will not play a film held in memory (a
+  blob), which is how the page loads the film. Built on that guess: a Home Screen app (`navigator.standalone`)
+  takes the film straight from the server (`?direct=1` forces it anywhere); and any stand whose in-memory film
+  errors, or shows no frame 4 s after the door, falls back to the server by itself (`useServer`). The readout's
+  last line now says app/tab and memory/server. `film_check` 27 ok. *Cost if the guess is right:* a Home Screen
+  stand streams its film and does not hold it whole, so it leans on the network during play.
+
+- **Still not playing after that (his report):** the iPad stays in the room (its [Play all] starts the others),
+  it jumps where told (to the start, to second 400) and shows the cursor there — "just the cursor doesn't
+  move" — and NO [Tap to play] came. So the film's data and its seeks are fine; only PLAY fails; and the blob
+  guess is not the answer (or not all of it). **Why no button came:** the watch asked "is the film paused?",
+  and a refused play() flips `paused` off and on each frame, so the watch never held. **Changed:** "not
+  started" is now judged by the film's own time standing still for 1.2 s · play() is asked again every 0.4 s,
+  not every frame · [Play alone] starts the film INSIDE the touch. **The AI's next guess, unproved:** the
+  device refuses a play() that no touch began — Low Power Mode does that, and so may the Home Screen mode.
+  If so, [Play alone] and [Tap to play] will work and a start by ANOTHER player will need a tap each time.
+  The readout's third line (the refusal's name) decides it. `film_check` 27 ok.
+
+- **✓ RESOLVED FOR NOW (his report, 2026-11-15): IN SAFARI IT WORKS** — the film plays, and "all the other
+  things seem to work." The Home Screen icon "didn't even pick up the changes" (so the AI's two fixes for it
+  were never run there) and "just doesn't seem to be viable." **HIS RULING: LOW PRIORITY, at the end if there
+  is time. The stand is used in SAFARI, not from a Home Screen icon — the players' instructions must say so.**
+  His priority: "get everything proofed and usable as soon as possible." The whole piece played through: later.
+- **A fault the AI found while preparing the tap talk, FIXED:** the two arrows landed two seconds INTO a row.
+  A row on screen is 8 s of FILM time from the film's zero — row k = film [8k, 8k+8), its left edge at
+  timeline 8k − 2 — and the rows behind the cursor are replaced AT the row change (seen at film 8.3 s: row 0
+  already shows the page that starts at 46). So at film time T, with p = floor(T/8), the screen shows pages
+  p … p+5, page q in row (q mod 6). `rowStart = 8k` now. `film_check` 27 ok.
+
+### THE DESIGN LIST AS IT STANDS (2026-11-15)
+
+Done: the time box, in seconds · the speed button · [Play all] with the one-second run-up, no count.
+Withdrawn by him: the narrower column and everything that went with it (smaller fonts, stacked words, stacked
+arrows, "Start", the part name alone). Open: **the tap to place the cursor** (in discussion). Low priority: the
+Home Screen icon. For his eye, never yet commented on: the band's wording and colours.
+
+**BUILT 2026-11-15 — THE TAP TO PLACE THE CURSOR** (his two answers: "only when stopped, exactly where the
+finger is"). A touch on a PART's score puts the cursor there: only while that stand is stopped (not playing
+alone, not while the room plays), exactly at the finger, no snapping. A tap is a touch that lifts within 0.7 s
+and 14 px (a drag or a resting hand is not one). The arithmetic: the row from the touch's height, the fraction
+across from its x, the page from the ring rule (above) — the film's own frame measured as rows starting 6.2 px
+in and 1587.2 px long on a 1600 × 1200 frame, the first row's top at 3 px, 198.4 px each. **NOT on the full
+score film** (two systems a screen, a different layout) — the tap is off there. `film_check` **30 ok** (three
+new: half way along the fourth row → film 28 s; from page 3 the second row = page 7; no effect while playing
+alone), and the AI looked at the shot: the cursor stands half way along the fourth row. Not yet tried by a
+finger on the iPad.
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the
