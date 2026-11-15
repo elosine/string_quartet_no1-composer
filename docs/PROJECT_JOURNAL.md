@@ -598,6 +598,29 @@ parts are unchanged · the site's landing page still links the old app.
   are what the iPad stutters on. ► HIS: the deploy line, a reload, [Play all] from the start, his eye, a
   photo.** (The trial films `a/` and `b/` stay on the box, unused unless a link asks.)
 
+- **4c4b2f4e ON THE iPAD BROKE TWO THINGS (his report + a photo, 2026-11-15):** "The first play played maybe a
+  second or two and then stopped altogether. Continued playing in the other scores. Now I can't go back to the
+  start. To the start doesn't work. Or it says −2, but the score shows something different." The photo:
+  `film 14.49 want 0.00` (stopped, the film NOT on the place) · `start 14ms est 59 door 27` · `seeks 1` ·
+  `free off −` · `trim 0` · `off 83ms` · `gaps 18 max 50ms` · `steps 0` · `plays 3`.
+  **(1) [To the start] — a real bug, the AI's, FOUND AND FIXED.** A stopped film is not seeked twice to the same
+  place (a guard against a browser that snaps a seek). Since "alone, the film is the clock" a stop lands
+  exactly on the film's own time, so no seek happens at a stop, and the guard still held the LAST place asked
+  for — the start. The guard is now cleared whenever the film plays. In `film_check` (new).
+  **(2) The film froze in the room — cause NOT proved.** The readout shows one seek made while playing (the
+  "settling" seek the AI added an hour before: a film over 40 ms out in its first four seconds) and only three
+  play() calls, so the film was not paused: it sat frozen while "playing". The AI's reading: on the iPad that
+  seek left the film stalled. **Changed:** the settling seek is REMOVED; a free film is put back only if over
+  150 ms out, three seconds or more after a start, and at most once in five seconds · the start's measurement
+  is taken 2.5 s in (was 0.3 s), so what a tablet loses in its first seconds is learned and the next start is
+  called that much earlier (no correction at all on a device that has played once) · a film that makes no
+  progress for 1.5 s while not paused is paused by the page, and the start logic plays it again (`rescues` in
+  the readout).
+  **What that photo also shows, the good part:** with the speed left alone there was NO trim, the worst gap
+  between frames fell from 146–171 ms to 50 ms, and the film's worst distance from the room from 217–264 ms to
+  83 ms. His eye on the smoothness is not yet given.
+  `film_check` 34 ok.
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the

@@ -159,7 +159,7 @@
   const LEAD_MS = 300;            // was 800: he saw it as a pause. A stand that is not ready by then joins a moment late (the catch-up below).
   const SEEK_GAP_MS = 500;        // in the room: a gap beyond this is closed by a seek, not a trim (was 350)
   const SERVO = Q.get('servo') === 'on';   // the frame servo trims the film's speed in the room only when a link asks for it
-  const FREE_GAP_MS = 120;        // a free-running film this far from the room for half a second is put back by one seek
+  const FREE_GAP_MS = 150;        // a free-running film this far from the room, well after the start, is put back by one seek
   const SEEK_EVERY_MS = 1500;    // …and never two such seeks closer than this (was 700: a slow device hopped back and forth)
   const DEFAULT_FILM = { parts: ['violin1.mp4', 'violin2.mp4', 'viola.mp4', 'cello.mp4'], score: 'fullscore.mp4', duration: 512, leadIn: 2, fps: 60, rowSeconds: 8, rows: 6 };
   const DEFAULT_PARTS = ['Violin I', 'Violin II', 'Viola', 'Cello'];
@@ -235,7 +235,7 @@
   }
   v.addEventListener('error', () => useServer('media error ' + (v.error ? v.error.code : '?')));
   function playFilm() {
-    S.plays++;
+    S.plays++; S.lastSeekTo = null;   // the film is about to move: any place may be asked for again once it stops
     let p;
     try { p = v.play(); } catch (e) { S.playErr = (e && e.name) || String(e); return; }
     if (p && p.then) p.then(() => { S.playErr = null; }, e => { S.playErr = (e && e.name) || String(e); });
@@ -288,6 +288,12 @@
     if (t.moving) {
       if (S.stuckSince == null || Math.abs(v.currentTime - S.lastCt) > 0.004) { S.stuckSince = now; S.lastCt = v.currentTime; }
     } else S.stuckSince = null;
+    // A FILM FROZEN WHILE IT SAYS IT IS PLAYING (no progress for 1.5 s, not paused, not seeking): it is paused
+    // here, and the start logic above then puts it on the place and plays it again — once every three seconds
+    if (S.stuckSince != null && now - S.stuckSince > 1500 && !v.paused && !isSeeking() && now - (S.rescuedAt || 0) > 3000) {
+      S.rescuedAt = now; S.rescues = (S.rescues || 0) + 1; S.chased = false;
+      try { v.pause(); } catch (e) { /* it will be asked again */ }
+    }
     const stuck = S.stuckSince != null && now - S.stuckSince > 1200;
     if (stuck !== S.stuck) { S.stuck = stuck; $('tap').style.display = stuck ? 'block' : 'none'; lastPaint = ''; }
     paint(t);
@@ -313,7 +319,10 @@
     K.prev = t.all ? { at, pos: t.pos } : null;
     if (!t.all) { setRate(t.rate); return; }       // alone: the film leads, at the stand's speed, untouched
     const mediaMs = md.mediaTime * 1000, targetMs = t.pos * 1000;
-    if (!S.startMeasured && S.startT0 != null && at - S.startT0 > 300) {
+    // THE START'S MEASUREMENT, 2.5 s in (it was 0.3 s): a tablet loses some tens of milliseconds in its first
+    // seconds of playing, so the film is judged once those are over, and the next start is called that much
+    // earlier — the film runs a touch ahead through the one-second run-up and is on the place after it.
+    if (!S.startMeasured && S.startT0 != null && at - S.startT0 > 2500 && S.lastSeekAt < S.startCalledAt) {
       S.startMeasured = true;
       S.lastStartErr = mediaMs - targetMs;                       // − = the film set off late
       S.startEst = Math.max(0, Math.min(0.6, S.startEst - 0.6 * S.lastStartErr / 1000));
@@ -330,17 +339,14 @@
     if (!SERVO) {
       setRate(t.rate);
       S.lastErrMs = mediaMs - targetMs;
-      // SETTLING: in the first four seconds after a start (or a rejoin) a film more than 40 ms out is put on the
-      // place by a seek — twice at most; after that only a film 120 ms out is touched, and seldom
+      // NO SETTLING BY SEEK. (For an hour on 2026-11-15 a film more than 40 ms out in its first seconds was put
+      // on the place by a seek; on the iPad the film then froze while the others played on.) What the first
+      // seconds cost a device is LEARNED instead — see the start's measurement above — and paid in advance.
+      // Only a film far out, well after the start, is put back, and seldom.
       if (S.startT0 != null) {
         const sinceStart = at - S.startT0, sinceSeek = performance.now() - S.lastSeekAt;
-        // a seek made while playing is aimed ahead by this device's own landing time, learned from where the
-        // last such seek actually landed (half a second after it)
         if (S.aimPending && sinceSeek > 500 && S.aimEst != null) { S.aimPending = false; S.aimEst = Math.max(-0.1, Math.min(0.8, S.aimEst - 0.7 * (mediaMs - targetMs) / 1000)); }
-        const settling = sinceStart < 4000 && S.settleTries < 2;
-        const lim = settling ? 40 : FREE_GAP_MS;
-        if (Math.abs(S.off) > lim && sinceStart > 400 && sinceSeek > (settling ? 1200 : 3000)) {
-          if (settling) S.settleTries++;
+        if (Math.abs(S.off) > FREE_GAP_MS && sinceStart > 3000 && sinceSeek > 5000) {
           S.off = null;
           if (S.aimEst == null) S.aimEst = S.seekEst;
           S.aimPending = true;
@@ -392,7 +398,7 @@
       $('net').textContent = 'paused ' + (v.paused ? 1 : 0) + ' seek ' + (v.seeking ? 1 : 0) + '/' + (S.seeking ? 1 : 0) + ' ready ' + v.readyState + ' net ' + v.networkState +
         '\nfilm ' + v.currentTime.toFixed(2) + ' want ' + t.pos.toFixed(2) + ' rate ' + v.playbackRate.toFixed(2) +
         '\nplays ' + S.plays + ' ' + (S.playErr || 'no error') + (v.error ? ' media ' + v.error.code : '') +
-        '\nstart ' + (S.lastStartErr == null ? '-' : S.lastStartErr.toFixed(0) + 'ms') + ' est ' + (S.startEst * 1000).toFixed(0) + ' door ' + (S.doorStartMs == null ? '-' : S.doorStartMs.toFixed(0)) + ' seeks ' + S.seekCount +
+        '\nstart ' + (S.lastStartErr == null ? '-' : S.lastStartErr.toFixed(0) + 'ms') + ' est ' + (S.startEst * 1000).toFixed(0) + ' door ' + (S.doorStartMs == null ? '-' : S.doorStartMs.toFixed(0)) + ' seeks ' + S.seekCount + ' rescues ' + (S.rescues || 0) +
         '\n' + (SERVO ? 'SERVO' : 'free') + ' off ' + (S.off == null ? '-' : S.off.toFixed(0)) + 'ms' +
         '\ntrim ' + S.trim.n + ' max ' + (S.trim.max * 100).toFixed(1) + '% at ' + (S.trim.at.join(',') || '-') + ' off ' + S.trim.worst.toFixed(0) + 'ms' +
         '\ngaps ' + S.gaps.n + ' max ' + S.gaps.max.toFixed(0) + 'ms at ' + (S.gaps.at.join(',') || '-') +

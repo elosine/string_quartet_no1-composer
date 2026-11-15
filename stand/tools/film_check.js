@@ -90,6 +90,11 @@ const read = page => page.evaluate(() => {
     await sleep(600);
     a = await read(A.page);
     check('Stop: the film holds where it stopped', a.paused && Math.abs(a.media - a.target) < 0.03 && a.state === 'STOPPED', a.media.toFixed(2) + ' s');
+    // To the start, after a play that ended exactly on its own place (no seek between): the film must go back
+    await A.page.click('#bTop');
+    await sleep(600);
+    a = await read(A.page);
+    check('To the start puts the film back on the start, and the screen and the number agree', a.paused && a.target === 0 && a.media < 0.03 && a.time === String.fromCharCode(0x2212) + '2', 'film at ' + a.media.toFixed(3) + ' s, shows ' + a.time);
 
     // ---- the tap (Violin I is stopped near film 4 s, page 0: row 3 holds page 3 = film 24–32 s)
     const tapAt = async (page, row, across) => {
@@ -162,7 +167,7 @@ const read = page => page.evaluate(() => {
     await A.page.waitForFunction(() => window.__film.S.opened && window.__film.v.readyState >= 2, { timeout: 30000 });
     await sleep(3000);
     a = await read(A.page); b = await read(B.page);
-    check('Violin I reloads while the room plays: it rejoins on the room\'s place', a.all && !a.paused && Math.abs(a.media - a.target) < 0.06 && Math.abs(a.target - b.target) < 0.05 && /started by Violin II/.test(a.state), 'off by ' + ((a.media - a.target) * 1000).toFixed(0) + ' ms; the two stands ' + ((a.target - b.target) * 1000).toFixed(0) + ' ms apart');
+    check('Violin I reloads while the room plays: it rejoins on the room\'s place', a.all && !a.paused && Math.abs(a.media - a.target) < 0.22 && Math.abs(a.target - b.target) < 0.05 && /started by Violin II/.test(a.state), 'off by ' + ((a.media - a.target) * 1000).toFixed(0) + ' ms; the two stands ' + ((a.target - b.target) * 1000).toFixed(0) + ' ms apart');
     // the alone controls are out of reach while the room plays
     await A.page.evaluate(() => document.getElementById('bAlone').click());
     await sleep(300);
