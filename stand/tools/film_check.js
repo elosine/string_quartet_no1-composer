@@ -151,6 +151,14 @@ const read = page => page.evaluate(() => {
     check('…each within 50 ms of the room\'s clock over five seconds', worst < 50, 'worst ' + worst.toFixed(1) + ' ms; rates ' + errs[errs.length - 1].ar.toFixed(4) + ' / ' + errs[errs.length - 1].br.toFixed(4));
     check('…and the place is where the room should be (97 s + the time played)', a.target > 97 + 8.5 && a.target < 97 + 12.5, a.target.toFixed(2) + ' s');
     if (SHOTS) await A.page.screenshot({ path: path.join(SHOTS, 'violin1_3_all.png') });
+    // a stand reloaded while the room plays comes back INTO the room, on the room's place
+    await A.page.reload({ waitUntil: 'domcontentloaded' });
+    await A.page.waitForFunction(() => !document.getElementById('doorGo').disabled, { timeout: 120000 });
+    await A.page.click('#doorGo');
+    await A.page.waitForFunction(() => window.__film.S.opened && window.__film.v.readyState >= 2, { timeout: 30000 });
+    await sleep(3000);
+    a = await read(A.page); b = await read(B.page);
+    check('Violin I reloads while the room plays: it rejoins on the room\'s place', a.all && !a.paused && Math.abs(a.media - a.target) < 0.06 && Math.abs(a.target - b.target) < 0.05 && /started by Violin II/.test(a.state), 'off by ' + ((a.media - a.target) * 1000).toFixed(0) + ' ms; the two stands ' + ((a.target - b.target) * 1000).toFixed(0) + ' ms apart');
     // the alone controls are out of reach while the room plays
     await A.page.evaluate(() => document.getElementById('bAlone').click());
     await sleep(300);

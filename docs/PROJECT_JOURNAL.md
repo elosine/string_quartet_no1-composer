@@ -361,6 +361,38 @@ new: half way along the fourth row → film 28 s; from page 3 the second row = p
 alone), and the AI looked at the shot: the cursor stands half way along the fourth row. Not yet tried by a
 finger on the iPad.
 
+- **✓ THE TAP on the iPad — his word, 2026-11-15: "that all works."** The first commit of the stand is pushed
+  (6f933c37).
+
+### TO DELIVERY (his ask, 2026-11-15: "do everything that needs to be done to get it in deliverable shape"; then
+### go back for the set-aside things, "notably" the Home Screen icon)
+
+**Done by the AI, PC-verified:**
+- **The three part films nobody had watched** (Violin II, Viola, Cello): one frame each at the start, the
+  middle and the end looked at — the right part's name and clef, its own music, the same ending. Not watched
+  in motion.
+- **The box's files** (`stand/server/README.md` § The box — the six first-deploy lines and the one later-deploy
+  line; `ecosystem.config.js` PM2 `sq1-stand`, port 5302; `deploy.sh`; `nginx.conf.example`). The stand has its
+  OWN `stand/package.json` + lock (socket.io, qrcode), so the box installs those two and not the Workshop's
+  puppeteer. A clean copy of `stand/` was installed with `npm ci --omit=dev` and started on the PC: /health,
+  the link sheet, the socket client and the page all answered. The folder on the box is a SPARSE clone
+  (`stand/` only), `/home/deploy/sq1-stand`; the repository is public (its page answers signed out).
+- **The address PROPOSED, his to confirm: `string-quartet-no-1.justinwenloyang.com`** (the house convention,
+  D102 in the tubas' journal: the title's words, lowercase, hyphens).
+- **The films go to the box by `scp`** (README step 3) — 270 MB, not for git. **That line has not been run.**
+- **The players' page: `stand/notation/app/help.html`** (`/notation/app/help.html` on the stand; printable; a
+  "How it works" link on the door) — Safari not a Home Screen icon, Low Power Mode off, the six rows, alone,
+  together, what to do if something looks wrong. FOR HIS EYE before any player sees it.
+- **A reloaded stand rejoins a playing room** on the room's place (new in `film_check`, as the help page
+  promises); after [Stop all] every stand now sits on the same frame (a stopped film is placed to half a
+  frame, was 20 ms). `film_check` **31 ok**, `shell_check` 22 ok.
+
+**HIS, in order:** confirm the address · the DNS record · README's lines 2–6 · the link sheet from the box ·
+the iPad from the box, in Safari (and whether the film is kept on a second open) · the help page read · THE
+WHOLE PIECE PLAYED THROUGH on his devices (the dress run) · the links to the quartet.
+**Not done, known:** the old Technical Manual describes the FIRST system, not this stand · the print score and
+parts are unchanged · the site's landing page still links the old app.
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the

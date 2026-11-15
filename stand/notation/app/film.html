@@ -107,6 +107,7 @@
   #doorBar i { display: block; height: 100%; width: 0; background: var(--ink); }
   #doorGo { min-width: 220px; min-height: 60px; font-size: 19px; background: var(--ink); color: #111; border: 0; }
   #doorGo[disabled] { opacity: .3; }
+  #doorHelp { color: var(--dim); font-size: 15px; text-decoration: underline; text-underline-offset: 3px; }
 </style>
 </head>
 <body class="side">
@@ -135,6 +136,7 @@
   <div id="doorBar"><i></i></div>
   <p id="doorMsg">Loading&hellip;</p>
   <button id="doorGo" disabled>Open</button>
+  <a id="doorHelp" href="/notation/app/help.html" target="_blank" rel="noopener">How it works</a>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -240,7 +242,8 @@
       setRate(1);
       // a stopped film sits on the place; a browser that snaps a seek to a frame is not asked twice for the same place
       S.chased = false;
-      if (!isSeeking() && Math.abs(v.currentTime - t.pos) > 0.02 && S.lastSeekTo !== t.pos) seekTo(t.pos);
+      // (half a frame: after [Stop all] every stand shows the SAME frame, not one a frame or two on)
+      if (!isSeeking() && Math.abs(v.currentTime - t.pos) > 0.008 && S.lastSeekTo !== t.pos) seekTo(t.pos);
     } else if (v.paused) {
       // THE START. On the place (or near it): play, and the servo closes what is left. Far from it: ONE seek,
       // aimed ahead by this device's own seek time, then play whatever it landed on — never seek after seek

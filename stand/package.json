@@ -1,0 +1,15 @@
+{
+  "name": "sq1-stand",
+  "version": "1.0.0",
+  "private": true,
+  "description": "String Quartet No. 1 — the film stand: one server, one page, the parts as films on one clock.",
+  "_note": "The stand's own dependencies, so the box installs these two and nothing else (the repository's root package.json carries the Workshop's, puppeteer among them). On the composer's PC there is no stand/node_modules: Node finds both in the root's.",
+  "scripts": {
+    "start": "node server/server.js",
+    "check": "node tools/shell_check.js"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.1"
+  }
+}
