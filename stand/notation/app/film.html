@@ -367,7 +367,7 @@
         '\nsteps ' + S.steps.n + ' max ' + S.steps.max.toFixed(0) + 'ms at ' + (S.steps.at.join(' ') || '-') +
         '\nclock ' + clockLine() +
         '\nmotor ' + (S.servo ? S.servo.motorPpm().toFixed(0) : '-') + 'ppm ' + (S.servo ? S.servo.policy : '') +
-        '\nseekEst ' + S.seekEst.toFixed(2) + (S.online ? ' on' : ' off') + (navigator.standalone ? ' app' : ' tab') + ' ' + (S.source || '?') + (S.fellBack ? ' (' + S.fellBack + ')' : '');
+        '\nseekEst ' + S.seekEst.toFixed(2) + (S.online ? ' on' : ' off') + (navigator.standalone ? ' app' : ' tab') + ' ' + (S.source || '?') + (S.version ? ' film=' + S.version : '') + (S.fellBack ? ' (' + S.fellBack + ')' : '');
     } else $('net').textContent = !TOKEN ? 'no room (a test link)' : (S.online ? 'connected' : 'not connected — alone only');
     $('net').classList.toggle('bad', !dbg && !!TOKEN && !S.online);
   }
@@ -557,7 +557,9 @@
   function loadFilm() {
     if (loading === S.file || !S.file) return;
     loading = S.file;
-    const url = '/films/' + S.file;
+    // ?film=<name> on a link takes the film from stand/films/<name>/ — a trial of another encoding of the same film
+    S.version = (Q.get('film') || '').replace(/[^A-Za-z0-9_-]/g, '');
+    const url = '/films/' + (S.version ? S.version + '/' : '') + S.file;
     S.url = url;
     const bar = $('doorBar').firstElementChild, msg = $('doorMsg');
     const ready = src => {

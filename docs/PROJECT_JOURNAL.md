@@ -531,6 +531,29 @@ parts are unchanged · the site's landing page still links the old app.
   causes left: the servo, the clock, the device. `film_check` 33 ok. **► NEXT: his deploy, a reload, [Play
   all] from the start, stop after the stutter, a photo of the readout.**
 
+- **THE READOUT WITH ALL ITS RECORDS (his third photo, 25d34a0b on the box, [Play all] from the start after a
+  reload, stopped at second 8):**
+  `start 11ms est 117` · `seeks 0` · `trim 3 max 5.2% at 0,1,10 off 264ms` · `gaps 16 max 171ms at 0,1,1,2,2,4`
+  · `steps 0` · `clock locked cal rtt 54 pend 0.0 corr 0/0ms relock 0 trip 0` · `motor −2000ppm previous`.
+  **What this settles:**
+  · THE CLOCK IS NOT THE CAUSE — no step, no correction, no relock; it is locked and calibrated; the round trip
+    to the box is 54 ms.
+  · THE FILM REALLY FELL BEHIND THE ROOM, BY 264 ms AT WORST, with no seek and an on-time start — so the film
+    itself stalled while "playing". Sixteen frames came late in under ten seconds, the worst 171 ms after the
+    one before, most of them in the first four seconds. (Safari is known to under-report frame callbacks — the
+    tubas' test kit — so the COUNT is soft; the 264 ms is measured from the film's own time and is not.)
+  · THE SERVO THEN MADE IT LONGER: it took hold three times and ran the film at the full 5 % to catch up, which
+    for 264 ms is five seconds of fast, frame-dropping film — the stutter he sees after the stall. Its learned
+    drift sits at its limit (−2000 ppm): it believes this film runs slow all the time, which would fit his
+    "lack of cursor smoothness throughout".
+  **THE READING NOW (still a reading): THE iPAD IS NOT DECODING THIS FILM FAST ENOUGH TO PLAY IT EVENLY.** The
+  film is 2048 × 1536 at 60 fps, H.264 High, level 5.1, with B-frames (847 of the first 1,200 frames) and
+  x264's "slow" preset (several reference frames); one 128 KB key frame a second.
+  **THE EXPERIMENT (building):** two lighter Violin I films beside the present one, chosen by `?film=a` or
+  `?film=b` on a link — `a` the same size with no B-frames and one reference frame; `b` the same, at
+  1600 × 1200. Same test each: a reload, [Play all] from the start, a photo of the readout. `gaps` and `off`
+  are the numbers to compare.
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the
