@@ -468,6 +468,57 @@ parts are unchanged · the site's landing page still links the old app.
   browser) — play() goes out that long before the room's instant; (3) the readout shows the last start's
   error, the estimate, and a count of seeks while playing.
 
+### HIS NOTES OF 2026-11-15, before the Violin I play-through (nothing here to be done now)
+
+- **THE ORDER HE SET:** first the whole of Violin I played through, reporting what he finds; THEN the deploy
+  line for ff04e49e (the door's warm-up, the early start); then "see if there's any immediate fixes to that
+  cursor jitter". **"Crucially, we have to fix that initial jitter."** He has seen no more instances of it yet.
+- **A GENERAL UNSMOOTHNESS OF THE CURSOR** — "a bit of a sort of stutter that's similar to the kind I had with
+  the old system, which I thought the video part was going to resolve … I think it's playable, but there is a
+  little bit of jitter. It's just not very smooth, the cursor." He wonders whether it is the old score's format,
+  and whether the new pieces will be free of it. "Otherwise, this is something we need to address for future
+  things. I'm not sure it's worth it for this one." Not diagnosed. What IS measured: in the film the cursor
+  advances 4.2 px on every frame through film 4–8 s (no frame back, none still), so that stretch of the film
+  is even. Not known: whether he sees it playing alone (the film untouched) or only in the room (the servo
+  trimming the rate), and on which devices.
+- **FOR THE NEXT PIECE, TO EVALUATE THEN (his thought, not a decision):** "this system is fine. I think I don't
+  need to do all the things we had mentioned before. We should just have, this is much simpler, a system like
+  this for all cases. So there's just one score. They can rehearse, they can play alone, they can play an
+  ensemble." No remote: "the conductor open a score on an iPad or even on a phone if the buttons are big
+  enough." "Let's evaluate that when we get to it for the next piece and see if I'm losing anything." It holds
+  "if we can iron out all the video smoothness issues." (This bears on the tubas' PLAN §9 and the septet's
+  stand — to be carried there when that work resumes.)
+- **ANNOTATIONS: dropped from his mind for now** — "maybe they can just print the paper score and annotate on
+  that." A note for later, NOT now: a little research into what performers who read from iPads do with PDF
+  scores — do they annotate on them directly?
+
+- **His observation during the play-through (before ff04e49e is deployed):** "once played to about 210 then back
+  to start that initial jitter gone." So the jitter belongs to the FIRST play after the page opens and does not
+  return on a later start in the same sitting — which is what the door's warm-up is aimed at. Still unproved
+  until he has run the deploy line and reloaded.
+
+- **✓ THE WHOLE OF VIOLIN I PLAYED THROUGH on the iPad (2026-11-15): "run thru no other issues"** — beyond "the
+  lack of cursor smoothness throughout" (the general note above).
+- **ff04e49e DEPLOYED by him, and the first-play stutter is NOT cured:** "the iPad had maybe not quite a severe
+  stutter, but a noticeable stutter at a different spot a little bit later. And then the second play, it seemed
+  smooth." So the warm-up and the early start changed its size and its moment and did not remove it.
+  **CONFIRMED so far (facts, not readings):** it comes on the first play after the page opens and not on later
+  plays · the film's own frames are even where measured · alone-play's back-and-forth went with "the film is
+  the clock". **NOT confirmed: the cause.** The AI's "slow first start" reading is weakened by this result.
+  **Wanted from him: after a first-play stutter, the readout's line "start … est … seeks …"** (tap
+  "connected"), and whether that play was [Play alone] or [Play all].
+
+- **THE FIRST DATA FROM THE iPAD (his photo of the readout, 2026-11-15, after a first play that he stopped at
+  second 7):** `start 6ms est 121` · `seeks 0` · `plays 2 no error` · `ready 4` · `tab memory` · `seekEst 0.08`.
+  **So two readings are RULED OUT for that play: the film did NOT start late (6 ms), and there was NO seek.**
+  What is left: the servo taking hold of the film's rate early in a stand's life (it has not yet learned the
+  device's own drift — `motor` is learned only after ten seconds of playing, and kept for later plays, which
+  would fit "the second play is smooth"), or the device's decoder, or the clock. NOT confirmed.
+  **Added to the readout (ff04e49e + this):** `trim N max X% at <film seconds> off Y ms` — how often the servo
+  took hold, how hard, where, and the film's worst distance from the room — and `motor … ppm <policy>`.
+  **The two plays wanted from him, each after a fresh reload:** [Play alone] from the start for twenty seconds
+  (no servo at all — does it stutter?), then [Play all] from the start, and a photo of the readout.
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the
