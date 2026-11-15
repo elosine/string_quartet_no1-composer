@@ -201,6 +201,11 @@ const read = page => page.evaluate(() => {
     await sleep(800);
     a = await read(A.page); b = await read(B.page);
     check('after Stop all each stand keeps its OWN speed setting (Violin I 50 %, Violin II 70 %)', a.speed === '50%' && b.speed === '70%' && a.paused && b.paused && Math.abs(a.target - b.target) < 0.001, a.speed + ' / ' + b.speed);
+    // the readout (a tap on the corner line): every record is there and reads as text
+    await B.page.click('#net');
+    await sleep(300);
+    const readout = await B.page.evaluate(() => document.getElementById('net').textContent);
+    check('the readout shows its records (start, seeks, trim, gaps, steps, clock, motor)', ['start ', 'seeks ', 'trim ', 'gaps ', 'steps ', 'clock locked', 'motor '].every(k => readout.includes(k)), readout.replace(/\n/g, ' | '));
     check('no page errors', A.errors.length === 0 && B.errors.length === 0, A.errors.concat(B.errors).slice(0, 3).join(' | '));
   } catch (e) {
     fail++;

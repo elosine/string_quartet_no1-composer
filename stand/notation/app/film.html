@@ -171,7 +171,9 @@
     opened: false, servo: null, seeking: false, lastSeekAt: 0, seekEst: 0.15, chased: false, typing: false, wake: null,
     playErr: null, plays: 0, stuckSince: null, stuck: false, debug: false,
     startEst: 0.12,               // s: how long this device takes from play() to a moving film (learned, kept)
-    trim: { n: 0, at: [], max: 0, worst: 0, was: false },   // the servo's record since the page opened
+    trim: { n: 0, at: [], max: 0, worst: 0, was: false },
+    gaps: { n: 0, max: 0, at: [], lastAt: null },             // frames that came late: over 45 ms since the one before
+    steps: { n: 0, max: 0, at: [], prev: null },              // the room's time moving by a step (over 4 ms in one frame)   // the servo's record since the page opened
     startCalledAt: 0, startT0: null, startMeasured: true, wasMoving: false, lastStartErr: null, seekCount: 0,
   };
 
@@ -292,10 +294,21 @@
   // every presented frame: the servo trims the rate (testkit/js/servo.js)
   function onFrame(cbNow, md) {
     v.requestVideoFrameCallback(onFrame);
-    if (!S.opened || v.paused || isSeeking()) return;
+    if (!S.opened || v.paused || isSeeking()) { S.gaps.lastAt = null; S.steps.prev = null; return; }
     const at = md.expectedDisplayTime;
     const t = target(at);
-    if (!t.moving) return;
+    if (!t.moving) { S.gaps.lastAt = null; S.steps.prev = null; return; }
+    // for the readout — a frame that came late (the device's drawing), wherever it happens, alone or in the room
+    const G = S.gaps;
+    if (G.lastAt != null && at - G.lastAt > 45 && at - G.lastAt < 3000) { G.n++; G.max = Math.max(G.max, at - G.lastAt); if (G.at.length < 6) G.at.push(Math.round(md.mediaTime)); }
+    G.lastAt = at;
+    // — and the ROOM'S TIME moving by a step between two frames (the clock correcting itself), in the room only
+    const K = S.steps;
+    if (t.all && K.prev && at - K.prev.at < 200) {
+      const d = (t.pos - K.prev.pos) * 1000 - (at - K.prev.at) * t.rate;
+      if (Math.abs(d) > 4) { K.n++; K.max = Math.max(K.max, Math.abs(d)); if (K.at.length < 6) K.at.push(Math.round(md.mediaTime) + ':' + d.toFixed(0)); }
+    }
+    K.prev = t.all ? { at, pos: t.pos } : null;
     if (!t.all) { setRate(t.rate); return; }       // alone: the film leads, at the stand's speed, untouched
     const mediaMs = md.mediaTime * 1000, targetMs = t.pos * 1000;
     if (!S.startMeasured && S.startT0 != null && at - S.startT0 > 300) {
@@ -328,7 +341,7 @@
   let lastPaint = '';
   function paint(t) {
     const all = t.all;
-    const key = [all, S.local.playing, Math.floor(t.pos * 5), Math.ceil(t.waitMs / 1000), S.online, S.canLead, S.tuple && S.tuple.by, S.typing, t.rate, S.speed, S.stuck, S.debug, (S.stuck || S.debug) ? [v.paused, v.seeking, v.readyState, S.plays, S.playErr, S.seekCount, S.lastStartErr, S.trim.n, Math.floor(performance.now() / 500)].join() : ''].join('|');
+    const key = [all, S.local.playing, Math.floor(t.pos * 5), Math.ceil(t.waitMs / 1000), S.online, S.canLead, S.tuple && S.tuple.by, S.typing, t.rate, S.speed, S.stuck, S.debug, (S.stuck || S.debug) ? [v.paused, v.seeking, v.readyState, S.plays, S.playErr, S.seekCount, S.lastStartErr, S.trim.n, S.gaps.n, S.steps.n, Math.floor(performance.now() / 500)].join() : ''].join('|');
     if (key === lastPaint) return;
     lastPaint = key;
     document.body.classList.toggle('all', all);
@@ -350,10 +363,22 @@
         '\nplays ' + S.plays + ' ' + (S.playErr || 'no error') + (v.error ? ' media ' + v.error.code : '') +
         '\nstart ' + (S.lastStartErr == null ? '-' : S.lastStartErr.toFixed(0) + 'ms') + ' est ' + (S.startEst * 1000).toFixed(0) + ' seeks ' + S.seekCount +
         '\ntrim ' + S.trim.n + ' max ' + (S.trim.max * 100).toFixed(1) + '% at ' + (S.trim.at.join(',') || '-') + ' off ' + S.trim.worst.toFixed(0) + 'ms' +
+        '\ngaps ' + S.gaps.n + ' max ' + S.gaps.max.toFixed(0) + 'ms at ' + (S.gaps.at.join(',') || '-') +
+        '\nsteps ' + S.steps.n + ' max ' + S.steps.max.toFixed(0) + 'ms at ' + (S.steps.at.join(' ') || '-') +
+        '\nclock ' + clockLine() +
         '\nmotor ' + (S.servo ? S.servo.motorPpm().toFixed(0) : '-') + 'ppm ' + (S.servo ? S.servo.policy : '') +
         '\nseekEst ' + S.seekEst.toFixed(2) + (S.online ? ' on' : ' off') + (navigator.standalone ? ' app' : ' tab') + ' ' + (S.source || '?') + (S.fellBack ? ' (' + S.fellBack + ')' : '');
     } else $('net').textContent = !TOKEN ? 'no room (a test link)' : (S.online ? 'connected' : 'not connected — alone only');
     $('net').classList.toggle('bad', !dbg && !!TOKEN && !S.online);
+  }
+  // the floor clock's own account: its state, the round trip, what is still to be slewed, its corrections and snaps
+  function clockLine() {
+    try {
+      const c = S.room && S.room.status().clock;
+      if (!c) return '-';
+      return c.state + (c.calibrated ? ' cal' : '') + ' rtt ' + (c.rttTypicalMs || 0).toFixed(0) + ' pend ' + c.pendingMs.toFixed(1) +
+        ' corr ' + c.count.corrections + '/' + c.count.correctedMs.toFixed(0) + 'ms relock ' + c.count.relocks + ' trip ' + c.count.trips;
+    } catch (e) { return '?'; }
   }
   const pct = r => Math.round(r * 100) + '%';
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

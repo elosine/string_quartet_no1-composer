@@ -519,6 +519,18 @@ parts are unchanged · the site's landing page still links the old app.
   **The two plays wanted from him, each after a fresh reload:** [Play alone] from the start for twenty seconds
   (no servo at all — does it stutter?), then [Play all] from the start, and a photo of the readout.
 
+- **HIS SECOND PHOTO (the same page load, a second play from the start, taken before 718f1321 was deployed):**
+  "it stuttered pretty severely at a slightly later point" — stopped at second 10; `start −6ms est 124` ·
+  `seeks 0` · `plays 3 no error`. **So it is NOT only the first play after a load** (the earlier "second play
+  smooth" does not hold every time); again the start was on time and there was no seek. It comes some seconds
+  into a play in the first minute or so of a stand's life, and was not seen later in the play-through.
+  **The readout now carries three more records** (this commit): `gaps` (frames that came over 45 ms after the
+  one before — the device's drawing; alone and in the room) · `steps` (the room's time moving by over 4 ms
+  between two frames — the clock correcting itself, with the size) · `clock` (the floor clock's state, round
+  trip, what is still being slewed, its corrections, relocks and trips). With `trim` these separate the three
+  causes left: the servo, the clock, the device. `film_check` 33 ok. **► NEXT: his deploy, a reload, [Play
+  all] from the start, stop after the stutter, a photo of the readout.**
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the
