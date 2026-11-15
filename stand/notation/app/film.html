@@ -157,7 +157,8 @@
   // message and put its film on that place, so that all start on the same instant.
   const RUNUP_S = 1;
   const LEAD_MS = 300;            // was 800: he saw it as a pause. A stand that is not ready by then joins a moment late (the catch-up below).
-  const SEEK_GAP_MS = 350;        // playing: a gap beyond this is closed by a seek, not a trim
+  const SEEK_GAP_MS = 500;        // in the room: a gap beyond this is closed by a seek, not a trim (was 350)
+  const SEEK_EVERY_MS = 1500;     // …and never two such seeks closer than this (was 700: a slow device hopped back and forth)
   const DEFAULT_FILM = { parts: ['violin1.mp4', 'violin2.mp4', 'viola.mp4', 'cello.mp4'], score: 'fullscore.mp4', duration: 512, leadIn: 2, fps: 60, rowSeconds: 8, rows: 6 };
   const DEFAULT_PARTS = ['Violin I', 'Violin II', 'Viola', 'Cello'];
 
@@ -191,7 +192,7 @@
     const p = localPos(now);
     return { pos: p, moving: S.local.playing && p < dur(), waitMs: 0, all: false, rate: S.local.rate };
   }
-  function setLocal(pos, playing) { S.local = { playing: !!playing, pos: clamp(pos), at: performance.now(), rate: S.speed }; }
+  function setLocal(pos, playing) { S.local = { playing: !!playing, pos: clamp(pos), at: performance.now(), rate: S.speed }; S.jumpPending = !!playing; }
 
   // ---- the film follows the clock ------------------------------------------------------
   const hasRVFC = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
@@ -235,7 +236,14 @@
     requestAnimationFrame(drive);
     if (!S.opened) return;
     const now = performance.now();
-    if (!roomLive() && S.local.playing && localPos(now) >= dur()) setLocal(dur(), false);   // alone, the end: stopped there
+    // ALONE, THE FILM IS THE CLOCK. A stand playing by itself keeps time with nobody, so its place is simply the
+    // film's own time — it never trims or seeks the film to follow a clock. (Until 2026-11-15 it chased its own
+    // clock like a stand in the room does; on the iPad from the box that showed as stutters and jumps back and
+    // forth.) A move asked for while playing (an arrow, the time box) is one seek, then the film leads again.
+    const alone = !roomLive() && S.local.playing;
+    if (alone && S.jumpPending) { S.jumpPending = false; if (Math.abs(v.currentTime - S.local.pos) > 0.05) seekTo(S.local.pos); }
+    if (alone && !isSeeking() && v.readyState >= 2) { S.local.pos = clamp(v.currentTime); S.local.at = now; }
+    if (alone && localPos(now) >= dur()) setLocal(dur(), false);   // alone, the end: stopped there
     const t = target(now);
     if (!t.moving) {
       if (!v.paused) v.pause();
@@ -249,13 +257,14 @@
       // aimed ahead by this device's own seek time, then play whatever it landed on — never seek after seek
       // (a slow seeker chasing a moving clock that way never starts: the iPad, 2026-11-15).
       if (!isSeeking()) {
-        if (Math.abs(v.currentTime - t.pos) > 0.25 && !S.chased) { S.chased = true; seekTo(t.pos + S.seekEst * t.rate + 0.02); }
+        if (t.all && Math.abs(v.currentTime - t.pos) > 0.25 && !S.chased) { S.chased = true; seekTo(t.pos + S.seekEst * t.rate + 0.02); }
         else if (now - (S.lastPlayAt || 0) > 400) { S.lastPlayAt = now; S.chased = false; setRate(t.rate); playFilm(); if (S.servo) S.servo.reset(); }   // asked again every 0.4 s, not every frame
       }
     } else if (!hasRVFC && !isSeeking()) {
       // no frame callbacks: a plain proportional trim on the media clock
       const errMs = (v.currentTime - t.pos) * 1000;
-      if (Math.abs(errMs) > SEEK_GAP_MS) { if (performance.now() - S.lastSeekAt > 700) seekTo(t.pos + S.seekEst * t.rate + 0.03); }
+      if (!t.all) setRate(t.rate);
+      else if (Math.abs(errMs) > SEEK_GAP_MS) { if (performance.now() - S.lastSeekAt > SEEK_EVERY_MS) seekTo(t.pos + S.seekEst * t.rate + 0.03); }
       else setRate(t.rate * (1 - Math.max(-0.03, Math.min(0.03, errMs * 0.0006))));
     }
     // THE FILM WILL NOT START: it should be moving and has sat paused for over a second. Offer the tap
@@ -265,7 +274,6 @@
     if (t.moving) {
       if (S.stuckSince == null || Math.abs(v.currentTime - S.lastCt) > 0.004) { S.stuckSince = now; S.lastCt = v.currentTime; }
     } else S.stuckSince = null;
-    if (S.source === 'memory' && S.openedAt && now - S.openedAt > 4000 && v.readyState < 2) useServer('no frame after 4 s');
     const stuck = S.stuckSince != null && now - S.stuckSince > 1200;
     if (stuck !== S.stuck) { S.stuck = stuck; $('tap').style.display = stuck ? 'block' : 'none'; lastPaint = ''; }
     paint(t);
@@ -278,9 +286,10 @@
     const at = md.expectedDisplayTime;
     const t = target(at);
     if (!t.moving) return;
+    if (!t.all) { setRate(t.rate); return; }       // alone: the film leads, at the stand's speed, untouched
     const mediaMs = md.mediaTime * 1000, targetMs = t.pos * 1000;
     if (Math.abs(mediaMs - targetMs) > SEEK_GAP_MS) {
-      if (performance.now() - S.lastSeekAt > 700) seekTo(t.pos + S.seekEst * t.rate + 0.03);
+      if (performance.now() - S.lastSeekAt > SEEK_EVERY_MS) seekTo(t.pos + S.seekEst * t.rate + 0.03);
       return;
     }
     const out = S.servo.update({ mediaMs, targetMs, nowMs: at, targetRate: t.rate, clockMs: v.currentTime * 1000 + (at - cbNow) * v.playbackRate });
@@ -527,7 +536,9 @@
           } catch (e) { cache = null; }
         }
         let blob;
-        if (res) { bar.style.width = '100%'; blob = await res.blob(); }
+        // the kept copy is read whole INTO MEMORY: a film played straight off the browser's stored copy stuttered
+        // badly on the iPad (2026-11-15, the second open from the box), where the first open, from memory, did not
+        if (res) { bar.style.width = '100%'; blob = new Blob([await res.arrayBuffer()], { type: 'video/mp4' }); }
         else {
           const r = await fetch(url, { cache: 'no-store' });
           if (!r.ok) throw new Error('HTTP ' + r.status);

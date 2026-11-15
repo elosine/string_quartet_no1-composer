@@ -108,6 +108,10 @@ const read = page => page.evaluate(() => {
     const mid = await read(A.page);
     a = await tapAt(A.page, 4, 0.5);
     check('a tap while playing alone does nothing', !a.paused && a.target > mid.target && a.target < mid.target + 1.5, 'still running at ' + a.target.toFixed(2) + ' s');
+    await A.page.click('#bFwd');
+    await sleep(900);
+    a = await read(A.page);
+    check('the forward arrow while playing alone jumps to the next row (film 64 s) and the film plays on from there', !a.paused && a.target > 64.3 && a.target < 65.6 && Math.abs(a.media - a.target) < 0.03, 'running at ' + a.media.toFixed(2) + ' s');
     await A.page.click('#bAlone');
     await sleep(400);
 

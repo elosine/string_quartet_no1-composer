@@ -393,6 +393,49 @@ WHOLE PIECE PLAYED THROUGH on his devices (the dress run) · the links to the qu
 **Not done, known:** the old Technical Manual describes the FIRST system, not this stand · the print score and
 parts are unchanged · the site's landing page still links the old app.
 
+- **✓ THE ADDRESS, his word 2026-11-15: "address is fine"** — `string-quartet-no-1.justinwenloyang.com`.
+- **A NOTE FOR LATER (his, 2026-11-15): A BACKUP SERVER TO RUN FROM HIS WINDOWS 10 LAPTOP** at the reading, in
+  case the box or the venue's internet fails. Not built, not planned. (What exists: `server.js --spare
+  <snapshot>` from the septet's stand, untested here; the laptop would need Node, the repo's `stand/` with its
+  films, and the players' devices on the laptop's network; over plain http the films are not kept in the
+  browser.)
+
+### STEP 6 TRAIL — THE BOX (2026-11-15, his hands)
+
+- ✓ the Cloudflare A record `string-quartet-no-1` → 5.161.233.35, proxy off — "saved".
+- ✓ README line 2 (the sparse clone, the install inside `stand/`, PM2 `sq1-stand`) — ran first time; /health
+  on the box answered ok true.
+
+- ✓ README line 3 — the `scp` of the films (the line nobody had run): ran first time, "done"; the owner set
+  and the listing: "it shows five files". The file sizes on the box were not read back.
+
+- ✓ README line 4 (nginx + certbot): "successfully deployed". ✓ line 5: /health through
+  `https://string-quartet-no-1.justinwenloyang.com` answers ok true. The box's admin key stays with him (not
+  put in the chat or here).
+
+- ✓ README line 6 (`setup.js "JACK Studio Readings" --server … --key …`): the piece registered on the box, the
+  ensemble made, and **the link sheet opens from the box with five QR codes** (his word). **✓ STEP 6's SIX
+  LINES ALL RAN, each first time.** ► NEXT: the iPad from the box, in Safari — the door, the film's load, play
+  alone, and whether a second open finds the film kept.
+
+- **THE iPAD FROM THE BOX, in Safari (his report, 2026-11-15):** it opens, plays, "the normal parts of the test
+  worked"; **the second open did NOT need to load the film again** (the browser keeps it — the look-ahead's
+  promise holds). **BUT: "a few stutters" on the first open, and on the second "really bad jitters … it jumped
+  back and forth a couple times"** — playing alone. Cause NOT measured (the AI cannot see the iPad). Its
+  reading: a stand playing alone was made to chase its own clock, like a stand in the room; when the film fell
+  behind, it seeked, landed off, and seeked again — and the second open played the film straight off the
+  browser's stored copy, which is slower to read than memory.
+  **Changed (PC-verified only, `film_check` 32 ok):**
+  (1) ALONE, THE FILM IS THE CLOCK — a stand playing by itself never trims or seeks its film; its place is the
+  film's own time. An arrow or a typed time while playing is one seek, then the film leads again.
+  (2) The kept copy is read whole into memory before it plays.
+  (3) In the room: a seek only for a gap over 0.5 s (was 0.35), and never two closer than 1.5 s (was 0.7).
+  (4) The 4-second "no frame → take it from the server" fallback is REMOVED — it was built on the Home Screen
+  guess, never confirmed, and could have switched a healthy stand to streaming; the fallback on a real media
+  error stays.
+  **► NEXT: the later-deploy line, then his iPad again — alone, and above all [Play all] across devices over
+  the internet, which is what the reading needs and has not yet been tried from the box.**
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the
