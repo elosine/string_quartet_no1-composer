@@ -25,6 +25,9 @@
  *   --keyint N    a keyframe every N frames (default = fps, one a second)
  *   --name STR    output name (default film_t<track>)
  *   --frames DIR  also keep every 30th frame as a PNG in DIR (for a look)
+ *   --gc N        the GC's impact dot N times as big (the travelling ball takes the dot's size); --ball PX overrides the ball
+ *   --badge F     a badge that covers notation is drawn at strength F (0.3 = lighter; 1 = as it is); --badgeAll 1: every badge
+ *   --raw 1       the app as it is, with none of the film's patches
  *
  * Output: builds/film/<name>.mp4   (builds/ is gitignored)
  * Needs: ffmpeg on the PATH; builds/performance/ built.
@@ -40,7 +43,7 @@ const ROOT = path.resolve(__dirname, '..');
 const PERF_DIR = path.join(ROOT, 'builds', 'performance');
 const OUT_DIR = path.join(ROOT, 'builds', 'film');
 
-const opt = { track: 1, pages: 6, from: 0, to: 32, fps: 30, width: 1600, height: 1200, scale: 1, crf: 18, keyint: null, name: null, frames: null, gc: 1, raw: 0 };
+const opt = { track: 1, pages: 6, from: 0, to: 32, fps: 30, width: 1600, height: 1200, scale: 1, crf: 18, keyint: null, name: null, frames: null, gc: 1, ball: null, badge: 1, badgeAll: 0, raw: 0 };
 for (let i = 2; i < process.argv.length; i++) {
     const k = process.argv[i].replace(/^--/, '');
     if (!(k in opt)) { console.error('Unknown option ' + process.argv[i]); process.exit(1); }
@@ -85,9 +88,12 @@ function patchFile(url, filePath) {
                 if (n !== want) throw new Error('patch 2: found ' + n + ' of "' + from + '", expected ' + want);
                 text = text.split(from).join(to);
             };
-            swap('ctx.arc(ballPos.x, ballPos.y, 5, 0, Math.PI * 2);', 'ctx.arc(ballPos.x, ballPos.y, ' + (5 * opt.gc) + ', 0, Math.PI * 2);', 2);
+            // the travelling ball is drawn the SAME SIZE as the impact dot it lands on (the composer, 2026-11-16);
+            // --ball N gives it another radius
+            const ballPx = opt.ball || 4 * opt.gc;
+            swap('ctx.arc(ballPos.x, ballPos.y, 5, 0, Math.PI * 2);', 'ctx.arc(ballPos.x, ballPos.y, ' + ballPx + ', 0, Math.PI * 2);', 2);
             swap("impactMarker.setAttribute('r', '4');", "impactMarker.setAttribute('r', '" + (4 * opt.gc) + "');", 2);
-            console.log('  patch 2: the GC\'s ball ' + (5 * opt.gc) + ' px, its impact dot ' + (4 * opt.gc) + ' px (x' + opt.gc + ')');
+            console.log('  patch 2: the GC\'s ball ' + ballPx + ' px, its impact dot ' + (4 * opt.gc) + ' px');
         }
     }
     patchCache[url] = Buffer.from(text, 'utf8');
@@ -238,14 +244,41 @@ async function main() {
         // patch 3: the notation's layer last in every row's SVG (kept so before each frame — the app appends
         // badges, wedges and curves after it whenever a row is replaced)
         if (!opt.raw) {
-            await page.evaluate(function () {
+            await page.evaluate(function (badgeOpacity, badgeAll) {
+                let tick = 0;
+                window.__filmLight = {};      // the badges made lighter, by where they stand (for the tool's report)
                 window.__filmOrder = function () {
                     const layers = document.querySelectorAll('[id^="svg-elements-"]');
                     for (let i = 0; i < layers.length; i++) { const g = layers[i], p = g.parentNode; if (p && p.lastElementChild !== g) p.appendChild(g); }
+                    // patch 4: A BADGE THAT COVERS NOTATION IS MADE LIGHTER (--badge 0.3), so the notation drawn over
+                    // it reads. "Covers" = a fifth or more of the badge lies over a notation element of its own row.
+                    // Looked at every eighth frame (rows are replaced as the piece goes). --badgeAll 1: every badge.
+                    if (badgeOpacity >= 1 || (tick++ % 8) !== 0) return;
+                    const badges = document.querySelectorAll('.badge-element');
+                    for (let b = 0; b < badges.length; b++) {
+                        const el = badges[b];
+                        let light = !!badgeAll;
+                        if (!light) {
+                            const r = el.getBoundingClientRect();
+                            const area = r.width * r.height;
+                            const svg = el.ownerSVGElement;
+                            const layer = svg && svg.querySelector('[id^="svg-elements-"]');
+                            if (area > 0 && layer) {
+                                for (let k = 0; k < layer.children.length && !light; k++) {
+                                    const q = layer.children[k].getBoundingClientRect();
+                                    const w = Math.min(r.right, q.right) - Math.max(r.left, q.left), h = Math.min(r.bottom, q.bottom) - Math.max(r.top, q.top);
+                                    if (w > 0 && h > 0 && w * h >= 0.2 * area) light = true;
+                                }
+                            }
+                        }
+                        el.style.opacity = light ? String(badgeOpacity) : '';
+                        if (light) window.__filmLight[(el.getAttribute('data-badge-id') || el.id || '?') + '@' + Math.round((ScoreTime.now() / 1000 - 2))] = 1;
+                    }
                 };
                 window.__filmOrder();
-            });
+            }, opt.badge, opt.badgeAll);
             console.log('  patch 3: the notation drawn on top of the badges, the wedges and the curves');
+            if (opt.badge < 1) console.log('  patch 4: ' + (opt.badgeAll ? 'every badge' : 'a badge that covers notation') + ' drawn at ' + Math.round(opt.badge * 100) + ' % strength');
         }
         await sleep(2000);
 

@@ -698,6 +698,23 @@ badge's dark blue — on top, though not strongly); the doubled ball and dot rea
 large in the full score's lanes, where a dot at the foot of a lane is half over the lane's edge.
 **► WAITING ON HIS EYE:** the three fixes, the GC's size (parts / full score), notation over wedges and curves.
 
+**His answers on the first clips (2026-11-16):** yes · look at the printed viola part · "try making the bouncing
+ball the same size as the impact ball, the destination ball" · assess making the badges that cover notation
+"a lighter transparency" — ideally only those, or all if that is easier, or not at all if it is a problem:
+"They're not super crucial."
+- **THE PRINTED VIOLA PART LACKS THE PIZZ — CONFIRMED** (`builds/print/Viola_6pages.pdf`, page 1, rendered with
+  MiKTeX's `pdftoppm` and looked at): on the third row the GC stands at 18.3 with nothing at its foot. The
+  same page shows the badge over the notation at 21. So the PRINT PARTS carry both faults (the 4- and 8-page
+  viola parts are made the same way; not opened). Whether to re-make the print parts: HIS, not yet asked.
+- **BUILT: the ball = the dot.** `--gc 2` now gives both a radius of 8 px (`--ball N` for another).
+- **BUILT: patch 4, the lighter badge** (`--badge 0.3`). EASY, and his ideal was possible: before the frames,
+  each badge is measured against the notation of its own row; one with a fifth or more of itself over a
+  notation element is drawn at 30 % strength, the others stay solid (`--badgeAll 1` would lighten every one).
+  In the Violin II clip two badges go pale (at 16 and at 21) and three stay solid.
+- **The second clips, sent:** `clip2_violin2_15-25.mp4`, `clip2_viola_13-23.mp4`. The AI looked at one frame of
+  the Violin II clip. **► WAITING ON HIS EYE:** the ball's size · the pale badges (30 %) · and, still, notation
+  over the wedges and curves, and the GC's size in the full score.
+
 ### WHAT IS LEFT TO DELIVERY (as told him 2026-11-16)
 
 After his yes to the clips: all five films re-made (about three hours unattended), cut, copied to the box (his
