@@ -621,6 +621,92 @@ parts are unchanged · the site's landing page still links the old app.
   83 ms. His eye on the smoothness is not yet given.
   `film_check` 34 ok.
 
+- **212f761d ON THE iPAD (his photo, 5:06 PM, [Play all] from the start, stopped at second 21):**
+  `start 13ms est 51 door 29` · `seeks 0` · `rescues 0` · `free off −` · `trim 0` · **`off 14ms`** ·
+  `gaps 32 max 50ms at 2,3,3,3,3,4` · `steps 0` · `clock locked cal rtt 121 corr 0` · `plays 2 no error`.
+  **It played on (no freeze), with no seek, no rescue and no trim, and the film's WORST distance from the room
+  in over twenty seconds was 14 ms** (it was 133–264 ms with the servo). The frame-gap count (32, none over
+  50 ms) is the soft number — Safari under-reports its frame callbacks — and had been 16–44 with gaps up to
+  171 ms. **His eye on it: not yet said.** [To the start]: not yet reported.
+
+- **✓ HIS EYE, 2026-11-15, on 212f761d from the box: "that all works and it is smoother."** The free-running
+  film stays as the stand's way in the room. (The reading that the servo's speed changes were the iPad's
+  jitter is now supported by his eye and by the numbers; the freeze did not return; [To the start] works.)
+- **His question: can the parts now get out of sync more easily?** The AI's answer, given in chat: yes, a
+  little, and bounded. Every [Play all] puts all stands on one instant (13 ms on the iPad). After that each
+  film runs on its own device's clock — tens of parts in a million between devices, so some tens of
+  milliseconds at most over the 8½ minutes; a stand that stalls stays behind by what it lost, up to 150 ms,
+  where one seek puts it back. MEASURED: 14 ms worst in twenty seconds on the iPad. NOT measured: the whole
+  piece. The readout's `off` on each device after a full [Play all] run is that measurement — for the dress run.
+
+### THE PROOFING PASS — the other parts on the iPad (begun 2026-11-15/16). Findings collected; fixed together on his go.
+
+1. **Violin II, at second 21 (he thinks also 22): NOTATION IS HIDDEN BEHIND A BADGE** (the flocking badges —
+   the dark squares). His rule, for everywhere: **"all the notation should be drawn on top so you can see
+   it."** This is in the film (the old app's drawing order), so the cure is in the filming — the badges' layer
+   put under the notation's before the frames are taken — and the films re-made. Not yet looked at by the AI.
+
+2. **Viola, at second 18: A GC WITH NO NOTATION** ("check orig"). **Checked in the score's data
+   (`builds/performance/score.json`) and in the films — the cause FOUND:** the viola's GC is
+   `GC_20260116_151414`, impact 18.30, track 3. Its notation is element 42,
+   `SVG_20260217_194202_41_M4_vla_BartokPizz_Cs3_final` (a Bartók pizz, C♯3), at 18.24 — **stored on TRACK 2
+   (Violin II) with `offsetYFraction` 1.03**, that is, one whole lane BELOW Violin II's own: in the FULL SCORE
+   it is drawn in the viola's lane, where it belongs to the eye; in the PARTS it is filed under Violin II and
+   drawn below that part's row, so it shows in NEITHER part. It is the only element in the score placed a lane
+   away from its track (542 checked; the 13 others outside the usual band are the furioso / delicato words at
+   the foot of a lane and one tall gliss, all in their own lanes), and the only GC of 248 without its notation
+   on its own track. The cure, at filming: that element moved to track 3 at the same height in the lane
+   (`offsetYFraction` 0.03). *Not checked:* whether the old app's viola part and the PRINTED viola part
+   (`builds/print/Viola_*.pdf`) lack it too — they are made from the same parts view, so probably.
+3. **Viola: the same as finding 1** — notation behind the badges.
+
+**The proofing pass closed by him (2026-11-16): "I think that's mostly it."** Three findings, above. He asked to
+DISCUSS the changes and the process first — and to assess the fixes WITHOUT a full re-run — and for an
+assessment of bigger GCs: "if the impact point, the ball at the bottom, could be bigger, and the actual
+traveling ball too … probably about twice as big as it is … I don't want to get too bogged down in graphic
+details if it's not done easily."
+
+**The AI's assessment, given in chat (nothing built):**
+- **The GC, found in the old app's code:** the travelling ball is a canvas circle of radius 5 px
+  (`ctx.arc(ballPos.x, ballPos.y, 5, …)`, two places — the full score's and the parts'); the impact dot is an
+  SVG circle of radius 4 (`impactMarker.setAttribute('r', '4')`, two places). Twice as big = 10 and 8. EASY:
+  two numbers, changed for the filming only. To look at in a clip: the bigger ball crossing notation at the
+  impact, and its size in the full score's narrower lanes.
+- **All three changes belong in the FILMING, not in the old app or the score file:** `film_part.js` serves the
+  app to its own headless browser, so it can hand it (a) the score with element 42 moved to the viola,
+  (b) the app with the two radii doubled, and (c) the badges' layer put under the notation's — each a named,
+  recorded patch.
+- **The process proposed:** the patches → SHORT CLIPS of the very spots (Violin II 19–24 s; Viola 16–22 s; a
+  busy GC spot; the same in the full score), a minute each to film, sent to him in the chat → his eye → on his
+  go, all five films re-made (about three hours unattended), cut, copied to the box with the `scp` line (no
+  deploy; the stands see the new size and load afresh) → he spot-checks two or three places on the iPad.
+
+**His go (2026-11-16): "ok that all is good"** — the process and the bigger GC in the clips. His question first:
+what is left after the re-filming (answered in chat; the list is "WHAT IS LEFT TO DELIVERY" below).
+
+**BUILT — the three patches, in `scripts/film_part.js` only** (the old app and the score file are not written):
+`patchFile()` hands the tool's own browser (1) the score with element 42 on track 3 (`offsetYFraction` 0.03),
+(2) the app with the GC's ball and impact dot scaled by `--gc` (2 → 10 px and 8 px; the tool refuses if it does
+not find exactly two of each line); and before every frame (3) `__filmOrder()` keeps the notation's layer last
+in each row's SVG. `--raw 1` films the app as it is. **Patch 3 goes further than the badges: the notation is
+now above the line wedges and the curves too** — the AI's reading of "all the notation should be drawn on
+top"; in the old app the wedges' bands and the curves' fills lay over it. For his eye.
+**THE CLIPS, sent to him in the chat** (`builds/film/clip_*.mp4`, 2048 × 1536, 60 fps, `--gc 2`): Violin II
+film 17–27 s · Viola film 15–25 s · the full score film 15–27 s. The AI looked at one frame of each: the
+viola's Bartók pizz stands at its GC at 18.3; notation shows over the badges at 21–22 (black notes on the
+badge's dark blue — on top, though not strongly); the doubled ball and dot read clearly in the parts and look
+large in the full score's lanes, where a dot at the foot of a lane is half over the lane's edge.
+**► WAITING ON HIS EYE:** the three fixes, the GC's size (parts / full score), notation over wedges and curves.
+
+### WHAT IS LEFT TO DELIVERY (as told him 2026-11-16)
+
+After his yes to the clips: all five films re-made (about three hours unattended), cut, copied to the box (his
+one `scp` line) → his spot-check on the iPad → the players' page read by him (`help.html`) → the dress run (the
+whole piece with [Play all] on three devices; the readout's `off` on each) → the links and the page to the
+quartet. Beside it: the printed viola part checked for the pizz at 18 · the two trial films removed from the
+box. For afterwards, as he set them aside: the Home Screen icon · a backup server on the laptop · the desktop's
+stutter · the site's landing page and the old Technical Manual.
+
 ### HOW TO WORK HERE (carried from the other pieces)
 
 - The composer starts and stops every server; the AI gives the exact line and the link, never runs them. From the

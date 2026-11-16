@@ -40,7 +40,7 @@ const ROOT = path.resolve(__dirname, '..');
 const PERF_DIR = path.join(ROOT, 'builds', 'performance');
 const OUT_DIR = path.join(ROOT, 'builds', 'film');
 
-const opt = { track: 1, pages: 6, from: 0, to: 32, fps: 30, width: 1600, height: 1200, scale: 1, crf: 18, keyint: null, name: null, frames: null };
+const opt = { track: 1, pages: 6, from: 0, to: 32, fps: 30, width: 1600, height: 1200, scale: 1, crf: 18, keyint: null, name: null, frames: null, gc: 1, raw: 0 };
 for (let i = 2; i < process.argv.length; i++) {
     const k = process.argv[i].replace(/^--/, '');
     if (!(k in opt)) { console.error('Unknown option ' + process.argv[i]); process.exit(1); }
@@ -53,6 +53,47 @@ if (!opt.keyint) opt.keyint = opt.fps;
 const MIME = { '.html': 'text/html', '.json': 'application/json', '.css': 'text/css', '.js': 'application/javascript',
     '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.otf': 'font/otf' };
 
+// ─── THE FILM'S PATCHES ───────────────────────────────────────────────────────
+// What the films show differently from the old app, decided at the proofing of 2026-11-16. They are made HERE,
+// to the copies this tool hands its own browser; builds/performance/ and the score file are never written.
+//   1. score.json — element 42 (M4_vla_BartokPizz_Cs3_final, the viola's Bartók pizz at 18.24) is filed on
+//      track 2 one whole lane down (offsetYFraction 1.03): drawn in the viola's lane in the full score, lost
+//      from both parts. It is given to track 3 at the same height in the lane.
+//   2. index.html — the GC's travelling ball (canvas radius 5) and its impact dot (SVG radius 4) are scaled by
+//      --gc (2 = twice as big).
+//   3. in the page, every frame — the notation's layer is kept the LAST in each row's SVG, so notation is
+//      drawn on top of the badges, the line wedges and the curves ("all the notation should be drawn on top").
+// --raw 1 films the app as it is, with none of them.
+const patchCache = {};
+function patchFile(url, filePath) {
+    if (opt.raw) return null;
+    if (url !== '/score.json' && url !== '/index.html') return null;
+    if (patchCache[url]) return patchCache[url];
+    let text = fs.readFileSync(filePath, 'utf8');
+    if (url === '/score.json') {
+        const score = JSON.parse(text);
+        const el = (score.svgElements || []).find(function (e) { return e.id === 42 && /M4_vla_BartokPizz_Cs3_final/.test(e.name); });
+        if (!el || Number(el.track) !== 2) throw new Error('patch 1: element 42 is not where it was (track ' + (el && el.track) + ')');
+        el.track = 3;
+        el.offsetYFraction = el.offsetYFraction - 1;
+        text = JSON.stringify(score);
+        console.log('  patch 1: the viola\'s Bartók pizz at 18.24 moved from track 2 to track 3 (y ' + el.offsetYFraction.toFixed(2) + ')');
+    } else {
+        if (opt.gc !== 1) {
+            const swap = function (from, to, want) {
+                const n = text.split(from).length - 1;
+                if (n !== want) throw new Error('patch 2: found ' + n + ' of "' + from + '", expected ' + want);
+                text = text.split(from).join(to);
+            };
+            swap('ctx.arc(ballPos.x, ballPos.y, 5, 0, Math.PI * 2);', 'ctx.arc(ballPos.x, ballPos.y, ' + (5 * opt.gc) + ', 0, Math.PI * 2);', 2);
+            swap("impactMarker.setAttribute('r', '4');", "impactMarker.setAttribute('r', '" + (4 * opt.gc) + "');", 2);
+            console.log('  patch 2: the GC\'s ball ' + (5 * opt.gc) + ' px, its impact dot ' + (4 * opt.gc) + ' px (x' + opt.gc + ')');
+        }
+    }
+    patchCache[url] = Buffer.from(text, 'utf8');
+    return patchCache[url];
+}
+
 function startServer() {
     return new Promise(function (resolve, reject) {
         const server = http.createServer(function (req, res) {
@@ -62,6 +103,8 @@ function startServer() {
             if (filePath.indexOf(PERF_DIR) !== 0 || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
                 res.writeHead(404); res.end('Not found'); return;
             }
+            const patched = patchFile(url, filePath);
+            if (patched) { res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath)] }); res.end(patched); return; }
             res.writeHead(200, { 'Content-Type': MIME[path.extname(filePath)] || 'application/octet-stream' });
             fs.createReadStream(filePath).pipe(res);
         });
@@ -192,6 +235,18 @@ async function main() {
         }, { timeout: 30000 });
         if (!(await page.evaluate(function () { return !!window._OFFLINE_STUB; }))) throw new Error('the app is not on its offline stub');
         await page.addStyleTag({ content: HIDE_CSS });
+        // patch 3: the notation's layer last in every row's SVG (kept so before each frame — the app appends
+        // badges, wedges and curves after it whenever a row is replaced)
+        if (!opt.raw) {
+            await page.evaluate(function () {
+                window.__filmOrder = function () {
+                    const layers = document.querySelectorAll('[id^="svg-elements-"]');
+                    for (let i = 0; i < layers.length; i++) { const g = layers[i], p = g.parentNode; if (p && p.lastElementChild !== g) p.appendChild(g); }
+                };
+                window.__filmOrder();
+            });
+            console.log('  patch 3: the notation drawn on top of the badges, the wedges and the curves');
+        }
         await sleep(2000);
 
         // The drawing loop is started by the server's 'scoreState' message, which the offline stub never sends: start it here, as that handler does.
@@ -230,6 +285,7 @@ async function main() {
             const gotMs = await page.evaluate(function (wantMs) {
                 const d = wantMs - ScoreTime.now();
                 if (d > 0) window.__clock.step(d);
+                if (window.__filmOrder) window.__filmOrder();
                 return ScoreTime.now();
             }, wantMs);
             if (Math.abs(gotMs - wantMs) > 0.5 && !(await page.evaluate(function () { return ScoreTime.isPlaying; }))) {
