@@ -38,6 +38,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
+const PROOF = require('./proof_patches');
 
 const ROOT = path.resolve(__dirname, '..');
 const PERF_DIR = path.join(ROOT, 'builds', 'performance');
@@ -57,7 +58,8 @@ const MIME = { '.html': 'text/html', '.json': 'application/json', '.css': 'text/
     '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.otf': 'font/otf' };
 
 // ─── THE FILM'S PATCHES ───────────────────────────────────────────────────────
-// What the films show differently from the old app, decided at the proofing of 2026-11-16. They are made HERE,
+// What the films show differently from the old app, decided at the proofing of 2026-11-16 — patches 1, 3 and 4
+// are in scripts/proof_patches.js (the print parts use them too); patch 2 is below. They are made HERE,
 // to the copies this tool hands its own browser; builds/performance/ and the score file are never written.
 //   1. score.json — element 42 (M4_vla_BartokPizz_Cs3_final, the viola's Bartók pizz at 18.24) is filed on
 //      track 2 one whole lane down (offsetYFraction 1.03): drawn in the viola's lane in the full score, lost
@@ -75,12 +77,8 @@ function patchFile(url, filePath) {
     let text = fs.readFileSync(filePath, 'utf8');
     if (url === '/score.json') {
         const score = JSON.parse(text);
-        const el = (score.svgElements || []).find(function (e) { return e.id === 42 && /M4_vla_BartokPizz_Cs3_final/.test(e.name); });
-        if (!el || Number(el.track) !== 2) throw new Error('patch 1: element 42 is not where it was (track ' + (el && el.track) + ')');
-        el.track = 3;
-        el.offsetYFraction = el.offsetYFraction - 1;
+        console.log('  ' + PROOF.patchScore(score));
         text = JSON.stringify(score);
-        console.log('  patch 1: the viola\'s Bartók pizz at 18.24 moved from track 2 to track 3 (y ' + el.offsetYFraction.toFixed(2) + ')');
     } else {
         if (opt.gc !== 1) {
             const swap = function (from, to, want) {
@@ -244,39 +242,7 @@ async function main() {
         // patch 3: the notation's layer last in every row's SVG (kept so before each frame — the app appends
         // badges, wedges and curves after it whenever a row is replaced)
         if (!opt.raw) {
-            await page.evaluate(function (badgeOpacity, badgeAll) {
-                let tick = 0;
-                window.__filmLight = {};      // the badges made lighter, by where they stand (for the tool's report)
-                window.__filmOrder = function () {
-                    const layers = document.querySelectorAll('[id^="svg-elements-"]');
-                    for (let i = 0; i < layers.length; i++) { const g = layers[i], p = g.parentNode; if (p && p.lastElementChild !== g) p.appendChild(g); }
-                    // patch 4: A BADGE THAT COVERS NOTATION IS MADE LIGHTER (--badge 0.3), so the notation drawn over
-                    // it reads. "Covers" = a fifth or more of the badge lies over a notation element of its own row.
-                    // Looked at every eighth frame (rows are replaced as the piece goes). --badgeAll 1: every badge.
-                    if (badgeOpacity >= 1 || (tick++ % 8) !== 0) return;
-                    const badges = document.querySelectorAll('.badge-element');
-                    for (let b = 0; b < badges.length; b++) {
-                        const el = badges[b];
-                        let light = !!badgeAll;
-                        if (!light) {
-                            const r = el.getBoundingClientRect();
-                            const area = r.width * r.height;
-                            const svg = el.ownerSVGElement;
-                            const layer = svg && svg.querySelector('[id^="svg-elements-"]');
-                            if (area > 0 && layer) {
-                                for (let k = 0; k < layer.children.length && !light; k++) {
-                                    const q = layer.children[k].getBoundingClientRect();
-                                    const w = Math.min(r.right, q.right) - Math.max(r.left, q.left), h = Math.min(r.bottom, q.bottom) - Math.max(r.top, q.top);
-                                    if (w > 0 && h > 0 && w * h >= 0.2 * area) light = true;
-                                }
-                            }
-                        }
-                        el.style.opacity = light ? String(badgeOpacity) : '';
-                        if (light) window.__filmLight[(el.getAttribute('data-badge-id') || el.id || '?') + '@' + Math.round((ScoreTime.now() / 1000 - 2))] = 1;
-                    }
-                };
-                window.__filmOrder();
-            }, opt.badge, opt.badgeAll);
+            await page.evaluate(PROOF.installLayerFix, opt.badge, opt.badgeAll, false);
             console.log('  patch 3: the notation drawn on top of the badges, the wedges and the curves');
             if (opt.badge < 1) console.log('  patch 4: ' + (opt.badgeAll ? 'every badge' : 'a badge that covers notation') + ' drawn at ' + Math.round(opt.badge * 100) + ' % strength');
         }

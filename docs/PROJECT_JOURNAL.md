@@ -715,6 +715,28 @@ ball the same size as the impact ball, the destination ball" · assess making th
   the Violin II clip. **► WAITING ON HIS EYE:** the ball's size · the pale badges (30 %) · and, still, notation
   over the wedges and curves, and the GC's size in the full score.
 
+**His answers on the second clips (2026-11-16):**
+- **"Badges too light; could you try about 1/2 as much as current"** → the lightening halved: 65 % strength
+  (was 30 %). `clip3_violin2_15-25.mp4` sent. ► his eye.
+- **✓ "Yes, notation in front of everything is fine. That looks good."** — patch 3 as built (over the badges,
+  the wedges and the curves) is APPROVED.
+- **The print parts:** "I'm not sure the ensemble will use printed parts, but we should have those available
+  for them … if we can, let's make the fixes to the print parts as well."
+  **WHAT EXISTS (clarified for him):** twelve part PDFs from 2026-03-21 in `builds/print/` — Violin I,
+  Violin II, Viola, Cello, each at 4, 6 and 8 rows a page — and `full_score.pdf`; the site's landing page
+  links the four 6-row parts and the full score. They were made by `scripts/generate_print_pdf.js`, which
+  prints the same parts view the films are taken from — hence the same two faults.
+  **BUILT:** the patches moved into ONE file, `scripts/proof_patches.js` (the score's patch; the layer order
+  and the lighter badge), used by `film_part.js` and by `generate_print_pdf.js --patched`. The print tool
+  gained `--patched`, `--parts` (the twelve, no full score), `--badge F` (0.65) and `--out DIR`; without
+  them it does exactly what it did in March, and `builds/print/` (the March files, D-Oct-2) is NOT touched.
+  **The corrected parts go to `print/parts/`.** The viola's 6-row part made first and its page 1 looked at by
+  the AI: the Bartók pizz stands at the GC at 18.3, notation is over everything, the two badges that cover
+  notation are at 65 %. Sent to him. All twelve are being made.
+  *Not changed in print:* the GC's impact dot (the bigger GC was asked for the moving ball on the stand) ·
+  the PRINT FULL SCORE (`builds/print/full_score.pdf`, and the assembled 36-page score sent to JACK): it has
+  the pizz, in the viola's lane, and still has badges over notation.
+
 ### WHAT IS LEFT TO DELIVERY (as told him 2026-11-16)
 
 After his yes to the clips: all five films re-made (about three hours unattended), cut, copied to the box (his

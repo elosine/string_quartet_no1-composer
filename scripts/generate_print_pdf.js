@@ -10,6 +10,11 @@
  *   node scripts/generate_print_pdf.js --track 1 --pages 6      # Violin I, 6 pages/screen
  *   node scripts/generate_print_pdf.js --track 2 --pages 4      # Violin II, 4 pages/screen
  *   node scripts/generate_print_pdf.js --all                    # All variants (full + 4 tracks × 3 densities)
+ *   node scripts/generate_print_pdf.js --parts --patched --out print/parts
+ *                                                               # The twelve parts with the proofing patches of
+ *                                                               # 2026-11-16 (scripts/proof_patches.js), into another folder
+ *
+ * Without --patched and --out the tool does exactly what it did in March 2026 (builds/print/).
  *
  * Prerequisites:
  *   - Run `node scripts/build_performance_app.js` first
@@ -21,12 +26,13 @@ const { PDFDocument } = require('pdf-lib');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const PROOF = require('./proof_patches');
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
 const ROOT = path.resolve(__dirname, '..');
 const PERF_DIR = path.join(ROOT, 'builds', 'performance');
-const OUTPUT_DIR = path.join(ROOT, 'builds', 'print');
+let OUTPUT_DIR = path.join(ROOT, 'builds', 'print');
 const PORT = 3002; // Different port from dev server to avoid conflicts
 
 const TRACK_NAMES = { 1: 'Violin_I', 2: 'Violin_II', 3: 'Viola', 4: 'Cello' };
@@ -41,6 +47,9 @@ const VIEWPORT_HEIGHT = 1200;
 let trackFilter = null;
 let pagesParam = 6;
 let generateAll = false;
+let partsOnly = false;        // --parts: the twelve parts, not the full score
+let patched = false;          // --patched: the proofing patches (scripts/proof_patches.js)
+let badgeOpacity = 0.65;      // --badge F: a badge that covers notation, at this strength (with --patched)
 
 for (let i = 2; i < process.argv.length; i++) {
     if (process.argv[i] === '--track' && process.argv[i + 1]) {
@@ -51,6 +60,14 @@ for (let i = 2; i < process.argv.length; i++) {
         i++;
     } else if (process.argv[i] === '--all') {
         generateAll = true;
+    } else if (process.argv[i] === '--parts') {
+        generateAll = true; partsOnly = true;
+    } else if (process.argv[i] === '--patched') {
+        patched = true;
+    } else if (process.argv[i] === '--badge' && process.argv[i + 1]) {
+        badgeOpacity = parseFloat(process.argv[i + 1]); i++;
+    } else if (process.argv[i] === '--out' && process.argv[i + 1]) {
+        OUTPUT_DIR = path.resolve(ROOT, process.argv[i + 1]); i++;
     }
 }
 
@@ -131,6 +148,7 @@ const MIME_TYPES = {
 
 // ─── Start local HTTP server ─────────────────────────────────────────────────
 
+let patchedScore = null;
 function startServer() {
     return new Promise(function(resolve, reject) {
         const server = http.createServer(function(req, res) {
@@ -145,6 +163,13 @@ function startServer() {
                 return;
             }
 
+            // --patched: the score goes to the page with the proofing's first patch (the viola's pizz at 18)
+            if (patched && url === '/score.json') {
+                if (!patchedScore) { const sc = JSON.parse(fs.readFileSync(filePath, 'utf8')); console.log('  ' + PROOF.patchScore(sc)); patchedScore = Buffer.from(JSON.stringify(sc), 'utf8'); }
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(patchedScore);
+                return;
+            }
             res.writeHead(200, { 'Content-Type': MIME_TYPES[ext] || 'application/octet-stream' });
             fs.createReadStream(filePath).pipe(res);
         });
@@ -203,6 +228,8 @@ async function initPage(page, track, pages) {
     await page.addStyleTag({ content: PRINT_CSS });
     await page.emulateMediaType('screen');
     await new Promise(function(r) { setTimeout(r, 1500); });
+    // --patched: notation on top; a badge that covers notation lighter (called again after every screen change)
+    if (patched) await page.evaluate(PROOF.installLayerFix, badgeOpacity, false, true);
 }
 
 // ─── Helper: navigate to a screen and wait for render ───────────────────────
@@ -217,6 +244,7 @@ async function navigateToScreen(pg, screenIndex, pagesPerScreen) {
     }, targetSeconds);
 
     await new Promise(function(r) { setTimeout(r, 1200); });
+    if (patched) { await pg.evaluate(function() { if (window.__filmOrder) window.__filmOrder(); }); await new Promise(function(r) { setTimeout(r, 150); }); }
 }
 
 // ─── Generate one PDF variant ───────────────────────────────────────────────
@@ -300,7 +328,7 @@ async function main() {
             // ─── Batch mode: full score + 4 tracks × 3 densities = 13 PDFs ──
             console.log('\n═══ Batch Mode: Generating all PDF variants ═══');
 
-            var variants = [
+            var variants = partsOnly ? [] : [
                 { track: null, pages: null },  // full score
             ];
             for (var t = 1; t <= 4; t++) {
