@@ -833,6 +833,11 @@ pushed (d12b61ca). **► It reaches the players only when he runs the deploy lin
 - *Not in them:* the final barline (the October score has one, drawn into its assembled PDF only) · a bigger
   GC dot (print keeps the old size). *Not done:* putting them on the site; sending them.
 
+- **A FAULT HE FOUND, 2026-11-18: "How do you get out of the instructions? No back button appeared."** The
+  door's "How it works" opened the page in a NEW TAB, which has no way back. **FIXED:** the instructions now
+  open OVER the door, in the same page, with a [Close] button top right; the part underneath is never left.
+  In `film_check` (35 ok), and the shot looked at. Needs the deploy line, like the page's new words.
+
 ### WHAT IS LEFT TO DELIVERY (as told him 2026-11-16)
 
 After his yes to the clips: all five films re-made (about three hours unattended), cut, copied to the box (his

@@ -108,6 +108,11 @@
   #doorGo { min-width: 220px; min-height: 60px; font-size: 19px; background: var(--ink); color: #111; border: 0; }
   #doorGo[disabled] { opacity: .3; }
   #doorHelp { color: var(--dim); font-size: 15px; text-decoration: underline; text-underline-offset: 3px; }
+  /* the instructions, shown OVER the door with their own Close (they used to open in a new tab, which has no way back) */
+  #helpSheet { position: fixed; inset: 0; z-index: 20; background: #fff; display: none; flex-direction: column; }
+  #helpSheet.on { display: flex; }
+  #helpSheet iframe { flex: 1 1 auto; width: 100%; border: 0; background: #fff; }
+  #helpClose { position: absolute; top: 14px; right: 16px; min-height: 48px; min-width: 110px; font-size: 17px; background: #17191d; color: #fff; border: 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
 </style>
 </head>
 <body class="side">
@@ -136,8 +141,9 @@
   <div id="doorBar"><i></i></div>
   <p id="doorMsg">Loading&hellip;</p>
   <button id="doorGo" disabled>Open</button>
-  <a id="doorHelp" href="/notation/app/help.html" target="_blank" rel="noopener">How it works</a>
+  <a id="doorHelp" href="/notation/app/help.html">How it works</a>
 </div>
+<div id="helpSheet"><iframe id="helpFrame" title="How it works"></iframe><button id="helpClose">Close</button></div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/testkit/js/syncclock.js"></script>
@@ -693,6 +699,14 @@
     layout();
     lastPaint = '';
   });
+
+  // ---- the instructions: over the door, with a Close — the part underneath is never left -------------------------------
+  $('doorHelp').addEventListener('click', e => {
+    e.preventDefault();
+    if (!$('helpFrame').getAttribute('src')) $('helpFrame').setAttribute('src', $('doorHelp').getAttribute('href'));
+    $('helpSheet').classList.add('on');
+  });
+  $('helpClose').addEventListener('click', () => $('helpSheet').classList.remove('on'));
 
   // ---- start -----------------------------------------------------------------------------------------------------
   window.__film = { S, target, v, isSeeking };      // for the headless check

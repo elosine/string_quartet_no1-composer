@@ -46,6 +46,7 @@ const read = page => page.evaluate(() => {
   if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
   const server = spawn(process.execPath, [path.join(STAND, 'server', 'server.js'), '--port', String(PORT), '--data', DATA, '--quiet'], { stdio: ['ignore', 'inherit', 'inherit'] });
   const browsers = [];
+  const help = [];
   try {
     let up = false;
     for (let i = 0; i < 50 && !up; i++) { await sleep(100); try { up = (await (await fetch(BASE + '/health')).json()).ok; } catch (e) { /* not yet */ } }
@@ -66,12 +67,21 @@ const read = page => page.evaluate(() => {
       await page.waitForFunction(() => !document.getElementById('doorGo').disabled, { timeout: 120000 });
       const door = await page.evaluate(() => ({ title: document.getElementById('doorTitle').textContent, part: document.getElementById('doorPart').textContent, msg: document.getElementById('doorMsg').textContent }));
       if (SHOTS) await page.screenshot({ path: path.join(SHOTS, name + '_0_door.png') });
+      // "How it works": the instructions open OVER the door, and Close brings the door back (no new tab to be lost in)
+      await page.click('#doorHelp');
+      await page.waitForFunction(() => { const f = document.getElementById('helpFrame'); return f.contentDocument && /Playing together/.test(f.contentDocument.body ? f.contentDocument.body.textContent : ''); }, { timeout: 15000 });
+      const helpOn = await page.evaluate(() => document.getElementById('helpSheet').classList.contains('on') && location.pathname.indexOf('/s/') === 0);
+      if (SHOTS && name === 'violin1') await page.screenshot({ path: path.join(SHOTS, 'violin1_0_help.png') });
+      await page.click('#helpClose');
+      const helpOff = await page.evaluate(() => !document.getElementById('helpSheet').classList.contains('on') && getComputedStyle(document.getElementById('door')).display !== 'none');
+      help.push(helpOn && helpOff);
       await page.click('#doorGo');
       await page.waitForFunction(() => window.__film.S.opened && window.__film.v.readyState >= 2, { timeout: 30000 });
       return { page, errors, door, name };
     };
     const A = await open(ens.rows[0], 'violin1');
     const B = await open(ens.rows[1], 'violin2');
+    check('How it works opens the instructions over the door, and Close returns to the door (both stands)', help.length === 2 && help.every(Boolean));
     check('the door names the piece and the part', A.door.title === 'String Quartet No. 1' && A.door.part === 'Violin I' && B.door.part === 'Violin II', A.door.part + ' / ' + B.door.part + ' / ' + A.door.msg);
     await sleep(2500);    // the clock's first samples
     let a = await read(A.page), b = await read(B.page);
