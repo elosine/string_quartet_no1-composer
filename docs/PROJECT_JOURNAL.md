@@ -812,6 +812,27 @@ PDF parts read on tablets are mostly portrait Letter or A4 because they began as
 wide time rows wants landscape, and 4:3 landscape is an iPad's own shape. Recommended: keep landscape 4:3,
 six rows a page as on the stand. ► his answer awaited.
 
+**✓ THE PLAYERS' PAGE IS HIS (2026-11-18: "ok good. Let's use these instructions … push it to the actual
+score").** Further rounds the same day: "Playing together" moved above "Playing solo" · "Anyone can start the
+group. Press [Play all] to start the score." · "[Play alone] moves the score only on your screen." · "To move
+the cursor: while the score is stopped, tap anywhere to move the cursor to that spot." (no bold). Committed and
+pushed (d12b61ca). **► It reaches the players only when he runs the deploy line.**
+
+**✓ THE PRINT PARTS, BUILT (his go the same message: "go ahead and make those print parts … with your specs").**
+- **The specs (the AI's, accepted):** every page on the score's own sheet, landscape 4:3 (1200 × 900 pt); six
+  rows a page, as on the stand.
+- **`node scripts/build_print_parts.js`** (new) assembles each part from what existed: a COVER in the house
+  style with the part's name under the title (`print/cover/make_cover.ps1`, words written to
+  `print/parts/cover/<part>.json`; printed and checked the way `render_cover.js` does — one page, the sheet's
+  size, the house face named in the PDF and each line within 3 % of the generator's measure) + THE PERFORMANCE
+  INSTRUCTIONS (`print/score/instructions.pdf`, the same three sheets in each) + THE PART
+  (`print/parts/<Part>_6pages.pdf`, the corrected ones).
+- **The four files: `print/parts/assembled/String_Quartet_No_1-<Violin_I|Violin_II|Viola|Cello>-JYang.pdf`** —
+  15 pages each (1 + 3 + 11), 1.7–1.8 MB. The AI looked at the viola's cover only ("String Quartet No. 1 /
+  Viola / Justin Yang", centred). The viola part sent to him; the folder opened on the desktop.
+- *Not in them:* the final barline (the October score has one, drawn into its assembled PDF only) · a bigger
+  GC dot (print keeps the old size). *Not done:* putting them on the site; sending them.
+
 ### WHAT IS LEFT TO DELIVERY (as told him 2026-11-16)
 
 After his yes to the clips: all five films re-made (about three hours unattended), cut, copied to the box (his
