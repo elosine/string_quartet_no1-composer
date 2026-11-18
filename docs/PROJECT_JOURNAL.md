@@ -737,6 +737,48 @@ ball the same size as the impact ball, the destination ball" · assess making th
   the PRINT FULL SCORE (`builds/print/full_score.pdf`, and the assembled 36-page score sent to JACK): it has
   the pizz, in the viola's lane, and still has badges over notation.
 
+**✓ HIS GO, 2026-11-16: "badges good go ahead and refilm."** The films' look is settled: the viola's pizz in
+the viola · notation on top of everything · the GC's ball and impact dot 8 px (`--gc 2`) · a badge that covers
+notation at 65 % (`--badge 0.65`).
+- **THE RE-FILMING IS RUNNING** (two unattended chains, started 2026-11-16; logs `builds/film/v2_<part>.log`):
+  `node scripts/film_part.js --track N --pages 6 --from 0 --to 516 --fps 60 --scale 1.28 --gc 2 --badge 0.65
+  --name v2_<part>`, then each film cut to 512 s straight into `stand/films/<part>.mp4` (the log ends with
+  `cut-ok`). Chain A: Violin I, Violin II, Cello. Chain B: Viola, the full score. About ten frames a second
+  each while two run together, so about fifty minutes a film: chain B about two hours, chain A about two and a
+  half. The first films (2026-11-13) stay in `builds/film/` under their old names.
+- **The full score is filmed with the doubled GC too** — the AI had flagged the dot as large in its narrow
+  lanes; he saw that clip and did not object; `--gc 1` for track 0 would undo it.
+- **✓ The twelve corrected print parts committed** (`print/parts/`, c19312d1). Not yet on the site.
+- **► WHEN THE FILMS ARE DONE:** the AI looks at a few frames of each · HIS: the `scp` line (README step 3; the
+  five films, and no deploy) and the owner line · his spot-check on the iPad.
+
+- **✓ THE FIVE FILMS ARE RE-MADE (2026-11-16, done by about 18:30) and cut into `stand/films/`** — every log
+  ends `cut-ok`; each film 2048 × 1536, 30,722 frames (512.03 s): violin1 51.6 MB · violin2 53.8 · viola 52.7 ·
+  cello (its log: 48.83 MB before the cut) · fullscore 67.0. The AI looked at ONE row of each part at second
+  18.35 (film 20.35): the viola has its Bartók pizz with the ball on the GC; the badges that cover notation
+  are pale and the notation reads over them; the impact dots are the new size. The full score film and the
+  rest of each part: not looked at. **► HIS: the two lines that copy the films to the box (README § The box,
+  step 3) — no deploy — then a spot-check on the iPad.**
+
+- **✓ THE RE-MADE FILMS ARE ON THE BOX AND SPOT-CHECKED — his word, 2026-11-18: "spot checks good."** The
+  films are final. ► NEXT, in order: his read of the players' page (`/notation/app/help.html`) · the dress run
+  (the whole piece, [Play all], three devices, the readout's `off` on each) · the links to the quartet. The
+  reading is 2026-11-23.
+
+- **THE PLAYERS' PAGE, EDITABLE IN PLACE (his ask, 2026-11-18: "Could you make the editable HTML? We did this
+  for some of the papers"). BUILT + PC-verified:** `node stand/tools/edit_server.js` →
+  `http://localhost:5303/help.html` — the page with the papers' Edit switch (`stand/tools/edit_switch.js`,
+  ported whole from `paperSubmissions/papers/edit.js`: Edit → click any text and type → Save / Done; CTRL+B,
+  CTRL+I, ENTER = a new line of the same kind, CTRL+S). **The switch is put into the page BY THAT SERVER as it
+  serves it; `help.html` itself never holds it**, so the players' copy on the box has no Edit bar, and the
+  stand's own server cannot write a page. The edit server listens on this computer only (127.0.0.1); each save
+  keeps the file as it was in `stand/server/data/help-versions/` (gitignored); a save is refused if the file
+  changed on disk since the page read it. The page's one HTML entity (`&middot;`) was written as its character
+  so that a save with nothing changed leaves the file byte for byte the same. Tested in a headless browser on
+  the real page, 8 of 8 (the bar, Edit, an unchanged save, a typed word saved into its own line only, the
+  version kept, no trace of the switch in the file), and the file restored exactly. **► HIS: his edits; then
+  the AI commits and he runs the deploy line, which is what puts the page before the players.**
+
 ### WHAT IS LEFT TO DELIVERY (as told him 2026-11-16)
 
 After his yes to the clips: all five films re-made (about three hours unattended), cut, copied to the box (his
