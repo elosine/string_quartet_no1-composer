@@ -779,6 +779,39 @@ notation at 65 % (`--badge 0.65`).
   version kept, no trace of the switch in the file), and the file restored exactly. **► HIS: his edits; then
   the AI commits and he runs the deploy line, which is what puts the page before the players.**
 
+- **HIS EDITS TO THE PLAYERS' PAGE, dictated 2026-11-18 and made by the AI in `help.html`:** the sections
+  "Opening your part" and "Reading it" REMOVED whole · a "Notes" section at the foot, holding the two lines kept
+  from "Opening your part" (Safari itself, not a Home Screen icon; the yellow battery icon) — its other two
+  lines (open the link sideways; wait for the bar and press Open) are dropped · "Playing by yourself" → "Playing
+  solo", its lines now: "Play alone moves only the score on your screen." · "**Move cursor.** While the score is
+  stopped, tap anywhere to move the cursor to that spot." · the arrows (unchanged) · "… Touch it, type a number,
+  press Go to jump to that time in the score." · "Toggle the 100% button to change the play speed of the
+  score." "Playing together" and "If something looks wrong" untouched. Not yet deployed.
+- **His second round, 2026-11-18:** "Playing together" is now two lines — "Press [Play all] to start the score
+  for everyone. Anyone can start the group." · "While the group is playing, controls become inactive until
+  stop." (the "every screen jumps" and the [Stop all] lines removed at his word — so the page no longer names
+  [Stop all]) · the closing line about the performance instructions removed. He asked what [Tap to play] is
+  (answered in chat) and to see the PDFs he may forward: `print/score/` opened for him — the 36-page score
+  (cover, 3 pages of instructions, 32 of score) and `instructions.pdf`. What the record shows was sent: a LINK
+  to that score, in the October application form, which he filled himself; nothing records the parts sent.
+
+- **His third round on the players' page, 2026-11-18:** the line under the title is now just "Justin Yang"
+  (his first and last name; "reading your part from the screen" removed). The browser tab's title follows it.
+
+### THE PRINT PARTS, FOR SENDING (opened 2026-11-18 — in discussion, nothing built)
+
+His ask: "we need to produce print versions of the part scores … put together a plan … you can include the
+performance instructions with each of the parts as well, just the same one. Let's discuss briefly what page
+size they should be at … in a part score that's distributed by PDF to iPads, what paper size and orientation
+do they typically use?" What exists to build from: the twelve corrected part PDFs (`print/parts/`, pages of
+1200 × 900 pt, landscape 4:3, at 4, 6 or 8 rows a page; the 6-row part is 11 pages) · `print/score/
+instructions.pdf` (3 pages, the same 1200 × 900 pt landscape, the house dress) · the house cover generator
+(`print/cover/`) · `scripts/build_print_score.js`, which assembled cover + instructions + score for the
+October submission. The AI's answer on the page, given in chat (from general knowledge, not researched):
+PDF parts read on tablets are mostly portrait Letter or A4 because they began as paper; a score laid out in
+wide time rows wants landscape, and 4:3 landscape is an iPad's own shape. Recommended: keep landscape 4:3,
+six rows a page as on the stand. ► his answer awaited.
+
 ### WHAT IS LEFT TO DELIVERY (as told him 2026-11-16)
 
 After his yes to the clips: all five films re-made (about three hours unattended), cut, copied to the box (his
