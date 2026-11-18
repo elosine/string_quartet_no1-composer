@@ -216,6 +216,24 @@ const read = page => page.evaluate(() => {
     await sleep(800);
     a = await read(A.page); b = await read(B.page);
     check('after Stop all each stand keeps its OWN speed setting (Violin I 50 %, Violin II 70 %)', a.speed === '50%' && b.speed === '70%' && a.paused && b.paused && Math.abs(a.target - b.target) < 0.001, a.speed + ' / ' + b.speed);
+    // a stand opened FRESH: on the room's last place if the room stopped a moment ago; at the START if it stopped long ago
+    const fresh = async (row, query) => {
+      const br = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox', '--autoplay-policy=no-user-gesture-required'] });
+      browsers.push(br);
+      const pg = await br.newPage();
+      await pg.setViewport({ width: 1180, height: 820 });
+      await pg.goto(BASE + '/s/' + row.token + query, { waitUntil: 'domcontentloaded' });
+      await pg.waitForFunction(() => !document.getElementById('doorGo').disabled, { timeout: 120000 });
+      await pg.click('#doorGo');
+      await pg.waitForFunction(() => window.__film.S.opened && window.__film.v.readyState >= 2, { timeout: 30000 });
+      await sleep(1200);
+      return read(pg);
+    };
+    const roomAt = (await read(B.page)).target;
+    const near = await fresh(ens.rows[0], '');
+    check('a stand opened fresh soon after a stop lands on the room\'s place', roomAt > 5 && Math.abs(near.target - roomAt) < 0.001 && Math.abs(near.media - roomAt) < 0.03, 'room at ' + roomAt.toFixed(2) + ' s, the stand at ' + near.media.toFixed(2));
+    const stale = await fresh(ens.rows[0], '?idle=1');
+    check('a stand opened fresh after the room has long stood still starts at the START', stale.target === 0 && stale.media < 0.03 && stale.time === String.fromCharCode(0x2212) + '2', 'the stand at ' + stale.media.toFixed(2) + ' s, shows ' + stale.time);
     // the readout (a tap on the corner line): every record is there and reads as text
     await B.page.click('#net');
     await sleep(300);

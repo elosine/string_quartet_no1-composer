@@ -166,7 +166,9 @@
   const SEEK_GAP_MS = 500;        // in the room: a gap beyond this is closed by a seek, not a trim (was 350)
   const SERVO = Q.get('servo') === 'on';   // the frame servo trims the film's speed in the room only when a link asks for it
   const FREE_GAP_MS = 150;        // a free-running film this far from the room, well after the start, is put back by one seek
-  const SEEK_EVERY_MS = 1500;    // …and never two such seeks closer than this (was 700: a slow device hopped back and forth)
+  // a room stopped longer ago than this: a fresh stand opens at the start (?idle=<ms> on a link, for the check)
+  const IDLE_START_MS = Q.get('idle') != null ? parseFloat(Q.get('idle')) : 30 * 60 * 1000;
+  const SEEK_EVERY_MS = 1500;   // …and never two such seeks closer than this (was 700: a slow device hopped back and forth)
   const DEFAULT_FILM = { parts: ['violin1.mp4', 'violin2.mp4', 'viola.mp4', 'cello.mp4'], score: 'fullscore.mp4', duration: 512, leadIn: 2, fps: 60, rowSeconds: 8, rows: 6 };
   const DEFAULT_PARTS = ['Violin I', 'Violin II', 'Viola', 'Cello'];
 
@@ -568,7 +570,18 @@
     S.room = NotationRoom.makeRoomClient({
       token: TOKEN, io: window.io, SyncClock: TK.SyncClock, posture: 'rehearsal',
       on: {
-        welcome: w => { applyWelcome(w); S.online = true; onTuple(w.roomState); lastPaint = ''; },
+        welcome: w => {
+          applyWelcome(w); S.online = true;
+          const first = !S.tuple;
+          onTuple(w.roomState);
+          // A STAND OPENED FRESH WHILE THE ROOM HAS LONG STOOD STILL STARTS AT THE START, not where the room was last
+          // stopped (after the dress run of 2026-11-18 the room sat at the end, and a player's first open would have
+          // shown the last, empty page). Within half an hour of the last stop a fresh stand still joins that place —
+          // a tablet reloaded in the middle of a rehearsal.
+          if (first && w.roomState && !w.roomState.playing && typeof w.serverTime === 'number' &&
+              w.serverTime - w.roomState.anchorServerTime > IDLE_START_MS) setLocal(0, false);
+          lastPaint = '';
+        },
         state: tp => { onTuple(tp); lastPaint = ''; },
         mode: m => { if (m && m.roomState) onTuple(m.roomState); },
         status: st => { S.online = !!st.online; lastPaint = ''; },

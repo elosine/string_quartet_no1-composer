@@ -838,6 +838,48 @@ pushed (d12b61ca). **► It reaches the players only when he runs the deploy lin
   open OVER the door, in the same page, with a [Close] button top right; the part underneath is never left.
   In `film_check` (35 ok), and the shot looked at. Needs the deploy line, like the page's new words.
 
+- **✓ THE PRINT PARTS — his word, 2026-11-18: "the parts are good too, the print parts."** The four assembled
+  parts are final. **► NEXT, his order: the trial run (the dress run), then everything made ready for sending.**
+  The dress run: three devices freshly reloaded, [Play all] from the start to the end, [Stop all], then the
+  readout on each device (tap "connected") — the number after "off" on the `trim` line is that stand's worst
+  distance from the room over the run.
+
+- **THE DRESS RUN, 2026-11-18, about 10:05–10:16 — the iPad's readout after the WHOLE PIECE with [Play all]
+  (his photo; Violin I, from the box, Safari):** `film 512.00 want 512.00` (it ran to the end) · `start −12ms
+  est 63 door 44` · **`seeks 0` · `rescues 0`** · `free off 2ms` · `trim 0` · **`off 12ms`** · `gaps 437 max
+  67ms` · `steps 0` · `clock locked cal rtt 48 corr 2/7ms relock 0 trip 1` · `plays 2 no error`.
+  **THE iPAD'S FILM WAS NEVER MORE THAN 12 ms FROM THE ROOM IN EIGHT AND A HALF MINUTES, with no correction of
+  any kind** — the answer to his question of 2026-11-15 whether free-running parts drift apart. (The `gaps`
+  count is the soft number, Safari under-reporting its frame callbacks; none over 67 ms.) **A second device's readout (his photo; a desktop browser — which of the laptop or the desktop he did not
+  say):** `film 512.00 want 512.00` · `seeks 0 rescues 0` · `trim 0` · **`off 21ms`** · `gaps 0` · `steps 0` ·
+  `clock locked cal rtt 38 corr 3/9ms relock 0 trip 0` · `est 1 door 14` (its start was not measured: `start −`).
+  So two devices ran the whole piece 12 ms and 21 ms from the room at worst — at most about 33 ms from each
+  other — with no seek and no rescue. **The third device (his photo, a desktop browser):** `film 511.99 want 512.00` · `seeks 0 rescues 0` ·
+  `trim 0` · **`off 37ms`** · `gaps 0` · `steps 0` · `clock locked cal rtt 50 corr 0/0ms`.
+  **✓ THE DRESS RUN'S NUMBERS: all three devices played the whole piece to the end from the box, with no seek,
+  no rescue and no trim; their worst distances from the room were 12, 21 and 37 ms.** His eye on the run: not
+  yet said in words.
+  *Noticed by the AI, to settle before the links go out:* the room now sits STOPPED AT THE END (512 s), and a
+  stand opened fresh lands where the room last stopped — so the quartet's first open would show the last
+  page. The room must be put back to the start (or the quartet given a fresh ensemble of their own).
+
+### FOR SENDING (2026-11-18)
+
+- **How he sends (his words):** he drafts the email himself · "probably just links, not QR codes" · "the 5 links
+  to the actual iPad part, and then the 5 links to the scores" · to the viola player, "who also manages the
+  tech", who forwards them · **he sends it to himself first and tests every link.**
+- **BUILT for it:**
+  · THE FIVE SCORE PDFs ARE NOW LINKS ON THE STAND: `stand/notation/print/` holds the four assembled parts and
+    the 36-page score (copies of `print/parts/assembled/*.pdf` and `print/score/String_Quartet_No_1-JYang.pdf`),
+    served at `/notation/print/<file>`; the server now names `.pdf` as `application/pdf`, so a browser shows it.
+  · A STAND OPENED FRESH WHILE THE ROOM HAS LONG STOOD STILL OPENS AT THE START (the room stopped more than
+    30 minutes ago, by the server's clock) — it used to land wherever the room last stopped, which after the
+    dress run is the end. Sooner than that a fresh stand still joins the room's place (a tablet reloaded in a
+    rehearsal). `film_check` 37 ok (both cases, the long one by `?idle=1`). No room reset is needed.
+- **► HIS: the deploy line; then the ten links tested from his own email.**
+- *Known, told him:* the 36-page score is October's — it has the viola's pizz, in the viola's lane, and its
+  badges still lie over notation; the four parts are the corrected ones.
+
 ### WHAT IS LEFT TO DELIVERY (as told him 2026-11-16)
 
 After his yes to the clips: all five films re-made (about three hours unattended), cut, copied to the box (his
