@@ -181,13 +181,16 @@ async function linkSheet(origin) {
       const svg = QR ? await QR.toString(it.link, { type: 'svg', margin: 1, errorCorrectionLevel: 'M' }) : '';
       html += '<div class="card"><h3>' + escHtml(it.label) + '</h3>' + svg + '<a href="' + escHtml(it.link) + '">' + escHtml(it.link) + '</a></div>';
     }
-    cards.push(html + '</div></section>');
+    html += '</div>';
+    // the same links as plain text, to copy into a message (the backup on a laptop: no QR camera to hand)
+    html += '<h3 class="plain">The links as text</h3><pre class="plain">' + items.map(it => escHtml(it.label) + '\n' + escHtml(it.link)).join('\n\n') + '</pre>';
+    cards.push(html + '</section>');
   }
   return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Links</title><style>' +
     'body{font:16px/1.4 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:32px;color:#111;background:#fff}h1{font-weight:300;font-size:30px;margin:0 0 4px}' +
     'p.note{color:#666;margin:0 0 28px}h2{font-size:20px;margin:28px 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}' +
     '.card{border:1px solid #ccc;border-radius:10px;padding:14px;text-align:center;break-inside:avoid}.card h3{margin:0 0 8px;font-size:20px}.card svg{width:100%;height:auto;max-width:240px}' +
-    '.card a{display:block;font-size:10px;color:#555;word-break:break-all;margin-top:6px;text-decoration:none}@media print{body{margin:12mm}}' +
+    '.card a{display:block;font-size:10px;color:#555;word-break:break-all;margin-top:6px;text-decoration:none}h3.plain{font-size:16px;margin:30px 0 8px}pre.plain{font:15px/1.45 ui-monospace,Consolas,Menlo,monospace;background:#f4f4f4;border:1px solid #ddd;border-radius:8px;padding:14px 16px;white-space:pre-wrap;word-break:break-all;-webkit-user-select:all;user-select:all}@media print{body{margin:12mm}}' +
     '</style></head><body><h1>Links</h1><p class="note">One link per player. Point the tablet\'s camera at the code, or type the address. ' +
     (QR ? '' : '(The QR library is not installed: run npm install.) ') + 'Keep this page private: a link is a key.</p>' +
     (cards.join('') || '<p>No ensemble yet.</p>') + '</body></html>';

@@ -31,10 +31,12 @@ ON THE DAY, IF THE WEBSITE FAILS
 
 3. On the laptop, double-click START_BACKUP.bat
    A black window opens. Keep it open the whole time.
-   The browser opens the LINK SHEET: one QR code per part.
+   The browser opens the LINK SHEET: one QR code per part, and the same
+   links as text underneath. The links are also in LINKS.txt in this folder,
+   ready to paste into a text message.
 
-4. Each player scans their part's QR code with the tablet's camera, opens it
-   in Safari, waits for the bar, presses Open.
+4. Each player scans their part's QR code with the tablet's camera (or opens
+   the link you texted them), opens it in Safari, waits for the bar, presses Open.
    The film loads from the laptop, about 50 MB each, so allow a minute.
 
 5. Everything works as before: Play all, Stop all, Play alone.
@@ -52,7 +54,10 @@ GOOD TO KNOW
 - Keep the laptop plugged in, and stop it from sleeping.
 
 - The links the players were emailed point at the website. They do NOT reach
-  the laptop. Use the QR codes on the link sheet.
+  the laptop. Use the QR codes, or the links from LINKS.txt.
+
+- The laptop's links change with the network: start START_BACKUP.bat on the
+  network you will use, then send the links.
 
 - If the sheet says the laptop is on no network: join the hotspot, close the
   black window, double-click START_BACKUP.bat again.

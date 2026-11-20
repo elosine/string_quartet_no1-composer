@@ -79,6 +79,17 @@ const stop = (msg) => { console.log('\n!! ' + msg + '\n'); process.exitCode = 1;
   if (!lan.length) say('\n!! This laptop is on NO network. Join the phone\'s hotspot (or the venue Wi-Fi), then close this window and start again.');
   else say('This laptop\'s address: ' + lan.join('  ·  '));
   say('\nThe link sheet (opening in the browser now):\n  ' + sheet + '\n');
+  // the links as text too: in this window, and in LINKS.txt beside START_BACKUP.bat, to copy into a message
+  try {
+    const html = await (await fetch('http://127.0.0.1:' + PORT + '/admin/sheet?key=' + key)).text();
+    const m = /<pre class="plain">([\s\S]*?)<\/pre>/.exec(html);
+    if (m) {
+      const text = m[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+      fs.writeFileSync(path.join(STAND, 'LINKS.txt'), 'String Quartet No. 1 - the backup stand on this laptop\r\n' +
+        '(these links work only while START_BACKUP.bat is running, and only on the same network)\r\n\r\n' + text.replace(/\n/g, '\r\n') + '\r\n');
+      say('The links (also saved in LINKS.txt, in this folder):\n\n' + text.split('\n').map(l => '  ' + l).join('\n') + '\n');
+    }
+  } catch (e) { /* the sheet still has them */ }
   say('To stop: close this window.\n');
   if (!process.env.BACKUP_NO_OPEN) spawn('cmd', ['/c', 'start', '', sheet], { detached: true, stdio: 'ignore' }).unref();
 })().catch(e => stop(String(e && e.message || e)));
