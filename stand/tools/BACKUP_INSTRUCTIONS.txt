@@ -1,0 +1,60 @@
+THE BACKUP STAND - String Quartet No. 1
+=======================================
+
+What it is
+  The same stand as the website, running on this laptop.
+  Use it if the website cannot be reached at the venue.
+  The players' tablets join this laptop over Wi-Fi, so no internet is needed.
+
+
+ONCE, BEFORE THE DAY (at home)
+------------------------------
+1. Node must be installed on this laptop.
+   If START_BACKUP.bat says it is not, install the LTS version from https://nodejs.org
+
+2. Copy this whole folder onto the laptop, for example to C:\sq1-backup
+   (Unzip sq1-backup.zip there, if it came as a zip.)
+
+3. Rehearse it at home, exactly as on the day (below), with your phone's hotspot
+   and one tablet. This is the real test: it proves the phone lets the tablet
+   reach the laptop.
+
+4. The first time it runs, Windows may ask whether Node may use the network.
+   Tick BOTH boxes (Private and Public networks), then Allow.
+
+
+ON THE DAY, IF THE WEBSITE FAILS
+--------------------------------
+1. Turn on your phone's hotspot.
+
+2. Join the laptop AND every tablet to that hotspot.
+
+3. On the laptop, double-click START_BACKUP.bat
+   A black window opens. Keep it open the whole time.
+   The browser opens the LINK SHEET: one QR code per part.
+
+4. Each player scans their part's QR code with the tablet's camera, opens it
+   in Safari, waits for the bar, presses Open.
+   The film loads from the laptop, about 50 MB each, so allow a minute.
+
+5. Everything works as before: Play all, Stop all, Play alone.
+   The piece starts at the beginning.
+
+To stop: close the black window.
+
+
+GOOD TO KNOW
+------------
+- Tablets: set Auto-Lock to Never for the reading
+  (Settings > Display & Brightness > Auto-Lock).
+  The backup cannot keep the screens awake by itself.
+
+- Keep the laptop plugged in, and stop it from sleeping.
+
+- The links the players were emailed point at the website. They do NOT reach
+  the laptop. Use the QR codes on the link sheet.
+
+- If the sheet says the laptop is on no network: join the hotspot, close the
+  black window, double-click START_BACKUP.bat again.
+
+- The link sheet holds every player's link. Show it on the laptop screen only.

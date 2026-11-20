@@ -51,6 +51,27 @@
    together, no remote, the conductor on a tablet or phone. Annotations dropped for now; a little research later
    into how performers who read PDFs on iPads annotate.
 
+### THE BACKUP STAND ON THE LAPTOP (2026-11-20, his ask: "a local back up server that I can run on my win 10
+### laptop … links and instructions in case I need to use it, or even … my phone hotspot") — BUILT + PC-verified
+
+- **The package: `builds/backup/sq1-backup/` and `builds/backup/sq1-backup.zip` (266 MB; gitignored — it holds
+  every player's token).** Made by `node stand/tools/make_backup.js <the full score's link>`: the stand as in git,
+  its two dependencies installed, the five films, the print PDFs, `server/data/backup.json` (the live stand's
+  address and the full score's token) and `server/data/spare.json` (the live registry as of the making),
+  `START_BACKUP.bat`, `BACKUP_INSTRUCTIONS.txt`. The laptop needs only Node.
+- **`START_BACKUP.bat` → `stand/tools/backup_start.js`:** fetches the registry fresh from the live stand if the
+  internet is there (else the saved copy) · checks the films · starts `server/server.js --spare` on port 5302 —
+  **the players' emailed tokens work on it, with the laptop's address in place of the website's** · opens the
+  link sheet (each part's link with the laptop's address, a QR each). The players scan their QR code.
+- **Tested on this PC as the laptop would run it** (unzipped fresh into a scratch folder; a test port; no
+  browser opened): 6 of 6 — the files there, the registry fetched fresh, the spare running with the live
+  registry, five links with the PC's own address, Violin I's emailed token opening there at the start and
+  [Play all] running, the print PDFs served. **NOT tested:** the laptop itself (Node installed? the firewall's
+  question), a phone hotspot (whether the phone lets a tablet reach the laptop), a tablet over plain http (the
+  screen-awake lock needs https, so Auto-Lock → Never), the no-internet path (the saved registry copy).
+- **► HIS: copy the folder to the laptop, then rehearse it at home with the phone hotspot and one tablet**
+  (`BACKUP_INSTRUCTIONS.txt` "Once, before the day").
+
 ### OPEN AT SESSION END
 
 - **The room is stopped at the end of the piece** (the dress run). Harmless: a stand opened more than half an
