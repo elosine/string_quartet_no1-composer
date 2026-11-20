@@ -70,7 +70,7 @@
   question), a phone hotspot (whether the phone lets a tablet reach the laptop), a tablet over plain http (the
   screen-awake lock needs https, so Auto-Lock → Never), the no-internet path (the saved registry copy).
 - **The links as TEXT too (his ask, the same day):** under the QR codes on the link sheet (a plain block to
-  copy), in the black window, and in  beside  — to paste into a text message. They
+  copy), in the black window, and in `LINKS.txt` beside `START_BACKUP.bat` — to paste into a text message. They
   carry the laptop's address on the network it was started on. Tested: 7 of 7.
 - **► HIS: copy the folder to the laptop, then rehearse it at home with the phone hotspot and one tablet**
   (`BACKUP_INSTRUCTIONS.txt` "Once, before the day").
