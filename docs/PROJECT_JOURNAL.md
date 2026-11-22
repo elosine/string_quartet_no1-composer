@@ -80,6 +80,11 @@
   by removing Node's built-in `fetch`, which Node has only from version 18,** so the laptop's Node is very
   likely older (its version not yet read). **Fixed:** `backup_start.js` uses Node's own `http`/`https`; run the
   same way it starts and prints its links. The laptop takes the one new file with `curl.exe` from GitHub.
+  **✓ On the laptop, 2026-11-22: "it says running."**
+  **✓ THE HOTSPOT REHEARSAL PASSED, 2026-11-22 (his word): "it works on the hotspot, cursor moved"** — laptop and
+  iPad on his phone's hotspot, Violin I opened from the laptop's QR code, [Play all]. The backup is ready. Not
+  tried: more than one tablet on the hotspot · a whole-piece run on it · the phone's data use.
+  On the laptop the folder is `C:\Users\jwloy\Downloads\sq1-backup\sq1-backup`.
 
 ### OPEN AT SESSION END
 
