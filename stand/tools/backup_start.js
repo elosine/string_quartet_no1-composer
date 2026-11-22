@@ -17,6 +17,8 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const http = require('http');
+const https = require('https');
 const { spawn } = require('child_process');
 
 const STAND = path.join(__dirname, '..');
@@ -26,6 +28,18 @@ const SPARE = path.join(DATA, 'spare.json');
 const PORT = parseInt(process.env.BACKUP_PORT || '5302', 10);   // BACKUP_PORT: only for the AI's own test
 const FILMS = ['violin1', 'violin2', 'viola', 'cello', 'fullscore'];
 const say = s => console.log(s);
+// Node's own http, not fetch: fetch does not exist before Node 18, and a laptop may have an older Node (2026-11-22)
+function get(url, ms) {
+  return new Promise((resolve, reject) => {
+    const req = (url.startsWith('https:') ? https : http).get(url, res => {
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => (res.statusCode === 200 ? resolve(Buffer.concat(chunks).toString('utf8')) : reject(new Error('HTTP ' + res.statusCode))));
+    });
+    req.setTimeout(ms || 3000, () => req.destroy(new Error('timed out')));
+    req.on('error', reject);
+  });
+}
 const stop = (msg) => { console.log('\n!! ' + msg + '\n'); process.exitCode = 1; };
 
 (async () => {
@@ -35,11 +49,7 @@ const stop = (msg) => { console.log('\n!! ' + msg + '\n'); process.exitCode = 1;
 
   // 1. the registry: fresh from the live stand when it can be had, else the copy kept
   try {
-    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), 6000);
-    const r = await fetch(cfg.box + '/api/snapshot?token=' + encodeURIComponent(cfg.gatekeeper), { signal: ctl.signal });
-    clearTimeout(t);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
+    const j = JSON.parse(await get(cfg.box + '/api/snapshot?token=' + encodeURIComponent(cfg.gatekeeper), 6000));
     if (!j.ensembles) throw new Error('not a registry');
     fs.writeFileSync(SPARE, JSON.stringify(j, null, 1));
     say('links      fetched fresh from the live stand');
@@ -64,13 +74,13 @@ const stop = (msg) => { console.log('\n!! ' + msg + '\n'); process.exitCode = 1;
   server.on('exit', code => { say('\nThe backup stand has stopped' + (code ? ' (code ' + code + ')' : '') + '.'); process.exit(code || 0); });
   process.on('SIGINT', () => { server.kill(); });
 
-  let up = false;
+  let up = false, lastErr = '';
   for (let i = 0; i < 50 && !up; i++) {
     await new Promise(r => setTimeout(r, 200));
-    try { const h = await (await fetch('http://127.0.0.1:' + PORT + '/health')).json(); up = !!h.ok; } catch (e) { /* not yet */ }
+    try { up = !!JSON.parse(await get('http://127.0.0.1:' + PORT + '/health')).ok; } catch (e) { lastErr = e.message; }
   }
-  if (!up) { server.kill(); return stop('The server did not start. Is something else already using port ' + PORT + '? Close other windows of this, then try again.'); }
-  try { lan = (await (await fetch('http://127.0.0.1:' + PORT + '/api/info')).json()).lan || []; } catch (e) { lan = []; }
+  if (!up) { server.kill(); return stop('The server did not answer (' + lastErr + '; Node ' + process.version + '). Is something else already using port ' + PORT + '? Close other windows of this, then try again.'); }
+  try { lan = JSON.parse(await get('http://127.0.0.1:' + PORT + '/api/info')).lan || []; } catch (e) { lan = []; }
 
   // 4. the link sheet, in the browser
   const key = fs.readFileSync(path.join(DATA, 'admin.key'), 'utf8').trim();
@@ -81,7 +91,7 @@ const stop = (msg) => { console.log('\n!! ' + msg + '\n'); process.exitCode = 1;
   say('\nThe link sheet (opening in the browser now):\n  ' + sheet + '\n');
   // the links as text too: in this window, and in LINKS.txt beside START_BACKUP.bat, to copy into a message
   try {
-    const html = await (await fetch('http://127.0.0.1:' + PORT + '/admin/sheet?key=' + key)).text();
+    const html = await get('http://127.0.0.1:' + PORT + '/admin/sheet?key=' + key);
     const m = /<pre class="plain">([\s\S]*?)<\/pre>/.exec(html);
     if (m) {
       const text = m[1].replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');

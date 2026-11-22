@@ -75,6 +75,12 @@
 - **► HIS: copy the folder to the laptop, then rehearse it at home with the phone hotspot and one tablet**
   (`BACKUP_INSTRUCTIONS.txt` "Once, before the day").
 
+- **First run on the laptop (2026-11-22, his screenshot):** the server started (LAN 192.168.1.64:5302), then the
+  starter said "no internet" and "the server did not start". **The same two messages were reproduced on the PC
+  by removing Node's built-in `fetch`, which Node has only from version 18,** so the laptop's Node is very
+  likely older (its version not yet read). **Fixed:** `backup_start.js` uses Node's own `http`/`https`; run the
+  same way it starts and prints its links. The laptop takes the one new file with `curl.exe` from GitHub.
+
 ### OPEN AT SESSION END
 
 - **The room is stopped at the end of the piece** (the dress run). Harmless: a stand opened more than half an
